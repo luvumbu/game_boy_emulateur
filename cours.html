@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gameboy3 — apprendre à programmer</title>
+
+<style>
+  :root {
+    --fond: #14161b;
+    --panneau: #1c1f27;
+    --panneau-clair: #232733;
+    --bord: #2e3441;
+    --texte: #e6e9ef;
+    --gris: #8b93a5;
+    --vert: #9bbc5a;
+    --vert-sombre: #3d6b47;
+    --rouge: #e5646d;
+
+    color-scheme: dark;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fond); color: var(--texte); }
+
+  button {
+    font: inherit; color: var(--texte); background: var(--panneau-clair);
+    border: 1px solid var(--bord); border-radius: 6px; padding: 6px 12px; cursor: pointer;
+  }
+
+  button:hover:not(:disabled) { background: #2c3140; border-color: #3b4354; }
+  button.principal { background: var(--vert-sombre); border-color: var(--vert); font-weight: 600; }
+
+  .app { display: flex; flex-direction: column; min-height: 100vh; }
+
+  .entete {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 12px 20px; background: var(--panneau); border-bottom: 1px solid var(--bord);
+    position: sticky; top: 0; z-index: 5;
+  }
+
+  .marque { display: flex; align-items: center; gap: 12px; }
+
+  .marque span {
+    display: grid; place-items: center; width: 38px; height: 38px; border-radius: 8px;
+    background: linear-gradient(140deg, var(--vert), var(--vert-sombre));
+    color: #12251c; font-weight: 800;
+  }
+
+  .marque h1 { margin: 0; font-size: 16px; }
+  .marque p { margin: 2px 0 0; font-size: 12px; color: var(--gris); }
+  .pousse { flex: 1; }
+  .entete a { color: var(--vert); font-size: 13px; }
+
+  .corps { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 1px; background: var(--bord); flex: 1; }
+
+  /* --- le sommaire --- */
+
+  .sommaire { background: var(--panneau); padding: 16px 12px; }
+  .sommaire h2 { margin: 0 0 10px 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: var(--gris); }
+  .sommaire ol { list-style: none; margin: 0; padding: 0; counter-reset: lecon; }
+
+  .sommaire button {
+    display: block; width: 100%; text-align: left; border: 0; background: none;
+    padding: 7px 10px 7px 34px; border-radius: 6px; position: relative; line-height: 1.35;
+  }
+
+  .sommaire button::before {
+    counter-increment: lecon; content: counter(lecon);
+    position: absolute; left: 8px; top: 7px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--panneau-clair); color: var(--gris);
+    font-size: 10px; display: grid; place-items: center;
+  }
+
+  /* Le titre d'un niveau : il ne se clique pas, il situe. */
+  .sommaire li.partie {
+    padding: 14px 10px 5px; font-size: 10px; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--vert); opacity: .75;
+  }
+
+  .sommaire li.partie:first-child { padding-top: 2px; }
+
+  .sommaire button:hover { background: var(--panneau-clair); }
+  .sommaire li.active button { background: #2c3140; color: var(--texte); }
+  .sommaire li.active button::before { background: var(--vert); color: #12251c; font-weight: 700; }
+  .sommaire li.vue button::before { background: var(--vert-sombre); color: #dff0c8; }
+
+  /* --- la leçon --- */
+
+  .lecon { background: var(--panneau); padding: 22px 26px 40px; display: flex; flex-direction: column; gap: 16px; }
+
+  .lecon h2 { margin: 0; font-size: 22px; }
+
+  /* Où l'on en est, et ce que la leçon apporte : le niveau, le numéro, et la
+     mention d'un atelier quand il y en a un. Une difficulté qui monte doit se
+     voir, sinon la neuvième leçon a l'air aussi facile que la première. */
+  .reperes {
+    margin: 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    font-size: 11px; color: var(--gris);
+  }
+
+  .reperes span {
+    background: var(--panneau-clair); border: 1px solid var(--bord);
+    border-radius: 20px; padding: 3px 10px;
+  }
+
+  .reperes span.niveau { color: var(--vert); border-color: var(--vert-sombre); }
+
+  /* La difficulté se lit AUSSI en barre : « 7 / 10 » demande de compter, une
+     barre pleine aux trois quarts se voit sans lire. */
+  .reperes span.difficulte {
+    position: relative; padding-left: 10px; padding-right: 10px;
+    background:
+      linear-gradient(90deg, var(--vert-sombre) var(--part, 0%), transparent var(--part, 0%)),
+      var(--panneau-clair);
+  }
+  .reperes span.outil { color: #0e1a10; background: var(--vert); border-color: var(--vert); font-weight: 600; }
+  .lecon .idee { margin: 0; color: var(--vert); font-size: 15px; }
+  .lecon p { margin: 0; line-height: 1.65; max-width: 68ch; color: #d3d8e2; }
+  .lecon code { background: #0b0d10; border: 1px solid var(--bord); border-radius: 4px; padding: 1px 5px; color: var(--vert); font-size: .92em; }
+  .lecon strong { color: #fff; }
+
+  .travail { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+
+  textarea {
+    width: 100%; min-height: 340px; resize: vertical;
+    background: #0b0d10; color: var(--texte);
+    border: 1px solid var(--bord); border-radius: 8px; padding: 12px;
+    font-family: ui-monospace, 'Cascadia Mono', monospace;
+    font-size: 13px; line-height: 1.55; tab-size: 2;
+  }
+
+  textarea:focus { outline: none; box-shadow: inset 0 0 0 2px var(--vert); }
+
+  .console { display: flex; flex-direction: column; gap: 10px; }
+  .ecran { background: #0b0d10; border: 1px solid var(--bord); border-radius: 8px; padding: 10px; }
+  .ecran canvas { display: block; width: 100%; image-rendering: pixelated; border-radius: 4px; }
+
+  .etat {
+    font-size: 12px; line-height: 1.6; padding: 10px 12px; border-radius: 6px;
+    background: var(--panneau-clair); border: 1px solid var(--bord);
+    white-space: pre-wrap; font-family: ui-monospace, monospace;
+  }
+
+  .etat.erreur { background: #3a1f24; border-color: var(--rouge); color: #ffc9cd; }
+  .etat.bon { border-left: 3px solid var(--vert); }
+
+  .rangee { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .aide { font-size: 11px; line-height: 1.7; color: var(--gris); }
+  kbd { background: var(--panneau-clair); border: 1px solid var(--bord); border-radius: 4px; padding: 1px 5px; font-size: .85em; }
+
+  .avoir {
+    border-left: 3px solid var(--vert); background: #1f2a1c66;
+    padding: 10px 14px; border-radius: 0 6px 6px 0; font-size: 13px;
+  }
+
+  .avoir b { color: var(--vert); }
+
+  .pieds { display: flex; justify-content: space-between; gap: 12px; padding-top: 6px; }
+
+  /* --- le plan : poser ses tuiles a la souris --- */
+
+  .planzone { display: flex; flex-direction: column; gap: 10px; }
+
+  .planzone .bande { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+
+  .planzone .tuile {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 6px; min-width: 54px; font-size: 10px; color: var(--gris); flex: 0 0 auto;
+  }
+
+  .planzone .tuile canvas {
+    width: 34px; height: 34px; image-rendering: pixelated;
+    border: 1px solid var(--bord); border-radius: 3px; display: block;
+  }
+
+  .planzone .tuile.choisie { border-color: var(--vert); color: var(--texte); background: #2c3140; }
+
+  canvas.plan {
+    width: 100%; max-width: 400px; image-rendering: pixelated; cursor: crosshair;
+    border: 1px solid var(--bord); border-radius: 8px; touch-action: none;
+    background: #0b0d10;
+  }
+
+  /* --- l'atelier : peindre une tuile a la souris --- */
+
+  .dessinzone { display: flex; flex-direction: column; gap: 10px; }
+  .dessinzone .bande { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+
+  .dessinzone .tuile {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 6px; min-width: 54px; font-size: 10px; color: var(--gris); flex: 0 0 auto;
+  }
+
+  .dessinzone .tuile canvas {
+    width: 38px; height: 38px; image-rendering: pixelated;
+    border: 1px solid var(--bord); border-radius: 3px; display: block;
+  }
+
+  .dessinzone .tuile canvas.grand { width: 54px; height: 54px; }
+  .dessinzone .tuile.choisie { border-color: var(--vert); color: var(--texte); background: #2c3140; }
+  .dessinzone .tuile.neuve { justify-content: center; min-height: 58px; color: var(--texte); }
+
+  .grille { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+  .grille.vide { padding: 4px 0; }
+  .grille .rangee { width: 100%; justify-content: space-between; }
+
+  .toile {
+    width: 176px; height: 176px; image-rendering: pixelated; cursor: crosshair;
+    border: 1px solid var(--bord); border-radius: 6px; touch-action: none;
+    background-image:
+      linear-gradient(to right, #ffffff14 1px, transparent 1px),
+      linear-gradient(to bottom, #ffffff14 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  .cote { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .palette { display: flex; gap: 6px; }
+
+  .pastille { width: 30px; height: 30px; padding: 0; border-radius: 5px; border: 2px solid var(--bord); }
+  .pastille.choisie { border-color: var(--vert); box-shadow: 0 0 0 2px #9bbc5a55; }
+  .reel { image-rendering: pixelated; border: 1px solid var(--bord); }
+
+  /* --- la partition : ecrire un air a la souris --- */
+
+  .airzone { display: flex; flex-direction: column; gap: 10px; }
+
+  .airzone .bande { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+
+  .airzone .air {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 6px; font-size: 10px; color: var(--gris); flex: 0 0 auto;
+  }
+
+  .airzone .air canvas {
+    width: 64px; height: 26px; display: block;
+    border: 1px solid var(--bord); border-radius: 3px;
+  }
+
+  .airzone .air.choisi { border-color: var(--vert); color: var(--texte); background: #2c3140; }
+  .airzone .air.neuf { justify-content: center; min-height: 50px; color: var(--texte); }
+
+  .airzone .rangee { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .airzone .outil, .airzone .petit { padding: 5px 9px; font-size: 12px; }
+  .airzone .outil.choisi { background: var(--vert-sombre); border-color: var(--vert); color: var(--texte); }
+  .airzone .reglage { display: flex; align-items: center; gap: 6px; }
+
+  .airzone .reglage input {
+    width: 52px; font: inherit; font-size: 12px; text-align: right;
+    color: var(--texte); background: #0b0d10;
+    border: 1px solid var(--bord); border-radius: 5px; padding: 4px 6px;
+  }
+
+  /* La partition defile toute seule quand l'air est long : trente-deux pas ne
+     tiennent pas dans la colonne, et retrecir les pas les rendrait impossibles
+     a viser a la souris. */
+  .partition {
+    overflow-x: auto; max-width: 100%; padding-bottom: 4px;
+    border: 1px solid var(--bord); border-radius: 8px; background: #0b0d10;
+  }
+
+  .toile-air { display: block; cursor: crosshair; touch-action: none; image-rendering: pixelated; }
+
+  .partition-atelier { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+
+  @media (max-width: 1000px) {
+    .corps { grid-template-columns: 1fr; }
+    .travail { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="entete">
+    <div class="marque">
+      <span>JS</span>
+      <div>
+        <h1>Apprendre à programmer</h1>
+        <p id="combien">…</p>
+      </div>
+    </div>
+    <div class="pousse"></div>
+    <a href="tuto.html">les leçons du tutoriel</a> &nbsp; <a href="index.html">← l’atelier complet</a>
+  </header>
+
+  <main class="corps">
+    <nav class="sommaire">
+      <h2>Les leçons</h2>
+      <ol id="sommaire"></ol>
+    </nav>
+
+    <section class="lecon">
+      <p class="reperes" id="reperes"></p>
+      <h2 id="titre"></h2>
+      <p class="idee" id="idee"></p>
+      <div id="explication" style="display: flex; flex-direction: column; gap: 12px;"></div>
+
+      <div class="planzone" id="planzone" style="display: none;"></div>
+
+      <div class="dessinzone" id="dessinzone" style="display: none;">
+        <div class="bande" id="bande"></div>
+        <div class="grille vide" id="grille"></div>
+      </div>
+
+      <div class="airzone" id="airzone" style="display: none;">
+        <div class="bande" id="bande-airs"></div>
+        <div class="partition-atelier vide" id="grille-airs"></div>
+      </div>
+
+      <div class="travail">
+        <div>
+          <div class="rangee" style="margin-bottom: 8px;">
+            <button type="button" class="principal" id="lancer">▶ Compiler et lancer</button>
+            <button type="button" id="son">🔊 Son</button>
+            <button type="button" id="remettre">⟲ Remettre le code de la leçon</button>
+            <span class="aide">Le code est modifiable : c’est fait pour.</span>
+          </div>
+          <textarea id="source" spellcheck="false"></textarea>
+        </div>
+
+        <div class="console">
+          <div class="ecran"><canvas id="ecran" width="160" height="144"></canvas></div>
+          <p class="avoir" id="avoir"></p>
+          <div class="etat" id="etat"></div>
+          <p class="aide">
+            <kbd>↑↓←→</kbd> croix · <kbd>X</kbd> A · <kbd>Z</kbd> B ·
+            <kbd>Entrée</kbd> Start · <kbd>Maj</kbd> Select<br>
+            Clique la console avant de jouer.
+          </p>
+        </div>
+      </div>
+
+      <div class="pieds">
+        <button type="button" id="precedent">← leçon précédente</button>
+        <button type="button" id="suivant">leçon suivante →</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script type="module">
+import { analyser } from './compilateur/analyseur.js'
+import { compiler } from './compilateur/emetteur.js'
+import { fabriquer } from './compilateur/cartouche.js'
+import { GameBoy } from './emulateur.js'
+/* Le cours « Apprendre à programmer » : les mêmes outils que le tutoriel,
+   mais ses leçons à lui, dans l'ordre des notions. */
+import { COURS as LECONS, CHAPITRES as NIVEAUX } from './tuto/programmation.js'
+import { installer as installerPlan } from './tuto/plan.js'
+import { installer as installerAirs } from './editeur-airs.js'
+import { installer as installerDessin } from './editeur-tuiles.js'
+import { enrichir } from './tuto/enrichir.js'
+
+/** Les quatre nuances de l'écran vert d'origine. */
+const NUANCES = [[0xe0, 0xf8, 0xd0], [0x88, 0xc0, 0x70], [0x34, 0x68, 0x56], [0x08, 0x18, 0x20]]
+
+const $ = (id) => document.getElementById(id)
+const toile = $('ecran')
+const ctx = toile.getContext('2d')
+const image = ctx.createImageData(160, 144)
+
+const gb = new GameBoy()
+let romActuelle = null
+let tourne = false
+let courante = 0
+let plan = null
+let atelierAirs = null
+let atelierDessin = null
+
+/* --------------------------------------------------------------- le sommaire */
+
+const vues = new Set()
+
+function dessinerSommaire() {
+  const liste = $('sommaire')
+  liste.textContent = ''
+
+  LECONS.forEach((lecon, i) => {
+    /* Les niveaux, écrits dans le sommaire. Vingt titres à la file ne disent
+       pas où l'on va ; dix niveaux le disent d'un coup d'œil. Le titre paraît
+       dès que la difficulté change — rien n'est à tenir à jour à la main. */
+    if (lecon.difficulte !== LECONS[i - 1]?.difficulte) {
+      const entete = document.createElement('li')
+      entete.className = 'partie'
+      entete.textContent = `Chapitre ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`
+      liste.append(entete)
+    }
+
+    const li = document.createElement('li')
+    li.className = 'lecon'
+    if (i === courante) li.className += ' active'
+    else if (vues.has(i)) li.className += ' vue'
+
+    const bouton = document.createElement('button')
+    bouton.type = 'button'
+    bouton.textContent = lecon.titre
+    bouton.addEventListener('click', () => aller(i))
+
+    li.append(bouton)
+    liste.append(li)
+  })
+}
+
+/* ----------------------------------------------------------------- une leçon */
+
+/**
+ * Un paragraphe de leçon, tel qu'il s'affiche.
+ *
+ * La transformation elle-même vit dans « tuto/enrichir.js » : la page, le
+ * livret et l'atelier doivent en dire exactement la même chose. Elle a été
+ * écrite trois fois, et les trois copies ont fini par diverger.
+ */
+function paragraphe(texte) {
+  const p = document.createElement('p')
+  p.innerHTML = enrichir(texte)
+  return p
+}
+
+function aller(index) {
+  courante = index
+  vues.add(index)
+  const lecon = LECONS[index]
+
+  $('titre').textContent = lecon.titre
+  $('idee').textContent = lecon.idee
+
+  /*
+   * Les repères : le niveau, le numéro, et l'atelier s'il y en a un.
+   *
+   * Le niveau n'est pas écrit sur chaque leçon — seulement sur celle qui ouvre
+   * la section. On remonte donc jusqu'à la précédente qui le porte : ajouter
+   * une leçon au milieu d'un niveau ne demande alors rien d'autre.
+   */
+  const reperes = $('reperes')
+  reperes.textContent = ''
+
+
+  const repere = (texte, classe) => {
+    const balise = document.createElement('span')
+    balise.className = classe
+    balise.textContent = texte
+    reperes.append(balise)
+  }
+
+  repere(`Chapitre ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`, 'niveau')
+  repere(`leçon ${index + 1} sur ${LECONS.length}`, '')
+  /* Ici, « difficulte » est le numéro du chapitre : une jauge sur 10 ne
+     voudrait rien dire. On montre plutôt où l'on en est dans le chapitre. */
+  const duChapitre = LECONS.filter((l) => l.difficulte === lecon.difficulte)
+  repere(`${duChapitre.indexOf(lecon) + 1} / ${duChapitre.length} dans ce chapitre`, '')
+  if (lecon.dessin) repere('🎨 avec l’atelier de dessin', 'outil')
+  if (lecon.plan) repere('🖱 avec le plan', 'outil')
+  if (lecon.airs) repere('♪ avec la partition', 'outil')
+
+  const explication = $('explication')
+  explication.textContent = ''
+  for (const texte of lecon.texte) explication.append(paragraphe(texte))
+
+  const avoir = $('avoir')
+  avoir.textContent = ''
+  const etiquette = document.createElement('b')
+  etiquette.textContent = 'Ce qu’on doit voir : '
+  avoir.append(etiquette, document.createTextNode(lecon.aVoir))
+
+  $('source').value = lecon.code
+
+  /*
+   * Le plan n'apparaît que sur les leçons qui le demandent. Il est reconstruit
+   * à chaque fois plutôt que caché : il lit le programme au moment où on
+   * l'installe, et un plan gardé d'une leçon à l'autre montrerait les tuiles
+   * de la précédente.
+   */
+  const zone = $('planzone')
+  zone.textContent = ''
+  plan = null
+
+  if (lecon.plan) {
+    zone.style.display = 'flex'
+    plan = installerPlan({
+      zone,
+      lireSource: () => $('source').value,
+      ecrireSource: (texte) => { $('source').value = texte },
+      surChangement: compilerEtLancer,
+    })
+  } else {
+    zone.style.display = 'none'
+  }
+
+  /* L'atelier de dessin, sur la leçon des tuiles : la même chose que le code
+     au-dessus, faite à la souris. Les deux façons, côte à côte, sur la même
+     page — c'est tout l'objet de cette leçon. */
+  atelierDessin = null
+  $('dessinzone').style.display = lecon.dessin ? 'flex' : 'none'
+
+  if (lecon.dessin) {
+    atelierDessin = installerDessin({
+      bande: $('bande'),
+      grille: $('grille'),
+      lireSource: () => $('source').value,
+      ecrireSource: (texte) => { $('source').value = texte },
+      surChangement: compilerEtLancer,
+    })
+  }
+
+  /* La partition, sur la leçon qui parle de musique. Comme le plan, elle est
+     reconstruite à chaque fois : un atelier gardé d'une leçon à l'autre
+     montrerait l'air de la précédente — et le ferait entendre. */
+  if (atelierAirs) atelierAirs.arreter()
+  atelierAirs = null
+  $('airzone').style.display = lecon.airs ? 'flex' : 'none'
+
+  if (lecon.airs) {
+    atelierAirs = installerAirs({
+      bande: $('bande-airs'),
+      atelier: $('grille-airs'),
+      lireSource: () => $('source').value,
+      ecrireSource: (texte) => { $('source').value = texte },
+      surChangement: compilerEtLancer,
+      audio: () => {
+        ouvrirLeSon()
+        return audio ? { contexte: audio, sortie: volume } : null
+      },
+    })
+  }
+
+  /* Les deux pas voisins, annoncés par leur nom : une flèche seule oblige à
+     cliquer pour savoir où l'on va, et l'on enchaîne moins volontiers. */
+  const avant = LECONS[index - 1]
+  const apres = LECONS[index + 1]
+
+  $('precedent').disabled = !avant
+  $('suivant').disabled = !apres
+  $('precedent').textContent = avant ? `← ${index}. ${avant.titre}` : '← leçon précédente'
+  $('suivant').textContent = apres
+    ? `${index + 2}. ${apres.titre} →`
+    : '✓ tu es au bout des ' + LECONS.length
+
+  dessinerSommaire()
+  compilerEtLancer()
+  location.hash = 'lecon-' + (index + 1)
+  scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+/* ----------------------------------------------------------------- compiler */
+
+function compilerEtLancer() {
+  ouvrirLeSon()
+
+  try {
+    const { octets, base, variables, vecteurVBlank, couleur } = compiler(analyser($('source').value))
+    /* « couleur » porte le drapeau de l'en-tête : sans lui, une leçon en
+       couleur tournerait en quatre nuances. */
+    romActuelle = fabriquer(octets, base, 'LECON ' + (courante + 1), vecteurVBlank, couleur)
+
+    gb.loadRom(romActuelle)
+    tourne = true
+
+    const noms = [...variables.keys()]
+    $('etat').className = 'etat bon'
+    $('etat').textContent =
+      `${octets.length} octets de programme\n` +
+      `${noms.length} variable${noms.length > 1 ? 's' : ''}` + (noms.length ? ' : ' + noms.join(', ') : '')
+  } catch (erreur) {
+    tourne = false
+    $('etat').className = 'etat erreur'
+    $('etat').textContent = erreur.message
+  }
+}
+
+/* --------------------------------------------------------------- le son */
+
+/*
+ * La console calculait déjà ses échantillons ; personne ne les écoutait.
+ *
+ * L'émulateur mélange ses voix dans un tampon, et `drain()` le vide. Il
+ * suffisait de le verser dans la sortie audio du navigateur. On le fait en
+ * programmant de petits morceaux les uns derrière les autres, plutôt qu'avec
+ * un nœud de traitement en direct : c'est plus simple, cela ne demande aucun
+ * fichier de plus, et la latence d'une image ou deux ne s'entend pas.
+ *
+ * Un navigateur refuse de jouer avant que l'on ait cliqué quelque part — c'est
+ * la règle, et elle est bonne. Le contexte est donc ouvert au premier geste.
+ */
+let audio = null
+let volume = null
+let curseurAudio = 0
+let sonVoulu = true
+
+function ouvrirLeSon() {
+  if (audio) {
+    if (audio.state === 'suspended') audio.resume()
+    return
+  }
+  audio = new AudioContext()
+  volume = audio.createGain()
+  volume.gain.value = sonVoulu ? 0.25 : 0
+  volume.connect(audio.destination)
+  /* La console échantillonne au rythme du navigateur : sans cela, tout est
+     joué trop vite ou trop lentement, d'un demi-ton à chaque fois. */
+  gb.apu.frequenceEchantillonnage = audio.sampleRate
+  curseurAudio = audio.currentTime
+}
+
+function verserLeSon() {
+  if (!audio || audio.state !== 'running') return
+
+  const echantillons = gb.apu.drain()
+  if (!echantillons.length) return
+
+  const tampon = audio.createBuffer(1, echantillons.length, audio.sampleRate)
+  tampon.getChannelData(0).set(echantillons)
+
+  const source = audio.createBufferSource()
+  source.buffer = tampon
+  source.connect(volume)
+
+  /*
+   * Le curseur dit où poser le morceau suivant. S'il est passé — l'onglet
+   * était caché, la page a ramé —, on le remet devant plutôt que de jouer
+   * dans le passé ; et s'il prend trop d'avance, on le rattrape, sinon le son
+   * finirait par arriver une seconde après l'image.
+   */
+  const maintenant = audio.currentTime
+  if (curseurAudio < maintenant + 0.02) curseurAudio = maintenant + 0.06
+  if (curseurAudio > maintenant + 0.30) curseurAudio = maintenant + 0.10
+
+  source.start(curseurAudio)
+  curseurAudio += tampon.duration
+}
+
+/* ------------------------------------------------------------ faire tourner */
+
+function tick() {
+  requestAnimationFrame(tick)
+  if (!tourne || !romActuelle) return
+
+  gb.runFrame()
+  verserLeSon()
+
+  /* Une cartouche en couleur (le chapitre 8 du cours) se montre en couleur :
+     cinq bits par composante, étirés sur huit. */
+  const huitBits = (c) => (c << 3) | (c >> 2)
+  for (let i = 0; i < 160 * 144; i++) {
+    if (gb.ppu.couleur) {
+      const c = gb.ppu.couleurs[i]
+      image.data[i * 4] = huitBits(c & 31)
+      image.data[i * 4 + 1] = huitBits(c >> 5 & 31)
+      image.data[i * 4 + 2] = huitBits(c >> 10 & 31)
+      image.data[i * 4 + 3] = 255
+      continue
+    }
+    const [r, v, b] = NUANCES[gb.framebuffer[i] & 3]
+    image.data[i * 4] = r
+    image.data[i * 4 + 1] = v
+    image.data[i * 4 + 2] = b
+    image.data[i * 4 + 3] = 255
+  }
+
+  ctx.putImageData(image, 0, 0)
+}
+
+/* -------------------------------------------------------------- la manette */
+
+const TOUCHES = {
+  ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
+  KeyX: 'a', KeyZ: 'b', KeyW: 'b',
+  Enter: 'start', ShiftLeft: 'select', ShiftRight: 'select',
+}
+
+const presser = (evenement, enfonce) => {
+  if (evenement.target.tagName === 'TEXTAREA') return
+  const bouton = TOUCHES[evenement.code]
+  if (!bouton) return
+  evenement.preventDefault()
+  gb.setButton(bouton, enfonce)
+}
+
+addEventListener('keydown', (e) => presser(e, true))
+addEventListener('keyup', (e) => presser(e, false))
+addEventListener('blur', () => gb.releaseAllButtons())
+
+/* --------------------------------------------------------------- les boutons */
+
+$('lancer').addEventListener('click', compilerEtLancer)
+
+$('son').addEventListener('click', () => {
+  ouvrirLeSon()
+  sonVoulu = !sonVoulu
+  if (volume) volume.gain.value = sonVoulu ? 0.25 : 0
+  $('son').textContent = sonVoulu ? '🔊 Son' : '🔇 Muet'
+})
+$('remettre').addEventListener('click', () => {
+  $('source').value = LECONS[courante].code
+  compilerEtLancer()
+  if (plan) plan.rafraichir()
+  if (atelierAirs) atelierAirs.rafraichir()
+})
+
+/* Le programme tapé à la main change aussi le plan et la partition : ils suivent. */
+let attenteFrappe = 0
+$('source').addEventListener('input', () => {
+  clearTimeout(attenteFrappe)
+  attenteFrappe = setTimeout(() => {
+    if (plan) plan.rafraichir()
+    if (atelierAirs) atelierAirs.rafraichir()
+  }, 300)
+})
+$('precedent').addEventListener('click', () => aller(courante - 1))
+$('suivant').addEventListener('click', () => aller(courante + 1))
+
+/*
+ * Une fenêtre sur la console qui tourne, ouverte exprès. Tout ce qui précède
+ * vit dans un module : rien n'est visible depuis la console du navigateur, ni
+ * depuis un outil qui piloterait la page. On expose donc de quoi regarder à
+ * l'intérieur — c'est aussi ce qui permet de vérifier la page en la pilotant
+ * vraiment, plutôt qu'en relisant son code source et en espérant.
+ */
+window.inspecteur = {
+  get gb() { return gb },
+  get rom() { return romActuelle },
+  get lecon() { return courante },
+  nuances() { return new Set(gb.framebuffer).size },
+}
+
+/* Le sous-titre se compte tout seul : écrit à la main, il resterait à onze le
+   jour où l'on en ajoute une douzième. */
+$('combien').textContent =
+  LECONS.length + ' leçons, huit chapitres : variables, conditions, boucles, tableaux, fonctions, struct, nuances, couleur'
+
+/* On ouvre sur la leçon demandée dans l'adresse, ou sur la première. */
+const demandee = Number((location.hash.match(/lecon-(\d+)/) ?? [])[1])
+aller(demandee >= 1 && demandee <= LECONS.length ? demandee - 1 : 0)
+tick()
+</script>
+</body>
+</html>

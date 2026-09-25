@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Cours 7 — Et, ou, non : &amp;&amp; || !</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+
+  a { color: var(--vert); }
+  .navigation { display: flex; justify-content: space-between; gap: 12pt; margin-top: 18pt; font-size: 9.5pt; }
+  .sommaire-cours { list-style: none; padding: 0; margin: 0; }
+  .sommaire-cours li { padding: 2pt 0; }
+  .sommaire-cours li.chapitre {
+    color: var(--vert); font-weight: 700; text-transform: uppercase;
+    font-size: 9pt; letter-spacing: .05em; padding-top: 12pt;
+  }
+  .sommaire-cours .numero {
+    display: inline-grid; place-items: center; width: 16pt; height: 16pt; border-radius: 50%;
+    background: var(--vert-clair); color: var(--vert); font-size: 8pt; font-weight: 700; margin-right: 4pt;
+  }
+</style>
+</head>
+<body>
+
+<p class="reperes">
+  <span class="niveau">Chapitre 2 — Les conditions : choisir</span>
+  <span>leçon 3 sur 4 dans ce chapitre</span>
+  <span>7 sur 42 dans le cours</span>
+</p>
+<h1>7. Et, ou, non : &amp;&amp; || !</h1>
+<p class="idee">Une vraie question de jeu se pose rarement en une seule comparaison.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>« Le héros est-il dans la zone ? » veut dire : x est <strong>au moins</strong> 8, <strong>et</strong> x est <strong>au plus</strong> 12. Deux comparaisons, reliées par <code>&amp;&amp;</code> (<strong>et</strong>) : c’est vrai seulement si les <strong>deux</strong> le sont.</p>
+<p><code>||</code> (<strong>ou</strong>) est vrai si <strong>l’une au moins</strong> l’est : « au bord » veut dire x vaut 0 <strong>ou</strong> x vaut 19. <code>!</code> (<strong>non</strong>) retourne une réponse : <code>!dans</code> est vrai quand <code>dans</code> est faux.</p>
+<p>Ces opérateurs <strong>s’arrêtent dès que la réponse est connue</strong>. Dans <code>x &gt; 0 &amp;&amp; …</code>, si x vaut 0, la droite n’est même pas calculée. Ce n’est pas un détail : c’est ce qui permet d’écrire <code>if (x &gt; 0 &amp;&amp; …)</code> sans jamais lire une case avant le début d’un tableau.</p>
+<p>Regarde aussi la ligne qui déplace : <code>bouton(DROITE) &amp;&amp; x &lt; 19</code>. On n’avance que si la touche est enfoncée <strong>et</strong> qu’il reste de la place. C’est la garde du chapitre précédent : jamais de x = 255 par accident.</p>
+<p>Ranger une condition dans une variable nommée (<code>dans</code>) rend le code lisible : <code>if (dans)</code> se lit comme une phrase.</p>
+<p>Dernier détail : on ne réécrit l’écran <strong>que si x a changé</strong> (<code>x != ancien</code>). Écrire à l’écran prend du temps sur cette console — le chapitre des boucles dira exactement pourquoi.</p>
+<p><strong>À toi :</strong> ajoute une seconde zone, de 15 à 17, et affiche « ZONE 2 ».</p>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1702 octets</strong> de cartouche.</p>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  uint8_t x = 2;
+  uint8_t ancien = 0;         // different de x : force le premier dessin
+
+  texte(1, 1, "GAUCHE DROITE");
+  texte(8, 12, "|   |");        // la zone : de 8 a 12
+
+  while (true) {
+    image();
+
+    if (bouton(DROITE) &amp;&amp; x &lt; 19) x++;
+    if (bouton(GAUCHE) &amp;&amp; x &gt; 0) x--;
+
+    if (x != ancien) {
+      uint8_t dans = x &gt;= 8 &amp;&amp; x &lt;= 12;
+      uint8_t bord = x == 0 || x == 19;
+
+      texte(ancien, 10, " ");
+      texte(x, 10, "#");
+
+      if (dans) texte(1, 4, "DANS LA ZONE");
+      if (!dans) texte(1, 4, "HORS ZONE   ");
+
+      if (bord) texte(1, 6, "AU BORD");
+      else texte(1, 6, "       ");
+
+      ancien = x;
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACdklEQVR4nO3czW0aQQCAUR9TQo4pIrWkhpSbElJGjjlEcpANy+wfu3w86R0wRrNjPjEe0Nhvv//8Iuzt8BmwK4HjBI4TOE7gOIHjBI67E/jL12//jNx/+eXnb40//v3BVy89MclbFx2c/8Q8rw41d56nCzwR4GG3R2x7rVtXH3/kqYwG3uoJnTuOwLsHHl+aFgS+u/StDDz3V8ncwCdfnw9YoueOvzLw3YRewQffXh/46o5P4P8/w/hSvNWue8Nd9CbznAh8/lXa++A4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4JUd2Rs4Pfx5q2QmNR56vTjry0N2IwfGvHr962aiXTh14/JV69QylwPcDzz3/vOAw22DdwdOTa85XJ23/Cp5+NhecZV85nxe3yxI98cwObrK2nc8r23gXfev23D9FsYt+RGACBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjZgf+8O/jXvz/yJ3fksCDd3IGCwN///njncBnJnCcwHECx9lkxXmbFOeDjjiB4wSOEzhO4DiB4wSOEzju6QNffmj64QPUpxh/bwIfPP7eBD54/L0JfPD4exP44PH3JvDB4+9N4IPH35vAB4+/t6cPzDSB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzjuL7lT2r9ZVN2iAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACdklEQVR4nO3cQW4aMQBA0Sx7hC57iJ6lZ+hxe4Qeo8suKqUoIYMHxph8nvQWhCCPwxeOQU5efv/5RdjL8hkwlcBxAscJHCdwnMBxAsddCPzl67d/Ru4//fL9t8Yf//rgs5femORHFx2c/8Y8zw61d54PF3gjwN1ujzj2Wh9dffyRD2U08FFP6N5xBJ4eeHxpuiLwxaXvxsB7f5XsDfzg6/OCJXrv+DcGvpjQK3jx7dsDn93xCfz/Zxhfio/adR+4iz5knhuBH3+V9j44TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM47pojOyPnh98Pdd0JjXuer05aeehuxOD4Z49fPW3UUw8dePyVevYMpcCXA+89/3zFYbbBuoOnJ285X510/Ct4+9m84iz7jfN5clOW6I1ndnCTdex8ntnBu+iPbu/9UxS76HsEJkDgOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOG5Z4Df/hu7J/x/dPCsDD97JLRYH/v7zxyuBZxA4TuA4geNssuK8TYrzQUecwHECxwkcJ3CcwHECxwkc9+kDn37Y+eaDz08x/mwCLx5/NoEXjz+bwIvHn03gxePPJvDi8WcTePH4swm8ePzZPn1gtgkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHF/AWDo2r+qnudFAAAAAElFTkSuQmCC" alt="l’écran après DROITE">
+    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACdklEQVR4nO3czW0aQQCAUR9TQo4pIrWkhpSbElJGjjlEcpANy+wfu3w86R0wRrNjPjEe0Nhvv//8Iuzt8BmwK4HjBI4TOE7gOIHjBI67E/jL12//jNx/+eXnb40//v3BVy89MclbFx2c/8Q8rw41d56nCzwR4GG3R2x7rVtXH3/kqYwG3uoJnTuOwLsHHl+aFgS+u/StDDz3V8ncwCdfnw9YoueOvzLw3YRewQffXh/46o5P4P8/w/hSvNWue8Nd9CbznAh8/lXa++A4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4JUd2Rs4Pfx5q2QmNR56vTjry0N2IwfGvHr962aiXTh14/JV69QylwPcDzz3/vOAw22DdwdOTa85XJ23/Cp5+NhecZV85nxe3yxI98cwObrK2nc8r23gXfev23D9FsYt+RGACBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjZgf+8O/jXvz/yJ3fksCDd3IGCwN///njncBnJnCcwHECx9lkxXmbFOeDjjiB4wSOEzhO4DiB4wSOEzju6QNffmj64QPUpxh/bwIfPP7eBD54/L0JfPD4exP44PH3JvDB4+9N4IPH35vAB4+/t6cPzDSB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzjuL7lT2r9ZVN2iAAAAAElFTkSuQmCC" alt="l’écran après GAUCHE">
+    <figcaption><strong>GAUCHE</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Un # qui glisse avec GAUCHE et DROITE ; « DANS LA ZONE » entre les deux barres, « AU BORD » aux extrémités.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles sont ceux que <code>verification/verifier-cours.mjs</code>
+exige de cette leçon. Ils viennent d’être joués, et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>au départ, hors de la zone </li>
+
+  <li>après quelques pas, dans la zone <span class="detail"> (x = 9)</span></li>
+
+  <li>la garde &amp;&amp; l’arrête au bord, sans déborder <span class="detail"> (x = 19)</span></li>
+
+  <li>|| reconnaît le bord </li>
+</ul>
+
+<p class="navigation">
+  <span>← <a href="06-une-comparaison-est-un-nombre.html">6. Une comparaison est un nombre</a></span>
+  <span><a href="index.html">sommaire</a></span>
+  <span><a href="08-plusieurs-cas-else-if-puis-switch.html">8. Plusieurs cas : else if, puis switch</a> →</span>
+</p>
+
+<p class="pied">gameboy3 — apprendre à programmer, en écrivant pour la Game Boy</p>
+
+</body>
+</html>

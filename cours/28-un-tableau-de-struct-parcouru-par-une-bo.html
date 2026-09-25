@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Cours 28 — Un tableau de struct, parcouru par une boucle</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+
+  a { color: var(--vert); }
+  .navigation { display: flex; justify-content: space-between; gap: 12pt; margin-top: 18pt; font-size: 9.5pt; }
+  .sommaire-cours { list-style: none; padding: 0; margin: 0; }
+  .sommaire-cours li { padding: 2pt 0; }
+  .sommaire-cours li.chapitre {
+    color: var(--vert); font-weight: 700; text-transform: uppercase;
+    font-size: 9pt; letter-spacing: .05em; padding-top: 12pt;
+  }
+  .sommaire-cours .numero {
+    display: inline-grid; place-items: center; width: 16pt; height: 16pt; border-radius: 50%;
+    background: var(--vert-clair); color: var(--vert); font-size: 8pt; font-weight: 700; margin-right: 4pt;
+  }
+</style>
+</head>
+<body>
+
+<p class="reperes">
+  <span class="niveau">Chapitre 6 — Les struct : ce qui va ensemble</span>
+  <span>leçon 2 sur 4 dans ce chapitre</span>
+  <span>28 sur 42 dans le cours</span>
+</p>
+<h1>28. Un tableau de struct, parcouru par une boucle</h1>
+<p class="idee">Quatre ennemis, un tableau, une boucle : le code d’un seul, appliqué à tous.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><code>Ennemi troupe[4];</code> : un <strong>tableau</strong> dont chaque case est une <strong>struct</strong>. On écrit <code>troupe[i].x</code> — <strong>d’abord</strong> la case, <strong>puis</strong> le champ.</p>
+<p>Le code d’<strong>un</strong> ennemi est écrit <strong>une</strong> fois, dans une boucle <code>for</code> sur <code>i</code>. Qu’il y ait 4 ennemis ou 40, le code est le même : on change <code>COMBIEN</code>, c’est tout. C’est là que tout le cours se rejoint — variables, conditions, boucles, tableaux et struct dans le même bloc.</p>
+<p>Chaque ennemi a son <strong>sens</strong> : 1 vers la droite, 0 vers la gauche. Quand il touche un bord, on <strong>retourne</strong> son sens. Deux <code>if</code> pour avancer, deux pour faire demi-tour.</p>
+<p>Les ennemis ne bougent qu’<strong>une image sur huit</strong> — une seule condition autour de toute la boucle suffit. Et chacun est initialisé par une <strong>boucle aussi</strong> : sa ligne et sa colonne de départ se <strong>calculent</strong> à partir de <code>i</code>.</p>
+<p><strong>À toi :</strong> donne à chaque ennemi sa propre vitesse — un champ <code>lenteur</code>, et <code>images() % troupe[i].lenteur</code>.</p>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1817 octets</strong> de cartouche.</p>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. une constante — COMBIEN</p>
+    <pre><code>const uint8_t COMBIEN = 4;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un enregistrement — Ennemi</p>
+    <pre><code>struct Ennemi {
+  uint8_t x;
+  uint8_t y;
+  uint8_t sens;       // 1 : vers la droite, 0 : vers la gauche
+};</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un tableau — troupe</p>
+    <pre><code>Ennemi troupe[COMBIEN];</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  for (uint8_t i = 0; i &lt; COMBIEN; i++) {
+    troupe[i].x = 2 + i * 4;
+    troupe[i].y = 4 + i * 3;
+    troupe[i].sens = i % 2;
+  }
+
+  while (true) {
+    image();
+    if (images() % 8 != 0) continue;    // une image sur huit
+
+    for (uint8_t i = 0; i &lt; COMBIEN; i++) {
+      texte(troupe[i].x, troupe[i].y, " ");
+
+      if (troupe[i].sens == 1) troupe[i].x++;
+      else troupe[i].x--;
+
+      if (troupe[i].x == 19) troupe[i].sens = 0;
+      if (troupe[i].x == 0)  troupe[i].sens = 1;
+
+      texte(troupe[i].x, troupe[i].y, "X");
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABqklEQVR4nO3aMQrCUBBAQUuPYOn9T+MRPIalha0oBv1hnwNTpAw8NktgD9fbhbDD7m/ATwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3Dcq8DH0/npM4MIHPfmE/3oqu5c73ewuqOZ4Dg7OE7gOP/BcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcZMCuzDZQOC4SYFdeW4wLLC6nxoW2AR/alJgO3gDgeMmBWYDgeMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4cmAXIAL3lQO7wuwH/vO6/cAmuBzYDha4rxwYgfsEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4gdfZ5cJE4HUE7lt/5SnwaovP/wReygSX2cFxAvN9AscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxd7IxoNPwyeEKAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABoUlEQVR4nO3asQkCQRBAUUNLMLT/aizBMgzNjAS5PcXdfw9+sOHCY5hkTvfHTeFOf/+BfhrgeIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjlYHPl+vb96ECHK8M/HI9rG4f+OC6fWATXAa2gwH3KwMLcD/A8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxxvJWAXGgMBjrcSsCvJgRYDpru1xYBN8NZWAraDBwIcbyVgDQQ4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgd43r5ywQJ43gD3239FCnj2dp4XAp46E1zODo4HWJ8DHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMd7Ai8fwBuTOnWfAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>au bout d’une seconde — image 60</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABqUlEQVR4nO3cMQrCQBBA0ZQewdL7n8YjeAxLOysxkFWy+XnwipSBz2YIDLs8nnfClt3fgL8SOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7guHLgy/X28flUBI4rB353PW3dfuCT1+0HdoLLgc1ggfvKgRG4T+A4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhN4Xj/ZSBF4XgL3jW+FCjy7wXVBgafmBJeZwXECs07gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOO5bYDfFBQgct/KJdlvr0a3PYHUPzQmOM4PjBI7zHxwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwn8HaH2HgReDuB++bfOhV41Mx1BR7lBJeZwXECsz+B4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LgXKZmg0zy+f78AAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>au bout de trois secondes — image 180</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABsklEQVR4nO3csWkFMRBAwR+6BIfuvxqX4DIcOnDq6JCs1WNgggsPHrrlYNHr6/uTsNfxN2ArgeMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhN4vbf3jz+fjxB4PYH7frseryvwRhPqCryLE1xmBscJzP8ROE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI6bGHjURsTtBI6bGHjUVuLthgZWd5WhgZ3gVSYGNoMXEjhuYmAWEjhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOE/i8rRssAp8ncN++LVKBp9i0XijwCE5wmRkcJzDPCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHPQnsJrqLCBz38BPtNthbPJ/B6l7BCY4zg+MEjvMfHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHPcDS7+g028DPB4AAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>au bout de sept secondes — image 420</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Quatre X sur quatre lignes, qui vont et viennent d’un bord à l’autre, chacun dans son sens.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles sont ceux que <code>verification/verifier-cours.mjs</code>
+exige de cette leçon. Ils viennent d’être joués, et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>jamais deux X sur une ligne : l’ancienne case est effacée </li>
+
+  <li>chacun a parcouru plusieurs cases <span class="detail"> (20, 20, 20, 20 cases)</span></li>
+
+  <li>chacun a touché un bord, et a fait demi-tour </li>
+</ul>
+
+<p class="navigation">
+  <span>← <a href="27-une-struct-ce-qui-va-ensemble.html">27. Une struct : ce qui va ensemble</a></span>
+  <span><a href="index.html">sommaire</a></span>
+  <span><a href="29-une-methode-la-fonction-qui-connait-son-.html">29. Une méthode : la fonction qui connaît son objet</a> →</span>
+</p>
+
+<p class="pied">gameboy3 — apprendre à programmer, en écrivant pour la Game Boy</p>
+
+</body>
+</html>

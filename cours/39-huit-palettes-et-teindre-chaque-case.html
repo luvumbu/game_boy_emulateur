@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Cours 39 — Huit palettes, et teindre chaque case</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+
+  a { color: var(--vert); }
+  .navigation { display: flex; justify-content: space-between; gap: 12pt; margin-top: 18pt; font-size: 9.5pt; }
+  .sommaire-cours { list-style: none; padding: 0; margin: 0; }
+  .sommaire-cours li { padding: 2pt 0; }
+  .sommaire-cours li.chapitre {
+    color: var(--vert); font-weight: 700; text-transform: uppercase;
+    font-size: 9pt; letter-spacing: .05em; padding-top: 12pt;
+  }
+  .sommaire-cours .numero {
+    display: inline-grid; place-items: center; width: 16pt; height: 16pt; border-radius: 50%;
+    background: var(--vert-clair); color: var(--vert); font-size: 8pt; font-weight: 700; margin-right: 4pt;
+  }
+</style>
+</head>
+<body>
+
+<p class="reperes">
+  <span class="niveau">Chapitre 8 — La couleur : la Game Boy Color</span>
+  <span>leçon 3 sur 6 dans ce chapitre</span>
+  <span>39 sur 42 dans le cours</span>
+</p>
+<h1>39. Huit palettes, et teindre chaque case</h1>
+<p class="idee">Le ciel en bleu, le mur en brique, l’herbe en vert : chaque case de l’écran choisit sa palette.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>Une palette n’a que <strong>quatre</strong> teintes. Pour un ciel, un mur et de l’herbe, il en faut plus : la Game Boy Color en a <strong>huit</strong> pour le décor, numérotées de 0 à 7. Huit palettes de quatre : <strong>32 couleurs</strong> à l’écran en même temps pour le fond.</p>
+<p><code>teindre(colonne, ligne, palette)</code> dit quelle palette emploie <strong>une case</strong> de l’écran. Le choix est rangé dans une <strong>seconde carte</strong>, cachée derrière la première : pour chaque case, l’une dit <strong>quelle tuile</strong>, l’autre dit <strong>quelle palette</strong>. C’est le seul ajout de la couleur à la façon de dessiner — les tuiles, elles, ne changent pas.</p>
+<p>La contrainte à retenir : <strong>une case = une palette = quatre couleurs</strong>. On ne peut pas mettre cinq couleurs dans une même tuile de 8 × 8. Les graphistes découpent donc leurs dessins en tuiles qui tiennent chacune dans une palette.</p>
+<p>Et une même tuile peut servir avec <strong>des palettes différentes</strong> : l’herbe et le buisson ci-dessous sont le même dessin, <code>TOUFFE</code>, en palette 2 puis en palette 3. Une tuile, deux objets.</p>
+<p>Toutes ces écritures se font écran éteint (le VBlank, chapitre 3).</p>
+<p><strong>À toi :</strong> ajoute une rangée d’eau en palette 4, avec des bleus.</p>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1870 octets</strong> de cartouche.</p>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. un dessin — CIEL</p>
+    <pre><code>Tuile CIEL = {
+  "00000000", "00000000", "00000000", "00000000",
+  "00000000", "00000000", "00000000", "00000000",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAQ0lEQVR4nO3OMQ0AIBAAsfevDgnIYMQFx9CkAjr7rK9MPhASEhKqB0JCQkL1QEhISKgeCAkJCdUDISEhoXogJCT02AV28+laVDSizQAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — BRIQUE</p>
+    <pre><code>Tuile BRIQUE = {
+  "33333333", "11131111", "11131111", "33333333",
+  "13111113", "13111113", "33333333", "11131111",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAaklEQVR4nO3VsQ2AQAgF0CsdwdIRHcOxHO16abwLEXN5ya8o4DVA2/bjV2nlAiCgbNB1nxOJjeb6xAABAQEBAY2Cyr/p87mWC4CAskFfrvSbWUBAQEBAQKOgWKoNENB6oKx1zToEQEDLgTrfwhFolmA+lQAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un dessin — TOUFFE</p>
+    <pre><code>Tuile TOUFFE = {
+  "00000000", "00100100", "01201210", "12212221",
+  "22222222", "22322232", "23333333", "33333333",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAe0lEQVR4nO3OsQ2AMBBD0ZSMQMkQzMIMlBmDsRiBERiDkv7SWCeFQ7kvubX9yv1cv0oJFwACFAE6zmrSrwUIUAZQO7Tum4mvpRABARoPpAwp00pL2QEEaDyQb6hfAAHKCZrmxcR3puwAApQB1Na+DCBA44Fi7wEBSgB6AbEozvYgotCiAAAAAElFTkSuQmCC" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  /* Palette 0 : le ciel. */
+  couleurFond(0, 0, 18, 26, 31);
+  couleurFond(0, 3,  2,  4, 14);
+  /* Palette 1 : la brique. */
+  couleurFond(1, 1, 26, 12,  6);
+  couleurFond(1, 3, 10,  4,  2);
+  /* Palette 2 : l'herbe.  Palette 3 : un buisson plus sombre. */
+  couleurFond(2, 0, 18, 26, 31);
+  couleurFond(2, 1, 20, 31, 10);
+  couleurFond(2, 2,  8, 24,  4);
+  couleurFond(2, 3,  2, 12,  2);
+  couleurFond(3, 0, 18, 26, 31);
+  couleurFond(3, 1, 10, 20, 16);
+  couleurFond(3, 2,  4, 14,  8);
+  couleurFond(3, 3,  0,  6,  4);
+
+  ecran(0);
+  for (uint8_t c = 0; c &lt; 20; c++) {
+    for (uint8_t l = 0; l &lt; 10; l++) poser(c, l, CIEL);      // palette 0
+    for (uint8_t l = 10; l &lt; 14; l++) {
+      poser(c, l, BRIQUE);
+      teindre(c, l, 1);
+    }
+    poser(c, 14, TOUFFE);
+    teindre(c, 14, c &lt; 10 ? 2 : 3);    // le meme dessin, deux palettes
+    for (uint8_t l = 15; l &lt; 18; l++) {
+      poser(c, l, BRIQUE);
+      teindre(c, l, 1);
+    }
+  }
+  texte(4, 3, "HUIT PALETTES");
+  ecran(1);
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZElEQVR4nO3RAQkAIBDAwO8f0ArG0BQijIMLMNjsswib7wU8ZXCcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEX7UwmayQav8MAAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACiElEQVR4nO3b200jQRBG4QnBKTgEUiAEp0AIpEAIm4JT2RBIh31oa9bybX1di48jnYfiBzxTfeiix4jp1+dXwExPv4N4KAnGSTBOgnESjJNgnATjJBgnwTgJxkkwToJxEoyTYJwE4yQYJ8E4CcZJME6CcRKMk2CcBOP8D8GL5ftF9fhwcDDc/9Sx6x774mOv/8/X2bnnu+Snb9UUfHq5H3Td6654/nfd3lGCE/wkwcdG1qMFXzTqzxnRNwq+6FfGdxJ8UX1HwVffz/lXvH0HX9fdmSQ4wTdz6Wn59Mh6qOBLT79Xj+hjr3/3xe85GCfBOAnGSTBOgnESjJNgnATjJBgnwTgJxkkwToJxEoyTYJwE4yQYJ8E4CcZJME6CcRKMk2CcBOMkGCfBOAnGSTBOgnESjJNgnATjJBgnwTgJxkkwToJxEoyTYJwE4yQYJ8E4CcZJME6CcRKMk2CcBOMkGGdaLRcBM32+vQxWy8Vcb1P+rfME43kjGmc6+LMwknIgTzCeN6JxOmTheTsYpx2M5wnG80Y0To9JeJ5gPG9E43TIwvN2ME47GM8TjOeNaJwek/A8wXjeiMbpkIXn7WCcdjCeJxjPG9E4PSbheYLxvBGN0yELz/sHcJyN4PXXaqew89X6Y6dQ82k0//p7ORfbi0Lmq/XH8v11LrYXxcun0fzofxSjVvPR/Oh/FKNW82lu/ocwN/9D2AhevC3mJbDrTdsvf03b9TQ630fNR+f7qPl0cBVgDq8CzNPfaomH0jtZeJ5gPG9E4/TnQjxPMJ43onE6ZOF5OxinHYznCcbzRjROj0l4nmA8b0TjdMjC83YwTjsYzxOM541onB6T8DzBeN6IxumQhed/AASiGfiwhyEvAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Un ciel bleu clair, un mur de briques, et une bande d’herbe : verte à gauche, plus sombre à droite.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles sont ceux que <code>verification/verifier-cours.mjs</code>
+exige de cette leçon. Ils viennent d’être joués, et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>le ciel prend la palette 0 <span class="detail"> (18/26/31)</span></li>
+
+  <li>la brique prend la palette 1 <span class="detail"> (26/12/6)</span></li>
+
+  <li>l’herbe, à gauche, la palette 2 <span class="detail"> (8/24/4)</span></li>
+
+  <li>le même dessin à droite, la palette 3 <span class="detail"> (4/14/8)</span></li>
+</ul>
+
+<p class="navigation">
+  <span>← <a href="38-melanger-la-lumiere.html">38. Mélanger la lumière</a></span>
+  <span><a href="index.html">sommaire</a></span>
+  <span><a href="40-les-lutins-en-couleur.html">40. Les lutins en couleur</a> →</span>
+</p>
+
+<p class="pied">gameboy3 — apprendre à programmer, en écrivant pour la Game Boy</p>
+
+</body>
+</html>

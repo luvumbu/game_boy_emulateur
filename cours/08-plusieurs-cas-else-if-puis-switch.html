@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Cours 8 — Plusieurs cas : else if, puis switch</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+
+  a { color: var(--vert); }
+  .navigation { display: flex; justify-content: space-between; gap: 12pt; margin-top: 18pt; font-size: 9.5pt; }
+  .sommaire-cours { list-style: none; padding: 0; margin: 0; }
+  .sommaire-cours li { padding: 2pt 0; }
+  .sommaire-cours li.chapitre {
+    color: var(--vert); font-weight: 700; text-transform: uppercase;
+    font-size: 9pt; letter-spacing: .05em; padding-top: 12pt;
+  }
+  .sommaire-cours .numero {
+    display: inline-grid; place-items: center; width: 16pt; height: 16pt; border-radius: 50%;
+    background: var(--vert-clair); color: var(--vert); font-size: 8pt; font-weight: 700; margin-right: 4pt;
+  }
+</style>
+</head>
+<body>
+
+<p class="reperes">
+  <span class="niveau">Chapitre 2 — Les conditions : choisir</span>
+  <span>leçon 4 sur 4 dans ce chapitre</span>
+  <span>8 sur 42 dans le cours</span>
+</p>
+<h1>8. Plusieurs cas : else if, puis switch</h1>
+<p class="idee">« else if » range des intervalles ; « switch » aiguille sur des valeurs exactes.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>Une chaîne <code>if … else if … else</code> teste <strong>dans l’ordre</strong>, et s’arrête au <strong>premier</strong> cas vrai. C’est ce qui permet d’écrire <code>score &lt; 120</code> sans répéter <code>score &gt;= 60</code> : si l’on arrive là, c’est que le premier test a déjà échoué.</p>
+<p>L’ordre compte donc. Mets <code>score &lt; 120</code> en premier, et « BRONZE » ne s’affichera plus jamais : un score de 10 est aussi plus petit que 120.</p>
+<p><code>switch (valeur)</code> compare <strong>une</strong> valeur à des cas <strong>exacts</strong> : <code>case 0:</code>, <code>case 1:</code>. On saute directement au bon cas, puis <code>break;</code> sort du <code>switch</code>. <strong>Oublier <code>break</code></strong> fait tomber dans le cas suivant — c’est permis en C++, et c’est presque toujours un bogue. <code>default:</code> attrape tout ce qui n’a pas de case.</p>
+<p>Quand choisir lequel ? <code>else if</code> pour des <strong>intervalles</strong> (moins de 60, moins de 120…), <code>switch</code> pour une liste de <strong>valeurs précises</strong> — un numéro de monde, un écran de jeu, une direction.</p>
+<p>Toutes les réponses font <strong>six lettres</strong>, espaces compris : « OR    ». Chacune recouvre exactement la précédente.</p>
+<p><strong>À toi :</strong> ajoute une médaille « PLATINE » au-dessus de 200.</p>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1552 octets</strong> de cartouche.</p>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  uint8_t score = 0;
+
+  texte(1, 2, "SCORE:");
+  texte(1, 5, "MEDAILLE:");
+  texte(1, 8, "MONDE:");
+
+  while (true) {
+    image();
+    score++;                          // le score monte tout seul
+    nombre(12, 2, score);
+
+    /* des intervalles : else if, dans l'ordre */
+    if (score &lt; 60) {
+      texte(12, 5, "BRONZE");
+    } else if (score &lt; 120) {
+      texte(12, 5, "ARGENT");
+    } else {
+      texte(12, 5, "OR    ");
+    }
+
+    /* des valeurs exactes : switch */
+    switch (score / 60) {
+      case 0:  texte(12, 8, "PLAINE"); break;
+      case 1:  texte(12, 8, "GROTTE"); break;
+      case 2:  texte(12, 8, "CHATEAU"); break;
+      default: texte(12, 8, "?      "); break;
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC2klEQVR4nO3cPU7DQBBA4ZQcgZL7n4YjcAxKuigK3t3ZP3vy8qRXWA5EXn+O42Lg9vP7beBulx+BbU1geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMLwG8Mfn173D/aWf73qTw7dKVdd6H1+9/MhrwJHjXrWd8+zMrCXJVTsLPHMiMqw/0v04n8xK++8vZVhg9BZdgiztf9ruunVn61Hr/xpL+18DuIkXBC7dxC5ff3Dth2b1/Umu3Vngru3gnSDy6snAXdupltD4Du59emze0tNe6U1j4FO0ARIYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDi05VRiYxdkyABPdvnQwZGBpcMtmyZF3tkZ3KuGj8gqj8bnwYb2wyZp584Rx4c+By+Vhx+xNcGQt9CeD51g76V0amu4YS9wIvHK5bArx1cq/3Fh2ZLg2eh/l1DX4HD/887xNcP/7gedg3dcsHPuE7uPcTPHA+zwbueoquX7nxvzrc+rRZPw+r1jV8Prc8RRsggeEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMLyRiY6ZiYXDN0n+n+4iEx2lX4nsHxtWXAN8nyubmfvtnUWKvHoycNfxD8ygNc/bcLNz0ZG53zHgPJ0A3DxviYB7P/HJ788Dt+jhOfD4nwKtBD5nO3MzY7y9Y8IXfIKvAs7D/3bAb/gUXdpfmmdeft6ci7bjBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDw/gClVgWHTmSIxwAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC3UlEQVR4nO3cPW6sQBAAYYc+gkPf/zQ+go/h0NkKaZmZnj/orS2pAsTaK5gPeATt9/H792PgPm4/AtuawPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4DeDPr+9Hp/tLP9/1JadflarKQVaOPMNJ1YBLx3fcv2o75+o0j7lyaSa5ameBIwsxBpynx3GWHlqlX8lwgtFHdPOU6pBdj+5sHbUiwMcL4vaDj75kRe68+p0avPYTdrwEg8B5rt1Z4K7t4JMg8unFwHXOzKfQ+De462058kgvPbozrEVkKYL7XwPYAAkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhRacqI5MYOyZAgvu3ToYMDA0umWxZcl7tkZ3ncdFVY7PxPWP7I58GgVdtNwcul48Vt+/g55nI1wKeb+2gf2VkumsocS/wwuG6JcBbJ/d6H9GR6dLe8duNwPXt3p/n3cH14w+uQ+SGFrh9FjuA61pja3I/cNdbdP3Kjf/V4da3zfo6rDqv4fXc8hZtgASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwRiY6ZiYWTr8k+f90F5noKP1KZP/YsOIa4Mdc2czcb+8sUuTTi4G7jn9gBq25bsPNzkVH5n7HgPN0AXBz3RIB997xyZ/PA4/o4Tnw+J8CrQS+ZjtzM2O8vWPCN9zBdwHn4X874Dd8iy7tL80zL18356LtPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwvH/NwBsvCe52iAAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout d’une seconde — image 60</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC1ElEQVR4nO3cMU7DQBBA0ZQcgZL7n4YjcAxKuigi3vXs7tie/HzpF5EDkb3PNi4m3H5+vw3c7fI9sEMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxvB/jj8+ve5vbWzw99yOZHlaq/k6PbqwBH9jvrdc3ViexzC77IWbsKHFmIOeA63fdz8ybUUi9ygNFbdAuytf3f66Fbd7UetTaPsbU+FY4r+pAVufL6V2rrNK/f4ynYOnEj218SeOh18E4Qefdk4P5evfBD1tDTcuSWXvZM78d8ijZAAsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHjRqcrRWaTnj5qbAAluP3QyZGJoMGWyJeW49kd2nsdFs8Zm41vmtkfeDQJnvd4duEwfK96/gjvjoi8BvF7uoH9nZHpoKPFY4MThuhTgQyf3Rm/RkenS4DqsH9fk3+Dpn+ddwf39D67D0DSuwMnLFLkiV9bh0BP3jKfo/pkb/9bhVd8kSDyu6fU85CnaAAkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhzUx0rEwsbH5I8f90F5noaP1KZPvcsGIO8H2ubGXud3QWKfLuycBD+z8xg7a7btOtzkVH5n7ngOt0AvDuuhUCHr3ii9+fJ27R03Pg8a8CZQKf87pyK2O8o2PCF1zBVwHX4X874Dd8im5tb80zp6+bc9G2ncDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMY3h9q/hGP+w41PgAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout de trois secondes — image 180</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACy0lEQVR4nO3cQU7DMBBA0S45AkvufxqOwDFYskMVjSczsZ04ny/9RVQKSvxSN4sRj6/vTwP3uPwMbGoCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geHtAL+9f/y2+Xrr/aU/svmnVmvzDOOTX+GiIuDMeY86XnN1/kAm1yH4lfPrBc5c8DHg1QqANzenRS4wu0XHl7oLWdq616wF/Gr5DH/5aWcfsjKfvPiTGm9x6xdvwq0b+vJr7AUuHSd3gsxPFwGOz3aFS9j5Di49LWe29GXv9F3d0jrcA9gACQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geFlpyozkxgzJkCSr8+eDKkODZbmwKdOvOyP7LyOhY4am82/cuz1zE+TusOPN9d5xmji/ic4GAu9BXB/AyFL63wl8MDhuiHA5+zPya+k522vtG7J9RkMHB9X38/7BOfHaavrJnBqCU74Ds7vZLcBPrBltdai9LRZen1UB27c6vlfA2yABIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPCOTHQEkxit47v/v+jZc9HzJlV656JfT2j3Pa2bJri9Ltcdchxf1/BhnRRwa2w2OK6+f/1mDxneDLj6ib/F/ry56x4YMqwC969P79js2O1rzTI71iTg/pNfF3gd/lFz0bcB/s9P0dW56AxkADz3KdoACQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHh/QD2bh//shdURgAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout de sept secondes — image 420</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Le score monte : BRONZE/PLAINE, puis ARGENT/GROTTE, puis OR/CHATEAU.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles sont ceux que <code>verification/verifier-cours.mjs</code>
+exige de cette leçon. Ils viennent d’être joués, et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>au début : BRONZE, PLAINE <span class="detail"> (BRONZE, PLAINE )</span></li>
+
+  <li>une seconde plus tard : ARGENT, GROTTE <span class="detail"> (ARGENT, GROTTE )</span></li>
+
+  <li>encore une : OR, CHATEAU <span class="detail"> (OR    , CHATEAU)</span></li>
+</ul>
+
+<p class="navigation">
+  <span>← <a href="07-et-ou-non.html">7. Et, ou, non : &amp;&amp; || !</a></span>
+  <span><a href="index.html">sommaire</a></span>
+  <span><a href="09-la-boucle-du-jeu-while-true.html">9. La boucle du jeu : while (true)</a> →</span>
+</p>
+
+<p class="pied">gameboy3 — apprendre à programmer, en écrivant pour la Game Boy</p>
+
+</body>
+</html>

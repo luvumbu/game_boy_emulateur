@@ -1,0 +1,34 @@
+{
+  "name": "gameboy3",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Écrire une cartouche Game Boy en C++",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "demarrer": "node demarrer.mjs",
+    "bonjour": "node outils/gb3.mjs exemples/bonjour.cpp",
+    "compteur": "node outils/gb3.mjs exemples/compteur.cpp",
+    "puits": "node outils/gb3.mjs exemples/puits.cpp",
+    "tetris": "node outils/gb3.mjs exemples/tetris.cpp",
+    "mario": "node outils/gb3.mjs exemples/mario.cpp",
+    "musique": "node outils/gb3.mjs exemples/musique.cpp",
+    "methodes": "node outils/gb3.mjs exemples/methodes.cpp",
+    "couleur": "node outils/gb3.mjs exemples/couleur.cpp --capture 40 --grossir 3",
+    "surplace": "node outils/gb3.mjs exemples/surplace.cpp --capture 20 --grossir 3",
+    "exemples": "node outils/gb3.mjs exemples/bonjour.cpp && node outils/gb3.mjs exemples/compteur.cpp && node outils/gb3.mjs exemples/puits.cpp && node outils/gb3.mjs exemples/langage.cpp && node outils/gb3.mjs exemples/console.cpp && node outils/gb3.mjs exemples/musique.cpp && node outils/gb3.mjs exemples/sans-dessin.cpp && node outils/gb3.mjs exemples/minimal.cpp && node outils/gb3.mjs exemples/ligne.cpp && node outils/gb3.mjs exemples/damier.cpp && node outils/gb3.mjs exemples/lutin.cpp && node outils/gb3.mjs exemples/perso16.cpp && node outils/gb3.mjs exemples/surplace.cpp && node outils/gb3.mjs exemples/nuances.cpp && node outils/gb3.mjs exemples/ecrans.cpp && node outils/gb3.mjs exemples/chute.cpp && node outils/gb3.mjs exemples/menu.cpp && node outils/gb3.mjs exemples/tetris.cpp && node outils/gb3.mjs exemples/mario.cpp",
+    "verifier": "node verification/verifier-langage.mjs && node verification/verifier-methodes.mjs && node verification/verifier-console.mjs && node verification/verifier-airs.mjs && node verification/verifier-desassembleur.mjs && node verification/verifier-refus.mjs && node verification/verifier-couleur.mjs && node verification/verifier-surplace.mjs && node verification/verifier-retour.mjs && node verification/verifier-marche.mjs && node verification/verifier-exemples.mjs && node verification/verifier-tuto.mjs && node verification/verifier-tutoriels.mjs && node verification/verifier-inclusion.mjs && node verification/verifier-portage.mjs",
+    "verifier-export": "node verification/verifier-export.mjs",
+    "tutoriels": "node outils/tutoriels.mjs",
+    "reglages": "node outils/reglages.mjs",
+    "lancer": "node outils/lancer-tutoriels.mjs",
+    "frappe": "node verification/verifier-frappe.mjs",
+    "livret": "node outils/livret.mjs",
+    "fiche": "node outils/fiche-ecrans.mjs",
+    "desassembler": "node outils/desassembler.mjs",
+    "retour": "node verification/verifier-retour.mjs",
+    "projets": "node verification/verifier-projets.mjs"
+  }
+}

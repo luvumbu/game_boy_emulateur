@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Cours 40 — Les lutins en couleur</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+
+  a { color: var(--vert); }
+  .navigation { display: flex; justify-content: space-between; gap: 12pt; margin-top: 18pt; font-size: 9.5pt; }
+  .sommaire-cours { list-style: none; padding: 0; margin: 0; }
+  .sommaire-cours li { padding: 2pt 0; }
+  .sommaire-cours li.chapitre {
+    color: var(--vert); font-weight: 700; text-transform: uppercase;
+    font-size: 9pt; letter-spacing: .05em; padding-top: 12pt;
+  }
+  .sommaire-cours .numero {
+    display: inline-grid; place-items: center; width: 16pt; height: 16pt; border-radius: 50%;
+    background: var(--vert-clair); color: var(--vert); font-size: 8pt; font-weight: 700; margin-right: 4pt;
+  }
+</style>
+</head>
+<body>
+
+<p class="reperes">
+  <span class="niveau">Chapitre 8 — La couleur : la Game Boy Color</span>
+  <span>leçon 4 sur 6 dans ce chapitre</span>
+  <span>40 sur 42 dans le cours</span>
+</p>
+<h1>40. Les lutins en couleur</h1>
+<p class="idee">Le même personnage en rouge et en vert : deux joueurs pour une seule tuile.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>Les lutins ont <strong>huit palettes à eux</strong>, réglées par <code>couleurLutin(palette, teinte, rouge, vert, bleu)</code>. Comme en quatre nuances, <strong>l’indice 0 est transparent</strong> : il ne reste que trois couleurs visibles par lutin — on règle donc les teintes 1, 2 et 3.</p>
+<p><code>teindreLutin(numero, palette)</code> choisit la palette d’un lutin. Ici, le même <code>HEROS</code> est dessiné deux fois : en palette 0 (rouge) et en palette 1 (vert) — un joueur et son frère, comme dans les jeux de plateforme.</p>
+<p><strong>Le piège</strong> : <code>sprite()</code> <strong>remet la palette du lutin à 0</strong> chaque fois qu’on l’appelle. Pour un lutin qui bouge — donc qu’on repose à chaque image —, il faut rappeler <code>teindreLutin()</code> <strong>juste après</strong> <code>sprite()</code>. Oublie-le, et le frère vert redevient rouge dès qu’il fait un pas.</p>
+<p>Ici, le héros vert avance tout seul : son <code>teindreLutin</code> est dans la boucle, juste après son <code>sprite</code>.</p>
+<p>Huit palettes de lutins, trois couleurs visibles chacune : <strong>24 couleurs</strong> pour les personnages, en plus des 32 du décor — <strong>56</strong> à l’écran en même temps, le plafond de la console.</p>
+<p><strong>À toi :</strong> ajoute un troisième héros en bleu, palette 2, qui avance dans l’autre sens.</p>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1518 octets</strong> de cartouche.</p>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. un dessin — HEROS</p>
+    <pre><code>Tuile HEROS = {
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAfUlEQVR4nO3VsQ2AMBAEQYeUQEgR1EINhJRBWZRACZRBSI4Dn6xHQn8rbeq/yVyu+2w2jFNIylYBBMgAVB+a1yUkhQgIUD6QMr8f2ytlXnlVrwMC5An6LkCAHEC/+1wBATIAKcS+lC1AgBxAUaf77gAClA8UNR9FBAQoHegBTfQxdrUAfpcAAAAASUVORK5CYII=" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  /* Palette 0 des lutins : le rouge. Palette 1 : le vert. */
+  couleurLutin(0, 1, 31, 28, 20);
+  couleurLutin(0, 2, 31,  4,  2);
+  couleurLutin(0, 3, 10,  0,  0);
+  couleurLutin(1, 1, 28, 31, 20);
+  couleurLutin(1, 2,  4, 26,  2);
+  couleurLutin(1, 3,  0,  8,  0);
+
+  texte(1, 1, "DEUX FRERES");
+
+  sprite(0, 40, 70, HEROS);
+  teindreLutin(0, 0);
+
+  uint8_t x = 60;
+
+  while (true) {
+    image();
+
+    if (images() % 4 == 0 &amp;&amp; x &lt; 150) x++;
+    sprite(1, x, 70, HEROS);
+    teindreLutin(1, 1);          // apres CHAQUE sprite() : sinon il redevient rouge
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZElEQVR4nO3RAQkAIBDAwO8f0ArG0BQijIMLMNjsswib7wU8ZXCcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEGxxkcZ3CcwXEX7UwmayQav8MAAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACRElEQVR4nO3XQU4iQQBA0V66dDlbruIRvKNX8gocg0kG04MYkAak7J+X/EULRaqtZzXltN29K9w0/A70owGOBzge4HiA4wGOBzjeOeCnP5u5U68fvrX0+pJ5jz679H4WjT/zkfX2DfAipDsCP+x+Lpl31T0CeP7xwhUEfMeuBD71fDuzWJcv39Ln571eP3xrOMxg4EXj77uDL//TWTp+6ZhVtMrv4DNPjlvGLx2ziu55ij71iHvAIWvpqX7RqXvV+T84HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMNBn6dprmbfo2XaW74mv6qRi7H6zTtNs9zVxtPL9Pm/XmO8afFGTXxh+727QP438UVxnvd7e5tr7u/YPx/fUZNfLR9r97ER9vXJj5en4Fze0Q/IIeseIN38Ox6i/GhK+PjxRk18VfR64y/ijL+tBrD70A/GuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4fwEGoNxBwUqlwAAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACOElEQVR4nO3XS27aUABAUQ87zLBTtpIlZI/ZUrbAMqjURBahguLWH/n6SHdg4CF/Dn5+DOfLh8INmx+BFg1wPMDxAMcDHA9wPMDxHgH/+Hkau/f+9UdTt5/Z7813px7PpPEPvrLf/gI8CWlG4NWO55n97ro1gMeXT15BwDP2j8D35rcHF+v5yzd1/pzr/euPNofZGHjS+Hnv4Od/OlPHTx2zi3b5DH4wc/zP+KljdtGcq+h7U9wKi6ypq/pJq+5d539wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMfbGPhtGMYWPMnXYWzzK75yW57w2zBcTi9jCxkPr8Pp42XsaMabne2X7vn9C/j3xuzGn7rny/un7ufGoYy3Bv7eQsA3AV4pU/QKWWTF2/gOHl2XM752PaDxls/gG9EljP8UPZrxgU71mAGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGO9wujntxBzMc5dQAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout d’une seconde — image 60</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACQElEQVR4nO3XQU4iQQBA0V66dDlbruIRvKNX8gocg0kG00FGGNppKfrnJX/RQpGq1NOinPaHd4Wbhq9APxrgeIDjAY4HOB7geIDjXQN++rWbu/T66VtLn2+Z9+yzS9ezaPyVj2y3fwAvQloR+G7ruWXeTXcP4PnHG3cQ8Ip9E/jS+XZls27fvqXn51qvn741HGYw8KLx6/4F3/6rs3T80jGbaJPfwVdOjv8Zv3TMJlrzFn3piLvDJWvprX7RrXvT+T84HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMNBn6dprnhe/Gd7XuZ5oYv5usVDpz7dZoOu+e5zRlPL9Pu/XnuMY2HrelDd//2AfznYUPGR9394e2oe3x4QOPRwJ/bHPBZgD/liL7HIsdO75L14yscOPep6xaNT10f1njkd/CZ6LaM/xZ9TOOHW5DWDXA8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3C833q23EGBXr75AAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>au bout de trois secondes — image 180</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACPklEQVR4nO3XQW7iMABA0Sy77HK2XKVH6B17pV6BYzDSUEUUDRTTlDRfT3qLNBhh+TfGTPvDO2HT6jPgRwkcJ3CcwHECxwkcJ3DctcBPf3azS/dPXxq9vuVzz947Op+h8Vfesl1fBB6KtGDgh83nls/dtEcEnv+8cQUFXtCdgS/tb1cW6/blG90/l7p/+tLqYVYOPDR+2Sf49n+d0fGjYzZhk9/BV3aO74wfHbMJS56iL21xDzhkjZ7qh07dm+Z3cJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHrRz4dZpmq6/Fpk0v0+zT/RXn9DpNh93zTOO7TS/T7v15dtp4tTX9qLt/+wj870LjOxzr7g9vx7rHi7nx2oE/E/gOZ4/v2UNsiy74jVv0kUPWUn7pIWvuqvF3nHY9a7zmd/BZUY3v85+n9rT36vPjRwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkc9xdNDdxBqmk+uAAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout de sept secondes — image 420</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Deux petits personnages : un rouge immobile, un vert qui avance — et qui reste vert.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles sont ceux que <code>verification/verifier-cours.mjs</code>
+exige de cette leçon. Ils viennent d’être joués, et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>le premier est rouge <span class="detail"> (31/4/2)</span></li>
+
+  <li>le second a bougé <span class="detail"> (x = 79)</span></li>
+
+  <li>et il est toujours vert <span class="detail"> (4/26/2)</span></li>
+
+  <li>le coin reste transparent </li>
+</ul>
+
+<p class="navigation">
+  <span>← <a href="39-huit-palettes-et-teindre-chaque-case.html">39. Huit palettes, et teindre chaque case</a></span>
+  <span><a href="index.html">sommaire</a></span>
+  <span><a href="41-animer-les-couleurs-l-eau-qui-scintille.html">41. Animer les couleurs : l’eau qui scintille</a> →</span>
+</p>
+
+<p class="pied">gameboy3 — apprendre à programmer, en écrivant pour la Game Boy</p>
+
+</body>
+</html>

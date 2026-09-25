@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Cours 5 — if et else : deux chemins</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+
+  a { color: var(--vert); }
+  .navigation { display: flex; justify-content: space-between; gap: 12pt; margin-top: 18pt; font-size: 9.5pt; }
+  .sommaire-cours { list-style: none; padding: 0; margin: 0; }
+  .sommaire-cours li { padding: 2pt 0; }
+  .sommaire-cours li.chapitre {
+    color: var(--vert); font-weight: 700; text-transform: uppercase;
+    font-size: 9pt; letter-spacing: .05em; padding-top: 12pt;
+  }
+  .sommaire-cours .numero {
+    display: inline-grid; place-items: center; width: 16pt; height: 16pt; border-radius: 50%;
+    background: var(--vert-clair); color: var(--vert); font-size: 8pt; font-weight: 700; margin-right: 4pt;
+  }
+</style>
+</head>
+<body>
+
+<p class="reperes">
+  <span class="niveau">Chapitre 2 — Les conditions : choisir</span>
+  <span>leçon 1 sur 4 dans ce chapitre</span>
+  <span>5 sur 42 dans le cours</span>
+</p>
+<h1>5. if et else : deux chemins</h1>
+<p class="idee">Le programme ne fait pas tout : il choisit ce qu’il fait, image après image.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><code>if (condition) { … }</code> exécute le bloc <strong>seulement si</strong> la condition est vraie. <code>else { … }</code> donne le chemin <strong>sinon</strong>. Un seul des deux blocs s’exécute, jamais les deux.</p>
+<p><code>bouton(A)</code> rend 1 quand A est enfoncé, 0 sinon. Pour <code>if</code>, <strong>0 veut dire faux, et tout le reste veut dire vrai</strong> — il n’y a pas d’autre définition de « vrai » dans la machine.</p>
+<p><strong>Les huit touches de la Game Boy</strong>, toutes lues par <code>bouton()</code> : <code>A</code> et <code>B</code> (les deux boutons ronds), <code>HAUT</code>, <code>BAS</code>, <code>GAUCHE</code> et <code>DROITE</code> (la croix), <code>START</code> et <code>SELECT</code> (les deux petits boutons du milieu). Chacune a sa ligne à l’écran, avec son nom.</p>
+<p><strong>Tant qu’on tient une touche, son nom clignote</strong>, et il reste affiché dès qu’on la lâche. Pour clignoter, il faut une horloge : <code>images()</code> compte les images depuis l’allumage, soixante par seconde. <code>images() / 16</code> avance d’un toutes les seize images, et <code>% 2</code> n’en garde que le reste : <strong>0, 1, 0, 1…</strong> — c’est le rythme du clignotement.</p>
+<p>C’est un <strong><code>if</code> dans un <code>if</code></strong> : le premier demande si la touche est tenue ; le second, seulement dans ce cas, choisit entre des espaces (autant que de lettres : quatre pour « HAUT », six pour « GAUCHE ») et le nom. 1 veut dire vrai, 0 faux : on n’a rien à comparer. Le <code>else</code> du premier réécrit le nom — sans lui, une touche lâchée au mauvais moment laisserait son nom effacé.</p>
+<p>Les huit <code>if</code> sont <strong>indépendants</strong> : on peut tenir plusieurs touches à la fois — la croix et A, par exemple, comme pour sauter en courant — et plusieurs noms clignotent en même temps.</p>
+<p>Le test est refait <strong>à chaque image</strong>, soixante fois par seconde, parce qu’il est dans la boucle du jeu. C’est ce qui rend le programme réactif : il repose sans cesse la même question, et la réponse change quand le joueur agit.</p>
+<p>Au clavier de l’ordinateur : les <strong>flèches</strong> pour la croix, <strong>X</strong> pour A, <strong>Z</strong> pour B (ou l’inverse, dans les réglages), <strong>Entrée</strong> pour START et <strong>Maj</strong> pour SELECT — et chacune se change dans ⚙ Options, « Les touches du clavier ».</p>
+<p><strong>Chaque <code>texte()</code> attend son moment</strong> : la console n’écrit à l’écran que pendant un court instant à chaque image — le chapitre 12 l’explique. Huit touches, huit écritures : un tour de boucle dure donc <strong>huit images</strong>, et l’on voit un tout petit retard entre l’appui et le premier clignotement. Le chapitre 12 montre comment n’écrire que ce qui change.</p>
+<p><strong>À toi :</strong> fais clignoter la touche A deux fois plus vite. Que faut-il changer dans <code>images() / 16</code> ?</p>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1960 octets</strong> de cartouche.</p>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  texte(1, 2, "TIENS UNE TOUCHE");
+
+  while (true) {
+    image();
+
+    /* Tenue : son nom clignote. Lâchée : il reste affiché. */
+    if (bouton(A)) {
+      if ((images() / 16) % 2) {
+        texte(4, 5, " ");
+      } else {
+        texte(4, 5, "A");
+      }
+    } else {
+      texte(4, 5, "A");
+    }
+    if (bouton(B)) {
+      if ((images() / 16) % 2) {
+        texte(4, 6, " ");
+      } else {
+        texte(4, 6, "B");
+      }
+    } else {
+      texte(4, 6, "B");
+    }
+    if (bouton(HAUT)) {
+      if ((images() / 16) % 2) {
+        texte(4, 7, "    ");
+      } else {
+        texte(4, 7, "HAUT");
+      }
+    } else {
+      texte(4, 7, "HAUT");
+    }
+    if (bouton(BAS)) {
+      if ((images() / 16) % 2) {
+        texte(4, 8, "   ");
+      } else {
+        texte(4, 8, "BAS");
+      }
+    } else {
+      texte(4, 8, "BAS");
+    }
+    if (bouton(GAUCHE)) {
+      if ((images() / 16) % 2) {
+        texte(4, 9, "      ");
+      } else {
+        texte(4, 9, "GAUCHE");
+      }
+    } else {
+      texte(4, 9, "GAUCHE");
+    }
+    if (bouton(DROITE)) {
+      if ((images() / 16) % 2) {
+        texte(4, 10, "      ");
+      } else {
+        texte(4, 10, "DROITE");
+      }
+    } else {
+      texte(4, 10, "DROITE");
+    }
+    if (bouton(START)) {
+      if ((images() / 16) % 2) {
+        texte(4, 11, "     ");
+      } else {
+        texte(4, 11, "START");
+      }
+    } else {
+      texte(4, 11, "START");
+    }
+    if (bouton(SELECT)) {
+      if ((images() / 16) % 2) {
+        texte(4, 12, "      ");
+      } else {
+        texte(4, 12, "SELECT");
+      }
+    } else {
+      texte(4, 12, "SELECT");
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADAUlEQVR4nO3dQU7jMBhAYZZzBJbc/zRzhDkGSxZIaBRi179j+3denvQJVWkbtTzFiZtQ3v59/hXYW/or0FQGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8PVAv95//jf6V0tjy/dPjzl5WttWefhdnT90ff78n01vv7Q6xwW+PSlV5ZXHvlzV+WXciXwkPW3vK/Zt4dbFPjwc3jgIeufETi6nt0D14emxqGvL/Dv9feNe1MDl3Zhk8bnpVtwdG0dgd2CDbw68F33wUOOojuGpgVHp+3vN7p806No3ZqB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3KLA8y4qU92KwMuuP9JvBoZbFHjqpb+qcAuGMzCcgeGcB8OtPshKf8NP4xANZ2A4h2g4t2A4A8M5RMM5D4ZLHqL3+Ut4qszAfd9fYdoQA8Nlng/u+OpDA0e5BcMZGG7HwPWrMA0c4jwYLvmTrJfL3V4v2nGINupABobLHKKjX6GvDjtuwaXnqoOB4ZKH6NJth+hRnAfDJf998H3/H9Fd7LgPnnH7sVYHLi0fdSBm4IN1ga+fD64EXv//iO7irkN0dP2PddfA7oMbrT6Kvng+2KPoKOfBcLucbCg9pWV59KK+R7nTPri0JPrIRzEwXHLg6EeV0cAPH5/zA79M6BZ8UX7g0zlSJZKBQ3Y8Hxw9ij5dg0fR35wHwyV/khW66K7j4j1lni4s3Tt2+vRwBobL/0r/9oOj+jhs4FOrD7JatrzovLm0Ht0ycKmlgU/lf0+W++CpnAfD7TgPruxlu+fNj92+d7lsdtRyh+4DWuDovXiZ8+CWkxBXHt9yL17mNMkteAFaYPfBB7tcVdl4dB06iv65K/23nMh5MJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3BeCC2eJOktvJAAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADAUlEQVR4nO3dQU7jMBhAYZZzBJbc/zRzhDkGSxZIaBRi179j+3denvQJVWkbtTzFiZtQ3v59/hXYW/or0FQGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8PVAv95//jf6V0tjy/dPjzl5WttWefhdnT90ff78n01vv7Q6xwW+PSlV5ZXHvlzV+WXciXwkPW3vK/Zt4dbFPjwc3jgIeufETi6nt0D14emxqGvL/Dv9feNe1MDl3Zhk8bnpVtwdG0dgd2CDbw68F33wUOOojuGpgVHp+3vN7p806No3ZqB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3KLA8y4qU92KwMuuP9JvBoZbFHjqpb+qcAuGMzCcgeGcB8OtPshKf8NP4xANZ2A4h2g4t2A4A8M5RMM5D4ZLHqL3+Ut4qszAfd9fYdoQA8Nlng/u+OpDA0e5BcMZGG7HwPWrMA0c4jwYLvmTrJfL3V4v2nGINupABobLHKKjX6GvDjtuwaXnqoOB4ZKH6NJth+hRnAfDJf998H3/H9Fd7LgPnnH7sVYHLi0fdSBm4IN1ga+fD64EXv//iO7irkN0dP2PddfA7oMbrT6Kvng+2KPoKOfBcLucbCg9pWV59KK+R7nTPri0JPrIRzEwXHLg6EeV0cAPH5/zA79M6BZ8UX7g0zlSJZKBQ3Y8Hxw9ij5dg0fR35wHwyV/khW66K7j4j1lni4s3Tt2+vRwBobL/0r/9oOj+jhs4FOrD7JatrzovLm0Ht0ycKmlgU/lf0+W++CpnAfD7TgPruxlu+fNj92+d7lsdtRyh+4DWuDovXiZ8+CWkxBXHt9yL17mNMkteAFaYPfBB7tcVdl4dB06iv65K/23nMh5MJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3BeCC2eJOktvJAAAAABJRU5ErkJggg==" alt="l’écran après A">
+    <figcaption><strong>A</strong> — l’écran n’a pas bougé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC+0lEQVR4nO3dQU7jMBhAYZZzBJbc/zRzhDkGSxZIaBRi17/j+LdfnvQJVU0btTwlsZtQ3v59/hXYW/or0K0MDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoarBf7z/vG/00Utjy/dPjzl5WttWefhdnT90ff78n01vv7Q6xwW+PSlV+6vPPJnUeWXciXwkPW3vK+7bw83KfDh5/DAQ9Z/R+DoelYPXN81Ne76+gL/Xn/ffu/WwKVD2E3756lbcHRtHYHdgg08O/Cux+Aho+iOXdOE0Wn7+43ev+goWlszMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhpsU+L6LylQ3I/C064/0m4HhJgW+9dJfVbgFwxkYzsBwzoPhDAxnYDgDwxkYzsBwBoYzMJyB4ZI/yVrnL+GpMgP3fX+FaUMMDJd5Prjjqw8NHOUWDGdguBUD16/CNHCI82C42YOs0qL2pyhkxV20UQcyMFzmLjr6FfrqsOIWXHquOhgYLnkXXbrtLnoU58FwyX8fvO//I9rFisfgLf4Xwi5mBy7dP2ogZuCDeYGvnw+uBJ7//4h2sesuOrr+x9o1sMfgRrNH0RfPBzuKjnIeDLfKyYbSU1ruj17U9yg7HYNL90Qf+SgGhksOHP2oMhr44fvn/MAvE7oFX5Qf+HSOVIlk4JAVzwdHR9Gna3AU/c15MFzyJ1mhi+46Lt5T5unC0tKx06eHMzBc/lf6tw+O6vthA5+aPchq2fKi8+bSerRl4FJLA59K/utCj8F3cx4Mt+I8uHKU7Z43P3b7XuWy2VH3u+s+oAWOLsXLnAe3nIS48viWpXiZ0yS34AlogT0GH6xyVWXj6Do0iv5ZlP5bTuQ8GM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkY7gvGZJepNza0VwAAAABJRU5ErkJggg==" alt="l’écran après B">
+    <figcaption><strong>B</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADAUlEQVR4nO3dQU7jMBhAYZZzBJbc/zRzhDkGSxZIaBRi179j+3denvQJVWkbtTzFiZtQ3v59/hXYW/or0FQGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8PVAv95//jf6V0tjy/dPjzl5WttWefhdnT90ff78n01vv7Q6xwW+PSlV5ZXHvlzV+WXciXwkPW3vK/Zt4dbFPjwc3jgIeufETi6nt0D14emxqGvL/Dv9feNe1MDl3Zhk8bnpVtwdG0dgd2CDbw68F33wUOOojuGpgVHp+3vN7p806No3ZqB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3KLA8y4qU92KwMuuP9JvBoZbFHjqpb+qcAuGMzCcgeGcB8OtPshKf8NP4xANZ2A4h2g4t2A4A8M5RMM5D4ZLHqL3+Ut4qszAfd9fYdoQA8Nlng/u+OpDA0e5BcMZGG7HwPWrMA0c4jwYLvmTrJfL3V4v2nGINupABobLHKKjX6GvDjtuwaXnqoOB4ZKH6NJth+hRnAfDJf998H3/H9Fd7LgPnnH7sVYHLi0fdSBm4IN1ga+fD64EXv//iO7irkN0dP2PddfA7oMbrT6Kvng+2KPoKOfBcLucbCg9pWV59KK+R7nTPri0JPrIRzEwXHLg6EeV0cAPH5/zA79M6BZ8UX7g0zlSJZKBQ3Y8Hxw9ij5dg0fR35wHwyV/khW66K7j4j1lni4s3Tt2+vRwBobL/0r/9oOj+jhs4FOrD7JatrzovLm0Ht0ycKmlgU/lf0+W++CpnAfD7TgPruxlu+fNj92+d7lsdtRyh+4DWuDovXiZ8+CWkxBXHt9yL17mNMkteAFaYPfBB7tcVdl4dB06iv65K/23nMh5MJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3BeCC2eJOktvJAAAAABJRU5ErkJggg==" alt="l’écran après DROITE">
+    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADAUlEQVR4nO3dQU7jMBhAYZZzBJbc/zRzhDkGSxZIaBRi179j+3denvQJVWkbtTzFiZtQ3v59/hXYW/or0FQGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8PVAv95//jf6V0tjy/dPjzl5WttWefhdnT90ff78n01vv7Q6xwW+PSlV5ZXHvlzV+WXciXwkPW3vK/Zt4dbFPjwc3jgIeufETi6nt0D14emxqGvL/Dv9feNe1MDl3Zhk8bnpVtwdG0dgd2CDbw68F33wUOOojuGpgVHp+3vN7p806No3ZqB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3KLA8y4qU92KwMuuP9JvBoZbFHjqpb+qcAuGMzCcgeGcB8OtPshKf8NP4xANZ2A4h2g4t2A4A8M5RMM5D4ZLHqL3+Ut4qszAfd9fYdoQA8Nlng/u+OpDA0e5BcMZGG7HwPWrMA0c4jwYLvmTrJfL3V4v2nGINupABobLHKKjX6GvDjtuwaXnqoOB4ZKH6NJth+hRnAfDJf998H3/H9Fd7LgPnnH7sVYHLi0fdSBm4IN1ga+fD64EXv//iO7irkN0dP2PddfA7oMbrT6Kvng+2KPoKOfBcLucbCg9pWV59KK+R7nTPri0JPrIRzEwXHLg6EeV0cAPH5/zA79M6BZ8UX7g0zlSJZKBQ3Y8Hxw9ij5dg0fR35wHwyV/khW66K7j4j1lni4s3Tt2+vRwBobL/0r/9oOj+jhs4FOrD7JatrzovLm0Ht0ycKmlgU/lf0+W++CpnAfD7TgPruxlu+fNj92+d7lsdtRyh+4DWuDovXiZ8+CWkxBXHt9yL17mNMkteAFaYPfBB7tcVdl4dB06iv65K/23nMh5MJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3BeCC2eJOktvJAAAAABJRU5ErkJggg==" alt="l’écran après GAUCHE">
+    <figcaption><strong>GAUCHE</strong> — l’écran n’a pas bougé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC8ElEQVR4nO3dQW7qMBgAYZY9Qpe9/2l6hB6jyy4qIRRix05s//ZkpE9PiEAEHcWJIY88fn6/BfYIfwXqysBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdguFzgj8+vV7uLSh6fur15yuFrLVnn5nbt+mvf7+H7Knz9Va+zWeDdl565P/PI56LMH+VK4CbrL3lfvW83Nyjw5t/mgZusv0fg2vXMHjg/NBUOfecCv6//3LjXNXBqF9ZpfB66Bdeu7URgt2ADjw686j64yVH0iaFpwNFp+futvX/So2gtzcBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRhuUOB+J5Upb0TgYecf6Z2B4QYF7nrqrzLcguEMDGdgOOfBcKMPssLf8N04RMMZGM4hGs4tGM7AcA7RcM6D4QwMZ2A4A8MZGM7AcAaGMzCcgeGCP8k6vN8Pvy6K/Cw65Lcb78bAcJFDdO1P6OuEGbfg1HN1goHhgofo1G2H6FacB8MF///gda9HtIoZ98FLXAthFaMDp+5f7momqxgXOH+9oIuBx1+PaBWrDtG167+tVQO7Dy40+ii6MMb81yNahfNguFm+bEg9peT+koMst+CO2u5Hyz+1vm3UVwaGCw5c+1FlbeCbj8/xgQ8TugVfFB94d46UiWTgKjN+H1x7FL27Bo+i/zkPhgv+JKvqpLsTJ+8p8uvC1NK206ebMzBc/E/6lx8c5cdhA+8afZBVsuXVzptT69GSgVMtDbwr/ney3Ad35TwYbsZ5cGYve3refNvte5bTZlvd79C9QQtcuxQvch5c8iXElceXLMWLnCa5BQ9AC+w+eGOWsyoLj66rjqKfi8L/yoGcB8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDw/0BiOX6UaUOP+0AAAAASUVORK5CYII=" alt="l’écran après HAUT">
+    <figcaption><strong>HAUT</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADAUlEQVR4nO3dQU7jMBhAYZZzBJbc/zRzhDkGSxZIaBRi179j+3denvQJVWkbtTzFiZtQ3v59/hXYW/or0FQGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8PVAv95//jf6V0tjy/dPjzl5WttWefhdnT90ff78n01vv7Q6xwW+PSlV5ZXHvlzV+WXciXwkPW3vK/Zt4dbFPjwc3jgIeufETi6nt0D14emxqGvL/Dv9feNe1MDl3Zhk8bnpVtwdG0dgd2CDbw68F33wUOOojuGpgVHp+3vN7p806No3ZqB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3KLA8y4qU92KwMuuP9JvBoZbFHjqpb+qcAuGMzCcgeGcB8OtPshKf8NP4xANZ2A4h2g4t2A4A8M5RMM5D4ZLHqL3+Ut4qszAfd9fYdoQA8Nlng/u+OpDA0e5BcMZGG7HwPWrMA0c4jwYLvmTrJfL3V4v2nGINupABobLHKKjX6GvDjtuwaXnqoOB4ZKH6NJth+hRnAfDJf998H3/H9Fd7LgPnnH7sVYHLi0fdSBm4IN1ga+fD64EXv//iO7irkN0dP2PddfA7oMbrT6Kvng+2KPoKOfBcLucbCg9pWV59KK+R7nTPri0JPrIRzEwXHLg6EeV0cAPH5/zA79M6BZ8UX7g0zlSJZKBQ3Y8Hxw9ij5dg0fR35wHwyV/khW66K7j4j1lni4s3Tt2+vRwBobL/0r/9oOj+jhs4FOrD7JatrzovLm0Ht0ycKmlgU/lf0+W++CpnAfD7TgPruxlu+fNj92+d7lsdtRyh+4DWuDovXiZ8+CWkxBXHt9yL17mNMkteAFaYPfBB7tcVdl4dB06iv65K/23nMh5MJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3BeCC2eJOktvJAAAAABJRU5ErkJggg==" alt="l’écran après BAS">
+    <figcaption><strong>BAS</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADAUlEQVR4nO3dQU7jMBhAYZZzBJbc/zRzhDkGSxZIaBRi179j+3denvQJVWkbtTzFiZtQ3v59/hXYW/or0FQGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8PVAv95//jf6V0tjy/dPjzl5WttWefhdnT90ff78n01vv7Q6xwW+PSlV5ZXHvlzV+WXciXwkPW3vK/Zt4dbFPjwc3jgIeufETi6nt0D14emxqGvL/Dv9feNe1MDl3Zhk8bnpVtwdG0dgd2CDbw68F33wUOOojuGpgVHp+3vN7p806No3ZqB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3KLA8y4qU92KwMuuP9JvBoZbFHjqpb+qcAuGMzCcgeGcB8OtPshKf8NP4xANZ2A4h2g4t2A4A8M5RMM5D4ZLHqL3+Ut4qszAfd9fYdoQA8Nlng/u+OpDA0e5BcMZGG7HwPWrMA0c4jwYLvmTrJfL3V4v2nGINupABobLHKKjX6GvDjtuwaXnqoOB4ZKH6NJth+hRnAfDJf998H3/H9Fd7LgPnnH7sVYHLi0fdSBm4IN1ga+fD64EXv//iO7irkN0dP2PddfA7oMbrT6Kvng+2KPoKOfBcLucbCg9pWV59KK+R7nTPri0JPrIRzEwXHLg6EeV0cAPH5/zA79M6BZ8UX7g0zlSJZKBQ3Y8Hxw9ij5dg0fR35wHwyV/khW66K7j4j1lni4s3Tt2+vRwBobL/0r/9oOj+jhs4FOrD7JatrzovLm0Ht0ycKmlgU/lf0+W++CpnAfD7TgPruxlu+fNj92+d7lsdtRyh+4DWuDovXiZ8+CWkxBXHt9yL17mNMkteAFaYPfBB7tcVdl4dB06iv65K/23nMh5MJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3BeCC2eJOktvJAAAAABJRU5ErkJggg==" alt="l’écran après START">
+    <figcaption><strong>START</strong> — l’écran n’a pas bougé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Les huit noms à l’écran ; une touche tenue fait clignoter le sien, relâchée il reste affiché.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles sont ceux que <code>verification/verifier-cours.mjs</code>
+exige de cette leçon. Ils viennent d’être joués, et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>au repos, les huit noms sont à l’écran </li>
+
+  <li>A tenu : son nom clignote — tantôt là, tantôt vide — et lui seul </li>
+
+  <li>A lâché : son nom reste affiché </li>
+
+  <li>B tenu : son nom clignote — tantôt là, tantôt vide — et lui seul </li>
+
+  <li>B lâché : son nom reste affiché </li>
+
+  <li>HAUT tenu : son nom clignote — tantôt là, tantôt vide — et lui seul </li>
+
+  <li>HAUT lâché : son nom reste affiché </li>
+
+  <li>BAS tenu : son nom clignote — tantôt là, tantôt vide — et lui seul </li>
+
+  <li>BAS lâché : son nom reste affiché </li>
+
+  <li>GAUCHE tenu : son nom clignote — tantôt là, tantôt vide — et lui seul </li>
+
+  <li>GAUCHE lâché : son nom reste affiché </li>
+
+  <li>DROITE tenu : son nom clignote — tantôt là, tantôt vide — et lui seul </li>
+
+  <li>DROITE lâché : son nom reste affiché </li>
+
+  <li>START tenu : son nom clignote — tantôt là, tantôt vide — et lui seul </li>
+
+  <li>START lâché : son nom reste affiché </li>
+
+  <li>SELECT tenu : son nom clignote — tantôt là, tantôt vide — et lui seul </li>
+
+  <li>SELECT lâché : son nom reste affiché </li>
+
+  <li>DROITE et A ensemble : les deux clignotent </li>
+</ul>
+
+<p class="navigation">
+  <span>← <a href="04-ou-vit-une-variable-avant-la-boucle-ou-d.html">4. Où vit une variable : avant la boucle, ou dedans</a></span>
+  <span><a href="index.html">sommaire</a></span>
+  <span><a href="06-une-comparaison-est-un-nombre.html">6. Une comparaison est un nombre</a> →</span>
+</p>
+
+<p class="pied">gameboy3 — apprendre à programmer, en écrivant pour la Game Boy</p>
+
+</body>
+</html>

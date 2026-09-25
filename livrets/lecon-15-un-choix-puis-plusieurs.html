@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 15 — Un choix, puis plusieurs</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Niveau 2 — Retenir, et réagir</span>
+    <span>leçon 15 sur 82</span>
+    <span class="jauge" style="--part: 20%">difficulté 2 / 10</span>
+    
+    
+    
+  </p>
+<h1>15. Un choix, puis plusieurs</h1>
+<p class="idee">`&amp;&amp;` s’arrête dès que la réponse est connue.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><code>if … else if … else</code> enchaîne les cas. Rien que de très ordinaire — sauf la dernière ligne.</p>
+<p><code>bouton(B) &amp;&amp; vies &gt; 0</code> : si <code>bouton(B)</code> rend 0, <strong>la partie droite n’est même pas calculée</strong>. Ce n’est pas une finesse de compilation, c’est ce qui permet plus tard d’écrire <code>if (i &lt; n &amp;&amp; table[i] == 0)</code> sans lire une case hors du tableau.</p>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1424 octets</strong> de cartouche.</p>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  uint8_t vies = 3;
+
+  while (true) {
+    if (vies == 0)      texte(4, 8, "PERDU   ");
+    else if (vies == 1) texte(4, 8, "DERNIERE");
+    else                texte(4, 8, "CA VA   ");
+
+    if (bouton(B) &amp;&amp; vies &gt; 0) vies--;
+    image();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABr0lEQVR4nO3XwQnCQBRAQY+W4NH+q7EEy/DoQRBRI0ZIgm8H5rAs4RN4LNnszpcTYbvN34BFCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncNxKgfeH482X+1ND3q7nzhnKGoGnwnwItuicoawdeGpf4IVsHPjRrDlP61lzhuIEx/3TN/j+2OsNa+6ccWx5i/4tzNur+A9zBuE/OE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOO4KY9CIw3713DgAAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABrElEQVR4nO3XQQqCQABA0ZYdoWX3P01H6Bgt24Wkggqp/B68xTAziPhx0Mvz9SDscvgd8FMCxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkct0fg6+3+MTc/XFqy/2t+csx+gVfFWLJ/7TX/lsBxZzmiF86vGnPAG7x8frwq8AbnDTzeIPAGBwee+4qeG08e3cOlwx/o2fgPjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjnsD8SJT0xtAu9gAAAAASUVORK5CYII=" alt="l’écran après B">
+    <figcaption><strong>B</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">« CA VA », puis « DERNIERE », puis « PERDU » — B après B.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>au départ, « CA VA » </li>
+
+  <li>B fait tomber les vies à zéro <span class="detail"> (0)</span></li>
+
+  <li>et « PERDU » s’affiche </li>
+
+  <li>sans jamais déborder sous zéro </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>16. Deux touches, deux effets</strong> — niveau 2 sur 10.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

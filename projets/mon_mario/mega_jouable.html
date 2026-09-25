@@ -1,0 +1,2081 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>MEGA — jouable</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; color: #ccc; font-family: system-ui, sans-serif; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+  canvas { image-rendering: pixelated; width: min(92vw, 640px); height: min(82.8vw, 576px); border: 2px solid #3a3a3a; background: #000; }
+  p { font-size: 13px; color: #8a8a8a; text-align: center; margin: 0; max-width: 90vw; }
+  .titre { color: #ddd; font-size: 15px; font-weight: 600; }
+</style>
+</head>
+<body>
+<p class="titre">MEGA</p>
+<canvas id="ecran" width="160" height="144"></canvas>
+<p>Flèches pour bouger · X = A · Z = B · Entrée = START · Maj = SELECT — clique une fois pour activer le son.</p>
+<script type="module">
+// src/core/emu/class/Apu.ts
+var HORLOGE = 4194304;
+var CYCLES_PAR_PAS = HORLOGE / 512;
+var RAPPORTS = [
+  [0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 1, 1, 1],
+  [0, 1, 1, 1, 1, 1, 1, 0]
+];
+var DIVISEURS = [8, 16, 32, 48, 64, 80, 96, 112];
+var Carre = class {
+  constructor(avecBalayage) {
+    this.avecBalayage = avecBalayage;
+  }
+  avecBalayage;
+  /* Registres, tels qu'ils ont été écrits. */
+  nrx0 = 0;
+  nrx1 = 0;
+  nrx2 = 0;
+  nrx3 = 0;
+  nrx4 = 0;
+  actif = false;
+  compteur = 0;
+  // cycles avant le prochain huitième
+  huitieme = 0;
+  volume = 0;
+  pasEnveloppe = 0;
+  longueur = 0;
+  /* Balayage — canal 1 seulement. */
+  freqOmbre = 0;
+  balayageActif = false;
+  pasBalayage = 0;
+  reset() {
+    this.nrx0 = this.nrx1 = this.nrx2 = this.nrx3 = this.nrx4 = 0;
+    this.actif = false;
+    this.compteur = 0;
+    this.huitieme = 0;
+    this.volume = 0;
+    this.longueur = 0;
+  }
+  /** Le convertisseur est coupé quand les cinq bits hauts de NRx2 sont à zéro. */
+  get dacAllume() {
+    return (this.nrx2 & 248) !== 0;
+  }
+  get joue() {
+    return this.actif && this.dacAllume;
+  }
+  get periode() {
+    return (this.nrx4 & 7) << 8 | this.nrx3;
+  }
+  write(index, valeur) {
+    switch (index) {
+      case 0:
+        this.nrx0 = valeur;
+        break;
+      case 1:
+        this.nrx1 = valeur;
+        this.longueur = 64 - (valeur & 63);
+        break;
+      case 2:
+        this.nrx2 = valeur;
+        if (!this.dacAllume) this.actif = false;
+        break;
+      case 3:
+        this.nrx3 = valeur;
+        break;
+      case 4:
+        this.nrx4 = valeur;
+        if (valeur & 128) this.declenche();
+        break;
+    }
+  }
+  read(index) {
+    const masques = [128, 63, 0, 255, 191];
+    const valeurs = [this.nrx0, this.nrx1, this.nrx2, this.nrx3, this.nrx4];
+    return valeurs[index] | masques[index];
+  }
+  /** Le bit 7 de NRx4 : la note repart de zéro. */
+  declenche() {
+    this.actif = this.dacAllume;
+    if (this.longueur === 0) this.longueur = 64;
+    this.compteur = (2048 - this.periode) * 4;
+    this.volume = this.nrx2 >> 4;
+    this.pasEnveloppe = this.nrx2 & 7;
+    if (this.avecBalayage) {
+      this.freqOmbre = this.periode;
+      this.pasBalayage = this.nrx0 >> 4 & 7;
+      this.balayageActif = this.pasBalayage !== 0 || (this.nrx0 & 7) !== 0;
+    }
+  }
+  step(cycles) {
+    if (!this.actif) return;
+    this.compteur -= cycles;
+    while (this.compteur <= 0) {
+      const periode = (2048 - this.periode) * 4;
+      this.compteur += periode > 0 ? periode : 4;
+      this.huitieme = this.huitieme + 1 & 7;
+    }
+  }
+  /** Appelé aux pas 0, 2, 4 et 6 du séquenceur. */
+  tickLongueur() {
+    if ((this.nrx4 & 64) === 0) return;
+    if (this.longueur > 0 && --this.longueur === 0) this.actif = false;
+  }
+  /** Appelé au pas 7 : le volume monte ou descend d'un cran. */
+  tickEnveloppe() {
+    const periode = this.nrx2 & 7;
+    if (periode === 0) return;
+    if (--this.pasEnveloppe > 0) return;
+    this.pasEnveloppe = periode;
+    const monte = (this.nrx2 & 8) !== 0;
+    if (monte && this.volume < 15) this.volume++;
+    else if (!monte && this.volume > 0) this.volume--;
+  }
+  /** Appelé aux pas 2 et 6 : la fréquence glisse. */
+  tickBalayage() {
+    if (!this.avecBalayage || !this.balayageActif) return;
+    const periode = this.nrx0 >> 4 & 7;
+    if (periode === 0) return;
+    if (--this.pasBalayage > 0) return;
+    this.pasBalayage = periode;
+    const decalage = this.nrx0 & 7;
+    const delta = this.freqOmbre >> decalage;
+    const suivante = (this.nrx0 & 8) !== 0 ? this.freqOmbre - delta : this.freqOmbre + delta;
+    if (suivante > 2047) {
+      this.actif = false;
+      return;
+    }
+    if (decalage === 0) return;
+    this.freqOmbre = suivante;
+    this.nrx3 = suivante & 255;
+    this.nrx4 = this.nrx4 & 248 | suivante >> 8 & 7;
+  }
+  /** L'échantillon courant, de 0 à 15. */
+  echantillon() {
+    if (!this.joue) return 0;
+    return RAPPORTS[this.nrx1 >> 6 & 3][this.huitieme] * this.volume;
+  }
+};
+var Bruit = class {
+  nrx1 = 0;
+  nrx2 = 0;
+  nrx3 = 0;
+  nrx4 = 0;
+  actif = false;
+  compteur = 0;
+  registre = 32767;
+  volume = 0;
+  pasEnveloppe = 0;
+  longueur = 0;
+  reset() {
+    this.nrx1 = this.nrx2 = this.nrx3 = this.nrx4 = 0;
+    this.actif = false;
+    this.compteur = 0;
+    this.registre = 32767;
+    this.volume = 0;
+    this.longueur = 0;
+  }
+  get dacAllume() {
+    return (this.nrx2 & 248) !== 0;
+  }
+  get joue() {
+    return this.actif && this.dacAllume;
+  }
+  write(index, valeur) {
+    switch (index) {
+      case 1:
+        this.nrx1 = valeur;
+        this.longueur = 64 - (valeur & 63);
+        break;
+      case 2:
+        this.nrx2 = valeur;
+        if (!this.dacAllume) this.actif = false;
+        break;
+      case 3:
+        this.nrx3 = valeur;
+        break;
+      case 4:
+        this.nrx4 = valeur;
+        if (valeur & 128) this.declenche();
+        break;
+    }
+  }
+  read(index) {
+    const masques = [255, 255, 0, 0, 191];
+    const valeurs = [0, this.nrx1, this.nrx2, this.nrx3, this.nrx4];
+    return valeurs[index] | masques[index];
+  }
+  get periode() {
+    return DIVISEURS[this.nrx3 & 7] << (this.nrx3 >> 4);
+  }
+  declenche() {
+    this.actif = this.dacAllume;
+    if (this.longueur === 0) this.longueur = 64;
+    this.compteur = this.periode;
+    this.volume = this.nrx2 >> 4;
+    this.pasEnveloppe = this.nrx2 & 7;
+    this.registre = 32767;
+  }
+  step(cycles) {
+    if (!this.actif) return;
+    this.compteur -= cycles;
+    while (this.compteur <= 0) {
+      const periode = this.periode;
+      this.compteur += periode > 0 ? periode : 8;
+      const bit = (this.registre ^ this.registre >> 1) & 1;
+      this.registre = this.registre >> 1 | bit << 14;
+      if (this.nrx3 & 8) this.registre = this.registre & ~64 | bit << 6;
+    }
+  }
+  tickLongueur() {
+    if ((this.nrx4 & 64) === 0) return;
+    if (this.longueur > 0 && --this.longueur === 0) this.actif = false;
+  }
+  tickEnveloppe() {
+    const periode = this.nrx2 & 7;
+    if (periode === 0) return;
+    if (--this.pasEnveloppe > 0) return;
+    this.pasEnveloppe = periode;
+    const monte = (this.nrx2 & 8) !== 0;
+    if (monte && this.volume < 15) this.volume++;
+    else if (!monte && this.volume > 0) this.volume--;
+  }
+  echantillon() {
+    if (!this.joue) return 0;
+    return (~this.registre & 1) * this.volume;
+  }
+};
+var Apu = class {
+  canal1 = new Carre(true);
+  canal2 = new Carre(false);
+  bruit = new Bruit();
+  nr50 = 0;
+  nr51 = 0;
+  allume = false;
+  /** Les seize octets de l'onde programmable : rangés, pas encore joués. */
+  waveRam = new Uint8Array(16);
+  cyclesSequenceur = 0;
+  pasSequenceur = 0;
+  /* L'échantillonnage : un compteur qui déborde à chaque échantillon voulu. */
+  cyclesEchantillon = 0;
+  cyclesParEchantillon = HORLOGE / 44100;
+  tampon = [];
+  /** Le nombre d'échantillons par seconde produits par `drain`. */
+  get frequenceEchantillonnage() {
+    return HORLOGE / this.cyclesParEchantillon;
+  }
+  set frequenceEchantillonnage(valeur) {
+    this.cyclesParEchantillon = HORLOGE / valeur;
+  }
+  reset() {
+    this.canal1.reset();
+    this.canal2.reset();
+    this.bruit.reset();
+    this.nr50 = 0;
+    this.nr51 = 0;
+    this.allume = false;
+    this.waveRam.fill(0);
+    this.cyclesSequenceur = 0;
+    this.pasSequenceur = 0;
+    this.cyclesEchantillon = 0;
+    this.tampon = [];
+  }
+  write(adresse, valeur) {
+    if (adresse >= 65328) {
+      this.waveRam[adresse - 65328] = valeur;
+      return;
+    }
+    if (adresse === 65318) {
+      const etait = this.allume;
+      this.allume = (valeur & 128) !== 0;
+      if (etait && !this.allume) {
+        this.canal1.reset();
+        this.canal2.reset();
+        this.bruit.reset();
+        this.nr50 = 0;
+        this.nr51 = 0;
+      }
+      return;
+    }
+    if (!this.allume) return;
+    if (adresse === 65316) {
+      this.nr50 = valeur;
+      return;
+    }
+    if (adresse === 65317) {
+      this.nr51 = valeur;
+      return;
+    }
+    if (adresse >= 65296 && adresse <= 65300) {
+      this.canal1.write(adresse - 65296, valeur);
+      return;
+    }
+    if (adresse >= 65301 && adresse <= 65305) {
+      this.canal2.write(adresse - 65301, valeur);
+      return;
+    }
+    if (adresse >= 65311 && adresse <= 65315) {
+      this.bruit.write(adresse - 65311, valeur);
+    }
+  }
+  read(adresse) {
+    if (adresse >= 65328) return this.waveRam[adresse - 65328];
+    if (adresse === 65316) return this.nr50;
+    if (adresse === 65317) return this.nr51;
+    if (adresse === 65318) {
+      const etats = (this.canal1.joue ? 1 : 0) | (this.canal2.joue ? 2 : 0) | (this.bruit.joue ? 8 : 0);
+      return (this.allume ? 128 : 0) | 112 | etats;
+    }
+    if (adresse >= 65296 && adresse <= 65300) return this.canal1.read(adresse - 65296);
+    if (adresse >= 65301 && adresse <= 65305) return this.canal2.read(adresse - 65301);
+    if (adresse >= 65311 && adresse <= 65315) return this.bruit.read(adresse - 65311);
+    return 255;
+  }
+  step(cycles) {
+    if (!this.allume) {
+      this.echantillonner(cycles, 0);
+      return;
+    }
+    this.canal1.step(cycles);
+    this.canal2.step(cycles);
+    this.bruit.step(cycles);
+    this.cyclesSequenceur += cycles;
+    while (this.cyclesSequenceur >= CYCLES_PAR_PAS) {
+      this.cyclesSequenceur -= CYCLES_PAR_PAS;
+      this.pasSequenceur = this.pasSequenceur + 1 & 7;
+      if ((this.pasSequenceur & 1) === 0) {
+        this.canal1.tickLongueur();
+        this.canal2.tickLongueur();
+        this.bruit.tickLongueur();
+      }
+      if (this.pasSequenceur === 2 || this.pasSequenceur === 6) this.canal1.tickBalayage();
+      if (this.pasSequenceur === 7) {
+        this.canal1.tickEnveloppe();
+        this.canal2.tickEnveloppe();
+        this.bruit.tickEnveloppe();
+      }
+    }
+    this.echantillonner(cycles, this.melange());
+  }
+  /**
+   * Le mélange des trois canaux, entre -1 et 1.
+   *
+   * Chaque convertisseur allumé rend une valeur **centrée** : un échantillon de
+   * 0 à 15 devient -1 à +1. Un canal éteint rend zéro, et non -1 — sinon un jeu
+   * muet produirait une tension continue, donc un claquement à chaque
+   * allumage. C'est aussi pourquoi baisser le volume rapproche l'onde de -1 au
+   * lieu de la rapprocher de zéro : le creux du carré ne bouge pas, c'est la
+   * crête qui descend.
+   */
+  melange() {
+    const centre = (joue, echantillon) => joue ? echantillon / 7.5 - 1 : 0;
+    let somme = 0;
+    if (this.nr51 & 17) somme += centre(this.canal1.joue, this.canal1.echantillon());
+    if (this.nr51 & 34) somme += centre(this.canal2.joue, this.canal2.echantillon());
+    if (this.nr51 & 136) somme += centre(this.bruit.joue, this.bruit.echantillon());
+    const gauche = this.nr50 >> 4 & 7;
+    const droite = this.nr50 & 7;
+    return somme / 3 * ((gauche + droite + 2) / 16);
+  }
+  echantillonner(cycles, valeur) {
+    this.cyclesEchantillon += cycles;
+    while (this.cyclesEchantillon >= this.cyclesParEchantillon) {
+      this.cyclesEchantillon -= this.cyclesParEchantillon;
+      this.tampon.push(valeur);
+    }
+  }
+  /** Rend les échantillons accumulés et vide le tampon. */
+  drain() {
+    const sortie = Float32Array.from(this.tampon);
+    this.tampon = [];
+    return sortie;
+  }
+  /** Vrai si au moins un canal produit du son en ce moment. */
+  get sonne() {
+    return this.allume && (this.canal1.joue || this.canal2.joue || this.bruit.joue);
+  }
+};
+
+// src/core/emu/class/Cpu.ts
+var FLAG_Z = 128;
+var FLAG_N = 64;
+var FLAG_H = 32;
+var FLAG_C = 16;
+var REG_HL_INDIRECT = 6;
+var Cpu = class {
+  a = 0;
+  b = 0;
+  c = 0;
+  d = 0;
+  e = 0;
+  h = 0;
+  l = 0;
+  f = 0;
+  sp = 0;
+  pc = 0;
+  ime = false;
+  imePending = false;
+  halted = false;
+  mmu;
+  constructor(mmu) {
+    this.mmu = mmu;
+  }
+  /** Post-boot-ROM register state, as the DMG leaves it. */
+  reset() {
+    this.a = 1;
+    this.f = 176;
+    this.b = 0;
+    this.c = 19;
+    this.d = 0;
+    this.e = 216;
+    this.h = 1;
+    this.l = 77;
+    this.sp = 65534;
+    this.pc = 256;
+    this.ime = false;
+    this.imePending = false;
+    this.halted = false;
+  }
+  step() {
+    const imeWasPending = this.imePending;
+    const serviced = this.serviceInterrupts();
+    if (serviced > 0) return serviced;
+    if (this.halted) return 4;
+    const cycles = this.execute();
+    if (imeWasPending) {
+      this.ime = true;
+      this.imePending = false;
+    }
+    return cycles;
+  }
+  serviceInterrupts() {
+    const pending = this.mmu.interruptEnable & this.mmu.interruptFlags & 31;
+    if (pending === 0) return 0;
+    this.halted = false;
+    if (!this.ime) return 0;
+    this.ime = false;
+    for (let bit = 0; bit < 5; bit++) {
+      if ((pending & 1 << bit) === 0) continue;
+      this.mmu.interruptFlags &= ~(1 << bit);
+      this.push16(this.pc);
+      this.pc = 64 + bit * 8;
+      return 20;
+    }
+    return 0;
+  }
+  /* --------------------------------------------------------- register pairs */
+  get bc() {
+    return this.b << 8 | this.c;
+  }
+  set bc(value) {
+    this.b = value >> 8 & 255;
+    this.c = value & 255;
+  }
+  get de() {
+    return this.d << 8 | this.e;
+  }
+  set de(value) {
+    this.d = value >> 8 & 255;
+    this.e = value & 255;
+  }
+  get hl() {
+    return this.h << 8 | this.l;
+  }
+  set hl(value) {
+    this.h = value >> 8 & 255;
+    this.l = value & 255;
+  }
+  get af() {
+    return this.a << 8 | this.f;
+  }
+  set af(value) {
+    this.a = value >> 8 & 255;
+    this.f = value & 240;
+  }
+  /* ----------------------------------------------------------------- flags */
+  get flagZ() {
+    return (this.f & FLAG_Z) !== 0;
+  }
+  get flagN() {
+    return (this.f & FLAG_N) !== 0;
+  }
+  get flagH() {
+    return (this.f & FLAG_H) !== 0;
+  }
+  get flagC() {
+    return (this.f & FLAG_C) !== 0;
+  }
+  setFlags(z, n, h, c) {
+    this.f = (z ? FLAG_Z : 0) | (n ? FLAG_N : 0) | (h ? FLAG_H : 0) | (c ? FLAG_C : 0);
+  }
+  setCarry(value) {
+    this.f = value ? this.f | FLAG_C : this.f & ~FLAG_C;
+  }
+  /* ------------------------------------------------------------ memory access */
+  fetch8() {
+    const value = this.mmu.read(this.pc);
+    this.pc = this.pc + 1 & 65535;
+    return value;
+  }
+  fetch16() {
+    const low = this.fetch8();
+    return low | this.fetch8() << 8;
+  }
+  push16(value) {
+    this.sp = this.sp - 1 & 65535;
+    this.mmu.write(this.sp, value >> 8 & 255);
+    this.sp = this.sp - 1 & 65535;
+    this.mmu.write(this.sp, value & 255);
+  }
+  pop16() {
+    const low = this.mmu.read(this.sp);
+    this.sp = this.sp + 1 & 65535;
+    const high = this.mmu.read(this.sp);
+    this.sp = this.sp + 1 & 65535;
+    return high << 8 | low;
+  }
+  readR(index) {
+    switch (index) {
+      case 0:
+        return this.b;
+      case 1:
+        return this.c;
+      case 2:
+        return this.d;
+      case 3:
+        return this.e;
+      case 4:
+        return this.h;
+      case 5:
+        return this.l;
+      case 6:
+        return this.mmu.read(this.hl);
+      default:
+        return this.a;
+    }
+  }
+  writeR(index, value) {
+    const byte = value & 255;
+    switch (index) {
+      case 0:
+        this.b = byte;
+        break;
+      case 1:
+        this.c = byte;
+        break;
+      case 2:
+        this.d = byte;
+        break;
+      case 3:
+        this.e = byte;
+        break;
+      case 4:
+        this.h = byte;
+        break;
+      case 5:
+        this.l = byte;
+        break;
+      case 6:
+        this.mmu.write(this.hl, byte);
+        break;
+      default:
+        this.a = byte;
+        break;
+    }
+  }
+  /* --------------------------------------------------------------- dispatch */
+  execute() {
+    const opcode = this.fetch8();
+    if (opcode >= 64 && opcode <= 127) {
+      if (opcode === 118) {
+        this.halted = true;
+        return 4;
+      }
+      const dst = opcode >> 3 & 7;
+      const src = opcode & 7;
+      this.writeR(dst, this.readR(src));
+      return dst === REG_HL_INDIRECT || src === REG_HL_INDIRECT ? 8 : 4;
+    }
+    if (opcode >= 128 && opcode <= 191) {
+      const src = opcode & 7;
+      this.alu(opcode >> 3 & 7, this.readR(src));
+      return src === REG_HL_INDIRECT ? 8 : 4;
+    }
+    switch (opcode) {
+      case 0:
+        return 4;
+      // NOP
+      case 16:
+        this.fetch8();
+        return 4;
+      // STOP swallows its padding byte
+      /* ---- 16-bit loads and arithmetic ---- */
+      case 1:
+        this.bc = this.fetch16();
+        return 12;
+      case 17:
+        this.de = this.fetch16();
+        return 12;
+      case 33:
+        this.hl = this.fetch16();
+        return 12;
+      case 49:
+        this.sp = this.fetch16();
+        return 12;
+      case 8: {
+        const address = this.fetch16();
+        this.mmu.write(address, this.sp & 255);
+        this.mmu.write(address + 1 & 65535, this.sp >> 8 & 255);
+        return 20;
+      }
+      case 3:
+        this.bc = this.bc + 1 & 65535;
+        return 8;
+      case 19:
+        this.de = this.de + 1 & 65535;
+        return 8;
+      case 35:
+        this.hl = this.hl + 1 & 65535;
+        return 8;
+      case 51:
+        this.sp = this.sp + 1 & 65535;
+        return 8;
+      case 11:
+        this.bc = this.bc - 1 & 65535;
+        return 8;
+      case 27:
+        this.de = this.de - 1 & 65535;
+        return 8;
+      case 43:
+        this.hl = this.hl - 1 & 65535;
+        return 8;
+      case 59:
+        this.sp = this.sp - 1 & 65535;
+        return 8;
+      case 9:
+        this.addHl(this.bc);
+        return 8;
+      case 25:
+        this.addHl(this.de);
+        return 8;
+      case 41:
+        this.addHl(this.hl);
+        return 8;
+      case 57:
+        this.addHl(this.sp);
+        return 8;
+      case 232:
+        this.sp = this.addSignedToWord(this.sp, this.signedFetch());
+        return 16;
+      case 248:
+        this.hl = this.addSignedToWord(this.sp, this.signedFetch());
+        return 12;
+      case 249:
+        this.sp = this.hl;
+        return 8;
+      /* ---- 8-bit loads ---- */
+      case 2:
+        this.mmu.write(this.bc, this.a);
+        return 8;
+      case 18:
+        this.mmu.write(this.de, this.a);
+        return 8;
+      case 34:
+        this.mmu.write(this.hl, this.a);
+        this.hl = this.hl + 1 & 65535;
+        return 8;
+      case 50:
+        this.mmu.write(this.hl, this.a);
+        this.hl = this.hl - 1 & 65535;
+        return 8;
+      case 10:
+        this.a = this.mmu.read(this.bc);
+        return 8;
+      case 26:
+        this.a = this.mmu.read(this.de);
+        return 8;
+      case 42:
+        this.a = this.mmu.read(this.hl);
+        this.hl = this.hl + 1 & 65535;
+        return 8;
+      case 58:
+        this.a = this.mmu.read(this.hl);
+        this.hl = this.hl - 1 & 65535;
+        return 8;
+      case 6:
+        this.b = this.fetch8();
+        return 8;
+      case 14:
+        this.c = this.fetch8();
+        return 8;
+      case 22:
+        this.d = this.fetch8();
+        return 8;
+      case 30:
+        this.e = this.fetch8();
+        return 8;
+      case 38:
+        this.h = this.fetch8();
+        return 8;
+      case 46:
+        this.l = this.fetch8();
+        return 8;
+      case 54:
+        this.mmu.write(this.hl, this.fetch8());
+        return 12;
+      case 62:
+        this.a = this.fetch8();
+        return 8;
+      case 224:
+        this.mmu.write(65280 + this.fetch8(), this.a);
+        return 12;
+      case 240:
+        this.a = this.mmu.read(65280 + this.fetch8());
+        return 12;
+      case 226:
+        this.mmu.write(65280 + this.c, this.a);
+        return 8;
+      case 242:
+        this.a = this.mmu.read(65280 + this.c);
+        return 8;
+      case 234:
+        this.mmu.write(this.fetch16(), this.a);
+        return 16;
+      case 250:
+        this.a = this.mmu.read(this.fetch16());
+        return 16;
+      /* ---- 8-bit INC/DEC ---- */
+      case 4:
+        this.b = this.inc8(this.b);
+        return 4;
+      case 12:
+        this.c = this.inc8(this.c);
+        return 4;
+      case 20:
+        this.d = this.inc8(this.d);
+        return 4;
+      case 28:
+        this.e = this.inc8(this.e);
+        return 4;
+      case 36:
+        this.h = this.inc8(this.h);
+        return 4;
+      case 44:
+        this.l = this.inc8(this.l);
+        return 4;
+      case 60:
+        this.a = this.inc8(this.a);
+        return 4;
+      case 52:
+        this.mmu.write(this.hl, this.inc8(this.mmu.read(this.hl)));
+        return 12;
+      case 5:
+        this.b = this.dec8(this.b);
+        return 4;
+      case 13:
+        this.c = this.dec8(this.c);
+        return 4;
+      case 21:
+        this.d = this.dec8(this.d);
+        return 4;
+      case 29:
+        this.e = this.dec8(this.e);
+        return 4;
+      case 37:
+        this.h = this.dec8(this.h);
+        return 4;
+      case 45:
+        this.l = this.dec8(this.l);
+        return 4;
+      case 61:
+        this.a = this.dec8(this.a);
+        return 4;
+      case 53:
+        this.mmu.write(this.hl, this.dec8(this.mmu.read(this.hl)));
+        return 12;
+      /* ---- immediate ALU ---- */
+      case 198:
+        this.alu(0, this.fetch8());
+        return 8;
+      case 206:
+        this.alu(1, this.fetch8());
+        return 8;
+      case 214:
+        this.alu(2, this.fetch8());
+        return 8;
+      case 222:
+        this.alu(3, this.fetch8());
+        return 8;
+      case 230:
+        this.alu(4, this.fetch8());
+        return 8;
+      case 238:
+        this.alu(5, this.fetch8());
+        return 8;
+      case 246:
+        this.alu(6, this.fetch8());
+        return 8;
+      case 254:
+        this.alu(7, this.fetch8());
+        return 8;
+      /* ---- accumulator rotates (these always clear Z) ---- */
+      case 7: {
+        const carry = (this.a & 128) !== 0;
+        this.a = (this.a << 1 | (carry ? 1 : 0)) & 255;
+        this.setFlags(false, false, false, carry);
+        return 4;
+      }
+      case 15: {
+        const carry = (this.a & 1) !== 0;
+        this.a = (this.a >> 1 | (carry ? 128 : 0)) & 255;
+        this.setFlags(false, false, false, carry);
+        return 4;
+      }
+      case 23: {
+        const carry = (this.a & 128) !== 0;
+        this.a = (this.a << 1 | (this.flagC ? 1 : 0)) & 255;
+        this.setFlags(false, false, false, carry);
+        return 4;
+      }
+      case 31: {
+        const carry = (this.a & 1) !== 0;
+        this.a = (this.a >> 1 | (this.flagC ? 128 : 0)) & 255;
+        this.setFlags(false, false, false, carry);
+        return 4;
+      }
+      /* ---- flag and accumulator fiddling ---- */
+      case 39:
+        this.daa();
+        return 4;
+      case 47:
+        this.a = ~this.a & 255;
+        this.f |= FLAG_N | FLAG_H;
+        return 4;
+      case 55:
+        this.f = this.f & FLAG_Z | FLAG_C;
+        return 4;
+      case 63:
+        this.f = this.f & FLAG_Z | (this.flagC ? 0 : FLAG_C);
+        return 4;
+      /* ---- jumps ---- */
+      case 24: {
+        const offset = this.signedFetch();
+        this.pc = this.pc + offset & 65535;
+        return 12;
+      }
+      case 32:
+        return this.jumpRelative(!this.flagZ);
+      case 40:
+        return this.jumpRelative(this.flagZ);
+      case 48:
+        return this.jumpRelative(!this.flagC);
+      case 56:
+        return this.jumpRelative(this.flagC);
+      case 195:
+        this.pc = this.fetch16();
+        return 16;
+      case 194:
+        return this.jumpAbsolute(!this.flagZ);
+      case 202:
+        return this.jumpAbsolute(this.flagZ);
+      case 210:
+        return this.jumpAbsolute(!this.flagC);
+      case 218:
+        return this.jumpAbsolute(this.flagC);
+      case 233:
+        this.pc = this.hl;
+        return 4;
+      /* ---- calls and returns ---- */
+      case 205: {
+        const target = this.fetch16();
+        this.push16(this.pc);
+        this.pc = target;
+        return 24;
+      }
+      case 196:
+        return this.call(!this.flagZ);
+      case 204:
+        return this.call(this.flagZ);
+      case 212:
+        return this.call(!this.flagC);
+      case 220:
+        return this.call(this.flagC);
+      case 201:
+        this.pc = this.pop16();
+        return 16;
+      case 192:
+        return this.ret(!this.flagZ);
+      case 200:
+        return this.ret(this.flagZ);
+      case 208:
+        return this.ret(!this.flagC);
+      case 216:
+        return this.ret(this.flagC);
+      case 217:
+        this.pc = this.pop16();
+        this.ime = true;
+        return 16;
+      /* ---- stack ---- */
+      case 193:
+        this.bc = this.pop16();
+        return 12;
+      case 209:
+        this.de = this.pop16();
+        return 12;
+      case 225:
+        this.hl = this.pop16();
+        return 12;
+      case 241:
+        this.af = this.pop16();
+        return 12;
+      case 197:
+        this.push16(this.bc);
+        return 16;
+      case 213:
+        this.push16(this.de);
+        return 16;
+      case 229:
+        this.push16(this.hl);
+        return 16;
+      case 245:
+        this.push16(this.af);
+        return 16;
+      /* ---- restarts ---- */
+      case 199:
+      case 207:
+      case 215:
+      case 223:
+      case 231:
+      case 239:
+      case 247:
+      case 255:
+        this.push16(this.pc);
+        this.pc = opcode & 56;
+        return 16;
+      /* ---- interrupt control ---- */
+      case 243:
+        this.ime = false;
+        this.imePending = false;
+        return 4;
+      case 251:
+        this.imePending = true;
+        return 4;
+      case 203:
+        return this.executeCb();
+      default:
+        this.halted = true;
+        return 4;
+    }
+  }
+  executeCb() {
+    const opcode = this.fetch8();
+    const target = opcode & 7;
+    const value = this.readR(target);
+    const onMemory = target === REG_HL_INDIRECT;
+    if (opcode < 64) {
+      const operation = opcode >> 3 & 7;
+      this.writeR(target, this.shift(operation, value));
+      return onMemory ? 16 : 8;
+    }
+    const bit = opcode >> 3 & 7;
+    if (opcode < 128) {
+      this.f = this.f & FLAG_C | FLAG_H | ((value & 1 << bit) === 0 ? FLAG_Z : 0);
+      return onMemory ? 12 : 8;
+    }
+    if (opcode < 192) {
+      this.writeR(target, value & ~(1 << bit));
+      return onMemory ? 16 : 8;
+    }
+    this.writeR(target, value | 1 << bit);
+    return onMemory ? 16 : 8;
+  }
+  /* ------------------------------------------------------------- operations */
+  shift(operation, value) {
+    let result = 0;
+    let carry = false;
+    switch (operation) {
+      case 0:
+        carry = (value & 128) !== 0;
+        result = (value << 1 | (carry ? 1 : 0)) & 255;
+        break;
+      case 1:
+        carry = (value & 1) !== 0;
+        result = (value >> 1 | (carry ? 128 : 0)) & 255;
+        break;
+      case 2:
+        carry = (value & 128) !== 0;
+        result = (value << 1 | (this.flagC ? 1 : 0)) & 255;
+        break;
+      case 3:
+        carry = (value & 1) !== 0;
+        result = (value >> 1 | (this.flagC ? 128 : 0)) & 255;
+        break;
+      case 4:
+        carry = (value & 128) !== 0;
+        result = value << 1 & 255;
+        break;
+      case 5:
+        carry = (value & 1) !== 0;
+        result = (value >> 1 | value & 128) & 255;
+        break;
+      case 6:
+        result = (value >> 4 | value << 4) & 255;
+        break;
+      default:
+        carry = (value & 1) !== 0;
+        result = value >> 1 & 255;
+        break;
+    }
+    this.setFlags(result === 0, false, false, carry);
+    return result;
+  }
+  alu(operation, value) {
+    switch (operation) {
+      case 0:
+        this.add8(value, false);
+        break;
+      case 1:
+        this.add8(value, this.flagC);
+        break;
+      case 2:
+        this.sub8(value, false);
+        break;
+      case 3:
+        this.sub8(value, this.flagC);
+        break;
+      case 4:
+        this.a &= value;
+        this.setFlags(this.a === 0, false, true, false);
+        break;
+      case 5:
+        this.a ^= value;
+        this.setFlags(this.a === 0, false, false, false);
+        break;
+      case 6:
+        this.a |= value;
+        this.setFlags(this.a === 0, false, false, false);
+        break;
+      default: {
+        const previous = this.a;
+        this.sub8(value, false);
+        this.a = previous;
+        break;
+      }
+    }
+  }
+  add8(value, withCarry) {
+    const carryIn = withCarry ? 1 : 0;
+    const result = this.a + value + carryIn;
+    const halfCarry = (this.a & 15) + (value & 15) + carryIn > 15;
+    this.a = result & 255;
+    this.setFlags(this.a === 0, false, halfCarry, result > 255);
+  }
+  sub8(value, withCarry) {
+    const carryIn = withCarry ? 1 : 0;
+    const result = this.a - value - carryIn;
+    const halfCarry = (this.a & 15) - (value & 15) - carryIn < 0;
+    this.a = result & 255;
+    this.setFlags(this.a === 0, true, halfCarry, result < 0);
+  }
+  inc8(value) {
+    const result = value + 1 & 255;
+    this.f = this.f & FLAG_C | (result === 0 ? FLAG_Z : 0) | ((value & 15) === 15 ? FLAG_H : 0);
+    return result;
+  }
+  dec8(value) {
+    const result = value - 1 & 255;
+    this.f = this.f & FLAG_C | FLAG_N | (result === 0 ? FLAG_Z : 0) | ((value & 15) === 0 ? FLAG_H : 0);
+    return result;
+  }
+  addHl(value) {
+    const result = this.hl + value;
+    const halfCarry = (this.hl & 4095) + (value & 4095) > 4095;
+    this.hl = result & 65535;
+    this.f = this.f & FLAG_Z | (halfCarry ? FLAG_H : 0) | (result > 65535 ? FLAG_C : 0);
+  }
+  /** Shared by `ADD SP, e8` and `LD HL, SP+e8`: flags come from the low byte. */
+  addSignedToWord(base, offset) {
+    const halfCarry = (base & 15) + (offset & 15) > 15;
+    const carry = (base & 255) + (offset & 255) > 255;
+    this.setFlags(false, false, halfCarry, carry);
+    return base + offset & 65535;
+  }
+  daa() {
+    let value = this.a;
+    if (!this.flagN) {
+      if (this.flagC || value > 153) {
+        value = value + 96 & 255;
+        this.setCarry(true);
+      }
+      if (this.flagH || (value & 15) > 9) value = value + 6 & 255;
+    } else {
+      if (this.flagC) value = value - 96 & 255;
+      if (this.flagH) value = value - 6 & 255;
+    }
+    this.a = value & 255;
+    this.f = this.f & (FLAG_N | FLAG_C) | (this.a === 0 ? FLAG_Z : 0);
+  }
+  signedFetch() {
+    return this.fetch8() << 24 >> 24;
+  }
+  jumpRelative(condition) {
+    const offset = this.signedFetch();
+    if (!condition) return 8;
+    this.pc = this.pc + offset & 65535;
+    return 12;
+  }
+  jumpAbsolute(condition) {
+    const target = this.fetch16();
+    if (!condition) return 12;
+    this.pc = target;
+    return 16;
+  }
+  call(condition) {
+    const target = this.fetch16();
+    if (!condition) return 12;
+    this.push16(this.pc);
+    this.pc = target;
+    return 24;
+  }
+  ret(condition) {
+    if (!condition) return 8;
+    this.pc = this.pop16();
+    return 20;
+  }
+};
+
+// src/core/emu/class/Joypad.ts
+var DIRECTION_ORDER = ["right", "left", "up", "down"];
+var BUTTON_ORDER = ["a", "b", "select", "start"];
+var Joypad = class {
+  pressed = /* @__PURE__ */ new Set();
+  select = 48;
+  reset() {
+    this.pressed.clear();
+    this.select = 48;
+  }
+  setPressed(button, isDown) {
+    if (isDown) this.pressed.add(button);
+    else this.pressed.delete(button);
+  }
+  releaseAll() {
+    this.pressed.clear();
+  }
+  read() {
+    let bits = 15;
+    if ((this.select & 16) === 0) bits &= this.rowBits(DIRECTION_ORDER);
+    if ((this.select & 32) === 0) bits &= this.rowBits(BUTTON_ORDER);
+    return 192 | this.select & 48 | bits;
+  }
+  write(value) {
+    this.select = value & 48;
+  }
+  rowBits(order) {
+    let bits = 15;
+    order.forEach((button, index) => {
+      if (this.pressed.has(button)) bits &= ~(1 << index) & 15;
+    });
+    return bits;
+  }
+};
+
+// src/core/emu/class/Mmu.ts
+function mbcKindFor(cartridgeType) {
+  if (cartridgeType >= 1 && cartridgeType <= 3) return "mbc1";
+  if (cartridgeType >= 15 && cartridgeType <= 19) return "mbc3";
+  if (cartridgeType >= 25 && cartridgeType <= 30) return "mbc5";
+  return "none";
+}
+var Mmu = class {
+  constructor(ppu, timer, joypad, apu = new Apu()) {
+    this.ppu = ppu;
+    this.timer = timer;
+    this.joypad = joypad;
+    this.apu = apu;
+  }
+  ppu;
+  timer;
+  joypad;
+  apu;
+  rom = new Uint8Array(32768);
+  externalRam = new Uint8Array(32768);
+  /*
+   * Huit banques de 4 Ko, et non plus deux.
+   *
+   * $C000-$CFFF est toujours la banque 0 ; $D000-$DFFF est celle que SVBK
+   * désigne, de 1 à 7. Le compilateur de ce projet range tout dans la banque
+   * fixe, donc rien ne change pour lui — mais une cartouche venue d'ailleurs
+   * s'attend à les trouver, et sans elles elle écrirait ses variables
+   * par-dessus les nôtres sans que rien ne le dise.
+   */
+  wram = new Uint8Array(32768);
+  svbk = 1;
+  hram = new Uint8Array(127);
+  interruptFlags = 0;
+  interruptEnable = 0;
+  mbc = "none";
+  romBank = 1;
+  ramBank = 0;
+  ramEnabled = false;
+  bankingMode = 0;
+  loadRom(rom) {
+    this.rom = rom;
+    this.mbc = mbcKindFor(rom[327] ?? 0);
+    /*
+     * Le mode couleur se lit en $0143, et nulle part ailleurs.
+     *
+     *   $80  la cartouche PROFITE de la couleur, et tourne aussi sur une
+     *        Game Boy d'origine
+     *   $C0  elle l'EXIGE
+     *
+     * Toute autre valeur — dont zéro — est une cartouche d'origine, rendue en
+     * quatre nuances exactement comme avant.
+     */
+    const drapeauCouleur = rom[323] ?? 0;
+    this.ppu.couleur = drapeauCouleur === 128 || drapeauCouleur === 192;
+    this.svbk = 1;
+  }
+  reset() {
+    this.externalRam.fill(0);
+    this.wram.fill(0);
+    this.hram.fill(0);
+    this.apu.reset();
+    this.interruptFlags = 225;
+    this.interruptEnable = 0;
+    this.romBank = 1;
+    this.ramBank = 0;
+    this.ramEnabled = false;
+    this.bankingMode = 0;
+  }
+  read(address) {
+    address &= 65535;
+    if (address < 16384) {
+      return this.rom[address] ?? 255;
+    }
+    if (address < 32768) {
+      const offset = this.romBank * 16384 + (address - 16384);
+      return this.rom[offset % Math.max(1, this.rom.length)] ?? 255;
+    }
+    if (address < 40960) return this.ppu.vram[this.ppu.vbk * 8192 + (address - 32768)];
+    if (address < 49152) {
+      if (!this.ramEnabled) return 255;
+      return this.externalRam[(this.ramBank * 8192 + (address - 40960)) % this.externalRam.length];
+    }
+    if (address < 53248) return this.wram[address - 49152];
+    if (address < 57344) return this.wram[Math.max(1, this.svbk) * 4096 + (address - 53248)];
+    /* L'écho de $E000 rejoue $C000, banque comprise. */
+    if (address < 61440) return this.wram[address - 57344];
+    if (address < 65024) return this.wram[Math.max(1, this.svbk) * 4096 + (address - 61440)];
+    if (address < 65184) return this.ppu.oam[address - 65024];
+    if (address < 65280) return 255;
+    if (address < 65408) return this.readIo(address);
+    if (address < 65535) return this.hram[address - 65408];
+    return this.interruptEnable;
+  }
+  write(address, value) {
+    address &= 65535;
+    value &= 255;
+    if (address < 32768) {
+      this.writeBankingRegister(address, value);
+      return;
+    }
+    if (address < 40960) {
+      this.ppu.vram[this.ppu.vbk * 8192 + (address - 32768)] = value;
+      return;
+    }
+    if (address < 49152) {
+      if (this.ramEnabled) {
+        this.externalRam[(this.ramBank * 8192 + (address - 40960)) % this.externalRam.length] = value;
+      }
+      return;
+    }
+    if (address < 53248) {
+      this.wram[address - 49152] = value;
+      return;
+    }
+    if (address < 57344) {
+      this.wram[Math.max(1, this.svbk) * 4096 + (address - 53248)] = value;
+      return;
+    }
+    if (address < 61440) {
+      this.wram[address - 57344] = value;
+      return;
+    }
+    if (address < 65024) {
+      this.wram[Math.max(1, this.svbk) * 4096 + (address - 61440)] = value;
+      return;
+    }
+    if (address < 65184) {
+      this.ppu.oam[address - 65024] = value;
+      return;
+    }
+    if (address < 65280) return;
+    if (address < 65408) {
+      this.writeIo(address, value);
+      return;
+    }
+    if (address < 65535) {
+      this.hram[address - 65408] = value;
+      return;
+    }
+    this.interruptEnable = value;
+  }
+  writeBankingRegister(address, value) {
+    if (this.mbc === "none") return;
+    if (address < 8192) {
+      this.ramEnabled = (value & 15) === 10;
+      return;
+    }
+    if (this.mbc === "mbc5") {
+      if (address < 12288) {
+        this.romBank = this.romBank & 256 | value;
+      } else if (address < 16384) {
+        this.romBank = this.romBank & 255 | (value & 1) << 8;
+      } else if (address < 24576) {
+        this.ramBank = value & 15;
+      }
+      if (this.romBank === 0) this.romBank = 0;
+      return;
+    }
+    if (address < 16384) {
+      const low = this.mbc === "mbc3" ? value & 127 : value & 31;
+      this.romBank = this.romBank & ~127 | (low === 0 ? 1 : low);
+      return;
+    }
+    if (address < 24576) {
+      if (this.mbc === "mbc3") {
+        this.ramBank = value & 15;
+      } else if (this.bankingMode === 0) {
+        this.romBank = this.romBank & 31 | (value & 3) << 5;
+      } else {
+        this.ramBank = value & 3;
+      }
+      return;
+    }
+    this.bankingMode = value & 1;
+  }
+  readIo(address) {
+    if (address === 65280) return this.joypad.read();
+    if (address >= 65284 && address <= 65287) return this.timer.read(address);
+    if (address === 65295) return this.interruptFlags | 224;
+    if (address >= 65296 && address <= 65343) return this.apu.read(address);
+    if (address >= 65344 && address <= 65355) return this.ppu.read(address);
+    if (address === 65359 || address >= 65384 && address <= 65387) return this.ppu.read(address);
+    if (address === 65392) return this.svbk | 248;
+    return 255;
+  }
+  writeIo(address, value) {
+    if (address === 65280) {
+      this.joypad.write(value);
+      return;
+    }
+    if (address >= 65284 && address <= 65287) {
+      this.timer.write(address, value);
+      return;
+    }
+    if (address === 65295) {
+      this.interruptFlags = value & 31;
+      return;
+    }
+    if (address >= 65296 && address <= 65343) {
+      this.apu.write(address, value);
+      return;
+    }
+    if (address === 65359 || address >= 65384 && address <= 65387) {
+      this.ppu.write(address, value);
+      return;
+    }
+    if (address === 65392) {
+      this.svbk = value & 7;
+      return;
+    }
+    if (address === 65350) {
+      this.runOamDma(value);
+      return;
+    }
+    if (address >= 65344 && address <= 65355) {
+      this.ppu.write(address, value);
+      return;
+    }
+  }
+  /** OAM DMA takes 160 machine cycles on hardware; we copy it instantly. */
+  runOamDma(page) {
+    const source = page << 8;
+    for (let i = 0; i < 160; i++) {
+      this.ppu.oam[i] = this.read(source + i);
+    }
+  }
+  requestInterrupt(bits) {
+    this.interruptFlags |= bits & 31;
+  }
+};
+
+// src/core/emu/constants.ts
+var SCREEN_WIDTH = 160;
+var SCREEN_HEIGHT = 144;
+var CYCLES_PER_FRAME = 70224;
+var VBLANK_INTERRUPT = 1 << 0;
+var STAT_INTERRUPT = 1 << 1;
+var TIMER_INTERRUPT = 1 << 2;
+var JOYPAD_INTERRUPT = 1 << 4;
+
+// src/core/emu/class/Ppu.ts
+var OAM_SCAN_CYCLES = 80;
+var DRAW_CYCLES = 172;
+var HBLANK_CYCLES = 204;
+var LINE_CYCLES = OAM_SCAN_CYCLES + DRAW_CYCLES + HBLANK_CYCLES;
+var LCDC_BG_ENABLE = 1;
+var LCDC_OBJ_ENABLE = 2;
+var LCDC_OBJ_TALL = 4;
+var LCDC_BG_MAP_HIGH = 8;
+var LCDC_TILE_DATA_LOW = 16;
+var LCDC_WINDOW_ENABLE = 32;
+var LCDC_WINDOW_MAP_HIGH = 64;
+var LCDC_ENABLE = 128;
+var MAX_SPRITES_PER_LINE = 10;
+/*
+ * Les quatre nuances d'origine, en BGR555 — le format de la Game Boy Color.
+ *
+ * Une cartouche qui ne pose aucune palette doit rester VERTE, et non noire :
+ * sur une vraie console, c'est le programme de démarrage qui met ces valeurs.
+ * Sans elles, tout programme d'avant deviendrait un écran noir le jour où on
+ * le lance en mode couleur — et l'on chercherait la faute dans le programme.
+ */
+var NUANCES_DMG = [
+  26 << 10 | 31 << 5 | 28,
+  14 << 10 | 24 << 5 | 17,
+  10 << 10 | 13 << 5 | 6,
+  4 << 10 | 3 << 5 | 1
+];
+var Ppu = class {
+  /* DEUX banques de 8 Ko : la seconde porte les attributs de chaque case de
+     la carte — sa palette, son retournement, sa priorité. */
+  vram = new Uint8Array(16384);
+  vbk = 0;
+  oam = new Uint8Array(160);
+  /* Le mode couleur, lu dans l'en-tête de la cartouche en $0143. */
+  couleur = false;
+  /* Huit palettes de quatre couleurs, deux octets chacune, pour le fond et
+     pour les lutins. L'index s'auto-incrémente à l'écriture : c'est ce qui
+     permet de verser une palette entière sans le reposer huit fois. */
+  bgPalettes = new Uint8Array(64);
+  objPalettes = new Uint8Array(64);
+  bcps = 0;
+  ocps = 0;
+  /** One shade (0-3) per pixel, ready for the UI to colourise. */
+  framebuffer = new Uint8Array(SCREEN_WIDTH * SCREEN_HEIGHT);
+  /*
+   * L'écran en couleurs, à côté de l'écran en nuances.
+   *
+   * `framebuffer` garde le numéro de nuance, de 0 à 3, comme il l'a toujours
+   * fait : toute la page, les captures et les contrôles le lisent. `couleurs`
+   * porte EN PLUS la couleur vraie, en BGR555. Remplacer l'un par l'autre
+   * aurait cassé dix-sept suites de contrôles pour n'ajouter rien ; les tenir
+   * tous les deux coûte un tableau de 46 Ko et ne casse personne.
+   */
+  couleurs = new Uint16Array(SCREEN_WIDTH * SCREEN_HEIGHT);
+  /** Set when a frame completes; the caller clears it. */
+  frameReady = false;
+  lcdc = 0;
+  stat = 0;
+  scy = 0;
+  scx = 0;
+  ly = 0;
+  lyc = 0;
+  bgp = 252;
+  obp0 = 255;
+  obp1 = 255;
+  wy = 0;
+  wx = 0;
+  mode = 2;
+  dot = 0;
+  windowLine = 0;
+  /** Palette index (pre-BGP) of each pixel on the current line, for sprite priority. */
+  lineColours = new Uint8Array(SCREEN_WIDTH);
+  /** Le bit de priorité de l'attribut, case par case — mode couleur seulement. */
+  linePriorite = new Uint8Array(SCREEN_WIDTH);
+  reset() {
+    this.vram.fill(0);
+    this.oam.fill(0);
+    this.framebuffer.fill(0);
+    this.couleurs.fill(NUANCES_DMG[0]);
+    this.vbk = 0;
+    this.bcps = 0;
+    this.ocps = 0;
+    /* Les palettes partent sur les quatre nuances d'origine — voir plus haut. */
+    for (let palette = 0; palette < 8; palette++) {
+      for (let teinte = 0; teinte < 4; teinte++) {
+        const ou = palette * 8 + teinte * 2;
+        this.bgPalettes[ou] = NUANCES_DMG[teinte] & 255;
+        this.bgPalettes[ou + 1] = NUANCES_DMG[teinte] >> 8;
+        this.objPalettes[ou] = NUANCES_DMG[teinte] & 255;
+        this.objPalettes[ou + 1] = NUANCES_DMG[teinte] >> 8;
+      }
+    }
+    this.lcdc = 145;
+    this.stat = 0;
+    this.scy = 0;
+    this.scx = 0;
+    this.ly = 0;
+    this.lyc = 0;
+    this.bgp = 252;
+    this.obp0 = 255;
+    this.obp1 = 255;
+    this.wy = 0;
+    this.wx = 0;
+    this.mode = 2;
+    this.dot = 0;
+    this.windowLine = 0;
+    this.frameReady = false;
+  }
+  /** Advances the PPU; returns the interrupt bits to raise. */
+  step(cycles) {
+    if ((this.lcdc & LCDC_ENABLE) === 0) {
+      this.ly = 0;
+      this.dot = 0;
+      this.mode = 0;
+      this.windowLine = 0;
+      return 0;
+    }
+    let interrupts = 0;
+    this.dot += cycles;
+    for (; ; ) {
+      if (this.mode === 2) {
+        if (this.dot < OAM_SCAN_CYCLES) break;
+        this.dot -= OAM_SCAN_CYCLES;
+        this.mode = 3;
+      } else if (this.mode === 3) {
+        if (this.dot < DRAW_CYCLES) break;
+        this.dot -= DRAW_CYCLES;
+        this.mode = 0;
+        this.renderScanline();
+        if (this.stat & 8) interrupts |= STAT_INTERRUPT;
+      } else if (this.mode === 0) {
+        if (this.dot < HBLANK_CYCLES) break;
+        this.dot -= HBLANK_CYCLES;
+        this.ly++;
+        interrupts |= this.checkCoincidence();
+        if (this.ly === SCREEN_HEIGHT) {
+          this.mode = 1;
+          this.frameReady = true;
+          interrupts |= VBLANK_INTERRUPT;
+          if (this.stat & 16) interrupts |= STAT_INTERRUPT;
+        } else {
+          this.mode = 2;
+          if (this.stat & 32) interrupts |= STAT_INTERRUPT;
+        }
+      } else {
+        if (this.dot < LINE_CYCLES) break;
+        this.dot -= LINE_CYCLES;
+        this.ly++;
+        if (this.ly > 153) {
+          this.ly = 0;
+          this.windowLine = 0;
+          this.mode = 2;
+          if (this.stat & 32) interrupts |= STAT_INTERRUPT;
+        }
+        interrupts |= this.checkCoincidence();
+      }
+    }
+    return interrupts;
+  }
+  checkCoincidence() {
+    if (this.ly === this.lyc && this.stat & 64) return STAT_INTERRUPT;
+    return 0;
+  }
+  /* ----------------------------------------------------------- registers */
+  read(address) {
+    switch (address) {
+      case 65344:
+        return this.lcdc;
+      case 65345:
+        return this.stat | 128 | (this.ly === this.lyc ? 4 : 0) | this.mode;
+      case 65346:
+        return this.scy;
+      case 65347:
+        return this.scx;
+      case 65348:
+        return this.ly;
+      case 65349:
+        return this.lyc;
+      case 65351:
+        return this.bgp;
+      case 65352:
+        return this.obp0;
+      case 65353:
+        return this.obp1;
+      case 65354:
+        return this.wy;
+      case 65355:
+        return this.wx;
+      case 65359:
+        return this.vbk | 254;
+      case 65384:
+        return this.bcps;
+      case 65385:
+        return this.bgPalettes[this.bcps & 63];
+      case 65386:
+        return this.ocps;
+      case 65387:
+        return this.objPalettes[this.ocps & 63];
+      default:
+        return 255;
+    }
+  }
+  write(address, value) {
+    switch (address) {
+      case 65344: {
+        const wasOn = (this.lcdc & LCDC_ENABLE) !== 0;
+        this.lcdc = value;
+        if (wasOn && (value & LCDC_ENABLE) === 0) {
+          this.ly = 0;
+          this.dot = 0;
+          this.mode = 0;
+          this.framebuffer.fill(0);
+        } else if (!wasOn && (value & LCDC_ENABLE) !== 0) {
+          this.mode = 2;
+          this.dot = 0;
+        }
+        break;
+      }
+      case 65345:
+        this.stat = value & 120;
+        break;
+      case 65346:
+        this.scy = value;
+        break;
+      case 65347:
+        this.scx = value;
+        break;
+      case 65348:
+        break;
+      // LY is read-only
+      case 65349:
+        this.lyc = value;
+        break;
+      case 65351:
+        this.bgp = value;
+        break;
+      case 65352:
+        this.obp0 = value;
+        break;
+      case 65353:
+        this.obp1 = value;
+        break;
+      case 65354:
+        this.wy = value;
+        break;
+      case 65355:
+        this.wx = value;
+        break;
+      /*
+       * $FF4F — la banque de VRAM que le PROCESSEUR voit.
+       *
+       * Le rendu, lui, lit toujours les deux : la carte et les tuiles dans la
+       * banque 0, les attributs dans la banque 1. Ce registre ne change que ce
+       * que le programme atteint en écrivant en $8000-$9FFF.
+       */
+      case 65359:
+        this.vbk = value & 1;
+        break;
+      /*
+       * $FF68-$FF6B — les palettes.
+       *
+       * L'index porte un bit d'auto-incrément : posé une fois, on verse les
+       * huit octets d'une palette d'affilée sans reposer l'index entre chaque.
+       * C'est ce qui rend « couleurFond() » court dans la cartouche.
+       */
+      case 65384:
+        this.bcps = value;
+        break;
+      case 65385:
+        this.bgPalettes[this.bcps & 63] = value;
+        if ((this.bcps & 128) !== 0) this.bcps = this.bcps & 192 | this.bcps + 1 & 63;
+        break;
+      case 65386:
+        this.ocps = value;
+        break;
+      case 65387:
+        this.objPalettes[this.ocps & 63] = value;
+        if ((this.ocps & 128) !== 0) this.ocps = this.ocps & 192 | this.ocps + 1 & 63;
+        break;
+    }
+  }
+  /* ------------------------------------------------------------ rendering */
+  renderScanline() {
+    const line = this.ly;
+    if (line >= SCREEN_HEIGHT) return;
+    const rowStart = line * SCREEN_WIDTH;
+    if ((this.lcdc & LCDC_BG_ENABLE) === 0) {
+      this.framebuffer.fill(0, rowStart, rowStart + SCREEN_WIDTH);
+      this.couleurs.fill(
+        this.couleur ? this.couleurDe(this.bgPalettes, 0, 0) : NUANCES_DMG[0],
+        rowStart,
+        rowStart + SCREEN_WIDTH
+      );
+      this.lineColours.fill(0);
+      this.linePriorite.fill(0);
+    } else {
+      this.renderBackground(line, rowStart);
+      if ((this.lcdc & LCDC_WINDOW_ENABLE) !== 0) this.renderWindow(line, rowStart);
+    }
+    if ((this.lcdc & LCDC_OBJ_ENABLE) !== 0) this.renderSprites(line, rowStart);
+  }
+  /** La couleur d'une teinte, dans une palette de fond ou de lutin. */
+  couleurDe(palettes, palette, teinte) {
+    const ou = (palette & 7) * 8 + (teinte & 3) * 2;
+    return palettes[ou] | palettes[ou + 1] << 8;
+  }
+  renderBackground(line, rowStart) {
+    const mapBase = (this.lcdc & LCDC_BG_MAP_HIGH) !== 0 ? 7168 : 6144;
+    const y = line + this.scy & 255;
+    const tileRow = y >> 3;
+    const pixelRow = y & 7;
+    for (let x = 0; x < SCREEN_WIDTH; x++) {
+      const mapX = x + this.scx & 255;
+      const ouCarte = mapBase + tileRow * 32 + (mapX >> 3);
+      const tileIndex = this.vram[ouCarte];
+      /* L'attribut vit à la MÊME adresse, dans la seconde banque. */
+      const attribut = this.couleur ? this.vram[8192 + ouCarte] : 0;
+      const colour = this.tilePixelCgb(tileIndex, pixelRow, mapX & 7, attribut);
+      this.lineColours[x] = colour;
+      this.linePriorite[x] = attribut >> 7 & 1;
+      this.peindreFond(rowStart + x, colour, attribut);
+    }
+  }
+  /** Le fond : la palette vient de l'attribut en couleur, de BGP sinon. */
+  peindreFond(ou, teinte, attribut) {
+    if (this.couleur) {
+      this.framebuffer[ou] = teinte;
+      this.couleurs[ou] = this.couleurDe(this.bgPalettes, attribut & 7, teinte);
+      return;
+    }
+    const nuance = this.bgp >> teinte * 2 & 3;
+    this.framebuffer[ou] = nuance;
+    this.couleurs[ou] = NUANCES_DMG[nuance];
+  }
+  /*
+   * Un pixel de tuile, attribut compris.
+   *
+   * En mode couleur l'attribut dit la banque où lire la tuile, et si elle est
+   * retournée. En mode d'origine il vaut zéro, et l'on retombe exactement sur
+   * l'ancien calcul — c'est ce qui permet aux deux modes de partager ce code
+   * sans que le premier change d'un cycle.
+   */
+  tilePixelCgb(tileIndex, row, column, attribut) {
+    const banque = this.couleur ? (attribut >> 3 & 1) * 8192 : 0;
+    const ligne = this.couleur && (attribut & 64) !== 0 ? 7 - row : row;
+    const colonne = this.couleur && (attribut & 32) !== 0 ? 7 - column : column;
+    let address;
+    if ((this.lcdc & LCDC_TILE_DATA_LOW) !== 0) {
+      address = tileIndex * 16;
+    } else {
+      address = 4096 + (tileIndex << 24 >> 24) * 16;
+    }
+    address += ligne * 2;
+    const low = this.vram[banque + address];
+    const high = this.vram[banque + address + 1];
+    const bit = 7 - colonne;
+    return (high >> bit & 1) << 1 | low >> bit & 1;
+  }
+  renderWindow(line, rowStart) {
+    if (line < this.wy) return;
+    const startX = this.wx - 7;
+    if (startX >= SCREEN_WIDTH) return;
+    const mapBase = (this.lcdc & LCDC_WINDOW_MAP_HIGH) !== 0 ? 7168 : 6144;
+    const y = this.windowLine;
+    const tileRow = y >> 3 & 31;
+    const pixelRow = y & 7;
+    for (let x = Math.max(0, startX); x < SCREEN_WIDTH; x++) {
+      const windowX = x - startX;
+      const ouCarte = mapBase + tileRow * 32 + (windowX >> 3 & 31);
+      const tileIndex = this.vram[ouCarte];
+      const attribut = this.couleur ? this.vram[8192 + ouCarte] : 0;
+      const colour = this.tilePixelCgb(tileIndex, pixelRow, windowX & 7, attribut);
+      this.lineColours[x] = colour;
+      this.linePriorite[x] = attribut >> 7 & 1;
+      this.peindreFond(rowStart + x, colour, attribut);
+    }
+    this.windowLine++;
+  }
+  /** Reads one pixel out of a background/window tile, honouring the LCDC addressing mode. */
+  tilePixel(tileIndex, row, column) {
+    let address;
+    if ((this.lcdc & LCDC_TILE_DATA_LOW) !== 0) {
+      address = tileIndex * 16;
+    } else {
+      address = 4096 + (tileIndex << 24 >> 24) * 16;
+    }
+    address += row * 2;
+    const low = this.vram[address];
+    const high = this.vram[address + 1];
+    const bit = 7 - column;
+    return (high >> bit & 1) << 1 | low >> bit & 1;
+  }
+  renderSprites(line, rowStart) {
+    const height = (this.lcdc & LCDC_OBJ_TALL) !== 0 ? 16 : 8;
+    const visible = [];
+    for (let index = 0; index < 40 && visible.length < MAX_SPRITES_PER_LINE; index++) {
+      const spriteY = this.oam[index * 4] - 16;
+      if (line >= spriteY && line < spriteY + height) visible.push(index);
+    }
+    visible.sort((a, b) => this.oam[b * 4 + 1] - this.oam[a * 4 + 1] || b - a);
+    for (const index of visible) {
+      const spriteY = this.oam[index * 4] - 16;
+      const spriteX = this.oam[index * 4 + 1] - 8;
+      const flags = this.oam[index * 4 + 3];
+      const behindBackground = (flags & 128) !== 0;
+      const flipY = (flags & 64) !== 0;
+      const flipX = (flags & 32) !== 0;
+      /* En couleur, la palette est un numéro de 0 à 7 pris dans les trois bits
+         du bas, et la tuile peut vivre dans la seconde banque. */
+      const palette = (flags & 16) !== 0 ? this.obp1 : this.obp0;
+      const paletteCgb = flags & 7;
+      const banque = this.couleur ? (flags >> 3 & 1) * 8192 : 0;
+      let tileIndex = this.oam[index * 4 + 2];
+      if (height === 16) tileIndex &= 254;
+      let row = line - spriteY;
+      if (flipY) row = height - 1 - row;
+      const address = tileIndex * 16 + row * 2;
+      const low = this.vram[banque + address];
+      const high = this.vram[banque + address + 1];
+      for (let x = 0; x < 8; x++) {
+        const screenX = spriteX + x;
+        if (screenX < 0 || screenX >= SCREEN_WIDTH) continue;
+        const bit = flipX ? x : 7 - x;
+        const colour = (high >> bit & 1) << 1 | low >> bit & 1;
+        if (colour === 0) continue;
+        /* Deux priorités en couleur : celle du lutin, et celle de la case du
+           fond. L'une ou l'autre suffit à faire passer le décor devant. */
+        if (behindBackground && this.lineColours[screenX] !== 0) continue;
+        if (this.couleur && this.linePriorite[screenX] && this.lineColours[screenX] !== 0) continue;
+        if (this.couleur) {
+          this.framebuffer[rowStart + screenX] = colour;
+          this.couleurs[rowStart + screenX] = this.couleurDe(this.objPalettes, paletteCgb, colour);
+        } else {
+          const nuance = palette >> colour * 2 & 3;
+          this.framebuffer[rowStart + screenX] = nuance;
+          this.couleurs[rowStart + screenX] = NUANCES_DMG[nuance];
+        }
+      }
+    }
+  }
+};
+
+// src/core/emu/class/Timer.ts
+var TAC_PERIODS = [1024, 16, 64, 256];
+var Timer = class {
+  divider = 0;
+  counter = 0;
+  // TIMA
+  modulo = 0;
+  // TMA
+  control = 0;
+  // TAC
+  tick = 0;
+  reset() {
+    this.divider = 43980;
+    this.counter = 0;
+    this.modulo = 0;
+    this.control = 0;
+    this.tick = 0;
+  }
+  /** Advances by `cycles` T-cycles; returns the interrupt bits to raise. */
+  step(cycles) {
+    this.divider = this.divider + cycles & 65535;
+    if ((this.control & 4) === 0) return 0;
+    let interrupts = 0;
+    const period = TAC_PERIODS[this.control & 3];
+    this.tick += cycles;
+    while (this.tick >= period) {
+      this.tick -= period;
+      this.counter++;
+      if (this.counter > 255) {
+        this.counter = this.modulo;
+        interrupts |= TIMER_INTERRUPT;
+      }
+    }
+    return interrupts;
+  }
+  read(address) {
+    switch (address) {
+      case 65284:
+        return this.divider >> 8 & 255;
+      case 65285:
+        return this.counter;
+      case 65286:
+        return this.modulo;
+      case 65287:
+        return this.control | 248;
+      default:
+        return 255;
+    }
+  }
+  write(address, value) {
+    switch (address) {
+      case 65284:
+        this.divider = 0;
+        this.tick = 0;
+        break;
+      case 65285:
+        this.counter = value & 255;
+        break;
+      case 65286:
+        this.modulo = value & 255;
+        break;
+      case 65287:
+        this.control = value & 7;
+        break;
+    }
+  }
+};
+
+// src/core/emu/class/GameBoy.ts
+var GameBoy = class {
+  apu = new Apu();
+  ppu = new Ppu();
+  timer = new Timer();
+  joypad = new Joypad();
+  mmu = new Mmu(this.ppu, this.timer, this.joypad, this.apu);
+  cpu = new Cpu(this.mmu);
+  /** Cycles carried over from the previous frame. */
+  carry = 0;
+  loadRom(rom) {
+    this.mmu.loadRom(rom);
+    this.reset();
+  }
+  reset() {
+    this.apu.reset();
+    this.ppu.reset();
+    this.timer.reset();
+    this.joypad.reset();
+    this.mmu.reset();
+    this.cpu.reset();
+    this.carry = 0;
+  }
+  setButton(button, isDown) {
+    this.joypad.setPressed(button, isDown);
+  }
+  releaseAllButtons() {
+    this.joypad.releaseAll();
+  }
+  /** Runs one instruction and advances the other chips by the cycles it took. */
+  stepInstruction() {
+    const cycles = this.cpu.step();
+    this.apu.step(cycles);
+    this.mmu.requestInterrupt(this.ppu.step(cycles));
+    this.mmu.requestInterrupt(this.timer.step(cycles));
+    return cycles;
+  }
+  /**
+   * Advances until the PPU finishes a frame. Falls back to a cycle budget so a
+   * ROM stuck in a loop with the LCD off cannot hang the browser tab.
+   */
+  runFrame() {
+    this.ppu.frameReady = false;
+    let cycles = this.carry;
+    while (!this.ppu.frameReady && cycles < CYCLES_PER_FRAME * 2) {
+      cycles += this.stepInstruction();
+    }
+    this.carry = this.ppu.frameReady ? Math.max(0, cycles - CYCLES_PER_FRAME) : 0;
+    return this.ppu.framebuffer;
+  }
+  get framebuffer() {
+    return this.ppu.framebuffer;
+  }
+};
+
+
+const ROM = Uint8Array.from(atob("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mAEABK8iC3mwIPnJzUEiIQCcAQAEryILebAg+ck+IOAA8ADwAC/mD0c+EOAA8ADwAPAA8AAv5g/LN7BHPjDgAHjJAAAAAAAAAAAAAAAAAAAAADg4RERERHx8REREREREAAB4eERERER4eERERER4eAAAODhEREBAQEBAQEREODgAAHh4RERERERERERERHh4AAB8fEBAQEB4eEBAQEB8fAAAfHxAQEBAeHhAQEBAQEAAADg4RERAQFxcRERERDw8AABERERERER8fERERERERAAAODgQEBAQEBAQEBAQODgAABwcCAgICAgICAhISDAwAABEREhIUFBgYFBQSEhERAAAQEBAQEBAQEBAQEBAfHwAAEREbGxUVFRUREREREREAABERGRkVFRMTERERERERAAAODhEREREREREREREODgAAHh4RERERHh4QEBAQEBAAAA4OERERERERFRUSEg0NAAAeHhEREREeHhQUEhIREQAADw8QEBAQDg4BAQEBHh4AAB8fBAQEBAQEBAQEBAQEAAAREREREREREREREREODgAAEREREREREREREQoKBAQAABERERERERUVFRUbGxERAAARERERCgoEBAoKEREREQAAEREREQoKBAQEBAQEBAQAAB8fAQECAgQECAgQEB8fAAAODhERExMVFRkZEREODgAABAQMDAQEBAQEBAQEDg4AAA4OEREBAQICBAQICB8fAAAfHwICBAQCAgEBEREODgAAAgIGBgoKEhIfHwICAgIAAB8fEBAeHgEBAQEREQ4OAAAGBggIEBAeHhEREREODgAAHx8BAQICBAQICAgICAgAAA4OEREREQ4OEREREQ4OAAAODhEREREPDwEBAgIMDAAABAQEBAQEBAQEBAAABAQAAA4OEREBAQICBAQAAAQEAAAAAAAAAAAAAAAAAAAEBAAAAAAAAAAAHx8AAAAAAAAAAAAABAQAAAAAAAAEBAAAAAA//+BgYG9gb2BvYG9gYH//wD/AP8A/wD/AP8A/wD/AP8HAA8AHwcfBh8ABwA/AH8BwADgAPDA8GDwAMAA+AD/40E/QD8wDx8AHwcfBx8HPwff4xzgMMDgAODA4MDgwPDABwAPAB8HHwYfAAcAPwB/AcAA4ADwwPBg8ADAAPgA/+NBP0A/MA8fAB8HPwd/B/wM3+Mc4DDA4ADAgICAAwAPAAcADwAfBx8GHwAHAD8AfwHAAOAA8MDwYPAAwAD4AP/jQT9APzAPHwAHAwMDwwPwAN/jHOAwwOAA4MDwwPjgDwwHAA8AHwcfBh8ABwA/AH8BwADgAPDA8GDwAMAA+AD/40E/QD8wDz8Afx5/HgEAAQDf4xzgMMDAAAAAAADw4PDgAAAPADAPZx9POE8/Tz9nHwAA8AAM8Ob45njm+Ob45vgwDw8AGAAwAAAAAAAAAAAADPDwABgADAAAAAAAAAAAAP//gf+r1bvFq9W7xYH///////+Bw5nDmcO1w5n/gf//GBg8JGJew73DvWJePCQYGDwYZjzDfsN+w37DfmY8PBgAADw8Qn5aZlpmQn48PAAAAAA8AEIAQgBCAEIAfAAAAAAAAAA8GH48fjw8GAAAAAA+wOBGPig9IP3JLACdAAcBawHJASMCdwLHAhIDWAObA9oDFgROBIMEtQTlBBEFOwVjBYkFrAXOBe0FCwYnBkIGWwZyBokGngayBsQG1gbnBvcGBgcUByEHLQc5B0QHTwdZB2IHawdzB3sHgweKB5AHlwedB6IHpwesB7EHtge6B74HEgUVExMJGg8OBQAOBRQUDxkFBQQFFBIVCRQEDw4OBQUTExQBEhQCAgICAgICAgICAgICAgICAAAAAgICAgIDAwMDBAQEAgIAAAICAgICAgICAwMDAwMCAgICAAAAAgICAgICAgQEBAQFBQUFAgICAgIAAAICAgICAgIDAwMDAgICAgAAAAICAgICAgICAwMDBAQEBQUFBQUFBQICAgIAAAAAAAAAAAABAQEAAgIAAAAAAAABAQAAAQEBAAAAAAAAAAACAgEBAQAAAAAAAgIAAQEAAAAAAAABAQEAAAAAAAAAAgIAAAEBAQAAAAAAAgEBAAAAAAAAAAEBAAAAAAAAAQEBAAICAAAAAAAAAAEBAQAAAAADAAAAAAAAAAAAAAAMDAwADAwAAAAAAAAMDAAACwsLAAAAAAAAAAALCwwMDAAAAAAACgoACwsAAAAAAAAMDAwAAAAAAAAACwsAAAwMDAAAAAAADAwMAAAAAAAAAAwMAAAAAAAADAwMAAwMAAAAAAAAAAoKCgAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="), (c) => c.charCodeAt(0))
+const EN_COULEUR = false
+const NUANCES = [[0xe0, 0xf8, 0xd0], [0x88, 0xc0, 0x70], [0x34, 0x68, 0x56], [0x08, 0x18, 0x20]]
+const huitBits = (cinq) => (cinq << 3) | (cinq >> 2)
+
+const toile = document.getElementById('ecran')
+const ctx = toile.getContext('2d')
+const image = ctx.createImageData(160, 144)
+
+const gb = new GameBoy()
+gb.loadRom(ROM)
+gb.ppu.couleur = EN_COULEUR
+
+let audio = null
+let volume = null
+let curseurAudio = 0
+
+function ouvrirLeSon() {
+  if (audio) { if (audio.state === 'suspended') audio.resume(); return }
+  audio = new AudioContext()
+  volume = audio.createGain()
+  volume.gain.value = 0.25
+  volume.connect(audio.destination)
+  gb.apu.frequenceEchantillonnage = audio.sampleRate
+  curseurAudio = audio.currentTime
+}
+
+function verserLeSon() {
+  if (!audio || audio.state !== 'running') return
+  const echantillons = gb.apu.drain()
+  if (!echantillons.length) return
+  const tampon = audio.createBuffer(1, echantillons.length, audio.sampleRate)
+  tampon.getChannelData(0).set(echantillons)
+  const source = audio.createBufferSource()
+  source.buffer = tampon
+  source.connect(volume)
+  const maintenant = audio.currentTime
+  if (curseurAudio < maintenant + 0.02) curseurAudio = maintenant + 0.06
+  if (curseurAudio > maintenant + 0.3) curseurAudio = maintenant + 0.1
+  source.start(curseurAudio)
+  curseurAudio += tampon.duration
+}
+
+function redessiner() {
+  if (gb.ppu.couleur) {
+    for (let i = 0; i < 160 * 144; i++) {
+      const c = gb.ppu.couleurs[i]
+      image.data[i * 4] = huitBits(c & 31)
+      image.data[i * 4 + 1] = huitBits((c >> 5) & 31)
+      image.data[i * 4 + 2] = huitBits((c >> 10) & 31)
+      image.data[i * 4 + 3] = 255
+    }
+  } else {
+    for (let i = 0; i < 160 * 144; i++) {
+      const [r, v, b] = NUANCES[gb.framebuffer[i] & 3]
+      image.data[i * 4] = r
+      image.data[i * 4 + 1] = v
+      image.data[i * 4 + 2] = b
+      image.data[i * 4 + 3] = 255
+    }
+  }
+  ctx.putImageData(image, 0, 0)
+}
+
+const TOUCHES = {
+  ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
+  KeyX: 'a', KeyZ: 'b', Enter: 'start', ShiftLeft: 'select', ShiftRight: 'select',
+}
+
+addEventListener('keydown', (e) => {
+  const bouton = TOUCHES[e.code]
+  if (!bouton) return
+  e.preventDefault()
+  gb.setButton(bouton, true)
+})
+addEventListener('keyup', (e) => {
+  const bouton = TOUCHES[e.code]
+  if (!bouton) return
+  e.preventDefault()
+  gb.setButton(bouton, false)
+})
+addEventListener('pointerdown', ouvrirLeSon, { once: true })
+addEventListener('keydown', ouvrirLeSon, { once: true })
+
+function tick() {
+  requestAnimationFrame(tick)
+  gb.runFrame()
+  verserLeSon()
+  redessiner()
+}
+tick()
+</script>
+</body>
+</html>

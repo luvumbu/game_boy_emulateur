@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Cours 15 — break et continue : sortir, ou sauter un tour</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+
+  a { color: var(--vert); }
+  .navigation { display: flex; justify-content: space-between; gap: 12pt; margin-top: 18pt; font-size: 9.5pt; }
+  .sommaire-cours { list-style: none; padding: 0; margin: 0; }
+  .sommaire-cours li { padding: 2pt 0; }
+  .sommaire-cours li.chapitre {
+    color: var(--vert); font-weight: 700; text-transform: uppercase;
+    font-size: 9pt; letter-spacing: .05em; padding-top: 12pt;
+  }
+  .sommaire-cours .numero {
+    display: inline-grid; place-items: center; width: 16pt; height: 16pt; border-radius: 50%;
+    background: var(--vert-clair); color: var(--vert); font-size: 8pt; font-weight: 700; margin-right: 4pt;
+  }
+</style>
+</head>
+<body>
+
+<p class="reperes">
+  <span class="niveau">Chapitre 3 — Les boucles : répéter</span>
+  <span>leçon 7 sur 9 dans ce chapitre</span>
+  <span>15 sur 42 dans le cours</span>
+</p>
+<h1>15. break et continue : sortir, ou sauter un tour</h1>
+<p class="idee">On n’est pas obligé de finir tous les tours : on sort dès qu’on a trouvé.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><code>break;</code> <strong>sort</strong> de la boucle immédiatement, sans finir le tour ni faire les suivants. C’est l’outil de la <strong>recherche</strong> : on parcourt jusqu’à trouver, puis on s’arrête.</p>
+<p>Ici, on cherche la <strong>première case vide</strong> d’une rangée — là où un jeu poserait une nouvelle pièce, un nouvel ennemi. <code>lire(colonne, ligne)</code> rend le numéro de la tuile affichée ; l’espace est la tuile <strong>0</strong>. Dès qu’on la trouve : on retient la colonne, et <code>break</code>.</p>
+<p><code>tours</code> le prouve : la boucle prévoyait 20 tours, elle n’en a fait que <strong>5</strong>. Sur une grande grille, s’arrêter tôt, c’est du temps de gagné — et sur une console à 4 MHz, le temps est compté.</p>
+<p><code>continue;</code> fait l’inverse : il <strong>abandonne ce tour-ci</strong> et passe <strong>au suivant</strong>. Ici, il saute les multiples de 3 (<code>i % 3 == 0</code>) : 0, 3, 6 et 9 ne sont pas écrits.</p>
+<p>Le <code>libre = 255</code> de départ est une <strong>valeur témoin</strong> : si la rangée était pleine, la boucle finirait sans rien trouver, et 255 le dirait (aucune colonne ne porte ce numéro).</p>
+<p><strong>À toi :</strong> remplis toute la rangée de # et vérifie que l’écran affiche 255.</p>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1571 octets</strong> de cartouche.</p>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  ecran(0);
+  texte(0, 3, "####  ##  ##########");
+
+  uint8_t libre = 255;        // 255 : pas encore trouve
+  uint8_t tours = 0;
+
+  for (uint8_t colonne = 0; colonne &lt; 20; colonne++) {
+    tours++;
+    if (lire(colonne, 3) == 0) {
+      libre = colonne;
+      break;                  // trouve : inutile de continuer
+    }
+  }
+
+  texte(0, 5, "CASE LIBRE:");  nombre(14, 5, libre);
+  texte(0, 6, "TOURS FAITS:"); nombre(14, 6, tours);
+
+  /* continue : on saute les multiples de 3 */
+  for (uint8_t i = 0; i &lt; 10; i++) {
+    if (i % 3 == 0) continue;
+    nombre(i * 2, 10, i, 1);
+  }
+  ecran(1);
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADA0lEQVR4nO3czXHbMBQAYR5TQo4pIrWkhpTrElKGjz5Eo9FIAsgH4IHgemf2INM0DeMT/zRhtn+fHwZuO30ElprA8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B424+fv1KLDmi17V+97e0cleauYXkDwFLbv/ryG/Dvv3/uPf5A//I2gHW2f/XlAi8KI7DAAgvsRdbwv3e15d4mwfODDngCwxMYnsDwBIYnMDyB4QkM7wZc+txgd/njt6IfQVTWebuR0saPLG/4SKSn6HzuTkgX8BNS6HXP+Orrv52dIePMm82esSW9C5+BowO9LnBe99/7eoQrWf7/8gTg3aNfaf0k4CGH7jnAr2b15ecA72L07DFj9+D6+pOB35rVlye9F1vOwWsCv/7Itc7BiXtw5ZBbej3kqnXUKeDIOL/1VbSB29r2pNLr0H1zqeh4juzxk6+/Ro1zDPAr1S5k8+uDs7O7/PglVfTiq3+Kl7qdE3h80fvg1MPJYOC2i4vSyqFDWejKJfv4HLoPPvJXrAI85ACYvQenTmjDffDFgOujXB/43HPwVOCGq8HS6yEfYVYmorL9zkv6ZuPQqWrGOdiQCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhtQOH/hn+nMfsGx5uy3s2qe15u+GDaQQOjWbOs7D9j8Ykjerc+Zm0B2dP7pEHGx9XXu2Ikjc/U4FTdZca0jqnsHnAEx7la5ij7PdcdOWr7sFzTnsrHBI7J2cV4Ob/kiFVOnTdl/18cN58hvI+GJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExjeF5rdrl2/jq66AAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">La case libre est la 004, trouvée en 005 tours ; puis 1 2 4 5 7 8, sans 0, 3, 6 ni 9.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles sont ceux que <code>verification/verifier-cours.mjs</code>
+exige de cette leçon. Ils viennent d’être joués, et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>la première case vide est la colonne 4 </li>
+
+  <li>break a arrêté la boucle après 5 tours </li>
+
+  <li>continue a sauté 0, 3, 6 et 9 </li>
+</ul>
+
+<p class="navigation">
+  <span>← <a href="14-une-boucle-dans-une-boucle-la-grille.html">14. Une boucle dans une boucle : la grille</a></span>
+  <span><a href="index.html">sommaire</a></span>
+  <span><a href="16-do-while-au-moins-une-fois.html">16. do … while : au moins une fois</a> →</span>
+</p>
+
+<p class="pied">gameboy3 — apprendre à programmer, en écrivant pour la Game Boy</p>
+
+</body>
+</html>

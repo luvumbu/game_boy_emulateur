@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Apprendre à programmer — le sommaire</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+
+  a { color: var(--vert); }
+  .navigation { display: flex; justify-content: space-between; gap: 12pt; margin-top: 18pt; font-size: 9.5pt; }
+  .sommaire-cours { list-style: none; padding: 0; margin: 0; }
+  .sommaire-cours li { padding: 2pt 0; }
+  .sommaire-cours li.chapitre {
+    color: var(--vert); font-weight: 700; text-transform: uppercase;
+    font-size: 9pt; letter-spacing: .05em; padding-top: 12pt;
+  }
+  .sommaire-cours .numero {
+    display: inline-grid; place-items: center; width: 16pt; height: 16pt; border-radius: 50%;
+    background: var(--vert-clair); color: var(--vert); font-size: 8pt; font-weight: 700; margin-right: 4pt;
+  }
+</style>
+</head>
+<body>
+
+<h1>Apprendre à programmer, sur Game&nbsp;Boy</h1>
+<p class="idee">42 leçons en huit chapitres qui se suivent : chaque notion est
+vue en profondeur avant de passer à la suivante. Chaque programme a été compilé, et
+chaque image est l’écran de la console émulée.</p>
+
+<p>Pour les faire tourner et les modifier : le <strong>MODE COURS</strong> de l’atelier, ou <code>cours.html</code>, dans
+l’atelier (<code>node demarrer.mjs</code>). Les leçons du tutoriel restent
+dans <code>tuto.html</code> et <code>livrets/</code> : ce cours les complète,
+il ne les remplace pas.</p>
+
+<ol class="sommaire-cours">
+<li class="chapitre">Chapitre 1 — Les variables : la mémoire de la console</li>
+<li><span class="numero">1</span>
+      <a href="01-une-variable-une-case-qui-porte-un-nom.html">Une variable, une case qui porte un nom</a>
+      — <span class="detail">Le programme se souvient de quelque chose : c’est tout ce qu’est une variable.</span></li>
+<li><span class="numero">2</span>
+      <a href="02-calculer-et.html">Calculer : + - * / et %</a>
+      — <span class="detail">Diviser des entiers laisse un reste — et ce reste est souvent ce qu’on cherche.</span></li>
+<li><span class="numero">3</span>
+      <a href="03-un-octet-s-arrete-a-255.html">Un octet s’arrête à 255</a>
+      — <span class="detail">Après 255 vient 0, et avant 0 vient 255 : la variable fait le tour.</span></li>
+<li><span class="numero">4</span>
+      <a href="04-ou-vit-une-variable-avant-la-boucle-ou-d.html">Où vit une variable : avant la boucle, ou dedans</a>
+      — <span class="detail">Une variable déclarée DANS la boucle renaît à chaque tour — et oublie tout.</span></li>
+<li class="chapitre">Chapitre 2 — Les conditions : choisir</li>
+<li><span class="numero">5</span>
+      <a href="05-if-et-else-deux-chemins.html">if et else : deux chemins</a>
+      — <span class="detail">Le programme ne fait pas tout : il choisit ce qu’il fait, image après image.</span></li>
+<li><span class="numero">6</span>
+      <a href="06-une-comparaison-est-un-nombre.html">Une comparaison est un nombre</a>
+      — <span class="detail">« x == 7 » n’est pas une question posée dans le vide : c’est un calcul qui donne 1 ou 0.</span></li>
+<li><span class="numero">7</span>
+      <a href="07-et-ou-non.html">Et, ou, non : &amp;&amp; || !</a>
+      — <span class="detail">Une vraie question de jeu se pose rarement en une seule comparaison.</span></li>
+<li><span class="numero">8</span>
+      <a href="08-plusieurs-cas-else-if-puis-switch.html">Plusieurs cas : else if, puis switch</a>
+      — <span class="detail">« else if » range des intervalles ; « switch » aiguille sur des valeurs exactes.</span></li>
+<li class="chapitre">Chapitre 3 — Les boucles : répéter</li>
+<li><span class="numero">9</span>
+      <a href="09-la-boucle-du-jeu-while-true.html">La boucle du jeu : while (true)</a>
+      — <span class="detail">Tout jeu est une boucle : lire, calculer, dessiner, attendre — soixante fois par seconde.</span></li>
+<li><span class="numero">10</span>
+      <a href="10-while-avec-une-condition-la-boucle-qui-s.html">while avec une condition : la boucle qui s’arrête</a>
+      — <span class="detail">La condition est posée AVANT chaque tour : quand elle devient fausse, on sort.</span></li>
+<li><span class="numero">11</span>
+      <a href="11-for-la-boucle-qui-compte.html">for : la boucle qui compte</a>
+      — <span class="detail">Départ, condition, pas : les trois morceaux d’une boucle qui compte, sur une seule ligne.</span></li>
+<li><span class="numero">12</span>
+      <a href="12-l-ecran-ne-s-ecrit-que-pendant-le-vblank.html">L’écran ne s’écrit que pendant le VBlank</a>
+      — <span class="detail">La console dessine l’écran soixante fois par seconde ; on ne peut lui écrire que pendant la courte pause entre deux images.</span></li>
+<li><span class="numero">13</span>
+      <a href="13-compter-a-l-envers-et-le-piege-du-zero.html">Compter à l’envers, et le piège du zéro</a>
+      — <span class="detail">Un octet n’est jamais plus petit que zéro : « i &gt;= 0 » est toujours vrai.</span></li>
+<li><span class="numero">14</span>
+      <a href="14-une-boucle-dans-une-boucle-la-grille.html">Une boucle dans une boucle : la grille</a>
+      — <span class="detail">Pour chaque ligne, toutes les colonnes : c’est ainsi qu’on remplit un écran.</span></li>
+<li><span class="numero">15</span>
+      <a href="15-break-et-continue-sortir-ou-sauter-un-to.html">break et continue : sortir, ou sauter un tour</a>
+      — <span class="detail">On n’est pas obligé de finir tous les tours : on sort dès qu’on a trouvé.</span></li>
+<li><span class="numero">16</span>
+      <a href="16-do-while-au-moins-une-fois.html">do … while : au moins une fois</a>
+      — <span class="detail">Quand il faut d’abord essayer pour savoir si c’est bon, la condition se pose APRÈS.</span></li>
+<li><span class="numero">17</span>
+      <a href="17-une-boucle-qui-dure-plusieurs-images.html">Une boucle qui dure plusieurs images</a>
+      — <span class="detail">Un « for » se fait d’un coup ; pour qu’on VOIE quelque chose se construire, la boucle du jeu doit porter le compte.</span></li>
+<li class="chapitre">Chapitre 4 — Les tableaux : ranger beaucoup de valeurs</li>
+<li><span class="numero">18</span>
+      <a href="18-un-tableau-plusieurs-cases-sous-un-seul-.html">Un tableau : plusieurs cases sous un seul nom</a>
+      — <span class="detail">Cinq scores, ce n’est pas cinq variables : c’est un tableau de cinq cases, et une boucle.</span></li>
+<li><span class="numero">19</span>
+      <a href="19-parcourir-le-total-le-plus-grand-le-plus.html">Parcourir : le total, le plus grand, le plus petit</a>
+      — <span class="detail">Une boucle qui passe sur chaque case, et une variable qui retient ce qu’on a vu.</span></li>
+<li><span class="numero">20</span>
+      <a href="20-une-table-gravee-dessiner-un-niveau.html">Une table gravée : dessiner un niveau</a>
+      — <span class="detail">Le niveau est une liste de nombres ; deux boucles en font un paysage.</span></li>
+<li><span class="numero">21</span>
+      <a href="21-chercher-et-changer-une-case.html">Chercher et changer une case</a>
+      — <span class="detail">Ramasser une pièce, c’est trouver sa case dans le tableau, et la mettre à zéro.</span></li>
+<li><span class="numero">22</span>
+      <a href="22-une-grille-un-tableau-a-deux-dimensions.html">Une grille : un tableau à deux dimensions</a>
+      — <span class="detail">Une carte de jeu, c’est des lignes de cases : carte[ligne][colonne].</span></li>
+<li class="chapitre">Chapitre 5 — Les fonctions : nommer un geste</li>
+<li><span class="numero">23</span>
+      <a href="23-une-fonction-donner-un-nom-a-un-geste.html">Une fonction : donner un nom à un geste</a>
+      — <span class="detail">Quand un bloc de code fait UNE chose, on lui donne un nom, et main() se lit comme une histoire.</span></li>
+<li><span class="numero">24</span>
+      <a href="24-des-arguments-le-meme-geste-ailleurs.html">Des arguments : le même geste, ailleurs</a>
+      — <span class="detail">Une fonction qui dessine UNE boîte n’a servi qu’une fois ; avec des arguments, elle en dessine autant qu’on veut.</span></li>
+<li><span class="numero">25</span>
+      <a href="25-une-valeur-de-retour-la-fonction-qui-rep.html">Une valeur de retour : la fonction qui répond</a>
+      — <span class="detail">Certaines fonctions font ; d’autres calculent, et « return » rapporte le résultat.</span></li>
+<li><span class="numero">26</span>
+      <a href="26-decouper-la-boucle-du-jeu-en-fonctions.html">Découper la boucle du jeu en fonctions</a>
+      — <span class="detail">lire, faire évoluer, dessiner : la boucle du jeu tient en trois appels.</span></li>
+<li class="chapitre">Chapitre 6 — Les struct : ce qui va ensemble</li>
+<li><span class="numero">27</span>
+      <a href="27-une-struct-ce-qui-va-ensemble.html">Une struct : ce qui va ensemble</a>
+      — <span class="detail">La position, la direction et les vies d’un héros ne sont pas trois choses : c’est UN héros.</span></li>
+<li><span class="numero">28</span>
+      <a href="28-un-tableau-de-struct-parcouru-par-une-bo.html">Un tableau de struct, parcouru par une boucle</a>
+      — <span class="detail">Quatre ennemis, un tableau, une boucle : le code d’un seul, appliqué à tous.</span></li>
+<li><span class="numero">29</span>
+      <a href="29-une-methode-la-fonction-qui-connait-son-.html">Une méthode : la fonction qui connaît son objet</a>
+      — <span class="detail">Ce que fait un ennemi peut s’écrire DANS l’ennemi : troupe[i].avancer().</span></li>
+<li><span class="numero">30</span>
+      <a href="30-le-petit-jeu-tout-ensemble.html">Le petit jeu : tout ensemble</a>
+      — <span class="detail">Variables, conditions, boucles, tableaux, fonctions, struct : un vrai jeu, et rien d’autre.</span></li>
+<li class="chapitre">Chapitre 7 — Les quatre nuances : la Game Boy d’origine</li>
+<li><span class="numero">31</span>
+      <a href="31-quatre-nuances-deux-bits-par-pixel.html">Quatre nuances, deux bits par pixel</a>
+      — <span class="detail">Sur la Game Boy d’origine, un pixel n’est pas une couleur : c’est un nombre de 0 à 3.</span></li>
+<li><span class="numero">32</span>
+      <a href="32-dessiner-avec-quatre-nuances-lumiere-et-.html">Dessiner avec quatre nuances : lumière et ombre</a>
+      — <span class="detail">Quatre nuances suffisent à faire du relief, si chacune a un rôle.</span></li>
+<li><span class="numero">33</span>
+      <a href="33-la-palette-un-indice-n-est-pas-une-nuanc.html">La palette : un indice n’est pas une nuance</a>
+      — <span class="detail">Changer la palette change TOUT l’écran d’un coup — sans toucher à une seule tuile.</span></li>
+<li><span class="numero">34</span>
+      <a href="34-un-fondu-au-noir-et-retour.html">Un fondu au noir, et retour</a>
+      — <span class="detail">Quatre palettes à la suite, et l’écran s’éteint en douceur.</span></li>
+<li><span class="numero">35</span>
+      <a href="35-les-lutins-trois-nuances-et-la-transpare.html">Les lutins : trois nuances et la transparence</a>
+      — <span class="detail">Un lutin n’a que trois nuances : l’indice 0 est un trou, par où l’on voit le décor.</span></li>
+<li><span class="numero">36</span>
+      <a href="36-faire-clignoter-un-personnage-touche.html">Faire clignoter un personnage touché</a>
+      — <span class="detail">Touché : le héros clignote une seconde. Une palette qui s’allume et s’éteint, rien de plus.</span></li>
+<li class="chapitre">Chapitre 8 — La couleur : la Game Boy Color</li>
+<li><span class="numero">37</span>
+      <a href="37-allumer-la-couleur-rouge-vert-bleu.html">Allumer la couleur : rouge, vert, bleu</a>
+      — <span class="detail">Sur Game Boy Color, chaque indice 0–3 d’une tuile devient une vraie couleur, que tu choisis.</span></li>
+<li><span class="numero">38</span>
+      <a href="38-melanger-la-lumiere.html">Mélanger la lumière</a>
+      — <span class="detail">Rouge et vert donnent du jaune : sur un écran, les couleurs s’ADDITIONNENT.</span></li>
+<li><span class="numero">39</span>
+      <a href="39-huit-palettes-et-teindre-chaque-case.html">Huit palettes, et teindre chaque case</a>
+      — <span class="detail">Le ciel en bleu, le mur en brique, l’herbe en vert : chaque case de l’écran choisit sa palette.</span></li>
+<li><span class="numero">40</span>
+      <a href="40-les-lutins-en-couleur.html">Les lutins en couleur</a>
+      — <span class="detail">Le même personnage en rouge et en vert : deux joueurs pour une seule tuile.</span></li>
+<li><span class="numero">41</span>
+      <a href="41-animer-les-couleurs-l-eau-qui-scintille.html">Animer les couleurs : l’eau qui scintille</a>
+      — <span class="detail">Faire tourner trois couleurs d’une palette, et toute une mer ondule — sans redessiner une tuile.</span></li>
+<li><span class="numero">42</span>
+      <a href="42-un-jeu-lisible-en-couleur-comme-en-nuanc.html">Un jeu lisible en couleur comme en nuances</a>
+      — <span class="detail">Dessiner d’abord en quatre nuances, colorier ensuite : un jeu qui se lit toujours.</span></li>
+</ol>
+
+<p class="pied">gameboy3 — apprendre à programmer, en écrivant pour la Game Boy</p>
+
+</body>
+</html>

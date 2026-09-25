@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>gameboy3 — Sommaire</title>
+<style>
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+    --fond: #fff;
+    --fond-carte: #fafbfc;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: var(--fond);
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.55;
+  }
+
+  main { max-width: 920px; margin: 0 auto; padding: 40px 20px 70px; }
+
+  code { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -.3px; }
+  .sous-titre { color: var(--gris); font-size: 16px; margin: 0 0 30px; }
+  h2 { font-size: 18px; margin: 40px 0 4px; padding-bottom: 6px; border-bottom: 1px solid var(--bord); }
+  .intro-section { color: var(--gris); font-size: 13.5px; margin: 0 0 16px; }
+
+  .cartes { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+
+  a.carte {
+    display: block; border: 1px solid var(--bord); border-radius: 8px;
+    padding: 14px 16px; text-decoration: none; color: inherit; background: var(--fond-carte);
+    transition: border-color .15s, transform .1s;
+  }
+  a.carte:hover { border-color: var(--vert); transform: translateY(-1px); }
+  a.carte b { display: block; font-size: 14.5px; margin-bottom: 3px; color: var(--vert); }
+  a.carte span { display: block; font-size: 12.5px; color: var(--gris); }
+  a.carte code { font-size: 11.5px; }
+
+  .lancer {
+    background: var(--vert-clair); border-left: 3px solid var(--vert);
+    padding: 14px 18px; border-radius: 0 6px 6px 0; margin: 0 0 30px;
+  }
+  .lancer b { display: block; margin-bottom: 6px; }
+  .lancer code {
+    background: #fff; border: 1px solid var(--bord); border-radius: 3px;
+    padding: 1px 5px;
+  }
+
+  footer { margin-top: 50px; padding-top: 12px; border-top: 1px solid var(--bord); font-size: 12px; color: var(--gris); }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --encre: #e7e9ee; --gris: #9aa3b2; --vert: #7fd18c; --vert-clair: #17241a;
+      --bord: #2c313b; --fond: #14161b; --fond-carte: #1b1e25;
+    }
+  }
+  :root[data-theme="dark"] {
+    --encre: #e7e9ee; --gris: #9aa3b2; --vert: #7fd18c; --vert-clair: #17241a;
+    --bord: #2c313b; --fond: #14161b; --fond-carte: #1b1e25;
+  }
+</style>
+</head>
+<body>
+<main>
+
+<h1>gameboy3</h1>
+<p class="sous-titre">Écrire une cartouche Game Boy en C++ — tout ce que contient le dépôt, à un seul endroit.</p>
+
+<div class="lancer">
+  <b>Pour démarrer</b>
+  Double-cliquer <code>lancer.bat</code>, ou dans un terminal : <code>node demarrer.mjs</code>.
+  Le navigateur s'ouvre tout seul sur l'atelier.
+</div>
+
+<h2>Utiliser l'atelier</h2>
+<p class="intro-section">Les deux pages qui tournent dans le navigateur, une fois l'atelier démarré.</p>
+<div class="cartes">
+  <a class="carte" href="index.html">
+    <b>🎮 L'atelier complet</b>
+    <span>Création (tuiles, airs, couleurs, modèles), Code, Leçons et Machine — les quatre modes, dans une seule page.</span>
+  </a>
+  <a class="carte" href="tuto.html">
+    <b>📘 Les 80 leçons illustrées</b>
+    <span>Une leçon par écran, du premier mot affiché à la musique d'un jeu, avec ateliers à la souris intégrés.</span>
+  </a>
+</div>
+
+<h2>Apprendre : le tutoriel</h2>
+<p class="intro-section">La même matière, en texte, pour lire ou chercher sans lancer l'atelier.</p>
+<div class="cartes">
+  <a class="carte" href="documents/TUTORIELS.md">
+    <b>📄 TUTORIELS.md</b>
+    <span>80 leçons complètes, code + explication, du niveau 1 au niveau 10.</span>
+  </a>
+  <a class="carte" href="documents/PARCOURS.md">
+    <b>🧭 PARCOURS.md</b>
+    <span>Les leçons regroupées par objectif : le chemin pas à pas vers Tetris, Mario, et neuf autres genres de jeu.</span>
+  </a>
+  <a class="carte" href="documents/tutoriel.pdf">
+    <b>📕 tutoriel.pdf</b>
+    <span>Les 80 leçons en PDF, une page chacune, prêtes à imprimer.</span>
+  </a>
+  <a class="carte" href="documents/livret.html">
+    <b>📚 livret.html</b>
+    <span>La version détaillée à l'écran : chaque leçon, étape par étape, avec ses captures.</span>
+  </a>
+  <a class="carte" href="livrets/">
+    <b>🗂 livrets/</b>
+    <span>Un livret PDF et HTML par leçon (une par une), avec l'exécution photographiée.</span>
+  </a>
+  <a class="carte" href="documents/passer-d-un-ecran-a-l-autre.html">
+    <b>🔀 Passer d'un écran à l'autre</b>
+    <span>Fiche à part sur les changements d'écran — enum, switch, machine à états.</span>
+  </a>
+</div>
+
+<h2>Le projet, en bref</h2>
+<p class="intro-section">Pour présenter ou évaluer le dépôt sans le parcourir en entier.</p>
+<div class="cartes">
+  <a class="carte" href="LISEZMOI.md">
+    <b>📖 LISEZMOI.md</b>
+    <span>Le README complet : installation, langage, fonctions de la console, réglages.</span>
+  </a>
+  <a class="carte" href="documents/valorisation.html">
+    <b>💎 valorisation.html</b>
+    <span>Ce que le projet est, ce qui le rend rare, comparé à PICO-8, et son volume.</span>
+  </a>
+  <a class="carte" href="documents/CHANGEMENTS.md">
+    <b>🕒 CHANGEMENTS.md</b>
+    <span>L'historique : ce que chaque passe de travail a ajouté ou corrigé.</span>
+  </a>
+</div>
+
+<h2>Voir aussi</h2>
+<p class="intro-section">Les jeux déjà écrits, et l'endroit où l'atelier range ses projets.</p>
+<div class="cartes">
+  <a class="carte" href="exemples/">
+    <b>🧩 exemples/</b>
+    <span>Tous les programmes du tutoriel et des jeux complets (Tetris, Mario…), en C++, prêts à compiler.</span>
+  </a>
+  <a class="carte" href="projets/">
+    <b>💾 projets/</b>
+    <span>Les projets enregistrés depuis l'atelier — dont un Mega Man jouable, projets/mon_mario.</span>
+  </a>
+</div>
+
+<footer>
+  Page de navigation seule — rien n'y est expliqué qui ne le soit déjà ailleurs.
+  Racine du dépôt rangée en <code>outils/</code> (scripts), <code>verification/</code> (contrôles automatiques),
+  <code>documents/</code> et <code>images/</code>.
+</footer>
+
+</main>
+</body>
+</html>

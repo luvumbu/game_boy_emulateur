@@ -1,0 +1,17 @@
+# Rien de ce dossier n'est gardé en cache par le navigateur.
+#
+# C'est un chantier : la page, ses modules et les exemples changent d'une
+# minute à l'autre. Un navigateur qui ressert sa copie montre l'atelier d'hier
+# — un onglet manquant, une fonction qui « n'existe pas » —, et l'on cherche le
+# défaut dans le code alors qu'il est dans le cache. Une heure perdue, deux
+# fois, avant d'écrire ces six lignes.
+#
+# Sur un site en production, on ferait l'inverse.
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|js|mjs|cpp|gb|png|md)$">
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+</IfModule>

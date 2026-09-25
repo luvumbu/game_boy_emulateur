@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 44 — Le panneau, et les nuances</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Niveau 6 — Ranger ce qu’on manipule</span>
+    <span>leçon 44 sur 82</span>
+    <span class="jauge" style="--part: 60%">difficulté 6 / 10</span>
+    
+    
+    
+  </p>
+<h1>44. Le panneau, et les nuances</h1>
+<p class="idee">Un score qui reste en place pendant que le décor glisse.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>Le décor défile ; le score, lui, ne doit pas bouger. Sans une seconde couche, il faudrait le redessiner à chaque image à la position que le défilement lui a donnée — et le moindre décalage se verrait.</p>
+<p>Le <strong>panneau</strong> est cette couche : le matériel l’appelle la fenêtre, il la pose par-dessus le décor, et <strong>elle ne défile pas</strong>. <code>panneau(x, y)</code> la place, en pixels, et l’allume. On y écrit avec <code>textePanneau()</code> et <code>poserPanneau()</code>, exactement comme sur le fond.</p>
+<p>Il n’y a que <strong>deux cartes de fond</strong> dans la console : le décor prend la première, le panneau la seconde. C’est un choix, et il vaut mieux le savoir que le découvrir.</p>
+<p><code>paletteFond(n0, n1, n2, n3)</code> choisit les quatre nuances, de la plus claire à la plus sombre — chaque nombre va de 0 à 3. Elles étaient posées une fois pour toutes à l’allumage ; ici on s’en sert pour assombrir le fond par paliers.</p>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1549 octets</strong> de cartouche.</p>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. un dessin — SOL</p>
+    <pre><code>Tuile SOL = {
+  "33333333",
+  "32222223",
+  "32122123",
+  "32222223",
+  "32221223",
+  "32122223",
+  "32222223",
+  "33333333",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAZUlEQVR4nO3UsQ2AMAwAwZQZgTJDMAszUDJGxmI0CjoqC0iC0EnfWr7GTnkqnyoNFwABtQfN69ItICCgs7pvlyLLIlNAQECtAwICinfvNQABAT1ZBgQE9O7ZAwEBxUFjAwL6HegAaZI021Ot+0MAAAAASUVORK5CYII=" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une variable — d</p>
+    <pre><code>uint8_t d = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une variable — attente</p>
+    <pre><code>uint8_t attente = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une variable — noirceur</p>
+    <pre><code>uint8_t noirceur = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  for (uint8_t x = 0; x &lt; 32; x++) {
+    poser(x, 12, SOL);
+    poser(x, 13, SOL);
+  }
+
+  textePanneau(1, 0, "SCORE 00");
+  panneau(0, 128);
+
+  while (true) {
+    image();
+
+    d++;
+    defiler(d, 0);
+
+    attente++;
+
+    if (attente &gt; 40) {
+      attente = 0;
+      noirceur++;
+      if (noirceur &gt; 3) noirceur = 0;
+
+      // le fond s'assombrit, puis revient
+      paletteFond(noirceur, noirceur + 1, 2, 3);
+    }
+  }
+
+  return 0;
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACFklEQVR4nO3Z0U3CUBiAUR4dwUeHcBZn8NExHMsRHMExfDQGQ/BKSwsSwpeTnJDmlzaNH720YfPx+U7Y5upnwEUJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdw3Obu/oGw78CPz0+D7d/MA/OfwK9vL9vRdmO3g/mtz13B8fmvwLv+ww7mtzsfl+hhB/Nbn1ui43OPSXECx1mi43PPwfG5Kzg+9xwcn3sOjs8t0fG5x6Q4P/jHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcUcC7/90fHA+9f5VBzl4qPnzWThnLvDU/2t//l/bS1zimHnnBj4nwMmBh4t1as6KJXoq5NR82F61dM+czPA6P2fFTdaSK2/+Sj34xbnqXPc/Cn8/QKcdM+/cwKu2F64E/3UOHP8OXnvXenRJn1q63UVfITABAscJHCdwnMBxAscJHCdwnMBxX2Z3VdeseFCnAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB9UlEQVR4nO3ZTUrDUBhA0Q5dgkMX4Vpcg8Muw2W5NBEnoc3faxqEy4GDhK8SHr3Na0IvX99Xwi7/vgJOJXCcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHGXl9c3wn4Dv39+3Ph7zTwwFzg+Fzg+Fzg+Fzg+Fzg+95gUJ3CcLTo+Fzg+Fzg+Fzg+Fzg+Fzg+95gU5wf/OIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOG4j8PSn49n50v8PnWT2VOvr2TlnLfDS+zWdP+t4jzPOmXc08JEADwe+uViX5gxs0bNv9FKA++OhrXtlMTd/1+cM3GTtufLWr9TZL86htU4/CvcfoMfOmXc08NDxzp3gWWtg+zt49K51c0tf2rrdRZ/Ec3CcwHECxwkcJ3CcwHECxwkcJ3DcD4aoRFJN+k9RAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>au bout d’une seconde — image 60</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACFklEQVR4nO3Z0U3CUBiAUR4dwUeHcBZn8NExHMsRHMExfDQGQ/BKSwsSwpeTnJDmlzaNH720YfPx+U7Y5upnwEUJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdw3Obu/oGw78CPz0+D7d/MA/OfwK9vL9vRdmO3g/mtz13B8fmvwLv+ww7mtzsfl+hhB/Nbn1ui43OPSXECx1mi43PPwfG5Kzg+9xwcn3sOjs8t0fG5x6Q4P/jHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcUcC7/90fHA+9f5VBzl4qPnzWThnLvDU/2t//l/bS1zimHnnBj4nwMmBh4t1as6KJXoq5NR82F61dM+czPA6P2fFTdaSK2/+Sj34xbnqXPc/Cn8/QKcdM+/cwKu2F64E/3UOHP8OXnvXenRJn1q63UVfITABAscJHCdwnMBxAscJHCdwnMBxX2Z3VdeseFCnAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>au bout de trois secondes — image 180</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACBklEQVR4nO3a0UnDUBiA0T46go8O4SzO4P4TFFFKTJM0t7EUPw4cJP7VEPo1twnt6f3zg7DT04+AhxI4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC408vrG2Ffga+zfz9mHpj/BL48fPnVvDF3BsfnvwJP+5s35vMlevYP5v99bomOz90mxQkcZ4mOz90Hx+fO4PjcfXB87j44PrdEx+duk+J84B8ncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLH3Qg8/eh4cb7290M7WdzV9vHsnLMVeO35Wvx+18HtPR6xz7yjgY8EuDvw7GRdmzOwRK+FXJvPtoeW7o2Dmf3cnjNwkbXnzNs+UxffOIeOdfpSuH4B3bfPvKOBh7Z3rgR/dQzcfg8evWq9uaSvLd2uop8QmACB4wSOEzhO4DiB4wSOEzhO4Lgzb0BMtNnPvvQAAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>au bout de sept secondes — image 420</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Le sol glisse ; « SCORE 00 » reste collé en bas, et les nuances changent.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>le panneau est allumé </li>
+
+  <li>il lit la seconde carte de fond </li>
+
+  <li>il est posé à la ligne 128 </li>
+
+  <li>le décor défile </li>
+
+  <li>mais le panneau ne bouge pas </li>
+
+  <li>et il n’est pas vide </li>
+
+  <li>les nuances ont changé <span class="detail">($e4 vers $ee)</span></li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>45. Remplir un tableau, puis le dessiner</strong> — niveau 6 sur 10.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

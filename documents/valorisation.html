@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>gameboy3 — Valorisation du projet</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.55;
+  }
+
+  code { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 26pt; margin: 0 0 4pt; letter-spacing: -.4pt; }
+  .sous-titre { color: var(--gris); font-size: 12pt; margin: 0 0 18pt; }
+  h2 { font-size: 15pt; margin: 22pt 0 9pt; padding-bottom: 4pt; border-bottom: 1pt solid var(--bord); break-after: avoid; }
+  h3 { font-size: 10.5pt; margin: 12pt 0 4pt; color: var(--vert); break-after: avoid; }
+  p { margin: 0 0 8pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .92em; color: #1f3a26;
+  }
+
+  .chiffres { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6mm; margin: 10pt 0 16pt; }
+  .chiffre { border: 1px solid var(--bord); border-radius: 5pt; padding: 8pt 9pt; text-align: center; break-inside: avoid; }
+  .chiffre b { display: block; font-size: 17pt; color: var(--vert); }
+  .chiffre span { font-size: 8pt; color: var(--gris); }
+
+  table { border-collapse: collapse; width: 100%; margin: 6pt 0 12pt; font-size: 9.3pt; }
+  th, td { text-align: left; padding: 4pt 7pt; border-bottom: 1px solid var(--bord); vertical-align: top; }
+  th { color: var(--gris); font-weight: 600; font-size: 8.3pt; text-transform: uppercase; letter-spacing: .03em; }
+
+  ul { margin: 4pt 0 10pt; padding-left: 16pt; }
+  li { margin-bottom: 4pt; }
+
+  .calc-taux {
+    display: flex; align-items: center; gap: 6pt; margin: 10pt 0 8pt; font-size: 9.8pt;
+  }
+  .calc-taux input {
+    width: 60pt; padding: 3pt 5pt; border: 1px solid var(--bord); border-radius: 3pt;
+    font-size: 9.8pt; font-family: inherit; color: var(--encre);
+  }
+
+  .encadre {
+    background: var(--vert-clair); border-left: 3pt solid var(--vert);
+    padding: 8pt 11pt; border-radius: 0 4pt 4pt 0; margin: 10pt 0 14pt; font-size: 9.8pt;
+  }
+
+  .pied { margin-top: 20pt; padding-top: 8pt; border-top: 1pt solid var(--bord); font-size: 8.5pt; color: var(--gris); }
+
+  section { break-inside: avoid-page; }
+
+  /* Centré et resserré à l'écran ; le PDF, lui, garde les marges de @page. */
+  @media screen {
+    body { max-width: 90%; margin: 0 auto; padding: 24pt 0; }
+  }
+</style>
+</head>
+<body>
+
+<h1>gameboy3</h1>
+<p class="sous-titre">Un atelier maison pour écrire, dessiner et faire tourner de vraies cartouches Game Boy — langage, compilateur, émulateur et éditeur, sans dépendance externe.</p>
+
+<div class="chiffres">
+  <div class="chiffre"><b>79</b><span>leçons vérifiées automatiquement</span></div>
+  <div class="chiffre"><b>10</b><span>niveaux, du premier programme au jeu complet</span></div>
+  <div class="chiffre"><b>30</b><span>exemples fournis, tous compilés</span></div>
+  <div class="chiffre"><b>~8 900</b><span>lignes pour le compilateur et l'émulateur</span></div>
+</div>
+
+<h2>Ce que c'est</h2>
+<p><code>gameboy3</code> n'assemble pas des briques existantes : c'est un langage (un C++ volontairement restreint), un compilateur qui l'émet directement en instructions du processeur SM83, un émulateur Game Boy / Game Boy Color écrit à la main, et un éditeur graphique — le tout dans une seule page web, sans RGBDS, sans GBDK, sans émulateur venu d'un paquet npm.</p>
+<p>Une cartouche compilée ici démarre sur une vraie console : la sortie n'est pas une approximation pédagogique, c'est un fichier <code>.gb</code> ou <code>.gbc</code> de 32 Ko, structurellement identique à ceux du commerce.</p>
+
+<h2>Ce qui le rend rare</h2>
+
+<h3>Un langage qui refuse, et qui dit pourquoi</h3>
+<p>Le compilateur ne traduit jamais en douce ce qu'il ne peut pas garantir : un <code>float</code>, une classe, un mauvais nombre d'index sur une grille sont refusés avec le numéro de ligne exact et la correction à faire. La leçon 78 en fait un sujet à part entière — un compilateur qui aide n'est pas seulement celui qui compile, c'est celui qui dit non correctement.</p>
+
+<h3>La couleur de la Game Boy Color, sans écrire une ligne</h3>
+<p>Huit palettes de quatre couleurs, onze variétés et huit thèmes toutes prêtes : on peint une tuile, un personnage ou une carte, et l'atelier écrit lui-même les <code>couleurFond</code> et les <code>teindre</code> — dans les limites exactes de la console (quatre couleurs par carré de 8 × 8). Changer une couleur ne touche que le dessin ouvert : une palette partagée est copiée, jamais changée en cachette pour tout l'écran.</p>
+
+<h3>Une musique qui ne ralentit jamais</h3>
+<p>Le séquenceur (<code>Air</code>, <code>jouer()</code>) avance dans l'interruption VBlank, pas dans la boucle du jeu : un jeu qui calcule beaucoup ne fait jamais traîner sa propre musique. Un atelier à la souris l'écrit, avec écoute immédiate sans recompiler.</p>
+
+<h3>De la rétro-ingénierie, honnêtement présentée</h3>
+<p>Le <strong>MODE MACHINE</strong> désassemble n'importe quelle cartouche compilée ici et retrouve les noms de variables et de fonctions — parce que le compilateur vient de les y ranger. Une cartouche venue d'ailleurs ne montre que des nombres, et l'outil le dit franchement plutôt que de prétendre deviner.</p>
+
+<h3>Un tutoriel qui ne peut pas mentir</h3>
+<p>Rien n'est rédigé à côté du code : chaque leçon est compilée pour de vrai, jouée dans l'émulateur du projet, et les contrôles qu'elle affiche sont ceux que <code>verifier-tuto.mjs</code> exige — mesurés, pas racontés. Le PDF (<code>tutoriel.pdf</code>, 79 pages) et les 79 livrets détaillés sont fabriqués depuis les mêmes leçons, jamais recopiés à la main.</p>
+
+<div class="encadre">
+En pratique : modifier une leçon et oublier de relancer la vérification est <em>détecté</em>, pas seulement possible — <code>verifier-tutoriels.mjs</code> régénère la documentation en mémoire et refuse si elle diffère de ce qui est commité.
+</div>
+
+<h2>Comparé à l'ambition de départ (« égaler PICO-8 »)</h2>
+<table>
+  <tr><th>Pilier</th><th>PICO-8</th><th>gameboy3</th></tr>
+  <tr><td>Mode code</td><td>Lua, interprété</td><td>C++ restreint, <strong>compilé</strong> en instructions réelles</td></tr>
+  <tr><td>Sprites</td><td>éditeur intégré</td><td>éditeur à la souris, ou en texte</td></tr>
+  <tr><td>Musique / son</td><td>séquenceur + effets</td><td>séquenceur indépendant du jeu, + bruitages</td></tr>
+  <tr><td>Cartouche</td><td>format « fantaisie » (.p8)</td><td><strong>.gb / .gbc réels</strong>, jouables sur console d'origine</td></tr>
+  <tr><td>Palette / couleurs</td><td>un éditeur de palette</td><td>un onglet dédié (« 🎨 Les couleurs »)</td></tr>
+  <tr><td>Bibliothèque de dessins de départ</td><td>non (le partage de cartouches, hors éditeur)</td><td><strong>oui</strong> — un onglet « 🖼 Les modèles », personnages et tuiles tout faits à reprendre</td></tr>
+  <tr><td>Effets sonores courts, séparés de la musique</td><td>oui (<code>sfx()</code>, éditeur dédié)</td><td>possible en code (<code>note()</code>/<code>bruit()</code>), <strong>pas d'éditeur visuel dédié</strong></td></tr>
+  <tr><td>Export en HTML autonome</td><td>oui</td><td><strong>oui</strong> — une page qui embarque l'émulateur et la cartouche, jouable en double-cliquant, sans atelier ni serveur ; vérifié automatiquement (<code>verifier-export.mjs</code>)</td></tr>
+  <tr><td>Carte pilotée par indicateurs de sprite</td><td>oui (<code>fget</code>/<code>fset</code>)</td><td>pas encore — identifié dans <code>PARCOURS.md</code></td></tr>
+</table>
+<p style="font-size:8.8pt;color:var(--gris)">Vérifié en pilotant l'atelier réel (et non relu dans le seul code) : 4 modes (Création, Code, Leçons, Machine), 4 onglets dans Création (tuiles, airs, couleurs, modèles), 28 exemples dans le sélecteur, 53 réglages en 7 groupes.</p>
+
+<h2>Coût de reconstruction : une hypothèse, pas la réalité de ce projet</h2>
+<div class="encadre" style="margin-bottom:10pt">
+<strong>Ce projet-ci a été construit en moins d'un mois</strong>, à deux, avec une IA. Le calcul ci-dessous répond à une question différente et purement hypothétique : <strong>combien de temps faudrait-il à UNE SEULE personne, seule, sans aide, tapant et déboguant chaque ligne à la main</strong>, pour produire le même volume ? Les deux chiffres ne se comparent pas — le second sert seulement à donner une idée de l'ampleur du volume produit, pas du temps réellement passé.
+</div>
+<p>Aucune heure n'a été pointée : ce n'est <strong>pas une facture</strong>. La méthode : le volume réel de chaque partie du dépôt, divisé par une vitesse de production prudente <em>pour un humain seul et non assisté</em> selon sa nature (le code d'un compilateur se teste et se corrige bien plus lentement qu'une leçon qui suit un modèle déjà établi). <code>TUTORIELS.md</code> n'est pas compté : c'est un fichier engendré depuis <code>tuto/lecons.js</code>, déjà comptabilisé — le compter aussi aurait été un double emploi.</p>
+
+<table>
+  <tr><th>Nature du travail</th><th>Volume réel</th><th>Vitesse retenue</th><th>Jours estimés</th></tr>
+  <tr><td>Compilateur + émulateur (le cœur technique)</td><td>8 888 lignes</td><td>15 à 25 lignes/jour</td><td>355 à 593</td></tr>
+  <tr><td>Interface, éditeurs, outils PDF</td><td>10 100 lignes</td><td>30 à 45 lignes/jour</td><td>224 à 337</td></tr>
+  <tr><td>Leçons, tests automatisés, exemples, documentation écrite</td><td>20 971 lignes</td><td>70 à 140 lignes/jour</td><td>149 à 300</td></tr>
+  <tr><td><strong>Total</strong></td><td><strong>39 959 lignes</strong></td><td>—</td><td><strong>728 à 1 230 jours</strong></td></tr>
+</table>
+
+<div class="calc-taux">
+  <label for="taux">Taux journalier à appliquer :</label>
+  <input type="number" id="taux" value="400" min="50" step="10">
+  <span>€ / jour</span>
+</div>
+
+<div class="encadre">
+  <strong>Hypothèse solo, non assisté : entre <span id="cout-bas">291&nbsp;200</span>&nbsp;€ et <span id="cout-haut">492&nbsp;000</span>&nbsp;€</strong>
+  (728 à 1 230 jours × <span id="taux-affiche">400</span>&nbsp;€/j), soit l'équivalent d'environ
+  <strong><span id="annees-bas">2,9</span> à <span id="annees-haut">4,9</span> années</strong> de travail à temps plein d'une seule personne (220 jours ouvrés/an) —
+  <strong>contre moins d'un mois, dans les faits, à deux avec une IA.</strong>
+</div>
+
+<p style="font-size:8.8pt;color:var(--gris)">Réserves à garder en tête : le nombre de lignes est un indicateur grossier de l'effort réel — il ne dit rien du temps passé à concevoir le langage, à choisir la pédagogie du tutoriel, ou à corriger un bogue invisible pendant des heures. Les vitesses retenues sont des repères de l'industrie du logiciel, pas une mesure prise sur ce projet précis. Et si tout ou partie de ce code a été écrit avec l'aide d'un outil d'IA plutôt que tapé à la main, le temps humain réellement passé peut être largement inférieur à ce que ce calcul suppose.</p>
+
+<script>
+(function () {
+  var JOURS_BAS = 728, JOURS_HAUT = 1230, JOURS_PAR_AN = 220;
+  var input = document.getElementById('taux');
+
+  function formater(n) {
+    return Math.round(n).toLocaleString('fr-FR');
+  }
+
+  function recalculer() {
+    var taux = parseFloat(input.value) || 0;
+    document.getElementById('cout-bas').textContent = formater(JOURS_BAS * taux);
+    document.getElementById('cout-haut').textContent = formater(JOURS_HAUT * taux);
+    document.getElementById('taux-affiche').textContent = formater(taux);
+    document.getElementById('annees-bas').textContent = (JOURS_BAS / JOURS_PAR_AN).toFixed(1).replace('.', ',');
+    document.getElementById('annees-haut').textContent = (JOURS_HAUT / JOURS_PAR_AN).toFixed(1).replace('.', ',');
+  }
+
+  input.addEventListener('input', recalculer);
+  recalculer();
+})();
+</script>
+
+<h2>Où ça peut aller ensuite</h2>
+<p><code>PARCOURS.md</code> détaille, genre par genre, ce qui est déjà utilisable et ce qui manquerait pour un jeu complet :</p>
+<ul>
+  <li><strong>Déjà praticables de bout en bout</strong> — puzzle (Tetris) et plateforme (Mario), chacun avec son chemin de douze leçons.</li>
+  <li><strong>Presque prêts</strong> — plateforme-tir façon Mega Man : ses briques manquantes (tir du joueur, jauge de vie, invincibilité temporaire) tournent désormais ensemble dans un exemple complet et jouable (<code>projets/mon_mario</code>) ; ce qu'il resterait pour en faire un chemin de leçons comme Tetris et Mario — plusieurs types d'ennemis, des salles fixes plutôt qu'un défilement continu.</li>
+  <li><strong>Jamais commencés</strong> — RPG, shoot 'em up, aventure vue du dessus, course, sport, Sokoban, jeu de rythme : chacun a déjà une partie de ses briques (le déplacement, les collisions, le hasard, le son), mais aucun n'a encore ce qui le rend vraiment jouable.</li>
+</ul>
+
+<p class="pied">Document généré depuis l'état réel du dépôt à la date de rédaction. Les chiffres techniques (leçons, contrôles, exemples) sont vérifiés par <code>npm run verifier</code> ; le coût de reconstruction, lui, est une <strong>estimation</strong> expliquée ci-dessus, pas une mesure. Détail des sources : <code>LISEZMOI.md</code>, <code>TUTORIELS.md</code>, <code>CHANGEMENTS.md</code>, <code>PARCOURS.md</code>.</p>
+
+</body>
+</html>

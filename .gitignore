@@ -1,0 +1,10 @@
+# Config locale Claude Code
+.claude/
+
+# ROM commerciales (droits Nintendo) : ne pas publier
+cartouches/
+
+# Fichier vide parasite
+/1
+
+node_modules/
