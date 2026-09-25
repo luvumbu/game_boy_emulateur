@@ -289,8 +289,23 @@ fait tourner dans l'émulateur.
 |---|---|
 | `texte(colonne, ligne, "…")` | écrit à l'écran. 20 colonnes, 18 lignes — ou le nom d'un `const char`. La position peut être **calculée**. Un nombre s'y colle : `texte(1, 4, "SCORE " + score)` devient le texte, puis `nombre()` juste après (trois chiffres) |
 | `nombre(colonne, ligne, valeur)` | écrit un **nombre calculé**, en base dix. Un quatrième argument dit combien de chiffres (3 par défaut) |
+| `textS(colonne, ligne, "…")` | comme `texte()`, mais **passe à la ligne tout seul** : après la colonne 19, la suite reprend en colonne 0 de la ligne d'en dessous ; après la ligne 17, en haut. `textS(18, 0, "BONJOUR")` écrit « BO » puis « NJOUR ». `texte()`, lui, refuse toujours une colonne hors de l'écran |
 | `effacer(colonne, ligne, quoi)` | **efface, sans compter les lettres**. « quoi » est le texte lui-même, le nom d'un `const char`, ou un nombre de cases — la longueur est lue par le compilateur |
+| `texte(MOT)` / `effacer(MOT)` | écrit ou efface un **`Mot`** : la colonne, la ligne et le texte rangés sous un seul nom (voir plus bas) |
 | `poser(colonne, ligne, tuile)` | pose **une** tuile à une position calculée. « tuile » est un nom, un numéro, ou **les huit rangées du dessin, écrites sur place** |
+| `poserS(colonne, ligne, tuile)` | comme `poser()`, mais **passe à la ligne tout seul**, comme `textS` : `poserS(i, 0, ALPHABET[i])` pose l'alphabet sur deux lignes, sans `% 20` ni `/ 20` |
+| `attendre(secondes)` | **arrête tout le programme** ce nombre de secondes (jusqu'à 255), lutins et musique compris, puis continue. Simple, mais rien d'autre ne bouge pendant ce temps : pour plusieurs rythmes à la fois, compter les images |
+| `ms(durée)` / `secondes(n)` | une durée **traduite en images** (60 par seconde), par le compilateur : `ms(250)` vaut 15, `ms(1000)` et `secondes(1)` valent 60. Ne coûte rien. À comparer à un compteur d'images : `if (images == ms(250))`. Jusqu'à 4250 ms |
+| `chaque(ms)` | répond **1 toutes les « ms » millisecondes**, 0 le reste du temps, sans rien arrêter : `if (chaque(250)) { … }` se fait 4 fois par seconde. Chaque `chaque` du programme a son propre chronomètre (huit au plus) |
+| `deplace_x(x, y, tuile, pas)` / `deplace_y(…)` | fait avancer une case de `pas` cases sur X ou Y (+ droite / bas, - gauche / haut), un pas tous les 250 ms ; **bloque** pendant le trajet ; rend la position d’arrivée. Seule sur sa ligne, la console **range la position** dans la variable : `deplace_x(x, 0, ALPHABET[0], 5);` |
+| `deplace(x, y, tuile, pasX, pasY)` / `va_a(x, y, tuile, colonne, ligne)` | les deux axes à la fois (5 et 5 : en diagonale) ; ou aller jusqu’à une case donnée. Rangent la colonne dans x et la ligne dans y |
+| `un_pas(x, y, tuile, sensX, sensY)` | **un** pas, tout de suite, sans bloquer : à appeler dans la boucle, pour faire bouger plusieurs lettres en même temps |
+| `vitesse(ms)` | le temps d’un pas de `deplace_x`, `deplace_y`, `deplace`, `va_a` qui viennent après : `vitesse(100);` = 10 pas par seconde |
+| `carre(x, y, tuile, taille, sens, vitesse, tours)` | un carré parfait **autour** de (x, y), de 2 × taille + 1 cases de côté ; sens 1 ou -1 ; vitesse en ms écrite en clair ; revient au centre. Les réglages peuvent être rangés sous un nom : `Carre ronde = { … }; carre(ronde);` |
+| `losange(…)` / `rectangle(…)` / `spirale(…)` / `aller_retour(…)` | les autres formes : le carré sur la pointe, un carré à deux tailles, une spirale qui s’élargit, un va-et-vient (tout droit ou en diagonale) |
+| `deplace_croix(x, y, tuile, vitesse)` | la lettre **suit la croix**, case par case, sans bloquer, à appeler à chaque image ; vitesse en ms entre deux pas ; n’efface que si elle a bougé (pas de clignotement) |
+| `glisse_croix(n, px, py, tuile, vitesse)` | la même chose **au pixel près**, avec un lutin ; vitesse en pixels par image |
+| `tourne_carre(n, x, y, tuile, cote, vitesse)` / `defile(n, x, y, tuile, sens, vitesse)` | sans bloquer : une lettre qui tourne en carré sans fin ; une lettre qui file à gauche ou à droite et repart de l’autre bord. `n` (0 à 3) : la console retient où en est chaque lettre |
 | `lire(colonne, ligne)` | rend la tuile affichée à cet endroit |
 | `changerDessin(tuile, dessin)` | **toutes les cases de cette tuile prennent un autre dessin, d'un coup** — c'est ainsi qu'on anime l'eau, le feu, l'herbe. `changerDessin(EAU, EAU)` rend le dessin d'origine. `changerDessin("A", MON_A)` redessine une **lettre** de la police, dans tous les textes |
 | `image()` | attend l'image suivante. C'est ce qui cadence un jeu |
@@ -304,6 +319,13 @@ fait tourner dans l'émulateur.
 | `images()` | le nombre d'images écoulées depuis l'allumage — une horloge que le jeu ne peut pas fausser |
 | `retard()` | rend 1 si le tour de boucle précédent a duré plus d'une image |
 | `hasard()` / `semer(n)` | un tirage, et de quoi choisir son point de départ |
+
+Deux noms sont fournis par la console, sans rien déclarer :
+
+| Nom | Ce que c'est |
+|---|---|
+| `ALPHABET` | les 26 lettres de la police : `ALPHABET[0]` est A (la tuile 1), `ALPHABET[25]` est Z. `sizeof(ALPHABET)` vaut 26. Rien n'est recopié : `ALPHABET[i]` se calcule `1 + i`. Il se lit, il ne s'écrit pas, et le nom est réservé |
+| `Mot` | un type : **la place et le texte sous un seul nom**. `Mot SALUT = { 5, 6, "BONJOUR" };` puis `texte(SALUT)` et `effacer(SALUT)`. La colonne et la ligne peuvent être des variables : elles sont relues à chaque appel |
 
 Le numéro d'un lutin **peut être calculé** : `sprite(i, …)` dans une boucle
 affiche toute une troupe rangée dans un tableau de `struct`. C'est ce qui rend

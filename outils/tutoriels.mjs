@@ -13,7 +13,9 @@
  */
 
 import { writeFileSync } from 'node:fs'
-import { LECONS, NIVEAUX } from '../tuto/lecons.js'
+import { LECONS, NIVEAUX, numeros } from '../tuto/lecons.js'
+
+const NUMEROS = numeros(LECONS)
 import { consoleDuProgramme } from '../tuto/console.mjs'
 
 const SAUT = String.fromCharCode(10)
@@ -27,7 +29,7 @@ const SAUT = String.fromCharCode(10)
  */
 const mesure = (lecon) => {
   try {
-    const { octets, variables } = consoleDuProgramme(lecon.code, lecon.titre, false)
+    const { octets, variables } = consoleDuProgramme(lecon.code, lecon.titre, false, lecon.fichiers)
     return { octets: octets.length, variables: variables.size }
   } catch (erreur) {
     return { erreur: erreur.message }
@@ -70,8 +72,8 @@ dire('| Niveau | Ce qu’on y apprend | Leçons |', '|---|---|---|')
 for (const [numero, nom] of Object.entries(NIVEAUX)) {
   const dedans = LECONS.filter((l) => l.difficulte === Number(numero))
   if (!dedans.length) continue
-  const premier = LECONS.indexOf(dedans[0]) + 1
-  const dernier = LECONS.indexOf(dedans[dedans.length - 1]) + 1
+  const premier = NUMEROS[LECONS.indexOf(dedans[0])]
+  const dernier = NUMEROS[LECONS.indexOf(dedans[dedans.length - 1])]
   dire(`| ${numero} | ${nom} | ${premier} – ${dernier} |`)
 }
 dire('', '---', '')
@@ -86,9 +88,16 @@ LECONS.forEach((lecon, i) => {
     dire(`## Niveau ${niveauCourant} — ${NIVEAUX[niveauCourant]}`, '')
   }
 
-  dire(`### ${i + 1}. ${lecon.titre}`, '')
+  dire(`### ${NUMEROS[i]}. ${lecon.titre}`, '')
   dire(`> ${lecon.idee}`, '')
 
+  /* Les fichiers voisins d'abord, chacun sous son nom : le principal les inclut. */
+  for (const [nom, contenu] of Object.entries(lecon.fichiers ?? {})) {
+    dire('`' + nom + '`', '', '```cpp')
+    dire(...contenu.replace(/\s+$/, '').split(SAUT))
+    dire('```', '')
+  }
+  if (lecon.fichiers) dire('`principal.cpp`', '')
   dire('```cpp')
   dire(...lecon.code.replace(/\s+$/, '').split(SAUT))
   dire('```', '')

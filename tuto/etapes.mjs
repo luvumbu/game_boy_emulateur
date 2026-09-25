@@ -144,7 +144,7 @@ const TOUCHES = [
  * qu'une seule image, et c'est la vérité sur ce programme.
  */
 export function etapesDeLExecution(lecon) {
-  const { laConsole, gb } = consoleDuProgramme(lecon.code, lecon.titre, false)
+  const { laConsole, gb } = consoleDuProgramme(lecon.code, lecon.titre, false, lecon.fichiers)
   const etapes = []
   let precedent = null
   let images = 0
@@ -191,7 +191,7 @@ export function etapesDeLExecution(lecon) {
  */
 export function controlesJoues(lecon) {
   try {
-    const { laConsole } = consoleDuProgramme(lecon.code, lecon.titre)
+    const { laConsole } = consoleDuProgramme(lecon.code, lecon.titre, true, lecon.fichiers)
     return lecon.controle(laConsole).map(([quoi, bon, detail]) => ({ quoi, bon: Boolean(bon), detail: detail ?? '' }))
   } catch (erreur) {
     return [{ quoi: 'le contrôle n’a pas pu être joué', bon: false, detail: erreur.message }]

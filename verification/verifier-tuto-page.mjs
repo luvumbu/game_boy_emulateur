@@ -14,7 +14,7 @@ import { spawn } from 'node:child_process'
 import { existsSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { LECONS } from '../tuto/lecons.js'
+import { LECONS, numeros, principales } from '../tuto/lecons.js'
 import { servirLAtelier } from '../outils/serveur-essai.mjs'
 
 /*
@@ -138,7 +138,9 @@ try {
     const avoir = await evaluer(`document.getElementById('avoir').textContent`)
     const nuances = await evaluer(`inspecteur.nuances()`)
 
-    const bon = !rate && !codeVide && explique > 0 && avoir.length > 25 && nuances > 1
+    /* Une leçon qui efface finit sur un écran vide : c'est ce qu'elle annonce. */
+    const videVoulu = LECONS[i].aVoir.includes('l’écran reste vide')
+    const bon = !rate && !codeVide && explique > 0 && avoir.length > 25 && (nuances > 1 || videVoulu)
     controle(`${i + 1}. ${titre}`, bon,
       ` — ${etat}, ${explique} paragraphe${explique > 1 ? 's' : ''}, ${nuances} nuances` +
       (rate ? ' — NE COMPILE PAS' : '') + (codeVide ? ' — CODE VIDE' : '') +
@@ -155,7 +157,7 @@ try {
   await evaluer(`document.getElementById('suivant').click()`)
   await patienter(400)
   controle('« suivant » avance d’une leçon',
-    (await evaluer(`document.querySelector('#sommaire li.active button').textContent`)) === 'Effacer ce qu’on a écrit')
+    (await evaluer(`document.querySelector('#sommaire li.active button').textContent`)) === LECONS[1].titre)
 
   /* Le bouton dit OÙ il mène : c'est ce qui fait qu'on enchaîne. */
   const promesse = await evaluer(`document.getElementById('suivant').textContent`)
@@ -177,7 +179,7 @@ try {
   await evaluer(`document.getElementById('remettre').click()`)
   await patienter(400)
   controle('« remettre » rend le code de la leçon',
-    (await evaluer(`document.getElementById('source').value`)).includes('sept espaces'))
+    (await evaluer(`document.getElementById('source').value`)) === LECONS[1].code)
 
   /* --- une erreur est montrée, pas avalée --- */
   await evaluer(`
@@ -292,7 +294,7 @@ try {
   /* Le repère de progression : le niveau, le numéro, l'atelier. */
   const reperes = await evaluer(`[...document.querySelectorAll('#reperes span')].map(s => s.textContent).join(' | ')`)
   controle('la leçon annonce son niveau, sa difficulté et son atelier',
-    reperes.includes('Niveau 3') && reperes.includes(`leçon ${LECON_DU_DESSIN + 1} sur ${LECONS.length}`)
+    reperes.includes('Niveau 3') && reperes.includes(`leçon ${numeros(LECONS)[LECON_DU_DESSIN]} sur ${principales(LECONS)}`)
       && reperes.includes('difficulté 3 / 10') && reperes.includes('atelier'),
     `\n      ${reperes}`)
 

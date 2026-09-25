@@ -26,6 +26,7 @@
  */
 
 import { numeroDe, octetsDesTuiles, NOMBRE_DE_TUILES } from './police.js'
+import { analyser } from './analyseur.js'
 
 /* Les guichets du matériel, nommés en français comme dans le reste du projet. */
 const MANETTE = 0x00 // $FF00
@@ -1045,6 +1046,13 @@ function resoudreProgramme(e, programme) {
   prelude.definir('DEVANT', { genre: 'constante', valeur: 0x80 }, 0)
   prelude.definir('true', { genre: 'constante', valeur: 1 }, 0)
   prelude.definir('false', { genre: 'constante', valeur: 0 }, 0)
+  /*
+   * ALPHABET : la police de la console, sous un nom. A est la tuile 1, Z la 26 :
+   * « ALPHABET[i] » se calcule donc « 1 + i », et rien n'est rangé dans la
+   * cartouche. Le recopier dans un « const char » coûtait 26 octets pour
+   * redire ce que la console sait déjà.
+   */
+  prelude.definir('ALPHABET', { genre: 'alphabet', taille: 26 }, 0)
 
   const global = new Portee(prelude, 'plus haut dans le programme')
   e.global = global
@@ -1064,6 +1072,7 @@ function resoudreProgramme(e, programme) {
     ...Object.keys(OPTIONS_LUTIN).map((nom) => [nom, 'une option de lutin']),
     ...Object.keys(NOTES).map((nom) => [nom, 'une hauteur de note']),
     ['DEVANT', 'la priorité d’une case (teindre)'],
+    ['ALPHABET', 'l’alphabet de la console'],
     ['true', 'la valeur vraie'],
     ['false', 'la valeur fausse'],
   ])
@@ -1245,8 +1254,8 @@ function resoudreDeclaration(e, n, portee, initialisations) {
   const deja = e.nomsDeLaConsole?.get(n.nom)
   if (deja) {
     throw new Error(
-      `ligne ${n.ligne} : « ${n.nom} » est déjà ${deja} — choisir un autre nom. ` +
-        'Sans cela, « bouton(' + n.nom + ') » ne parlerait plus du bouton.',
+      `ligne ${n.ligne} : « ${n.nom} » est déjà ${deja} — choisir un autre nom.` +
+        (BOUTONS[n.nom] !== undefined ? ' Sans cela, « bouton(' + n.nom + ') » ne parlerait plus du bouton.' : ''),
     )
   }
 
@@ -1287,6 +1296,39 @@ function resoudreDeclaration(e, n, portee, initialisations) {
     })
     const air = e.composer(n.nom, pas, n.ligne)
     n.symbole = portee.definir(n.nom, { genre: 'air', ...air }, n.ligne)
+    return
+  }
+
+  /*
+   * Un mot et sa place, sous un seul nom.
+   *
+   *   Mot SALUT = { 5, 6, "BONJOUR" };
+   *   texte(SALUT);
+   *   effacer(SALUT);
+   *
+   * Rien n'est rangé en mémoire : le nom retient les trois morceaux, et
+   * texte() comme effacer() les reçoivent tels qu'ils sont écrits ici. La
+   * colonne et la ligne peuvent être des variables : elles sont relues à
+   * chaque appel.
+   */
+  if (n.type.nom === 'Mot') {
+    if (n.tableau) throw new Error(`ligne ${n.ligne} : un Mot ne se met pas en tableau`)
+    const morceaux = n.valeur && n.valeur.genre === 'liste' ? n.valeur.valeurs : []
+    if (morceaux.length !== 3) {
+      throw new Error(
+        `ligne ${n.ligne} : « Mot ${n.nom} » veut sa colonne, sa ligne et son texte, ` +
+          `comme Mot ${n.nom} = { 5, 6, "BONJOUR" };`,
+      )
+    }
+    const [x, y, texte] = morceaux
+    for (const morceau of morceaux) resoudreExpression(e, morceau, portee)
+    if (texteDe(texte) === null) {
+      throw new Error(
+        `ligne ${n.ligne} : le troisième morceau d'un Mot est un texte entre guillemets, ` +
+          'ou le nom d\'un « const char NOM[] = "…"; »',
+      )
+    }
+    n.symbole = portee.definir(n.nom, { genre: 'mot', x, y, texte }, n.ligne)
     return
   }
 
@@ -1465,6 +1507,7 @@ function resoudreInstruction(e, n, portee) {
 
     case 'affecter':
       resoudreExpression(e, n.cible, portee)
+      if (n.cible.alphabet) throw new Error(`ligne ${n.ligne} : ALPHABET est la police de la console : il se lit, il ne s'écrit pas`)
       if (n.valeur.genre === 'liste') {
         throw new Error(`ligne ${n.ligne} : une liste entre accolades ne s'écrit qu'à la déclaration`)
       }
@@ -1558,6 +1601,18 @@ function resoudreExpression(e, n, portee) {
     case 'index':
       resoudreExpression(e, n.cible, portee)
       resoudreExpression(e, n.index, portee)
+
+      /* ALPHABET[i] devient « 1 + i » : le numéro de la tuile de la lettre. */
+      if (n.cible.symbole?.genre === 'alphabet') {
+        const i = constante(n.index)
+        if (i !== null && i > 25) {
+          throw new Error(`ligne ${n.ligne} : ALPHABET va de l'indice 0 (A) à 25 (Z) ; ${i} est au-delà`)
+        }
+        Object.assign(n, {
+          genre: 'calcul', operateur: '+', alphabet: true,
+          gauche: { genre: 'nombre', valeur: 1, ligne: n.ligne }, droite: n.index,
+        })
+      }
       return
 
     case 'champ':
@@ -1585,6 +1640,7 @@ function resoudreExpression(e, n, portee) {
 
     case 'incrementer':
       resoudreExpression(e, n.cible, portee)
+      if (n.cible.alphabet) throw new Error(`ligne ${n.ligne} : ALPHABET est la police de la console : il se lit, il ne s'écrit pas`)
       return
 
     case 'taille': {
@@ -1646,6 +1702,49 @@ function resoudreExpression(e, n, portee) {
     }
 
     case 'appel': {
+      /*
+       * secondes(n) et ms(n) : une durée, convertie en IMAGES (60 par seconde).
+       *
+       *   if (images == secondes(1))   →   if (images == 60)
+       *   if (images == ms(250))       →   if (images == 15)
+       *
+       * La conversion est faite ICI, une fois pour toutes : l'appel devient le
+       * nombre, et la cartouche n'en garde rien. C'est aussi ce qui permet
+       * « const uint8_t DUREE = ms(250); ». Le nombre doit donc être écrit en
+       * clair — il est lu tel quel, et 1000 passe, même s'il ne tient pas dans
+       * un octet : c'est le résultat qui doit tenir, pas ce qu'on convertit.
+       */
+      if ((n.nom === 'secondes' || n.nom === 'ms') && !e.signatures.has(n.nom)) {
+        if (n.arguments.length !== 1) {
+          throw new Error(`ligne ${n.ligne} : ${n.nom}() prend un seul nombre : ${n.nom === 'ms' ? 'ms(250)' : 'secondes(2)'}`)
+        }
+        const quoi = n.arguments[0]
+        let duree = quoi.genre === 'nombre' ? quoi.valeur : null
+        if (duree === null) {
+          resoudreExpression(e, quoi, portee)
+          duree = constante(quoi)
+        }
+        if (duree === null) {
+          throw new Error(
+            `ligne ${n.ligne} : ${n.nom}() veut un nombre écrit en clair, comme ${n.nom === 'ms' ? 'ms(250)' : 'secondes(2)'} : ` +
+              'la conversion en images est faite à la compilation, pas pendant le jeu',
+          )
+        }
+        const images = n.nom === 'secondes' ? duree * 60 : Math.round((duree * 60) / 1000)
+        if (images > 255) {
+          throw new Error(
+            `ligne ${n.ligne} : ${n.nom}(${duree}) fait ${images} images, et un compteur uint8_t s'arrête à 255 ` +
+              '(environ 4,25 secondes, soit 4250 ms). Pour attendre plus longtemps sans compter : attendre(secondes).',
+          )
+        }
+        if (images === 0 && duree > 0) {
+          throw new Error(`ligne ${n.ligne} : ms(${duree}) fait moins d'une image : la console ne compte pas en dessous de 16,7 ms`)
+        }
+        for (const cle of Object.keys(n)) if (cle !== 'ligne') delete n[cle]
+        Object.assign(n, { genre: 'nombre', valeur: images })
+        return
+      }
+
       /*
        * Un dessin écrit sur place n'a rien à résoudre : ni nom, ni portée.
        *
@@ -1733,7 +1832,7 @@ function resoudreExpression(e, n, portee) {
 /** Combien d'octets occupe ce qu'une expression désigne. */
 function tailleDe(e, n, ligne) {
   if (n.genre === 'variable' && n.symbole) {
-    if (n.symbole.genre === 'zone' || n.symbole.genre === 'table') return n.symbole.taille
+    if (n.symbole.genre === 'zone' || n.symbole.genre === 'table' || n.symbole.genre === 'alphabet') return n.symbole.taille
     return 1
   }
   if (n.genre === 'index') {
@@ -1831,6 +1930,15 @@ function lieu(e, n) {
       throw new Error(
         `ligne ${n.ligne} : « ${n.nom} » est un Air : il ne se lit pas, il se joue — ` +
           `jouer(1, ${n.nom}, 8);`,
+      )
+    }
+    if (s.genre === 'alphabet') {
+      throw new Error(`ligne ${n.ligne} : ALPHABET est un tableau : il faut dire quelle lettre, comme ALPHABET[0] pour A`)
+    }
+    if (s.genre === 'mot') {
+      throw new Error(
+        `ligne ${n.ligne} : « ${n.nom} » est un Mot : il ne se lit pas, il s'écrit ` +
+          `avec texte(${n.nom}) et s'efface avec effacer(${n.nom})`,
       )
     }
     throw new Error(`ligne ${n.ligne} : « ${n.nom} » ne se lit pas ainsi`)
@@ -2351,7 +2459,7 @@ const BUILTINS = new Set([
   'texte', 'poser', 'lire', 'image', 'bouton', 'hasard', 'semer', 'ecran',
   'sprite', 'sprite16', 'cacher', 'cacher16', 'defiler',
   'panneau', 'cacherPanneau', 'effacerPanneau', 'poserPanneau', 'lirePanneau', 'textePanneau',
-  'effacer',
+  'effacer', 'textS', 'poserS', 'attendre',
   'couleurFond', 'couleurLutin', 'teindre', 'teindreLutin', 'teindrePanneau',
   'paletteFond', 'paletteLutins', 'retard', 'images',
   'note', 'bruit', 'silence', 'volumeSon', 'jouer', 'airFini', 'sauver', 'sauvegarde',
@@ -2368,6 +2476,7 @@ const BUILTINS = new Set([
  */
 const TUILE_ATTENDUE = new Map([
   ['poser', { rang: 2, cote: 8 }],
+  ['poserS', { rang: 2, cote: 8 }],
   ['poserPanneau', { rang: 2, cote: 8 }],
   ['sprite', { rang: 3, cote: 8 }],
   ['sprite16', { rang: 3, cote: 16 }],
@@ -2517,6 +2626,25 @@ function appel(e, n) {
   }
 
   /*
+   * « texte(SALUT) », « effacer(SALUT) » : un Mot se déplie en ses trois
+   * morceaux, comme si on les avait écrits. L'effacement reçoit donc
+   * forcément la case et la longueur de l'écriture.
+   */
+  const mot = args.length === 1 && args[0].genre === 'variable' && args[0].symbole?.genre === 'mot'
+    ? args[0].symbole
+    : null
+  if (mot) {
+    if (!['texte', 'textePanneau', 'effacer', 'effacerPanneau'].includes(nom)) {
+      throw new Error(
+        `ligne ${n.ligne} : « ${args[0].nom} » est un Mot : il s'écrit avec texte(${args[0].nom}) ` +
+          `et s'efface avec effacer(${args[0].nom})`,
+      )
+    }
+    appel(e, { ...n, arguments: [mot.x, mot.y, mot.texte] })
+    return
+  }
+
+  /*
    * Effacer, sans compter les lettres à la main.
    *
    *   effacer(6, 4, "BONJOUR");     sept cases — la longueur est LUE dans le texte
@@ -2606,6 +2734,105 @@ function appel(e, n) {
     }
 
     e.call('EffacerCases')
+    return
+  }
+
+  /*
+   * textS : un texte qui passe à la ligne tout seul.
+   *
+   *   textS(18, 0, "BONJOUR");   « BO » en ligne 0, « NJOUR » en ligne 1
+   *
+   * Au bout de la ligne (après la colonne 19), la suite reprend à la colonne 0
+   * de la ligne d'en dessous ; après la ligne 17, en haut. Une colonne de départ
+   * trop grande saute de même : textS(20, 0, …) écrit en (0, 1).
+   *
+   * texte() n'a pas changé : il refuse toujours une colonne hors de l'écran, et
+   * c'est ce qui attrape les fautes. textS est pour qui VEUT le saut.
+   */
+  /*
+   * poserS : poser() qui passe à la ligne tout seul, comme textS.
+   *
+   *   poserS(i, 0, ALPHABET[i]);   colonne 20 → (0, 1), colonne 25 → (5, 1)
+   *
+   * La colonne est ramenée dans l'écran (le reste de la division par 20), et
+   * ce qui dépasse descend d'autant de lignes (le quotient). Après la ligne 17,
+   * on repart en haut. Le calcul est fait ICI, une fois pour toutes : la boucle
+   * qui s'en sert n'a plus rien à calculer. Position en clair : c'est le
+   * compilateur qui calcule, et cela ne coûte rien.
+   */
+  if (nom === 'poserS') {
+    if (args.length !== 3) throw new Error(`ligne ${n.ligne} : poserS(colonne, ligne, tuile) prend trois arguments`)
+    const [x, y, tuile] = args
+    const nombre = (v) => ({ genre: 'nombre', valeur: v, ligne: n.ligne })
+    const calcul = (operateur, gauche, droite) => ({ genre: 'calcul', operateur, gauche, droite, ligne: n.ligne })
+    const colonneFixe = constante(x)
+    const ligneFixe = constante(y)
+    const colonne = colonneFixe !== null ? nombre(colonneFixe % 20) : calcul('%', x, nombre(20))
+    const ligne = colonneFixe !== null && ligneFixe !== null
+      ? nombre((ligneFixe + Math.floor(colonneFixe / 20)) % 18)
+      : calcul('%', calcul('+', y, calcul('/', x, nombre(20))), nombre(18))
+    appel(e, { ...n, nom: 'poser', arguments: [colonne, ligne, tuile] })
+    return
+  }
+
+  if (nom === 'textS') {
+    if (args.length !== 3) throw new Error(`ligne ${n.ligne} : textS(colonne, ligne, "…") prend trois arguments`)
+    const [x, y, message] = args
+    const contenu = texteDe(message)
+    if (contenu === null) {
+      throw new Error(
+        `ligne ${n.ligne} : le troisième argument de textS() est un texte entre guillemets, ` +
+          'ou le nom d\'un « const char NOM[] = "…"; »',
+      )
+    }
+    if (!contenu.length) return
+
+    const nombre = (v) => ({ genre: 'nombre', valeur: v, ligne: n.ligne })
+    const calcul = (operateur, gauche, droite) => ({ genre: 'calcul', operateur, gauche, droite, ligne: n.ligne })
+
+    /* Position écrite en clair : le compilateur découpe lui-même, ligne par
+       ligne, en texte() ordinaires. Rien de plus dans la cartouche. */
+    const colonneFixe = constante(x)
+    const ligneFixe = constante(y)
+    if (colonneFixe !== null && ligneFixe !== null) {
+      let c = colonneFixe % 20
+      let l = (ligneFixe + Math.floor(colonneFixe / 20)) % 18
+      if (c + contenu.length <= 20) {
+        appel(e, { ...n, nom: 'texte', arguments: [nombre(c), nombre(l), message] })
+        return
+      }
+      let reste = contenu
+      while (reste.length) {
+        const morceau = reste.slice(0, 20 - c)
+        appel(e, { ...n, nom: 'texte', arguments: [nombre(c), nombre(l), { genre: 'texte', valeur: morceau, ligne: n.ligne }] })
+        reste = reste.slice(morceau.length)
+        c = 0
+        l = (l + 1) % 18
+      }
+      return
+    }
+
+    /* Position calculée : la case de départ est ramenée dans l'écran, puis la
+       routine « EcrireTexteS » compte les colonnes pendant qu'elle écrit. */
+    e.besoinTexteS = true
+    const colonne = calcul('%', x, nombre(20))
+    const ligne = calcul('%', calcul('+', y, calcul('/', x, nombre(20))), nombre(18))
+    e.adresseCarte(colonne, ligne, valeur, CARTE_FOND)
+    e.pushHL()
+    valeur(e, colonne)
+    e.ldCA()
+    e.popHL()
+
+    let etiquette
+    if (message.genre === 'texte') {
+      etiquette = neuve('Texte')
+      e.textes.push({ etiquette, contenu })
+    } else {
+      etiquette = message.symbole.etiquette
+    }
+    e.ldDEetiquette(etiquette)
+    e.ldB(contenu.length)
+    e.call('EcrireTexteS')
     return
   }
 
@@ -2774,6 +3001,26 @@ function appel(e, n) {
 
     e.ldB(chiffres)
     e.call('EcrireNombre')
+    return
+  }
+
+  /*
+   * attendre(secondes) : le temps dit en secondes, et non en images.
+   *
+   * La console ne connaît que les images (60 par seconde) : attendre(2), c'est
+   * 2 × 60 = 120 fois image(), lutins et musique compris. Le programme est
+   * arrêté pendant ce temps — c'est la différence avec compter les images
+   * soi-même, où la boucle de jeu continue de tourner (et de lire la manette).
+   * Jusqu'à 255 secondes ; attendre(0) n'attend pas.
+   */
+  if (nom === 'attendre') {
+    if (args.length !== 1) throw new Error(`ligne ${n.ligne} : attendre(secondes) prend un argument : le nombre de secondes`)
+    if (args[0].genre === 'nombre' && args[0].valeur > 255) {
+      throw new Error(`ligne ${n.ligne} : attendre() va jusqu'à 255 secondes, et non ${args[0].valeur}`)
+    }
+    e.besoinAttendre = true
+    valeur(e, args[0])
+    e.call('AttendreSecondes')
     return
   }
 
@@ -3817,7 +4064,7 @@ function instruction(e, n) {
   switch (n.genre) {
     case 'declarer': {
       const symbole = n.symbole
-      if (!symbole || symbole.genre === 'constante' || symbole.genre === 'table') return
+      if (!symbole || symbole.genre === 'constante' || symbole.genre === 'table' || symbole.genre === 'mot') return
       if (symbole.genre === 'zone') {
         if (n.copie) recopier(e, n.copie, symbole.base, n.copieTaille)
         return
@@ -4000,12 +4247,1032 @@ function instruction(e, n) {
   }
 }
 
+/* ------------------------------------------------ les fonctions écrites en C */
+
+/*
+ * deplace_x(colonne, ligne, tuile, pas) : une case qui avance ou recule toute
+ * seule, d'un pas tous les quarts de seconde, et rend sa nouvelle colonne.
+ *
+ *   x = deplace_x(x, 0, ALPHABET[0], 5);    5 cases vers la droite
+ *   x = deplace_x(x, 0, ALPHABET[0], -5);   5 cases vers la gauche
+ *
+ * Elle n'est pas écrite en instructions de la console, mais dans le langage
+ * du lecteur : c'est exactement le programme de la leçon « Une lettre qui
+ * avance de 5 cases », rangé dans une fonction. Le compilateur l'ajoute au
+ * programme SEULEMENT s'il s'en sert — sinon elle ne coûte pas un octet.
+ *
+ * Le signe : un octet ne connaît pas les nombres négatifs. -5 y est rangé
+ * comme 256 − 5 = 251. Tout pas au-delà de 127 est donc lu comme un recul,
+ * et « 0 - pas » retrouve le nombre de cases (0 − 251 = 5, en tournant).
+ *
+ * Elle bloque, comme attendre() : pendant le voyage, la boucle du programme
+ * ne tourne pas. Au bord de l'écran (colonne 0 ou 19), elle s'arrête plutôt
+ * que de sortir, et rend la colonne où elle s'est arrêtée.
+ */
+const SOURCE_DEPLACE_X = `
+uint8_t deplace_x(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t pas) {
+  uint8_t recule = pas > 127;          // -5 est rangé 251 : au-delà de 127, on recule
+  if (recule) pas = 0 - pas;           // 251 redevient 5 : le nombre de cases
+  poser(colonne, ligne, tuile);        // la case à sa place de départ
+  while (pas > 0) {
+    for (uint8_t i = 0; i < deplace_images; i++) image();   // un pas : 15 images (250 ms), ou ce que vitesse() a réglé
+    if (recule && colonne == 0) break;          // bord gauche : on s'arrête
+    if (!recule && colonne == 19) break;        // bord droit : on s'arrête
+    effacer(colonne, ligne, 1);        // 1. efface l'ancienne place
+    if (recule) colonne--;             // 2. une colonne plus à gauche…
+    else colonne++;                    //    …ou plus à droite
+    poser(colonne, ligne, tuile);      // 3. la case à sa nouvelle place
+    pas--;                             // un pas de moins à faire
+  }
+  return colonne;                      // la colonne d'arrivée
+}
+`
+
+/*
+ * deplace_y(colonne, ligne, tuile, pas) : la même chose que deplace_x, mais
+ * sur l'axe Y — la case DESCEND ou MONTE — et elle rend sa nouvelle LIGNE.
+ *
+ *   y = deplace_y(0, y, ALPHABET[0], 5);    5 lignes vers le bas
+ *   y = deplace_y(0, y, ALPHABET[0], -5);   5 lignes vers le haut
+ *
+ * Pourquoi deux fonctions, et pas une seule pour X et Y ? Une fonction ne
+ * rend qu'UNE valeur. deplace_x rend la colonne, deplace_y rend la ligne :
+ * chacune dit où elle s'est arrêtée, même quand le bord l'a stoppée.
+ *
+ * Sur l'écran, les lignes vont de 0 (en haut) à 17 (en bas) : un pas positif
+ * descend (la ligne grandit), un pas négatif monte (la ligne diminue).
+ */
+const SOURCE_DEPLACE_Y = `
+uint8_t deplace_y(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t pas) {
+  uint8_t monte = pas > 127;           // -5 est rangé 251 : au-delà de 127, on monte
+  if (monte) pas = 0 - pas;            // 251 redevient 5 : le nombre de lignes
+  poser(colonne, ligne, tuile);        // la case à sa place de départ
+  while (pas > 0) {
+    for (uint8_t i = 0; i < deplace_images; i++) image();   // un pas : 15 images (250 ms), ou ce que vitesse() a réglé
+    if (monte && ligne == 0) break;             // bord du haut : on s'arrête
+    if (!monte && ligne == 17) break;           // bord du bas : on s'arrête
+    effacer(colonne, ligne, 1);        // 1. efface l'ancienne place
+    if (monte) ligne--;                // 2. une ligne plus haut…
+    else ligne++;                      //    …ou plus bas
+    poser(colonne, ligne, tuile);      // 3. la case à sa nouvelle place
+    pas--;                             // un pas de moins à faire
+  }
+  return ligne;                        // la ligne d'arrivée
+}
+`
+
+/*
+ * Les fonctions qui bougent sur les DEUX axes à la fois : deplace, va_a, un_pas.
+ *
+ * Elles ont un problème que deplace_x et deplace_y n'ont pas : une fonction ne
+ * rend qu'UNE valeur, et il y en a deux à rendre, la colonne ET la ligne.
+ * Elles rendent donc la colonne (return), et déposent la ligne dans une
+ * variable de la console, « deplace_ligne_rendue ». Le compilateur, en
+ * réécrivant la ligne (voir « rangerLaPosition »), range l'une dans x et
+ * l'autre dans y :
+ *
+ *   deplace(x, y, ALPHABET[0], 5, 5);
+ *   devient
+ *   { x = deplace(x, y, ALPHABET[0], 5, 5);  y = deplace_ligne_rendue; }
+ *
+ * Cette variable n'est ajoutée qu'une fois, même si le programme se sert des
+ * trois fonctions : c'est « SOURCE_LIGNE_RENDUE », à part. Elle porte aussi
+ * « deplace_images », la durée d'un pas de deplace_x, deplace_y, deplace et
+ * va_a : 15 images (250 ms) au départ, et ce que vitesse(ms) règle ensuite.
+ */
+const SOURCE_LIGNE_RENDUE = `
+uint8_t deplace_ligne_rendue = 0;      // la ligne d'arrivée, que la console range dans y
+uint8_t deplace_images = 15;           // la durée d'un pas, en images : 15 = 250 ms ; vitesse(ms) la change
+`
+
+/*
+ * deplace(colonne, ligne, tuile, pasX, pasY) : les deux axes en une ligne.
+ *
+ *   deplace(x, y, ALPHABET[0], 5, 0);    5 cases vers la droite
+ *   deplace(x, y, ALPHABET[0], 0, -5);   5 lignes vers le haut
+ *   deplace(x, y, ALPHABET[0], 5, 5);    en diagonale, vers le bas à droite
+ *
+ * À chaque quart de seconde, un pas sur X (s'il en reste) ET un pas sur Y (s'il
+ * en reste) : avec 5 et 5, la case part en diagonale. Au bord, l'axe bloqué
+ * ne bouge plus, l'autre continue.
+ */
+const SOURCE_DEPLACE = `
+uint8_t deplace(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t pasX, uint8_t pasY) {
+  uint8_t gauche = pasX > 127;         // -5 est rangé 251 : au-delà de 127, vers la gauche
+  if (gauche) pasX = 0 - pasX;         // 251 redevient 5 : le nombre de cases
+  uint8_t haut = pasY > 127;           // pareil pour Y : au-delà de 127, vers le haut
+  if (haut) pasY = 0 - pasY;
+  poser(colonne, ligne, tuile);        // la case à sa place de départ
+  while (pasX > 0 || pasY > 0) {       // tant qu'il reste un pas sur l'un des axes
+    for (uint8_t i = 0; i < deplace_images; i++) image();   // un pas : 15 images (250 ms), ou ce que vitesse() a réglé
+    effacer(colonne, ligne, 1);        // 1. efface l'ancienne place
+    if (pasX > 0) {                    // 2. un pas sur X…
+      if (gauche && colonne > 0) colonne--;
+      if (!gauche && colonne < 19) colonne++;
+      pasX--;
+    }
+    if (pasY > 0) {                    //    …et un pas sur Y
+      if (haut && ligne > 0) ligne--;
+      if (!haut && ligne < 17) ligne++;
+      pasY--;
+    }
+    poser(colonne, ligne, tuile);      // 3. la case à sa nouvelle place
+  }
+  deplace_ligne_rendue = ligne;        // la ligne d'arrivée, pour y
+  return colonne;                      // la colonne d'arrivée, pour x
+}
+`
+
+/*
+ * va_a(colonne, ligne, tuile, versColonne, versLigne) : aller à une case.
+ *
+ *   va_a(x, y, ALPHABET[0], 10, 5);      jusqu'en (10, 5)
+ *
+ * On ne compte plus les pas : on dit OÙ aller. À chaque quart de seconde, la
+ * case se rapproche d'un pas sur chaque axe qui n'est pas encore bon —
+ * d'abord en diagonale, puis tout droit.
+ */
+const SOURCE_VA_A = `
+uint8_t va_a(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t versColonne, uint8_t versLigne) {
+  if (versColonne > 19) versColonne = 19;   // l'arrivée reste dans l'écran
+  if (versLigne > 17) versLigne = 17;
+  poser(colonne, ligne, tuile);             // la case à sa place de départ
+  while (colonne != versColonne || ligne != versLigne) {   // pas encore arrivée
+    for (uint8_t i = 0; i < deplace_images; i++) image();   // un pas : 15 images (250 ms), ou ce que vitesse() a réglé
+    effacer(colonne, ligne, 1);             // 1. efface l'ancienne place
+    if (colonne < versColonne) colonne++;   // 2. un pas vers la colonne voulue…
+    else if (colonne > versColonne) colonne--;
+    if (ligne < versLigne) ligne++;         //    …et vers la ligne voulue
+    else if (ligne > versLigne) ligne--;
+    poser(colonne, ligne, tuile);           // 3. la case à sa nouvelle place
+  }
+  deplace_ligne_rendue = ligne;             // la ligne d'arrivée, pour y
+  return colonne;                           // la colonne d'arrivée, pour x
+}
+`
+
+/*
+ * un_pas(colonne, ligne, tuile, sensX, sensY) : UN pas, tout de suite.
+ *
+ *   un_pas(x, y, ALPHABET[0], 1, 0);     une case à droite
+ *   un_pas(x, y, ALPHABET[0], 0, -1);    une case en haut
+ *
+ * Les autres BLOQUENT : pendant le voyage, rien d'autre ne tourne. Celle-ci
+ * fait un seul pas, sans attendre, et rend la main. On l'appelle dans la
+ * boucle, au rythme qu'on veut : c'est ce qui permet de faire bouger deux
+ * lettres à la fois, ou de lire la manette pendant le mouvement.
+ *
+ * Seul le SIGNE compte : 1 (ou 5) avance d'une case, -1 recule d'une case,
+ * 0 ne bouge pas sur cet axe.
+ */
+const SOURCE_UN_PAS = `
+uint8_t un_pas(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t sensX, uint8_t sensY) {
+  effacer(colonne, ligne, 1);               // 1. efface l'ancienne place
+  if (sensX > 127) {                        // 2. négatif : à gauche…
+    if (colonne > 0) colonne--;
+  } else if (sensX > 0) {                   //    …positif : à droite
+    if (colonne < 19) colonne++;
+  }
+  if (sensY > 127) {                        //    négatif : en haut…
+    if (ligne > 0) ligne--;
+  } else if (sensY > 0) {                   //    …positif : en bas
+    if (ligne < 17) ligne++;
+  }
+  poser(colonne, ligne, tuile);             // 3. la case à sa nouvelle place
+  deplace_ligne_rendue = ligne;             // la ligne d'arrivée, pour y
+  return colonne;                           // la colonne d'arrivée, pour x
+}
+`
+
+/*
+ * carre(x, y, tuile, taille, sens, vitesse, tours) : un carré parfait AUTOUR
+ * de la case (x, y).
+ *
+ *   carre(10, 8, ALPHABET[0], 2, 1, 250, 3);
+ *   autour de (10, 8), un carré de 5 × 5, dans le sens des aiguilles d'une
+ *   montre, un pas tous les 250 ms, trois tours
+ *
+ * La taille de base, c'est la case elle-même : « taille » dit à combien de
+ * cases d'elle on tourne. 1 : le tour juste autour d'elle (3 × 3) ; 2 : un
+ * cran plus loin (5 × 5) ; n : un carré de 2 × n + 1 cases de côté.
+ *
+ * Le trajet : la case part du centre, gagne en diagonale le coin en haut à
+ * gauche, fait ses tours, et revient en diagonale au centre. À la fin, elle
+ * est EXACTEMENT à sa place de départ : x et y n'ont pas à changer.
+ *
+ * Le sens : 1 dans le sens des aiguilles d'une montre (droite, bas, gauche,
+ * haut) ; -1 dans l'autre sens (bas, droite, haut, gauche). -1 est rangé 255 :
+ * au-delà de 127, c'est l'autre sens.
+ *
+ * La vitesse : en millisecondes par pas, ÉCRITE EN CLAIR (250, 100…). Le
+ * compilateur la traduit en images, comme ms() : la fonction, elle, reçoit
+ * un nombre d'images (voir « preparerLesFormes »).
+ *
+ * Le carré reste PARFAIT : s'il sortait de l'écran, c'est le centre qui est
+ * poussé vers l'intérieur, pas la taille qui est rognée. Seule une taille
+ * plus grande que l'écran (au-delà de 8) est ramenée à 8.
+ */
+const SOURCE_CARRE = `
+void carre(uint8_t x, uint8_t y, uint8_t tuile, uint8_t taille, uint8_t sens, uint8_t vitesse, uint8_t tours) {
+  if (taille > 8) taille = 8;                // 8 : le plus grand carré que l'écran tienne (17 lignes)
+  if (x < taille) x = taille;                // trop à gauche : le centre est poussé vers la droite
+  if (x + taille > 19) x = 19 - taille;      // trop à droite
+  if (y < taille) y = taille;                // trop haut
+  if (y + taille > 17) y = 17 - taille;      // trop bas
+  uint8_t cote = taille + taille;            // un côté, en pas : 2 × taille
+  uint8_t colonne = x;
+  uint8_t ligne = y;
+  poser(colonne, ligne, tuile);              // la case au centre
+
+  // 1. du centre au coin en haut à gauche, en diagonale : « taille » pas
+  for (uint8_t k = 0; k < taille; k++) {
+    for (uint8_t i = 0; i < vitesse; i++) image();
+    effacer(colonne, ligne, 1);
+    colonne--;
+    ligne--;
+    poser(colonne, ligne, tuile);
+  }
+
+  // 2. les tours : 4 côtés de « cote » pas chacun
+  for (uint8_t t = 0; t < tours; t++) {
+    for (uint8_t c = 0; c < 4; c++) {        // c : le côté, de 0 à 3
+      // Dans le sens des aiguilles : côté 0 droite, 1 bas, 2 gauche, 3 haut.
+      // Dans l'autre sens, on échange 0 et 1, 2 et 3 : bas, droite, haut, gauche.
+      uint8_t direction = c;
+      if (sens > 127) direction = c ^ 1;     // ^ 1 : 0 ↔ 1, 2 ↔ 3
+      for (uint8_t k = 0; k < cote; k++) {
+        for (uint8_t i = 0; i < vitesse; i++) image();
+        effacer(colonne, ligne, 1);
+        if (direction == 0) colonne++;       // à droite
+        if (direction == 1) ligne++;         // en bas
+        if (direction == 2) colonne--;       // à gauche
+        if (direction == 3) ligne--;         // en haut
+        poser(colonne, ligne, tuile);
+      }
+    }
+  }
+
+  // 3. du coin au centre, en diagonale : retour à la place de départ
+  for (uint8_t k = 0; k < taille; k++) {
+    for (uint8_t i = 0; i < vitesse; i++) image();
+    effacer(colonne, ligne, 1);
+    colonne++;
+    ligne++;
+    poser(colonne, ligne, tuile);
+  }
+}
+`
+
+/*
+ * losange(x, y, tuile, taille, sens, vitesse, tours) : le carré posé sur la
+ * POINTE, autour de la case (x, y). Ses côtés sont des diagonales.
+ *
+ *   losange(10, 8, ALPHABET[0], 2, 1, 250, 1);
+ *
+ *           ↘                 les quatre pointes sont à « taille » cases
+ *     . . A . .               du centre : en haut, à droite, en bas, à gauche.
+ *     . ↗ . ↘ .
+ *     A . + . A               Les mêmes réglages que carre(), dans le même
+ *     . ↖ . ↙ .               ordre : on peut lui donner un Carre,
+ *     . . A . .               losange(ronde).
+ *
+ * Le trajet : du centre, tout droit jusqu'à la pointe du haut ; puis les tours,
+ * en diagonale (sens 1 : vers la droite d'abord ; -1 : vers la gauche) ; puis
+ * tout droit jusqu'au centre. Près du bord, le centre est poussé vers
+ * l'intérieur ; la taille va jusqu'à 8.
+ */
+const SOURCE_LOSANGE = `
+void losange(uint8_t x, uint8_t y, uint8_t tuile, uint8_t taille, uint8_t sens, uint8_t vitesse, uint8_t tours) {
+  if (taille > 8) taille = 8;                // 8 : le plus grand losange que l'écran tienne
+  if (x < taille) x = taille;                // trop près d'un bord : le centre est poussé
+  if (x + taille > 19) x = 19 - taille;
+  if (y < taille) y = taille;
+  if (y + taille > 17) y = 17 - taille;
+  uint8_t colonne = x;
+  uint8_t ligne = y;
+  poser(colonne, ligne, tuile);              // la case au centre
+
+  // 1. du centre à la pointe du haut, tout droit : « taille » pas vers le haut
+  for (uint8_t k = 0; k < taille; k++) {
+    for (uint8_t i = 0; i < vitesse; i++) image();
+    effacer(colonne, ligne, 1);
+    ligne--;
+    poser(colonne, ligne, tuile);
+  }
+
+  // 2. les tours : 4 côtés EN DIAGONALE, de « taille » pas chacun
+  for (uint8_t t = 0; t < tours; t++) {
+    for (uint8_t c = 0; c < 4; c++) {
+      // Sens 1, depuis la pointe du haut : côté 0 bas-droite, 1 bas-gauche,
+      // 2 haut-gauche, 3 haut-droite. Sens -1 : on échange droite et gauche.
+      uint8_t droite = c == 0 || c == 3;
+      if (sens > 127) droite = !droite;
+      uint8_t bas = c < 2;
+      for (uint8_t k = 0; k < taille; k++) {
+        for (uint8_t i = 0; i < vitesse; i++) image();
+        effacer(colonne, ligne, 1);
+        if (droite) colonne++;               // un pas sur X…
+        else colonne--;
+        if (bas) ligne++;                    // …ET un pas sur Y : la diagonale
+        else ligne--;
+        poser(colonne, ligne, tuile);
+      }
+    }
+  }
+
+  // 3. de la pointe du haut au centre, tout droit
+  for (uint8_t k = 0; k < taille; k++) {
+    for (uint8_t i = 0; i < vitesse; i++) image();
+    effacer(colonne, ligne, 1);
+    ligne++;
+    poser(colonne, ligne, tuile);
+  }
+}
+`
+
+/*
+ * rectangle(x, y, tuile, largeur, hauteur, sens, vitesse, tours) : un
+ * rectangle autour de (x, y). C'est carre() avec DEUX tailles : « largeur »
+ * sur X, « hauteur » sur Y, comptées comme la taille d'un carré. Un rectangle
+ * de largeur 4 et de hauteur 2 fait 9 × 5 cases (2 × 4 + 1, 2 × 2 + 1).
+ *
+ *   rectangle(10, 8, ALPHABET[0], 4, 2, 1, 250, 1);
+ *
+ * Le trajet : du centre au coin en haut à gauche (en diagonale, puis tout
+ * droit sur l'axe le plus long), les tours, puis le chemin inverse. Largeur
+ * jusqu'à 9, hauteur jusqu'à 8.
+ */
+const SOURCE_RECTANGLE = `
+void rectangle(uint8_t x, uint8_t y, uint8_t tuile, uint8_t largeur, uint8_t hauteur, uint8_t sens, uint8_t vitesse, uint8_t tours) {
+  if (largeur > 9) largeur = 9;              // 9 : 19 colonnes, presque toute la largeur
+  if (hauteur > 8) hauteur = 8;              // 8 : 17 lignes
+  if (x < largeur) x = largeur;              // trop près d'un bord : le centre est poussé
+  if (x + largeur > 19) x = 19 - largeur;
+  if (y < hauteur) y = hauteur;
+  if (y + hauteur > 17) y = 17 - hauteur;
+  uint8_t colonne = x;
+  uint8_t ligne = y;
+  uint8_t coinX = x - largeur;               // le coin en haut à gauche
+  uint8_t coinY = y - hauteur;
+  poser(colonne, ligne, tuile);
+
+  // 1. du centre au coin : en diagonale tant que les deux axes avancent, puis tout droit
+  while (colonne != coinX || ligne != coinY) {
+    for (uint8_t i = 0; i < vitesse; i++) image();
+    effacer(colonne, ligne, 1);
+    if (colonne > coinX) colonne--;
+    if (ligne > coinY) ligne--;
+    poser(colonne, ligne, tuile);
+  }
+
+  // 2. les tours : 2 côtés de 2 × largeur pas, 2 côtés de 2 × hauteur pas
+  for (uint8_t t = 0; t < tours; t++) {
+    for (uint8_t c = 0; c < 4; c++) {
+      uint8_t direction = c;                 // sens 1 : 0 droite, 1 bas, 2 gauche, 3 haut
+      if (sens > 127) direction = c ^ 1;     // sens -1 : bas, droite, haut, gauche
+      uint8_t longueur = largeur + largeur;  // un côté horizontal : 2 × largeur
+      if (direction == 1 || direction == 3) longueur = hauteur + hauteur;   // vertical : 2 × hauteur
+      for (uint8_t k = 0; k < longueur; k++) {
+        for (uint8_t i = 0; i < vitesse; i++) image();
+        effacer(colonne, ligne, 1);
+        if (direction == 0) colonne++;
+        if (direction == 1) ligne++;
+        if (direction == 2) colonne--;
+        if (direction == 3) ligne--;
+        poser(colonne, ligne, tuile);
+      }
+    }
+  }
+
+  // 3. du coin au centre : le même chemin, à l'envers
+  while (colonne != x || ligne != y) {
+    for (uint8_t i = 0; i < vitesse; i++) image();
+    effacer(colonne, ligne, 1);
+    if (colonne < x) colonne++;
+    if (ligne < y) ligne++;
+    poser(colonne, ligne, tuile);
+  }
+}
+`
+
+/*
+ * spirale(x, y, tuile, taille, sens, vitesse) : partir du centre et tourner
+ * en s'éloignant, jusqu'au bord d'un carré de « taille ».
+ *
+ *   spirale(10, 8, ALPHABET[0], 2, 1, 250);
+ *
+ * Les branches de la spirale s'allongent d'un pas toutes les deux branches :
+ * 1, 1, 2, 2, 3, 3… jusqu'à 2 × taille, puis une dernière branche de
+ * 2 × taille ferme le carré. Sens 1 : droite, bas, gauche, haut… ; sens -1 :
+ * bas, droite, haut, gauche… À la fin, retour au centre en diagonale.
+ */
+const SOURCE_SPIRALE = `
+void spirale(uint8_t x, uint8_t y, uint8_t tuile, uint8_t taille, uint8_t sens, uint8_t vitesse) {
+  if (taille > 8) taille = 8;
+  if (x < taille) x = taille;                // trop près d'un bord : le centre est poussé
+  if (x + taille > 19) x = 19 - taille;
+  if (y < taille) y = taille;
+  if (y + taille > 17) y = 17 - taille;
+  uint8_t colonne = x;
+  uint8_t ligne = y;
+  uint8_t cote = taille + taille;            // la plus longue branche : 2 × taille
+  uint8_t longueur = 1;                      // la branche en cours : 1, 1, 2, 2, 3, 3…
+  uint8_t branche = 0;                       // son numéro : 0, 1, 2, 3, 4…
+  uint8_t derniere = 0;                      // 1 quand on fait la branche qui ferme le carré
+  poser(colonne, ligne, tuile);
+
+  while (longueur <= cote) {
+    uint8_t direction = branche & 3;         // 0, 1, 2, 3, 0, 1… : droite, bas, gauche, haut
+    if (sens > 127) direction = direction ^ 1;   // l'autre sens : bas, droite, haut, gauche
+    for (uint8_t k = 0; k < longueur; k++) {
+      for (uint8_t i = 0; i < vitesse; i++) image();
+      effacer(colonne, ligne, 1);
+      if (direction == 0) colonne++;
+      if (direction == 1) ligne++;
+      if (direction == 2) colonne--;
+      if (direction == 3) ligne--;
+      poser(colonne, ligne, tuile);
+    }
+    if (derniere) break;                     // la branche qui ferme le carré est faite
+    branche++;
+    if ((branche & 1) == 0) longueur++;      // toutes les deux branches, un pas de plus
+    if (longueur > cote) {                   // on a dépassé : une dernière branche de 2 × taille
+      longueur = cote;
+      derniere = 1;
+    }
+  }
+
+  // retour au centre, en diagonale
+  while (colonne != x || ligne != y) {
+    for (uint8_t i = 0; i < vitesse; i++) image();
+    effacer(colonne, ligne, 1);
+    if (colonne < x) colonne++;
+    else if (colonne > x) colonne--;
+    if (ligne < y) ligne++;
+    else if (ligne > y) ligne--;
+    poser(colonne, ligne, tuile);
+  }
+}
+`
+
+/*
+ * aller_retour(x, y, tuile, pasX, pasY, vitesse, fois) : aller, et revenir.
+ *
+ *   aller_retour(10, 8, ALPHABET[0], 5, 0, 250, 3);    3 allers-retours à droite
+ *   aller_retour(10, 8, ALPHABET[0], 4, 4, 250, 1);    en diagonale, vers le bas à droite
+ *
+ * pasX et pasY disent où est l'autre bout, comme pour deplace() : + vers la
+ * droite ou le bas, - vers la gauche ou le haut. Avec les deux, le chemin est
+ * une diagonale. L'autre bout est gardé dans l'écran. La lettre finit à sa
+ * place de départ.
+ */
+const SOURCE_ALLER_RETOUR = `
+void aller_retour(uint8_t x, uint8_t y, uint8_t tuile, uint8_t pasX, uint8_t pasY, uint8_t vitesse, uint8_t fois) {
+  // L'autre bout. -5 est rangé 251 : x + 251 « tourne » et revient à x - 5.
+  uint8_t versColonne = x + pasX;
+  if (pasX > 127 && versColonne > x) versColonne = 0;      // trop à gauche : on a tourné sous 0
+  if (pasX < 128 && versColonne > 19) versColonne = 19;    // trop à droite
+  uint8_t versLigne = y + pasY;
+  if (pasY > 127 && versLigne > y) versLigne = 0;          // trop haut
+  if (pasY < 128 && versLigne > 17) versLigne = 17;        // trop bas
+  uint8_t colonne = x;
+  uint8_t ligne = y;
+  poser(colonne, ligne, tuile);
+
+  for (uint8_t f = 0; f < fois; f++) {
+    // l'aller : un pas vers l'autre bout, sur chaque axe qui n'y est pas encore
+    while (colonne != versColonne || ligne != versLigne) {
+      for (uint8_t i = 0; i < vitesse; i++) image();
+      effacer(colonne, ligne, 1);
+      if (colonne < versColonne) colonne++;
+      else if (colonne > versColonne) colonne--;
+      if (ligne < versLigne) ligne++;
+      else if (ligne > versLigne) ligne--;
+      poser(colonne, ligne, tuile);
+    }
+    // le retour : pareil, vers la place de départ
+    while (colonne != x || ligne != y) {
+      for (uint8_t i = 0; i < vitesse; i++) image();
+      effacer(colonne, ligne, 1);
+      if (colonne < x) colonne++;
+      else if (colonne > x) colonne--;
+      if (ligne < y) ligne++;
+      else if (ligne > y) ligne--;
+      poser(colonne, ligne, tuile);
+    }
+  }
+}
+`
+
+/*
+ * deplace_croix(colonne, ligne, tuile, vitesse) : la lettre suit la croix,
+ * case par case. Tout le 0.66 en une ligne, à appeler dans la boucle, à
+ * chaque image :
+ *
+ *   while (true) {
+ *     image();
+ *     deplace_croix(x, y, ALPHABET[0], 250);
+ *   }
+ *
+ * « vitesse » : le temps entre deux pas, en MILLISECONDES, écrit en clair —
+ * 250 fait 4 cases par seconde, 100 en fait 10. Le compilateur la traduit en
+ * images, comme ms() (voir FORMES) : la fonction reçoit un nombre d'images.
+ *
+ * Elle lit la croix, fait au plus un pas, reste dans l'écran, efface
+ * l'ancienne case SEULEMENT si la lettre a bougé (sinon elle clignoterait),
+ * et la pose à sa place. Seule sur sa ligne, la console range la colonne
+ * dans x et la ligne dans y.
+ *
+ * Elle NE BLOQUE PAS : un appel, au plus un pas, et elle rend la main.
+ * « croix_attente » compte les images avant le pas suivant : c'est une
+ * variable de la console, qui survit d'un appel à l'autre.
+ */
+const SOURCE_DEPLACE_CROIX = `
+uint8_t croix_attente = 0;                // les images avant le prochain pas
+uint8_t croix_image = 0;                  // la dernière image où le temps a passé
+uint8_t croix_pret = 0;                   // 1 : dans cette image, on a le droit de bouger
+uint8_t deplace_croix(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t vitesse) {
+  // Le temps ne passe qu'UNE fois par image, même si l'on appelle
+  // deplace_croix pour plusieurs lettres : sinon la première lettre
+  // relancerait l'attente, et la seconde ne bougerait jamais.
+  // Et il passe du VRAI nombre d'images écoulées : une boucle chargée (des
+  // nombres à écrire, plusieurs lettres) peut durer deux images par tour ;
+  // la lettre garde quand même sa vitesse.
+  uint8_t maintenant = images();
+  uint8_t passees = maintenant - croix_image;   // les images depuis la dernière fois
+  if (passees > 0) {                          // au moins une nouvelle image :
+    croix_image = maintenant;
+    if (croix_attente > passees) croix_attente -= passees;   //   le temps passe…
+    else croix_attente = 0;                   //   …sans descendre sous zéro
+    croix_pret = croix_attente == 0;          //   et l'on sait si l'on peut bouger
+  }
+  if (croix_pret) {                           // on peut faire un pas
+    uint8_t avantX = colonne;                 // la place d'avant, pour l'effacer
+    uint8_t avantY = ligne;
+    if (bouton(DROITE) && colonne < 19) colonne++;
+    else if (bouton(GAUCHE) && colonne > 0) colonne--;
+    if (bouton(BAS) && ligne < 17) ligne++;
+    else if (bouton(HAUT) && ligne > 0) ligne--;
+    if (colonne != avantX || ligne != avantY) {   // elle a bougé :
+      effacer(avantX, avantY, 1);             //   l'ancienne case s'efface
+      croix_attente = vitesse;                //   et l'on attend « vitesse » images
+    }
+  }
+  poser(colonne, ligne, tuile);               // la lettre à sa place
+  deplace_ligne_rendue = ligne;               // la ligne, pour y
+  return colonne;                             // la colonne, pour x
+}
+`
+
+/*
+ * glisse_croix(numero, px, py, tuile, vitesse) : la même chose AU PIXEL PRÈS,
+ * avec un lutin. Tout le 0.70 en une ligne :
+ *
+ *   glisse_croix(0, px, py, ALPHABET[0], 1);
+ *
+ * « vitesse » : combien de PIXELS par image, tant qu'une flèche est tenue —
+ * 1 fait 60 pixels par seconde, 3 en fait 180. Ce n'est pas une durée : elle
+ * peut donc être une variable, et changer en plein jeu (courir avec B…).
+ *
+ * px va de 0 à 152 et py de 0 à 136, pour que le lutin reste entier dans
+ * l'écran de 160 × 144 : un pas qui dépasserait s'arrête au bord. Seule sur
+ * sa ligne, la console range la nouvelle place dans px et py.
+ */
+const SOURCE_GLISSE_CROIX = `
+uint8_t glisse_croix(uint8_t numero, uint8_t px, uint8_t py, uint8_t tuile, uint8_t vitesse) {
+  if (bouton(DROITE)) {                       // « vitesse » pixels à droite…
+    if (px + vitesse < 152) px += vitesse;
+    else px = 152;                            // …sans dépasser le bord
+  }
+  if (bouton(GAUCHE)) {
+    if (px > vitesse) px -= vitesse;
+    else px = 0;
+  }
+  if (bouton(BAS)) {
+    if (py + vitesse < 136) py += vitesse;
+    else py = 136;
+  }
+  if (bouton(HAUT)) {
+    if (py > vitesse) py -= vitesse;
+    else py = 0;
+  }
+  sprite(numero, px, py, tuile);              // le lutin à sa nouvelle place
+  deplace_ligne_rendue = py;                  // la ligne en pixels, pour py
+  return px;                                  // la colonne en pixels, pour px
+}
+`
+
+/*
+ * tourne_carre(numero, x, y, tuile, cote, vitesse) : une lettre qui tourne
+ * en carré SANS FIN, sans bloquer. À appeler à chaque image, dans la boucle :
+ *
+ *   tourne_carre(0, 10, 8, ALPHABET[1], 4, 250);
+ *
+ * Au premier appel, la lettre apparaît en (x, y), un coin du carré. Ensuite,
+ * toutes les « vitesse » ms, elle fait UN pas : « cote » pas à droite, puis
+ * en bas, puis à gauche, puis en haut, et elle recommence. Un côté NÉGATIF
+ * (-4) part vers la gauche puis vers le haut : le même carré, parcouru depuis
+ * le coin opposé.
+ *
+ * « numero » (0 à 3) : la console retient, pour chaque numéro, où en est la
+ * lettre — sa place, son pas dans le tour, son temps d'attente. Quatre
+ * lettres peuvent tourner en même temps, chacune avec son numéro.
+ */
+const SOURCE_TOURNE_CARRE = `
+uint8_t tour_parti[4];                    // 0 : ce numéro n'a pas encore commencé
+uint8_t tour_x[4];                        // la place de chaque lettre
+uint8_t tour_y[4];
+uint8_t tour_pas[4];                      // où elle en est dans son tour
+uint8_t tour_attente[4];                  // les images avant son prochain pas
+uint8_t tour_image[4];                    // la dernière image où l'on a compté
+void tourne_carre(uint8_t numero, uint8_t x, uint8_t y, uint8_t tuile, uint8_t cote, uint8_t vitesse) {
+  uint8_t maintenant = images();
+  if (tour_parti[numero] == 0) {          // premier appel : la lettre apparaît
+    tour_parti[numero] = 1;
+    tour_x[numero] = x;
+    tour_y[numero] = y;
+    tour_pas[numero] = 0;
+    tour_attente[numero] = vitesse;
+    tour_image[numero] = maintenant;
+    poser(x, y, tuile);
+    return;
+  }
+  uint8_t passees = maintenant - tour_image[numero];   // le temps passé depuis
+  tour_image[numero] = maintenant;
+  if (tour_attente[numero] > passees) {   // pas encore l'heure du pas suivant
+    tour_attente[numero] = tour_attente[numero] - passees;
+    return;
+  }
+  tour_attente[numero] = vitesse;         // l'heure est venue : un pas
+  uint8_t direction = 0;                  // 0 droite, 1 bas, 2 gauche, 3 haut
+  uint8_t p = tour_pas[numero];
+  uint8_t n = cote;
+  if (cote > 127) n = 0 - cote;           // -4 est rangé 252 : la longueur, c'est 4
+  while (p >= n) { p = p - n; direction++; }   // quel côté du tour : 0, 1, 2 ou 3
+  if (cote > 127) direction = direction + 2;   // côté négatif : on commence à gauche
+  direction = direction & 3;              // 4 redevient 0, 5 redevient 1
+  uint8_t cx = tour_x[numero];
+  uint8_t cy = tour_y[numero];
+  effacer(cx, cy, 1);
+  if (direction == 0) cx++;
+  if (direction == 1) cy++;
+  if (direction == 2) cx--;
+  if (direction == 3) cy--;
+  poser(cx, cy, tuile);
+  tour_x[numero] = cx;
+  tour_y[numero] = cy;
+  tour_pas[numero]++;
+  if (tour_pas[numero] == n + n + n + n) tour_pas[numero] = 0;   // le tour est fini
+}
+`
+
+/*
+ * defile(numero, x, y, tuile, sens, vitesse) : une lettre qui file sur sa
+ * ligne, SANS FIN, sans bloquer. À appeler à chaque image :
+ *
+ *   defile(0, 19, 3, ALPHABET[2], -1, 250);   à gauche
+ *   defile(1, 0, 14, ALPHABET[3], 1, 250);    à droite
+ *
+ * Au premier appel, la lettre apparaît en (x, y). Ensuite, toutes les
+ * « vitesse » ms, elle fait un pas : à gauche (sens -1) ou à droite (sens 1).
+ * Au bord, elle repart de l'autre côté. « numero » (0 à 3), comme pour
+ * tourne_carre : la console retient où en est chaque lettre.
+ */
+const SOURCE_DEFILE = `
+uint8_t file_parti[4];
+uint8_t file_x[4];
+uint8_t file_attente[4];
+uint8_t file_image[4];
+void defile(uint8_t numero, uint8_t x, uint8_t y, uint8_t tuile, uint8_t sens, uint8_t vitesse) {
+  uint8_t maintenant = images();
+  if (file_parti[numero] == 0) {          // premier appel : la lettre apparaît
+    file_parti[numero] = 1;
+    file_x[numero] = x;
+    file_attente[numero] = vitesse;
+    file_image[numero] = maintenant;
+    poser(x, y, tuile);
+    return;
+  }
+  uint8_t passees = maintenant - file_image[numero];
+  file_image[numero] = maintenant;
+  if (file_attente[numero] > passees) {
+    file_attente[numero] = file_attente[numero] - passees;
+    return;
+  }
+  file_attente[numero] = vitesse;         // un pas
+  uint8_t cx = file_x[numero];
+  effacer(cx, y, 1);
+  if (sens > 127) {                       // sens -1 : à gauche…
+    if (cx == 0) cx = 19;                 //   …et au bord, on repart de droite
+    else cx--;
+  } else {                                // sens 1 : à droite…
+    if (cx == 19) cx = 0;                 //   …et au bord, on repart de gauche
+    else cx++;
+  }
+  poser(cx, y, tuile);
+  file_x[numero] = cx;
+}
+`
+
+/*
+ * chaque(ms) : « est-ce l'heure ? ». Répond 1 toutes les « ms » millisecondes,
+ * 0 le reste du temps, SANS rien arrêter :
+ *
+ *   if (chaque(250)) { … }     ce bloc se fait 4 fois par seconde
+ *
+ * Chaque « chaque(…) » écrit dans le programme a son propre chronomètre : le
+ * compilateur le réécrit en « chaque_minuteur(k, ms(250)) », avec k son
+ * numéro (0, 1, 2… dans l'ordre du programme). L'élève n'a rien à numéroter.
+ * Huit au plus. Le temps compte les images RÉELLEMENT passées, comme
+ * deplace_croix : une boucle lente ne ralentit pas le rythme.
+ */
+const SOURCE_CHAQUE = `
+uint8_t chaque_parti[8];
+uint8_t chaque_attente[8];
+uint8_t chaque_image[8];
+uint8_t chaque_minuteur(uint8_t numero, uint8_t duree) {
+  uint8_t maintenant = images();
+  if (chaque_parti[numero] == 0) {        // la première fois : le chronomètre part
+    chaque_parti[numero] = 1;
+    chaque_image[numero] = maintenant;
+    chaque_attente[numero] = duree;
+    return 0;
+  }
+  uint8_t passees = maintenant - chaque_image[numero];
+  chaque_image[numero] = maintenant;
+  if (chaque_attente[numero] > passees) {  // pas encore l'heure
+    chaque_attente[numero] = chaque_attente[numero] - passees;
+    return 0;
+  }
+  chaque_attente[numero] = duree;         // l'heure : on repart pour un tour
+  return 1;
+}
+`
+
+/** Les fonctions de la console écrites en C : leur nom, et leur texte. */
+const FONCTIONS_EN_C = {
+  chaque_minuteur: SOURCE_CHAQUE,
+  tourne_carre: SOURCE_TOURNE_CARRE, defile: SOURCE_DEFILE,
+  deplace_croix: SOURCE_DEPLACE_CROIX, glisse_croix: SOURCE_GLISSE_CROIX,
+  deplace_x: SOURCE_DEPLACE_X, deplace_y: SOURCE_DEPLACE_Y,
+  deplace: SOURCE_DEPLACE, va_a: SOURCE_VA_A, un_pas: SOURCE_UN_PAS,
+  carre: SOURCE_CARRE, losange: SOURCE_LOSANGE, rectangle: SOURCE_RECTANGLE,
+  spirale: SOURCE_SPIRALE, aller_retour: SOURCE_ALLER_RETOUR,
+}
+
+/*
+ * Les formes : leurs réglages, et où est leur vitesse.
+ *
+ *   combien  : le nombre de réglages attendus ;
+ *   vitesse  : la place du réglage de vitesse (0 = le premier) ;
+ *   exemple  : ce que dit le message quand il manque un réglage.
+ *
+ * La vitesse est donnée en MILLISECONDES par pas (250, 100…), et traduite ici
+ * en images : « 250 » devient « ms(250) », que le compilateur calcule (15
+ * images). Un octet ne tient pas 500 : c'est pour cela que la conversion se
+ * fait avant le jeu, et que la vitesse s'écrit en clair.
+ */
+const FORMES = {
+  carre: { combien: 7, vitesse: 5, exemple: 'carre(x, y, tuile, taille, sens, vitesse, tours), comme carre(10, 8, ALPHABET[0], 2, 1, 250, 3)' },
+  losange: { combien: 7, vitesse: 5, exemple: 'losange(x, y, tuile, taille, sens, vitesse, tours), comme losange(10, 8, ALPHABET[0], 2, 1, 250, 1)' },
+  rectangle: { combien: 8, vitesse: 6, exemple: 'rectangle(x, y, tuile, largeur, hauteur, sens, vitesse, tours), comme rectangle(10, 8, ALPHABET[0], 4, 2, 1, 250, 1)' },
+  spirale: { combien: 6, vitesse: 5, exemple: 'spirale(x, y, tuile, taille, sens, vitesse), comme spirale(10, 8, ALPHABET[0], 2, 1, 250)' },
+  aller_retour: { combien: 7, vitesse: 5, exemple: 'aller_retour(x, y, tuile, pasX, pasY, vitesse, fois), comme aller_retour(10, 8, ALPHABET[0], 5, 0, 250, 3)' },
+  tourne_carre: { combien: 6, vitesse: 5, exemple: 'tourne_carre(numero, x, y, tuile, cote, vitesse), comme tourne_carre(0, 10, 8, ALPHABET[1], 4, 250)' },
+  defile: { combien: 6, vitesse: 5, exemple: 'defile(numero, x, y, tuile, sens, vitesse), comme defile(0, 19, 3, ALPHABET[2], -1, 250)' },
+  deplace_croix: { combien: 4, vitesse: 3, exemple: 'deplace_croix(x, y, tuile, vitesse), comme deplace_croix(x, y, ALPHABET[0], 250) — la vitesse en millisecondes entre deux pas' },
+  /* glisse_croix : sa vitesse est en PIXELS par image, pas en millisecondes —
+     rien à traduire (pas de « vitesse » ici), et elle peut être une variable. */
+  glisse_croix: { combien: 5, exemple: 'glisse_croix(numero, px, py, tuile, vitesse), comme glisse_croix(0, px, py, ALPHABET[0], 1) — la vitesse en pixels par image' },
+}
+
+/*
+ * Avant la traduction, trois préparations :
+ *
+ * 1. « Carre » : les sept réglages d'un carré sous un seul nom, comme un Mot.
+ *
+ *      Carre ronde = { 10, 8, ALPHABET[0], 2, 1, 250, 3 };
+ *      carre(ronde);        et aussi        losange(ronde);
+ *
+ *    Rien n'est rangé en mémoire : « carre(ronde) » est déplié en
+ *    « carre(10, 8, ALPHABET[0], 2, 1, 250, 3) », comme si on l'avait écrit.
+ *    losange() a les mêmes sept réglages, dans le même ordre : il accepte un
+ *    Carre lui aussi.
+ *
+ * 2. La vitesse des formes, en millisecondes, traduite en images (voir FORMES).
+ *
+ * 3. « vitesse(100); » : la vitesse de deplace_x, deplace_y, deplace et va_a.
+ *    Elles font un pas tous les « deplace_images » images (15 au départ, soit
+ *    250 ms). La ligne devient « deplace_images = ms(100); » : les
+ *    déplacements qui suivent vont à 100 ms par pas.
+ *
+ * Rend true si le programme a réglé la vitesse : il faut alors la variable
+ * « deplace_images », même s'il ne se sert d'aucun déplacement.
+ */
+function preparerLesFormes(programme, siennes) {
+  const carres = new Map()           // le nom d'un Carre → ses sept réglages
+  let vitesseReglee = false
+  let chaques = 0                    // les chaque() déjà numérotés
+
+  /* 1. On relève les « Carre nom = { … }; », et on les retire du programme. */
+  const relever = (noeud) => {
+    if (Array.isArray(noeud)) {
+      for (let i = noeud.length - 1; i >= 0; i--) {
+        const n = noeud[i]
+        if (n?.genre === 'declarer' && n.type?.nom === 'Carre') {
+          const reglages = n.valeur?.genre === 'liste' ? n.valeur.valeurs : []
+          if (n.tableau || reglages.length !== 7) {
+            throw new Error(
+              `ligne ${n.ligne} : « Carre ${n.nom} » veut ses sept réglages — le centre (x, y), la tuile, ` +
+                `la taille, le sens, la vitesse en ms et les tours : Carre ${n.nom} = { 10, 8, ALPHABET[0], 2, 1, 250, 3 };`,
+            )
+          }
+          carres.set(n.nom, reglages)
+          noeud.splice(i, 1)
+        } else relever(n)
+      }
+      return
+    }
+    if (noeud && typeof noeud === 'object') for (const v of Object.values(noeud)) relever(v)
+  }
+  relever(programme)
+
+  /* 2 et 3. On déplie les Carre, on traduit les vitesses, on règle vitesse(). */
+  const preparer = (noeud) => {
+    if (Array.isArray(noeud)) { noeud.forEach(preparer); return }
+    if (!noeud || typeof noeud !== 'object') return
+
+    /* « vitesse(100); » devient « deplace_images = ms(100); ». */
+    const appel = noeud.valeur
+    if (noeud.genre === 'expression' && appel?.genre === 'appel' && appel.nom === 'vitesse' && !siennes.has('vitesse')) {
+      const ms = appel.arguments[0]
+      if (appel.arguments.length !== 1 || ms.genre !== 'nombre') {
+        throw new Error(
+          `ligne ${noeud.ligne} : vitesse() veut UN nombre écrit en clair, en millisecondes par pas, comme vitesse(100) : ` +
+            'il est traduit en images à la compilation, comme ms(100)',
+        )
+      }
+      noeud.genre = 'affecter'
+      noeud.cible = { genre: 'variable', nom: 'deplace_images', ligne: noeud.ligne }
+      noeud.operateur = '='
+      noeud.valeur = { genre: 'appel', nom: 'ms', arguments: [ms], ligne: noeud.ligne }
+      vitesseReglee = true
+      return
+    }
+
+    /* « chaque(250) » devient « chaque_minuteur(k, ms(250)) » : son numéro
+       caché, et la durée traduite en images. */
+    if (noeud.genre === 'appel' && noeud.nom === 'chaque' && !siennes.has('chaque')) {
+      const ms = noeud.arguments[0]
+      if (noeud.arguments.length !== 1 || ms.genre !== 'nombre') {
+        throw new Error(
+          `ligne ${noeud.ligne} : chaque() veut UN nombre écrit en clair, en millisecondes, comme chaque(250) : ` +
+            'il est traduit en images à la compilation, comme ms(250)',
+        )
+      }
+      if (chaques >= 8) throw new Error(`ligne ${noeud.ligne} : huit chaque() au plus dans un programme`)
+      noeud.nom = 'chaque_minuteur'
+      noeud.arguments = [{ genre: 'nombre', valeur: chaques++, ligne: noeud.ligne }, { genre: 'appel', nom: 'ms', arguments: [ms], ligne: noeud.ligne }]
+      return
+    }
+
+    if (noeud.genre === 'appel' && noeud.nom in FORMES && !siennes.has(noeud.nom)) {
+      const forme = FORMES[noeud.nom]
+      const args = noeud.arguments
+      /* Un Carre à la place des sept réglages : carre(ronde), losange(ronde). */
+      if (args.length === 1 && args[0].genre === 'variable' && forme.combien === 7 && noeud.nom !== 'aller_retour') {
+        if (!carres.has(args[0].nom)) {
+          throw new Error(`ligne ${noeud.ligne} : « ${args[0].nom} » n'est pas un Carre — Carre ${args[0].nom} = { 10, 8, ALPHABET[0], 2, 1, 250, 3 };`)
+        }
+        noeud.arguments = structuredClone(carres.get(args[0].nom))
+      }
+      if (noeud.arguments.length !== forme.combien) {
+        throw new Error(`ligne ${noeud.ligne} : ${noeud.nom}() veut ${forme.combien} réglages — ${forme.exemple}`)
+      }
+      if (forme.vitesse === undefined) return   // une vitesse qui n'est pas une durée : rien à traduire
+      const vitesse = noeud.arguments[forme.vitesse]
+      if (vitesse.genre !== 'nombre') {
+        throw new Error(
+          `ligne ${noeud.ligne} : la vitesse de ${noeud.nom}() s'écrit en clair, en millisecondes par pas, comme 250 : ` +
+            'elle est traduite en images à la compilation, comme ms(250)',
+        )
+      }
+      noeud.arguments[forme.vitesse] = { genre: 'appel', nom: 'ms', arguments: [vitesse], ligne: vitesse.ligne }
+      return
+    }
+    for (const v of Object.values(noeud)) preparer(v)
+  }
+  preparer(programme)
+  return vitesseReglee
+}
+
+/*
+ * L'autre façon d'écrire : « deplace_x(x, …); », sans « x = ».
+ *
+ * En C, une fonction reçoit une COPIE de ce qu'on lui donne : elle ne peut pas
+ * changer la variable x elle-même (il faudrait une référence, « uint8_t& »,
+ * que ce compilateur refuse). La façon normale est donc « x = deplace_x(x, …) »
+ * : la fonction REND la position, et on la range.
+ *
+ * Mais ces fonctions sont des fonctions de la CONSOLE, et le compilateur peut
+ * faire ce rangement à notre place. Quand l'appel est seul sur sa ligne — son
+ * résultat n'est rangé nulle part — et que la position donnée est une
+ * variable (x) ou un champ (joueur.x), il réécrit la ligne :
+ *
+ *   deplace_x(x, 0, ALPHABET[0], 5);   devient   x = deplace_x(x, 0, ALPHABET[0], 5);
+ *   deplace(x, y, ALPHABET[0], 5, 5);  devient   { x = deplace(…);  y = deplace_ligne_rendue; }
+ *
+ * Rien d'autre ne change : c'est la même fonction, la même cartouche. Et une
+ * position qui n'est pas une variable (« deplace_x(3, …) ») n'a nulle part où
+ * être rangée : elle n'est pas rangée, la lettre bouge, c'est tout.
+ *
+ * Seulement pour les fonctions de la console : si le programme a écrit la
+ * sienne sous l'un de ces noms, elle suit la règle ordinaire du C.
+ */
+const RANGEMENTS = {
+  // colonne : l'argument qui reçoit la valeur rendue (return) ;
+  // ligne   : celui qui reçoit « deplace_ligne_rendue ».
+  deplace_x: { colonne: 0 },
+  deplace_y: { ligne: 1, rendue: true }, // deplace_y REND la ligne, elle n'a pas besoin de la variable
+  deplace: { colonne: 0, ligne: 1 },
+  va_a: { colonne: 0, ligne: 1 },
+  un_pas: { colonne: 0, ligne: 1 },
+  deplace_croix: { colonne: 0, ligne: 1 },
+  glisse_croix: { colonne: 1, ligne: 2 },   // le 1er réglage est le numéro du lutin
+}
+const RANGEABLE = new Set(['variable', 'champ'])        // ce qui peut être à gauche d'un « = »
+
+function rangerLaPosition(noeud, siennes) {
+  if (Array.isArray(noeud)) { noeud.forEach((n) => rangerLaPosition(n, siennes)); return }
+  if (!noeud || typeof noeud !== 'object') return
+  const appel = noeud.valeur
+  if (noeud.genre === 'expression' && appel?.genre === 'appel' && appel.nom in RANGEMENTS && !siennes.has(appel.nom)) {
+    const regle = RANGEMENTS[appel.nom]
+    const rangeable = (i) => i !== undefined && RANGEABLE.has(appel.arguments[i]?.genre)
+    const ranger = (i, valeur) => ({
+      genre: 'affecter', cible: structuredClone(appel.arguments[i]), operateur: '=', valeur, ligne: noeud.ligne,
+    })
+
+    /* deplace_y : une seule valeur, rendue par return — comme deplace_x. */
+    if (regle.rendue) {
+      if (rangeable(regle.ligne)) Object.assign(noeud, ranger(regle.ligne, appel))
+      return
+    }
+
+    /* Les autres : la colonne par return, la ligne par la variable de la console. */
+    const lignes = []
+    lignes.push(rangeable(regle.colonne) ? ranger(regle.colonne, appel) : { genre: 'expression', valeur: appel, ligne: noeud.ligne })
+    if (rangeable(regle.ligne)) {
+      lignes.push(ranger(regle.ligne, { genre: 'variable', nom: 'deplace_ligne_rendue', ligne: noeud.ligne }))
+    }
+    if (lignes.length === 1) Object.assign(noeud, lignes[0])
+    else {
+      /* Deux lignes à la place d'une : un bloc « { … } » les tient ensemble. */
+      for (const cle of Object.keys(noeud)) delete noeud[cle]
+      Object.assign(noeud, { genre: 'bloc', corps: lignes, ligne: lignes[0].ligne })
+    }
+    return
+  }
+  for (const v of Object.values(noeud)) rangerLaPosition(v, siennes)
+}
+
+/** Le programme appelle-t-il `nom(…)` quelque part ? On fouille tout l'arbre. */
+function appelle(noeud, nom) {
+  if (Array.isArray(noeud)) return noeud.some((n) => appelle(n, nom))
+  if (!noeud || typeof noeud !== 'object') return false
+  if (noeud.genre === 'appel' && noeud.nom === nom) return true
+  return Object.values(noeud).some((v) => appelle(v, nom))
+}
+
+/**
+ * Ajoute au programme les fonctions de la console écrites en C dont il se
+ * sert — à moins qu'il n'ait écrit la sienne sous le même nom : c'est alors
+ * la sienne qui compte.
+ */
+function avecLesFonctionsEnC(programme) {
+  const siennes = new Set(programme.filter((n) => n.genre === 'fonction').map((n) => n.nom))
+  const vitesseReglee = preparerLesFormes(programme, siennes)
+  rangerLaPosition(programme, siennes)
+  const ajoutees = []
+  for (const [nom, source] of Object.entries(FONCTIONS_EN_C)) {
+    if (siennes.has(nom) || !appelle(programme, nom)) continue   // la sienne, ou pas appelée
+    ajoutees.push(...analyser(source))
+  }
+  /* Les deux variables des déplacements (la ligne rendue, la durée d'un pas),
+     UNE fois, si l'un des déplacements est là — ou si vitesse() a été réglée. */
+  const deplacements = ['deplace_x', 'deplace_y', 'deplace', 'va_a', 'un_pas', 'deplace_croix', 'glisse_croix']
+  const bouge = deplacements.some((nom) => !siennes.has(nom) && appelle(programme, nom))
+  if (bouge || vitesseReglee) ajoutees.unshift(...analyser(SOURCE_LIGNE_RENDUE))
+  return [...ajoutees, ...programme]
+}
+
 /* ------------------------------------------------------------ la traduction */
 
 /**
  * Compile un programme analysé, et rend les octets à poser dans la cartouche.
  */
 export function compiler(programme, options = {}) {
+  programme = avecLesFonctionsEnC(programme)
   compteur = 0
   const e = new Emetteur()
   if (options.cible) e.cible = options.cible
@@ -4401,6 +5668,21 @@ function routines(e) {
 
   airs(e)
 
+  /*
+   * Attendre le moment où l'on peut écrire à l'écran : le VBlank, lignes 144
+   * à 153, quand la console ne dessine pas.
+   *
+   * Autrefois, on attendait la ligne 144 EXACTEMENT. Déjà dans le VBlank (145
+   * et au-delà), on laissait donc passer toute une image pour attendre le
+   * suivant : « effacer » dans un VBlank, « poser » dans le suivant, et
+   * l'écran montrait entre les deux une image SANS la lettre — elle
+   * clignotait, et chaque pas durait une image de trop.
+   *
+   * Maintenant, on écrit tout de suite si l'on est déjà dans le VBlank —
+   * sauf sur ses deux dernières lignes (152, 153) : trop près de la reprise
+   * du dessin pour écrire sans risque sur une vraie console. Là, on attend
+   * le VBlank suivant, comme avant.
+   */
   e.poser('AttendreVBlank')
   e.ldhVersA(ECRAN)
   e.andN(0x80) // bit 7 : l'écran est-il allumé ?
@@ -4409,7 +5691,9 @@ function routines(e) {
   e.poser(a1)
   e.ldhVersA(LIGNE_ECRAN)
   e.cpN(144)
-  e.jrNZ(a1)
+  e.jrC(a1) // avant la ligne 144 : la console dessine, on attend
+  e.cpN(152)
+  e.jrNC(a1) // lignes 152 et 153 : trop tard, on attend le VBlank suivant
   e.ret()
 
   e.poser('AttendreFinVBlank')
@@ -4456,6 +5740,71 @@ function routines(e) {
   e.decB()
   e.jrNZ(boucle)
   e.ret()
+
+  /*
+   * textS à une position calculée. `hl` la première case, `c` sa colonne,
+   * `de` le texte, `b` sa longueur. Après la colonne 19 : +12 pour sauter les
+   * douze colonnes cachées de la carte (32 − 20), et l'on est au début de la
+   * ligne suivante. Arrivé sous la ligne 17 (0x9A40), on repart en haut.
+   * Ajoutée seulement si le programme s'en sert.
+   */
+  /*
+   * attendre(secondes). `a` le nombre de secondes. Deux compteurs : `b` les
+   * secondes, `c` les 60 images de chacune. Ils sont mis à l'abri à chaque
+   * image : « AttendreImage » se sert de `b`. Ajoutée seulement si le
+   * programme s'en sert.
+   */
+  if (e.besoinAttendre) {
+    e.poser('AttendreSecondes')
+    e.orA()
+    e.retZ() // attendre(0) : rien à attendre
+    e.ldBA()
+    const seconde = neuve('attendre')
+    const uneImage = neuve('attendre')
+    e.poser(seconde)
+    e.ldC(60)
+    e.poser(uneImage)
+    e.ecrire(0xc5) // push bc
+    e.call('AttendreImage')
+    e.ecrire(0xcd, ROUTINE_TRANSFERT & 0xff, (ROUTINE_TRANSFERT >> 8) & 0xff) // les lutins, comme image()
+    e.ecrire(0xc1) // pop bc
+    e.ecrire(0x0d) // dec c
+    e.jrNZ(uneImage)
+    e.decB()
+    e.jrNZ(seconde)
+    e.ret()
+  }
+
+  if (e.besoinTexteS) {
+    e.poser('EcrireTexteS')
+    e.call('AttendreVBlank')
+    const lettre = neuve('textS')
+    const suite = neuve('textS')
+    e.poser(lettre)
+    e.ldAdeDE()
+    e.ldHLplusA()
+    e.incDE()
+    e.ecrire(0x0c) // inc c — la colonne suivante
+    e.ldAC()
+    e.cpN(20)
+    e.jrNZ(suite)
+    e.ldC(0)
+    e.pushDE()
+    e.ldDE(12)
+    e.addHLDE()
+    e.popDE()
+    e.ldAH()
+    e.cpN((CARTE_FOND + 18 * 32) >> 8)
+    e.jrNZ(suite)
+    e.ldAL()
+    e.cpN((CARTE_FOND + 18 * 32) & 0xff)
+    e.jrNZ(suite)
+    e.ldHL(CARTE_FOND)
+    e.poser(suite)
+    e.decB()
+    e.jrNZ(lettre)
+    e.ret()
+  }
 
   /*
    * Écrire un nombre, en base dix. `a` la valeur, `hl` la première case,

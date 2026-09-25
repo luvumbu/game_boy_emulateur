@@ -18,7 +18,7 @@ import { writeFileSync, mkdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { batir } from './controle.mjs'
-import { LECONS } from '../tuto/lecons.js'
+import { LECONS, numeros } from '../tuto/lecons.js'
 import { GameBoy } from '../emulateur.js'
 import { png } from '../compilateur/png.mjs'
 
@@ -35,22 +35,23 @@ const HAUTEUR = 144
  * code serait faire l'aller-retour, et donner l'occasion à une virgule de se
  * perdre en chemin. On prend les programmes là où ils sont écrits.
  */
+const NUMEROS = numeros(LECONS)
 const tutoriels = LECONS.map((lecon, i) => ({
-  titre: `${i + 1}. ${lecon.titre}`,
-  numero: i + 1,
-  etiquette: String(i + 1),
+  titre: `${NUMEROS[i]}. ${lecon.titre}`,
+  etiquette: NUMEROS[i], // « 1.1 » pour une leçon qui prolonge la précédente
   code: lecon.code.split(String.fromCharCode(10)),
+  fichiers: lecon.fichiers ?? {},
 }))
 
 /* ------------------------------------------------------- les arguments */
 
-const demande = process.argv[2] && /^\d+$/.test(process.argv[2]) ? Number(process.argv[2]) : null
+const demande = process.argv[2] && /^\d+(\.\d+)?$/.test(process.argv[2]) ? process.argv[2] : null
 const iTouches = process.argv.indexOf('--touches')
 const touches = iTouches > 0 ? (process.argv[iTouches + 1] ?? '').split(',').filter(Boolean) : []
 
-const choisis = demande === null ? tutoriels : tutoriels.filter((t) => t.numero === demande)
+const choisis = demande === null ? tutoriels : tutoriels.filter((t) => t.etiquette === demande)
 if (!choisis.length) {
-  console.error(`aucune leçon numéro ${demande} — il y en a de 1 à ${tutoriels.length}`)
+  console.error(`aucune leçon numéro ${demande} — il y en a de 1 à ${tutoriels.at(-1).etiquette}`)
   process.exit(1)
 }
 
@@ -75,6 +76,8 @@ let numeroDeFichier = 0
 function faireTourner(tutoriel) {
   const chemin = join(dossierTemporaire, `lancer-${numeroDeFichier++}.cpp`)
   writeFileSync(chemin, tutoriel.code.join('\n') + '\n')
+  /* Les fichiers voisins, à côté : #include les cherche dans le même dossier. */
+  for (const [nom, contenu] of Object.entries(tutoriel.fichiers)) writeFileSync(join(dossierTemporaire, nom), contenu)
 
   try {
     const bati = batir(chemin, tutoriel.etiquette)
@@ -142,7 +145,7 @@ for (const tutoriel of choisis) {
 
   const { gb, bati } = etat
   const grossir = demande === null ? 1 : 3
-  const nom = join('tutoriels', `${tutoriel.etiquette.padStart(2, '0')}.png`)
+  const nom = join('tutoriels', `${tutoriel.etiquette.replace(/^\d+/,(n) => n.padStart(2, '0'))}.png`)
   writeFileSync(nom, png(LARGEUR * grossir, HAUTEUR * grossir, pixels(gb, grossir)))
 
   const vide = estNoir(gb)

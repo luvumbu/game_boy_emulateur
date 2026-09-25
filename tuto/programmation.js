@@ -612,7 +612,7 @@ export const COURS = [
       'Chaque passage dans le bloc s’appelle un **tour** (on dit aussi une **itération**). `image()` attend que l’écran ait fini de se dessiner : un tour dure donc exactement **une image**, soit 1/60 de seconde. C’est l’**horloge** du jeu.',
       'Tous les jeux Game Boy ont cette forme : **lire les touches → faire évoluer le monde → dessiner → attendre l’image suivante**, et recommencer. Tetris, Zelda, Pokémon : même boucle, plus de choses dedans.',
       'Ici, on s’en sert pour faire une **montre**. `imagesVues` compte les tours ; quand il atteint 60, une seconde est passée : on le remet à zéro et on ajoute une seconde. C’est ainsi que l’on compte plus loin que 255 — avec **deux** variables, comme les heures et les minutes.',
-      'Remarque qu’on n’écrit les secondes à l’écran **qu’au moment où elles changent**, une fois par seconde. Écrire à l’écran à chaque tour ralentirait la boucle : un tour ne durerait plus une image, mais deux. La leçon « L’écran ne s’écrit que pendant le VBlank », un peu plus loin, explique pourquoi.',
+      'Remarque qu’on n’écrit les secondes à l’écran **qu’au moment où elles changent**, une fois par seconde. Écrire à l’écran n’est pas gratuit : chaque écriture doit attendre un moment précis, la courte pause entre deux images. On n’écrit donc que ce qui change. La leçon « L’écran ne s’écrit que pendant le VBlank », un peu plus loin, explique pourquoi.',
       '**À toi :** ajoute les minutes : quand `secondes` atteint 60, remets-le à 0 et augmente `minutes`.',
     ],
     code: `int main() {
@@ -710,7 +710,7 @@ export const COURS = [
       '`uint8_t i = 0; while (i < 20) { …; i++; }` — tout ce qui concerne le comptage est au même endroit, et on ne risque plus d’oublier le `i++` en bas du bloc.',
       '`i < 20` fait **20 tours**, de 0 à 19 — pas de 1 à 20. L’écran a 20 colonnes, numérotées de 0 à 19 : la boucle et l’écran parlent la même langue. `i` n’existe **que dans la boucle** : après l’accolade, le nom est libre.',
       'Le pas n’est pas forcément `i++` : `i += 2` saute une case sur deux. Et `i` sert dans des calculs : `nombre(i * 2, …)` écarte les chiffres.',
-      '**Regarde bien l’écran** : les lignes n’apparaissent pas d’un coup, elles se dessinent en une demi-seconde environ. Pourtant la boucle n’appelle jamais `image()`… C’est **l’écriture à l’écran** qui attend, pas la boucle. La leçon suivante explique pourquoi — c’est **la** règle de la Game Boy.',
+      '**Une question** : la boucle n’appelle jamais `image()`, et pourtant elle ne va pas aussi vite que le processeur le pourrait. C’est **l’écriture à l’écran** qui attend, pas la boucle : chaque `texte()` attend la courte pause entre deux images. La leçon suivante explique pourquoi — c’est **la** règle de la Game Boy.',
       '**À toi :** trace une colonne de # (la ligne varie, la colonne est fixe) de la ligne 12 à la ligne 17.',
     ],
     code: `int main() {
@@ -752,8 +752,8 @@ export const COURS = [
     idee: 'La console dessine l’écran soixante fois par seconde ; on ne peut lui écrire que pendant la courte pause entre deux images.',
     texte: [
       'L’écran de la Game Boy est dessiné **ligne par ligne**, de haut en bas : 144 lignes, puis une courte pause de 10 lignes avant de recommencer. Cette pause s’appelle le **VBlank** (« vertical blank »). Elle dure à peine plus d’**une milliseconde**, soixante fois par seconde.',
-      'Pendant que l’écran se dessine, la puce graphique **occupe la mémoire vidéo** : le processeur n’a pas le droit d’y écrire. Il doit **attendre le VBlank**. C’est ce que font `texte()` et `nombre()` pour toi : chacun attend la pause, puis écrit. Un appel coûte donc **jusqu’à une image entière**.',
-      'Le programme le **mesure** avec `images()`, l’horloge de la console, qui avance à chaque VBlank. Vingt `texte()` écran allumé : une vingtaine d’images, un tiers de seconde. C’est ce qu’on a vu à la leçon précédente.',
+      'Pendant que l’écran se dessine, la puce graphique **occupe la mémoire vidéo** : le processeur n’a pas le droit d’y écrire. Il doit **attendre le VBlank**. C’est ce que font `texte()` et `nombre()` pour toi : chacun attend la pause, puis écrit. Si la pause est déjà là, il écrit tout de suite ; sinon, il attend, **jusqu’à presque une image entière**. Une pause est courte : elle ne tient que **quelques** petites écritures.',
+      'Le programme le **mesure** avec `images()`, l’horloge de la console, qui avance à chaque VBlank. Vingt `texte()` écran allumé : **plusieurs images**, car vingt écritures ne tiennent pas dans une seule pause. Pour vingt cases, c’est encore peu ; pour tout un décor de 360 cases, ce serait long.',
       '**Première solution : éteindre l’écran.** `ecran(0)` l’éteint ; la mémoire vidéo est alors libre **tout le temps**, et les vingt écritures se font d’un trait. `ecran(1)` le rallume. L’écran clignote en blanc un instant : on le fait donc aux moments où ça ne gêne pas — au début d’un niveau, entre deux écrans. **À partir d’ici, les leçons dessinent leur décor écran éteint.** (La mesure donne 0 ou 1 image : `ecran(0)` attend lui-même un VBlank, car éteindre l’écran pendant qu’il se dessine peut abîmer une vraie console. Ensuite, écran éteint, il n’y a plus de VBlank du tout.)',
       '**Seconde solution, dans la boucle du jeu : n’écrire que ce qui change.** Déplacer un personnage, c’est effacer **une** case et en écrire **une** — pas redessiner toute la ligne. C’est pourquoi les programmes du chapitre 2 gardaient `ancien`.',
       'Les vrais jeux Game Boy vivent avec cette règle : le décor est posé écran éteint, et chaque image ne change que quelques cases. Ce qui bouge beaucoup est confié aux **lutins**, que le tutoriel présente dans ses leçons sur les sprites.',
@@ -786,14 +786,16 @@ export const COURS = [
   }
 }
 `,
-    aVoir: 'Deux lignes de # identiques ; la première a demandé une vingtaine d’images, la seconde une au plus.',
+    aVoir: 'Deux lignes de # identiques ; la première a demandé plusieurs images, la seconde une au plus.',
     controle: (c) => {
       c.avancer(40)
       const allume = c.variable('allume')
       const eteint = c.variable('eteint')
       return [
         ['les deux lignes sont dessinées', c.mot(0, 3, 20) === '#'.repeat(20) && c.mot(0, 5, 20) === '#'.repeat(20)],
-        ['écran allumé : une dizaine d’images au moins', allume >= 10, ` (${allume} images)`],
+        /* Une pause (le VBlank) tient quelques écritures, pas vingt : écran
+           allumé, il en faut plusieurs. */
+        ['écran allumé : plusieurs images', allume >= 2, ` (${allume} images)`],
         ['écran éteint : presque rien', eteint <= 1, ` (${eteint})`],
         ['l’écran affiche la mesure', Number(c.mot(10, 9, 3)) === allume],
       ]

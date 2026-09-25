@@ -24,26 +24,38 @@ export const TUTORIELS = [
   /* ------------------------------------------ 1 — les tout premiers pas */
 
   {
-    titre: 'La plus petite cartouche',
+    titre: 'Un carré de 8 × 8',
     difficulte: 1,
     provenance: 'tutoriel',
-    idee: 'Trois lignes, et la console affiche quelque chose.',
+    idee: 'Une case de l’écran est un carré de 8 × 8 pixels : on en pose un.',
     texte: [
-      'Un programme C++ **ne s’exécute pas de haut en bas**. Il commence à `int main()`, et nulle part ailleurs — c’est la première chose qui change quand on vient d’un langage de script.',
-      '`texte(colonne, ligne, "…")` écrit à partir d’une case. L’écran en fait **20 de large sur 18 de haut**, et la case (0, 0) est en haut à gauche.',
-      '`while (true) { image(); }` n’est pas décoratif. Un programme qui se termine laisse le processeur partir n’importe où ; `image()` attend l’image suivante, et l’écran reste sur ce qu’on vient d’écrire.',
+      'Chaque case de l’écran est un **carré de 8 × 8 pixels**, qu’on appelle une **tuile**. Une lettre est une tuile ; ce carré aussi.',
+      '`Tuile CARRE = { … };` dessine la tuile : **8 lignes de 8 chiffres**, un chiffre par pixel. `3` est la nuance la plus foncée, `0` la plus claire.',
+      '`poser(colonne, ligne, CARRE)` pose la tuile dans une case. L’écran fait 20 × 18 cases, soit **160 × 144 pixels**.',
     ],
-    code: `int main() {
-  texte(5, 6, "BONJOUR");
+    code: `// Un carré de 8 × 8 pixels : 8 lignes de 8 chiffres.
+// 3 = pixel le plus foncé.
+Tuile CARRE = {
+  "33333333",
+  "33333333",
+  "33333333",
+  "33333333",
+  "33333333",
+  "33333333",
+  "33333333",
+  "33333333",
+};
 
-  while (true) {
-    image();
-  }
+int main() {
+  poser(9, 8, CARRE);   // colonne 9, ligne 8 : le milieu de l'écran
+
+  while (true) image(); // garde l'écran affiché
 }
 `,
-    aVoir: '« BONJOUR » à la colonne 5, ligne 6.',
+    aVoir: 'Un carré noir de 8 × 8 au milieu de l’écran.',
     controle: (c) => [
-      ['« BONJOUR » est écrit', c.mot(5, 6, 7) === 'BONJOUR'],
+      ['le carré est posé en (9, 8)', c.lire(9, 8) === 44],
+      ['il est seul : la case d’à côté est vide', c.lire(10, 8) === 0],
       ['l’écran est allumé', c.ecranAllume()],
     ],
   },

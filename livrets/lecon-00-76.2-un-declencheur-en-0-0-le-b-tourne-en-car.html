@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 0.76.2 — Un déclencheur en (0, 0) : le B tourne en carré</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Niveau 0 — Avant tout</span>
+    <span>leçon 0.76.2 sur 82</span>
+    <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
+    
+    
+    
+  </p>
+<h1>0.76.2. Un déclencheur en (0, 0) : le B tourne en carré</h1>
+<p class="idee">Le 0.76.1, plus un bloc : une fois apparu, le B fait un carré sans fin à partir du milieu, un pas tous les quarts de seconde, sans bloquer le A.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>C’est le 0.76.1, plus un bloc :</strong> les mouvements, qui ne commencent que quand <code>actif</code> vaut 1.</p>
+<p><strong>Pourquoi pas <code>carre</code> :</strong> <code>carre</code> bloque. Pendant son tour, le A ne pourrait plus bouger. On fait donc le carré <strong>pas à pas</strong>, avec <code>un_pas</code>, qui n’attend pas (le 0.30).</p>
+<p><strong>Le tour, compté par <code>bpas</code> :</strong> un carré de 4 cases de côté, c’est 16 pas. <code>bpas</code> va de 0 à 15 : de 0 à 3, un pas <strong>à droite</strong> ; de 4 à 7, <strong>en bas</strong> ; de 8 à 11, <strong>à gauche</strong> ; de 12 à 15, <strong>en haut</strong>. Après le pas 15, <code>bpas</code> revient à 0 : le tour recommence, sans fin.</p>
+<p><strong><code>else if</code></strong> enchaîne les cas : on ne teste le suivant que si le précédent était faux. Un seul des quatre <code>un_pas</code> est fait à chaque pas.</p>
+<p><strong>Le rythme :</strong> <code>bimages</code> compte les images ; à 15 (un quart de seconde), un pas, et on recompte. Le B part du milieu (10, 8) et tourne : (14, 8), (14, 12), (10, 12), puis retour au milieu.</p>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>2387 octets</strong> de cartouche.</p>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. une variable — x</p>
+    <pre><code>uint8_t x = 10;       // le A part de (10, 0)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une variable — y</p>
+    <pre><code>uint8_t y = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une variable — actif</p>
+    <pre><code>uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une variable — bx</p>
+    <pre><code>uint8_t bx = 10;      // le B : sa colonne…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une variable — by</p>
+    <pre><code>uint8_t by = 8;       // …et sa ligne. Il apparaît au milieu, (10, 8).</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">6. une variable — bpas</p>
+    <pre><code>uint8_t bpas = 0;     // où il en est dans son tour : du pas 0 au pas 15</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">7. une variable — bimages</p>
+    <pre><code>uint8_t bimages = 0;  // le chronomètre du B, en images</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">8. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  while (true) {
+    image();
+    deplace_croix(x, y, ALPHABET[0], 250);   // le A suit la croix
+    nombre(0, 17, x);                        // sa position, en direct
+    nombre(4, 17, y);
+
+    // Le déclencheur : le A arrive en (0, 0), et actif vaut encore 0.
+    if (x == 0 &amp;&amp; y == 0 &amp;&amp; actif == 0) {
+      actif = 1;                             // une seule fois : ensuite actif vaut 1
+      poser(10, 8, ALPHABET[1]);             // le B apparaît au milieu
+    }
+
+    // Les mouvements, une fois le déclencheur passé.
+    if (actif == 1) {
+      bimages++;                             // le chronomètre avance
+      if (bimages == 15) {                   // toutes les 15 images : un pas
+        bimages = 0;
+        if (bpas &lt; 4) { un_pas(bx, by, ALPHABET[1], 1, 0); }          // pas 0 à 3 : à droite
+        else if (bpas &lt; 8) { un_pas(bx, by, ALPHABET[1], 0, 1); }     // pas 4 à 7 : en bas
+        else if (bpas &lt; 12) { un_pas(bx, by, ALPHABET[1], -1, 0); }   // pas 8 à 11 : à gauche
+        else { un_pas(bx, by, ALPHABET[1], 0, -1); }                   // pas 12 à 15 : en haut
+        bpas++;
+        if (bpas == 16) { bpas = 0; }     // le tour est fini : on recommence
+      }
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB4UlEQVR4nO3XTU7CYBRAUYYsgSH7X41LcBkOGWAU236WNirmcpIT0ry8QdOb/nB4fXt5QsfT+erhZ/LbDg8/g7932zXfWGCBcz6ez8/wlH7SwIvHSQILnCMwHQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAce+Bj6fz1XxjNBztLxrtb52z1WGScHJNR1d/tL9otL/1mB2+BF7NOZnceZON9rfO2eEz8O3vYp7JZLQ/N9rfOmd/4Nub5p7A3+zPjfa3ztlh5R28OvEO/udWvqJ/6ivXV/Sj+B8cdwEdVPXsBu80vAAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">En (0, 0), le B apparaît au milieu, puis tourne en carré sans fin, pendant que le A suit toujours la croix.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>le B tourne : (14, 8), (14, 12), (10, 12) </li>
+
+  <li>et revient au milieu, (10, 8), après le tour </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>0.76.3. Un déclencheur en (0, 0) : le carré plus rapide</strong> — niveau 0 sur 10.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

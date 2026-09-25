@@ -80,6 +80,30 @@ export function rassembler(lire, principal) {
 }
 
 /**
+ * Un programme et ses fichiers voisins donnés d'avance, assemblés.
+ *
+ *   assemblerAvec(code, { 'variables.h': '…' })
+ *
+ * C'est le cas d'une leçon : ses fichiers ne sont ni sur un disque ni dans des
+ * onglets, ils sont écrits avec elle. Le principal s'appelle « principal.cpp »,
+ * comme dans l'atelier, pour que les fautes y renvoient sous le même nom.
+ */
+export function assemblerAvec(code, fichiers = {}) {
+  const PRINCIPAL = 'principal.cpp'
+  return rassembler((nom) => {
+    if (nom === PRINCIPAL) return code
+    if (!Object.hasOwn(fichiers, nom)) {
+      const connus = Object.keys(fichiers)
+      throw new Error(
+        `fichier introuvable : « ${nom} »` +
+          (connus.length ? `. Cette leçon a : ${connus.join(', ')}.` : ' : cette leçon n\'a pas d\'autre fichier.'),
+      )
+    }
+    return fichiers[nom]
+  }, PRINCIPAL)
+}
+
+/**
  * Réécrit « ligne 214 » en « dessins.js, ligne 7 ».
  *
  * Sans cela, une faute dans un fichier inclus renverrait à un numéro de ligne

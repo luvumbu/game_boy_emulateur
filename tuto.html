@@ -158,6 +158,9 @@
   }
 
   .avoir b { color: var(--vert); }
+  .onglets { display: flex; gap: 4px; margin-bottom: 4px; }
+  .onglets button { font-family: inherit; }
+  .onglets button.ouvert { border-color: var(--vert); color: var(--vert); }
 
   .pieds { display: flex; justify-content: space-between; gap: 12px; padding-top: 6px; }
 
@@ -194,6 +197,9 @@
     display: flex; flex-direction: column; align-items: center; gap: 4px;
     padding: 6px; min-width: 54px; font-size: 10px; color: var(--gris); flex: 0 0 auto;
   }
+
+  .dessinzone .bande-renommer { font-style: normal; cursor: pointer; color: var(--gris); }
+  .dessinzone .bande-renommer:hover { color: var(--vert); }
 
   .dessinzone .tuile canvas {
     width: 38px; height: 38px; image-rendering: pixelated;
@@ -319,6 +325,7 @@
             <button type="button" id="remettre">⟲ Remettre le code de la leçon</button>
             <span class="aide">Le code est modifiable : c’est fait pour.</span>
           </div>
+          <div class="onglets" id="onglets" style="display: none;"></div>
           <textarea id="source" spellcheck="false"></textarea>
         </div>
 
@@ -347,11 +354,13 @@ import { analyser } from './compilateur/analyseur.js'
 import { compiler } from './compilateur/emetteur.js'
 import { fabriquer } from './compilateur/cartouche.js'
 import { GameBoy } from './emulateur.js'
-import { LECONS, NIVEAUX } from './tuto/lecons.js'
+import { LECONS, NIVEAUX, numeros, principales } from './tuto/lecons.js'
+const NUMEROS = numeros(LECONS)
 import { installer as installerPlan } from './tuto/plan.js'
 import { installer as installerAirs } from './editeur-airs.js'
-import { installer as installerDessin } from './editeur-tuiles.js'
+import { installer as installerDessin, lireDessins } from './editeur-tuiles.js'
 import { enrichir } from './tuto/enrichir.js'
+import { assemblerAvec, traduire } from './compilateur/inclusion.js'
 
 /** Les quatre nuances de l'écran vert d'origine. */
 const NUANCES = [[0xe0, 0xf8, 0xd0], [0x88, 0xc0, 0x70], [0x34, 0x68, 0x56], [0x08, 0x18, 0x20]]
@@ -418,7 +427,7 @@ function paragraphe(texte) {
   return p
 }
 
-function aller(index) {
+function aller(index, { defiler = true } = {}) {
   courante = index
   vues.add(index)
   const lecon = LECONS[index]
@@ -445,10 +454,13 @@ function aller(index) {
   }
 
   repere(`Niveau ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`, 'niveau')
-  repere(`leçon ${index + 1} sur ${LECONS.length}`, '')
+  repere(`leçon ${NUMEROS[index]} sur ${principales(LECONS)}`, '')
   repere(`difficulté ${lecon.difficulte} / 10`, 'difficulte')
   reperes.querySelector('.difficulte').style.setProperty('--part', `${lecon.difficulte * 10}%`)
-  if (lecon.dessin) repere('🎨 avec l’atelier de dessin', 'outil')
+  /* Tout carré écrit dans le code se montre aussi en dessin : le texte et
+     l'image sont la même tuile, et l'un se modifie par l'autre. */
+  const avecDessin = lecon.dessin || lireDessins(lecon.code).length > 0
+  if (avecDessin) repere('🎨 avec l’atelier de dessin', 'outil')
   if (lecon.plan) repere('🖱 avec le plan', 'outil')
   if (lecon.airs) repere('♪ avec la partition', 'outil')
 
@@ -462,7 +474,7 @@ function aller(index) {
   etiquette.textContent = 'Ce qu’on doit voir : '
   avoir.append(etiquette, document.createTextNode(lecon.aVoir))
 
-  $('source').value = lecon.code
+  chargerLesFichiers(lecon)
 
   /*
    * Le plan n'apparaît que sur les leçons qui le demandent. Il est reconstruit
@@ -490,9 +502,9 @@ function aller(index) {
      au-dessus, faite à la souris. Les deux façons, côte à côte, sur la même
      page — c'est tout l'objet de cette leçon. */
   atelierDessin = null
-  $('dessinzone').style.display = lecon.dessin ? 'flex' : 'none'
+  $('dessinzone').style.display = avecDessin ? 'flex' : 'none'
 
-  if (lecon.dessin) {
+  if (avecDessin) {
     atelierDessin = installerDessin({
       bande: $('bande'),
       grille: $('grille'),
@@ -530,24 +542,101 @@ function aller(index) {
 
   $('precedent').disabled = !avant
   $('suivant').disabled = !apres
-  $('precedent').textContent = avant ? `← ${index}. ${avant.titre}` : '← leçon précédente'
+  $('precedent').textContent = avant ? `← ${NUMEROS[index - 1]}. ${avant.titre}` : '← leçon précédente'
   $('suivant').textContent = apres
-    ? `${index + 2}. ${apres.titre} →`
-    : '✓ tu es au bout des ' + LECONS.length
+    ? `${NUMEROS[index + 1]}. ${apres.titre} →`
+    : '✓ tu es au bout des ' + principales(LECONS)
 
   dessinerSommaire()
   compilerEtLancer()
   location.hash = 'lecon-' + (index + 1)
-  scrollTo({ top: 0, behavior: 'smooth' })
+  /* La leçon est retenue par son TITRE et par sa PLACE : voir « retrouver sa
+     place », plus bas. */
+  retenir({ titre: lecon.titre, place: index + 1, hauteur: 0 })
+  /* Changer de leçon remonte en haut. Mais pas à l'ouverture de la page : là,
+     c'est la hauteur retenue qui compte. */
+  if (defiler) scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+/*
+ * Retrouver sa place d'une visite à l'autre.
+ *
+ * Rafraîchir la page doit ramener au MÊME endroit : la même leçon, à la même
+ * hauteur de lecture — pas à la première leçon, ni en haut de la page.
+ *
+ * L'adresse (« #lecon-20 ») garde déjà la PLACE de la leçon, mais pas son
+ * identité : quand une leçon est ajoutée avant elle, la 20e n'est plus la
+ * même. Le navigateur retient donc aussi son TITRE, qui, lui, ne bouge pas.
+ *
+ * Tout passe par try/catch : un navigateur qui refuse de retenir (navigation
+ * privée) n'empêche pas la page de s'ouvrir ; elle oublie, c'est tout.
+ */
+const MEMOIRE = 'gameboy3-tuto'
+
+/** Ce que le navigateur a retenu : { titre, place, hauteur }, ou {} s'il n'a rien. */
+function lireMemoire() {
+  try { return JSON.parse(localStorage.getItem(MEMOIRE) ?? '{}') ?? {} } catch { return {} }
+}
+
+/** Retient quelques valeurs, sans oublier les autres. */
+function retenir(quoi) {
+  try { localStorage.setItem(MEMOIRE, JSON.stringify({ ...lireMemoire(), ...quoi })) } catch { /* tant pis */ }
+}
+
+/* La hauteur de lecture est notée au moment où l'on quitte la page
+   (rafraîchir, fermer l'onglet) : la noter à chaque tour de molette ne
+   servirait à rien de plus. */
+addEventListener('pagehide', () => retenir({ hauteur: scrollY }))
+
 /* ----------------------------------------------------------------- compiler */
+
+/*
+ * Les fichiers de la leçon, un onglet chacun.
+ *
+ * La plupart n'en ont qu'un, et les onglets restent cachés. Une leçon qui
+ * range ses variables dans « variables.h » montre les deux : chacun se lit et
+ * se modifie, et la compilation les assemble comme #include le demande.
+ */
+const PRINCIPAL = 'principal.cpp'
+let fichiersLecon = new Map()
+let ouvert = PRINCIPAL
+
+function chargerLesFichiers(lecon) {
+  fichiersLecon = new Map([[PRINCIPAL, lecon.code], ...Object.entries(lecon.fichiers ?? {})])
+  ouvert = PRINCIPAL
+  $('source').value = lecon.code
+  dessinerLesOnglets()
+}
+
+function dessinerLesOnglets() {
+  const zone = $('onglets')
+  zone.textContent = ''
+  zone.style.display = fichiersLecon.size > 1 ? '' : 'none'
+  for (const nom of fichiersLecon.keys()) {
+    const onglet = document.createElement('button')
+    onglet.type = 'button'
+    onglet.textContent = nom
+    if (nom === ouvert) onglet.className = 'ouvert'
+    onglet.addEventListener('click', () => {
+      fichiersLecon.set(ouvert, $('source').value)
+      ouvert = nom
+      $('source').value = fichiersLecon.get(nom)
+      dessinerLesOnglets()
+    })
+    zone.append(onglet)
+  }
+}
 
 function compilerEtLancer() {
   ouvrirLeSon()
 
+  fichiersLecon.set(ouvert, $('source').value)
+  const { [PRINCIPAL]: principal, ...voisins } = Object.fromEntries(fichiersLecon)
+  let assemble = null
+
   try {
-    const { octets, base, variables, vecteurVBlank } = compiler(analyser($('source').value))
+    assemble = assemblerAvec(principal, voisins)
+    const { octets, base, variables, vecteurVBlank } = compiler(analyser(assemble.texte))
     romActuelle = fabriquer(octets, base, 'LECON ' + (courante + 1), vecteurVBlank)
 
     gb.loadRom(romActuelle)
@@ -561,7 +650,7 @@ function compilerEtLancer() {
   } catch (erreur) {
     tourne = false
     $('etat').className = 'etat erreur'
-    $('etat').textContent = erreur.message
+    $('etat').textContent = assemble ? traduire(erreur.message, assemble.origine) : erreur.message
   }
 }
 
@@ -677,7 +766,7 @@ $('son').addEventListener('click', () => {
   $('son').textContent = sonVoulu ? '🔊 Son' : '🔇 Muet'
 })
 $('remettre').addEventListener('click', () => {
-  $('source').value = LECONS[courante].code
+  chargerLesFichiers(LECONS[courante])
   compilerEtLancer()
   if (plan) plan.rafraichir()
   if (atelierAirs) atelierAirs.rafraichir()
@@ -712,11 +801,28 @@ window.inspecteur = {
 /* Le sous-titre se compte tout seul : écrit à la main, il resterait à onze le
    jour où l'on en ajoute une douzième. */
 $('combien').textContent =
-  LECONS.length + ' leçons pour écrire une cartouche Game Boy en C++'
+  principales(LECONS) + ' leçons pour écrire une cartouche Game Boy en C++'
 
-/* On ouvre sur la leçon demandée dans l'adresse, ou sur la première. */
+/*
+ * On ouvre sur la leçon demandée dans l'adresse, sinon sur la dernière lue,
+ * sinon sur la première.
+ *
+ * Un cas fin : l'adresse « #lecon-20 » écrite par la page elle-même, lors de
+ * la dernière visite, alors qu'une leçon a été ajoutée depuis. La 20e n'est
+ * plus celle qu'on lisait : on la retrouve par son titre.
+ */
+history.scrollRestoration = 'manual' // c'est nous qui remettons la hauteur, pas le navigateur
+const memoire = lireMemoire()
+const retenue = LECONS.findIndex((l) => l.titre === memoire.titre) // -1 : aucune, ou disparue
 const demandee = Number((location.hash.match(/lecon-(\d+)/) ?? [])[1])
-aller(demandee >= 1 && demandee <= LECONS.length ? demandee - 1 : 0)
+const demandeeValable = demandee >= 1 && demandee <= LECONS.length
+let depart = demandeeValable ? demandee - 1 : 0
+if (retenue >= 0 && (!demandeeValable || demandee === memoire.place)) depart = retenue
+aller(depart, { defiler: false })
+/* La même leçon qu'en partant : on redescend là où on lisait. */
+if (depart === retenue && memoire.hauteur > 0) {
+  requestAnimationFrame(() => scrollTo({ top: memoire.hauteur, behavior: 'instant' }))
+}
 tick()
 </script>
 </body>

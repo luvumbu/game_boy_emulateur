@@ -24,7 +24,7 @@ const CONTROLE = new Set(['if', 'else', 'while', 'for', 'do', 'return', 'break',
 const TYPES = new Set([
   'int', 'uint8_t', 'int8_t', 'uint16_t', 'int16_t', 'uint32_t', 'int32_t', 'bool', 'void', 'char',
   'unsigned', 'signed', 'short', 'long', 'const', 'static', 'struct', 'enum', 'auto', 'inline',
-  'Tuile', 'Perso', 'Air',
+  'Tuile', 'Perso', 'Air', 'Mot', 'Carre',
 ])
 const VALEURS = new Set(['true', 'false', 'NULL', 'nullptr'])
 /* Les fonctions de la console (voir BUILTINS dans compilateur/emetteur.js). */
@@ -766,16 +766,29 @@ export function installerEditeur({ champ, actif = () => true, ligneFautive = () 
     return true
   }
 
+  /* Ce nom est-il déjà écrit dans le programme ? Les textes entre guillemets ne comptent pas. */
+  const dejaPris = (nom) =>
+    [...champ.value.matchAll(/"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|[A-Za-z_]\w*/g)].some(([m]) => m === nom)
+
   function fermerLeRenommage(appliquer) {
     if (renommage.hidden) return
-    renommage.hidden = true
     const neuf = champNom.value.trim()
+
+    /* Un nom refusé laisse la boîte ouverte, avec la raison : on corrige sur place. */
+    if (appliquer && aRenommer && neuf !== aRenommer.nom) {
+      let refus = null
+      if (!/^[A-Za-z_]\w*$/.test(neuf) || MOTS_LANGAGE.has(neuf) || FONCTIONS[neuf]) refus = `« ${neuf} » ne peut pas être un nom`
+      else if (dejaPris(neuf)) refus = `« ${neuf} » est déjà utilisé dans le programme : choisis un autre nom`
+      if (refus) {
+        aideNom.textContent = refus
+        champNom.focus()
+        return
+      }
+    }
+
+    renommage.hidden = true
     champ.focus()
     if (!appliquer || !aRenommer || neuf === aRenommer.nom) return
-    if (!/^[A-Za-z_]\w*$/.test(neuf) || MOTS_LANGAGE.has(neuf) || FONCTIONS[neuf]) {
-      aideNom.textContent = `« ${neuf} » ne peut pas être un nom`
-      return
-    }
     /* Toutes les apparitions d'un coup, de la dernière à la première : les positions restent justes. */
     let v = champ.value
     for (const p of [...aRenommer.positions].sort((a, b) => b - a)) v = v.slice(0, p) + neuf + v.slice(p + aRenommer.nom.length)

@@ -16,6 +16,7 @@ import { analyser } from '../compilateur/analyseur.js'
 import { compiler } from '../compilateur/emetteur.js'
 import { fabriquer } from '../compilateur/cartouche.js'
 import { ORDRE } from '../compilateur/police.js'
+import { assemblerAvec, traduire } from '../compilateur/inclusion.js'
 
 const CARTE = 0x9800
 const OAM = 0xfe00
@@ -28,9 +29,18 @@ export const IMAGES_DE_DEPART = 20
  *
  * `laisserDemarrer` à faux rend la console AVANT la première image : c'est ce
  * qu'il faut pour photographier un programme depuis son tout premier instant.
+ * `fichiers` : les fichiers voisins qu'il inclut, { "variables.h": "…" }.
  */
-export function consoleDuProgramme(code, titre, laisserDemarrer = true) {
-  const { octets, variables, vecteurVBlank, couleur } = compiler(analyser(code))
+export function consoleDuProgramme(code, titre, laisserDemarrer = true, fichiers = {}) {
+  const assemble = assemblerAvec(code, fichiers)
+  let rendu
+  try {
+    rendu = compiler(analyser(assemble.texte))
+  } catch (erreur) {
+    erreur.message = traduire(erreur.message, assemble.origine)
+    throw erreur
+  }
+  const { octets, variables, vecteurVBlank, couleur } = rendu
 
   const gb = new GameBoy()
   gb.loadRom(fabriquer(octets, 0x0150, titre.slice(0, 15), vecteurVBlank, couleur))

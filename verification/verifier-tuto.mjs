@@ -26,7 +26,7 @@ for (const [index, lecon] of LECONS.entries()) {
   let octets
   let variables
   try {
-    const bati = consoleDuProgramme(lecon.code, lecon.titre)
+    const bati = consoleDuProgramme(lecon.code, lecon.titre, true, lecon.fichiers)
     laConsole = bati.laConsole
     octets = bati.octets
     variables = bati.variables

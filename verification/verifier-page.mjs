@@ -18,7 +18,16 @@ import { writeFileSync, existsSync, rmSync } from 'node:fs'
 /* Le nombre de leçons n'est jamais recopié : il vient des leçons elles-mêmes.
    Un nombre écrit à la main devient faux le jour où l'on en ajoute une, et le
    contrôle se met alors à mesurer autre chose sans le dire. */
-import { LECONS } from '../tuto/lecons.js'
+import { LECONS, numeros } from '../tuto/lecons.js'
+
+/* Les deux premières leçons, CHERCHÉES dans la liste : écrites en dur (« 1. »,
+   « BONJOUR »), ces contrôles se périmaient dès qu'on ajoutait une leçon devant. */
+const NUMEROS = numeros(LECONS)
+const COMMUNES = new Set(['int main() {', 'while (true) {', 'image();', '{', '}'])
+const ligneDe = (lecon) => {
+  const lignes = lecon.code.split('\n').map((l) => l.replace(/\/\/.*/, '').trim()).filter((l) => l && !COMMUNES.has(l))
+  return lignes[0] ?? 'image();'   // la première ligne qui distingue la leçon
+}
 import { MODELES } from '../bibliotheque.js'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
@@ -677,26 +686,26 @@ try {
     ` (${combien} leçons, ${niveaux} niveaux)`)
 
   controle('la première leçon est ouverte',
-    (await evaluer(`document.getElementById('lecon-titre').textContent`)).startsWith('1.'))
+    (await evaluer(`document.getElementById('lecon-titre').textContent`)).startsWith(NUMEROS[0] + '. '))
 
   /* Le programme de la leçon est DANS l'éditeur, et il tourne : c'est tout
      l'objet du mode. Une leçon qu'on ne pourrait que lire ne vaudrait pas
      mieux qu'une page de documentation. */
   controle('son programme est chargé dans l’éditeur',
-    (await evaluer(`document.getElementById('source').value`)).includes('BONJOUR'))
+    (await evaluer(`document.getElementById('source').value`)).includes(ligneDe(LECONS[0])))
   controle('et il compile', !(await evaluer(`document.getElementById('etat').className`)).includes('erreur'))
 
   /* Le bouton du bas annonce la leçon d'après par son nom : c'est ce qui fait
      qu'on enchaîne les vingt au lieu d'en lire trois. */
   const promis = await evaluer(`document.getElementById('lecon-apres-bas').textContent`)
-  controle('le bouton « suivant » annonce la leçon d’après', promis.includes('Effacer'),
+  controle('le bouton « suivant » annonce la leçon d’après', promis.includes(LECONS[1].titre),
     ` (« ${promis} »)`)
 
   await evaluer(`document.getElementById('lecon-apres-bas').click()`)
   await patienter(900)
   controle('il passe à la leçon suivante, et charge son code',
-    (await evaluer(`document.getElementById('lecon-titre').textContent`)).startsWith('2.') &&
-      (await evaluer(`document.getElementById('source').value`)).includes('APPUIE SUR A'))
+    (await evaluer(`document.getElementById('lecon-titre').textContent`)).startsWith(NUMEROS[1] + '. ') &&
+      (await evaluer(`document.getElementById('source').value`)).includes(ligneDe(LECONS[1])))
 
   /* Au bout, il ne promet plus rien qui n'existe pas. */
   await choisirLaLecon(LECONS.length - 1)

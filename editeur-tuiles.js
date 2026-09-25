@@ -143,6 +143,36 @@ export function remplacerDessin(source, dessin, rangees) {
   return source.slice(0, dessin.debut) + texte + source.slice(dessin.fin)
 }
 
+/*
+ * Les morceaux du texte qu'on ne renomme pas : les textes entre guillemets
+ * (« SOL » affiché à l'écran n'est pas la tuile SOL). Les commentaires, eux,
+ * sont renommés : c'est là que vivent « /* SOL : palette 2 *\/ » et les
+ * étiquettes, qui suivent leur tuile par son nom.
+ */
+const MORCEAUX = /"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|[A-Za-z_]\w*/g
+
+/** Tous les noms écrits dans le programme, hors des textes entre guillemets. */
+export function nomsDuProgramme(source) {
+  const noms = new Set()
+  for (const [morceau] of source.matchAll(MORCEAUX)) {
+    if (morceau[0] !== '"' && morceau[0] !== "'") noms.add(morceau)
+  }
+  return noms
+}
+
+/**
+ * Renomme partout : la déclaration, chaque « poser(…, SOL) », les marques
+ * de palette et d'étiquettes, et « SOL_PALETTES » qui accompagne un Perso.
+ * Un mot qui ne fait que contenir l'ancien nom (« SOLDAT ») n'est pas touché.
+ */
+export function renommerPartout(source, ancien, neuf) {
+  return source.replace(MORCEAUX, (morceau) => {
+    if (morceau === ancien) return neuf
+    if (morceau === `${ancien}_PALETTES`) return `${neuf}_PALETTES`
+    return morceau
+  })
+}
+
 /**
  * Une tuile neuve, ajoutée à la suite des autres.
  *
@@ -434,6 +464,47 @@ export function installer({
 
   /* --- la bande des tuiles --- */
 
+  /*
+   * Renommer un dessin.
+   *
+   * Un nom déjà porté par autre chose (une tuile, une variable, une fonction)
+   * est REFUSÉ, avec la raison : deux choses sous un même nom, le compilateur
+   * ne saurait plus laquelle on veut. Un nom libre remplace l'ancien partout.
+   */
+  async function renommer(ancien) {
+    const pris = nomsDuProgramme(lireSource())
+    pris.delete(ancien)
+
+    const neuf = demanderUnNom
+      ? await demanderUnNom({ quoi: `le nouveau nom de ${ancien}`, propose: ancien, pris, prevenir: true })
+      : demanderSansBoite(ancien, pris)
+    if (!neuf || neuf === ancien) return
+
+    ecrireSource(renommerPartout(lireSource(), ancien, neuf))
+    if (choisi === ancien) choisi = neuf
+    surChangement()
+    rafraichirBande()
+    rafraichirGrille()
+  }
+
+  /* Sans la boîte de l'atelier (la page du tutoriel) : celle du navigateur. */
+  function demanderSansBoite(ancien, pris) {
+    let propose = ancien
+    for (;;) {
+      const brut = window.prompt(`Nouveau nom pour ${ancien} :`, propose)
+      if (brut === null) return null
+      const nom = brut.trim()
+      propose = nom
+      if (!/^[A-Za-z_]\w*$/.test(nom)) {
+        window.alert(`« ${nom} » ne peut pas être un nom : des lettres, des chiffres et _, sans commencer par un chiffre.`)
+      } else if (pris.has(nom)) {
+        window.alert(`« ${nom} » est déjà utilisé dans le programme. Choisis un autre nom.`)
+      } else {
+        return nom
+      }
+    }
+  }
+
   function boutonNeuf(texte, cote) {
     const bouton = document.createElement('button')
     bouton.type = 'button'
@@ -558,7 +629,19 @@ export function installer({
       })
       bouton.addEventListener('mouseleave', () => { loupe.hidden = true })
 
-      bouton.append(canevas, nom, etoile)
+      /* ✎ : renommer, partout où le nom est écrit. */
+      const crayon = document.createElement('i')
+      crayon.className = 'bande-renommer'
+      crayon.setAttribute('role', 'button')
+      crayon.setAttribute('aria-label', 'renommer')
+      crayon.title = `renommer ${dessin.nom} partout dans le programme`
+      crayon.textContent = '✎'
+      crayon.addEventListener('click', (e) => {
+        e.stopPropagation()
+        renommer(dessin.nom)
+      })
+
+      bouton.append(canevas, nom, etoile, crayon)
       bouton.addEventListener('click', () => {
         choisi = dessin.nom
         rafraichirBande()

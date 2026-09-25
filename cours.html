@@ -420,7 +420,7 @@ function paragraphe(texte) {
   return p
 }
 
-function aller(index) {
+function aller(index, { defiler = true } = {}) {
   courante = index
   vues.add(index)
   const lecon = LECONS[index]
@@ -542,8 +542,43 @@ function aller(index) {
   dessinerSommaire()
   compilerEtLancer()
   location.hash = 'lecon-' + (index + 1)
-  scrollTo({ top: 0, behavior: 'smooth' })
+  /* La leçon est retenue par son TITRE et par sa PLACE : voir « retrouver sa
+     place », plus bas. */
+  retenir({ titre: lecon.titre, place: index + 1, hauteur: 0 })
+  /* Changer de leçon remonte en haut. Mais pas à l'ouverture de la page : là,
+     c'est la hauteur retenue qui compte. */
+  if (defiler) scrollTo({ top: 0, behavior: 'smooth' })
 }
+
+/*
+ * Retrouver sa place d'une visite à l'autre.
+ *
+ * Rafraîchir la page doit ramener au MÊME endroit : la même leçon, à la même
+ * hauteur de lecture — pas à la première leçon, ni en haut de la page.
+ *
+ * L'adresse (« #lecon-20 ») garde déjà la PLACE de la leçon, mais pas son
+ * identité : quand une leçon est ajoutée avant elle, la 20e n'est plus la
+ * même. Le navigateur retient donc aussi son TITRE, qui, lui, ne bouge pas.
+ *
+ * Tout passe par try/catch : un navigateur qui refuse de retenir (navigation
+ * privée) n'empêche pas la page de s'ouvrir ; elle oublie, c'est tout.
+ */
+const MEMOIRE = 'gameboy3-cours'
+
+/** Ce que le navigateur a retenu : { titre, place, hauteur }, ou {} s'il n'a rien. */
+function lireMemoire() {
+  try { return JSON.parse(localStorage.getItem(MEMOIRE) ?? '{}') ?? {} } catch { return {} }
+}
+
+/** Retient quelques valeurs, sans oublier les autres. */
+function retenir(quoi) {
+  try { localStorage.setItem(MEMOIRE, JSON.stringify({ ...lireMemoire(), ...quoi })) } catch { /* tant pis */ }
+}
+
+/* La hauteur de lecture est notée au moment où l'on quitte la page
+   (rafraîchir, fermer l'onglet) : la noter à chaque tour de molette ne
+   servirait à rien de plus. */
+addEventListener('pagehide', () => retenir({ hauteur: scrollY }))
 
 /* ----------------------------------------------------------------- compiler */
 
@@ -731,9 +766,26 @@ window.inspecteur = {
 $('combien').textContent =
   LECONS.length + ' leçons, huit chapitres : variables, conditions, boucles, tableaux, fonctions, struct, nuances, couleur'
 
-/* On ouvre sur la leçon demandée dans l'adresse, ou sur la première. */
+/*
+ * On ouvre sur la leçon demandée dans l'adresse, sinon sur la dernière lue,
+ * sinon sur la première.
+ *
+ * Un cas fin : l'adresse « #lecon-20 » écrite par la page elle-même, lors de
+ * la dernière visite, alors qu'une leçon a été ajoutée depuis. La 20e n'est
+ * plus celle qu'on lisait : on la retrouve par son titre.
+ */
+history.scrollRestoration = 'manual' // c'est nous qui remettons la hauteur, pas le navigateur
+const memoire = lireMemoire()
+const retenue = LECONS.findIndex((l) => l.titre === memoire.titre) // -1 : aucune, ou disparue
 const demandee = Number((location.hash.match(/lecon-(\d+)/) ?? [])[1])
-aller(demandee >= 1 && demandee <= LECONS.length ? demandee - 1 : 0)
+const demandeeValable = demandee >= 1 && demandee <= LECONS.length
+let depart = demandeeValable ? demandee - 1 : 0
+if (retenue >= 0 && (!demandeeValable || demandee === memoire.place)) depart = retenue
+aller(depart, { defiler: false })
+/* La même leçon qu'en partant : on redescend là où on lisait. */
+if (depart === retenue && memoire.hauteur > 0) {
+  requestAnimationFrame(() => scrollTo({ top: memoire.hauteur, behavior: 'instant' }))
+}
 tick()
 </script>
 </body>

@@ -27,7 +27,10 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { LECONS, NIVEAUX } from '../tuto/lecons.js'
+import { LECONS, NIVEAUX, numeros, principales } from '../tuto/lecons.js'
+
+const NUMEROS = numeros(LECONS)
+const TOTAL = principales(LECONS)
 import { STYLE } from '../tuto/style.js'
 import { enrichir, echapper } from '../tuto/enrichir.js'
 import { consoleDuProgramme } from '../tuto/console.mjs'
@@ -55,7 +58,7 @@ const enNomDeFichier = (titre) => titre
  */
 function matiereDeLaLecon(lecon) {
   const dessins = new Map(lireDessins(lecon.code).map((d) => [d.nom, d]))
-  const { gb, octets } = consoleDuProgramme(lecon.code, lecon.titre)
+  const { gb, octets } = consoleDuProgramme(lecon.code, lecon.titre, true, lecon.fichiers)
 
   return {
     morceaux: decouperLeProgramme(lecon.code, dessins),
@@ -183,7 +186,7 @@ async function photographierLesAteliers() {
 const reperesDe = (lecon, index) => `
   <p class="reperes">
     <span class="niveau">Niveau ${lecon.difficulte} — ${echapper(NIVEAUX[lecon.difficulte])}</span>
-    <span>leçon ${index + 1} sur ${LECONS.length}</span>
+    <span>leçon ${NUMEROS[index]} sur ${TOTAL}</span>
     <span class="jauge" style="--part: ${lecon.difficulte * 10}%">difficulté ${lecon.difficulte} / 10</span>
     ${lecon.dessin ? '<span class="outil">à la souris : atelier de dessin</span>' : ''}
     ${lecon.plan ? '<span class="outil">à la souris : plan du décor</span>' : ''}
@@ -198,13 +201,13 @@ function pageDeLecon(lecon, index, matiere, atelier) {
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>Leçon ${index + 1} — ${echapper(lecon.titre)}</title>
+<title>Leçon ${NUMEROS[index]} — ${echapper(lecon.titre)}</title>
 <style>${STYLE}</style>
 </head>
 <body>
 
 ${reperesDe(lecon, index)}
-<h1>${index + 1}. ${echapper(lecon.titre)}</h1>
+<h1>${NUMEROS[index]}. ${echapper(lecon.titre)}</h1>
 <p class="idee">${echapper(lecon.idee)}</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
@@ -271,8 +274,8 @@ la cartouche se refait dans la seconde. C’est le même texte, écrit autrement
 
 <p class="pied">
   ${suivante
-    ? `Ensuite : <strong>${index + 2}. ${echapper(suivante.titre)}</strong> — niveau ${suivante.difficulte} sur 10.`
-    : 'C’est la dernière des ' + LECONS.length + ' leçons.'}
+    ? `Ensuite : <strong>${NUMEROS[index + 1]}. ${echapper(suivante.titre)}</strong> — niveau ${suivante.difficulte} sur 10.`
+    : 'C’est la dernière des ' + TOTAL + ' leçons.'}
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 
@@ -290,7 +293,7 @@ function livretComplet(matieres, ateliers) {
       niveau = lecon.difficulte
       sommaire.push(`<li class="niveau">Niveau ${niveau} — ${echapper(NIVEAUX[niveau])}</li>`)
     }
-    sommaire.push(`<li><span class="numero">${index + 1}</span> ${echapper(lecon.titre)}
+    sommaire.push(`<li><span class="numero">${NUMEROS[index]}</span> ${echapper(lecon.titre)}
       <span class="points">difficulté ${lecon.difficulte}/10</span></li>`)
   }
 
@@ -301,7 +304,7 @@ function livretComplet(matieres, ateliers) {
     return `
 <section class="lecon">
   ${reperesDe(lecon, index)}
-  <h1 class="titre-lecon">${index + 1}. ${echapper(lecon.titre)}</h1>
+  <h1 class="titre-lecon">${NUMEROS[index]}. ${echapper(lecon.titre)}</h1>
   <p class="idee">${echapper(lecon.idee)}</p>
 
   ${lecon.texte.map((p) => `<p>${enrichir(p)}</p>`).join('\n  ')}
@@ -309,6 +312,9 @@ function livretComplet(matieres, ateliers) {
   <div class="deux">
     <div>
       <h3>Le programme — ${m.octets} octets</h3>
+      ${Object.entries(lecon.fichiers ?? {}).map(([nom, contenu]) =>
+        `<p><code>${echapper(nom)}</code></p><pre><code>${echapper(contenu.trimEnd())}</code></pre>`).join('')}
+      ${lecon.fichiers ? '<p><code>principal.cpp</code></p>' : ''}
       <pre><code>${echapper(lecon.code.trimEnd())}</code></pre>
     </div>
 
@@ -395,7 +401,7 @@ console.log()
 console.log('  compilation, exécution et captures…')
 const matieres = LECONS.map((lecon, i) => {
   const m = matiereDeLaLecon(lecon)
-  console.log(`    ${String(i + 1).padStart(2)}. ${lecon.titre} — ${m.octets} o, ` +
+  console.log(`    ${NUMEROS[i].padStart(4)}. ${lecon.titre} — ${m.octets} o, ` +
     `${m.morceaux.length} morceaux, ${m.etapes.length} étape${m.etapes.length > 1 ? 's' : ''}` +
     (m.touches.length ? `, ${m.touches.length} touche${m.touches.length > 1 ? 's' : ''}` : ''))
   return m
@@ -428,7 +434,7 @@ const aImprimer = [{ html: 'documents/livret.html', pdf: 'documents/tutoriel.pdf
 writeFileSync('documents/livret.html', livretComplet(matieres, ateliers))
 
 LECONS.forEach((lecon, index) => {
-  const nom = `lecon-${String(index + 1).padStart(2, '0')}-${enNomDeFichier(lecon.titre)}`
+  const nom = `lecon-${NUMEROS[index].replace(/^\d+/,(n) => n.padStart(2, '0')).replace('.', '-')}-${enNomDeFichier(lecon.titre)}`
   writeFileSync(join(DOSSIER, `${nom}.html`), pageDeLecon(lecon, index, matieres[index], ateliers.get(index)))
   aImprimer.push({ html: `${DOSSIER}/${nom}.html`, pdf: join(DOSSIER, `${nom}.pdf`) })
 })

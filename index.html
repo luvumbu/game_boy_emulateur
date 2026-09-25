@@ -884,6 +884,8 @@
   .bande-etoile.allumee { color: #ffd23f; }
   .bande-etoile::before { content: "☆"; }
   .bande-etoile.allumee::before { content: "★"; }
+  .bande-renommer { position: absolute; top: 1px; left: 3px; font-size: 12px; font-style: normal; color: #8889; cursor: pointer; }
+  .bande-renommer:hover { color: #3794ff; }
   .bande-loupe { position: fixed; width: 128px; height: 128px; z-index: 50; pointer-events: none; image-rendering: pixelated; border: 2px solid var(--bord); border-radius: 6px; background: #fff; box-shadow: 0 6px 20px #0008; }
   .bande-loupe[hidden] { display: none; }
   .tuile-etiquettes { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
@@ -1737,7 +1739,7 @@ import { tuilesDeLaMemoire, fichierDeLaCartouche } from './convertir.js'
 import { retourAuCpp } from './retour-cpp.js'
 import { installer as installerProjets } from './projets.js'
 import { BOUTONS, OPTIONS_LUTIN, NOTES } from './compilateur/emetteur.js'
-import { LECONS, NIVEAUX } from './tuto/lecons.js'
+import { LECONS, NIVEAUX, numeros, principales } from './tuto/lecons.js'
 import { COURS, CHAPITRES } from './tuto/programmation.js'
 import { enrichir } from './tuto/enrichir.js'
 import { construirePageAutonome } from './exporter-html.js'
@@ -2194,8 +2196,14 @@ const CATALOGUE = [
     appliquer: () => {},
   },
   {
-    cle: 'leconDepart', groupe: 'La page', type: 'glissiere', defaut: 1, min: 1, max: LECONS.length, pas: 1, unite: '',
-    titre: 'La leçon d’ouverture', aide: 'Celle qui s’affiche quand on entre en mode leçons.',
+    /* 0, tout à gauche : la dernière leçon lue, celle qu'on avait sous les
+       yeux en quittant la page. C'est ce qu'on attend d'un rafraîchissement.
+       La clé a changé de nom (« leconDepart » valait 1 par défaut) : l'ancien
+       1, retenu par le navigateur, ne doit pas ramener tout le monde à la
+       première leçon. */
+    cle: 'leconOuverture', groupe: 'La page', type: 'glissiere', defaut: 0, min: 0, max: LECONS.length, pas: 1, unite: '',
+    zero: 'la dernière lue',
+    titre: 'La leçon d’ouverture', aide: 'Celle qui s’affiche quand la page s’ouvre en mode leçons. Tout à gauche : celle que tu lisais en quittant la page.',
     appliquer: () => {},
   },
 
@@ -4256,6 +4264,9 @@ async function prendreLeModele(modele) {
 }
 
 function montrerAtelier(lequel) {
+  /* L'onglet ouvert est retenu : un rafraîchissement le rouvre (voir « Par
+     quoi la page s'ouvre »). */
+  try { localStorage.setItem('gameboy3-atelier', lequel) } catch { /* tant pis */ }
   for (const [onglet, zone, sien] of [
     ['onglet-tuiles', 'atelier-tuiles', 'tuiles'],
     ['onglet-airs', 'atelier-airs', 'airs'],
@@ -4566,7 +4577,7 @@ function demanderLaConsole() {
   })
 }
 
-function demanderUnNom({ quoi, propose, pris, genre = 'identifiant' }) {
+function demanderUnNom({ quoi, propose, pris, genre = 'identifiant', prevenir = false }) {
   const regle = REGLES_DU_NOM[genre] ?? REGLES_DU_NOM.identifiant
   const dejaPris = pris instanceof Set ? pris : new Set(pris ?? [])
 
@@ -4599,7 +4610,7 @@ function demanderUnNom({ quoi, propose, pris, genre = 'identifiant' }) {
 
   /* Réglage décoché : la page nomme elle-même, comme avant — mais elle passe
      tout de même par la règle, sinon un nom proposé pourrait faire doublon. */
-  if (!REGLAGES.nommer) return Promise.resolve(nomFinal(propose))
+  if (!REGLAGES.nommer && !prevenir) return Promise.resolve(nomFinal(propose))
 
   return new Promise((repondre) => {
     const voile = $('voile')
@@ -4613,6 +4624,15 @@ function demanderUnNom({ quoi, propose, pris, genre = 'identifiant' }) {
     /* Ce qui sera retenu, montré dès que cela diffère de ce qui est tapé. */
     const montrerLeNomRetenu = () => {
       const tape = champ.value.trim()
+      /* « prevenir » (renommer) : un nom pris n'est pas renuméroté en douce, il est signalé. */
+      if (prevenir) {
+        const voulu = regle.corriger(tape)
+        faute.hidden = !occupe(voulu) && voulu === tape
+        faute.textContent = occupe(voulu)
+          ? `« ${voulu} » est déjà utilisé dans le programme : choisis un autre nom.`
+          : `Ce sera : « ${voulu} »`
+        return
+      }
       const final = nomFinal(tape)
       const pareil = tape === final
       faute.hidden = pareil
@@ -4637,6 +4657,12 @@ function demanderUnNom({ quoi, propose, pris, genre = 'identifiant' }) {
     /* Aucun refus : ce qui est tapé est arrangé, et la boîte se ferme. */
     const valider = (evenement) => {
       evenement.preventDefault()
+      if (prevenir) {
+        const voulu = regle.corriger(champ.value.trim())
+        if (!voulu || occupe(voulu)) { montrerLeNomRetenu(); champ.focus(); return }
+        fermer(voulu)
+        return
+      }
       fermer(nomFinal(champ.value))
     }
 
@@ -5299,8 +5325,42 @@ const SERIES = {
   cours: { liste: COURS, groupes: CHAPITRES, groupe: 'Chapitre', page: 'cours.html', lien: 'le cours en grand ↗' },
 }
 let serie = 'lecons'
-const ouEnEtait = { lecons: 0, cours: 0 }
 const liste = () => SERIES[serie].liste
+
+/*
+ * La leçon où l'on en était, dans chaque série — retenue d'une visite à
+ * l'autre, pour qu'un rafraîchissement ramène à la MÊME leçon.
+ *
+ * Le navigateur garde son TITRE, pas seulement sa place : quand une leçon est
+ * ajoutée avant elle, sa place change (la 19e devient la 20e), son titre non.
+ * La place ne sert que si le titre a disparu (une leçon renommée).
+ */
+const LECON_RETENUE = 'gameboy3-lecon'
+
+function lireLeconsRetenues() {
+  try { return JSON.parse(localStorage.getItem(LECON_RETENUE) ?? '{}') ?? {} } catch { return {} }
+}
+
+/** La place, dans sa série, de la leçon retenue : 0 si rien n'est retenu. */
+function leconRetenue(laSerie) {
+  const gardee = lireLeconsRetenues()[laSerie]
+  if (!gardee) return 0
+  const lecons = SERIES[laSerie].liste
+  const parTitre = lecons.findIndex((l) => l.titre === gardee.titre)
+  if (parTitre >= 0) return parTitre
+  return gardee.place >= 0 && gardee.place < lecons.length ? gardee.place : 0
+}
+
+function retenirLaLecon(laSerie, index) {
+  const toutes = lireLeconsRetenues()
+  toutes[laSerie] = { titre: SERIES[laSerie].liste[index].titre, place: index }
+  try { localStorage.setItem(LECON_RETENUE, JSON.stringify(toutes)) } catch { /* tant pis */ }
+}
+
+const ouEnEtait = { lecons: leconRetenue('lecons'), cours: leconRetenue('cours') }
+/* La série ouverte au départ est celle des leçons : sa leçon courante est donc
+   la retenue. Sans cela, passer au cours noterait « leçon 0 » à sa place. */
+leconCourante = ouEnEtait.lecons
 
 /* Le choix des leçons de la série, rangées par niveau ou par chapitre. */
 function remplirLeChoix() {
@@ -5317,7 +5377,7 @@ function remplirLeChoix() {
     }
     const option = document.createElement('option')
     option.value = String(i)
-    option.textContent = `${i + 1}. ${lecon.titre}`
+    option.textContent = `${numeros(lecons)[i]}. ${lecon.titre}`
     groupe.append(option)
   })
   $('lecon-lien').href = SERIES[serie].page
@@ -5354,13 +5414,23 @@ $('lecon-atelier').addEventListener('click', () => {
   $('zone-creation').scrollIntoView({ behavior: 'smooth', block: 'start' })
 })
 
-/** Ouvre une leçon : son texte, et son programme dans l'éditeur. */
-function allerALaLecon(index) {
+/**
+ * Ouvre une leçon : son texte, et son programme dans l'éditeur.
+ *
+ * Deux options, pour l'ouverture de la page seulement :
+ *   garderLeCode — le programme retenu (peut-être modifié) reste dans
+ *                  l'éditeur, au lieu d'être remplacé par celui de la leçon ;
+ *   defiler      — false : on ne remonte pas en haut, la page remet elle-même
+ *                  la hauteur où l'on lisait.
+ */
+function allerALaLecon(index, { garderLeCode = false, defiler = true } = {}) {
   const LECONS = liste() // celles de la série ouverte : leçons ou cours
   if (index < 0 || index >= LECONS.length) return
   leconCourante = index
   ouEnEtait[serie] = index
+  retenirLaLecon(serie, index) // pour la retrouver après un rafraîchissement
   const lecon = LECONS[index]
+  const NUMEROS = numeros(LECONS)
 
   $('lecon-choix').value = String(index)
 
@@ -5377,15 +5447,15 @@ function allerALaLecon(index) {
   for (const bouton of ['lecon-avant', 'lecon-avant-bas']) $(bouton).disabled = !avant
   for (const bouton of ['lecon-apres', 'lecon-apres-bas']) $(bouton).disabled = !apres
 
-  $('lecon-avant-bas').textContent = avant ? `◀ ${index}. ${avant.titre}` : '◀ Précédent'
-  $('lecon-apres-bas').textContent = apres ? `${index + 2}. ${apres.titre} ▶` : `✓ Tu es au bout des ${LECONS.length}`
+  $('lecon-avant-bas').textContent = avant ? `◀ ${NUMEROS[index - 1]}. ${avant.titre}` : '◀ Précédent'
+  $('lecon-apres-bas').textContent = apres ? `${NUMEROS[index + 1]}. ${apres.titre} ▶` : `✓ Tu es au bout des ${principales(LECONS)}`
   $('lecon-ou').textContent = !apres
     ? 'la dernière leçon : tu as tout vu'
     : serie === 'cours'
       ? `ensuite — chapitre ${apres.difficulte} : ${CHAPITRES[apres.difficulte]}`
       : `ensuite — niveau ${apres.difficulte} sur 10`
 
-  $('lecon-titre').textContent = `${index + 1}. ${lecon.titre}`
+  $('lecon-titre').textContent = `${NUMEROS[index]}. ${lecon.titre}`
   $('lecon-idee').textContent = lecon.idee
 
   const reperes = $('lecon-reperes')
@@ -5402,11 +5472,11 @@ function allerALaLecon(index) {
     /* Un chapitre n'est pas une difficulté : une jauge sur 10 mentirait. */
     const duChapitre = LECONS.filter((l) => l.difficulte === lecon.difficulte)
     repere(`Chapitre ${lecon.difficulte} — ${CHAPITRES[lecon.difficulte]}`, 'niveau')
-    repere(`leçon ${index + 1} sur ${LECONS.length}`, '')
+    repere(`leçon ${NUMEROS[index]} sur ${principales(LECONS)}`, '')
     repere(`${duChapitre.indexOf(lecon) + 1} / ${duChapitre.length} dans ce chapitre`, '')
   } else {
     repere(`Niveau ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`, 'niveau')
-    repere(`leçon ${index + 1} sur ${LECONS.length}`, '')
+    repere(`leçon ${NUMEROS[index]} sur ${principales(LECONS)}`, '')
     repere(`difficulté ${lecon.difficulte} / 10`, 'difficulte')
       .style.setProperty('--part', `${lecon.difficulte * 10}%`)
   }
@@ -5451,7 +5521,16 @@ function allerALaLecon(index) {
 
   /* Le programme de la leçon part dans l'éditeur, et tourne aussitôt : c'est
      ce qui rend la leçon vivante plutôt que lue. */
-  ouvrirProgramme(lecon.code)
+  /* Ses fichiers voisins, s'il en a, s'ouvrent dans les onglets. */
+  /* Au rafraîchissement, le programme retenu est gardé : c'est peut-être le
+     code de la leçon, modifié à la main — le remplacer l'effacerait sans le
+     dire. « ⟲ Remettre le code » est là pour revenir à celui de la leçon. */
+  if (!garderLeCode) {
+    ouvrirProgramme(lecon.code, lecon.fichiers ? new Map(Object.entries(lecon.fichiers)) : null)
+    /* Et on le retient tout de suite : sans cela, le navigateur garderait le
+       programme d'AVANT, qui reviendrait sous cette leçon au rafraîchissement. */
+    retenirLeProgramme()
+  }
   compilerEtLancer()
   atelier.rafraichir()
   atelierAirs.rafraichir()
@@ -5460,7 +5539,7 @@ function allerALaLecon(index) {
 
   /* On revient en haut : sans cela, la leçon suivante s'ouvre au milieu, à
      l'endroit où l'on avait fini de lire la précédente. */
-  $('zone-lecons').closest('.volet').scrollTo({ top: 0, behavior: 'smooth' })
+  if (defiler) $('zone-lecons').closest('.volet').scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 /* Ce que ce programme contient, dit là où on le cherche. */
@@ -5514,6 +5593,15 @@ const DEMANDES = {
  * s'applique qu'à ceux qui entrent par les leçons.
  */
 const MODES_CONNUS = ['creation', 'code', 'lecons', 'cours']
+
+/* Ce que la dernière visite a laissé, relu AVANT que le démarrage ne touche à
+   rien : ouvrir l'exemple ou la leçon change l'onglet de l'atelier, et
+   écraserait celui qu'on avait choisi. */
+const atelierRetenu = (() => { try { return localStorage.getItem('gameboy3-atelier') } catch { return null } })()
+const defilementRetenu = (() => {
+  try { return JSON.parse(localStorage.getItem('gameboy3-defilement') ?? 'null') } catch { return null }
+})()
+
 const modeVoulu = REGLAGES.modeDemarrage === 'dernier'
   ? (localStorage.getItem('gameboy3-mode') ?? 'creation')
   : REGLAGES.modeDemarrage
@@ -5521,7 +5609,8 @@ montrerMode(MODES_CONNUS.includes(modeVoulu) ? modeVoulu : 'creation')
 
 /* Le programme retenu passe avant l'exemple : c'est le travail de quelqu'un,
    et le remplacer par un exemple serait l'effacer sans le dire. */
-if (!reprendreLeProgramme()) {
+const programmeRepris = reprendreLeProgramme()
+if (!programmeRepris) {
   const voulu = REGLAGES.exempleDemarrage
   const exemple = voulu === 'garder'
     ? (localStorage.getItem('gameboy3-exemple') ?? 'mario')
@@ -5543,8 +5632,34 @@ if (!projetRepris && REGLAGES.compilerAuChargement) compilerEtLancer()
 /* Décoché : la console n'a rien à jouer, et elle doit le DIRE. Sans ce mot,
    l'écran noir du démarrage se confond avec une page cassée. */
 else montrerLaPause()
-if (modeVoulu === 'lecons') allerALaLecon(Math.min(Number(REGLAGES.leconDepart) || 1, LECONS.length) - 1)
-if (modeVoulu === 'cours') allerALaLecon(0)
+/*
+ * En mode leçons ou cours : la leçon qu'on lisait en quittant la page.
+ *
+ * Sauf si le réglage « La leçon d'ouverture » en impose une (1, 2, 3…) :
+ * c'est alors elle, avec son code d'origine.
+ *
+ * Le code : quand la page se rouvre dans le mode qu'on avait quitté, le
+ * programme retenu EST celui de cette leçon, peut-être modifié à la main.
+ * On le garde. Dans les autres cas (un mode imposé, une leçon imposée), il
+ * peut venir d'ailleurs : c'est le code de la leçon qui s'ouvre.
+ */
+if (modeVoulu === 'lecons' || modeVoulu === 'cours') {
+  const imposee = modeVoulu === 'lecons' ? Number(REGLAGES.leconOuverture) || 0 : 0
+  const depart = imposee > 0 ? Math.min(imposee, LECONS.length) - 1 : ouEnEtait[modeVoulu]
+  const garderLeCode = imposee === 0 && REGLAGES.modeDemarrage === 'dernier' && (programmeRepris || projetRepris)
+  allerALaLecon(depart, { garderLeCode, defiler: false })
+}
+
+/* L'onglet de l'atelier qu'on avait ouvert — sauf quand la leçon en demande
+   un : elle parle de cet outil-là, c'est lui qu'il faut montrer. */
+const leconAvecAtelier = (() => {
+  if (modeVoulu !== 'lecons' && modeVoulu !== 'cours') return false
+  const lecon = liste()[leconCourante]
+  return Boolean(lecon?.dessin || lecon?.airs || lecon?.carte)
+})()
+const ATELIERS = ['tuiles', 'airs', 'couleurs', 'carte', 'modeles']
+if (ATELIERS.includes(atelierRetenu) && !leconAvecAtelier) montrerAtelier(atelierRetenu)
+
 atelier.rafraichir()
 atelierAirs.rafraichir()
 atelierCarte.rafraichir()
@@ -5565,6 +5680,35 @@ if (demande && EXEMPLES[demande[1]]) {
 } else {
   DEMANDES[location.hash]?.()
 }
+
+/*
+ * La hauteur de lecture, retrouvée.
+ *
+ * La page défile à deux endroits : la fenêtre elle-même, et chacun des deux
+ * volets (le travail à gauche, la console à droite), qui ont leur propre
+ * barre. On note les trois en quittant la page (rafraîchir, fermer l'onglet),
+ * et on les remet ici — sauf si l'adresse demandait un endroit précis.
+ *
+ * Le navigateur sait remettre la fenêtre tout seul, mais pas les volets, et
+ * il le fait trop tôt, avant que la leçon ne soit écrite : on s'en charge.
+ */
+history.scrollRestoration = 'manual'
+if (!location.hash && defilementRetenu?.mode === document.body.dataset.mode) {
+  requestAnimationFrame(() => {
+    const volets = document.querySelectorAll('.volet')
+    volets.forEach((volet, i) => { volet.scrollTop = defilementRetenu.volets?.[i] ?? 0 })
+    scrollTo({ top: defilementRetenu.fenetre ?? 0, behavior: 'instant' })
+  })
+}
+addEventListener('pagehide', () => {
+  try {
+    localStorage.setItem('gameboy3-defilement', JSON.stringify({
+      mode: document.body.dataset.mode, // une hauteur ne vaut que pour le mode où on l'a prise
+      fenetre: scrollY,
+      volets: [...document.querySelectorAll('.volet')].map((volet) => volet.scrollTop),
+    }))
+  } catch { /* tant pis */ }
+})
 
 /* --------------------------------------------- les gestes du champ de code */
 
@@ -5689,6 +5833,8 @@ function lireControle(regle, element) {
 /** Ce qu'un réglage affiche à droite de son nom. */
 function montrerLaValeur(regle, valeur) {
   if (regle.type !== 'glissiere') return ''
+  /* Un 0 qui veut dire autre chose qu'un nombre le dit en mots. */
+  if (Number(valeur) === 0 && regle.zero) return regle.zero
   return `${valeur}${regle.unite ?? ''}`
 }
 

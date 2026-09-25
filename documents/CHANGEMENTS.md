@@ -2,8 +2,8 @@
 
 > Ce fichier porte **toutes les passes**, dans l’ordre : celle-ci — la musique,
 > les ateliers, le tutoriel —, puis chaque « passe d’après ». La dernière, tout
-> en bas, est **« La passe des couleurs, et de l’atelier complet »** : huit
-> palettes, et tout ce qui manquait à l’atelier.
+> en bas, est **« La passe du chapitre 0 »** : apprendre depuis le programme qui
+> ne fait rien, et ce que le langage a gagné pour cela.
 
 Le compilateur savait faire du son : `note()` jouait **une** note. Une mélodie
 s'écrivait donc en comptant les images à la main, dans la boucle du jeu, avec un
@@ -1459,3 +1459,320 @@ ondule, le texte bascule sur COSINUS après l'appui, exactement comme annoncé.
 | `tuto/lecons.js` | les leçons 19 et 20 |
 | `tuto/programmation.js`, `cours/`, `documents/COURS.md` | les chapitres 37 et 42 réécrits |
 | `LISEZMOI.md`, `documents/valorisation.html` / `.pdf` | la documentation |
+
+---
+
+# La passe du chapitre 0 : apprendre depuis le tout début
+
+> 25 septembre 2026. Le tutoriel commençait par « Écrire à l’écran » : un
+> programme qui supposait déjà `int main()`, `while` et `texte()` compris. Cette
+> passe ajoute **le chapitre 0**, qui part du programme qui ne fait rien, et
+> réorganise les chapitres 1 et 2 pour qu’ils avancent **une idée à la fois**.
+> Le langage a gagné ce que ces leçons demandaient.
+>
+> **Ensuite, le même jour**, le chapitre 0 a grandi jusqu’à un premier petit jeu :
+> le déplacement pas à pas (0.17 à 0.64, une seule nouveauté par leçon), la croix
+> (0.65 à 0.75), un déclencheur (0.76), `chaque`, le rebond, la poursuite, la
+> `struct` (0.77 à 0.80), puis les pièces, les murs, le son, les vies et les
+> ennemis (0.81 à 0.85). Chaque leçon de 0.1 à 0.75 a ses intermédiaires (0.N.1
+> « de base, ailleurs », 0.N.2 « doublé »), les leçons longues une version
+> « en simple ». 359 leçons en tout. Les pièces et les murs sont des **lettres**.
+>
+> **Les fonctions natives ajoutées** (écrites en C, ajoutées à la cartouche
+> seulement si le programme s’en sert) : `deplace_x`, `deplace_y`, `deplace`,
+> `va_a`, `un_pas`, `vitesse`, `carre` (+ le type `Carre`), `losange`,
+> `rectangle`, `spirale`, `aller_retour`, `deplace_croix`, `glisse_croix`,
+> `tourne_carre`, `defile`, `chaque`. Seules sur leur ligne, celles qui bougent
+> une lettre **rangent sa position** dans la variable donnée (sans `x =`).
+>
+> **Deux corrections du compilateur** : `AttendreVBlank` écrit tout de suite si
+> le VBlank est déjà là (plus de clignotement, plus d’image de trop par pas) ;
+> l’attente de `deplace_croix` compte les images réellement passées, une fois
+> par image (deux lettres bougent ensemble, et une boucle lente garde la vitesse).
+
+## 1. Les leçons se numérotent 1, 1.1, 1.2… et 0.0, 0.1…
+
+Une leçon marquée `suite: true` **prolonge** la précédente au lieu d’ouvrir la
+suivante : elle s’affiche « 1.1 », et les leçons d’après **gardent leur
+numéro** — celui des livrets déjà imprimés. Le chapitre 0 (`difficulte: 0`)
+compte à part : 0.0, 0.1, 0.2…
+
+`numeros(liste)` et `principales(liste)` (dans `tuto/lecons.js`) donnent ce
+numéro à **toutes** les pages : le tutoriel, l’atelier, le livret,
+`TUTORIELS.md`, les captures (`tutoriels/01.1.png`).
+
+## 2. Le chapitre 0 : de rien jusqu’au premier jeu
+
+Toujours la même lettre, et une seule idée nouvelle par chapitre.
+
+| N° | Chapitre | L’idée nouvelle |
+|---|---|---|
+| 0.0 | Le programme qui ne fait rien | `int main()`, `while (true)`, `image()` |
+| 0.1 | Afficher la lettre A | `texte(0, 0, "A")` : la case en haut à gauche |
+| 0.2 | A, pris dans ALPHABET à l’indice 0 | un tableau commence à 0 ; `poser` et non `texte` |
+| 0.3 | Écrire au même endroit écrase | la même case, **exprès** : le B efface le A |
+| 0.4 | L’alphabet à la main, jusqu’au bout de la ligne | 20 colonnes : on s’arrête à T, la colonne 20 est refusée |
+| 0.5 | La même ligne, avec une boucle for | `for` |
+| 0.6 | La même ligne, avec une boucle while | `while (condition)`, et le piège du `i++` oublié |
+| 0.7 | La même ligne, avec do … while | la boucle qui fait toujours un tour |
+| 0.8 | Tout l’alphabet, avec deux boucles | passer à la ligne à la main |
+| 0.9 | Tout l’alphabet, avec une seule boucle | `sizeof`, le quotient `/` et le reste `%` |
+| 0.10 | Tout l’alphabet, avec poserS | la fonction qui fait ce calcul |
+| 0.11 | Tout l’alphabet, avec textS | la même chose pour un texte |
+| 0.12 | Une lettre toutes les secondes | compter les images : 60 par seconde, ≈ 16,7 ms l’une |
+| 0.13 | Une lettre toutes les secondes, avec attendre | `attendre(1)` — et sa limite : tout s’arrête |
+| 0.14 | Deux choses, deux rythmes | un compteur par chose |
+| 0.15 | Deux rythmes, un seul chronomètre | la version courte, avec `%` |
+| 0.16 | Deux rythmes, écrits en millisecondes | `ms(1000)`, `ms(250)` |
+| 0.17 | Une lettre qui avance de 5 cases | bouger = effacer puis réécrire ; `pas` pour s’arrêter |
+| 0.18 | Avancer avec deplace_x | `x = deplace_x(x, 0, A, pas)` ; la copie, `return`, le `x =` |
+| 0.19 | Revenir : un pas négatif | + une ligne : `-pas` (rangé 251) ; le retour part de x |
+| 0.20 | Voir x à l’écran : nombre | + `nombre(0, 2, x)` : 005 puis 000 |
+| 0.21 | Descendre avec deplace_y | l’axe Y, `y = deplace_y(…)` |
+| 0.22 | Remonter : deplace_y et un pas négatif | + une ligne ; pourquoi deux fonctions |
+| 0.23 | Sans « x = » : la console range la position | le 0.20 sans les `x =` : même cartouche |
+| 0.24 | Les deux axes à la suite | deplace_x puis deplace_y, x et y affichés |
+| 0.25 | Le carré, côté par côté | + les deux côtés du retour |
+| 0.26 | En diagonale : deplace | `deplace(x, y, A, 5, 5)` |
+| 0.27 | Le carré avec deplace | + quatre lignes, un 0 sur un axe |
+| 0.28 | Aller à une case : va_a | `va_a(x, y, A, 10, 5)` |
+| 0.29 | Revenir au départ avec va_a | + `va_a(x, y, A, 0, 0)` |
+| 0.30 | Un pas sans attendre : un_pas | une lettre, le chronomètre du 0.17 |
+| 0.31 | Deux lettres à la fois | + un deuxième `un_pas` |
+| 0.32 | Le trajet dans un tableau | `PAS_X[]`, `PAS_Y[]`, boucle `for` |
+| 0.33 | Écrire soi-même sa fonction | `mon_deplace_x` ; `x =` obligatoire |
+| 0.34 | Un carré autour d’une lettre, avec carre | une ligne : `carre(10, 8, A, 1, 1, 250, 1)` |
+| 0.35 | Taille 2 : un carré de 5 × 5 | un seul carré, taille 2, autour de (10, 8) : colonnes 8 à 12, lignes 6 à 10 |
+| 0.36 | Taille 3 : un carré de 7 × 7 | un seul carré, taille 3, autour de (10, 8) : colonnes 7 à 13, lignes 5 à 11 |
+| 0.37 | Taille 4 : un carré de 9 × 9 | un seul carré, taille 4, autour de (10, 8) : colonnes 6 à 14, lignes 4 à 12 |
+| 0.38 | Taille 5 : un carré de 11 × 11 | un seul carré, taille 5, autour de (10, 8) : colonnes 5 à 15, lignes 3 à 13 |
+| 0.39 | Taille 6 : un carré de 13 × 13 | un seul carré, taille 6, autour de (10, 8) : colonnes 4 à 16, lignes 2 à 14 |
+| 0.40 | Taille 7 : un carré de 15 × 15 | un seul carré, taille 7, autour de (10, 8) : colonnes 3 à 17, lignes 1 à 15 |
+| 0.41 | Taille 8 : un carré de 17 × 17 | un seul carré, taille 8, autour de (10, 8) : colonnes 2 à 18, lignes 0 à 16 ; le plus grand possible |
+| 0.42 | Dans l’autre sens : sens -1 | le carré de taille 2, sens 1 → -1 |
+| 0.43 | Plus lentement : vitesse 500 | le carré de taille 2, vitesse 250 → 500 |
+| 0.44 | Plus vite : vitesse 100 | le carré de taille 2, vitesse 250 → 100 |
+| 0.45 | Très vite : vitesse 50 | le carré de taille 2, vitesse 250 → 50 |
+| 0.46 | Deux tours | le carré de taille 2, tours 1 → 2 |
+| 0.47 | Trois tours | le carré de taille 2, tours 1 → 3 |
+| 0.48 | Les réglages sous un nom : Carre | `Carre ronde = { … }; carre(ronde);` |
+| 0.49 | De plus en plus grand : 1, puis 2 | taille 1 puis 2, même centre (10, 8) : le milieu, où tiennent les tailles 1 à 8 |
+| 0.50 | De plus en plus grand : et 3 | + taille 3 |
+| 0.51 | Jusqu’au plus grand : une boucle | `for (taille = 1; taille <= 8; …)` : huit carrés emboîtés, le plus grand touche presque les bords |
+| 0.52 | Deux carrés à la suite | un petit carré, puis un grand (taille 3, sens -1, vitesse 100, 3 tours) |
+| 0.53 | Deux lettres, deux carrés | A et B, deux centres |
+| 0.54 | Trois lettres, trois carrés | + `carre(ronde)` pour le C |
+| 0.55 | La vitesse des déplacements : vitesse | `vitesse(100);` puis deplace_x |
+| 0.56 | Changer de vitesse en route | + `vitesse(500);` et le retour |
+| 0.57 | Un carré sur la pointe : losange | `losange(…)` |
+| 0.58 | Plus large que haut : rectangle | `rectangle(…)` |
+| 0.59 | Tourner en s’éloignant : spirale | `spirale(…)` |
+| 0.60 | Aller et revenir : aller_retour | `aller_retour(10, 8, A, 5, 0, 250, 2)` |
+| 0.61 | Aller et revenir en diagonale | + `aller_retour(…, 4, 4, 100, 1)` |
+| 0.62 | Deux formes ensemble | losange + rectangle |
+| 0.63 | Trois formes ensemble | + spirale |
+| 0.64 | Quatre formes ensemble | + aller-retour |
+| 0.65 | Une lettre qui avance | le même mouvement, sans fin |
+| 0.66 | La lettre bouge avec la croix | la manette : le premier jeu |
+| 0.67 | Les variables de la lettre dans leur propre fichier | le 0.66 rangé en deux : `variables.h` et `#include` |
+| 0.68 | Voir la position du A en direct | + `nombre(0, 17, x)` et `nombre(4, 17, y)` DANS la boucle ; l’Inspecteur, onglet Variables |
+| 0.69 | Chercher le A sur l’écran : lire | + la recherche au bouton A : `lire(c, l) == ALPHABET[0]` sur les 360 cases |
+| 0.70 | Plus fluide : la lettre au pixel près | `sprite(0, px, py, ALPHABET[0])` : un lutin, un pixel par image au lieu d’une case de 8 |
+| 0.71 | La croix en une ligne : deplace_croix | `deplace_croix(x, y, ALPHABET[0], 250)` : tout le bloc du 0.66, natif, vitesse en ms |
+| 0.72 | Plus vite sur la grille : deplace_croix à 100 | vitesse 250 → 100 : 10 cases par seconde |
+| 0.73 | Glisser en une ligne : glisse_croix | `glisse_croix(0, px, py, ALPHABET[0], 1)` : le 0.70 en une ligne, vitesse en pixels par image |
+| 0.74 | Glisser plus vite : glisse_croix à 3 | vitesse 1 → 3 : 180 pixels par seconde |
+| 0.75 | Arrivé en (0, 0), le A devient B | départ (10, 0), `deplace_croix`, position en direct ; `if (x == 0 && y == 0) lettre = 1;` — `&&`, et la lettre dans une variable (`ALPHABET[lettre]`) ; + 0.75.1 (départ (10, 8), toujours B en (0, 0) : à gauche puis en haut) et 0.75.2 (les deux A, chacun B en arrivant en (0, 0)) |
+| 0.76 | Un déclencheur en (0, 0) : actif | le drapeau `actif` (0 puis 1), condition à trois morceaux `x == 0 && y == 0 && actif == 0` : une seule fois. Puis 0.76.1 un B apparaît au milieu ; 0.76.2 il tourne en carré pas à pas (`un_pas`, `bpas` de 0 à 15, `else if`) sans bloquer le A ; 0.76.3 plus vite (5 images) ; 0.76.4 deux B à mi-tour ; 0.76.5 un C file à gauche ; 0.76.6 un D file à droite |
+| 0.76.7 à 0.76.13 | la série 0.76 en simple | `tourne_carre(numero, x, y, tuile, cote, vitesse)` et `defile(numero, x, y, tuile, sens, vitesse)` : tout le 0.76.6 en quatre lignes |
+| 0.77 | Plusieurs rythmes sans compteur : chaque | `if (chaque(250)) { … }` : le 0.16 sans chronomètres |
+| 0.78 | Le rebond : une vitesse qui change de signe | `x = x + vx`, au bord `vx = -1` ; + 0.78.1 en diagonale (`vx`, `vy`) |
+| 0.79 | Suivre une autre lettre | le B poursuit le A, un pas toutes les 600 ms (le A : 250) : on peut lui échapper ; `sx`, `sy` = 1, -1 ou 0 ; `PRIS` ; + 0.79.1 : il accélère (`lenteur` 36 → 12 images, `chaque(3000)`, `compte >= lenteur`) |
+| 0.80 | x et y rangés ensemble : struct | `struct Position { uint8_t x, y; }; Position joueur;`, `joueur.x` ; + 0.80.1 : l’intérieur du `while` dans `boucle.h`, versé par un `#include` AU MILIEU de la boucle ; + 0.80.2 : la façon propre, `void tour_de_jeu()` dans `jeu.h`, la boucle n’a qu’un appel |
+| 0.81 | Ramasser une pièce : le P | la pièce est une LETTRE (P) ; `x == px && y == py`, score ; + 0.81.1 réapparaît (tableaux PX, PY) ; + 0.81.2 au hasard (`hasard() % 20`) |
+| 0.82 | Un mur qu’on ne traverse pas : le M | les murs sont des LETTRES (M) ; la case d’arrivée `nx`, `ny`, `lire(nx, ny) != ALPHABET[12]` ; + 0.82.1 un labyrinthe |
+| 0.83 | Un son quand on ramasse : note | `note(1, DO5, 10, 12)` ; + 0.83.1 `bruit(4, 8)` contre un mur, dans le `else` |
+| 0.84 | Des vies et une fin de partie | 3 vies, l’état du jeu (`etat` 0 / 1), PERDU, START pour recommencer |
+| 0.85 | Plusieurs ennemis : un tableau de struct | `Position ennemis[3]`, `ennemis[i].x`, départ au hasard, une boucle `for` |
+
+La série du déplacement (0.18 à 0.64) est **progressive** : chaque leçon reprend
+le code de la précédente et n’ajoute **qu’une chose** — une ligne, ou un réglage
+changé. Beaucoup de leçons, mais jamais deux nouveautés à la fois. Pour carre :
+un seul carré par leçon (taille 1 à 8, sens -1, vitesses 500 / 100 / 50, 2 et
+3 tours), tous autour de (10, 8) ; les leçons à plusieurs carrés viennent après.
+
+Chaque élément nouveau est **expliqué en détail**, dans les commentaires du code
+et dans le texte de la leçon — d’autant plus que le code se complique.
+
+## 3. Les chapitres 1 et 2, réorganisés
+
+Le chapitre 1 va **par paires** : une leçon affiche BONJOUR en (5, 6), la
+suivante l’efface. D’une paire à l’autre, une seule chose change.
+
+| N° | Afficher | N° | Effacer |
+|---|---|---|---|
+| 1 | en clair | 1.1 / 1.2 | avec des espaces / avec `effacer()` |
+| 1.3 | sous un nom (`const char MOT[]`) | 1.4 | par ce nom |
+| 1.5 | à une place rangée dans `x` et `y` | 1.6 | à la même place |
+| 1.7 | dans un `Mot` | 1.8 | par le `Mot` |
+| 1.9 | un `Mot` fait de variables | 1.10 | le même |
+| | | 1.11 | les variables dans `variables.h` |
+
+Le chapitre 2 fait les mêmes gestes **avec les boutons** : 2 (A efface), 2.1
+(A et B changent le message), 2.2 (A efface, B remet), 2.3 (les messages dans
+`variables.h`). La leçon 3 est devenue **« Un carré de 8 × 8 »**, dessiné pixel
+par pixel avec `Tuile`.
+
+## 4. Ce que le langage a gagné
+
+Tout est **natif** : on s’en sert sans rien déclarer, dans n’importe quel
+programme.
+
+| Ajout | Exemple | Ce qu’il fait |
+|---|---|---|
+| `ALPHABET` | `poser(0, 0, ALPHABET[0])` | les 26 lettres de la police ; `ALPHABET[i]` vaut `1 + i`, rien n’est recopié ; `sizeof(ALPHABET)` vaut 26 ; nom réservé |
+| `Mot` | `Mot SALUT = { 5, 6, "BONJOUR" };` | la place et le texte sous un seul nom : `texte(SALUT)`, `effacer(SALUT)` |
+| `textS` | `textS(18, 0, "BONJOUR")` | `texte()` qui passe à la ligne tout seul (axes X et Y) |
+| `poserS` | `poserS(i, 0, ALPHABET[i])` | `poser()` qui passe à la ligne tout seul |
+| `attendre` | `attendre(1)` | arrête **tout** le programme ce nombre de secondes |
+| `ms`, `secondes` | `if (images == ms(250))` | une durée traduite en images par le compilateur : gratuit |
+| `deplace_x`, `deplace_y` | `x = deplace_x(x, 0, ALPHABET[0], 5)` | fait bouger une case de `pas` cases (X) ou lignes (Y), +5 ou -5, et rend la position d’arrivée ; deux fonctions car une fonction ne rend qu’une valeur (`deplacer` a été renommée `deplace_x`). Seul sur sa ligne, avec une variable, `deplace_x(x, …);` est réécrit par le compilateur en `x = deplace_x(x, …);` : même cartouche, octet pour octet ; une fonction `deplace_x` écrite par l’élève suit la règle ordinaire du C |
+| `deplace`, `va_a`, `un_pas` | `deplace(x, y, ALPHABET[0], 5, 5);` | les deux axes à la fois ; rendent la colonne (`return`) et déposent la ligne dans `deplace_ligne_rendue` ; seules sur leur ligne, le compilateur les réécrit en `{ x = …; y = deplace_ligne_rendue; }`. `un_pas` ne bloque pas |
+| `carre`, `Carre` | `carre(10, 8, ALPHABET[0], 2, 1, 250, 3)` ; `Carre ronde = { … }; carre(ronde);` | un carré parfait autour de (x, y), de 2 × taille + 1 cases de côté ; sens 1 / -1 ; vitesse en ms écrite en clair (traduite comme `ms()`) ; revient au centre ; près du bord, le centre est poussé vers l’intérieur (taille 8 au plus). `Carre` est déplié à la compilation, comme `Mot` : rien en mémoire |
+| `losange`, `rectangle`, `spirale`, `aller_retour` | `losange(10, 8, ALPHABET[0], 2, 1, 250, 1)` | les autres formes, vitesse en ms écrite en clair (traduite comme `ms()`), retour à la place de départ, centre poussé vers l’intérieur près du bord ; `losange` accepte un `Carre` |
+| `vitesse` | `vitesse(100);` | devient `deplace_images = ms(100);` : le pas de deplace_x, deplace_y, deplace et va_a (15 images au départ). |
+| `deplace_croix`, `glisse_croix` | `deplace_croix(x, y, ALPHABET[0]);` | la croix en une ligne, dans la boucle, AVEC SA VITESSE (obligatoire) : case par case (vitesse en ms écrites en clair, traduite comme `ms()`, `croix_attente` tenue par la console, efface seulement si la lettre a bougé) ou au pixel près avec un lutin (vitesse en pixels par image, variable permise) ; ne bloquent pas ; seules sur leur ligne, rangent la place dans x et y |
+
+Aucune fonction existante n’a changé : `texte()` refuse toujours la colonne 20,
+`image()` et le comptage d’images restent la façon de faire plusieurs rythmes.
+Chaque faute a son message : `ALPHABET[26]`, `ALPHABET[0] = 3`, `ms(5000)`,
+`ms(5)`, `attendre(300)`, `Mot m = { 5, "X" }`…
+
+Les routines de `textS` (position calculée) et d’`attendre` ne sont ajoutées à
+la cartouche **que si** le programme s’en sert.
+
+## 5. Une leçon peut avoir plusieurs fichiers
+
+Une leçon porte `fichiers: { 'variables.h': '…' }`, que le programme inclut par
+`#include "variables.h"`. Le tutoriel montre des **onglets** au-dessus de
+l’éditeur, l’atelier les ouvre dans ses onglets de fichiers, le livret et
+`TUTORIELS.md` les impriment, et une faute y est signalée « variables.h,
+ligne 2 ». (`assemblerAvec` dans `compilateur/inclusion.js`.)
+
+## 6. Le dessin et le renommage
+
+- **Tout carré écrit dans le code se montre en dessin** : le tutoriel ouvre
+  l’atelier de dessin dès que le code d’une leçon contient une `Tuile` ou un
+  `Perso`.
+- **✎ sur chaque tuile** : renommer partout où le nom est écrit (déclaration,
+  `poser`, marques de palette et d’étiquettes, `NOM_PALETTES`), sans toucher aux
+  textes entre guillemets. **Un nom déjà pris est refusé**, avec la raison — la
+  boîte « Quel nom pour… » a un mode `prevenir` qui ne renumérote plus en
+  silence.
+- **F2 dans l’éditeur de code** : un nom déjà utilisé est signalé, et la boîte
+  reste ouverte.
+
+## 7. Rafraîchir ramène au même endroit
+
+Avant, un rafraîchissement renvoyait ailleurs : le mode Leçons rouvrait la
+leçon 1 (le réglage « La leçon d’ouverture »), le mode Cours la première, et
+le code de la leçon écrasait celui qu’on avait modifié. Maintenant, chaque page
+retient **la dernière chose ouverte** :
+
+| Page | Ce qui est retenu | Clé du navigateur |
+|---|---|---|
+| `index.html` | la leçon de chaque série (leçons, cours), par son **titre** | `gameboy3-lecon` |
+| `index.html` | le code modifié de la leçon, gardé au lieu d’être remplacé | `gameboy3-programme` (déjà là) |
+| `index.html` | l’onglet de l’atelier (tuiles, airs, couleurs, carte, modèles) | `gameboy3-atelier` |
+| `index.html` | la hauteur de la fenêtre et des deux volets | `gameboy3-defilement` |
+| `tuto.html`, `cours.html` | la leçon (titre et place) et la hauteur de lecture | `gameboy3-tuto`, `gameboy3-cours` |
+
+La leçon est retrouvée par son **titre**, pas par sa place : quand une leçon est
+insérée avant elle (le 0.19 `deplace_y`), l’ancienne adresse `#lecon-20`
+pointerait une autre leçon. Une adresse différente de celle que la page avait
+écrite garde le dernier mot. Le réglage « La leçon d’ouverture » s’appelle
+désormais `leconOuverture` : 0 (« la dernière lue ») par défaut, et 1, 2, 3…
+impose une leçon, avec son code d’origine. « ⟲ Remettre le code » revient au
+code de la leçon.
+
+### Les leçons intermédiaires : 0.N.1 et 0.N.2
+
+Chaque leçon de 0.1 à 0.74 a deux intermédiaires, juste après elle (148 en tout) :
+
+- **0.N.1 — de base, ailleurs** : la même chose, à une deuxième place (souvent
+  avec le B, `ALPHABET[1]`). Le texte dit pourquoi cette place : où la forme tient.
+- **0.N.2 — doublé, deux positions** : les deux ensemble dans le même programme.
+  Avec les fonctions qui bloquent (`carre`, `deplace_x`…), l’une après l’autre ;
+  dans une boucle (`un_pas`, la croix, les lutins), en même temps.
+
+Elles portent `suite: true` ; `numeros()` leur donne le numéro du parent suivi de
+« .1 », « .2 ». Les leçons principales **gardent leur numéro** : aucun renvoi n’a
+bougé. Pour les leçons qui avaient déjà plusieurs lettres (0.53, 0.54, 0.62 à
+0.64), le .1 ajoute une lettre à une place libre, et le .2 réunit tout.
+
+`deplace_croix` a changé pour le doublé : son attente ne s’écoule plus qu’**une
+fois par image** (`croix_image`, `croix_pret`, avec `images()`). Deux appels dans la
+même image — deux lettres — font donc chacun leur pas ; avant, la première
+relançait l’attente et la seconde ne bougeait jamais. Et l’attente compte les images
+**réellement écoulées** (`images()` − la dernière fois) : une boucle chargée qui dure
+deux images par tour garde la même vitesse de lettre.
+
+### Les versions « en simple » et les nouvelles fonctions
+
+- **0.65.3 à 0.70.3** : les leçons longues (la lettre qui avance, la croix, variables.h,
+  la position en direct, lire, le lutin), réécrites avec `defile`, `deplace_croix`,
+  `glisse_croix`.
+- **`tourne_carre`**, **`defile`** : sans bloquer, à appeler à chaque image ; la console
+  retient l’état de chaque lettre par son numéro (0 à 3), dans des tableaux
+  `tour_x[4]`, `file_x[4]`… Un côté négatif fait partir `tourne_carre` vers la gauche.
+- **`chaque(ms)`** : réécrit en `chaque_minuteur(k, ms(…))`, k étant son rang dans le
+  programme (huit au plus) ; il compte les images réellement passées.
+
+## 8. Ce qui reste à faire
+
+- ~~**`chaque(ms)`**~~ **fait** : le 0.77.
+- ~~**`nombre()` juste après `image()` ralentit la boucle de moitié**~~ **réglé** :
+  `AttendreVBlank` écrit tout de suite si le VBlank est déjà là (lignes 144 à 151),
+  et n’attend le suivant que sur les lignes 152 et 153. Trois leçons du cours de
+  programmation (la montre, `for`, le VBlank) disaient l’ancien comportement :
+  leur texte a suivi.
+- ~~**`verifier-page.mjs` attendait la leçon « 1. »**~~ **réglé** : ses contrôles
+  cherchent maintenant les deux premières leçons dans la liste, au lieu de les
+  écrire en dur. `verifier-tutoriels.mjs` compte les numéros à trois niveaux
+  (0.35.1).
+- **Les autres chapitres en millisecondes** (0.12, 0.13, et des leçons de 0.17 à
+  0.85 parlent encore d’images).
+- **Le ✎ pour les airs et les cartes**, comme pour les tuiles.
+- **Le contrôle « la console tourne »** de `verifier-page.mjs` peut échouer :
+  il relève le compteur d’images par seconde au bout de 1,2 s.
+- **`#include` refuse un commentaire sur sa ligne** (« # n’est compris que dans
+  #include, seul sur sa ligne ») : on pourrait l’accepter.
+- **La suite du jeu**, proposée : un écran titre (`enum`), des niveaux, un temps
+  limité, tirer, le record, des portes et des clés, le jeu complet en fichiers.
+
+### Le bilan de la séance
+
+Toutes les vérifications ont tourné (`verifier-tuto`, `verifier-cours`,
+`verifier-page`, `verifier-tuto-page` et les autres) ; `TUTORIELS.md`, les
+livrets et les captures sont régénérés ; tout est envoyé sur GitHub.
+`verifier-portage.mjs` échoue seul : il cherche `../gameboy2/exemples/ecrans.gb`,
+un dossier voisin qui n’est pas sur ce disque.
+
+## Les fichiers ajoutés ou mis à jour
+
+| Fichier | Rôle |
+|---|---|
+| `compilateur/emetteur.js` | `Mot`, `ALPHABET`, `textS`, `poserS`, `attendre`, `ms`, `secondes` ; le message des noms réservés |
+| `compilateur/analyseur.js` | le type `Mot` |
+| `compilateur/inclusion.js` | `assemblerAvec` : un programme et ses fichiers voisins donnés d’avance |
+| `tuto/lecons.js` | le chapitre 0, les chapitres 1 et 2 réorganisés, `numeros`, `principales` |
+| `tuto/tutoriels.js` | la leçon 3, « Un carré de 8 × 8 » |
+| `tuto/console.mjs`, `tuto/etapes.mjs` | les fichiers voisins d’une leçon |
+| `tuto.html` | les numéros 1.1, les onglets de fichiers, le dessin automatique, le ✎ |
+| `index.html` | les numéros, les fichiers d’une leçon, le mode `prevenir` |
+| `editeur-tuiles.js` | ✎ renommer, `renommerPartout`, `nomsDuProgramme` |
+| `editeur-code.js` | F2 prévient d’un nom déjà pris ; `Mot` en couleur |
+| `aide-fonctions.js` | les nouvelles fonctions dans l’aide |
+| `outils/livret.mjs`, `outils/tutoriels.mjs`, `outils/lancer-tutoriels.mjs` | les numéros et les fichiers voisins |
+| `verification/verifier-*.mjs` | adaptés à la nouvelle numérotation |
+| `LISEZMOI.md` | les nouvelles fonctions ; `documents/TUTORIELS.md` régénéré |

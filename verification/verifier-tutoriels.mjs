@@ -39,11 +39,13 @@ b.verifier('il est à jour avec les leçons', avant === apres,
   avant === apres ? '' : ' — relancer « node outils/tutoriels.mjs » et committer le résultat')
 
 b.egal('il porte toutes les leçons',
-  (apres.match(/^### \d+\. /gm) ?? []).length, LECONS.length)
+  (apres.match(/^### \d+(\.\d+)*\. /gm) ?? []).length, LECONS.length)   // 1, 1.1, 0.35, 0.35.1…
 
+/* Un bloc par programme, plus un par fichier voisin. */
+const BLOCS = LECONS.reduce((n, l) => n + 1 + Object.keys(l.fichiers ?? {}).length, 0)
 b.verifier('chaque leçon porte son programme',
-  (apres.match(/^```cpp$/gm) ?? []).length === LECONS.length,
-  ` (${(apres.match(/^```cpp$/gm) ?? []).length} blocs pour ${LECONS.length} leçons)`)
+  (apres.match(/^```cpp$/gm) ?? []).length === BLOCS,
+  ` (${(apres.match(/^```cpp$/gm) ?? []).length} blocs pour ${BLOCS} fichiers de leçons)`)
 
 /* Le marqueur exact, et non la tournure : une leçon peut parfaitement PARLER
    d'octets de programme dans son explication — celle qui enseigne à lire le
