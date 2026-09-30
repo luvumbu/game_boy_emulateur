@@ -13,7 +13,7 @@
  */
 
 import { writeFileSync } from 'node:fs'
-import { LECONS, NIVEAUX, numeros } from '../tuto/lecons.js'
+import { LECONS, NIVEAUX, numeros, partieDe } from '../tuto/lecons.js'
 
 const NUMEROS = numeros(LECONS)
 import { consoleDuProgramme } from '../tuto/console.mjs'
@@ -76,7 +76,34 @@ for (const [numero, nom] of Object.entries(NIVEAUX)) {
   const dernier = NUMEROS[LECONS.indexOf(dedans[dedans.length - 1])]
   dire(`| ${numero} | ${nom} | ${premier} – ${dernier} |`)
 }
-dire('', '---', '')
+dire('')
+
+/* --- les parties d'un niveau (le 0 en a dix), chacune avec ses numéros --- */
+
+// La place de chaque leçon qui OUVRE une partie (celles qui portent
+// « partie: '…' »). flatMap garde [i] pour elles, et [] (rien) pour les autres :
+// on obtient la liste de leurs places, par exemple [0, 51, 69, …].
+const ouvertures = LECONS.flatMap((l, i) => (l.partie ? [i] : []))
+
+// Un tableau seulement s'il y a des parties : sans elles, rien à écrire.
+if (ouvertures.length) {
+  dire('| Partie | Niveau | Leçons |', '|---|---|---|')   // l'en-tête du tableau markdown
+  for (const i of ouvertures) {
+    const { lettre, nom } = partieDe(LECONS, i)   // par exemple B et « Le temps »
+
+    // La DERNIÈRE leçon de la partie : on avance d'une leçon à la fois tant
+    // que la suivante est du même niveau et n'ouvre pas une autre partie.
+    // Pour « Le temps » : du 0.12, on avance jusqu'au 0.17.2 (le 0.18 ouvre
+    // « Déplacer une lettre »). Le ?. évite l'erreur au bout de la liste.
+    let fin = i
+    while (LECONS[fin + 1]?.difficulte === LECONS[i].difficulte && !LECONS[fin + 1].partie) fin++
+
+    // Une ligne : « | B. Le temps | 0 | 0.12 – 0.17.2 | ».
+    dire(`| ${lettre}. ${nom} | ${LECONS[i].difficulte} | ${NUMEROS[i]} – ${NUMEROS[fin]} |`)
+  }
+  dire('')   // une ligne vide : le markdown termine le tableau
+}
+dire('---', '')
 
 /* --- les leçons --- */
 
@@ -86,6 +113,12 @@ LECONS.forEach((lecon, i) => {
   if (lecon.difficulte !== niveauCourant) {
     niveauCourant = lecon.difficulte
     dire(`## Niveau ${niveauCourant} — ${NIVEAUX[niveauCourant]}`, '')
+  }
+  // Sur la leçon qui ouvre une partie, un titre avant elle :
+  // « ### Partie B — Le temps ». Les autres leçons n'ont pas « partie ».
+  if (lecon.partie) {
+    const { lettre, nom } = partieDe(LECONS, i)
+    dire(`### Partie ${lettre} — ${nom}`, '')
   }
 
   dire(`### ${NUMEROS[i]}. ${lecon.titre}`, '')

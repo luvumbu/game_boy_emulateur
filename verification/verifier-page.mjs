@@ -679,8 +679,16 @@ try {
     (await evaluer(`document.body.dataset.mode`)) === 'lecons' && await vu('zone-lecons'))
 
   const combien = await evaluer(`document.querySelectorAll('#lecon-choix option').length`)
+  /* Un groupe par niveau, et un par partie dans un niveau qui en a (le 0).
+     Le calcul des groupes attendus :
+       les niveaux différents (11 : de 0 à 10)
+     + les parties (10, toutes dans le niveau 0)
+     - les niveaux qui ont des parties (1 : le 0), car pour eux les groupes des
+       parties REMPLACENT le groupe du niveau au lieu de s'y ajouter.
+     11 + 10 - 1 = 20 groupes. */
   const niveaux = await evaluer(`document.querySelectorAll('#lecon-choix optgroup').length`)
   const attendus = new Set(LECONS.map((l) => l.difficulte)).size
+    + LECONS.filter((l) => l.partie).length - new Set(LECONS.filter((l) => l.partie).map((l) => l.difficulte)).size
   controle('toutes les leçons y sont, rangées par niveau',
     combien === LECONS.length && niveaux === attendus,
     ` (${combien} leçons, ${niveaux} niveaux)`)

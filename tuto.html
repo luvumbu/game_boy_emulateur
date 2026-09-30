@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>gameboy3 — apprendre à écrire une cartouche en C++</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<!-- En PREMIER, et sans « type=module » : si un fichier du programme manque,
+     ce petit script le dit dans un bandeau, au lieu d'une page figée. -->
+<script src="garde.js"></script>
 
 <style>
   :root {
@@ -60,7 +64,7 @@
 
   .sommaire { background: var(--panneau); padding: 16px 12px; }
   .sommaire h2 { margin: 0 0 10px 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: var(--gris); }
-  .sommaire ol { list-style: none; margin: 0; padding: 0; counter-reset: lecon; }
+  .sommaire ol { list-style: none; margin: 0; padding: 0; }
 
   .sommaire button {
     display: block; width: 100%; text-align: left; border: 0; background: none;
@@ -68,7 +72,10 @@
   }
 
   .sommaire button::before {
-    counter-increment: lecon; content: counter(lecon);
+    /* Le numéro est ÉCRIT sur chaque bouton (data-rang), et non compté par
+       la feuille de style : une recherche cache des leçons, et un compteur
+       les renumérotait alors 1, 2, 3… — la 300e aurait affiché « 1 ». */
+    content: attr(data-rang);
     position: absolute; left: 8px; top: 7px;
     width: 18px; height: 18px; border-radius: 50%;
     background: var(--panneau-clair); color: var(--gris);
@@ -83,6 +90,21 @@
 
   .sommaire li.partie:first-child { padding-top: 2px; }
 
+  /* La partie d'un niveau : sous le titre du niveau, plus discrète.
+     - padding : un peu d'air au-dessus, et 16px à gauche pour la décaler
+       sous le titre du niveau (qui n'en a que 10) ;
+     - text-transform: none et letter-spacing: 0 : en minuscules et sans
+       espacement, au contraire du titre du niveau, écrit EN CAPITALES ;
+     - font-weight: 600 : un peu gras, pour qu'on la distingue des leçons. */
+  .sommaire li.sous-partie {
+    padding: 10px 10px 4px 16px; text-transform: none; letter-spacing: 0;
+    font-size: 11px; font-weight: 600; opacity: .9;
+  }
+
+  /* Une ligne du sommaire porte la classe « lecon », comme la grande zone de
+     la leçon (.lecon, plus bas) : sans cette règle, chaque ligne héritait de
+     ses marges de 22 et 40 px, et le sommaire avait de grands trous. */
+  .sommaire li.lecon { display: block; padding: 0; gap: 0; background: none; }
   .sommaire button:hover { background: var(--panneau-clair); }
   .sommaire li.active button { background: #2c3140; color: var(--texte); }
   .sommaire li.active button::before { background: var(--vert); color: #12251c; font-weight: 700; }
@@ -138,6 +160,11 @@
   .console { display: flex; flex-direction: column; gap: 10px; }
   .ecran { background: #0b0d10; border: 1px solid var(--bord); border-radius: 8px; padding: 10px; }
   .ecran canvas { display: block; width: 100%; image-rendering: pixelated; border-radius: 4px; }
+  /* En plein écran, la console seule, centrée sur du noir. Le canevas prend
+     la taille que lui donne ajusterLePleinEcran : un nombre ENTIER de fois
+     160 × 144, pour que chaque pixel de la console garde la même taille. */
+  .ecran:fullscreen { display: grid; place-items: center; padding: 0; border: none; border-radius: 0; background: #000; }
+  .ecran:fullscreen canvas { width: auto; border-radius: 0; }
 
   .etat {
     font-size: 12px; line-height: 1.6; padding: 10px 12px; border-radius: 6px;
@@ -322,6 +349,7 @@
           <div class="rangee" style="margin-bottom: 8px;">
             <button type="button" class="principal" id="lancer">▶ Compiler et lancer</button>
             <button type="button" id="son">🔊 Son</button>
+            <button type="button" id="plein-ecran" title="la console seule à l’écran — F ou « Échap » pour revenir">⛶ Plein écran</button>
             <button type="button" id="remettre">⟲ Remettre le code de la leçon</button>
             <span class="aide">Le code est modifiable : c’est fait pour.</span>
           </div>
@@ -335,7 +363,7 @@
           <div class="etat" id="etat"></div>
           <p class="aide">
             <kbd>↑↓←→</kbd> croix · <kbd>X</kbd> A · <kbd>Z</kbd> B ·
-            <kbd>Entrée</kbd> Start · <kbd>Maj</kbd> Select<br>
+            <kbd>Entrée</kbd> Start · <kbd>Maj</kbd> Select · <kbd>F</kbd> plein écran<br>
             Clique la console avant de jouer.
           </p>
         </div>
@@ -354,7 +382,8 @@ import { analyser } from './compilateur/analyseur.js'
 import { compiler } from './compilateur/emetteur.js'
 import { fabriquer } from './compilateur/cartouche.js'
 import { GameBoy } from './emulateur.js'
-import { LECONS, NIVEAUX, numeros, principales } from './tuto/lecons.js'
+import { LECONS, NIVEAUX, numeros, partieDe, principales } from './tuto/lecons.js'
+import { sommaireCherchable } from './recherche.js'
 const NUMEROS = numeros(LECONS)
 import { installer as installerPlan } from './tuto/plan.js'
 import { installer as installerAirs } from './editeur-airs.js'
@@ -380,6 +409,20 @@ let atelierDessin = null
 
 /* --------------------------------------------------------------- le sommaire */
 
+/*
+ * La recherche du sommaire (recherche.js) : un champ sous « Les leçons », qui
+ * cache les leçons qui ne correspondent pas. Elle cherche dans le numéro, le
+ * titre, l'idée, le niveau et la partie, et les fonctions que le programme utilise.
+ */
+const recherche = sommaireCherchable({
+  titre: document.querySelector('.sommaire h2'),
+  liste: $('sommaire'),
+  lecons: LECONS,
+  numeros: NUMEROS,
+  extra: (lecon, i) => [NIVEAUX[lecon.difficulte], partieDe(LECONS, i)?.nom],
+  aller: (i) => aller(i),
+})
+
 const vues = new Set()
 
 function dessinerSommaire() {
@@ -397,19 +440,41 @@ function dessinerSommaire() {
       liste.append(entete)
     }
 
+    /* Dans un niveau coupé en parties (le 0 en a dix), le titre de la
+       partie paraît sur la leçon qui l'ouvre, un cran sous celui du niveau. */
+    // « lecon.partie » n'existe que sur la leçon qui OUVRE une partie (le 0.0,
+    // le 0.12, le 0.18…). Sur les autres, il vaut undefined : le && s'arrête
+    // là, partie vaut undefined, et aucun titre n'est ajouté.
+    const partie = lecon.partie && partieDe(LECONS, i)
+    if (partie) {
+      const entete = document.createElement('li')   // une ligne du sommaire…
+      // …qui ne se clique pas : « partie » lui donne le style des titres de
+      // niveau, « sous-partie » la décale et l'allège (voir la feuille de style).
+      entete.className = 'partie sous-partie'
+      entete.textContent = `${partie.lettre}. ${partie.nom}`   // par exemple « B. Le temps »
+      liste.append(entete)   // posé juste avant la leçon qui ouvre la partie
+    }
+
     const li = document.createElement('li')
     li.className = 'lecon'
     if (i === courante) li.className += ' active'
     else if (vues.has(i)) li.className += ' vue'
 
+    li.dataset.index = i   // pour la recherche : quelle leçon est sur cette ligne
+
     const bouton = document.createElement('button')
     bouton.type = 'button'
+    bouton.dataset.rang = i + 1   // le numéro de la pastille (voir la feuille de style)
     bouton.textContent = lecon.titre
     bouton.addEventListener('click', () => aller(i))
 
     li.append(bouton)
     liste.append(li)
   })
+
+  /* La liste vient d'être refaite (à chaque leçon ouverte) : on lui réapplique
+     la recherche en cours, sinon toutes les leçons réapparaîtraient. */
+  recherche.rafraichir()
 }
 
 /* ----------------------------------------------------------------- une leçon */
@@ -454,6 +519,10 @@ function aller(index, { defiler = true } = {}) {
   }
 
   repere(`Niveau ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`, 'niveau')
+  // La partie, juste après le niveau : « Partie D — Des formes ». Seul le
+  // chapitre 0 en a ; ailleurs partieDe rend null, et rien n'est ajouté.
+  const partie = partieDe(LECONS, index)
+  if (partie) repere(`Partie ${partie.lettre} — ${partie.nom}`, 'niveau')
   repere(`leçon ${NUMEROS[index]} sur ${principales(LECONS)}`, '')
   repere(`difficulté ${lecon.difficulte} / 10`, 'difficulte')
   reperes.querySelector('.difficulte').style.setProperty('--part', `${lecon.difficulte * 10}%`)
@@ -678,7 +747,19 @@ function ouvrirLeSon() {
     if (audio.state === 'suspended') audio.resume()
     return
   }
-  audio = new AudioContext()
+  /* Pas de son possible — un navigateur sans « Web Audio », ou qui refuse
+     d'en ouvrir un (trop de contextes, réglage de confidentialité) : la
+     console tourne quand même, muette. Avant, « new AudioContext() » levait
+     une erreur, et c'est TOUTE la page qui restait figée au démarrage.
+     webkitAudioContext : l'ancien nom, chez les vieux Safari. */
+  const Contexte = window.AudioContext ?? window.webkitAudioContext
+  if (!Contexte) return          // pas de son du tout : on s'arrête là, sans erreur
+  try {
+    audio = new Contexte()
+  } catch {
+    audio = null                 // refusé : on reste muet, audio vaut null
+    return                       // (verserLeSon et les autres vérifient « if (!audio) »)
+  }
   volume = audio.createGain()
   volume.gain.value = sonVoulu ? 0.25 : 0
   volume.connect(audio.destination)
@@ -823,7 +904,67 @@ aller(depart, { defiler: false })
 if (depart === retenue && memoire.hauteur > 0) {
   requestAnimationFrame(() => scrollTo({ top: memoire.hauteur, behavior: 'instant' }))
 }
+
+/*
+ * Le plein écran : la console seule, comme sur la page principale.
+ *
+ * C'est le CADRE (.ecran) qui passe en plein écran, pas le canevas : le
+ * canevas seul serait étiré jusqu'aux bords, et les pixels deviendraient
+ * inégaux. On l'agrandit donc d'un nombre ENTIER de fois (×4, ×5…), le plus
+ * grand qui tient, avec des bandes noires autour.
+ *
+ * Le bouton « ⛶ Plein écran », ou la touche F, entrent et sortent ; Échap
+ * sort aussi. F est ignorée quand on écrit dans le code.
+ */
+const cadreDeLEcran = document.querySelector('.ecran')
+
+function ajusterLePleinEcran() {
+  const canevas = $('ecran')
+  if (document.fullscreenElement !== cadreDeLEcran) {   // hors plein écran : la taille de la feuille de style
+    canevas.style.width = ''
+    canevas.style.height = ''
+    return
+  }
+  const facteur = Math.max(1, Math.floor(Math.min(innerWidth / 160, innerHeight / 144)))
+  canevas.style.width = 160 * facteur + 'px'
+  canevas.style.height = 144 * facteur + 'px'
+}
+
+async function basculerLePleinEcran() {
+  if (document.fullscreenElement) { document.exitFullscreen(); return }
+  try {
+    await cadreDeLEcran.requestFullscreen()
+  } catch {
+    /* Un navigateur peut refuser : on le dit, plutôt qu'un bouton qui semble mort. */
+    $('etat').textContent = 'Le navigateur a refusé le plein écran.'
+  }
+}
+
+$('plein-ecran').addEventListener('click', basculerLePleinEcran)
+
+/* Le bouton dit où l'on est, même quand on est sorti par Échap. */
+document.addEventListener('fullscreenchange', () => {
+  ajusterLePleinEcran()
+  $('plein-ecran').textContent =
+    document.fullscreenElement === cadreDeLEcran ? '⛶ Quitter le plein écran' : '⛶ Plein écran'
+})
+addEventListener('resize', ajusterLePleinEcran)
+
+/* La touche F, sauf quand on écrit (dans le code, ou tout autre champ). */
+addEventListener('keydown', (e) => {
+  if (e.code !== 'KeyF' || e.ctrlKey || e.altKey || e.metaKey) return
+  const ici = document.activeElement
+  if (ici && (ici.tagName === 'TEXTAREA' || ici.tagName === 'INPUT' || ici.isContentEditable)) return
+  e.preventDefault()
+  basculerLePleinEcran()
+})
+
 tick()
+
+/* Tout s'est chargé, et le programme de la page est allé jusqu'au bout :
+   on le dit à garde.js, qui n'affichera donc aucun bandeau d'erreur.
+   « ?. » : si garde.js manque, on ne plante pas pour autant. */
+window.atelierPret?.()
 </script>
 </body>
 </html>

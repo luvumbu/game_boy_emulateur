@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>gameboy3 — écrire une cartouche en C++</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<!-- En PREMIER, et sans « type=module » : si un fichier du programme manque,
+     ce petit script le dit dans un bandeau, au lieu d'une page figée. -->
+<script src="garde.js"></script>
 
 <style>
   :root {
@@ -963,9 +967,11 @@
     display: flex; flex-direction: column; gap: 8px;
   }
   .didacticiel-menu h3 { margin: 0 0 4px; font-size: 15px; }
-  .didacticiel-menu > button:not(.petit) {
+  .didacticiel-menu > button:not(.petit),
+  .modeles-jeux-liste > button {   /* les jeux sont rangés dans leur boîte, pour la recherche */
     display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; padding: 10px 12px;
   }
+  .modeles-jeux-liste { display: flex; flex-direction: column; gap: 8px; }
   .didacticiel-menu small { color: var(--gris); font-size: 12px; font-weight: 400; }
   .didacticiel-menu .petit { align-self: flex-end; }
 
@@ -1369,6 +1375,7 @@
     <button type="button" id="projets-ouvrir" title="ouvrir un projet du disque">📂 Ouvrir</button>
     <button type="button" id="nouveau" title="repartir d’un programme vide, sous un nouveau nom">✦ Nouveau</button>
     <button type="button" id="modeles-jeux" title="un jeu complet tout prêt — aventure, chasse aux pièces, labyrinthe — à jouer puis à changer">🧩 Modèles</button>
+    <button type="button" id="tout-chercher" title="tout chercher : leçons, cours, exemples, projets, fonctions, réglages, modèles — Ctrl+K">🔎</button>
     <button type="button" id="reglages" title="les réglages de la page">⚙</button>
     <button type="button" id="didacticiel" title="apprendre à se servir de tout l’atelier, pas à pas">🎓 Didacticiel</button>
     <button type="button" class="principal" id="lancer">▶ Compiler et lancer</button>
@@ -1672,12 +1679,12 @@
       </div>
       <div class="rangee">
         <button type="button" id="pause">⏸ Pause</button>
-        <button type="button" id="reset">⟲ Reset</button>
+        <button type="button" id="reset" title="en mode leçons : remet le code d’origine de la leçon et la relance ; ailleurs : relance la cartouche">⟲ Reset</button>
         <button type="button" id="stop" title="arrêter, et revenir au tout début de la cartouche — rien ne tourne jusqu’à « Reprendre »">⏹ Stop</button>
         <button type="button" id="sauver-etat" disabled title="retenir l’état EXACT de la console — processeur, mémoires, écran, son — pour y revenir plus tard">💾 Sauver l’état</button>
         <button type="button" id="reprendre-etat" disabled title="revenir à l’état retenu, au cycle près">⏏ Reprendre l’état</button>
         <button type="button" id="son">🔊 Son</button>
-        <button type="button" id="plein-ecran" title="la console seule à l’écran — « Échap » pour revenir">⛶ Plein écran</button>
+        <button type="button" id="plein-ecran" title="la console seule à l’écran — F ou « Échap » pour revenir">⛶ Plein écran</button>
         <button type="button" id="telecharger" disabled title="la cartouche, à mettre sur une vraie console">⬇ .gb</button>
         <!-- Le second fichier n’apparaît que lorsqu’il existe : « les deux » sur un
              programme en couleur fabrique un « .gbc » et un « .gb ». -->
@@ -1739,7 +1746,7 @@ import { tuilesDeLaMemoire, fichierDeLaCartouche } from './convertir.js'
 import { retourAuCpp } from './retour-cpp.js'
 import { installer as installerProjets } from './projets.js'
 import { BOUTONS, OPTIONS_LUTIN, NOTES } from './compilateur/emetteur.js'
-import { LECONS, NIVEAUX, numeros, principales } from './tuto/lecons.js'
+import { LECONS, NIVEAUX, numeros, partieDe, principales } from './tuto/lecons.js'
 import { COURS, CHAPITRES } from './tuto/programmation.js'
 import { enrichir } from './tuto/enrichir.js'
 import { construirePageAutonome } from './exporter-html.js'
@@ -1748,6 +1755,9 @@ import { MODELES as MODELES_DE_JEUX } from './modeles-jeux.js'
 import { analyser as analyserLaCartouche, montrer as montrerLAnalyse } from './analyse-rom.js'
 import { capturer as capturerLEtat, restaurer as restaurerLEtat } from './etat-console.js'
 import { installer as installerLInspecteur } from './inspecteur.js'
+import { champDeRecherche, correspond, fiche, filtrerUnMenu, filtrerUneGrille, motsDe, motsDuCode, normaliser } from './recherche.js'
+import { installer as installerToutChercher } from './recherche-globale.js'
+import { FONCTIONS } from './aide-fonctions.js'
 
 /*
  * Les exemples ne sont PAS recopiés ici : la page va chercher les mêmes
@@ -2855,7 +2865,19 @@ function ouvrirLeSon() {
     if (audio.state === 'suspended') audio.resume()
     return
   }
-  audio = new AudioContext()
+  /* Pas de son possible — un navigateur sans « Web Audio », ou qui refuse
+     d'en ouvrir un (trop de contextes, réglage de confidentialité) : la
+     console tourne quand même, muette. Avant, « new AudioContext() » levait
+     une erreur, et c'est TOUTE la page qui restait figée au démarrage.
+     webkitAudioContext : l'ancien nom, chez les vieux Safari. */
+  const Contexte = window.AudioContext ?? window.webkitAudioContext
+  if (!Contexte) return          // pas de son du tout : on s'arrête là, sans erreur
+  try {
+    audio = new Contexte()
+  } catch {
+    audio = null                 // refusé : on reste muet, audio vaut null
+    return                       // (verserLeSon et les autres vérifient « if (!audio) »)
+  }
   volume = audio.createGain()
   volume.gain.value = sonVoulu ? 0.25 : 0
   volume.connect(audio.destination)
@@ -3218,6 +3240,16 @@ $('pause').addEventListener('click', () => {
 document.addEventListener('visibilitychange', appliquerLeVolume)
 
 $('reset').addEventListener('click', () => {
+  /* En mode leçons (ou cours), Reset rend le code D'ORIGINE de la leçon, puis
+     le relance : si l'on a modifié le programme, ou tout effacé, on repart de
+     ce que la leçon donnait. Redémarrer seulement la cartouche relancerait le
+     code abîmé. Ailleurs (la création), il n'y a pas de leçon : Reset relance
+     la cartouche, comme avant. */
+  if (document.body.dataset.mode === 'lecons') {
+    allerALaLecon(leconCourante, { defiler: false })   // le code de la leçon, compilé et lancé
+    ouvrirLeSon()
+    return
+  }
   if (romActuelle) { gb.loadRom(romActuelle); tourne = true; montrerLaPause(); ouvrirLeSon() }
 })
 
@@ -3327,6 +3359,18 @@ document.addEventListener('fullscreenchange', () => {
 })
 
 addEventListener('resize', ajusterLePleinEcran)
+
+/* La touche F : plein écran, ou le quitter — comme le bouton. Ignorée quand on
+   écrit (le code, un champ), et quand F est la touche d'un bouton de la
+   console dans les réglages : le jeu passe avant. */
+addEventListener('keydown', (e) => {
+  if (e.code !== 'KeyF' || e.ctrlKey || e.altKey || e.metaKey) return
+  const ici = document.activeElement
+  if (ici && (ici.tagName === 'TEXTAREA' || ici.tagName === 'INPUT' || ici.tagName === 'SELECT' || ici.isContentEditable)) return
+  if (BOUTONS_DE_LA_CONSOLE.some((b) => REGLAGES['touche_' + b] === 'KeyF')) return
+  e.preventDefault()
+  $('plein-ecran').click()
+})
 
 /** Le titre de la cartouche, taillé pour servir de nom de fichier. */
 const nomDeFichier = () => (titreDeLaCartouche().toLowerCase().trim().replace(/[^a-z0-9]+/g, '-') || 'mon-jeu')
@@ -4115,6 +4159,19 @@ function ouvrirLesModeles() {
   const titre = document.createElement('h3')
   titre.textContent = '🧩 Les modèles de jeux — un jeu complet, à jouer puis à changer'
   menu.append(titre)
+
+  /* Les boutons des modèles, dans leur propre boîte : la recherche ne filtre
+     qu'eux (et pas le bouton « Fermer » ni le texte d'aide, plus bas). */
+  const liste = document.createElement('div')
+  liste.className = 'modeles-jeux-liste'
+  const recherche = champDeRecherche({
+    texte: '🔎 chercher un jeu : aventure, pièces, labyrinthe…',
+    unite: ['jeu', 'jeux'],
+    filtrer: (mots) => filtrerUneGrille(liste, mots).visibles,   // dans le nom et la description de chaque jeu
+    ouvrir: () => [...liste.children].find((b) => !b.classList.contains('recherche-cache'))?.click(),
+  })
+  menu.append(recherche.element, liste)
+
   for (const modele of MODELES_DE_JEUX) {
     const b = document.createElement('button')
     b.type = 'button'
@@ -4134,7 +4191,7 @@ function ouvrirLesModeles() {
       compterLAtelier()
       compilerEtLancer()
     })
-    menu.append(b)
+    liste.append(b)   // dans la boîte des modèles (voir plus haut)
   }
   const dit = document.createElement('p')
   dit.className = 'aide'
@@ -4146,6 +4203,7 @@ function ouvrirLesModeles() {
   fermer.addEventListener('click', () => menu.remove())
   menu.append(dit, fermer)
   document.body.append(menu)
+  recherche.champ.focus()   // on peut taper tout de suite
 }
 $('modeles-jeux').addEventListener('click', ouvrirLesModeles)
 
@@ -5157,6 +5215,11 @@ $('retour-cpp').addEventListener('click', () => {
  * ouvert et le chemin de son dossier, en permanence sous les yeux, avec un
  * point dès que l'écran n'est plus ce que le disque contient.
  */
+/* La recherche des projets est créée plus bas (« Chercher ») ; elle est
+   déclarée ICI, vide, parce que le lecteur des projets la nomme déjà. Lire
+   une variable « let » avant sa ligne fait planter la page, même avec « ?. ». */
+let rechercheProjets = null
+
 const projets = installerProjets({
   bandeau: $('bandeau-projet'),
   nomCourant: $('projet-nom'),
@@ -5165,6 +5228,7 @@ const projets = installerProjets({
   voile: $('voile-projets'),
   grille: $('projets-grille'),
   cheminDuDossier: $('projets-dossier'),
+  apresLaListe: () => rechercheProjets?.rafraichir(),   // voir « Chercher un projet », plus bas
 
   /* Ce que la page a à écrire : tous les onglets, le titre gravé, la console. */
   lireProjet: () => {
@@ -5320,6 +5384,10 @@ let leconCourante = 0
  * Même forme, mêmes contrôles : seuls leur liste et le nom de leurs groupes
  * diffèrent. Dans le cours, « difficulte » porte le numéro du chapitre.
  */
+/* La recherche des leçons (plus bas, « Chercher ») : déclarée ici, vide,
+   parce que remplirLeChoix() la nomme et qu'elle est appelée avant. */
+let rechercheLecons = null
+
 const SERIES = {
   lecons: { liste: LECONS, groupes: NIVEAUX, groupe: 'Niveau', page: 'tuto.html', lien: 'le tutoriel en grand ↗' },
   cours: { liste: COURS, groupes: CHAPITRES, groupe: 'Chapitre', page: 'cours.html', lien: 'le cours en grand ↗' },
@@ -5369,10 +5437,27 @@ function remplirLeChoix() {
   choix.textContent = ''
   let groupe = null
   lecons.forEach((lecon, i) => {
-    if (!groupe || Number(groupe.dataset.niveau) !== lecon.difficulte) {
+    /* Un groupe par niveau — et, dans un niveau coupé en parties (le 0),
+       un groupe par partie : un menu ne s'emboîte pas sur deux étages. */
+    // La partie de cette leçon : { lettre: 'B', nom: 'Le temps' }, ou null
+    // dans un niveau sans parties (1 à 10) et dans le cours.
+    const partie = partieDe(lecons, i)
+
+    // La « clé » du groupe : le niveau, puis la lettre de la partie.
+    // Exemples : « 0 A », « 0 B »… pour le chapitre 0 ; « 3 » tout court
+    // pour le niveau 3 (la lettre manque : ?? '' la remplace par du vide).
+    const cle = `${lecon.difficulte} ${partie?.lettre ?? ''}`
+
+    // Un nouveau groupe quand il n'y en a pas encore (la première leçon), ou
+    // quand la clé change : on vient d'entrer dans un autre niveau ou une
+    // autre partie. Sinon, la leçon va dans le groupe déjà ouvert.
+    if (!groupe || groupe.dataset.cle !== cle) {
       groupe = document.createElement('optgroup')
-      groupe.dataset.niveau = lecon.difficulte
+      groupe.dataset.cle = cle   // gardée sur le groupe, pour comparer à la leçon suivante
+      // Le titre du groupe dans le menu, par exemple :
+      // « Niveau 0 — Avant tout · B. Le temps », ou « Niveau 3 — Dessiner ».
       groupe.label = `${nomDuGroupe} ${lecon.difficulte} — ${groupes[lecon.difficulte]}`
+        + (partie ? ` · ${partie.lettre}. ${partie.nom}` : '')
       choix.append(groupe)
     }
     const option = document.createElement('option')
@@ -5382,6 +5467,7 @@ function remplirLeChoix() {
   })
   $('lecon-lien').href = SERIES[serie].page
   $('lecon-lien').textContent = SERIES[serie].lien
+  rechercheLecons?.rafraichir()   // le menu est tout neuf : on lui réapplique la recherche
 }
 
 /* Changer de série garde la place de chacune : revenir aux leçons rouvre
@@ -5395,6 +5481,195 @@ function choisirLaSerie(laquelle) {
 }
 
 remplirLeChoix()
+
+/* ------------------------------------------------------------- chercher */
+
+/*
+ * Les recherches de l'atelier (voir recherche.js) : les leçons, les exemples,
+ * les modèles de dessins, les projets, les modèles de jeux. Toutes marchent
+ * pareil — sans accents ni majuscules, plusieurs mots, « / » pour y aller,
+ * Entrée pour ouvrir le premier, Échap pour effacer.
+ */
+
+/* 1. Les leçons (et le cours) : dans le numéro, le titre, l'idée, le niveau,
+      la partie, et les fonctions que le programme utilise. Les fiches d'une
+      série sont faites une fois, la première fois qu'on cherche dedans. */
+const fichesDesSeries = {}
+function fichesDe(laSerie) {
+  if (fichesDesSeries[laSerie]) return fichesDesSeries[laSerie]
+  const { liste: lecons, groupes } = SERIES[laSerie]
+  const nums = numeros(lecons)
+  fichesDesSeries[laSerie] = {
+    numeros: nums,
+    fiches: lecons.map((l, i) => fiche(
+      nums[i], l.titre, l.idee, groupes[l.difficulte],
+      laSerie === 'lecons' ? partieDe(lecons, i)?.nom : null,   // seul le tutoriel a des parties
+      motsDuCode(l.code), Object.values(l.fichiers ?? {}).map((t) => motsDuCode(t)),
+    )),
+  }
+  return fichesDesSeries[laSerie]
+}
+rechercheLecons = champDeRecherche({
+  texte: '🔎 leçon : titre, numéro, fonction…',
+  unite: ['leçon', 'leçons'],
+  enLigne: true,
+  filtrer: (mots) => {
+    const { fiches, numeros: nums } = fichesDe(serie)
+    const { visibles } = filtrerUnMenu($('lecon-choix'),
+      (option) => correspond(mots, fiches[option.value], nums[option.value]), mots.length > 0)
+    return visibles
+  },
+  // Entrée : la première leçon qui correspond s'ouvre
+  ouvrir: () => {
+    const premiere = [...$('lecon-choix').options].find((o) => !o.hidden)
+    if (premiere) allerALaLecon(Number(premiere.value))
+  },
+})
+$('lecon-choix').before(rechercheLecons.element)
+
+/* 2. Les exemples : dans leur nom affiché et leur nom court. */
+const rechercheExemples = champDeRecherche({
+  texte: '🔎 exemple…',
+  unite: ['exemple', 'exemples'],
+  enLigne: true,
+  filtrer: (mots) => filtrerUnMenu($('exemples'),
+    (option) => correspond(mots, fiche(option.textContent, option.value)), mots.length > 0).visibles,
+  // Entrée : on choisit le premier exemple trouvé, comme si on l'avait pris dans le menu
+  ouvrir: () => {
+    const premiere = [...$('exemples').options].find((o) => !o.hidden)
+    if (!premiere) return
+    $('exemples').value = premiere.value
+    $('exemples').dispatchEvent(new Event('change'))
+  },
+})
+rechercheExemples.element.classList.add('recherche-exemples')
+/* Le menu et sa recherche dans une même boîte : quand la barre du haut passe
+   à la ligne, ils restent ensemble au lieu d'être séparés. */
+const groupeExemples = document.createElement('span')
+groupeExemples.className = 'groupe-exemples'
+groupeExemples.style.cssText = 'display: inline-flex; gap: 6px; align-items: center;'
+const menuExemples = $('exemples')   // gardé AVANT de le déplacer : une fois retiré, $('exemples') ne le trouve plus
+menuExemples.replaceWith(groupeExemples)
+groupeExemples.append(menuExemples, rechercheExemples.element)
+
+/* 3. Les modèles de dessins (🖼 Les modèles) : dans leur nom et ce qu'ils sont
+      (le « title » de chaque bouton les porte tous les deux). */
+const rechercheModeles = champDeRecherche({
+  texte: '🔎 chercher un modèle : nom, personnage, bloc…',
+  unite: ['modèle', 'modèles'],
+  filtrer: (mots) => filtrerUneGrille($('modeles'), mots, (bouton) => bouton.title).visibles,
+  ouvrir: () => [...$('modeles').children].find((b) => !b.classList.contains('recherche-cache'))?.click(),
+})
+$('modeles').before(rechercheModeles.element)
+
+/* 4. Les projets (📂 Ouvrir) : dans le nom du dossier et son titre. La grille
+      est refaite à chaque ouverture : projets.js rappelle rafraichir(). */
+rechercheProjets = champDeRecherche({
+  texte: '🔎 chercher un projet…',
+  unite: ['projet', 'projets'],
+  enLigne: true,
+  filtrer: (mots) => filtrerUneGrille($('projets-grille'), mots).visibles,
+  // Entrée : ouvrir le premier projet trouvé (son bouton « Ouvrir »)
+  ouvrir: () => [...$('projets-grille').children]
+    .find((c) => !c.classList.contains('recherche-cache'))?.querySelector('button.principal:not([disabled])')?.click(),
+})
+document.querySelector('#voile-projets .reglages-haut h3').after(rechercheProjets.element)
+
+/* 5. Tout chercher (Ctrl+K, ou le bouton 🔎) : toutes les sortes à la fois.
+      Chaque « fiche » dit ce qu'elle est, où chercher, et où elle emmène. */
+
+/* Les projets sont sur le disque : on relit leur liste en arrière-plan, au
+   démarrage et à chaque ouverture de la fenêtre (elle montre la dernière lue). */
+let projetsConnus = []
+function relireLesProjets() {
+  fetch('projets.php?quoi=liste')
+    .then((r) => r.json())
+    .then((lu) => { if (Array.isArray(lu.projets)) projetsConnus = lu.projets })
+    .catch(() => { /* pas de service des projets : on n'en propose simplement pas */ })
+}
+relireLesProjets()
+
+/* Aller à une leçon d'une série : le bon mode, puis la leçon. */
+function allerALaLeconDe(laSerie, index) {
+  montrerMode(laSerie)       // « lecons » ou « cours » : choisit aussi la série
+  allerALaLecon(index)
+}
+
+function toutesLesFiches() {
+  relireLesProjets()   // pour la prochaine fois
+  const liste = []
+
+  // 📘 les leçons du tutoriel, et 🎓 celles du cours
+  for (const [laSerie, genre] of [['lecons', '📘 Leçon'], ['cours', '🎓 Cours']]) {
+    const { fiches: textes, numeros: nums } = fichesDe(laSerie)
+    SERIES[laSerie].liste.forEach((lecon, i) => liste.push({
+      genre, libelle: `${nums[i]}. ${lecon.titre}`, detail: lecon.idee,
+      texte: textes[i], numero: nums[i], aller: () => allerALaLeconDe(laSerie, i),
+    }))
+  }
+
+  // 🎮 les exemples (les options du menu, sauf la page blanche)
+  for (const option of $('exemples').options) {
+    if (option.value === 'vide') continue
+    liste.push({
+      genre: '🎮 Exemple', libelle: option.textContent, texte: fiche(option.textContent, option.value, 'exemple'),
+      aller: () => { $('exemples').value = option.value; $('exemples').dispatchEvent(new Event('change')) },
+    })
+  }
+
+  // 📁 les projets du disque
+  for (const p of projetsConnus) {
+    liste.push({
+      genre: '📁 Projet', libelle: p.nom, detail: p.titre, texte: fiche(p.nom, p.titre, 'projet'),
+      aller: () => projets.ouvrir(p.nom).catch((e) => { $('etat').textContent = e.message }),
+    })
+  }
+
+  // 🔧 les fonctions de la console : on emmène aux leçons qui s'en servent
+  for (const [nom, { args, dit }] of Object.entries(FONCTIONS)) {
+    liste.push({
+      genre: '🔧 Fonction', libelle: `${nom}(${args.join(', ')})`, detail: dit, texte: fiche(nom, dit, 'fonction'),
+      aller: () => {
+        montrerMode('lecons')
+        rechercheLecons.champ.value = nom   // les leçons qui utilisent cette fonction
+        rechercheLecons.rafraichir()
+        rechercheLecons.champ.focus()
+      },
+    })
+  }
+
+  // ⚙ les réglages : la fenêtre des réglages, déjà filtrée sur celui-ci
+  for (const regle of CATALOGUE) {
+    liste.push({
+      genre: '⚙ Réglage', libelle: regle.titre, detail: regle.groupe, texte: fiche(regle.titre, regle.aide, regle.groupe, 'reglage'),
+      aller: () => {
+        $('voile-reglages').hidden = false
+        $('reglages-chercher').value = regle.titre
+        filtrerLesReglages(regle.titre)
+      },
+    })
+  }
+
+  // 🖼 les modèles de dessins : les prendre, comme d'un clic dans « Les modèles »
+  for (const modele of MODELES) {
+    liste.push({ genre: '🖼 Modèle', libelle: modele.nom, detail: modele.quoi, texte: fiche(modele.nom, modele.quoi, 'modele dessin'), aller: () => prendreLeModele(modele) })
+  }
+
+  // 🧩 les modèles de jeux : la liste des jeux, filtrée sur celui-ci
+  for (const modele of MODELES_DE_JEUX) {
+    liste.push({
+      genre: '🧩 Jeu', libelle: modele.nom, detail: modele.dit, texte: fiche(modele.nom, modele.dit, 'modele jeu'),
+      aller: () => {
+        ouvrirLesModeles()
+        const champ = document.querySelector('.didacticiel-menu .recherche input')
+        champ.value = modele.nom
+        champ.dispatchEvent(new Event('input'))
+      },
+    })
+  }
+  return liste
+}
+installerToutChercher({ fiches: toutesLesFiches, bouton: $('tout-chercher') })
 $('lecon-choix').addEventListener('change', () => allerALaLecon(Number($('lecon-choix').value)))
 
 for (const bouton of ['lecon-avant', 'lecon-avant-bas']) {
@@ -5476,6 +5751,10 @@ function allerALaLecon(index, { garderLeCode = false, defiler = true } = {}) {
     repere(`${duChapitre.indexOf(lecon) + 1} / ${duChapitre.length} dans ce chapitre`, '')
   } else {
     repere(`Niveau ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`, 'niveau')
+    // La partie, juste après le niveau : « Partie D — Des formes ». Seul le
+    // chapitre 0 en a ; ailleurs partieDe rend null, et rien n'est ajouté.
+    const partie = partieDe(LECONS, index)
+    if (partie) repere(`Partie ${partie.lettre} — ${partie.nom}`, 'niveau')
     repere(`leçon ${NUMEROS[index]} sur ${principales(LECONS)}`, '')
     repere(`difficulté ${lecon.difficulte} / 10`, 'difficulte')
       .style.setProperty('--part', `${lecon.difficulte * 10}%`)
@@ -5602,8 +5881,20 @@ const defilementRetenu = (() => {
   try { return JSON.parse(localStorage.getItem('gameboy3-defilement') ?? 'null') } catch { return null }
 })()
 
+/* Lire le stockage du navigateur SANS jamais planter : en navigation privée
+   stricte, ou quand le navigateur bloque les données du site, le simple fait
+   de toucher à localStorage lève une erreur — et l'atelier entier restait
+   alors figé au démarrage. Ici, on rend la valeur par défaut à la place. */
+function lireLeStockage(cle, parDefaut) {
+  try {
+    return localStorage.getItem(cle) ?? parDefaut   // rien de gardé : la valeur par défaut
+  } catch {
+    return parDefaut                                // stockage interdit : pareil
+  }
+}
+
 const modeVoulu = REGLAGES.modeDemarrage === 'dernier'
-  ? (localStorage.getItem('gameboy3-mode') ?? 'creation')
+  ? lireLeStockage('gameboy3-mode', 'creation')
   : REGLAGES.modeDemarrage
 montrerMode(MODES_CONNUS.includes(modeVoulu) ? modeVoulu : 'creation')
 
@@ -5613,7 +5904,7 @@ const programmeRepris = reprendreLeProgramme()
 if (!programmeRepris) {
   const voulu = REGLAGES.exempleDemarrage
   const exemple = voulu === 'garder'
-    ? (localStorage.getItem('gameboy3-exemple') ?? 'mario')
+    ? lireLeStockage('gameboy3-exemple', 'mario')
     : voulu
   document.getElementById('exemples').value = EXEMPLES[exemple] ? exemple : 'mario'
   await ouvrirLExemple(EXEMPLES[exemple] ? exemple : 'mario')
@@ -5998,14 +6289,13 @@ function rafraichirLePanneau() {
  * aide parle de son. C'est voulu — on cherche rarement le mot exact.
  */
 function filtrerLesReglages(mot) {
-  const cherche = mot.trim().toLowerCase()
+  /* La même comparaison que toutes les recherches (recherche.js) : sans
+     accents ni majuscules, et TOUS les mots tapés doivent s'y trouver. */
+  const mots = motsDe(mot)
   let trouves = 0
 
   for (const { ligne, regle } of lignesDeReglage.values()) {
-    const dedans = !cherche
-      || regle.titre.toLowerCase().includes(cherche)
-      || regle.aide.toLowerCase().includes(cherche)
-      || regle.groupe.toLowerCase().includes(cherche)
+    const dedans = correspond(mots, fiche(regle.titre, regle.aide, regle.groupe))
     ligne.hidden = !dedans
     if (dedans) trouves++
   }
@@ -6123,6 +6413,11 @@ Annuler : la réduire à UNE tuile.`)) {
 Elle prend les images, les cartouches .gb/.gbc, les tuiles .gbr, les programmes .cpp et les musiques .mid.`)
 })
 
+
+/* Tout s'est chargé, et le programme de la page est allé jusqu'au bout :
+   on le dit à garde.js, qui n'affichera donc aucun bandeau d'erreur.
+   « ?. » : si garde.js manque, on ne plante pas pour autant. */
+window.atelierPret?.()
 </script>
 </body>
 </html>

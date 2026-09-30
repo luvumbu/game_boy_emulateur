@@ -16,6 +16,10 @@
  * Le tri est STABLE : deux leçons de même difficulté restent dans l'ordre où
  * elles sont écrites ici.
  *
+ * `partie: 'Le temps'`, sur la leçon qui l'ouvre, coupe un niveau en parties
+ * (A, B, C… comptées toutes seules, voir `partieDe`). Le chapitre 0 en a dix ;
+ * les numéros des leçons n'en dépendent pas.
+ *
  * `controle` est exécuté avec un objet qui sait lire la console :
  *
  *   lire(colonne, ligne)   la tuile affichée à cet endroit
@@ -80,6 +84,7 @@ const ECRITES = [
   {
     titre: 'Le programme qui ne fait rien',
     difficulte: 0,
+    partie: 'Écrire des lettres',
     idee: 'Le squelette de tout programme : int main(), et la boucle while.',
     texte: [
       '**`int main()`** est le point de départ. Quand la console s’allume, c’est là qu’elle arrive, et nulle part ailleurs. Tout ce que fait le programme s’écrit entre ses accolades `{ }`.',
@@ -1198,6 +1203,7 @@ const ECRITES = [
   {
     titre: 'Une lettre toutes les secondes',
     difficulte: 0,
+    partie: 'Le temps',
     idee: 'Écrire DANS la boucle de jeu, et compter les images pour mesurer le temps.',
     texte: [
       'Jusqu’ici, on écrivait **avant** la boucle de jeu, une fois pour toutes. Ici, on écrit **dedans** : à chaque image, la case (0, 0) reçoit la lettre du moment.',
@@ -2126,6 +2132,7 @@ int main() {
   {
     titre: 'Avancer avec deplace_x',
     difficulte: 0,
+    partie: 'Déplacer une lettre',
     idee: 'deplace_x(colonne, ligne, tuile, pas) fait tout le 0.17 en une ligne : la lettre avance de 5 cases.',
     texte: [
       '**C’est le programme du 0.17**, mais tout le travail (le chronomètre, l’effacement, le pas de plus, la lettre reposée) est fait par **une seule fonction de la console** : `deplace_x`.',
@@ -4044,6 +4051,7 @@ int main() {
   {
     titre: 'Un carré autour d’une lettre, avec carre',
     difficulte: 0,
+    partie: 'Des formes',
     idee: 'Une ligne, une lettre : carre(10, 8, ALPHABET[0], 1, 1, 250, 1) fait faire au A un tour en carré autour de la case (10, 8).',
     texte: [
       '**Une seule lettre, une seule ligne.** Le A fait **un tour complet** autour de la case (10, 8), en carré, puis revient à sa place.',
@@ -7544,6 +7552,7 @@ int main() {
   {
     titre: 'Une lettre qui avance',
     difficulte: 0,
+    partie: 'La croix : le joueur',
     idee: 'Bouger, c’est effacer la lettre à sa place, puis la réécrire un peu plus loin.',
     texte: [
       '**Maintenant, la lettre ne s’arrête plus :** il n’y a plus de `pas`, elle avance tant que la console tourne.',
@@ -10413,6 +10422,7 @@ int main() {
   {
     titre: 'Ramasser une pièce : le P',
     difficulte: 0,
+    partie: 'Un premier jeu',
     idee: 'Une pièce, la lettre P, en (15, 8). Quand le A arrive dessus, le score augmente de 1, et la pièce s’en va.',
     texte: [
       '**La pièce est une lettre, le P** (`ALPHABET[15]`, la 16e lettre). On la pose une fois, au début, en (15, 8).',
@@ -11193,6 +11203,7062 @@ int main() {
       return [
         ['des B à l’écran au départ', bs >= 1, ` (${bs})`],
         ['ils sont descendus vers le A (ligne 8 ou plus bas)', [8, 9, 10, 11, 12].some((l) => c.mot(0, l, 20).includes('B'))],
+      ]
+    },
+  },
+
+  {
+    titre: 'L’alphabet en gras, avec poserS',
+    difficulte: 0,
+    partie: 'Les lettres et l’écran titre',
+    idee: 'ALPHABET_GRAS, un second alphabet de la console, aux traits épais. Le 0.10 avec ALPHABET_GRAS à la place d’ALPHABET : A à T sur la ligne 0, U à Z sur la ligne 1.',
+    texte: [
+      '**C’est le 0.10, avec un autre alphabet.** Même boucle, même `poserS` : seul le nom du tableau change, `ALPHABET_GRAS` au lieu d’`ALPHABET`.',
+      '**Ce qui est nouveau ici : `ALPHABET_GRAS`.** Un second tableau de la console, comme `ALPHABET` : 26 cases, de `ALPHABET_GRAS[0]` (le A) à `ALPHABET_GRAS[25]` (le Z). Les lettres sont les mêmes, mais leurs traits font **2 pixels d’épaisseur** au lieu d’un.',
+      '**L’ancien alphabet ne change pas :** `ALPHABET` est toujours là, et tous les cours d’avant gardent leurs lettres. Les deux peuvent se mélanger dans un même programme.',
+      '**`sizeof(ALPHABET_GRAS)`** vaut 26, comme `sizeof(ALPHABET)` (le 0.9) : la boucle fait 26 tours, de A à Z.',
+      '**`poserS`** passe tout seul à la ligne suivante (le 0.10) : A à T sur la ligne 0, puis U à Z sur la ligne 1.',
+      '**Gratuit si on ne s’en sert pas :** les 26 lettres grasses ne sont ajoutées à la cartouche que si le programme écrit `ALPHABET_GRAS`.',
+    ],
+    code: `int main() {
+  // La boucle, morceau par morceau :
+  //
+  //   poserS(i, 0, ALPHABET_GRAS[i]);
+  //          |  |  |
+  //          |  |  +-- ALPHABET_GRAS[i] : la lettre n° i, EN GRAS
+  //          |  |      (0 = A, 1 = B … 25 = Z), comme ALPHABET[i]
+  //          |  +----- la ligne 0 ; poserS passe tout seul à la ligne 1
+  //          +-------- la colonne i : après la colonne 19, poserS repart en 0
+  //
+  //   i = 0 : A gras en (0, 0)      i = 19 : T gras en (19, 0)
+  //   i = 20 : U gras en (0, 1)     i = 25 : Z gras en (5, 1)
+  // sizeof(ALPHABET_GRAS) vaut 26 : i va de 0 (A) à 25 (Z).
+  for (uint8_t i = 0; i < sizeof(ALPHABET_GRAS); i++) {
+    poserS(i, 0, ALPHABET_GRAS[i]);
+  }
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Tout l’alphabet en gras, de A à Z : A à T sur la première ligne, U à Z sur la deuxième.',
+    controle: (c) => {
+      c.avancer(10)
+      const cases = []
+      for (let x = 0; x < 20; x++) cases.push(c.lire(x, 0))
+      for (let x = 0; x < 6; x++) cases.push(c.lire(x, 1))
+      const par = 1
+      return [
+        ['26 lettres grasses, toutes différentes', new Set(cases).size === 26, ` (${new Set(cases).size})`],
+        ['ce ne sont pas les lettres d’ALPHABET', cases.every((t) => t > 26)],
+      ]
+    },
+  },
+
+  {
+    titre: 'L’alphabet en gras, avec poserS — de base, ailleurs',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.86 cinq lignes plus bas : poserS(i, 5, ALPHABET_GRAS[i]).',
+    texte: [
+      '**C’est le 0.86, cinq lignes plus bas :** la ligne de départ est 5 au lieu de 0. `poserS` passe tout seul à la ligne 6 après le T.',
+      '**Un seul nombre change**, dans `poserS` : c’est la ligne.',
+      '**C’est la version de base.** Le 0.86.2 met l’ancien et le nouvel alphabet l’un au-dessus de l’autre.',
+    ],
+    code: `int main() {
+  // Le changement : la ligne, 0 → 5. U à Z iront sur la ligne 6.
+  for (uint8_t i = 0; i < sizeof(ALPHABET_GRAS); i++) {
+    poserS(i, 5, ALPHABET_GRAS[i]);
+  }
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'L’alphabet en gras, sur les lignes 5 et 6.',
+    controle: (c) => {
+      c.avancer(10)
+      const cases = []
+      for (let x = 0; x < 20; x++) cases.push(c.lire(x, 5))
+      for (let x = 0; x < 6; x++) cases.push(c.lire(x, 6))
+      const par = 1
+      return [
+        ['26 lettres grasses, toutes différentes', new Set(cases).size === 26, ` (${new Set(cases).size})`],
+        ['ce ne sont pas les lettres d’ALPHABET', cases.every((t) => t > 26)],
+      ]
+    },
+  },
+
+  {
+    titre: 'L’alphabet en gras, avec poserS — doublé, deux positions',
+    difficulte: 0,
+    suite: true,
+    idee: 'L’ancien alphabet en haut, le nouveau en dessous : ALPHABET sur les lignes 0 et 1, ALPHABET_GRAS sur les lignes 3 et 4. On compare.',
+    texte: [
+      '**Les deux alphabets l’un au-dessus de l’autre**, pour comparer : `ALPHABET`, celui de toujours, sur les lignes 0 et 1 ; `ALPHABET_GRAS` sur les lignes 3 et 4.',
+      '**Deux boucles, deux tableaux :** la première lit `ALPHABET[i]`, la seconde `ALPHABET_GRAS[i]`. Chaque `for` a son propre `i`.',
+      '**Regarde le M, le N et le W :** leurs traits étaient trop serrés pour être simplement épaissis. Ils ont été redessinés un peu plus larges, pour garder leurs creux.',
+    ],
+    code: `int main() {
+  // 1. L'alphabet de toujours, sur les lignes 0 et 1.
+  for (uint8_t i = 0; i < sizeof(ALPHABET); i++) {
+    poserS(i, 0, ALPHABET[i]);
+  }
+
+  // 2. L’alphabet en gras, sur les lignes 3 et 4 : on compare.
+  for (uint8_t i = 0; i < sizeof(ALPHABET_GRAS); i++) {
+    poserS(i, 3, ALPHABET_GRAS[i]);
+  }
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'En haut, l’alphabet habituel ; en dessous, le même en gras.',
+    controle: (c) => {
+      c.avancer(10)
+      return [
+        ['en haut, l’alphabet habituel', c.mot(0, 0, 20) === 'ABCDEFGHIJKLMNOPQRST' && c.mot(0, 1, 6) === 'UVWXYZ'],
+        ['en dessous, 26 lettres grasses', new Set([...Array(20).keys()].map((x) => c.lire(x, 3)).concat([...Array(6).keys()].map((x) => c.lire(x, 4)))).size === 26 && c.lire(0, 3) > 26],
+      ]
+    },
+  },
+
+  {
+    titre: 'Agrandir une lettre : texteGrand',
+    difficulte: 0,
+    idee: 'texteGrand(x, y, "A", 3) : le A trois fois plus grand, sans rien dessiner. Chaque pixel devient un carré de 3 × 3 pixels ; les proportions sont gardées.',
+    texte: [
+      '**Une lettre plus grande, sans la dessiner.** La Game Boy n’a pas de zoom, mais la console peut **calculer** une lettre agrandie à partir de la police : chaque pixel devient un carré.',
+      '**Ce qui est nouveau ici : `texteGrand(x, y, "TEXTE", taille)`.** La **taille** va de **1 à 20** : c’est combien de fois plus grand. Avec `3`, chaque pixel de la lettre devient un carré de **3 × 3 pixels**. La lettre garde **exactement ses proportions**.',
+      '**La place qu’elle prend :** une lettre normale tient dans **1 case** (8 × 8 pixels). Agrandie 3 fois, elle en prend **3 × 3 = 9** (24 × 24 pixels). À la taille *n*, une lettre prend *n* cases de large et *n* de haut.',
+      '**Le texte et la taille s’écrivent en clair** (`"A"`, `3`), comme pour `ms()` : le compilateur fabrique les tuiles agrandies **avant le jeu**, et seulement celles dont le programme a besoin.',
+      '**Ce qu’elle coûte :** quelques tuiles de plus dans la cartouche. Deux tuiles identiques (souvent toutes pleines aux grandes tailles) ne sont fabriquées qu’une fois.',
+    ],
+    code: `int main() {
+  // La ligne, morceau par morceau :
+  //
+  //   texteGrand(2, 2, "A", 3);
+  //              |  |  |    |
+  //              |  |  |    +-- la TAILLE : 3 fois plus grand (de 1 à 20)
+  //              |  |  +------- le texte, entre guillemets
+  //              +--+---------- la case en haut à gauche du grand A : (2, 2)
+  //
+  // Chaque pixel du A devient un carré de 3 × 3 pixels :
+  //
+  //   le A normal (8 × 8)      le A × 3 (24 × 24 pixels = 3 × 3 cases)
+  //   ··███···                 ······█████████·········
+  //   ·█···█··                 ······█████████·········
+  //   ·█···█··                 ······█████████·········
+  //   ·█████··                 ···███·········███······
+  //   …                        …
+  texteGrand(2, 2, "A", 3);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un grand A, trois fois plus grand qu’une lettre normale, en haut à gauche.',
+    controle: (c) => {
+      c.avancer(10)
+      return [
+        ['le grand A occupe ses 3 × 3 cases', (() => { let n = 0; for (let j = 2; j < 5; j++) for (let i = 2; i < 5; i++) if (c.lire(i, j) !== 0) n++; return n })() >= 6],
+        ['rien à côté', (() => { let n = 0; for (let j = 2; j < 5; j++) for (let i = 5; i < 8; i++) if (c.lire(i, j) !== 0) n++; return n })() === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'Agrandir une lettre : texteGrand — toutes les tailles',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le même A, aux tailles 1, 2, 3 et 4, côte à côte : un seul nombre change d’une ligne à l’autre.',
+    texte: [
+      '**Quatre lignes, un seul nombre qui change :** la taille, 1, 2, 3, puis 4. On voit le A grandir.',
+      '**Tu choisis la taille, la console s’adapte :** aucune taille n’est dessinée à l’avance. Chaque `texteGrand` fait calculer les tuiles de SA taille.',
+      '**La place :** taille 1, 1 case ; taille 2, 2 × 2 ; taille 3, 3 × 3 ; taille 4, 4 × 4. Les colonnes de départ (0, 2, 5, 9) laissent juste la place à chacun.',
+    ],
+    code: `int main() {
+  texteGrand(0, 0, "A", 1);     // taille 1 : 1 case, comme une lettre normale
+  texteGrand(2, 0, "A", 2);     // taille 2 : 2 × 2 cases
+  texteGrand(5, 0, "A", 3);     // taille 3 : 3 × 3 cases
+  texteGrand(9, 0, "A", 4);     // taille 4 : 4 × 4 cases
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Quatre A côte à côte, de plus en plus grands : tailles 1, 2, 3 et 4.',
+    controle: (c) => {
+      c.avancer(10)
+      return [
+        ['taille 1 : une case', (() => { let n = 0; for (let j = 0; j < 1; j++) for (let i = 0; i < 1; i++) if (c.lire(i, j) !== 0) n++; return n })() === 1],
+        ['taille 4 : dans ses 4 × 4 cases', (() => { let n = 0; for (let j = 0; j < 4; j++) for (let i = 9; i < 13; i++) if (c.lire(i, j) !== 0) n++; return n })() >= 10],
+        ['chacun plus grand que le précédent', (() => { let n = 0; for (let j = 0; j < 2; j++) for (let i = 2; i < 4; i++) if (c.lire(i, j) !== 0) n++; return n })() < (() => { let n = 0; for (let j = 0; j < 3; j++) for (let i = 5; i < 8; i++) if (c.lire(i, j) !== 0) n++; return n })() && (() => { let n = 0; for (let j = 0; j < 3; j++) for (let i = 5; i < 8; i++) if (c.lire(i, j) !== 0) n++; return n })() < (() => { let n = 0; for (let j = 0; j < 4; j++) for (let i = 9; i < 13; i++) if (c.lire(i, j) !== 0) n++; return n })()],
+      ]
+    },
+  },
+
+  {
+    titre: 'Agrandir une lettre : texteGrand — dix fois',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le plus grand : texteGrand(5, 4, "A", 10). Un A de 80 × 80 pixels, 10 × 10 cases, la moitié de l’écran.',
+    texte: [
+      '**La taille la plus grande, 10 :** chaque pixel devient un carré de 10 × 10 pixels. Le A fait **80 × 80 pixels**, soit **10 × 10 cases** : la moitié de la largeur de l’écran (20 cases).',
+      '**La moitié de l’écran :** l’écran fait 20 × 18 cases ; à la taille 10, une lettre en prend 10 × 10. La plus grande taille, 20, remplit l’écran entier : c’est le 0.87.4.',
+      '**Ça ne coûte presque rien de plus :** aux grandes tailles, beaucoup de tuiles sont **toutes pleines** ou **toutes vides**. Les tuiles identiques ne sont fabriquées qu’une fois.',
+    ],
+    code: `int main() {
+  // Le A dix fois plus grand : 10 × 10 cases, de (5, 4) à (14, 13).
+  texteGrand(5, 4, "A", 10);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A géant au milieu de l’écran, dix fois plus grand qu’une lettre normale.',
+    controle: (c) => {
+      c.avancer(10)
+      return [
+        ['le A géant remplit une bonne part de ses 10 × 10 cases', (() => { let n = 0; for (let j = 4; j < 14; j++) for (let i = 5; i < 15; i++) if (c.lire(i, j) !== 0) n++; return n })() >= 40, ` (${(() => { let n = 0; for (let j = 4; j < 14; j++) for (let i = 5; i < 15; i++) if (c.lire(i, j) !== 0) n++; return n })()})`],
+        ['il ne déborde pas', (() => { let n = 0; for (let j = 4; j < 14; j++) for (let i = 15; i < 20; i++) if (c.lire(i, j) !== 0) n++; return n })() === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'Agrandir une lettre : texteGrand — un mot',
+    difficulte: 0,
+    suite: true,
+    idee: 'Un mot entier agrandi : texteGrand(3, 7, "JEU", 4). Chaque lettre prend 4 × 4 cases ; le mot, 12 × 4.',
+    texte: [
+      '**Pas seulement une lettre :** `texteGrand` agrandit un **mot entier**. Les lettres se suivent, chacune agrandie.',
+      '**La largeur du mot :** 3 lettres × 4 cases = **12 cases**. Il faut qu’elle tienne dans les 20 colonnes de l’écran : `"BONJOUR"` (7 lettres) tient à la taille 2 (14 cases), pas à la taille 3 (21 cases).',
+      '**Un titre de jeu,** c’est exactement ça : un mot en grand, au milieu de l’écran.',
+    ],
+    code: `int main() {
+  // 3 lettres × 4 cases = 12 cases de large, 4 de haut : de (3, 7) à (14, 10).
+  texteGrand(3, 7, "JEU", 4);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Le mot JEU en grandes lettres, au milieu de l’écran.',
+    controle: (c) => {
+      c.avancer(10)
+      return [
+        ['le J, le E et le U, chacun dans ses 4 × 4 cases', (() => { let n = 0; for (let j = 7; j < 11; j++) for (let i = 3; i < 7; i++) if (c.lire(i, j) !== 0) n++; return n })() > 4 && (() => { let n = 0; for (let j = 7; j < 11; j++) for (let i = 7; i < 11; i++) if (c.lire(i, j) !== 0) n++; return n })() > 4 && (() => { let n = 0; for (let j = 7; j < 11; j++) for (let i = 11; i < 15; i++) if (c.lire(i, j) !== 0) n++; return n })() > 4],
+        ['rien après le mot', (() => { let n = 0; for (let j = 7; j < 11; j++) for (let i = 15; i < 20; i++) if (c.lire(i, j) !== 0) n++; return n })() === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'Agrandir une lettre : texteGrand — vingt fois',
+    difficulte: 0,
+    suite: true,
+    idee: 'La plus grande taille : texteGrand(0, 0, "A", 20). Le A remplit tout l’écran, 160 × 140 pixels.',
+    texte: [
+      '**La taille la plus grande, 20 :** chaque pixel du A devient un carré de 20 × 20 pixels. La lettre fait **160 pixels de large** (toute la largeur de l’écran) et **140 de haut** : elle remplit l’écran.',
+      '**Pourquoi 20 au plus :** une lettre de la police fait **7 pixels de haut**, et l’écran **144**. 7 × 20 = 140 : elle tient encore entière. À 21, 7 × 21 = 147 : le bas du A sortirait de l’écran. Le compilateur refuse donc au-delà de 20, et dit pourquoi.',
+      '**En largeur aussi, tout juste :** une case de lettre fait 8 pixels ; 8 × 20 = 160, la largeur exacte de l’écran. Pour tenir, le A géant commence en (0, 0).',
+      '**Ça ne coûte presque rien en dessins :** à cette taille, presque toutes les tuiles sont toutes pleines ou toutes vides. Le A géant n’en demande que 9 différentes.',
+    ],
+    code: `int main() {
+  // La plus grande taille : 20. Le A fait 20 × 20 cases, tout l'écran.
+  //   8 pixels × 20 = 160 : toute la largeur
+  //   7 pixels × 20 = 140 : presque toute la hauteur (144)
+  texteGrand(0, 0, "A", 20);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A immense, qui remplit tout l’écran.',
+    controle: (c) => {
+      c.avancer(10)
+      let n = 0
+      for (let j = 0; j < 18; j++) for (let i = 0; i < 20; i++) if (c.lire(i, j) !== 0) n++
+      return [['le A géant occupe une grande part de l’écran', n >= 100, ` (${n} cases pleines)`]]
+    },
+  },
+
+  {
+    titre: 'Agrandir une lettre : texteGrand — aller à la ligne, texteGrandS',
+    difficulte: 0,
+    suite: true,
+    idee: 'texteGrandS(0, 0, "BONJOUR", 3) : comme texteGrand, mais les lettres qui ne tiennent plus dans la largeur passent à la ligne, comme textS.',
+    texte: [
+      '**Avec `texteGrand`, un mot trop long sort de l’écran par la droite.** « BONJOUR » en taille 3 demande 7 × 3 = 21 cases de large ; l’écran n’en a que 20 : le R disparaît.',
+      '**Ce qui est nouveau ici : `texteGrandS`,** le `S` de `textS` (le 0.11). Même réglages que `texteGrand`, mais les lettres qui ne tiennent plus **passent à la ligne** : elles reprennent en colonne 0, une rangée de lettres plus bas (3 cases, à la taille 3).',
+      '**Le découpage :** à la taille 3, une ligne tient 20 ÷ 3 = 6 lettres (18 cases). « BONJOU » sur la première, « R » sur la deuxième.',
+      '**Trop haut, c’est une erreur :** l’écran a 18 cases de haut. Si le texte en demande plus (« BONJOUR » en taille 7 : 4 lignes de 7 cases, 28), le compilateur refuse, et dit combien il en faudrait.',
+      '**Tout s’écrit en clair,** même la place : le découpage en lignes se fait avant le jeu.',
+    ],
+    code: `int main() {
+  // Comme texteGrand, mais qui VA À LA LIGNE :
+  //
+  //   texteGrandS(0, 0, "BONJOUR", 3);
+  //   la taille 3 : 3 cases par lettre ; une ligne de 20 cases en tient 6.
+  //
+  //   ligne 1, cases 0 à 2 :   B O N J O U     (6 lettres × 3 = 18 cases)
+  //   ligne 2, cases 3 à 5 :   R               (repart en colonne 0)
+  texteGrandS(0, 0, "BONJOUR", 3);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'BONJOU en grandes lettres sur la première ligne, et le R en dessous, à gauche.',
+    controle: (c) => {
+      c.avancer(10)
+      const plein = (x, y, l, h) => { let n = 0; for (let j = y; j < y + h; j++) for (let i = x; i < x + l; i++) if (c.lire(i, j) !== 0) n++; return n }
+      return [
+        ['BONJOU sur la première ligne (cases 0 à 2)', plein(0, 0, 18, 3) > 20],
+        ['le R est passé à la ligne, en colonne 0', plein(0, 3, 3, 3) > 2],
+        ['rien après le R', plein(3, 3, 17, 3) === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'Des lettres en couleur : couleurTexte',
+    difficulte: 0,
+    idee: 'couleurTexte(31, 0, 0) : toutes les lettres deviennent rouges. Trois nombres de 0 à 31 : le rouge, le vert, le bleu.',
+    texte: [
+      '**Les lettres peuvent changer de couleur.** Une ligne suffit : `couleurTexte(rouge, vert, bleu);`.',
+      '**Ce qui est nouveau ici : une couleur, en trois nombres.** L’écran mélange du **rouge**, du **vert** et du **bleu**, chacun de **0** (rien) à **31** (le plus fort). `31, 0, 0` : tout le rouge, pas de vert, pas de bleu → **rouge**. `0, 0, 31` : bleu. `31, 31, 0` : rouge + vert = **jaune**. `31, 31, 31` : blanc.',
+      '**Toutes les lettres changent ensemble**, même celles écrites avant ou après : `couleurTexte` règle la couleur **de l’encre**, pas d’un mot.',
+      '**Sur la Game Boy Color seulement :** la Game Boy d’origine n’a que 4 gris-verts. Le programme passe tout seul en mode couleur ; choisis « En couleur » en haut de la page.',
+    ],
+    code: `int main() {
+  // La couleur, morceau par morceau :
+  //
+  //   couleurTexte(31, 0, 0);
+  //                |   |  |
+  //                |   |  +-- le BLEU  : 0 (rien)
+  //                |   +----- le VERT  : 0 (rien)
+  //                +--------- le ROUGE : 31 (le plus fort) → du rouge
+  //
+  //   quelques mélanges :   31, 0, 0 rouge     0, 31, 0 vert     0, 0, 31 bleu
+  //                         31, 31, 0 jaune    31, 16, 0 orange  31, 31, 31 blanc
+  couleurTexte(31, 0, 0);
+
+  texte(9, 8, "A");         // un A… rouge
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A rouge au milieu de l’écran (sur « En couleur »).',
+    controle: (c) => {
+      c.avancer(10)
+      const coul = (p, t) => { const i = p * 8 + t * 2, v = c.gb.ppu.bgPalettes[i] | (c.gb.ppu.bgPalettes[i + 1] << 8); return [v & 31, (v >> 5) & 31, (v >> 10) & 31].join(',') }
+      const pal = (x, y) => c.gb.ppu.vram[0x2000 + 0x1800 + y * 32 + x] & 7
+      return [
+        ['le A est écrit', c.mot(9, 8, 1) === 'A'],
+        ['l’encre des lettres est rouge : 31, 0, 0', coul(0, 3) === '31,0,0', ` (${coul(0, 3)})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Des lettres en couleur : couleurTexte — un mot en bleu',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.88 avec une autre couleur et un mot entier : couleurTexte(0, 0, 31), puis BONJOUR.',
+    texte: [
+      '**C’est le 0.88, avec un mot et du bleu :** `couleurTexte(0, 0, 31)` (seulement du bleu), puis `texte(6, 8, "BONJOUR")`.',
+      '**Toutes les lettres du mot** prennent la couleur : c’est la même encre pour tout le texte.',
+    ],
+    code: `int main() {
+  couleurTexte(0, 0, 31);   // rouge 0, vert 0, bleu 31 : du bleu
+  texte(6, 8, "BONJOUR");   // tout le mot, en bleu
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'BONJOUR en bleu, au milieu de l’écran.',
+    controle: (c) => {
+      c.avancer(10)
+      const coul = (p, t) => { const i = p * 8 + t * 2, v = c.gb.ppu.bgPalettes[i] | (c.gb.ppu.bgPalettes[i + 1] << 8); return [v & 31, (v >> 5) & 31, (v >> 10) & 31].join(',') }
+      const pal = (x, y) => c.gb.ppu.vram[0x2000 + 0x1800 + y * 32 + x] & 7
+      return [['BONJOUR en bleu : 0, 0, 31', c.mot(6, 8, 7) === 'BONJOUR' && coul(0, 3) === '0,0,31', ` (${coul(0, 3)})`]]
+    },
+  },
+
+  {
+    titre: 'Des lettres en couleur : couleurTexte — changer en route',
+    difficulte: 0,
+    suite: true,
+    idee: 'La couleur change toute seule, toutes les demi-secondes : rouge, vert, bleu, et on recommence. chaque(500) et une étape de 0 à 2.',
+    texte: [
+      '**La couleur peut changer pendant le jeu :** il suffit de rappeler `couleurTexte` avec d’autres nombres. Le mot déjà écrit change de couleur **tout de suite**, sans être réécrit.',
+      '**Toutes les demi-secondes** (`chaque(500)`, le 0.77), `etape` avance : 0, 1, 2, puis 0. Selon l’étape, une couleur : rouge, vert, bleu.',
+      '**Le mot n’est écrit qu’une fois**, avant la boucle : seule l’encre change.',
+    ],
+    code: `uint8_t etape = 0;        // 0 = rouge, 1 = vert, 2 = bleu
+
+int main() {
+  texte(6, 8, "BONJOUR");   // écrit UNE fois : ensuite, seule l'encre change
+
+  while (true) {
+    image();
+    if (chaque(500)) {                 // toutes les demi-secondes…
+      etape = (etape + 1) % 3;         // …l'étape suivante : 0, 1, 2, 0…
+      if (etape == 0) { couleurTexte(31, 0, 0); }   // rouge
+      if (etape == 1) { couleurTexte(0, 31, 0); }   // vert
+      if (etape == 2) { couleurTexte(0, 0, 31); }   // bleu
+    }
+  }
+}
+`,
+    aVoir: 'BONJOUR qui change de couleur toutes les demi-secondes : rouge, vert, bleu.',
+    controle: (c) => {
+      const coul = (p, t) => { const i = p * 8 + t * 2, v = c.gb.ppu.bgPalettes[i] | (c.gb.ppu.bgPalettes[i + 1] << 8); return [v & 31, (v >> 5) & 31, (v >> 10) & 31].join(',') }
+      const pal = (x, y) => c.gb.ppu.vram[0x2000 + 0x1800 + y * 32 + x] & 7
+      const vues = new Set()
+      for (let k = 0; k < 150; k++) { c.avancer(1); vues.add(coul(0, 3)) }
+      return [['les trois couleurs, l’une après l’autre', ['31,0,0', '0,31,0', '0,0,31'].every((v) => vues.has(v)), ` (${[...vues].join(' / ')})`]]
+    },
+  },
+
+  {
+    titre: 'Chaque mot sa couleur : texteCouleur',
+    difficulte: 0,
+    idee: 'texteCouleur(x, y, "MOT", palette) : le mot, dans la couleur de SA palette. Trois palettes, trois couleurs, trois mots.',
+    texte: [
+      '**`couleurTexte` teint TOUT le texte.** Pour des mots de couleurs différentes, il faut dire **quelle couleur à quel mot**.',
+      '**Ce qui est nouveau ici : les palettes.** La console en a **8**, numérotées de 0 à 7 : 8 boîtes de couleurs. `couleurFond(1, 3, 31, 0, 0)` met du rouge dans la **teinte 3** (celle des lettres) de la **palette 1**. On remplit ainsi la palette 1 en rouge, la 2 en vert, la 3 en bleu.',
+      '**Ce qui est nouveau aussi : `texteCouleur(x, y, "MOT", palette)`.** Il écrit le mot, **et** met chacune de ses cases dans cette palette. Le mot prend la couleur de la palette.',
+      '**La palette 0** est celle de toutes les cases qu’on n’a pas teintes : c’est elle que `couleurTexte` règle.',
+      '**Sur la Game Boy Color seulement :** la Game Boy d’origine n’a que 4 gris-verts. Le programme passe tout seul en mode couleur ; choisis « En couleur » en haut de la page.',
+    ],
+    code: `int main() {
+  // Trois palettes, trois couleurs pour la teinte 3 (celle des lettres) :
+  //
+  //   couleurFond(1, 3, 31, 0, 0);
+  //               |  |  |
+  //               |  |  +-- la couleur : rouge, vert, bleu (0 à 31)
+  //               |  +----- la teinte 3 : celle des lettres
+  //               +-------- la palette n° 1 (il y en a 8, de 0 à 7)
+  couleurFond(1, 3, 31, 0, 0);    // palette 1 : rouge
+  couleurFond(2, 3, 0, 31, 0);    // palette 2 : vert
+  couleurFond(3, 3, 0, 0, 31);    // palette 3 : bleu
+
+  // Chaque mot, dans sa palette :
+  //
+  //   texteCouleur(6, 4, "ROUGE", 1);
+  //                |  |  |        |
+  //                |  |  |        +-- la palette : 1, la rouge
+  //                |  |  +----------- le mot
+  //                +--+-------------- sa place
+  texteCouleur(6, 4, "ROUGE", 1);
+  texteCouleur(6, 8, "VERT", 2);
+  texteCouleur(6, 12, "BLEU", 3);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'ROUGE en rouge, VERT en vert, BLEU en bleu, l’un sous l’autre.',
+    controle: (c) => {
+      c.avancer(10)
+      const coul = (p, t) => { const i = p * 8 + t * 2, v = c.gb.ppu.bgPalettes[i] | (c.gb.ppu.bgPalettes[i + 1] << 8); return [v & 31, (v >> 5) & 31, (v >> 10) & 31].join(',') }
+      const pal = (x, y) => c.gb.ppu.vram[0x2000 + 0x1800 + y * 32 + x] & 7
+      return [
+        ['les trois mots', c.mot(6, 4, 5) === 'ROUGE' && c.mot(6, 8, 4) === 'VERT' && c.mot(6, 12, 4) === 'BLEU'],
+        ['ROUGE dans la palette 1, rouge', pal(6, 4) === 1 && pal(10, 4) === 1 && coul(1, 3) === '31,0,0'],
+        ['VERT dans la 2, BLEU dans la 3', pal(6, 8) === 2 && pal(6, 12) === 3 && coul(2, 3) === '0,31,0' && coul(3, 3) === '0,0,31'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Chaque mot sa couleur : texteCouleur — un arc-en-ciel',
+    difficulte: 0,
+    suite: true,
+    idee: 'Chaque LETTRE sa couleur : six palettes, et teindre(x + i, y, 1 + i % 6) dans une boucle. BONJOUR en arc-en-ciel.',
+    texte: [
+      '**Plus fin que le mot : la lettre.** `teindre(colonne, ligne, palette)` met **une seule case** dans une palette. Dans une boucle, chaque lettre du mot prend la sienne.',
+      '**Six couleurs d’arc-en-ciel,** dans les palettes 1 à 6 : rouge, orange, jaune, vert, bleu, violet.',
+      '**`1 + i % 6`** : pour la lettre n° i, la palette 1, 2 … 6, puis de nouveau 1 (le `%` du 0.9). BONJOUR a 7 lettres : la 7e (le R) reprend le rouge.',
+    ],
+    code: `int main() {
+  // Six couleurs, dans les palettes 1 à 6 (teinte 3, celle des lettres) :
+  couleurFond(1, 3, 31, 0, 0);    // 1 : rouge
+  couleurFond(2, 3, 31, 16, 0);   // 2 : orange (rouge + un peu de vert)
+  couleurFond(3, 3, 31, 31, 0);   // 3 : jaune  (rouge + vert)
+  couleurFond(4, 3, 0, 31, 0);    // 4 : vert
+  couleurFond(5, 3, 0, 0, 31);    // 5 : bleu
+  couleurFond(6, 3, 20, 0, 31);   // 6 : violet (bleu + un peu de rouge)
+
+  texte(6, 8, "BONJOUR");
+
+  // Chaque lettre, sa palette :
+  //   i = 0 (B) : 1 + 0 % 6 = 1 rouge     i = 3 (J) : 4 vert
+  //   i = 1 (O) : 2 orange                i = 5 (U) : 6 violet
+  //   i = 6 (R) : 1 + 6 % 6 = 1 : de nouveau rouge
+  for (uint8_t i = 0; i < 7; i++) {
+    teindre(6 + i, 8, 1 + i % 6);
+  }
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'BONJOUR en arc-en-ciel : chaque lettre de sa couleur.',
+    controle: (c) => {
+      c.avancer(10)
+      const coul = (p, t) => { const i = p * 8 + t * 2, v = c.gb.ppu.bgPalettes[i] | (c.gb.ppu.bgPalettes[i + 1] << 8); return [v & 31, (v >> 5) & 31, (v >> 10) & 31].join(',') }
+      const pal = (x, y) => c.gb.ppu.vram[0x2000 + 0x1800 + y * 32 + x] & 7
+      const pals = [0, 1, 2, 3, 4, 5, 6].map((i) => pal(6 + i, 8))
+      return [
+        ['chaque lettre sa palette : 1 à 6, puis 1', pals.join('') === '1234561', ` (${pals.join('')})`],
+        ['la 3 est jaune', coul(3, 3) === '31,31,0'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un titre agrandi, en couleur',
+    difficulte: 0,
+    idee: 'texteGrand (le 0.87) et couleurTexte ensemble : un grand JEU orange, comme l’écran titre d’un jeu.',
+    texte: [
+      '**On réunit deux choses déjà vues :** `texteGrand` (le 0.87), qui agrandit, et `couleurTexte` (le 0.88), qui colore.',
+      '**Ce qui est nouveau ici :** rien de plus, mais ensemble. Les lettres agrandies sont dessinées dans la **même teinte** que les lettres normales, la teinte 3 : `couleurTexte` les colore aussi.',
+      '**L’orange,** c’est `31, 16, 0` : tout le rouge, la moitié du vert, pas de bleu.',
+      '**C’est un écran titre :** un mot en grand et en couleur, au milieu. Il ne reste qu’à écrire en dessous « APPUIE SUR START ».',
+    ],
+    code: `int main() {
+  couleurTexte(31, 16, 0);          // de l'orange : tout le rouge, la moitié du vert
+  texteGrand(4, 5, "JEU", 4);       // le titre, 4 fois plus grand (le 0.87)
+  texte(2, 12, "APPUIE SUR START"); // en dessous, en petit : orange aussi
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un grand JEU orange au milieu de l’écran, et en dessous APPUIE SUR START.',
+    controle: (c) => {
+      c.avancer(10)
+      const coul = (p, t) => { const i = p * 8 + t * 2, v = c.gb.ppu.bgPalettes[i] | (c.gb.ppu.bgPalettes[i + 1] << 8); return [v & 31, (v >> 5) & 31, (v >> 10) & 31].join(',') }
+      const pal = (x, y) => c.gb.ppu.vram[0x2000 + 0x1800 + y * 32 + x] & 7
+      let pleines = 0
+      for (let j = 5; j < 9; j++) for (let i = 4; i < 16; i++) if (c.lire(i, j) !== 0) pleines++
+      return [
+        ['le grand JEU est là', pleines > 15],
+        ['et APPUIE SUR START', c.mot(2, 12, 16) === 'APPUIE SUR START'],
+        ['en orange : 31, 16, 0', coul(0, 3) === '31,16,0', ` (${coul(0, 3)})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'L’écran titre — START, un autre écran',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le titre du 0.90, et START qui le fait disparaître : l’écran se vide, un autre apparaît. Une variable retient sur quel écran on est.',
+    texte: [
+      '**C’est le 0.90, avec une seule chose en plus :** quand on appuie sur **START**, le titre s’en va et un **autre écran** apparaît (ici, « C EST PARTI »).',
+      '**`bouton(START)`** rend 1 tant que START est enfoncé. On le regarde **à chaque image**, dans la boucle.',
+      '**Ce qui est nouveau ici : une variable qui dit sur quel écran on est.** `ecranTitre` vaut **1** tant qu’on est sur le titre, **0** ensuite. Pourquoi ? Un appui sur START dure plusieurs images. Sans cette variable, l’écran serait vidé et réécrit **à chaque image** où le doigt reste sur le bouton. Avec elle, le changement se fait **une seule fois** : dès la première image, `ecranTitre` passe à 0, et la condition `ecranTitre == 1 && bouton(START)` n’est plus jamais vraie.',
+      '**`&&` veut dire « et » :** il faut les deux à la fois, être sur le titre **et** appuyer sur START.',
+      '**Vider l’écran :** il n’y a pas de fonction qui efface tout d’un coup. On le fait ligne par ligne : une boucle `for` sur les **18 lignes** (0 à 17), et sur chacune `effacer(0, y, 20)` efface **20 cases** à partir de la colonne 0, toute la largeur.',
+      '**La couleur reste :** `couleurTexte` a réglé l’encre de toutes les lettres ; le nouvel écran est orange aussi.',
+    ],
+    code: `uint8_t ecranTitre = 1;   // sur quel écran on est : 1 = le titre, 0 = l'écran d'après
+
+int main() {
+  // Le titre du 0.90 :
+  couleurTexte(31, 16, 0);          // de l'orange
+  texteGrand(4, 5, "JEU", 4);       // le grand titre
+  texte(2, 12, "APPUIE SUR START"); // la consigne
+
+  while (true) {
+    image();
+
+    // On change d'écran si on est SUR LE TITRE  ET  que START est appuyé.
+    //
+    //   ecranTitre == 1    &&    bouton(START)
+    //   |                  |     |
+    //   |                  |     +-- START est enfoncé (1), ou pas (0)
+    //   |                  +-------- « et » : il faut les deux à la fois
+    //   +--------------------------- on est encore sur le titre
+    if (ecranTitre == 1 && bouton(START)) {
+      ecranTitre = 0;               // tout de suite : ce bloc ne se refera plus jamais,
+                                    // même si le doigt reste sur START
+
+      // Vider l'écran : 18 lignes (0 à 17), 20 cases chacune.
+      //   y = 0 : effacer(0, 0, 20)   la ligne du haut
+      //   y = 1 : effacer(0, 1, 20)   celle d'en dessous
+      //   …
+      //   y = 17 : effacer(0, 17, 20) la ligne du bas
+      for (uint8_t y = 0; y < 18; y++) {
+        effacer(0, y, 20);
+      }
+
+      texte(5, 8, "C EST PARTI");   // le nouvel écran
+    }
+  }
+}
+`,
+    aVoir: 'Le grand JEU orange et APPUIE SUR START ; appuie sur START (touche Entrée) : l’écran se vide et C EST PARTI apparaît.',
+    controle: (c) => {
+      c.avancer(10)
+      const avant = c.mot(2, 12, 16) === 'APPUIE SUR START'
+      const titre = c.variable('ecranTitre') === 1
+      c.presser('start', 6)
+      c.avancer(5)
+      let pleines = 0
+      for (let j = 5; j < 8; j++) for (let i = 4; i < 16; i++) if (c.lire(i, j) !== 0) pleines++   // lignes 5 à 7 : la ligne 8 porte le nouveau texte
+      return [
+        ['avant START : le titre et sa consigne', avant && titre],
+        ['après START : la consigne et le grand JEU ont disparu', c.mot(2, 12, 16).trim() === '' && pleines === 0, ` (${pleines} cases du titre restent)`],
+        ['le nouvel écran : C EST PARTI', c.mot(5, 8, 11) === 'C EST PARTI'],
+        ['ecranTitre est passé à 0', c.variable('ecranTitre') === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'L’écran titre — une lettre qui file',
+    difficulte: 0,
+    suite: true,
+    idee: 'Sur l’écran d’après START, un B qui file de gauche à droite, sans fin : defile(0, 0, 12, ALPHABET[1], 1, 150).',
+    texte: [
+      '**C’est le 0.90.1, avec une chose en plus :** sur l’écran d’après START, un **B** traverse l’écran **de gauche à droite**, et recommence.',
+      '**`defile` (le 0.65.3)** fait filer une lettre sur sa ligne : un pas toutes les « vitesse » millisecondes ; arrivée au bord droit, elle repart du bord gauche. Elle **ne bloque rien** : le reste de la boucle continue.',
+      '**Il faut l’appeler à chaque image**, dans la boucle : chaque appel regarde si c’est le moment de faire un pas.',
+      '**Seulement après START :** `if (ecranTitre == 0)`. Sur le titre, `ecranTitre` vaut 1 : le B ne vient pas encore.',
+      '**Le B, pas un A :** « C EST PARTI » contient déjà un A ; un B se distingue mieux.',
+    ],
+    code: `uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
+
+int main() {
+  couleurTexte(31, 16, 0);          // le titre du 0.90, en orange
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    // Le changement d'écran du 0.90.1 : une seule fois, au premier appui sur START.
+    if (ecranTitre == 1 && bouton(START)) {
+      ecranTitre = 0;
+      for (uint8_t y = 0; y < 18; y++) {
+        effacer(0, y, 20);          // on vide les 18 lignes
+      }
+      texte(5, 8, "C EST PARTI");
+    }
+
+    // ---- NOUVEAU : une lettre qui file, seulement sur l'écran d'après
+    //
+    //   defile(0, 0, 12, ALPHABET[1], 1, 150);
+    //          |  |  |   |           |  |
+    //          |  |  |   |           |  +-- la VITESSE : un pas toutes les 150 ms
+    //          |  |  |   |           +----- le SENS : 1 = vers la droite (-1 = vers la gauche)
+    //          |  |  |   +----------------- la lettre : ALPHABET[1], le B
+    //          |  +--+--------------------- le départ : colonne 0, ligne 12
+    //          +--------------------------- son numéro (0 à 3) : jusqu'à 4 lettres qui filent
+    if (ecranTitre == 0) {
+      defile(0, 0, 12, ALPHABET[1], 1, 150);
+    }
+  }
+}
+`,
+    aVoir: 'Après START : C EST PARTI, et un B qui file de gauche à droite sur la ligne 12, sans fin.',
+    controle: (c) => {
+      c.avancer(10)
+      const avant = c.mot(0, 12, 20).includes('B')
+      c.presser('start', 6)
+      const { B } = suivre(c, 'B', 200)
+      const xs = B.map((p) => Number(p.split(',')[0]))
+      return [
+        ['pas de B sur le titre', !avant],
+        ['après START, le B avance vers la droite', xs.length > 5 && xs[1] > xs[0], ` (${xs.slice(0, 8).join(' → ')})`],
+        ['toujours sur la ligne 12', B.every((p) => p.endsWith(',12'))],
+      ]
+    },
+  },
+
+  {
+    titre: 'L’écran titre — tout l’écran glisse',
+    difficulte: 0,
+    suite: true,
+    idee: 'On repart du 0.90.1 : cette fois, c’est TOUT l’écran qui glisse vers la droite. defiler(d, 0), et d qui diminue à chaque image.',
+    texte: [
+      '**On repart du 0.90.1** (sans le B du 0.90.2), avec une seule chose en plus : **tout l’écran** glisse de gauche à droite, « C EST PARTI » compris.',
+      '**Ce qui est nouveau ici : `defiler(x, y)`.** Il ne bouge pas une lettre : il déplace **la caméra** qui regarde le décor. `x` dit de combien de **pixels** la caméra est poussée vers la droite.',
+      '**Pour que le décor aille à DROITE, la caméra va à GAUCHE :** comme dans un train, quand tu avances, le paysage recule. Alors `d` **diminue** : `d--`, un pixel à chaque image.',
+      '**`d` passe sous 0 ?** C’est un `uint8_t` : après 0 vient **255**, puis 254… (l’octet qui boucle, la leçon 35). Et le décor fait justement **256 pixels** de large : il revient tout seul, sans fin. Ce qui sort par la droite réapparaît à gauche.',
+      '**60 images par seconde, un pixel chaque fois :** le texte traverse l’écran (160 pixels) en moins de 3 secondes, tout en douceur.',
+    ],
+    code: `uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
+uint8_t d = 0;            // la caméra : 0 = elle regarde le début du décor
+
+int main() {
+  couleurTexte(31, 16, 0);          // le titre du 0.90, en orange
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    // Le changement d'écran du 0.90.1 : une seule fois, au premier appui sur START.
+    if (ecranTitre == 1 && bouton(START)) {
+      ecranTitre = 0;
+      for (uint8_t y = 0; y < 18; y++) {
+        effacer(0, y, 20);          // on vide les 18 lignes
+      }
+      texte(5, 8, "C EST PARTI");
+    }
+
+    // ---- NOUVEAU : tout l'écran glisse, seulement sur l'écran d'après
+    //
+    //   d--          la caméra recule d'un pixel : 0, 255, 254, 253…
+    //   defiler(d, 0);
+    //           |  |
+    //           |  +-- vers le bas : 0, on ne bouge pas en hauteur
+    //           +----- vers la droite : d pixels
+    //
+    //   la caméra recule → le décor semble avancer vers la DROITE
+    if (ecranTitre == 0) {
+      d--;
+      defiler(d, 0);
+    }
+  }
+}
+`,
+    aVoir: 'Après START : C EST PARTI glisse vers la droite, sort de l’écran et revient par la gauche, sans fin.',
+    controle: (c) => {
+      c.avancer(10)
+      const avant = c.defilement()
+      c.avancer(30)
+      const toujours = c.defilement()
+      c.presser('start', 6)
+      c.avancer(20)
+      const d = c.variable('d')
+      return [
+        ['sur le titre, rien ne glisse', avant === toujours],
+        ['après START, la caméra recule : d est passé sous 0 (255, 254…)', d > 200, ` (d = ${d})`],
+        ['et l’écran glisse vraiment', c.defilement() !== avant, ` (${avant} vers ${c.defilement()})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'L’écran titre — un bandeau qui passe',
+    difficulte: 0,
+    suite: true,
+    idee: 'On repart du 0.90.1 : une seule ligne bouge, les autres restent en place. BONJOUR passe en bas, de gauche à droite : effacer, avancer, réécrire.',
+    texte: [
+      '**`defiler` bouge TOUT l’écran** (le 0.90.3). Pour un **bandeau**, comme les informations qui passent en bas d’une télé, il faut qu’**une seule ligne** bouge et que « C EST PARTI » reste en place.',
+      '**Ce qui est nouveau ici : déplacer un mot soi-même,** en trois gestes, toutes les 150 ms (`chaque(150)`, le 0.77) : **effacer** le mot là où il est, **avancer** sa position d’une case, le **réécrire** à la nouvelle place.',
+      '**`effacer(p, 16, "BONJOUR")`** : quand on lui donne le texte lui-même, `effacer` efface exactement autant de cases que le texte a de lettres (7).',
+      '**`p = (p + 1) % 20`** : p va de 0 à 19, puis revient à 0 (le `%` du 0.9). À droite, les dernières lettres passent **hors de l’écran** : la carte du décor fait 32 cases de large, l’écran n’en montre que 20. Elles existent, mais on ne les voit pas.',
+      '**Le mot n’est écrit qu’après START :** p commence à 0 ; au premier coup après START, on efface en 0 (rien à effacer), p passe à 1, et BONJOUR s’écrit en (1, 16).',
+    ],
+    code: `uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
+uint8_t p = 0;            // la colonne du bandeau
+
+int main() {
+  couleurTexte(31, 16, 0);          // le titre du 0.90, en orange
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    // Le changement d'écran du 0.90.1 : une seule fois, au premier appui sur START.
+    if (ecranTitre == 1 && bouton(START)) {
+      ecranTitre = 0;
+      for (uint8_t y = 0; y < 18; y++) {
+        effacer(0, y, 20);          // on vide les 18 lignes
+      }
+      texte(5, 8, "C EST PARTI");
+    }
+
+    // ---- NOUVEAU : un bandeau qui passe, seulement sur l'écran d'après
+    //   toutes les 150 ms, trois gestes :
+    //     1. effacer le mot à sa place       effacer(p, 16, "BONJOUR");
+    //     2. avancer d'une case              p = (p + 1) % 20;   0, 1, … 19, puis 0
+    //     3. l'écrire à la nouvelle place    texte(p, 16, "BONJOUR");
+    //
+    //   p = 0 :  BONJOUR.............
+    //   p = 1 :  .BONJOUR............
+    //   p = 15 : ...............BONJO   (UR : hors de l'écran, à droite)
+    if (ecranTitre == 0 && chaque(150)) {
+      effacer(p, 16, "BONJOUR");
+      p = (p + 1) % 20;
+      texte(p, 16, "BONJOUR");
+    }
+  }
+}
+`,
+    aVoir: 'Après START : C EST PARTI reste au milieu ; en bas, BONJOUR passe de gauche à droite, et recommence.',
+    controle: (c) => {
+      c.avancer(10)
+      c.presser('start', 6)
+      c.avancer(5)
+      const p1 = c.variable('p')
+      c.avancer(40)
+      const p2 = c.variable('p')
+      return [
+        ['le bandeau avance', p2 > p1, ` (p : ${p1} → ${p2})`],
+        ['BONJOUR est à sa place, sur la ligne 16', c.mot(p2, 16, 7).startsWith('BONJOUR'.slice(0, 20 - p2))],
+        ['une seule case derrière lui est vide : pas de traînée', p2 === 0 || c.mot(p2 - 1, 16, 1).trim() === ''],
+        ['C EST PARTI ne bouge pas', c.mot(5, 8, 11) === 'C EST PARTI' && c.defilement() === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'L’écran titre — la consigne qui clignote',
+    difficulte: 0,
+    suite: true,
+    idee: 'On repart du 0.90.1 : APPUIE SUR START clignote, comme dans les vrais jeux. Toutes les demi-secondes, on l’écrit ou on l’efface.',
+    texte: [
+      '**On repart du 0.90.1** (le titre, START, l’écran d’après), avec une chose en plus : sur le titre, « APPUIE SUR START » **clignote**.',
+      '**Ce qui est nouveau ici : une variable qui retient si le texte est affiché.** `visible` vaut **1** quand la consigne est à l’écran, **0** quand elle est effacée. Toutes les demi-secondes (`chaque(500)`, le 0.77), on regarde : visible ? on l’**efface** ; effacée ? on l’**écrit**. Et `visible` change de valeur.',
+      '**`visible = 1 - visible`** : une astuce pour basculer. 1 - 1 = **0**, et 1 - 0 = **1**. À chaque fois, la valeur passe de l’une à l’autre.',
+      '**Seulement sur le titre :** `ecranTitre == 1 && chaque(500)`. Après START, la consigne ne revient plus.',
+    ],
+    code: `uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
+uint8_t visible = 1;      // 1 = la consigne est à l'écran, 0 = elle est effacée
+
+int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");   // au départ, elle est là : visible = 1
+
+  while (true) {
+    image();
+
+    // ---- NOUVEAU : sur le titre, toutes les demi-secondes, la consigne bascule.
+    //
+    //   visible = 1 → on l'efface, visible devient 0
+    //   visible = 0 → on l'écrit,  visible devient 1
+    //   …et ainsi de suite : écrite, effacée, écrite, effacée…
+    if (ecranTitre == 1 && chaque(500)) {
+      if (visible == 1) {
+        effacer(2, 12, "APPUIE SUR START");   // efface autant de cases que le texte
+      } else {
+        texte(2, 12, "APPUIE SUR START");
+      }
+      visible = 1 - visible;                  // 1 - 1 = 0 ;  1 - 0 = 1 : ça bascule
+    }
+
+    // Le changement d'écran du 0.90.1.
+    if (ecranTitre == 1 && bouton(START)) {
+      ecranTitre = 0;
+      for (uint8_t y = 0; y < 18; y++) {
+        effacer(0, y, 20);
+      }
+      texte(5, 8, "C EST PARTI");
+    }
+  }
+}
+`,
+    aVoir: 'Le grand JEU orange, et APPUIE SUR START qui clignote. START : C EST PARTI, et plus rien ne clignote.',
+    controle: (c) => {
+      c.avancer(5)
+      const vus = new Set()
+      for (let k = 0; k < 90; k++) { c.avancer(1); vus.add(c.mot(2, 12, 16).trim()) }
+      c.presser('start', 6)
+      let revient = false
+      for (let k = 0; k < 90; k++) { c.avancer(1); if (c.mot(2, 12, 16).trim() !== '') revient = true }
+      return [
+        ['la consigne clignote : tantôt là, tantôt effacée', vus.has('APPUIE SUR START') && vus.has('')],
+        ['après START, elle ne revient plus', !revient && c.mot(5, 8, 11) === 'C EST PARTI'],
+      ]
+    },
+  },
+
+  {
+    titre: 'L’écran titre — SELECT, retour au titre',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.90.5, et SELECT qui ramène au titre. Le titre se dessine alors deux fois : on le range dans une fonction, dessinerTitre().',
+    texte: [
+      '**C’est le 0.90.5, avec une chose en plus :** sur l’écran d’après, **SELECT** ramène au titre. `ecranTitre` repasse à **1**, et le titre se redessine.',
+      '**Ce qui est nouveau ici : ranger des lignes dans une fonction** (comme `tour_de_jeu` au 0.80.2). Le titre doit être dessiné **au départ**, et **à chaque retour**. Plutôt que d’écrire les mêmes lignes deux fois, on les met dans `void dessinerTitre() { … }`, et on écrit juste `dessinerTitre();` là où il faut.',
+      '**Même chose pour vider l’écran :** `viderEcran()` range la boucle des 18 lignes. Elle sert pour aller sur l’écran d’après, et pour en revenir.',
+      '**`void`** veut dire que la fonction ne rend rien : elle **fait** quelque chose (elle dessine, elle efface), c’est tout.',
+      '**Au retour, `visible` repasse à 1 :** dessinerTitre() vient d’écrire la consigne, elle est donc à l’écran.',
+    ],
+    code: `uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
+uint8_t visible = 1;      // la consigne : 1 = à l'écran, 0 = effacée
+
+// ---- NOUVEAU : des lignes rangées sous un nom, pour s'en servir plusieurs fois ----
+
+// Dessiner le titre : au départ, ET à chaque retour avec SELECT.
+void dessinerTitre() {
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+}
+
+// On vide l'écran : 18 lignes (0 à 17), 20 cases chacune.
+void viderEcran() {
+  for (uint8_t y = 0; y < 18; y++) {
+    effacer(0, y, 20);
+  }
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  dessinerTitre();                  // la première fois : toutes les lignes de la fonction
+
+  while (true) {
+    image();
+
+    // La consigne qui clignote (le 0.90.5).
+    if (ecranTitre == 1 && chaque(500)) {
+      if (visible == 1) {
+        effacer(2, 12, "APPUIE SUR START");
+      } else {
+        texte(2, 12, "APPUIE SUR START");
+      }
+      visible = 1 - visible;
+    }
+
+    // Titre → écran d'après, avec START.
+    if (ecranTitre == 1 && bouton(START)) {
+      ecranTitre = 0;
+      viderEcran();                 // la boucle des 18 lignes, rangée dans sa fonction
+      texte(5, 8, "C EST PARTI");
+      texte(1, 16, "SELECT : LE TITRE");
+    }
+
+    // ---- NOUVEAU : écran d'après → titre, avec SELECT.
+    if (ecranTitre == 0 && bouton(SELECT)) {
+      ecranTitre = 1;               // on est de nouveau sur le titre
+      viderEcran();
+      dessinerTitre();              // la deuxième fois : les mêmes lignes, sans les réécrire
+      visible = 1;                  // la consigne vient d'être écrite : elle est là
+    }
+  }
+}
+`,
+    aVoir: 'Le titre ; START : C EST PARTI ; SELECT : le titre revient, et la consigne clignote de nouveau.',
+    controle: (c) => {
+      c.avancer(10)
+      c.presser('start', 6)
+      c.avancer(5)
+      const apres = c.mot(5, 8, 11) === 'C EST PARTI' && c.variable('ecranTitre') === 0
+      c.presser('select', 6)
+      c.avancer(5)
+      let pleines = 0
+      for (let j = 5; j < 9; j++) for (let i = 4; i < 16; i++) if (c.lire(i, j) !== 0) pleines++
+      return [
+        ['START : l’écran d’après', apres],
+        ['SELECT : retour au titre (ecranTitre = 1)', c.variable('ecranTitre') === 1],
+        ['le grand JEU est redessiné, C EST PARTI a disparu', pleines > 15 && !c.mot(0, 16, 20).includes('SELECT')],
+      ]
+    },
+  },
+
+  {
+    titre: 'L’écran titre — trois écrans',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.90.6 avec un troisième écran : ecranTitre devient ecran, qui vaut 0 (le titre), 1 (le jeu) ou 2 (la fin). B mène à la fin, START fait rejouer.',
+    texte: [
+      '**Un jeu a presque toujours trois écrans :** le **titre**, le **jeu**, la **fin**. Deux valeurs (1 ou 0) ne suffisent plus.',
+      '**Ce qui est nouveau ici : une variable qui compte les écrans.** `ecranTitre` devient `ecran`, et vaut **0** (le titre), **1** (le jeu) ou **2** (la fin). Chaque `if` commence par regarder sur quel écran on est : `ecran == 0 && …`, `ecran == 1 && …`, `ecran == 2 && …`.',
+      '**Les chemins :** titre → **START** → jeu ; jeu → **B** → fin (plus tard, ce sera « perdu » ou « le temps est fini ») ; fin → **START** → le jeu, de nouveau ; jeu → **SELECT** → le titre.',
+      '**Pourquoi la fin ramène au JEU, et pas au titre ?** Un appui sur START dure plusieurs images. Si la fin menait au titre, l’image suivante, START encore enfoncé, ferait aussitôt passer du titre au jeu : on ne verrait pas le titre. Aller droit au jeu, c’est « rejouer ».',
+      '**Les numéros sont une convention :** 0, 1, 2, c’est nous qui décidons ce qu’ils veulent dire. Les commentaires le rappellent.',
+    ],
+    code: `// ---- NOUVEAU : une variable pour TROIS écrans ----
+//   ecran = 0 : le TITRE    ecran = 1 : le JEU    ecran = 2 : la FIN
+uint8_t ecran = 0;
+uint8_t visible = 1;      // la consigne du titre : 1 = à l'écran, 0 = effacée
+
+void dessinerTitre() {
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+}
+
+// L'écran du jeu (pour l'instant, deux mots) : depuis le titre, ET depuis la fin.
+void dessinerJeu() {
+  texte(5, 8, "C EST PARTI");
+  texte(3, 14, "B : LA FIN");
+  texte(1, 16, "SELECT : LE TITRE");
+}
+
+// On vide l'écran : 18 lignes (0 à 17), 20 cases chacune.
+void viderEcran() {
+  for (uint8_t y = 0; y < 18; y++) {
+    effacer(0, y, 20);
+  }
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  dessinerTitre();
+
+  while (true) {
+    image();
+
+    // ---- ÉCRAN 0 : LE TITRE ----
+    if (ecran == 0 && chaque(500)) {          // la consigne qui clignote
+      if (visible == 1) {
+        effacer(2, 12, "APPUIE SUR START");
+      } else {
+        texte(2, 12, "APPUIE SUR START");
+      }
+      visible = 1 - visible;
+    }
+    if (ecran == 0 && bouton(START)) {        // titre → jeu
+      ecran = 1;
+      viderEcran();
+      dessinerJeu();
+    }
+
+    // ---- ÉCRAN 1 : LE JEU ----
+    if (ecran == 1 && bouton(B)) {            // jeu → fin
+      ecran = 2;
+      viderEcran();
+      texte(8, 8, "FIN");
+      texte(2, 12, "START : REJOUER");
+    }
+    if (ecran == 1 && bouton(SELECT)) {       // jeu → titre
+      ecran = 0;
+      viderEcran();
+      dessinerTitre();
+      visible = 1;
+    }
+
+    // ---- ÉCRAN 2 : LA FIN ----
+    if (ecran == 2 && bouton(START)) {        // fin → jeu : on rejoue
+      ecran = 1;
+      viderEcran();
+      dessinerJeu();
+    }
+  }
+}
+`,
+    aVoir: 'Le titre ; START : le jeu ; B : FIN ; START : le jeu de nouveau ; SELECT : le titre.',
+    controle: (c) => {
+      c.avancer(10)
+      const e = []
+      e.push(c.variable('ecran'))
+      c.presser('start', 6); c.avancer(5); e.push(c.variable('ecran'))
+      c.presser('b', 6); c.avancer(5); e.push(c.variable('ecran'))
+      const fin = c.mot(8, 8, 3) === 'FIN'
+      c.presser('start', 6); c.avancer(5); e.push(c.variable('ecran'))
+      const rejoue = c.mot(5, 8, 11) === 'C EST PARTI'
+      c.presser('select', 6); c.avancer(5); e.push(c.variable('ecran'))
+      return [
+        ['le chemin : titre 0 → jeu 1 → fin 2 → jeu 1 → titre 0', e.join(' ') === '0 1 2 1 0', ` (${e.join(' → ')})`],
+        ['la fin affiche FIN', fin],
+        ['START sur la fin : on rejoue', rejoue],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le titre, puis le jeu',
+    difficulte: 0,
+    partie: 'Du titre au snake',
+    idee: 'On réunit l’écran titre (le 0.90) et le jeu du 0.81 : START fait disparaître le titre, pose le P, et la partie commence.',
+    texte: [
+      '**Deux programmes qu’on connaît, réunis en un :** l’**écran titre** (le 0.90.1) et le **jeu de la pièce** (le 0.81 : le A suit la croix et ramasse le P).',
+      '**Ce qui est nouveau ici : le jeu n’existe qu’après START.** Tout ce que faisait la boucle du 0.81 est rangé dans `if (ecran == 1) { … }`. Sur le titre (`ecran == 0`), le A n’est pas là, la croix ne fait rien.',
+      '**Ce que le 0.81 faisait avant la boucle** (poser le P, écrire SCORE) se fait maintenant **au moment de START** : c’est là que l’écran du jeu commence.',
+      '**Deux fois `if`, pas `if … else`,** pour rester comme au 0.90.1 : le premier regarde START sur le titre, le second fait tourner le jeu.',
+    ],
+    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU
+
+// Les variables du jeu du 0.81 :
+uint8_t x = 5;            // le A : sa colonne…
+uint8_t y = 8;            // …et sa ligne (le 0.81)
+uint8_t px = 15;          // la pièce, le P : sa colonne…
+uint8_t py = 8;           // …et sa ligne
+uint8_t score = 0;        // les pièces ramassées
+
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+int main() {
+  couleurTexte(31, 16, 0);            // le titre du 0.90
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    // ---- ÉCRAN 0 : LE TITRE. START : on prépare le jeu, une seule fois.
+    if (ecran == 0 && bouton(START)) {
+      ecran = 1;
+      viderEcran();
+      poser(px, py, ALPHABET[15]);    // le P (ce que le 0.81 faisait AVANT la boucle)
+      texte(0, 17, "SCORE");
+    }
+
+    // ---- ÉCRAN 1 : LE JEU. La boucle du 0.81, seulement sur cet écran.
+    if (ecran == 1) {
+      deplace_croix(x, y, ALPHABET[0], 250);   // le A suit la croix
+      if (x == px && y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+        px = 20;                               // la pièce part hors de l'écran
+      }
+      nombre(6, 17, score);
+    }
+  }
+}
+`,
+    aVoir: 'Le titre ; START : le titre disparaît, le A et le P apparaissent, et on ramasse le P avec la croix.',
+    controle: (c) => {
+      c.avancer(10)
+      const pasDeP = c.mot(15, 8, 1) !== 'P'
+      c.presser('start', 6)
+      c.avancer(5)
+      const piece = c.mot(15, 8, 1) === 'P'
+      for (let k = 0; k < 200; k++) { c.gb.setButton('right', true); c.avancer(1) } c.gb.setButton('right', false); c.avancer(3)
+      return [
+        ['sur le titre, pas de pièce', pasDeP],
+        ['après START, le P est posé', piece],
+        ['on le ramasse : le score vaut 1', c.variable('score') === 1 && c.mot(6, 17, 3) === '001'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le titre, puis le jeu — trente secondes',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.91 avec un chronomètre : 30 secondes, une de moins chaque seconde (chaque(1000)). À 0 : l’écran FIN.',
+    texte: [
+      '**C’est le 0.91, avec une chose en plus : le temps.** La partie dure **30 secondes**. Le reste s’affiche en bas à droite, après TEMPS.',
+      '**Ce qui est nouveau ici : un compte à rebours.** `temps` part de **30**. Toutes les secondes (`chaque(1000)`), il perd 1 : 30, 29, 28… À **0**, la partie s’arrête : on passe à un troisième écran, `ecran = 2`, la **fin** (le 0.90.7).',
+      '**Seulement pendant le jeu :** `ecran == 1 && chaque(1000)`. Sur le titre, le temps ne bouge pas.',
+      '**Sur l’écran de fin, plus rien ne bouge :** la boucle du jeu est dans `if (ecran == 1)`. Avec `ecran == 2`, le A ne suit plus la croix.',
+    ],
+    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+
+uint8_t x = 5;            // le A : sa colonne…
+uint8_t y = 8;            // …et sa ligne (le 0.81)
+uint8_t px = 15;          // la pièce, le P : sa colonne…
+uint8_t py = 8;           // …et sa ligne
+uint8_t score = 0;        // les pièces ramassées
+uint8_t temps = 30;       // NOUVEAU : les secondes qui restent
+
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    if (ecran == 0 && bouton(START)) {
+      ecran = 1;
+      viderEcran();
+      poser(px, py, ALPHABET[15]);
+      texte(0, 17, "SCORE");
+      texte(11, 17, "TEMPS");         // NOUVEAU : le mot TEMPS, en bas à droite
+    }
+
+    if (ecran == 1) {
+      deplace_croix(x, y, ALPHABET[0], 250);   // le A suit la croix
+      if (x == px && y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+        px = 20;                               // la pièce part hors de l'écran
+      }
+      nombre(6, 17, score);
+      nombre(17, 17, temps);          // NOUVEAU : les secondes, après TEMPS
+    }
+
+    // ---- NOUVEAU : le compte à rebours, une seconde de moins toutes les 1000 ms.
+    //   30 → 29 → … → 1 → 0 : c'est fini, écran 2.
+    if (ecran == 1 && chaque(1000)) {
+      temps = temps - 1;
+      if (temps == 0) {
+        ecran = 2;                    // la FIN
+        viderEcran();
+        texte(8, 8, "FIN");
+      }
+    }
+  }
+}
+`,
+    aVoir: 'START : le jeu, et TEMPS qui descend de 030 à 000. À 0, l’écran se vide et FIN s’affiche.',
+    controle: (c) => {
+      c.avancer(10)
+      c.presser('start', 6)
+      c.avancer(300)
+      const t = c.variable('temps')
+      c.avancer(1600)
+      return [
+        ['le temps descend, une seconde à la fois', t >= 23 && t <= 26, ` (après 5 secondes : ${t})`],
+        ['au bout de 30 secondes : FIN', c.variable('ecran') === 2 && c.variable('temps') === 0 && c.mot(8, 8, 3) === 'FIN'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le titre, puis le jeu — le score et rejouer',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.91.1, et sur l’écran FIN : le score de la partie, et START pour rejouer. Tout se remet au départ : une fonction nouvellePartie().',
+    texte: [
+      '**C’est le 0.91.1, avec une chose en plus :** l’écran de fin montre le **score**, et **START** relance une partie.',
+      '**Ce qui est nouveau ici : tout remettre au départ.** Une nouvelle partie, c’est le A en (5, 8), le P en (15, 8), le score à 0, le temps à 30, et l’écran du jeu redessiné. Ces lignes servent **deux fois** : depuis le titre, et depuis la fin. On les range dans **`nouvellePartie()`** (le 0.90.6).',
+      '**Remettre les variables, c’est indispensable :** sans `score = 0`, la deuxième partie commencerait avec le score de la première ; sans `px = 15`, le P resterait hors de l’écran (en 20), et on ne pourrait plus le ramasser.',
+      '**La fin mène au jeu, pas au titre** (le 0.90.7) : START encore enfoncé ferait sauter le titre aussitôt.',
+      '**La première seconde de la nouvelle partie est un peu courte :** le chronomètre de `chaque(1000)` a continué de tourner pendant l’écran de fin. Au retour dans le jeu, il est déjà « à l’heure » : 30 devient 29 tout de suite.',
+    ],
+    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+
+uint8_t x = 5;            // le A : sa colonne…
+uint8_t y = 8;            // …et sa ligne (le 0.81)
+uint8_t px = 15;          // la pièce, le P : sa colonne…
+uint8_t py = 8;           // …et sa ligne
+uint8_t score = 0;        // les pièces ramassées
+uint8_t temps = 30;       // les secondes qui restent
+
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+// ---- NOUVEAU : une partie qui commence, TOUT au départ ----
+// Depuis le titre, ET depuis la fin (START : rejouer).
+void nouvellePartie() {
+  x = 5;                          // le A revient à sa place
+  y = 8;
+  px = 15;                        // le P aussi (il était peut-être en 20, ramassé)
+  py = 8;
+  score = 0;                      // pas encore de pièce
+  temps = 30;                     // 30 secondes de nouveau
+  ecran = 1;                      // on est sur le JEU
+  viderEcran();
+  poser(px, py, ALPHABET[15]);
+  texte(0, 17, "SCORE");
+  texte(11, 17, "TEMPS");
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    if (ecran == 0 && bouton(START)) {
+      nouvellePartie();               // la première partie
+    }
+
+    if (ecran == 1) {
+      deplace_croix(x, y, ALPHABET[0], 250);   // le A suit la croix
+      if (x == px && y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+        px = 20;                               // la pièce part hors de l'écran
+      }
+      nombre(6, 17, score);
+      nombre(17, 17, temps);
+    }
+
+    if (ecran == 1 && chaque(1000)) {
+      temps = temps - 1;
+      if (temps == 0) {
+        ecran = 2;
+        viderEcran();
+        texte(8, 6, "FIN");
+        texte(5, 9, "SCORE");         // NOUVEAU : le score de la partie
+        nombre(11, 9, score);
+        texte(2, 13, "START : REJOUER");
+      }
+    }
+
+    // ---- NOUVEAU : sur la fin, START relance une partie.
+    if (ecran == 2 && bouton(START)) {
+      nouvellePartie();               // la même fonction : tout au départ
+    }
+  }
+}
+`,
+    aVoir: 'Une partie de 30 secondes ; à la fin : FIN, le score, START : REJOUER. START : une nouvelle partie, score 0, temps 30.',
+    controle: (c) => {
+      c.avancer(10)
+      c.presser('start', 6)
+      for (let k = 0; k < 200; k++) { c.gb.setButton('right', true); c.avancer(1) } c.gb.setButton('right', false)
+      c.avancer(1700)
+      const fin = c.variable('ecran') === 2 && c.mot(8, 6, 3) === 'FIN' && c.mot(11, 9, 3) === '001'
+      c.presser('start', 6)
+      c.avancer(10)
+      return [
+        ['la fin montre le score : 001', fin],
+        ['START : une nouvelle partie (écran 1, score 0, temps 30 ou 29)', c.variable('ecran') === 1 && c.variable('score') === 0 && c.variable('temps') >= 29, ` (temps = ${c.variable('temps')})`],
+        ['le P est revenu en (15, 8), et le A en (5, 8)', c.mot(15, 8, 1) === 'P' && c.mot(5, 8, 1) === 'A'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le titre, puis le jeu — un cadre de murs X',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.91.2, et des murs tout autour du terrain : un cadre de X. Le A qui y entre revient aussitôt à sa place d’avant.',
+    texte: [
+      '**C’est le 0.91.2, avec une chose en plus : un cadre de murs.** Les murs sont des **lettres**, comme le M du 0.82 ; ici, le **X**. Il fait le tour du terrain : le haut (ligne 0), le bas (ligne 16), la gauche (colonne 0), la droite (colonne 19).',
+      '**Le dessiner : deux boucles.** La première pose les X du haut et du bas, colonne par colonne (0 à 19). La seconde, ceux des côtés, ligne par ligne (1 à 15 : les coins sont déjà posés).',
+      '**La ligne 17 reste aux nombres :** le cadre s’arrête à la ligne 16, SCORE et TEMPS restent en dessous.',
+      '**Ce qui est nouveau ici : revenir en arrière.** `deplace_croix` ne connaît pas les murs : elle fait le pas. Alors on retient la place du A **avant** (`ax`, `ay`), et **après** le pas on regarde : sur le cadre ? On remet le X (le A l’avait recouvert) et le A revient à sa place d’avant. Tout se passe dans la même image : on ne voit pas le A entrer dans le mur.',
+      '**`||` veut dire « ou » :** `x == 0 || x == 19 || y == 0 || y >= 16` est vrai dès qu’**une** des quatre l’est. `y >= 16` (plus grand ou égal) compte aussi la ligne 17 : le A ne descend jamais sur les nombres.',
+      '**Le cadre est redessiné à chaque partie,** dans `nouvellePartie()` : après le titre et après la fin, l’écran a été vidé.',
+    ],
+    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+
+uint8_t x = 5;            // le A : sa colonne…
+uint8_t y = 8;            // …et sa ligne (le 0.81)
+uint8_t px = 15;          // la pièce, le P : sa colonne…
+uint8_t py = 8;           // …et sa ligne
+uint8_t score = 0;        // les pièces ramassées
+uint8_t temps = 30;       // les secondes qui restent
+uint8_t ax = 5;           // NOUVEAU : la place du A AVANT son pas…
+uint8_t ay = 8;           // …pour l'y remettre s'il entre dans un mur
+
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+// ---- NOUVEAU : une partie qui commence, TOUT au départ ----
+// Depuis le titre, ET depuis la fin (START : rejouer).
+void nouvellePartie() {
+  x = 5;                          // le A revient à sa place
+  y = 8;
+  px = 15;                        // le P aussi (il était peut-être en 20, ramassé)
+  py = 8;
+  ax = 5;                         // et sa place d'avant, la même
+  ay = 8;
+  score = 0;                      // pas encore de pièce
+  temps = 30;                     // 30 secondes de nouveau
+  ecran = 1;                      // on est sur le JEU
+  viderEcran();
+  poser(px, py, ALPHABET[15]);
+
+  // ---- NOUVEAU : le cadre de murs, des X tout autour du terrain ----
+  //
+  //   colonne : 0 1 2 …           19
+  //   ligne 0 : X X X X X X … X X X     le haut : ligne 0, colonnes 0 à 19
+  //   ligne 1 : X                 X
+  //   …         X   A        P    X     les côtés : colonnes 0 et 19
+  //   ligne 15: X                 X
+  //   ligne 16: X X X X X X … X X X     le bas : ligne 16
+  //   ligne 17: SCORE 000  TEMPS 030    la ligne 17 reste aux nombres
+  //
+  // ALPHABET[23] : la 24e lettre (on compte depuis 0), le X.
+  for (uint8_t c = 0; c < 20; c++) {
+    poser(c, 0, ALPHABET[23]);        // le haut
+    poser(c, 16, ALPHABET[23]);       // le bas
+  }
+  for (uint8_t l = 1; l < 16; l++) {
+    poser(0, l, ALPHABET[23]);        // le côté gauche
+    poser(19, l, ALPHABET[23]);       // le côté droit
+  }
+
+  texte(0, 17, "SCORE");
+  texte(11, 17, "TEMPS");
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    if (ecran == 0 && bouton(START)) {
+      nouvellePartie();               // la première partie
+    }
+
+    if (ecran == 1) {
+      ax = x;                                  // NOUVEAU : on retient où est le A…
+      ay = y;
+      deplace_croix(x, y, ALPHABET[0], 250);   // …il fait peut-être un pas…
+
+      // …et s'il est arrivé SUR le cadre (colonne 0 ou 19, ligne 0 ou 16) :
+      //   1. on remet le X, que le A venait de recouvrir ;
+      //   2. le A revient à sa place d'avant, et s'y pose.
+      // || veut dire « OU » : une seule des quatre suffit.
+      if (x == 0 || x == 19 || y == 0 || y >= 16) {
+        poser(x, y, ALPHABET[23]);             // le mur revient
+        x = ax;                                // le A recule
+        y = ay;
+        poser(x, y, ALPHABET[0]);
+      }
+      if (x == px && y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+        px = 20;                               // la pièce part hors de l'écran
+      }
+      nombre(6, 17, score);
+      nombre(17, 17, temps);
+    }
+
+    if (ecran == 1 && chaque(1000)) {
+      temps = temps - 1;
+      if (temps == 0) {
+        ecran = 2;
+        viderEcran();
+        texte(8, 6, "FIN");
+        texte(5, 9, "SCORE");         // NOUVEAU : le score de la partie
+        nombre(11, 9, score);
+        texte(2, 13, "START : REJOUER");
+      }
+    }
+
+    // ---- NOUVEAU : sur la fin, START relance une partie.
+    if (ecran == 2 && bouton(START)) {
+      nouvellePartie();               // la même fonction : tout au départ
+    }
+  }
+}
+`,
+    aVoir: 'START : le terrain entouré de X ; le A se cogne au cadre et ne le traverse pas.',
+    controle: (c) => {
+      c.avancer(10)
+      c.presser('start', 6)
+      c.avancer(5)
+      const cadre = c.mot(0, 0, 20) === 'X'.repeat(20) && c.mot(0, 16, 20) === 'X'.repeat(20) && c.mot(0, 8, 1) === 'X' && c.mot(19, 8, 1) === 'X'
+      c.presser('left', 120)
+      const gauche = c.variable('x')
+      c.presser('up', 120)
+      const haut = c.variable('y')
+      c.avancer(3)
+      return [
+        ['le cadre de X fait le tour du terrain', cadre],
+        ['à gauche, le A s’arrête en colonne 1', gauche === 1, ` (x = ${gauche})`],
+        ['en haut, il s’arrête en ligne 1', haut === 1, ` (y = ${haut})`],
+        ['les murs sont intacts, le A est à sa place', c.mot(0, 1, 1) === 'X' && c.mot(1, 0, 1) === 'X' && c.mot(1, 1, 1) === 'A'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le titre, puis le jeu — la pièce revient au hasard',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.91.3, mais la pièce ramassée ne disparaît plus : elle réapparaît au hasard, dans le cadre. 1 + hasard() % 18 pour la colonne, 1 + hasard() % 15 pour la ligne.',
+    texte: [
+      '**C’est le 0.91.3, avec une chose en plus :** quand le A prend le P, le P ne part plus hors de l’écran (`px = 20`). Il **réapparaît ailleurs, au hasard**, et on peut le ramasser encore et encore pendant les 30 secondes.',
+      '**`hasard()`, on la connaît (le 0.81.2) :** elle rend un nombre imprévisible, de 0 à 255. Au 0.81.2, `hasard() % 20` donnait une colonne de 0 à 19 : tout l’écran.',
+      '**Ce qui est nouveau ici : rester DANS le cadre.** Les colonnes 0 et 19 sont des murs X : une pièce posée là effacerait le mur, et le A ne pourrait jamais l’atteindre. La pièce doit donc tomber entre la colonne **1** et la colonne **18** : 18 colonnes possibles.',
+      '**`hasard() % 18`** garde le **reste** de la division par 18 : un nombre de **0 à 17**. Exemples : 137 = 7 × 18 + 11, le reste est **11** ; 36 = 2 × 18 + 0, le reste est **0** ; 17 = 0 × 18 + 17, le reste est **17**.',
+      '**Le `1 +` décale tout d’une case :** 0 devient 1, 17 devient 18. `1 + hasard() % 18` donne donc une colonne de **1 à 18** : jamais sur un mur. Avec 137 : 1 + 11 = **12**.',
+      '**Pour la ligne, pareil :** les lignes 0 et 16 sont des murs, la pièce va de la ligne **1** à la ligne **15** : 15 lignes possibles. `hasard() % 15` donne 0 à 14, et `1 + hasard() % 15` donne **1 à 15**.',
+      '**Le calcul se fait dans l’ordre des maths :** `%` passe avant `+`, comme × avant +. `1 + hasard() % 18`, c’est « le reste d’abord, puis on ajoute 1 ».',
+      '**Puis `poser(px, py, ALPHABET[15])`** dessine le nouveau P à sa place. L’ancien n’a pas besoin d’être effacé : le A est dessus.',
+      '**Dans `nouvellePartie()`,** rien ne change : le P revient en (15, 8), d’où qu’il soit.',
+    ],
+    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+
+uint8_t x = 5;            // le A : sa colonne…
+uint8_t y = 8;            // …et sa ligne (le 0.81)
+uint8_t px = 15;          // la pièce, le P : sa colonne…
+uint8_t py = 8;           // …et sa ligne
+uint8_t score = 0;        // les pièces ramassées
+uint8_t temps = 30;       // les secondes qui restent
+uint8_t ax = 5;           // la place du A AVANT son pas… (le 0.91.3)
+uint8_t ay = 8;           // …pour l'y remettre s'il entre dans un mur
+
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+// ---- Une partie qui commence, TOUT au départ (le 0.91.2) ----
+// Depuis le titre, ET depuis la fin (START : rejouer).
+void nouvellePartie() {
+  x = 5;                          // le A revient à sa place
+  y = 8;
+  px = 15;                        // le P revient en (15, 8), d'où qu'il soit
+  py = 8;
+  ax = 5;                         // et sa place d'avant, la même
+  ay = 8;
+  score = 0;                      // pas encore de pièce
+  temps = 30;                     // 30 secondes de nouveau
+  ecran = 1;                      // on est sur le JEU
+  viderEcran();
+  poser(px, py, ALPHABET[15]);
+
+  // ---- Le cadre de murs, des X tout autour du terrain (le 0.91.3) ----
+  //
+  //   colonne : 0 1 2 …           19
+  //   ligne 0 : X X X X X X … X X X     le haut : ligne 0, colonnes 0 à 19
+  //   ligne 1 : X                 X
+  //   …         X   A        P    X     les côtés : colonnes 0 et 19
+  //   ligne 15: X                 X
+  //   ligne 16: X X X X X X … X X X     le bas : ligne 16
+  //   ligne 17: SCORE 000  TEMPS 030    la ligne 17 reste aux nombres
+  //
+  // ALPHABET[23] : la 24e lettre (on compte depuis 0), le X.
+  for (uint8_t c = 0; c < 20; c++) {
+    poser(c, 0, ALPHABET[23]);        // le haut
+    poser(c, 16, ALPHABET[23]);       // le bas
+  }
+  for (uint8_t l = 1; l < 16; l++) {
+    poser(0, l, ALPHABET[23]);        // le côté gauche
+    poser(19, l, ALPHABET[23]);       // le côté droit
+  }
+
+  texte(0, 17, "SCORE");
+  texte(11, 17, "TEMPS");
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    if (ecran == 0 && bouton(START)) {
+      nouvellePartie();               // la première partie
+    }
+
+    if (ecran == 1) {
+      ax = x;                                  // on retient où est le A… (le 0.91.3)
+      ay = y;
+      deplace_croix(x, y, ALPHABET[0], 250);   // …il fait peut-être un pas…
+
+      // …et s'il est arrivé SUR le cadre (colonne 0 ou 19, ligne 0 ou 16) :
+      //   1. on remet le X, que le A venait de recouvrir ;
+      //   2. le A revient à sa place d'avant, et s'y pose.
+      // || veut dire « OU » : une seule des quatre suffit.
+      if (x == 0 || x == 19 || y == 0 || y >= 16) {
+        poser(x, y, ALPHABET[23]);             // le mur revient
+        x = ax;                                // le A recule
+        y = ay;
+        poser(x, y, ALPHABET[0]);
+      }
+      if (x == px && y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+
+        // ---- NOUVEAU : la pièce réapparaît AU HASARD, mais DANS le cadre ----
+        //
+        //   px = 1 + hasard() % 18;
+        //        |   |        |
+        //        |   |        +-- % 18 : le reste de la division par 18, de 0 à 17.
+        //        |   |            Exemple : hasard() rend 137 ; 137 = 7 × 18 + 11 ;
+        //        |   |            le reste est 11.
+        //        |   +----------- un nombre imprévisible, de 0 à 255 (le 0.81.2)
+        //        +--------------- + 1 : on décale de 0…17 à 1…18 → 11 + 1 = 12.
+        //
+        // Pourquoi pas % 20 comme au 0.81.2 ? Les colonnes 0 et 19 sont des murs X :
+        // la pièce doit rester de 1 à 18. Les lignes 0 et 16 aussi sont des murs :
+        // la pièce doit rester de 1 à 15, d'où 1 + hasard() % 15.
+        px = 1 + hasard() % 18;                // une colonne : 1 à 18
+        py = 1 + hasard() % 15;                // une ligne : 1 à 15
+        poser(px, py, ALPHABET[15]);           // le nouveau P apparaît là
+      }
+      nombre(6, 17, score);
+      nombre(17, 17, temps);
+    }
+
+    if (ecran == 1 && chaque(1000)) {
+      temps = temps - 1;
+      if (temps == 0) {
+        ecran = 2;
+        viderEcran();
+        texte(8, 6, "FIN");
+        texte(5, 9, "SCORE");         // le score de la partie (le 0.91.2)
+        nombre(11, 9, score);
+        texte(2, 13, "START : REJOUER");
+      }
+    }
+
+    // ---- Sur la fin, START relance une partie (le 0.91.2).
+    if (ecran == 2 && bouton(START)) {
+      nouvellePartie();               // la même fonction : tout au départ
+    }
+  }
+}
+`,
+    aVoir: 'START : le A prend le P ; un autre P apparaît aussitôt ailleurs, toujours à l’intérieur du cadre de X.',
+    controle: (c) => {
+      c.avancer(10)
+      c.presser('start', 6)
+      c.avancer(5)
+      for (let k = 0; k < 200; k++) { c.gb.setButton('right', true); c.avancer(1) } c.gb.setButton('right', false)
+      c.avancer(3)
+      let p = 0
+      for (let l = 0; l < 17; l++) p += [...c.mot(0, l, 20)].filter((ch) => ch === 'P').length
+      const px = c.variable('px'), py = c.variable('py')
+      const surA = px === c.variable('x') && py === c.variable('y')
+      return [
+        ['la pièce est ramassée', c.variable('score') >= 1, ` (score = ${c.variable('score')})`],
+        ['un nouveau P est à l’écran', p === 1 || surA],
+        ['dans le cadre : colonne 1 à 18, ligne 1 à 15', px >= 1 && px <= 18 && py >= 1 && py <= 15, ` (px = ${px}, py = ${py})`],
+        ['le cadre de X est intact', c.mot(0, 0, 20) === 'X'.repeat(20) && c.mot(0, 16, 20) === 'X'.repeat(20)],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le snake — une queue qui suit le A',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.91.4, et le A a une queue : un O, toujours sur la case que le A vient de quitter. Le début d’un serpent.',
+    texte: [
+      '**C’est le 0.91.4, avec une chose en plus : une queue.** Derrière le A, il y a un **O** (`ALPHABET[14]`, la 15e lettre). Quand le A fait un pas, le O le suit : il prend **la case que le A vient de quitter**. C’est le début d’un jeu de serpent, le « snake ».',
+      '**Deux nouvelles variables, `qx` et `qy` :** la colonne et la ligne de la queue. Au départ, (4, 8) : juste à gauche du A, qui est en (5, 8). `nouvellePartie()` les remet là, et y pose le O.',
+      '**Où était le A avant son pas ? On le sait déjà :** au 0.91.3, on a rangé sa place d’avant dans `ax` et `ay`, pour le faire reculer devant un mur. On s’en sert une deuxième fois : c’est exactement là que la queue doit aller.',
+      '**Ce qui est nouveau ici : savoir si le A a bougé.** `deplace_croix` ne fait un pas que toutes les 250 ms ; les autres images, le A ne bouge pas. Et contre un mur, il est revenu en (`ax`, `ay`). Il a bougé si sa place n’est **plus** celle d’avant : `x != ax || y != ay`. **`!=`** veut dire « n’est pas égal à » (le 0.82), **`||`** veut dire « ou » (le 0.91.3) : une seule des deux différences suffit (un pas à gauche ou à droite change `x`, un pas en haut ou en bas change `y`).',
+      '**Quand il a bougé, quatre étapes, dans cet ordre :** 1. `effacer(qx, qy, 1)` efface l’ancien O (le `1` : une seule case). 2. `qx = ax;` et `qy = ay;` : la queue prend la case quittée par le A. 3. `poser(qx, qy, ALPHABET[14])` dessine le O à sa nouvelle place. 4. `poser(x, y, ALPHABET[0])` redessine le A.',
+      '**Pourquoi redessiner le A ?** Pour le demi-tour. Le A est en (5, 8), sa queue en (4, 8). Il va à gauche : il arrive en (4, 8), **sur** sa queue. L’étape 1 efface (4, 8)… et efface donc le A ! L’étape 3 pose le O en (5, 8), la case quittée. L’étape 4 remet le A en (4, 8). Le A et sa queue ont échangé leurs places.',
+      '**Déroulons un pas à droite :** A en (5, 8), O en (4, 8). `deplace_croix` : A en (6, 8), et (5, 8) est effacée. `x` vaut 6, `ax` vaut 5 : il a bougé. 1. (4, 8) est effacée. 2. `qx` = 5, `qy` = 8. 3. O en (5, 8). 4. A en (6, 8). Résultat : **O A**, un cran plus loin.',
+      '**Encore un défaut, pour plus tard :** si le P réapparaît juste sur la queue, le O l’efface au pas suivant ; on ne le voit plus, mais il est toujours là, dans `px` et `py`.',
+    ],
+    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+
+uint8_t x = 5;            // le A : sa colonne…
+uint8_t y = 8;            // …et sa ligne (le 0.81)
+uint8_t px = 15;          // la pièce, le P : sa colonne…
+uint8_t py = 8;           // …et sa ligne
+uint8_t score = 0;        // les pièces ramassées
+uint8_t temps = 30;       // les secondes qui restent
+uint8_t ax = 5;           // la place du A AVANT son pas… (le 0.91.3)
+uint8_t ay = 8;           // …pour l'y remettre s'il entre dans un mur
+uint8_t qx = 4;           // NOUVEAU : la QUEUE, un O : sa colonne…
+uint8_t qy = 8;           // …et sa ligne. Elle part juste à gauche du A.
+
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+// ---- Une partie qui commence, TOUT au départ (le 0.91.2) ----
+// Depuis le titre, ET depuis la fin (START : rejouer).
+void nouvellePartie() {
+  x = 5;                          // le A revient à sa place
+  y = 8;
+  px = 15;                        // le P revient en (15, 8), d'où qu'il soit
+  py = 8;
+  ax = 5;                         // et sa place d'avant, la même
+  ay = 8;
+  qx = 4;                         // NOUVEAU : la queue, juste à gauche du A
+  qy = 8;
+  score = 0;                      // pas encore de pièce
+  temps = 30;                     // 30 secondes de nouveau
+  ecran = 1;                      // on est sur le JEU
+  viderEcran();
+  poser(px, py, ALPHABET[15]);
+  poser(qx, qy, ALPHABET[14]);    // NOUVEAU : le O de la queue
+
+  // ---- Le cadre de murs, des X tout autour du terrain (le 0.91.3) ----
+  //
+  //   colonne : 0 1 2 …           19
+  //   ligne 0 : X X X X X X … X X X     le haut : ligne 0, colonnes 0 à 19
+  //   ligne 1 : X                 X
+  //   …         X   A        P    X     les côtés : colonnes 0 et 19
+  //   ligne 15: X                 X
+  //   ligne 16: X X X X X X … X X X     le bas : ligne 16
+  //   ligne 17: SCORE 000  TEMPS 030    la ligne 17 reste aux nombres
+  //
+  // ALPHABET[23] : la 24e lettre (on compte depuis 0), le X.
+  for (uint8_t c = 0; c < 20; c++) {
+    poser(c, 0, ALPHABET[23]);        // le haut
+    poser(c, 16, ALPHABET[23]);       // le bas
+  }
+  for (uint8_t l = 1; l < 16; l++) {
+    poser(0, l, ALPHABET[23]);        // le côté gauche
+    poser(19, l, ALPHABET[23]);       // le côté droit
+  }
+
+  texte(0, 17, "SCORE");
+  texte(11, 17, "TEMPS");
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    if (ecran == 0 && bouton(START)) {
+      nouvellePartie();               // la première partie
+    }
+
+    if (ecran == 1) {
+      ax = x;                                  // on retient où est le A… (le 0.91.3)
+      ay = y;
+      deplace_croix(x, y, ALPHABET[0], 250);   // …il fait peut-être un pas…
+
+      // …et s'il est arrivé SUR le cadre (colonne 0 ou 19, ligne 0 ou 16) :
+      //   1. on remet le X, que le A venait de recouvrir ;
+      //   2. le A revient à sa place d'avant, et s'y pose.
+      // || veut dire « OU » : une seule des quatre suffit.
+      if (x == 0 || x == 19 || y == 0 || y >= 16) {
+        poser(x, y, ALPHABET[23]);             // le mur revient
+        x = ax;                                // le A recule
+        y = ay;
+        poser(x, y, ALPHABET[0]);
+      }
+
+      // ---- NOUVEAU : la queue suit le A ----
+      // Le A a-t-il bougé ? Sa place n'est plus celle d'avant (ax, ay).
+      // (Pas de pas cette image-ci, ou un mur : il est toujours en (ax, ay).)
+      // != veut dire « n'est pas égal », || veut dire « OU ».
+      if (x != ax || y != ay) {
+        effacer(qx, qy, 1);                    // 1. l'ancien O disparaît (1 : une case)
+        qx = ax;                               // 2. la queue prend la case
+        qy = ay;                               //    que le A vient de quitter
+        poser(qx, qy, ALPHABET[14]);           // 3. le O s'y dessine (la 15e lettre)
+        poser(x, y, ALPHABET[0]);              // 4. le A par-dessus : au demi-tour,
+      }                                        //    l'étape 1 venait de l'effacer
+      if (x == px && y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+
+        // ---- La pièce réapparaît AU HASARD, mais DANS le cadre (le 0.91.4) ----
+        //
+        //   px = 1 + hasard() % 18;
+        //        |   |        |
+        //        |   |        +-- % 18 : le reste de la division par 18, de 0 à 17.
+        //        |   |            Exemple : hasard() rend 137 ; 137 = 7 × 18 + 11 ;
+        //        |   |            le reste est 11.
+        //        |   +----------- un nombre imprévisible, de 0 à 255 (le 0.81.2)
+        //        +--------------- + 1 : on décale de 0…17 à 1…18 → 11 + 1 = 12.
+        //
+        // Pourquoi pas % 20 comme au 0.81.2 ? Les colonnes 0 et 19 sont des murs X :
+        // la pièce doit rester de 1 à 18. Les lignes 0 et 16 aussi sont des murs :
+        // la pièce doit rester de 1 à 15, d'où 1 + hasard() % 15.
+        px = 1 + hasard() % 18;                // une colonne : 1 à 18
+        py = 1 + hasard() % 15;                // une ligne : 1 à 15
+        poser(px, py, ALPHABET[15]);           // le nouveau P apparaît là
+      }
+      nombre(6, 17, score);
+      nombre(17, 17, temps);
+    }
+
+    if (ecran == 1 && chaque(1000)) {
+      temps = temps - 1;
+      if (temps == 0) {
+        ecran = 2;
+        viderEcran();
+        texte(8, 6, "FIN");
+        texte(5, 9, "SCORE");         // le score de la partie (le 0.91.2)
+        nombre(11, 9, score);
+        texte(2, 13, "START : REJOUER");
+      }
+    }
+
+    // ---- Sur la fin, START relance une partie (le 0.91.2).
+    if (ecran == 2 && bouton(START)) {
+      nouvellePartie();               // la même fonction : tout au départ
+    }
+  }
+}
+`,
+    aVoir: 'START : un O suit le A partout, un cran derrière lui ; au demi-tour, les deux échangent leurs places.',
+    controle: (c) => {
+      const lesO = () => {
+        let n = 0
+        for (let l = 1; l < 16; l++) n += [...c.mot(0, l, 20)].filter((ch) => ch === 'O').length
+        return n
+      }
+      c.avancer(10)
+      c.presser('start', 6)
+      c.avancer(5)
+      const depart = c.mot(4, 8, 2) === 'OA'
+      c.presser('right', 60)
+      c.avancer(3)
+      const x = c.variable('x')
+      const droite = x > 5 && c.mot(x - 1, 8, 2) === 'OA' && lesO() === 1
+      c.presser('up', 30)
+      c.avancer(3)
+      const y = c.variable('y')
+      const haut = y < 8 && c.mot(x, y, 1) === 'A' && c.variable('qx') === x && c.variable('qy') === y + 1 && c.mot(x, y + 1, 1) === 'O' && lesO() === 1
+      return [
+        ['au départ : O A, en (4, 8) et (5, 8)', depart],
+        ['à droite, le O suit, un cran derrière', droite, ` (x = ${x})`],
+        ['en haut, le O est juste sous le A, et il n’y a qu’un O', haut, ` (y = ${y})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le snake — la queue grandit à chaque pièce',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.91.5, mais la queue est un tableau de cases O. Au début, le A est tout seul ; chaque pièce ramassée ajoute un O. Le serpent grandit.',
+    texte: [
+      '**C’est le 0.91.5, avec une chose en plus : la queue grandit.** Au début, le A est **tout seul**. À chaque P ramassé, il gagne **une case O**. Au bout de dix pièces, le A traîne dix O derrière lui.',
+      '**Une queue de plusieurs cases, c’est plusieurs places : un tableau.** `uint8_t qx[50];` réserve **50** colonnes, de `qx[0]` à `qx[49]` ; `qy[50]`, les 50 lignes. La case `i` de la queue est en (`qx[i]`, `qy[i]`). **`qx[0]`** est la case collée au A ; la dernière est le **bout** de la queue.',
+      '**`longueur` compte les cases utilisées :** **0** au départ, le A est tout seul ; `nouvellePartie()` la remet à 0 et ne pose aucun O. Les cases utilisées vont de `0` à `longueur - 1` : avec `longueur` = 3, ce sont `qx[0]`, `qx[1]` et `qx[2]`. Le bout est donc toujours `qx[longueur - 1]`.',
+      '**Un piège : `longueur - 1` quand `longueur` vaut 0.** On attendrait -1. Mais un `uint8_t` ne connaît que 0 à 255 : sous 0, il repart de l’autre côté, et 0 - 1 donne **255**. `qx[255]` n’existe pas (le tableau s’arrête à `qx[49]`), et la boucle ferait 255 tours. D’où la condition `longueur > 0 && (x != ax || y != ay)` : **`&&`** veut dire « et » (le 0.75) ; **les deux** doivent être vraies. Sans queue, on ne la déplace pas.',
+      '**Les parenthèses** autour de `x != ax || y != ay` : elles se calculent d’abord, comme en maths. « Il y a une queue » ET « le A a bougé (en x ou en y) ».',
+      '**Ce qui est nouveau ici : faire avancer toute la queue.** Chaque case prend la place de **celle de devant** : `qx[2]` prend la place de `qx[1]`, puis `qx[1]` celle de `qx[0]`, puis `qx[0]` celle que le A vient de quitter (`ax`, `ay`). Comme les wagons d’un train.',
+      '**Pourquoi en partant du bout ?** Si l’on commençait par `qx[1] = qx[0];`, l’ancienne place de `qx[1]` serait perdue avant que `qx[2]` ne la prenne. En partant du bout, chaque case est lue **avant** d’être écrasée.',
+      '**La boucle qui recule :** `for (uint8_t i = longueur - 1; i > 0; i--)`. **`i--`** retire 1 à `i` à chaque tour (le contraire de `i++`). Avec `longueur` = 3 : `i` vaut 2, puis 1, et s’arrête avant 0 (`i > 0` est faux). Tour `i` = 2 : `qx[2] = qx[1]`. Tour `i` = 1 : `qx[1] = qx[0]`. Avec `longueur` = 1, `i` part de 0 : `0 > 0` est faux, la boucle ne tourne pas du tout.',
+      '**Le bout est effacé avant, toute la queue est redessinée après :** `effacer(qx[longueur - 1], qy[longueur - 1], 1)` gomme l’ancien bout, puis une boucle `for` pose un O sur chaque case, de `0` à `longueur - 1`. Et le A par-dessus, comme au 0.91.5.',
+      '**Grandir, quand on ramasse le P :** la nouvelle case naît **sur le bout de la queue** : `qx[longueur] = qx[longueur - 1];`, puis `longueur = longueur + 1;`. Au pas suivant, toute la queue avance d’un cran, sauf la nouvelle case, qui prend la place de l’ancien bout : **elle reste derrière**, et la queue a une case de plus.',
+      '**La toute première case, elle, n’a pas de bout sur lequel naître** (et `qx[longueur - 1]` serait encore `qx[255]`). Elle naît donc **sous le A** : `qx[0] = x;` et `qy[0] = y;`. Au pas suivant, le A s’en va, et le O apparaît sur la case qu’il a quittée. `else` (le 0.83.1) : « sinon », quand la queue a déjà au moins une case.',
+      '**Pourquoi redessiner toute la queue ?** Juste après la pièce, le bout et la nouvelle case sont sur la même place. Au pas suivant, on efface le bout… donc aussi la nouvelle case, qui doit y rester. Redessiner toutes les cases la fait réapparaître.',
+      '**`if (longueur < 50)` :** le tableau n’a que 50 cases. Au-delà, `qx[50]` écrirait en dehors, sur d’autres variables. Après 49 pièces, la queue ne grandit plus.',
+      '**Pour plus tard :** le A traverse sa propre queue sans rien dire, et le P peut tomber sur la queue. Dans un vrai serpent, toucher sa queue fait perdre.',
+    ],
+    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+
+uint8_t x = 5;            // le A : sa colonne…
+uint8_t y = 8;            // …et sa ligne (le 0.81)
+uint8_t px = 15;          // la pièce, le P : sa colonne…
+uint8_t py = 8;           // …et sa ligne
+uint8_t score = 0;        // les pièces ramassées
+uint8_t temps = 30;       // les secondes qui restent
+uint8_t ax = 5;           // la place du A AVANT son pas… (le 0.91.3)
+uint8_t ay = 8;           // …pour l'y remettre s'il entre dans un mur
+uint8_t qx[50];           // NOUVEAU : la queue, un TABLEAU de 50 cases O : les colonnes…
+uint8_t qy[50];           // …et les lignes. qx[0] : la case collée au A.
+uint8_t longueur = 0;     // NOUVEAU : combien de cases la queue utilise (0 : le A seul)
+
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+// ---- Une partie qui commence, TOUT au départ (le 0.91.2) ----
+// Depuis le titre, ET depuis la fin (START : rejouer).
+void nouvellePartie() {
+  x = 5;                          // le A revient à sa place
+  y = 8;
+  px = 15;                        // le P revient en (15, 8), d'où qu'il soit
+  py = 8;
+  ax = 5;                         // et sa place d'avant, la même
+  ay = 8;
+  longueur = 0;                   // NOUVEAU : pas de queue, le A est tout seul
+  score = 0;                      // pas encore de pièce
+  temps = 30;                     // 30 secondes de nouveau
+  ecran = 1;                      // on est sur le JEU
+  viderEcran();
+  poser(px, py, ALPHABET[15]);
+
+  // ---- Le cadre de murs, des X tout autour du terrain (le 0.91.3) ----
+  //
+  //   colonne : 0 1 2 …           19
+  //   ligne 0 : X X X X X X … X X X     le haut : ligne 0, colonnes 0 à 19
+  //   ligne 1 : X                 X
+  //   …         X   A        P    X     les côtés : colonnes 0 et 19
+  //   ligne 15: X                 X
+  //   ligne 16: X X X X X X … X X X     le bas : ligne 16
+  //   ligne 17: SCORE 000  TEMPS 030    la ligne 17 reste aux nombres
+  //
+  // ALPHABET[23] : la 24e lettre (on compte depuis 0), le X.
+  for (uint8_t c = 0; c < 20; c++) {
+    poser(c, 0, ALPHABET[23]);        // le haut
+    poser(c, 16, ALPHABET[23]);       // le bas
+  }
+  for (uint8_t l = 1; l < 16; l++) {
+    poser(0, l, ALPHABET[23]);        // le côté gauche
+    poser(19, l, ALPHABET[23]);       // le côté droit
+  }
+
+  texte(0, 17, "SCORE");
+  texte(11, 17, "TEMPS");
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    if (ecran == 0 && bouton(START)) {
+      nouvellePartie();               // la première partie
+    }
+
+    if (ecran == 1) {
+      ax = x;                                  // on retient où est le A… (le 0.91.3)
+      ay = y;
+      deplace_croix(x, y, ALPHABET[0], 250);   // …il fait peut-être un pas…
+
+      // …et s'il est arrivé SUR le cadre (colonne 0 ou 19, ligne 0 ou 16) :
+      //   1. on remet le X, que le A venait de recouvrir ;
+      //   2. le A revient à sa place d'avant, et s'y pose.
+      // || veut dire « OU » : une seule des quatre suffit.
+      if (x == 0 || x == 19 || y == 0 || y >= 16) {
+        poser(x, y, ALPHABET[23]);             // le mur revient
+        x = ax;                                // le A recule
+        y = ay;
+        poser(x, y, ALPHABET[0]);
+      }
+
+      // ---- La queue suit le A (le 0.91.5) ----
+      // Le A a-t-il bougé ? Sa place n'est plus celle d'avant (ax, ay).
+      // NOUVEAU : longueur > 0 d'abord. Sans queue, rien à déplacer, et
+      // longueur - 1 vaudrait 255 (un uint8_t ne descend pas sous 0).
+      // && veut dire « ET » : il faut une queue ET que le A ait bougé.
+      if (longueur > 0 && (x != ax || y != ay)) {
+        // 1. le BOUT de la queue disparaît : la dernière case, longueur - 1
+        effacer(qx[longueur - 1], qy[longueur - 1], 1);
+
+        // ---- NOUVEAU : 2. chaque case prend la place de celle de devant ----
+        // En partant du BOUT, et en reculant (i-- : i = i - 1).
+        // Avec longueur = 3 :  i = 2 : qx[2] = qx[1]
+        //                      i = 1 : qx[1] = qx[0]
+        //                      i = 0 : 0 > 0 est faux, la boucle s'arrête.
+        for (uint8_t i = longueur - 1; i > 0; i--) {
+          qx[i] = qx[i - 1];
+          qy[i] = qy[i - 1];
+        }
+
+        // 3. la première case prend la case que le A vient de quitter
+        qx[0] = ax;
+        qy[0] = ay;
+
+        // 4. toute la queue redessinée, de la case 0 à la case longueur - 1
+        //    (après une pièce, la nouvelle case venait d'être effacée avec le bout)
+        for (uint8_t i = 0; i < longueur; i++) {
+          poser(qx[i], qy[i], ALPHABET[14]);
+        }
+        poser(x, y, ALPHABET[0]);              // 5. le A par-dessus (le 0.91.5)
+      }
+      if (x == px && y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+
+        // ---- La pièce réapparaît AU HASARD, mais DANS le cadre (le 0.91.4) ----
+        //
+        //   px = 1 + hasard() % 18;
+        //        |   |        |
+        //        |   |        +-- % 18 : le reste de la division par 18, de 0 à 17.
+        //        |   |            Exemple : hasard() rend 137 ; 137 = 7 × 18 + 11 ;
+        //        |   |            le reste est 11.
+        //        |   +----------- un nombre imprévisible, de 0 à 255 (le 0.81.2)
+        //        +--------------- + 1 : on décale de 0…17 à 1…18 → 11 + 1 = 12.
+        //
+        // Pourquoi pas % 20 comme au 0.81.2 ? Les colonnes 0 et 19 sont des murs X :
+        // la pièce doit rester de 1 à 18. Les lignes 0 et 16 aussi sont des murs :
+        // la pièce doit rester de 1 à 15, d'où 1 + hasard() % 15.
+        px = 1 + hasard() % 18;                // une colonne : 1 à 18
+        py = 1 + hasard() % 15;                // une ligne : 1 à 15
+        poser(px, py, ALPHABET[15]);           // le nouveau P apparaît là
+
+        // ---- NOUVEAU : la queue grandit d'une case ----
+        // La nouvelle case naît SUR le bout de la queue. Au prochain pas, toutes
+        // les autres avancent, elle non : elle reste derrière.
+        // La toute première n'a pas de bout : elle naît SOUS le A.
+        // < 50 : le tableau n'a que 50 cases, qx[0] à qx[49].
+        if (longueur < 50) {
+          if (longueur == 0) {
+            qx[0] = x;                         // la première case : sous le A
+            qy[0] = y;
+          } else {
+            qx[longueur] = qx[longueur - 1];   // la case d'après le bout…
+            qy[longueur] = qy[longueur - 1];   // …à la même place que le bout
+          }
+          longueur = longueur + 1;             // une case de plus
+        }
+      }
+      nombre(6, 17, score);
+      nombre(17, 17, temps);
+    }
+
+    if (ecran == 1 && chaque(1000)) {
+      temps = temps - 1;
+      if (temps == 0) {
+        ecran = 2;
+        viderEcran();
+        texte(8, 6, "FIN");
+        texte(5, 9, "SCORE");         // le score de la partie (le 0.91.2)
+        nombre(11, 9, score);
+        texte(2, 13, "START : REJOUER");
+      }
+    }
+
+    // ---- Sur la fin, START relance une partie (le 0.91.2).
+    if (ecran == 2 && bouton(START)) {
+      nouvellePartie();               // la même fonction : tout au départ
+    }
+  }
+}
+`,
+    aVoir: 'START : le A tout seul ; à chaque P ramassé, un O de plus derrière lui.',
+    controle: (c) => {
+      const lesO = () => {
+        let n = 0
+        for (let l = 1; l < 16; l++) n += [...c.mot(0, l, 20)].filter((ch) => ch === 'O').length
+        return n
+      }
+      c.avancer(10)
+      c.presser('start', 6)
+      c.avancer(5)
+      const depart = c.variable('longueur') === 0 && c.mot(4, 8, 2) === ' A' && lesO() === 0
+      c.presser('right', 160)
+      const score = c.variable('score')
+      c.presser('up', 45)
+      c.avancer(3)
+      const longueur = c.variable('longueur')
+      return [
+        ['au départ : le A tout seul, aucun O', depart],
+        ['le P est ramassé', score >= 1, ` (score = ${score})`],
+        ['la queue a grandi : une case par pièce', longueur === score && longueur >= 1, ` (longueur = ${longueur})`],
+        ['autant de O à l’écran que de cases', lesO() === longueur, ` (${lesO()} O)`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le snake — le A avance tout seul',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.91.6, mais le A ne s’arrête plus : il avance tout seul, un pas toutes les 250 ms. La croix ne fait que choisir la direction. Comme un vrai snake.',
+    texte: [
+      '**C’est le 0.91.6, avec une chose en plus : le A avance tout seul.** Même sans toucher à rien, il fait un pas toutes les 250 ms. La croix ne le fait plus avancer : elle **choisit sa direction**. C’est comme ça que bouge un vrai serpent, dans un vrai snake.',
+      '**`deplace_croix` s’en va.** Elle faisait un pas seulement quand on appuyait. On la remplace par deux morceaux écrits à la main : **choisir** la direction, puis **avancer**.',
+      '**Ce qui est nouveau ici : retenir une direction dans un nombre.** `uint8_t sens = 0;` Il y a quatre directions ; on leur donne un numéro : **0 = droite, 1 = bas, 2 = gauche, 3 = haut**. Le programme ne retient que ce numéro. Au départ, 0 : le A part vers la droite. `nouvellePartie()` le remet à 0.',
+      '**Choisir :** `if (bouton(DROITE)) sens = 0;`, et de même pour les trois autres. Il suffit d’**appuyer une fois**, même très court : `sens` change, et **il le reste** quand on lâche. Rien ne remet `sens` à zéro : le A continue dans la dernière direction choisie.',
+      '**Avancer :** `if (chaque(250)) { … }` (le 0.77) : quatre fois par seconde. `effacer(x, y, 1)` enlève le A de sa case. Puis **un seul** des quatre `if` est vrai, celui du `sens` : il change `x` ou `y` d’une case. Enfin `poser(x, y, ALPHABET[0])` dessine le A sur sa nouvelle case.',
+      '**Pourquoi `+ 1` et `- 1` ?** Les colonnes grandissent vers la droite : droite, c’est `x + 1` ; gauche, `x - 1`. Les lignes grandissent vers le **bas** (la ligne 0 est en haut) : bas, c’est `y + 1` ; haut, `y - 1`.',
+      '**Deux `chaque()` dans le même programme ?** Oui : `chaque(250)` pour les pas, `chaque(1000)` pour le chronomètre. Chacun a **son propre chronomètre** : ils ne se gênent pas.',
+      '**Déroulons :** A en (5, 8), `sens` = 0. 250 ms : `x` = 6. 250 ms : `x` = 7. On touche BAS : `sens` = 1. 250 ms : `y` = 9, `x` reste 7. Le A descend maintenant, tout seul, jusqu’à ce qu’on choisisse autre chose.',
+      '**Le reste ne change pas :** le mur fait reculer le A (le 0.91.3) ; il reste donc collé au mur tant qu’on ne choisit pas une autre direction. La queue le suit, le P le fait grandir (le 0.91.6). Le A doit maintenant être **posé** dans `nouvellePartie()` : `deplace_croix` le faisait à sa place.',
+      '**Pour plus tard :** en snake, on ne peut pas faire demi-tour d’un coup, sur sa propre queue ; et toucher un mur ou sa queue fait perdre.',
+    ],
+    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+
+uint8_t x = 5;            // le A : sa colonne…
+uint8_t y = 8;            // …et sa ligne (le 0.81)
+uint8_t px = 15;          // la pièce, le P : sa colonne…
+uint8_t py = 8;           // …et sa ligne
+uint8_t score = 0;        // les pièces ramassées
+uint8_t temps = 30;       // les secondes qui restent
+uint8_t ax = 5;           // la place du A AVANT son pas… (le 0.91.3)
+uint8_t ay = 8;           // …pour l'y remettre s'il entre dans un mur
+uint8_t qx[50];           // la queue (le 0.91.6), un TABLEAU de 50 cases O : les colonnes…
+uint8_t qy[50];           // …et les lignes. qx[0] : la case collée au A.
+uint8_t longueur = 0;     // combien de cases la queue utilise (0 : le A seul)
+uint8_t sens = 0;         // NOUVEAU : où va le A. 0 = droite, 1 = bas, 2 = gauche, 3 = haut
+
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+// ---- Une partie qui commence, TOUT au départ (le 0.91.2) ----
+// Depuis le titre, ET depuis la fin (START : rejouer).
+void nouvellePartie() {
+  x = 5;                          // le A revient à sa place
+  y = 8;
+  px = 15;                        // le P revient en (15, 8), d'où qu'il soit
+  py = 8;
+  ax = 5;                         // et sa place d'avant, la même
+  ay = 8;
+  longueur = 0;                   // pas de queue, le A est tout seul (le 0.91.6)
+  sens = 0;                       // NOUVEAU : le A repart vers la droite
+  score = 0;                      // pas encore de pièce
+  temps = 30;                     // 30 secondes de nouveau
+  ecran = 1;                      // on est sur le JEU
+  viderEcran();
+  poser(px, py, ALPHABET[15]);
+  poser(x, y, ALPHABET[0]);       // NOUVEAU : le A (deplace_croix ne le pose plus)
+
+  // ---- Le cadre de murs, des X tout autour du terrain (le 0.91.3) ----
+  //
+  //   colonne : 0 1 2 …           19
+  //   ligne 0 : X X X X X X … X X X     le haut : ligne 0, colonnes 0 à 19
+  //   ligne 1 : X                 X
+  //   …         X   A        P    X     les côtés : colonnes 0 et 19
+  //   ligne 15: X                 X
+  //   ligne 16: X X X X X X … X X X     le bas : ligne 16
+  //   ligne 17: SCORE 000  TEMPS 030    la ligne 17 reste aux nombres
+  //
+  // ALPHABET[23] : la 24e lettre (on compte depuis 0), le X.
+  for (uint8_t c = 0; c < 20; c++) {
+    poser(c, 0, ALPHABET[23]);        // le haut
+    poser(c, 16, ALPHABET[23]);       // le bas
+  }
+  for (uint8_t l = 1; l < 16; l++) {
+    poser(0, l, ALPHABET[23]);        // le côté gauche
+    poser(19, l, ALPHABET[23]);       // le côté droit
+  }
+
+  texte(0, 17, "SCORE");
+  texte(11, 17, "TEMPS");
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    if (ecran == 0 && bouton(START)) {
+      nouvellePartie();               // la première partie
+    }
+
+    if (ecran == 1) {
+      // ---- NOUVEAU : la croix ne fait plus avancer, elle CHOISIT la direction ----
+      // On appuie une fois, même très court : sens change, et il le reste.
+      if (bouton(DROITE)) sens = 0;
+      if (bouton(BAS))    sens = 1;
+      if (bouton(GAUCHE)) sens = 2;
+      if (bouton(HAUT))   sens = 3;
+
+      ax = x;                                  // on retient où est le A… (le 0.91.3)
+      ay = y;
+
+      // ---- NOUVEAU : le A avance TOUT SEUL, un pas toutes les 250 ms ----
+      // chaque(250) : vrai 4 fois par seconde (le 0.77). Ce chronomètre-ci
+      // n'est pas celui de chaque(1000), plus bas : chacun a le sien.
+      //
+      //   sens :   3
+      //            ↑           colonne : x - 1 à gauche, x + 1 à droite
+      //        2 ← A → 0       ligne   : y - 1 en haut,  y + 1 en bas
+      //            ↓
+      //            1
+      if (chaque(250)) {
+        effacer(x, y, 1);                      // le A quitte sa case
+        if (sens == 0) x = x + 1;              // à droite
+        if (sens == 1) y = y + 1;              // en bas
+        if (sens == 2) x = x - 1;              // à gauche
+        if (sens == 3) y = y - 1;              // en haut
+        poser(x, y, ALPHABET[0]);              // et se pose sur la suivante
+      }
+
+      // …et s'il est arrivé SUR le cadre (colonne 0 ou 19, ligne 0 ou 16) :
+      //   1. on remet le X, que le A venait de recouvrir ;
+      //   2. le A revient à sa place d'avant, et s'y pose.
+      // || veut dire « OU » : une seule des quatre suffit.
+      if (x == 0 || x == 19 || y == 0 || y >= 16) {
+        poser(x, y, ALPHABET[23]);             // le mur revient
+        x = ax;                                // le A recule
+        y = ay;
+        poser(x, y, ALPHABET[0]);
+      }
+
+      // ---- La queue suit le A (le 0.91.5) ----
+      // Le A a-t-il bougé ? Sa place n'est plus celle d'avant (ax, ay).
+      // longueur > 0 d'abord (le 0.91.6). Sans queue, rien à déplacer, et
+      // longueur - 1 vaudrait 255 (un uint8_t ne descend pas sous 0).
+      // && veut dire « ET » : il faut une queue ET que le A ait bougé.
+      if (longueur > 0 && (x != ax || y != ay)) {
+        // 1. le BOUT de la queue disparaît : la dernière case, longueur - 1
+        effacer(qx[longueur - 1], qy[longueur - 1], 1);
+
+        // ---- 2. chaque case prend la place de celle de devant ----
+        // En partant du BOUT, et en reculant (i-- : i = i - 1).
+        // Avec longueur = 3 :  i = 2 : qx[2] = qx[1]
+        //                      i = 1 : qx[1] = qx[0]
+        //                      i = 0 : 0 > 0 est faux, la boucle s'arrête.
+        for (uint8_t i = longueur - 1; i > 0; i--) {
+          qx[i] = qx[i - 1];
+          qy[i] = qy[i - 1];
+        }
+
+        // 3. la première case prend la case que le A vient de quitter
+        qx[0] = ax;
+        qy[0] = ay;
+
+        // 4. toute la queue redessinée, de la case 0 à la case longueur - 1
+        //    (après une pièce, la nouvelle case venait d'être effacée avec le bout)
+        for (uint8_t i = 0; i < longueur; i++) {
+          poser(qx[i], qy[i], ALPHABET[14]);
+        }
+        poser(x, y, ALPHABET[0]);              // 5. le A par-dessus (le 0.91.5)
+      }
+      if (x == px && y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+
+        // ---- La pièce réapparaît AU HASARD, mais DANS le cadre (le 0.91.4) ----
+        //
+        //   px = 1 + hasard() % 18;
+        //        |   |        |
+        //        |   |        +-- % 18 : le reste de la division par 18, de 0 à 17.
+        //        |   |            Exemple : hasard() rend 137 ; 137 = 7 × 18 + 11 ;
+        //        |   |            le reste est 11.
+        //        |   +----------- un nombre imprévisible, de 0 à 255 (le 0.81.2)
+        //        +--------------- + 1 : on décale de 0…17 à 1…18 → 11 + 1 = 12.
+        //
+        // Pourquoi pas % 20 comme au 0.81.2 ? Les colonnes 0 et 19 sont des murs X :
+        // la pièce doit rester de 1 à 18. Les lignes 0 et 16 aussi sont des murs :
+        // la pièce doit rester de 1 à 15, d'où 1 + hasard() % 15.
+        px = 1 + hasard() % 18;                // une colonne : 1 à 18
+        py = 1 + hasard() % 15;                // une ligne : 1 à 15
+        poser(px, py, ALPHABET[15]);           // le nouveau P apparaît là
+
+        // ---- La queue grandit d'une case (le 0.91.6) ----
+        // La nouvelle case naît SUR le bout de la queue. Au prochain pas, toutes
+        // les autres avancent, elle non : elle reste derrière.
+        // La toute première n'a pas de bout : elle naît SOUS le A.
+        // < 50 : le tableau n'a que 50 cases, qx[0] à qx[49].
+        if (longueur < 50) {
+          if (longueur == 0) {
+            qx[0] = x;                         // la première case : sous le A
+            qy[0] = y;
+          } else {
+            qx[longueur] = qx[longueur - 1];   // la case d'après le bout…
+            qy[longueur] = qy[longueur - 1];   // …à la même place que le bout
+          }
+          longueur = longueur + 1;             // une case de plus
+        }
+      }
+      nombre(6, 17, score);
+      nombre(17, 17, temps);
+    }
+
+    if (ecran == 1 && chaque(1000)) {
+      temps = temps - 1;
+      if (temps == 0) {
+        ecran = 2;
+        viderEcran();
+        texte(8, 6, "FIN");
+        texte(5, 9, "SCORE");         // le score de la partie (le 0.91.2)
+        nombre(11, 9, score);
+        texte(2, 13, "START : REJOUER");
+      }
+    }
+
+    // ---- Sur la fin, START relance une partie (le 0.91.2).
+    if (ecran == 2 && bouton(START)) {
+      nouvellePartie();               // la même fonction : tout au départ
+    }
+  }
+}
+`,
+    aVoir: 'START : le A part tout seul vers la droite ; un appui sur la croix change sa direction, et il continue sans s’arrêter.',
+    controle: (c) => {
+      c.avancer(10)
+      c.presser('start', 6)
+      c.avancer(5)
+      const x0 = c.variable('x')
+      c.avancer(60)
+      const x1 = c.variable('x')
+      const seul = x1 > x0 && c.variable('y') === 8
+      c.presser('down', 3)
+      c.avancer(60)
+      const x2 = c.variable('x'), y2 = c.variable('y')
+      const bas = c.variable('sens') === 1 && y2 > 8 && x2 === x1 && c.mot(x2, y2, 1) === 'A'
+      return [
+        ['sans rien toucher, le A avance à droite', seul, ` (x : ${x0} → ${x1})`],
+        ['un appui court sur BAS : il descend, et continue tout seul', bas, ` (x = ${x2}, y = ${y2})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le snake — le mur fait perdre',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.91.7, mais toucher le cadre de X arrête la partie : l’écran FIN, comme quand le temps est écoulé. Une fonction finPartie() pour les deux.',
+    texte: [
+      '**C’est le 0.91.7, avec une chose en plus : le mur fait perdre.** Avant, le A qui entrait dans un X reculait, et restait collé au mur. Maintenant, **la partie s’arrête** : l’écran FIN, le score, et START pour rejouer. Comme dans un vrai snake : le A avance tout seul, c’est à toi de tourner à temps.',
+      '**Deux façons de finir, un seul écran FIN :** le temps écoulé (le 0.91.1), et maintenant le mur. Plutôt que d’écrire l’écran FIN deux fois, on le range dans une fonction, **`finPartie()`**, comme `nouvellePartie()` au 0.91.2. Elle met `ecran` à 2, vide l’écran et écrit FIN, le score et « START : REJOUER ». Le chronomètre l’appelle quand `temps` arrive à 0 ; le mur aussi.',
+      '**Le test du mur ne change pas :** `x == 0 || x == 19 || y == 0 || y >= 16` (le 0.91.3), vrai dès que le A est sur une colonne ou une ligne du cadre. Ce qui change, c’est ce qu’on fait : plus de recul, plus de X à reposer (l’écran va être vidé), juste `finPartie();`.',
+      '**Ce qui est nouveau ici : `continue;`.** Il saute **tout le reste du tour** de la boucle `while (true)`, et repart au début : à `image()`. Pourquoi ? Juste après le mur, la suite de ce tour ferait encore bouger la queue, redessiner le A, tester le P et écrire le score en bas… **par-dessus** l’écran FIN, qu’on vient d’écrire. Avec `continue;`, rien de tout ça n’arrive.',
+      '**Au tour suivant,** `ecran` vaut 2 : le bloc `if (ecran == 1)` ne se fait plus, le A ne bouge plus. Seul reste `if (ecran == 2 && bouton(START))` : START relance une partie, avec `nouvellePartie()` (le 0.91.2).',
+      '**Déroulons, sans rien toucher :** le A part de (5, 8) vers la droite. Il passe sur le P en (15, 8) : score 1, une case de queue. Il continue… (18, 8)… puis (19, 8) : colonne 19, le mur. `finPartie()` : FIN, SCORE 001. `continue;` : on repart à `image()`.',
+      '**Pour plus tard :** le A peut encore faire demi-tour sur sa queue, et la traverser sans perdre.',
+    ],
+    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+
+uint8_t x = 5;            // le A : sa colonne…
+uint8_t y = 8;            // …et sa ligne (le 0.81)
+uint8_t px = 15;          // la pièce, le P : sa colonne…
+uint8_t py = 8;           // …et sa ligne
+uint8_t score = 0;        // les pièces ramassées
+uint8_t temps = 30;       // les secondes qui restent
+uint8_t ax = 5;           // la place du A AVANT son pas… (le 0.91.3)
+uint8_t ay = 8;           // …pour l'y remettre s'il entre dans un mur
+uint8_t qx[50];           // la queue (le 0.91.6), un TABLEAU de 50 cases O : les colonnes…
+uint8_t qy[50];           // …et les lignes. qx[0] : la case collée au A.
+uint8_t longueur = 0;     // combien de cases la queue utilise (0 : le A seul)
+uint8_t sens = 0;         // où va le A (le 0.91.7). 0 = droite, 1 = bas, 2 = gauche, 3 = haut
+
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+// ---- Une partie qui commence, TOUT au départ (le 0.91.2) ----
+// Depuis le titre, ET depuis la fin (START : rejouer).
+void nouvellePartie() {
+  x = 5;                          // le A revient à sa place
+  y = 8;
+  px = 15;                        // le P revient en (15, 8), d'où qu'il soit
+  py = 8;
+  ax = 5;                         // et sa place d'avant, la même
+  ay = 8;
+  longueur = 0;                   // pas de queue, le A est tout seul (le 0.91.6)
+  sens = 0;                       // le A repart vers la droite (le 0.91.7)
+  score = 0;                      // pas encore de pièce
+  temps = 30;                     // 30 secondes de nouveau
+  ecran = 1;                      // on est sur le JEU
+  viderEcran();
+  poser(px, py, ALPHABET[15]);
+  poser(x, y, ALPHABET[0]);       // le A (le 0.91.7)
+
+  // ---- Le cadre de murs, des X tout autour du terrain (le 0.91.3) ----
+  //
+  //   colonne : 0 1 2 …           19
+  //   ligne 0 : X X X X X X … X X X     le haut : ligne 0, colonnes 0 à 19
+  //   ligne 1 : X                 X
+  //   …         X   A        P    X     les côtés : colonnes 0 et 19
+  //   ligne 15: X                 X
+  //   ligne 16: X X X X X X … X X X     le bas : ligne 16
+  //   ligne 17: SCORE 000  TEMPS 030    la ligne 17 reste aux nombres
+  //
+  // ALPHABET[23] : la 24e lettre (on compte depuis 0), le X.
+  for (uint8_t c = 0; c < 20; c++) {
+    poser(c, 0, ALPHABET[23]);        // le haut
+    poser(c, 16, ALPHABET[23]);       // le bas
+  }
+  for (uint8_t l = 1; l < 16; l++) {
+    poser(0, l, ALPHABET[23]);        // le côté gauche
+    poser(19, l, ALPHABET[23]);       // le côté droit
+  }
+
+  texte(0, 17, "SCORE");
+  texte(11, 17, "TEMPS");
+}
+
+// ---- NOUVEAU : une partie qui s'arrête, l'écran FIN ----
+// Deux raisons de perdre : le temps est écoulé, ou le A touche un mur.
+// Les deux appellent cette fonction : l'écran FIN n'est écrit qu'une fois.
+void finPartie() {
+  ecran = 2;                      // on est sur la FIN
+  viderEcran();
+  texte(8, 6, "FIN");
+  texte(5, 9, "SCORE");           // le score de la partie (le 0.91.2)
+  nombre(11, 9, score);
+  texte(2, 13, "START : REJOUER");
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    if (ecran == 0 && bouton(START)) {
+      nouvellePartie();               // la première partie
+    }
+
+    if (ecran == 1) {
+      // ---- La croix CHOISIT la direction (le 0.91.7) ----
+      // On appuie une fois, même très court : sens change, et il le reste.
+      if (bouton(DROITE)) sens = 0;
+      if (bouton(BAS))    sens = 1;
+      if (bouton(GAUCHE)) sens = 2;
+      if (bouton(HAUT))   sens = 3;
+
+      ax = x;                                  // on retient où est le A… (le 0.91.3)
+      ay = y;
+
+      // ---- Le A avance TOUT SEUL, un pas toutes les 250 ms (le 0.91.7) ----
+      // chaque(250) : vrai 4 fois par seconde (le 0.77). Ce chronomètre-ci
+      // n'est pas celui de chaque(1000), plus bas : chacun a le sien.
+      //
+      //   sens :   3
+      //            ↑           colonne : x - 1 à gauche, x + 1 à droite
+      //        2 ← A → 0       ligne   : y - 1 en haut,  y + 1 en bas
+      //            ↓
+      //            1
+      if (chaque(250)) {
+        effacer(x, y, 1);                      // le A quitte sa case
+        if (sens == 0) x = x + 1;              // à droite
+        if (sens == 1) y = y + 1;              // en bas
+        if (sens == 2) x = x - 1;              // à gauche
+        if (sens == 3) y = y - 1;              // en haut
+        poser(x, y, ALPHABET[0]);              // et se pose sur la suivante
+      }
+
+      // ---- NOUVEAU : le A touche le cadre ? La partie s'arrête ----
+      // Avant (le 0.91.3), le A reculait. Maintenant, il a PERDU.
+      // || veut dire « OU » : une seule des quatre suffit.
+      if (x == 0 || x == 19 || y == 0 || y >= 16) {
+        finPartie();                           // l'écran FIN, avec le score
+        continue;                              // on saute TOUT le reste de ce tour
+      }                                        // de boucle : retour à image()
+
+      // ---- La queue suit le A (le 0.91.5) ----
+      // Le A a-t-il bougé ? Sa place n'est plus celle d'avant (ax, ay).
+      // longueur > 0 d'abord (le 0.91.6). Sans queue, rien à déplacer, et
+      // longueur - 1 vaudrait 255 (un uint8_t ne descend pas sous 0).
+      // && veut dire « ET » : il faut une queue ET que le A ait bougé.
+      if (longueur > 0 && (x != ax || y != ay)) {
+        // 1. le BOUT de la queue disparaît : la dernière case, longueur - 1
+        effacer(qx[longueur - 1], qy[longueur - 1], 1);
+
+        // ---- 2. chaque case prend la place de celle de devant ----
+        // En partant du BOUT, et en reculant (i-- : i = i - 1).
+        // Avec longueur = 3 :  i = 2 : qx[2] = qx[1]
+        //                      i = 1 : qx[1] = qx[0]
+        //                      i = 0 : 0 > 0 est faux, la boucle s'arrête.
+        for (uint8_t i = longueur - 1; i > 0; i--) {
+          qx[i] = qx[i - 1];
+          qy[i] = qy[i - 1];
+        }
+
+        // 3. la première case prend la case que le A vient de quitter
+        qx[0] = ax;
+        qy[0] = ay;
+
+        // 4. toute la queue redessinée, de la case 0 à la case longueur - 1
+        //    (après une pièce, la nouvelle case venait d'être effacée avec le bout)
+        for (uint8_t i = 0; i < longueur; i++) {
+          poser(qx[i], qy[i], ALPHABET[14]);
+        }
+        poser(x, y, ALPHABET[0]);              // 5. le A par-dessus (le 0.91.5)
+      }
+      if (x == px && y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+
+        // ---- La pièce réapparaît AU HASARD, mais DANS le cadre (le 0.91.4) ----
+        //
+        //   px = 1 + hasard() % 18;
+        //        |   |        |
+        //        |   |        +-- % 18 : le reste de la division par 18, de 0 à 17.
+        //        |   |            Exemple : hasard() rend 137 ; 137 = 7 × 18 + 11 ;
+        //        |   |            le reste est 11.
+        //        |   +----------- un nombre imprévisible, de 0 à 255 (le 0.81.2)
+        //        +--------------- + 1 : on décale de 0…17 à 1…18 → 11 + 1 = 12.
+        //
+        // Pourquoi pas % 20 comme au 0.81.2 ? Les colonnes 0 et 19 sont des murs X :
+        // la pièce doit rester de 1 à 18. Les lignes 0 et 16 aussi sont des murs :
+        // la pièce doit rester de 1 à 15, d'où 1 + hasard() % 15.
+        px = 1 + hasard() % 18;                // une colonne : 1 à 18
+        py = 1 + hasard() % 15;                // une ligne : 1 à 15
+        poser(px, py, ALPHABET[15]);           // le nouveau P apparaît là
+
+        // ---- La queue grandit d'une case (le 0.91.6) ----
+        // La nouvelle case naît SUR le bout de la queue. Au prochain pas, toutes
+        // les autres avancent, elle non : elle reste derrière.
+        // La toute première n'a pas de bout : elle naît SOUS le A.
+        // < 50 : le tableau n'a que 50 cases, qx[0] à qx[49].
+        if (longueur < 50) {
+          if (longueur == 0) {
+            qx[0] = x;                         // la première case : sous le A
+            qy[0] = y;
+          } else {
+            qx[longueur] = qx[longueur - 1];   // la case d'après le bout…
+            qy[longueur] = qy[longueur - 1];   // …à la même place que le bout
+          }
+          longueur = longueur + 1;             // une case de plus
+        }
+      }
+      nombre(6, 17, score);
+      nombre(17, 17, temps);
+    }
+
+    if (ecran == 1 && chaque(1000)) {
+      temps = temps - 1;
+      if (temps == 0) {
+        finPartie();                  // NOUVEAU : la même fonction que pour le mur
+      }
+    }
+
+    // ---- Sur la fin, START relance une partie (le 0.91.2).
+    if (ecran == 2 && bouton(START)) {
+      nouvellePartie();               // la même fonction : tout au départ
+    }
+  }
+}
+`,
+    aVoir: 'START : le A file tout seul ; s’il touche le cadre de X, la partie s’arrête sur FIN et le score. START : on rejoue.',
+    controle: (c) => {
+      c.avancer(10)
+      c.presser('start', 6)
+      c.avancer(5)
+      c.avancer(280)
+      const ecran = c.variable('ecran')
+      const fin = ecran === 2 && c.mot(8, 6, 3) === 'FIN' && c.mot(11, 9, 3) === '001'
+      const propre = c.mot(0, 17, 20).trim() === '' && c.mot(0, 8, 20).trim() === ''
+      c.presser('start', 6)
+      c.avancer(10)
+      return [
+        ['sans rien toucher, le A va au mur : FIN, SCORE 001', fin, ` (ecran = ${ecran})`],
+        ['rien n’est dessiné par-dessus l’écran FIN', propre],
+        ['START : une nouvelle partie', c.variable('ecran') === 1 && c.variable('score') === 0 && c.variable('longueur') === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le snake — sans limite de temps',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.91.8, sans le chronomètre : plus de 30 secondes, plus de TEMPS. La partie dure tant que le A ne touche pas un mur.',
+    texte: [
+      '**C’est le 0.91.8, avec une chose en moins : le temps.** Plus de 30 secondes, plus de TEMPS en bas à droite. La partie dure **tant que le A ne touche pas un mur**. C’est la règle d’un vrai snake : on joue jusqu’à perdre.',
+      '**Ce qui change ici : on enlève, on n’ajoute rien.** Tout ce que le 0.91.1 avait mis pour le temps s’en va, morceau par morceau :',
+      '• la variable **`temps`** (`uint8_t temps = 30;`), et sa remise à 30 dans `nouvellePartie()` ;',
+      '• le mot **TEMPS** (`texte(11, 17, "TEMPS")`) et son nombre (`nombre(17, 17, temps)`), sur la ligne 17 ;',
+      '• le bloc du **chronomètre**, `if (ecran == 1 && chaque(1000)) { … }`, qui retirait une seconde et appelait `finPartie()` à 0.',
+      '**Enlever, c’est aussi de la programmation :** si l’on oubliait une seule de ces lignes, par exemple `nombre(17, 17, temps)` en gardant la variable effacée, le compilateur dirait que `temps` n’existe pas. Chaque ligne qui parlait du temps doit partir avec lui.',
+      '**`finPartie()` reste,** mais n’a plus qu’une raison d’être appelée : le mur (le 0.91.8). La fonction ne change pas : elle écrit toujours FIN, le score et « START : REJOUER ».',
+      '**`chaque(250)`, lui, reste :** c’est lui qui fait avancer le A (le 0.91.7). Il n’avait rien à voir avec le chronomètre ; chaque `chaque()` a son propre chronomètre.',
+      '**Pour plus tard :** le A peut encore faire demi-tour sur sa queue, et la traverser sans perdre. Sans limite de temps, c’est maintenant le seul vrai défaut du jeu.',
+    ],
+    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+
+uint8_t x = 5;            // le A : sa colonne…
+uint8_t y = 8;            // …et sa ligne (le 0.81)
+uint8_t px = 15;          // la pièce, le P : sa colonne…
+uint8_t py = 8;           // …et sa ligne
+uint8_t score = 0;        // les pièces ramassées
+uint8_t ax = 5;           // la place du A AVANT son pas… (le 0.91.3)
+uint8_t ay = 8;           // …pour l'y remettre s'il entre dans un mur
+uint8_t qx[50];           // la queue (le 0.91.6), un TABLEAU de 50 cases O : les colonnes…
+uint8_t qy[50];           // …et les lignes. qx[0] : la case collée au A.
+uint8_t longueur = 0;     // combien de cases la queue utilise (0 : le A seul)
+uint8_t sens = 0;         // où va le A (le 0.91.7). 0 = droite, 1 = bas, 2 = gauche, 3 = haut
+
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+// ---- Une partie qui commence, TOUT au départ (le 0.91.2) ----
+// Depuis le titre, ET depuis la fin (START : rejouer).
+void nouvellePartie() {
+  x = 5;                          // le A revient à sa place
+  y = 8;
+  px = 15;                        // le P revient en (15, 8), d'où qu'il soit
+  py = 8;
+  ax = 5;                         // et sa place d'avant, la même
+  ay = 8;
+  longueur = 0;                   // pas de queue, le A est tout seul (le 0.91.6)
+  sens = 0;                       // le A repart vers la droite (le 0.91.7)
+  score = 0;                      // pas encore de pièce
+  ecran = 1;                      // on est sur le JEU
+  viderEcran();
+  poser(px, py, ALPHABET[15]);
+  poser(x, y, ALPHABET[0]);       // le A (le 0.91.7)
+
+  // ---- Le cadre de murs, des X tout autour du terrain (le 0.91.3) ----
+  //
+  //   colonne : 0 1 2 …           19
+  //   ligne 0 : X X X X X X … X X X     le haut : ligne 0, colonnes 0 à 19
+  //   ligne 1 : X                 X
+  //   …         X   A        P    X     les côtés : colonnes 0 et 19
+  //   ligne 15: X                 X
+  //   ligne 16: X X X X X X … X X X     le bas : ligne 16
+  //   ligne 17: SCORE 000               la ligne 17 reste au score
+  //
+  // ALPHABET[23] : la 24e lettre (on compte depuis 0), le X.
+  for (uint8_t c = 0; c < 20; c++) {
+    poser(c, 0, ALPHABET[23]);        // le haut
+    poser(c, 16, ALPHABET[23]);       // le bas
+  }
+  for (uint8_t l = 1; l < 16; l++) {
+    poser(0, l, ALPHABET[23]);        // le côté gauche
+    poser(19, l, ALPHABET[23]);       // le côté droit
+  }
+
+  texte(0, 17, "SCORE");         // NOUVEAU : plus de TEMPS à côté
+}
+
+// ---- Une partie qui s'arrête, l'écran FIN (le 0.91.8) ----
+// NOUVEAU : une seule raison de perdre maintenant, le mur.
+void finPartie() {
+  ecran = 2;                      // on est sur la FIN
+  viderEcran();
+  texte(8, 6, "FIN");
+  texte(5, 9, "SCORE");           // le score de la partie (le 0.91.2)
+  nombre(11, 9, score);
+  texte(2, 13, "START : REJOUER");
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    if (ecran == 0 && bouton(START)) {
+      nouvellePartie();               // la première partie
+    }
+
+    if (ecran == 1) {
+      // ---- La croix CHOISIT la direction (le 0.91.7) ----
+      // On appuie une fois, même très court : sens change, et il le reste.
+      if (bouton(DROITE)) sens = 0;
+      if (bouton(BAS))    sens = 1;
+      if (bouton(GAUCHE)) sens = 2;
+      if (bouton(HAUT))   sens = 3;
+
+      ax = x;                                  // on retient où est le A… (le 0.91.3)
+      ay = y;
+
+      // ---- Le A avance TOUT SEUL, un pas toutes les 250 ms (le 0.91.7) ----
+      // chaque(250) : vrai 4 fois par seconde (le 0.77).
+      //
+      //   sens :   3
+      //            ↑           colonne : x - 1 à gauche, x + 1 à droite
+      //        2 ← A → 0       ligne   : y - 1 en haut,  y + 1 en bas
+      //            ↓
+      //            1
+      if (chaque(250)) {
+        effacer(x, y, 1);                      // le A quitte sa case
+        if (sens == 0) x = x + 1;              // à droite
+        if (sens == 1) y = y + 1;              // en bas
+        if (sens == 2) x = x - 1;              // à gauche
+        if (sens == 3) y = y - 1;              // en haut
+        poser(x, y, ALPHABET[0]);              // et se pose sur la suivante
+      }
+
+      // ---- Le A touche le cadre ? La partie s'arrête (le 0.91.8) ----
+      // Avant (le 0.91.3), le A reculait. Maintenant, il a PERDU.
+      // || veut dire « OU » : une seule des quatre suffit.
+      if (x == 0 || x == 19 || y == 0 || y >= 16) {
+        finPartie();                           // l'écran FIN, avec le score
+        continue;                              // on saute TOUT le reste de ce tour
+      }                                        // de boucle : retour à image()
+
+      // ---- La queue suit le A (le 0.91.5) ----
+      // Le A a-t-il bougé ? Sa place n'est plus celle d'avant (ax, ay).
+      // longueur > 0 d'abord (le 0.91.6). Sans queue, rien à déplacer, et
+      // longueur - 1 vaudrait 255 (un uint8_t ne descend pas sous 0).
+      // && veut dire « ET » : il faut une queue ET que le A ait bougé.
+      if (longueur > 0 && (x != ax || y != ay)) {
+        // 1. le BOUT de la queue disparaît : la dernière case, longueur - 1
+        effacer(qx[longueur - 1], qy[longueur - 1], 1);
+
+        // ---- 2. chaque case prend la place de celle de devant ----
+        // En partant du BOUT, et en reculant (i-- : i = i - 1).
+        // Avec longueur = 3 :  i = 2 : qx[2] = qx[1]
+        //                      i = 1 : qx[1] = qx[0]
+        //                      i = 0 : 0 > 0 est faux, la boucle s'arrête.
+        for (uint8_t i = longueur - 1; i > 0; i--) {
+          qx[i] = qx[i - 1];
+          qy[i] = qy[i - 1];
+        }
+
+        // 3. la première case prend la case que le A vient de quitter
+        qx[0] = ax;
+        qy[0] = ay;
+
+        // 4. toute la queue redessinée, de la case 0 à la case longueur - 1
+        //    (après une pièce, la nouvelle case venait d'être effacée avec le bout)
+        for (uint8_t i = 0; i < longueur; i++) {
+          poser(qx[i], qy[i], ALPHABET[14]);
+        }
+        poser(x, y, ALPHABET[0]);              // 5. le A par-dessus (le 0.91.5)
+      }
+      if (x == px && y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+
+        // ---- La pièce réapparaît AU HASARD, mais DANS le cadre (le 0.91.4) ----
+        //
+        //   px = 1 + hasard() % 18;
+        //        |   |        |
+        //        |   |        +-- % 18 : le reste de la division par 18, de 0 à 17.
+        //        |   |            Exemple : hasard() rend 137 ; 137 = 7 × 18 + 11 ;
+        //        |   |            le reste est 11.
+        //        |   +----------- un nombre imprévisible, de 0 à 255 (le 0.81.2)
+        //        +--------------- + 1 : on décale de 0…17 à 1…18 → 11 + 1 = 12.
+        //
+        // Pourquoi pas % 20 comme au 0.81.2 ? Les colonnes 0 et 19 sont des murs X :
+        // la pièce doit rester de 1 à 18. Les lignes 0 et 16 aussi sont des murs :
+        // la pièce doit rester de 1 à 15, d'où 1 + hasard() % 15.
+        px = 1 + hasard() % 18;                // une colonne : 1 à 18
+        py = 1 + hasard() % 15;                // une ligne : 1 à 15
+        poser(px, py, ALPHABET[15]);           // le nouveau P apparaît là
+
+        // ---- La queue grandit d'une case (le 0.91.6) ----
+        // La nouvelle case naît SUR le bout de la queue. Au prochain pas, toutes
+        // les autres avancent, elle non : elle reste derrière.
+        // La toute première n'a pas de bout : elle naît SOUS le A.
+        // < 50 : le tableau n'a que 50 cases, qx[0] à qx[49].
+        if (longueur < 50) {
+          if (longueur == 0) {
+            qx[0] = x;                         // la première case : sous le A
+            qy[0] = y;
+          } else {
+            qx[longueur] = qx[longueur - 1];   // la case d'après le bout…
+            qy[longueur] = qy[longueur - 1];   // …à la même place que le bout
+          }
+          longueur = longueur + 1;             // une case de plus
+        }
+      }
+      nombre(6, 17, score);
+    }
+
+    // NOUVEAU : ici, il y avait le chronomètre, chaque(1000). Il n'y est plus :
+    // la partie dure tant que le A ne touche pas un mur.
+
+    // ---- Sur la fin, START relance une partie (le 0.91.2).
+    if (ecran == 2 && bouton(START)) {
+      nouvellePartie();               // la même fonction : tout au départ
+    }
+  }
+}
+`,
+    aVoir: 'START : plus de TEMPS en bas ; le A file tout seul, aussi longtemps qu’il évite les murs.',
+    controle: (c) => {
+      c.avancer(10)
+      c.presser('start', 6)
+      c.avancer(5)
+      const bas = c.mot(0, 17, 20)
+      // de (5, 8), vers la droite, puis en bas, à gauche, en haut… : un tour
+      // du terrain qui ne touche jamais le cadre, plus long que 30 secondes
+      const tour = [['down', 90], ['left', 90], ['up', 90], ['right', 90]]
+      c.avancer(60)
+      let t = 60
+      while (t < 2100) {
+        for (const [b, n] of tour) { c.presser(b, 3); c.avancer(n - 3); t += n }
+      }
+      const vivant = c.variable('ecran') === 1
+      return [
+        ['en bas, SCORE seul, plus de TEMPS', bas.startsWith('SCORE') && !bas.includes('TEMPS'), ` (« ${bas.trim()} »)`],
+        ['après plus de 30 secondes, la partie continue', vivant, ` (ecran = ${c.variable('ecran')})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le snake, avec un menu — la couleur du serpent',
+    difficulte: 0,
+    idee: 'Le jeu du 0.91.9, et un MENU entre le titre et la partie : GAUCHE et DROITE choisissent la couleur du serpent, A lance la partie.',
+    texte: [
+      '**C’est le jeu du 0.91.9 (le snake sans limite de temps), avec une chose en plus : un menu.** Après le titre, START n’ouvre plus directement la partie : il ouvre le **MENU**. On y choisit la **couleur du serpent** avec GAUCHE et DROITE, puis **A** lance la partie. À la fin, START ramène au menu : on peut changer de couleur avant de rejouer.',
+      '**Un quatrième écran :** `ecran` valait 0 (titre), 1 (jeu) ou 2 (fin) ; il vaut maintenant aussi **3, le MENU**. La fonction `ouvrirMenu()` le dessine, comme `nouvellePartie()` dessine le jeu et `finPartie()` la fin.',
+      '**Ce qui est nouveau ici : colorer le serpent, et lui seul.** `couleurTexte()` colore **toutes** les lettres : les X et le P changeraient aussi. On se sert donc des **palettes** du 0.89 : le serpent va dans la **palette 1**, tout le reste reste dans la palette 0. Après chaque `poser()` du A ou d’un O, un `teindre(colonne, ligne, 1)` (le 0.89.1) met cette case dans la palette 1.',
+      '**Changer de couleur, c’est changer la palette, pas les cases.** `couleurFond(1, 3, rouge, vert, bleu)` change la **teinte 3** de la palette 1, celle des lettres (le 0.89). Toutes les cases de la palette 1 prennent la nouvelle couleur **d’un coup**, sans rien redessiner. C’est ce que fait `choisirCouleur()` : un `if` par couleur, et le nom de la couleur écrit dans le menu.',
+      '**La couleur est un numéro :** `uint8_t couleur = 0;` 0 = vert, 1 = rouge, 2 = bleu, 3 = violet. Comme `sens` au 0.91.7 : on retient un numéro, et des `if` disent ce qu’il veut dire.',
+      '**Les noms ont des espaces derrière :** `"VERT  "`, `"ROUGE "`, `"VIOLET"` ont tous 6 cases. Si l’on passait de VIOLET à VERT sans espaces, il resterait « VERTET » : les 2 dernières lettres de VIOLET : on efface avec des espaces, comme au chapitre 1.',
+      '**DROITE : la couleur suivante.** `couleur = (couleur + 1) % 4;` : 0 → 1 → 2 → 3, puis 3 + 1 = 4, et 4 % 4 = **0** : on revient au vert (le `%` du 0.9).',
+      '**GAUCHE : la couleur d’avant.** On voudrait `couleur - 1`, mais un `uint8_t` ne descend pas sous 0 : 0 - 1 donnerait 255 (le 0.91.6). L’astuce : **`(couleur + 3) % 4`**. Ajouter 3 puis garder le reste par 4, c’est reculer d’un. 2 : (2 + 3) % 4 = 5 % 4 = **1**. 0 : (0 + 3) % 4 = **3**, le violet.',
+      '**`chaque(200)` dans le menu :** un appui sur la croix dure plusieurs images. Si l’on regardait la croix à chaque image, un seul appui ferait tourner toutes les couleurs. On ne la regarde donc que 5 fois par seconde. Ce `chaque(200)` a son chronomètre à lui : il ne gêne pas le `chaque(250)` du serpent.',
+      '**Le petit serpent du menu :** trois O et un A, en (8, 9) à (11, 9), dans la palette 1. En changeant de couleur, on le voit changer tout de suite.',
+      '**Deux précautions, parce qu’une case garde sa palette :** `effacer()` enlève la **lettre**, pas la **palette** de la case. 1. `viderEcran()` remet toutes les cases dans la palette 0 (une boucle de plus, sur les 20 colonnes) : sinon, FIN ou MENU seraient à moitié de la couleur du serpent. 2. Quand le P réapparaît au hasard, `teindre(px, py, 0)` : la case a pu être celle du serpent.',
+    ],
+    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN, 3 = le MENU (NOUVEAU)
+
+uint8_t x = 5;            // le A : sa colonne…
+uint8_t y = 8;            // …et sa ligne (le 0.81)
+uint8_t px = 15;          // la pièce, le P : sa colonne…
+uint8_t py = 8;           // …et sa ligne
+uint8_t score = 0;        // les pièces ramassées
+uint8_t ax = 5;           // la place du A AVANT son pas… (le 0.91.3)
+uint8_t ay = 8;           // …pour l'y remettre s'il entre dans un mur
+uint8_t qx[50];           // la queue (le 0.91.6), un TABLEAU de 50 cases O : les colonnes…
+uint8_t qy[50];           // …et les lignes. qx[0] : la case collée au A.
+uint8_t longueur = 0;     // combien de cases la queue utilise (0 : le A seul)
+uint8_t sens = 0;         // où va le A (le 0.91.7). 0 = droite, 1 = bas, 2 = gauche, 3 = haut
+uint8_t couleur = 0;      // NOUVEAU : la couleur du serpent. 0 = vert, 1 = rouge, 2 = bleu, 3 = violet
+
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+    // NOUVEAU : chaque case de la ligne revient dans la palette 0.
+    // effacer() enlève la lettre, pas la palette de la case : sans ça,
+    // le FIN et le MENU seraient en partie de la couleur du serpent.
+    for (uint8_t c = 0; c < 20; c++) {
+      teindre(c, l, 0);
+    }
+  }
+}
+
+// ---- Une partie qui commence, TOUT au départ (le 0.91.2) ----
+// Depuis le titre, ET depuis la fin (START : rejouer).
+void nouvellePartie() {
+  x = 5;                          // le A revient à sa place
+  y = 8;
+  px = 15;                        // le P revient en (15, 8), d'où qu'il soit
+  py = 8;
+  ax = 5;                         // et sa place d'avant, la même
+  ay = 8;
+  longueur = 0;                   // pas de queue, le A est tout seul (le 0.91.6)
+  sens = 0;                       // le A repart vers la droite (le 0.91.7)
+  score = 0;                      // pas encore de pièce
+  ecran = 1;                      // on est sur le JEU
+  viderEcran();
+  poser(px, py, ALPHABET[15]);
+  poser(x, y, ALPHABET[0]);       // le A (le 0.91.7)…
+  teindre(x, y, 1);               // NOUVEAU : …dans la palette 1, celle du serpent
+
+  // ---- Le cadre de murs, des X tout autour du terrain (le 0.91.3) ----
+  //
+  //   colonne : 0 1 2 …           19
+  //   ligne 0 : X X X X X X … X X X     le haut : ligne 0, colonnes 0 à 19
+  //   ligne 1 : X                 X
+  //   …         X   A        P    X     les côtés : colonnes 0 et 19
+  //   ligne 15: X                 X
+  //   ligne 16: X X X X X X … X X X     le bas : ligne 16
+  //   ligne 17: SCORE 000               la ligne 17 reste au score
+  //
+  // ALPHABET[23] : la 24e lettre (on compte depuis 0), le X.
+  for (uint8_t c = 0; c < 20; c++) {
+    poser(c, 0, ALPHABET[23]);        // le haut
+    poser(c, 16, ALPHABET[23]);       // le bas
+  }
+  for (uint8_t l = 1; l < 16; l++) {
+    poser(0, l, ALPHABET[23]);        // le côté gauche
+    poser(19, l, ALPHABET[23]);       // le côté droit
+  }
+
+  texte(0, 17, "SCORE");         // plus de TEMPS à côté (le 0.91.9)
+}
+
+// ---- Une partie qui s'arrête, l'écran FIN (le 0.91.8) ----
+// Une seule raison de perdre : le mur (le 0.91.9).
+void finPartie() {
+  ecran = 2;                      // on est sur la FIN
+  viderEcran();
+  texte(8, 6, "FIN");
+  texte(5, 9, "SCORE");           // le score de la partie (le 0.91.2)
+  nombre(11, 9, score);
+  texte(2, 13, "START : LE MENU"); // NOUVEAU : on repasse par le menu
+}
+
+// ---- NOUVEAU : la couleur du serpent ----
+// Le serpent (le A et ses O) est dans la PALETTE 1 (teindre, le 0.89.1).
+// Changer la couleur, c'est changer la teinte 3 de la palette 1 (celle des
+// lettres) : TOUTES les cases de la palette 1 changent d'un coup.
+// Et on écrit le nom de la couleur dans le menu, avec des espaces derrière
+// pour recouvrir un nom plus long (VIOLET a 6 lettres, VERT n'en a que 4).
+void choisirCouleur() {
+  if (couleur == 0) {
+    couleurFond(1, 3, 0, 24, 0);      // rouge 0, vert 24, bleu 0 : VERT
+    texte(11, 6, "VERT  ");
+  }
+  if (couleur == 1) {
+    couleurFond(1, 3, 31, 0, 0);      // tout rouge : ROUGE
+    texte(11, 6, "ROUGE ");
+  }
+  if (couleur == 2) {
+    couleurFond(1, 3, 0, 8, 31);      // surtout du bleu : BLEU
+    texte(11, 6, "BLEU  ");
+  }
+  if (couleur == 3) {
+    couleurFond(1, 3, 20, 0, 31);     // bleu + un peu de rouge : VIOLET
+    texte(11, 6, "VIOLET");
+  }
+}
+
+// ---- NOUVEAU : l'écran du MENU ----
+//
+//   ligne 2 :         MENU
+//   ligne 6 :  COULEUR : VERT
+//   ligne 9 :         OOOA          un petit serpent, pour voir la couleur
+//   ligne 12:   GAUCHE - DROITE
+//   ligne 13:  LA COULEUR CHANGE
+//   ligne 16:      A : JOUER
+void ouvrirMenu() {
+  ecran = 3;                          // on est sur le MENU
+  viderEcran();
+  texte(8, 2, "MENU");
+  texte(1, 6, "COULEUR :");
+
+  // le petit serpent d'exemple : trois O et un A, tous dans la palette 1
+  for (uint8_t c = 8; c < 11; c++) {
+    poser(c, 9, ALPHABET[14]);
+    teindre(c, 9, 1);
+  }
+  poser(11, 9, ALPHABET[0]);
+  teindre(11, 9, 1);
+
+  texte(2, 12, "GAUCHE - DROITE");
+  texte(1, 13, "LA COULEUR CHANGE");
+  texte(5, 16, "A : JOUER");
+  choisirCouleur();                   // la couleur choisie, et son nom
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    if (ecran == 0 && bouton(START)) {
+      ouvrirMenu();                   // NOUVEAU : le titre mène au MENU
+    }
+
+    // ---- NOUVEAU : dans le MENU, la croix choisit la couleur ----
+    // chaque(200) : on ne regarde la croix que 5 fois par seconde. Sans lui,
+    // un appui (qui dure plusieurs images) ferait défiler toutes les couleurs.
+    if (ecran == 3 && chaque(200)) {
+      if (bouton(DROITE)) {
+        couleur = (couleur + 1) % 4;  // la suivante : 0 1 2 3, puis 0
+        choisirCouleur();
+      }
+      if (bouton(GAUCHE)) {
+        couleur = (couleur + 3) % 4;  // la précédente : 3 2 1 0, puis 3
+        choisirCouleur();             // (+ 3 puis % 4 : comme - 1, sans passer sous 0)
+      }
+    }
+    if (ecran == 3 && bouton(A)) {
+      nouvellePartie();               // A : on joue, avec cette couleur
+    }
+
+
+    if (ecran == 1) {
+      // ---- La croix CHOISIT la direction (le 0.91.7) ----
+      // On appuie une fois, même très court : sens change, et il le reste.
+      if (bouton(DROITE)) sens = 0;
+      if (bouton(BAS))    sens = 1;
+      if (bouton(GAUCHE)) sens = 2;
+      if (bouton(HAUT))   sens = 3;
+
+      ax = x;                                  // on retient où est le A… (le 0.91.3)
+      ay = y;
+
+      // ---- Le A avance TOUT SEUL, un pas toutes les 250 ms (le 0.91.7) ----
+      // chaque(250) : vrai 4 fois par seconde (le 0.77).
+      //
+      //   sens :   3
+      //            ↑           colonne : x - 1 à gauche, x + 1 à droite
+      //        2 ← A → 0       ligne   : y - 1 en haut,  y + 1 en bas
+      //            ↓
+      //            1
+      if (chaque(250)) {
+        effacer(x, y, 1);                      // le A quitte sa case
+        if (sens == 0) x = x + 1;              // à droite
+        if (sens == 1) y = y + 1;              // en bas
+        if (sens == 2) x = x - 1;              // à gauche
+        if (sens == 3) y = y - 1;              // en haut
+        poser(x, y, ALPHABET[0]);              // et se pose sur la suivante,
+        teindre(x, y, 1);                      // NOUVEAU : dans la palette 1
+      }
+
+      // ---- Le A touche le cadre ? La partie s'arrête (le 0.91.8) ----
+      // Avant (le 0.91.3), le A reculait. Maintenant, il a PERDU.
+      // || veut dire « OU » : une seule des quatre suffit.
+      if (x == 0 || x == 19 || y == 0 || y >= 16) {
+        finPartie();                           // l'écran FIN, avec le score
+        continue;                              // on saute TOUT le reste de ce tour
+      }                                        // de boucle : retour à image()
+
+      // ---- La queue suit le A (le 0.91.5) ----
+      // Le A a-t-il bougé ? Sa place n'est plus celle d'avant (ax, ay).
+      // longueur > 0 d'abord (le 0.91.6). Sans queue, rien à déplacer, et
+      // longueur - 1 vaudrait 255 (un uint8_t ne descend pas sous 0).
+      // && veut dire « ET » : il faut une queue ET que le A ait bougé.
+      if (longueur > 0 && (x != ax || y != ay)) {
+        // 1. le BOUT de la queue disparaît : la dernière case, longueur - 1
+        effacer(qx[longueur - 1], qy[longueur - 1], 1);
+
+        // ---- 2. chaque case prend la place de celle de devant ----
+        // En partant du BOUT, et en reculant (i-- : i = i - 1).
+        // Avec longueur = 3 :  i = 2 : qx[2] = qx[1]
+        //                      i = 1 : qx[1] = qx[0]
+        //                      i = 0 : 0 > 0 est faux, la boucle s'arrête.
+        for (uint8_t i = longueur - 1; i > 0; i--) {
+          qx[i] = qx[i - 1];
+          qy[i] = qy[i - 1];
+        }
+
+        // 3. la première case prend la case que le A vient de quitter
+        qx[0] = ax;
+        qy[0] = ay;
+
+        // 4. toute la queue redessinée, de la case 0 à la case longueur - 1
+        //    (après une pièce, la nouvelle case venait d'être effacée avec le bout)
+        for (uint8_t i = 0; i < longueur; i++) {
+          poser(qx[i], qy[i], ALPHABET[14]);
+          teindre(qx[i], qy[i], 1);            // NOUVEAU : chaque O dans la palette 1
+        }
+        poser(x, y, ALPHABET[0]);              // 5. le A par-dessus (le 0.91.5)
+        teindre(x, y, 1);
+      }
+      if (x == px && y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+
+        // ---- La pièce réapparaît AU HASARD, mais DANS le cadre (le 0.91.4) ----
+        //
+        //   px = 1 + hasard() % 18;
+        //        |   |        |
+        //        |   |        +-- % 18 : le reste de la division par 18, de 0 à 17.
+        //        |   |            Exemple : hasard() rend 137 ; 137 = 7 × 18 + 11 ;
+        //        |   |            le reste est 11.
+        //        |   +----------- un nombre imprévisible, de 0 à 255 (le 0.81.2)
+        //        +--------------- + 1 : on décale de 0…17 à 1…18 → 11 + 1 = 12.
+        //
+        // Pourquoi pas % 20 comme au 0.81.2 ? Les colonnes 0 et 19 sont des murs X :
+        // la pièce doit rester de 1 à 18. Les lignes 0 et 16 aussi sont des murs :
+        // la pièce doit rester de 1 à 15, d'où 1 + hasard() % 15.
+        px = 1 + hasard() % 18;                // une colonne : 1 à 18
+        py = 1 + hasard() % 15;                // une ligne : 1 à 15
+        poser(px, py, ALPHABET[15]);           // le nouveau P apparaît là,
+        teindre(px, py, 0);                    // NOUVEAU : palette 0. La case a pu être
+                                               // au serpent : le P serait de sa couleur.
+
+        // ---- La queue grandit d'une case (le 0.91.6) ----
+        // La nouvelle case naît SUR le bout de la queue. Au prochain pas, toutes
+        // les autres avancent, elle non : elle reste derrière.
+        // La toute première n'a pas de bout : elle naît SOUS le A.
+        // < 50 : le tableau n'a que 50 cases, qx[0] à qx[49].
+        if (longueur < 50) {
+          if (longueur == 0) {
+            qx[0] = x;                         // la première case : sous le A
+            qy[0] = y;
+          } else {
+            qx[longueur] = qx[longueur - 1];   // la case d'après le bout…
+            qy[longueur] = qy[longueur - 1];   // …à la même place que le bout
+          }
+          longueur = longueur + 1;             // une case de plus
+        }
+      }
+      nombre(6, 17, score);
+    }
+
+    // ---- Sur la fin, START (le 0.91.2) : NOUVEAU, retour au MENU.
+    if (ecran == 2 && bouton(START)) {
+      ouvrirMenu();                   // on peut changer de couleur avant de rejouer
+    }
+  }
+}
+`,
+    aVoir: 'START : le MENU ; GAUCHE et DROITE changent la couleur du petit serpent ; A : on joue, le serpent a cette couleur, le reste non.',
+    controle: (c) => {
+      const coul = (p, t) => { const i = p * 8 + t * 2, v = c.gb.ppu.bgPalettes[i] | (c.gb.ppu.bgPalettes[i + 1] << 8); return [v & 31, (v >> 5) & 31, (v >> 10) & 31].join(',') }
+      const pal = (x, y) => c.gb.ppu.vram[0x2000 + 0x1800 + y * 32 + x] & 7
+      c.avancer(10)
+      c.presser('start', 6)
+      c.avancer(20)                     // le menu se dessine en une dizaine d'images
+      const menu = c.variable('ecran') === 3 && c.mot(8, 2, 4) === 'MENU' && c.mot(11, 6, 4) === 'VERT' && [8, 9, 10, 11].every((x) => pal(x, 9) === 1)
+      c.presser('right', 12)
+      c.avancer(3)
+      const rouge = c.variable('couleur') === 1 && c.mot(11, 6, 6) === 'ROUGE ' && coul(1, 3) === '31,0,0'
+      c.presser('left', 12)
+      c.presser('left', 12)
+      c.avancer(3)
+      const violet = c.variable('couleur') === 3 && c.mot(11, 6, 6) === 'VIOLET'
+      c.presser('right', 12)
+      c.avancer(3)
+      c.presser('a', 3)
+      for (let t = 0; t < 400 && c.variable('score') < 1; t++) c.avancer(1)
+      c.avancer(20)
+      const x = c.variable('x')
+      const jeu = c.variable('ecran') === 1 && c.variable('score') === 1 && pal(x, 8) === 1 && pal(x - 1, 8) === 1 && pal(c.variable('px'), c.variable('py')) === 0 && pal(0, 8) === 0
+      for (let t = 0; t < 300 && c.variable('ecran') !== 2; t++) c.avancer(1)
+      c.avancer(20)
+      const fin = c.variable('ecran') === 2 && c.mot(8, 6, 3) === 'FIN' && [15, 16, 17, 18].every((x) => pal(x, 8) === 0)
+      return [
+        ['START : le MENU, VERT, le petit serpent dans la palette 1', menu],
+        ['DROITE : ROUGE, et la palette 1 devient rouge', rouge],
+        ['GAUCHE deux fois : de 1 à 0, puis de 0 à 3, VIOLET', violet],
+        ['A : le jeu ; le A et sa queue dans la palette 1, le P et les X dans la 0', jeu, ` (x = ${x})`],
+        ['au mur : FIN, et plus aucune case dans la palette 1', fin],
+        ['le fond de la palette 1 est celui de la palette 0', coul(1, 0) === coul(0, 0), ` (${coul(1, 0)} / ${coul(0, 0)})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le snake, avec un menu — le pas compté en images',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.92, mais le pas du A n’est plus donné par chaque(250) : on compte les images nous-mêmes, dans compte, jusqu’à attente. Même vitesse — mais attente est une variable.',
+    texte: [
+      '**C’est le 0.92, écrit d’une autre façon.** À l’écran, **presque rien ne change** : le A fait toujours un pas à peu près tous les quarts de seconde. Ce qui change, c’est **comment** le programme le sait. C’est une autre méthode pour arriver au même résultat.',
+      '**Pourquoi changer ce qui marche ?** Pour la leçon suivante : on veut un A qui **accélère**. Or `chaque(250)` ne prend qu’un **nombre écrit en clair** : `chaque(attente)` est refusé, parce que le compilateur traduit 250 ms en images **avant** que le jeu tourne. Il faut donc un temps qu’on peut **changer pendant la partie** : une variable.',
+      '**Ce qui est nouveau ici : compter les images soi-même.** `image()` revient **60 fois par seconde** : une image, 1/60 de seconde. Deux variables : **`compte`**, les images passées depuis le dernier pas, et **`attente`**, combien il en faut pour un pas : **15**.',
+      '**À chaque image :** `compte = compte + 1;`. Puis `if (compte >= attente)` : si l’on a attendu assez, on remet **`compte = 0;`** et le A fait son pas. **`>=`** veut dire « plus grand ou égal » (le 0.91.3).',
+      '**Déroulons :** image 1 : `compte` = 1, pas de pas. Image 2 : 2… Image 15 : `compte` = 15, 15 >= 15 est vrai : **un pas**, et `compte` repart à 0. Image 16 : 1… Image 30 : un pas. Un pas toutes les **15 images**.',
+      '**15 images, combien de temps ?** 60 images font une seconde ; 15, c’est un quart : **250 ms**. Ce que donnait `chaque(250)`… presque.',
+      '**Pourquoi « presque » ?** `compte` compte les **tours de boucle**, pas le vrai temps. D’habitude, un tour dure une image. Mais le tour où le A fait son pas doit tout redessiner (le A, la queue, les palettes) : il déborde un peu sur l’image suivante. Un pas prend donc 16 images au lieu de 15, environ 267 ms au lieu de 250 : l’œil ne voit pas la différence. `chaque()`, lui, regarde la vraie horloge de la console : il ne prend pas de retard.',
+      '**`nouvellePartie()` remet `compte` à 0 :** chaque partie commence par une attente complète.',
+      '**Pour la suite :** `attente` est une **variable**. Si elle passe à 14, le A fait un pas toutes les 14 images : un peu plus vite. C’est le 0.92.2.',
+    ],
+    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN, 3 = le MENU (le 0.92)
+
+uint8_t x = 5;            // le A : sa colonne…
+uint8_t y = 8;            // …et sa ligne (le 0.81)
+uint8_t px = 15;          // la pièce, le P : sa colonne…
+uint8_t py = 8;           // …et sa ligne
+uint8_t score = 0;        // les pièces ramassées
+uint8_t ax = 5;           // la place du A AVANT son pas… (le 0.91.3)
+uint8_t ay = 8;           // …pour l'y remettre s'il entre dans un mur
+uint8_t qx[50];           // la queue (le 0.91.6), un TABLEAU de 50 cases O : les colonnes…
+uint8_t qy[50];           // …et les lignes. qx[0] : la case collée au A.
+uint8_t longueur = 0;     // combien de cases la queue utilise (0 : le A seul)
+uint8_t sens = 0;         // où va le A (le 0.91.7). 0 = droite, 1 = bas, 2 = gauche, 3 = haut
+uint8_t attente = 15;     // NOUVEAU : combien d'images entre deux pas du A (15 = 250 ms)
+uint8_t compte = 0;       // NOUVEAU : les images comptées depuis le dernier pas
+uint8_t couleur = 0;      // la couleur du serpent (le 0.92). 0 = vert, 1 = rouge, 2 = bleu, 3 = violet
+
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+    // Chaque case de la ligne revient dans la palette 0 (le 0.92).
+    // effacer() enlève la lettre, pas la palette de la case : sans ça,
+    // le FIN et le MENU seraient en partie de la couleur du serpent.
+    for (uint8_t c = 0; c < 20; c++) {
+      teindre(c, l, 0);
+    }
+  }
+}
+
+// ---- Une partie qui commence, TOUT au départ (le 0.91.2) ----
+// Depuis le titre, ET depuis la fin (START : rejouer).
+void nouvellePartie() {
+  x = 5;                          // le A revient à sa place
+  y = 8;
+  px = 15;                        // le P revient en (15, 8), d'où qu'il soit
+  py = 8;
+  ax = 5;                         // et sa place d'avant, la même
+  ay = 8;
+  longueur = 0;                   // pas de queue, le A est tout seul (le 0.91.6)
+  sens = 0;                       // le A repart vers la droite (le 0.91.7)
+  compte = 0;                     // NOUVEAU : on recommence à compter
+  score = 0;                      // pas encore de pièce
+  ecran = 1;                      // on est sur le JEU
+  viderEcran();
+  poser(px, py, ALPHABET[15]);
+  poser(x, y, ALPHABET[0]);       // le A (le 0.91.7)…
+  teindre(x, y, 1);               // …dans la palette 1, celle du serpent (le 0.92)
+
+  // ---- Le cadre de murs, des X tout autour du terrain (le 0.91.3) ----
+  //
+  //   colonne : 0 1 2 …           19
+  //   ligne 0 : X X X X X X … X X X     le haut : ligne 0, colonnes 0 à 19
+  //   ligne 1 : X                 X
+  //   …         X   A        P    X     les côtés : colonnes 0 et 19
+  //   ligne 15: X                 X
+  //   ligne 16: X X X X X X … X X X     le bas : ligne 16
+  //   ligne 17: SCORE 000               la ligne 17 reste au score
+  //
+  // ALPHABET[23] : la 24e lettre (on compte depuis 0), le X.
+  for (uint8_t c = 0; c < 20; c++) {
+    poser(c, 0, ALPHABET[23]);        // le haut
+    poser(c, 16, ALPHABET[23]);       // le bas
+  }
+  for (uint8_t l = 1; l < 16; l++) {
+    poser(0, l, ALPHABET[23]);        // le côté gauche
+    poser(19, l, ALPHABET[23]);       // le côté droit
+  }
+
+  texte(0, 17, "SCORE");         // plus de TEMPS à côté (le 0.91.9)
+}
+
+// ---- Une partie qui s'arrête, l'écran FIN (le 0.91.8) ----
+// Une seule raison de perdre : le mur (le 0.91.9).
+void finPartie() {
+  ecran = 2;                      // on est sur la FIN
+  viderEcran();
+  texte(8, 6, "FIN");
+  texte(5, 9, "SCORE");           // le score de la partie (le 0.91.2)
+  nombre(11, 9, score);
+  texte(2, 13, "START : LE MENU"); // on repasse par le menu (le 0.92)
+}
+
+// ---- La couleur du serpent (le 0.92) ----
+// Le serpent (le A et ses O) est dans la PALETTE 1 (teindre, le 0.89.1).
+// Changer la couleur, c'est changer la teinte 3 de la palette 1 (celle des
+// lettres) : TOUTES les cases de la palette 1 changent d'un coup.
+// Et on écrit le nom de la couleur dans le menu, avec des espaces derrière
+// pour recouvrir un nom plus long (VIOLET a 6 lettres, VERT n'en a que 4).
+void choisirCouleur() {
+  if (couleur == 0) {
+    couleurFond(1, 3, 0, 24, 0);      // rouge 0, vert 24, bleu 0 : VERT
+    texte(11, 6, "VERT  ");
+  }
+  if (couleur == 1) {
+    couleurFond(1, 3, 31, 0, 0);      // tout rouge : ROUGE
+    texte(11, 6, "ROUGE ");
+  }
+  if (couleur == 2) {
+    couleurFond(1, 3, 0, 8, 31);      // surtout du bleu : BLEU
+    texte(11, 6, "BLEU  ");
+  }
+  if (couleur == 3) {
+    couleurFond(1, 3, 20, 0, 31);     // bleu + un peu de rouge : VIOLET
+    texte(11, 6, "VIOLET");
+  }
+}
+
+// ---- L'écran du MENU (le 0.92) ----
+//
+//   ligne 2 :         MENU
+//   ligne 6 :  COULEUR : VERT
+//   ligne 9 :         OOOA          un petit serpent, pour voir la couleur
+//   ligne 12:   GAUCHE - DROITE
+//   ligne 13:  LA COULEUR CHANGE
+//   ligne 16:      A : JOUER
+void ouvrirMenu() {
+  ecran = 3;                          // on est sur le MENU
+  viderEcran();
+  texte(8, 2, "MENU");
+  texte(1, 6, "COULEUR :");
+
+  // le petit serpent d'exemple : trois O et un A, tous dans la palette 1
+  for (uint8_t c = 8; c < 11; c++) {
+    poser(c, 9, ALPHABET[14]);
+    teindre(c, 9, 1);
+  }
+  poser(11, 9, ALPHABET[0]);
+  teindre(11, 9, 1);
+
+  texte(2, 12, "GAUCHE - DROITE");
+  texte(1, 13, "LA COULEUR CHANGE");
+  texte(5, 16, "A : JOUER");
+  choisirCouleur();                   // la couleur choisie, et son nom
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    if (ecran == 0 && bouton(START)) {
+      ouvrirMenu();                   // le titre mène au MENU (le 0.92)
+    }
+
+    // ---- Dans le MENU, la croix choisit la couleur (le 0.92) ----
+    // chaque(200) : on ne regarde la croix que 5 fois par seconde. Sans lui,
+    // un appui (qui dure plusieurs images) ferait défiler toutes les couleurs.
+    if (ecran == 3 && chaque(200)) {
+      if (bouton(DROITE)) {
+        couleur = (couleur + 1) % 4;  // la suivante : 0 1 2 3, puis 0
+        choisirCouleur();
+      }
+      if (bouton(GAUCHE)) {
+        couleur = (couleur + 3) % 4;  // la précédente : 3 2 1 0, puis 3
+        choisirCouleur();             // (+ 3 puis % 4 : comme - 1, sans passer sous 0)
+      }
+    }
+    if (ecran == 3 && bouton(A)) {
+      nouvellePartie();               // A : on joue, avec cette couleur
+    }
+
+
+    if (ecran == 1) {
+      // ---- La croix CHOISIT la direction (le 0.91.7) ----
+      // On appuie une fois, même très court : sens change, et il le reste.
+      if (bouton(DROITE)) sens = 0;
+      if (bouton(BAS))    sens = 1;
+      if (bouton(GAUCHE)) sens = 2;
+      if (bouton(HAUT))   sens = 3;
+
+      ax = x;                                  // on retient où est le A… (le 0.91.3)
+      ay = y;
+
+      // ---- Le A avance TOUT SEUL (le 0.91.7) : NOUVEAU, on compte les images ----
+      // image() revient 60 fois par seconde : compte gagne 1 à chaque image.
+      // Quand il atteint attente (15), on remet compte à 0, et le A fait un pas.
+      // 15 images sur 60 : un quart de seconde, 250 ms, comme chaque(250).
+      // Mais attente est une VARIABLE : on pourra la changer (le 0.92.2).
+      // chaque(), lui, ne prend qu'un nombre écrit en clair.
+      //
+      //   sens :   3
+      //            ↑           colonne : x - 1 à gauche, x + 1 à droite
+      //        2 ← A → 0       ligne   : y - 1 en haut,  y + 1 en bas
+      //            ↓
+      //            1
+      compte = compte + 1;
+      if (compte >= attente) {
+        compte = 0;                            // on recommence à compter
+        effacer(x, y, 1);                      // le A quitte sa case
+        if (sens == 0) x = x + 1;              // à droite
+        if (sens == 1) y = y + 1;              // en bas
+        if (sens == 2) x = x - 1;              // à gauche
+        if (sens == 3) y = y - 1;              // en haut
+        poser(x, y, ALPHABET[0]);              // et se pose sur la suivante,
+        teindre(x, y, 1);                      // dans la palette 1 (le 0.92)
+      }
+
+      // ---- Le A touche le cadre ? La partie s'arrête (le 0.91.8) ----
+      // Avant (le 0.91.3), le A reculait. Maintenant, il a PERDU.
+      // || veut dire « OU » : une seule des quatre suffit.
+      if (x == 0 || x == 19 || y == 0 || y >= 16) {
+        finPartie();                           // l'écran FIN, avec le score
+        continue;                              // on saute TOUT le reste de ce tour
+      }                                        // de boucle : retour à image()
+
+      // ---- La queue suit le A (le 0.91.5) ----
+      // Le A a-t-il bougé ? Sa place n'est plus celle d'avant (ax, ay).
+      // longueur > 0 d'abord (le 0.91.6). Sans queue, rien à déplacer, et
+      // longueur - 1 vaudrait 255 (un uint8_t ne descend pas sous 0).
+      // && veut dire « ET » : il faut une queue ET que le A ait bougé.
+      if (longueur > 0 && (x != ax || y != ay)) {
+        // 1. le BOUT de la queue disparaît : la dernière case, longueur - 1
+        effacer(qx[longueur - 1], qy[longueur - 1], 1);
+
+        // ---- 2. chaque case prend la place de celle de devant ----
+        // En partant du BOUT, et en reculant (i-- : i = i - 1).
+        // Avec longueur = 3 :  i = 2 : qx[2] = qx[1]
+        //                      i = 1 : qx[1] = qx[0]
+        //                      i = 0 : 0 > 0 est faux, la boucle s'arrête.
+        for (uint8_t i = longueur - 1; i > 0; i--) {
+          qx[i] = qx[i - 1];
+          qy[i] = qy[i - 1];
+        }
+
+        // 3. la première case prend la case que le A vient de quitter
+        qx[0] = ax;
+        qy[0] = ay;
+
+        // 4. toute la queue redessinée, de la case 0 à la case longueur - 1
+        //    (après une pièce, la nouvelle case venait d'être effacée avec le bout)
+        for (uint8_t i = 0; i < longueur; i++) {
+          poser(qx[i], qy[i], ALPHABET[14]);
+          teindre(qx[i], qy[i], 1);            // chaque O dans la palette 1 (le 0.92)
+        }
+        poser(x, y, ALPHABET[0]);              // 5. le A par-dessus (le 0.91.5)
+        teindre(x, y, 1);
+      }
+      if (x == px && y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+
+        // ---- La pièce réapparaît AU HASARD, mais DANS le cadre (le 0.91.4) ----
+        //
+        //   px = 1 + hasard() % 18;
+        //        |   |        |
+        //        |   |        +-- % 18 : le reste de la division par 18, de 0 à 17.
+        //        |   |            Exemple : hasard() rend 137 ; 137 = 7 × 18 + 11 ;
+        //        |   |            le reste est 11.
+        //        |   +----------- un nombre imprévisible, de 0 à 255 (le 0.81.2)
+        //        +--------------- + 1 : on décale de 0…17 à 1…18 → 11 + 1 = 12.
+        //
+        // Pourquoi pas % 20 comme au 0.81.2 ? Les colonnes 0 et 19 sont des murs X :
+        // la pièce doit rester de 1 à 18. Les lignes 0 et 16 aussi sont des murs :
+        // la pièce doit rester de 1 à 15, d'où 1 + hasard() % 15.
+        px = 1 + hasard() % 18;                // une colonne : 1 à 18
+        py = 1 + hasard() % 15;                // une ligne : 1 à 15
+        poser(px, py, ALPHABET[15]);           // le nouveau P apparaît là,
+        teindre(px, py, 0);                    // palette 0 (le 0.92). La case a pu être
+                                               // au serpent : le P serait de sa couleur.
+
+        // ---- La queue grandit d'une case (le 0.91.6) ----
+        // La nouvelle case naît SUR le bout de la queue. Au prochain pas, toutes
+        // les autres avancent, elle non : elle reste derrière.
+        // La toute première n'a pas de bout : elle naît SOUS le A.
+        // < 50 : le tableau n'a que 50 cases, qx[0] à qx[49].
+        if (longueur < 50) {
+          if (longueur == 0) {
+            qx[0] = x;                         // la première case : sous le A
+            qy[0] = y;
+          } else {
+            qx[longueur] = qx[longueur - 1];   // la case d'après le bout…
+            qy[longueur] = qy[longueur - 1];   // …à la même place que le bout
+          }
+          longueur = longueur + 1;             // une case de plus
+        }
+      }
+      nombre(6, 17, score);
+    }
+
+    // ---- Sur la fin, START (le 0.91.2) : retour au MENU (le 0.92).
+    if (ecran == 2 && bouton(START)) {
+      ouvrirMenu();                   // on peut changer de couleur avant de rejouer
+    }
+  }
+}
+`,
+    aVoir: 'Comme au 0.92 : le A avance d’un pas tous les quarts de seconde. Le changement est dans le code.',
+    controle: (c) => {
+      c.avancer(10)
+      c.presser('start', 6)
+      c.avancer(20)                     // le menu se dessine
+      c.presser('a', 3)
+      c.avancer(30)                     // puis le terrain
+      const x0 = c.variable('x')
+      c.avancer(150)
+      const x1 = c.variable('x')
+      return [
+        ['attente vaut 15', c.variable('attente') === 15],
+        ['150 images : 9 ou 10 pas (environ un toutes les 15 images)', x1 - x0 === 9 || x1 - x0 === 10, ` (x : ${x0} → ${x1})`],
+        ['compte reste sous attente', c.variable('compte') < 15],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le snake, avec un menu — la vitesse qui monte',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.92.1, et une deuxième ligne au menu : B choisit VITESSE FIXE ou MONTE. En MONTE, chaque P ramassé retire une image d’attente : le A va de plus en plus vite.',
+    texte: [
+      '**C’est le 0.92.1, avec une chose en plus : un mode vitesse.** Dans le menu, une deuxième ligne : **VITESSE : FIXE** ou **MONTE**. Le bouton **B** passe de l’un à l’autre. En FIXE, le jeu est celui du 0.92.1. En MONTE, **chaque P ramassé rend le A un peu plus rapide**.',
+      '**Ce qui est nouveau ici : `monte`, un interrupteur.** `uint8_t monte = 0;` 0 veut dire FIXE, 1 veut dire MONTE. Une variable qui ne vaut que 0 ou 1, c’est un **interrupteur** : éteint ou allumé.',
+      '**B l’inverse :** `monte = 1 - monte;`. Si `monte` vaut 0 : 1 - 0 = **1**. S’il vaut 1 : 1 - 1 = **0**. Une seule ligne, dans les deux sens. Puis `choisirVitesse()` écrit FIXE ou MONTE, comme `choisirCouleur()` écrit le nom de la couleur. `"FIXE "` a un espace derrière : MONTE a une lettre de plus.',
+      '**B est lu dans le même `chaque(200)` que la croix :** sinon, un appui (plusieurs images) allumerait et éteindrait l’interrupteur plusieurs fois.',
+      '**Aller plus vite, c’est attendre moins.** Au 0.92.1, le A fait un pas toutes les `attente` images (15). Quand il ramasse un P, en mode MONTE : `attente = attente - 1;`. 15, puis 14, 13, 12… **Moins d’images entre deux pas, plus de pas par seconde.**',
+      '**Les deux conditions à la fois :** `if (monte == 1 && attente > 5)` (`&&`, le 0.75). **`monte == 1`** : seulement en mode MONTE ; en FIXE, `attente` reste à 15. **`attente > 5`** : on s’arrête à 5 images par pas, soit 12 pas par seconde. Sans cette limite, le jeu deviendrait injouable ; et à 0, `attente - 1` donnerait 255 (le 0.91.6) : le A presque arrêté !',
+      '**Les chiffres :** 15 images, 4 pas par seconde (60 / 15). Après 5 P : 10 images, **6** pas par seconde. Après 10 P : 5 images, **12** pas par seconde. La vitesse a triplé.',
+      '**`nouvellePartie()` remet `attente` à 15 :** chaque partie repart lentement, même après une partie très rapide. `monte`, lui, n’est **pas** remis à 0 : c’est un réglage du menu, il reste choisi d’une partie à l’autre, comme la couleur.',
+    ],
+    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN, 3 = le MENU (le 0.92)
+
+uint8_t x = 5;            // le A : sa colonne…
+uint8_t y = 8;            // …et sa ligne (le 0.81)
+uint8_t px = 15;          // la pièce, le P : sa colonne…
+uint8_t py = 8;           // …et sa ligne
+uint8_t score = 0;        // les pièces ramassées
+uint8_t ax = 5;           // la place du A AVANT son pas… (le 0.91.3)
+uint8_t ay = 8;           // …pour l'y remettre s'il entre dans un mur
+uint8_t qx[50];           // la queue (le 0.91.6), un TABLEAU de 50 cases O : les colonnes…
+uint8_t qy[50];           // …et les lignes. qx[0] : la case collée au A.
+uint8_t longueur = 0;     // combien de cases la queue utilise (0 : le A seul)
+uint8_t sens = 0;         // où va le A (le 0.91.7). 0 = droite, 1 = bas, 2 = gauche, 3 = haut
+uint8_t attente = 15;     // combien d'images entre deux pas du A (15 = 250 ms) (le 0.92.1)
+uint8_t compte = 0;       // les images comptées depuis le dernier pas
+uint8_t monte = 0;        // NOUVEAU : le mode vitesse. 0 = FIXE, 1 = MONTE (plus vite à chaque P)
+uint8_t couleur = 0;      // la couleur du serpent (le 0.92). 0 = vert, 1 = rouge, 2 = bleu, 3 = violet
+
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+    // Chaque case de la ligne revient dans la palette 0 (le 0.92).
+    // effacer() enlève la lettre, pas la palette de la case : sans ça,
+    // le FIN et le MENU seraient en partie de la couleur du serpent.
+    for (uint8_t c = 0; c < 20; c++) {
+      teindre(c, l, 0);
+    }
+  }
+}
+
+// ---- Une partie qui commence, TOUT au départ (le 0.91.2) ----
+// Depuis le titre, ET depuis la fin (START : rejouer).
+void nouvellePartie() {
+  x = 5;                          // le A revient à sa place
+  y = 8;
+  px = 15;                        // le P revient en (15, 8), d'où qu'il soit
+  py = 8;
+  ax = 5;                         // et sa place d'avant, la même
+  ay = 8;
+  longueur = 0;                   // pas de queue, le A est tout seul (le 0.91.6)
+  sens = 0;                       // le A repart vers la droite (le 0.91.7)
+  compte = 0;                     // on recommence à compter (le 0.92.1)
+  attente = 15;                   // NOUVEAU : la vitesse du départ, 250 ms par pas
+  score = 0;                      // pas encore de pièce
+  ecran = 1;                      // on est sur le JEU
+  viderEcran();
+  poser(px, py, ALPHABET[15]);
+  poser(x, y, ALPHABET[0]);       // le A (le 0.91.7)…
+  teindre(x, y, 1);               // …dans la palette 1, celle du serpent (le 0.92)
+
+  // ---- Le cadre de murs, des X tout autour du terrain (le 0.91.3) ----
+  //
+  //   colonne : 0 1 2 …           19
+  //   ligne 0 : X X X X X X … X X X     le haut : ligne 0, colonnes 0 à 19
+  //   ligne 1 : X                 X
+  //   …         X   A        P    X     les côtés : colonnes 0 et 19
+  //   ligne 15: X                 X
+  //   ligne 16: X X X X X X … X X X     le bas : ligne 16
+  //   ligne 17: SCORE 000               la ligne 17 reste au score
+  //
+  // ALPHABET[23] : la 24e lettre (on compte depuis 0), le X.
+  for (uint8_t c = 0; c < 20; c++) {
+    poser(c, 0, ALPHABET[23]);        // le haut
+    poser(c, 16, ALPHABET[23]);       // le bas
+  }
+  for (uint8_t l = 1; l < 16; l++) {
+    poser(0, l, ALPHABET[23]);        // le côté gauche
+    poser(19, l, ALPHABET[23]);       // le côté droit
+  }
+
+  texte(0, 17, "SCORE");         // plus de TEMPS à côté (le 0.91.9)
+}
+
+// ---- Une partie qui s'arrête, l'écran FIN (le 0.91.8) ----
+// Une seule raison de perdre : le mur (le 0.91.9).
+void finPartie() {
+  ecran = 2;                      // on est sur la FIN
+  viderEcran();
+  texte(8, 6, "FIN");
+  texte(5, 9, "SCORE");           // le score de la partie (le 0.91.2)
+  nombre(11, 9, score);
+  texte(2, 13, "START : LE MENU"); // on repasse par le menu (le 0.92)
+}
+
+// ---- La couleur du serpent (le 0.92) ----
+// Le serpent (le A et ses O) est dans la PALETTE 1 (teindre, le 0.89.1).
+// Changer la couleur, c'est changer la teinte 3 de la palette 1 (celle des
+// lettres) : TOUTES les cases de la palette 1 changent d'un coup.
+// Et on écrit le nom de la couleur dans le menu, avec des espaces derrière
+// pour recouvrir un nom plus long (VIOLET a 6 lettres, VERT n'en a que 4).
+void choisirCouleur() {
+  if (couleur == 0) {
+    couleurFond(1, 3, 0, 24, 0);      // rouge 0, vert 24, bleu 0 : VERT
+    texte(11, 6, "VERT  ");
+  }
+  if (couleur == 1) {
+    couleurFond(1, 3, 31, 0, 0);      // tout rouge : ROUGE
+    texte(11, 6, "ROUGE ");
+  }
+  if (couleur == 2) {
+    couleurFond(1, 3, 0, 8, 31);      // surtout du bleu : BLEU
+    texte(11, 6, "BLEU  ");
+  }
+  if (couleur == 3) {
+    couleurFond(1, 3, 20, 0, 31);     // bleu + un peu de rouge : VIOLET
+    texte(11, 6, "VIOLET");
+  }
+}
+
+// ---- NOUVEAU : le nom du mode vitesse, dans le menu ----
+// FIXE  : le A garde toujours la même vitesse.
+// MONTE : chaque P ramassé le rend un peu plus rapide.
+void choisirVitesse() {
+  if (monte == 0) {
+    texte(11, 7, "FIXE ");            // un espace derrière : MONTE a 5 lettres
+  }
+  if (monte == 1) {
+    texte(11, 7, "MONTE");
+  }
+}
+
+// ---- L'écran du MENU (le 0.92) ----
+//
+//   ligne 2 :         MENU
+//   ligne 6 :  COULEUR : VERT
+//   ligne 7 :  VITESSE : FIXE       NOUVEAU
+//   ligne 9 :         OOOA          un petit serpent, pour voir la couleur
+//   ligne 12:   GAUCHE - DROITE
+//   ligne 13:  LA COULEUR CHANGE
+//   ligne 14:   B : LA VITESSE      NOUVEAU
+//   ligne 16:      A : JOUER
+void ouvrirMenu() {
+  ecran = 3;                          // on est sur le MENU
+  viderEcran();
+  texte(8, 2, "MENU");
+  texte(1, 6, "COULEUR :");
+
+  // le petit serpent d'exemple : trois O et un A, tous dans la palette 1
+  for (uint8_t c = 8; c < 11; c++) {
+    poser(c, 9, ALPHABET[14]);
+    teindre(c, 9, 1);
+  }
+  poser(11, 9, ALPHABET[0]);
+  teindre(11, 9, 1);
+
+  texte(2, 12, "GAUCHE - DROITE");
+  texte(1, 13, "LA COULEUR CHANGE");
+  texte(3, 14, "B : LA VITESSE");      // NOUVEAU
+  texte(1, 7, "VITESSE :");           // NOUVEAU
+  texte(5, 16, "A : JOUER");
+  choisirCouleur();                   // la couleur choisie, et son nom
+  choisirVitesse();                   // NOUVEAU : le mode vitesse, et son nom
+}
+
+int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    if (ecran == 0 && bouton(START)) {
+      ouvrirMenu();                   // le titre mène au MENU (le 0.92)
+    }
+
+    // ---- Dans le MENU, la croix choisit la couleur (le 0.92) ----
+    // chaque(200) : on ne regarde la croix que 5 fois par seconde. Sans lui,
+    // un appui (qui dure plusieurs images) ferait défiler toutes les couleurs.
+    if (ecran == 3 && chaque(200)) {
+      if (bouton(DROITE)) {
+        couleur = (couleur + 1) % 4;  // la suivante : 0 1 2 3, puis 0
+        choisirCouleur();
+      }
+      if (bouton(GAUCHE)) {
+        couleur = (couleur + 3) % 4;  // la précédente : 3 2 1 0, puis 3
+        choisirCouleur();             // (+ 3 puis % 4 : comme - 1, sans passer sous 0)
+      }
+      // NOUVEAU : B passe de FIXE à MONTE, et de MONTE à FIXE.
+      //   1 - monte : si monte vaut 0, 1 - 0 = 1 ; s'il vaut 1, 1 - 1 = 0.
+      if (bouton(B)) {
+        monte = 1 - monte;
+        choisirVitesse();
+      }
+    }
+    if (ecran == 3 && bouton(A)) {
+      nouvellePartie();               // A : on joue, avec cette couleur
+    }
+
+
+    if (ecran == 1) {
+      // ---- La croix CHOISIT la direction (le 0.91.7) ----
+      // On appuie une fois, même très court : sens change, et il le reste.
+      if (bouton(DROITE)) sens = 0;
+      if (bouton(BAS))    sens = 1;
+      if (bouton(GAUCHE)) sens = 2;
+      if (bouton(HAUT))   sens = 3;
+
+      ax = x;                                  // on retient où est le A… (le 0.91.3)
+      ay = y;
+
+      // ---- Le A avance TOUT SEUL (le 0.91.7), en comptant les images (le 0.92.1) ----
+      // image() revient 60 fois par seconde : compte gagne 1 à chaque image.
+      // Quand il atteint attente (15), on remet compte à 0, et le A fait un pas.
+      // 15 images sur 60 : un quart de seconde, 250 ms, comme chaque(250).
+      // attente est une VARIABLE : en mode MONTE, elle diminue (voir le P).
+      //
+      //   sens :   3
+      //            ↑           colonne : x - 1 à gauche, x + 1 à droite
+      //        2 ← A → 0       ligne   : y - 1 en haut,  y + 1 en bas
+      //            ↓
+      //            1
+      compte = compte + 1;
+      if (compte >= attente) {
+        compte = 0;                            // on recommence à compter
+        effacer(x, y, 1);                      // le A quitte sa case
+        if (sens == 0) x = x + 1;              // à droite
+        if (sens == 1) y = y + 1;              // en bas
+        if (sens == 2) x = x - 1;              // à gauche
+        if (sens == 3) y = y - 1;              // en haut
+        poser(x, y, ALPHABET[0]);              // et se pose sur la suivante,
+        teindre(x, y, 1);                      // dans la palette 1 (le 0.92)
+      }
+
+      // ---- Le A touche le cadre ? La partie s'arrête (le 0.91.8) ----
+      // Avant (le 0.91.3), le A reculait. Maintenant, il a PERDU.
+      // || veut dire « OU » : une seule des quatre suffit.
+      if (x == 0 || x == 19 || y == 0 || y >= 16) {
+        finPartie();                           // l'écran FIN, avec le score
+        continue;                              // on saute TOUT le reste de ce tour
+      }                                        // de boucle : retour à image()
+
+      // ---- La queue suit le A (le 0.91.5) ----
+      // Le A a-t-il bougé ? Sa place n'est plus celle d'avant (ax, ay).
+      // longueur > 0 d'abord (le 0.91.6). Sans queue, rien à déplacer, et
+      // longueur - 1 vaudrait 255 (un uint8_t ne descend pas sous 0).
+      // && veut dire « ET » : il faut une queue ET que le A ait bougé.
+      if (longueur > 0 && (x != ax || y != ay)) {
+        // 1. le BOUT de la queue disparaît : la dernière case, longueur - 1
+        effacer(qx[longueur - 1], qy[longueur - 1], 1);
+
+        // ---- 2. chaque case prend la place de celle de devant ----
+        // En partant du BOUT, et en reculant (i-- : i = i - 1).
+        // Avec longueur = 3 :  i = 2 : qx[2] = qx[1]
+        //                      i = 1 : qx[1] = qx[0]
+        //                      i = 0 : 0 > 0 est faux, la boucle s'arrête.
+        for (uint8_t i = longueur - 1; i > 0; i--) {
+          qx[i] = qx[i - 1];
+          qy[i] = qy[i - 1];
+        }
+
+        // 3. la première case prend la case que le A vient de quitter
+        qx[0] = ax;
+        qy[0] = ay;
+
+        // 4. toute la queue redessinée, de la case 0 à la case longueur - 1
+        //    (après une pièce, la nouvelle case venait d'être effacée avec le bout)
+        for (uint8_t i = 0; i < longueur; i++) {
+          poser(qx[i], qy[i], ALPHABET[14]);
+          teindre(qx[i], qy[i], 1);            // chaque O dans la palette 1 (le 0.92)
+        }
+        poser(x, y, ALPHABET[0]);              // 5. le A par-dessus (le 0.91.5)
+        teindre(x, y, 1);
+      }
+      if (x == px && y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+
+        // ---- La pièce réapparaît AU HASARD, mais DANS le cadre (le 0.91.4) ----
+        //
+        //   px = 1 + hasard() % 18;
+        //        |   |        |
+        //        |   |        +-- % 18 : le reste de la division par 18, de 0 à 17.
+        //        |   |            Exemple : hasard() rend 137 ; 137 = 7 × 18 + 11 ;
+        //        |   |            le reste est 11.
+        //        |   +----------- un nombre imprévisible, de 0 à 255 (le 0.81.2)
+        //        +--------------- + 1 : on décale de 0…17 à 1…18 → 11 + 1 = 12.
+        //
+        // Pourquoi pas % 20 comme au 0.81.2 ? Les colonnes 0 et 19 sont des murs X :
+        // la pièce doit rester de 1 à 18. Les lignes 0 et 16 aussi sont des murs :
+        // la pièce doit rester de 1 à 15, d'où 1 + hasard() % 15.
+        px = 1 + hasard() % 18;                // une colonne : 1 à 18
+        py = 1 + hasard() % 15;                // une ligne : 1 à 15
+        poser(px, py, ALPHABET[15]);           // le nouveau P apparaît là,
+        teindre(px, py, 0);                    // palette 0 (le 0.92). La case a pu être
+                                               // au serpent : le P serait de sa couleur.
+
+        // ---- La queue grandit d'une case (le 0.91.6) ----
+        // La nouvelle case naît SUR le bout de la queue. Au prochain pas, toutes
+        // les autres avancent, elle non : elle reste derrière.
+        // La toute première n'a pas de bout : elle naît SOUS le A.
+        // < 50 : le tableau n'a que 50 cases, qx[0] à qx[49].
+        if (longueur < 50) {
+          if (longueur == 0) {
+            qx[0] = x;                         // la première case : sous le A
+            qy[0] = y;
+          } else {
+            qx[longueur] = qx[longueur - 1];   // la case d'après le bout…
+            qy[longueur] = qy[longueur - 1];   // …à la même place que le bout
+          }
+          longueur = longueur + 1;             // une case de plus
+        }
+
+        // ---- NOUVEAU : en mode MONTE, le A va plus vite ----
+        // Une image d'attente en moins à chaque P : 15, 14, 13… jusqu'à 5.
+        // attente > 5 : on s'arrête à 5 images par pas (12 pas par seconde),
+        // sinon le jeu deviendrait injouable, puis attente passerait sous 0.
+        if (monte == 1 && attente > 5) {
+          attente = attente - 1;
+        }
+      }
+      nombre(6, 17, score);
+    }
+
+    // ---- Sur la fin, START (le 0.91.2) : retour au MENU (le 0.92).
+    if (ecran == 2 && bouton(START)) {
+      ouvrirMenu();                   // on peut changer de couleur avant de rejouer
+    }
+  }
+}
+`,
+    aVoir: 'Le MENU : B change VITESSE FIXE / MONTE. En MONTE, le A accélère à chaque P ramassé.',
+    controle: (c) => {
+      c.avancer(10)
+      c.presser('start', 6)
+      c.avancer(20)                     // le menu se dessine
+      const fixe = c.mot(1, 7, 15) === 'VITESSE : FIXE ' && c.variable('monte') === 0
+      c.presser('b', 12)
+      c.avancer(3)
+      const monte = c.mot(11, 7, 5) === 'MONTE' && c.variable('monte') === 1
+      c.presser('a', 3)
+      c.avancer(20)                     // le terrain se dessine
+      const depart = c.variable('attente')
+      for (let t = 0; t < 400 && c.variable('score') < 1; t++) c.avancer(1)
+      c.avancer(3)
+      const apres = c.variable('attente')
+      return [
+        ['le menu dit VITESSE : FIXE', fixe],
+        ['B : MONTE', monte],
+        ['la partie part à 15 images par pas', depart === 15],
+        ['un P ramassé : 14 images par pas, un peu plus vite', c.variable('score') === 1 && apres === 14, ` (score = ${c.variable('score')}, attente = ${apres})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un jeu de bombes — le terrain',
+    difficulte: 0,
+    partie: 'Le jeu de bombes',
+    idee: 'Un nouveau jeu, façon Bomberman. D’abord le terrain : un cadre de X, et des piliers X sur une case sur deux (colonne ET ligne paires). Le joueur, le O, en (1, 1).',
+    texte: [
+      '**Un nouveau jeu : des bombes, comme dans Bomberman.** Le joueur est un **O**, les ennemis seront des **W**, les murs sont des **X**. On le construit leçon après leçon ; ici, **seulement le terrain**, et le O posé à sa place de départ.',
+      '**Le terrain :** un **cadre** de X tout autour (comme au 0.91.3), et à l’intérieur, des **piliers** X, un sur deux, en quadrillage. Entre les piliers, des **couloirs** : c’est là qu’on se déplacera, et que les flammes des bombes passeront.',
+      '**19 colonnes, de 0 à 18,** et 17 lignes, de 0 à 16. Pourquoi 19 et pas 20 ? Pour que le cadre de droite (colonne 18) soit **pair**, comme celui de gauche (colonne 0). Ainsi, il y a un couloir des deux côtés de chaque pilier. La colonne 19 reste vide ; la ligne 17 servira au score.',
+      '**Ce qui est nouveau ici : une case sur deux, avec `% 2`.** `c % 2` est le **reste de la division par 2** (le `%` du 0.9) : 0 pour un nombre **pair** (0, 2, 4…), 1 pour un nombre **impair** (1, 3, 5…). Exemples : 6 % 2 = 0, car 6 = 3 × 2 + 0 ; 7 % 2 = 1, car 7 = 3 × 2 + 1.',
+      '**Un pilier, c’est colonne paire ET ligne paire :** `c % 2 == 0 && l % 2 == 0` (`&&`, « et », le 0.75). En (2, 2) : oui, pilier. En (2, 3) : la ligne 3 est impaire, non : couloir. En (3, 2) : la colonne 3 est impaire, non : couloir. En (1, 1) : ni l’une ni l’autre, c’est la place du O.',
+      '**Le cadre :** `l == 0 || l == 16 || c == 0 || c == 18` (`||`, « ou », le 0.91.3) : la première ou la dernière ligne, la première ou la dernière colonne.',
+      '**Deux boucles, l’une dans l’autre (le 0.69.1) :** la boucle des lignes (`l`, de 0 à 16) contient celle des colonnes (`c`, de 0 à 18). Pour **chaque** ligne, on passe sur **toutes** les colonnes : 17 × 19 = **323 cases**, une par une. Déroulons : `l` = 0 : `c` = 0, 1, 2 … 18, tout est cadre. `l` = 1 : `c` = 0 cadre, 1 à 17 rien (ligne impaire), 18 cadre. `l` = 2 : `c` = 0 cadre, 1 rien, 2 pilier, 3 rien, 4 pilier… 18 cadre.',
+      '**Sur le cadre, certaines cases sont aussi des piliers** (par exemple (0, 0), ou (4, 16) : colonne et ligne paires). Le X y est posé deux fois : ce n’est pas grave, c’est le même X au même endroit.',
+      '**Le compte :** 68 X pour le cadre (19 en haut, 19 en bas, 15 à gauche, 15 à droite) et 56 piliers à l’intérieur (8 colonnes paires, de 2 à 16, × 7 lignes paires, de 2 à 14) : **124 X**.',
+    ],
+    code: `// ---- UN JEU DE BOMBES : le terrain ----
+//
+//   colonne : 0 1 2 3 4 …            18
+//   ligne 0 : X X X X X X X … X X X X X     le cadre
+//   ligne 1 : X O                     X     une ligne impaire : un couloir
+//   ligne 2 : X   X   X   X   …   X   X     une ligne paire : des piliers
+//   ligne 3 : X                       X
+//   …
+//   ligne 16: X X X X X X X … X X X X X     le cadre
+//
+// ALPHABET[23] : le X (la 24e lettre, on compte depuis 0).
+// ALPHABET[14] : le O (la 15e lettre).
+
+int main() {
+  // Deux boucles, l'une dans l'autre : chaque LIGNE, et dans chaque ligne,
+  // chaque COLONNE. 17 lignes × 19 colonnes = 323 cases.
+  for (uint8_t l = 0; l < 17; l++) {
+    for (uint8_t c = 0; c < 19; c++) {
+
+      // Le cadre : la première ou la dernière ligne, OU (||) la première
+      // ou la dernière colonne.
+      if (l == 0 || l == 16 || c == 0 || c == 18) {
+        poser(c, l, ALPHABET[23]);
+      }
+
+      // NOUVEAU : les piliers. c % 2 : le reste de c divisé par 2.
+      //   0 si c est PAIR (0, 2, 4…), 1 s'il est IMPAIR (1, 3, 5…).
+      // Colonne paire ET (&&) ligne paire : un pilier.
+      //   (2, 2) : pilier    (2, 3) : couloir    (3, 2) : couloir
+      if (c % 2 == 0 && l % 2 == 0) {
+        poser(c, l, ALPHABET[23]);
+      }
+    }
+  }
+
+  // Le joueur, le O, dans le coin en haut à gauche : (1, 1).
+  poser(1, 1, ALPHABET[14]);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un cadre de X, des piliers X en quadrillage à l’intérieur, et le O en haut à gauche.',
+    controle: (c) => {
+      c.avancer(20)
+      let x = 0
+      for (let l = 0; l < 17; l++) x += [...c.mot(0, l, 20)].filter((ch) => ch === 'X').length
+      return [
+        ['le cadre : lignes 0 et 16, colonnes 0 et 18', c.mot(0, 0, 19) === 'X'.repeat(19) && c.mot(0, 16, 19) === 'X'.repeat(19) && c.mot(0, 7, 1) === 'X' && c.mot(18, 7, 1) === 'X'],
+        ['la colonne 19 reste vide', c.mot(19, 0, 1) === ' ' && c.mot(19, 8, 1) === ' '],
+        ['la ligne 2 : un pilier sur deux', c.mot(0, 2, 19) === 'X X X X X X X X X X'],
+        ['les lignes impaires sont des couloirs', c.mot(0, 3, 19) === 'X' + ' '.repeat(17) + 'X'],
+        ['124 X en tout', x === 124, ` (${x})`],
+        ['le O en (1, 1)', c.mot(1, 1, 1) === 'O'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un jeu de bombes — le O bouge, les X l’arrêtent',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.93, et le O bouge avec la croix, un pas toutes les 150 ms. Avant chaque pas, lire() regarde la case d’arrivée : un X, et le O reste où il est.',
+    texte: [
+      '**C’est le 0.93, avec une chose en plus : le O bouge.** La croix le déplace d’une case, dans les couloirs. Les X (le cadre et les piliers) l’arrêtent.',
+      '**Deux variables pour le O :** `ox` et `oy`, sa colonne et sa ligne. Il part de (1, 1). Et deux autres, `nx` et `ny` : la case d’**arrivée**, là où il irait s’il bougeait. C’est la méthode du mur M (le 0.82) : **on calcule d’abord, on regarde, et seulement après on bouge.**',
+      '**`chaque(150)`** (le 0.77) : au plus un pas toutes les 150 ms, un peu plus vite que le serpent.',
+      '**Étape 1, la case d’arrivée.** On part de la case actuelle (`nx = ox; ny = oy;`), puis la flèche tenue change `nx` ou `ny` d’une case. **Ce qui est nouveau ici : `else if`.** `if (…) { … } else if (…) { … }` : « sinon, si… ». Dès qu’une flèche est trouvée, les suivantes ne sont **pas** regardées. Avec DROITE et BAS tenues ensemble, seule DROITE compte : **pas de pas en diagonale** (en diagonale, le O passerait entre deux piliers). `else` seul, on l’a vu au 0.83.1.',
+      '**Étape 2 : une flèche est-elle tenue ?** Si aucune ne l’est, l’arrivée est la case où l’on est déjà : `nx != ox || ny != oy` est faux, on ne fait rien.',
+      '**Étape 3 : regarder l’arrivée.** `lire(nx, ny) != ALPHABET[23]` (le 0.82) : « la case d’arrivée n’est pas un X ». Alors on efface le O, on change `ox` et `oy`, et on le pose sur sa nouvelle case.',
+      '**Déroulons :** O en (1, 1), DROITE : l’arrivée est (2, 1). `lire(2, 1)` : un espace, pas un X. Le O va en (2, 1). Puis BAS : l’arrivée est (2, 2), un **pilier** (colonne et ligne paires, le 0.93). `lire(2, 2)` rend le X : le O ne bouge pas. Il faut revenir en colonne 1 ou aller en colonne 3 pour descendre.',
+    ],
+    code: `// ---- UN JEU DE BOMBES ----
+// Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
+// ALPHABET[23] : le X    ALPHABET[14] : le O
+// ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+uint8_t ox = 1;           // NOUVEAU : le O, le joueur : sa colonne…
+uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
+uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
+uint8_t ny = 0;
+
+int main() {
+  // ---- Le terrain : le cadre et les piliers X (le 0.93) ----
+  for (uint8_t l = 0; l < 17; l++) {
+    for (uint8_t c = 0; c < 19; c++) {
+      if (l == 0 || l == 16 || c == 0 || c == 18) {   // le cadre
+        poser(c, l, ALPHABET[23]);
+      }
+      if (c % 2 == 0 && l % 2 == 0) {                 // les piliers : colonne ET ligne paires
+        poser(c, l, ALPHABET[23]);
+      }
+    }
+  }
+
+  poser(ox, oy, ALPHABET[14]);            // le O à sa place (le 0.93)
+
+  while (true) {
+    image();
+
+    // ---- NOUVEAU : le O bouge avec la croix, un pas toutes les 150 ms ----
+    if (chaque(150)) {
+      // 1. la case d'ARRIVÉE : on part de la case actuelle (le 0.82).
+      //    else if : une seule flèche à la fois, pas de pas en diagonale.
+      nx = ox;
+      ny = oy;
+      if (bouton(DROITE)) {
+        nx = ox + 1;
+      } else if (bouton(GAUCHE)) {
+        nx = ox - 1;
+      } else if (bouton(BAS)) {
+        ny = oy + 1;
+      } else if (bouton(HAUT)) {
+        ny = oy - 1;
+      }
+
+      // 2. une flèche est tenue (l'arrivée n'est pas la case où l'on est)…
+      if (nx != ox || ny != oy) {
+        // 3. …et l'arrivée n'est pas un X : le O y va.
+        if (lire(nx, ny) != ALPHABET[23]) {
+          effacer(ox, oy, 1);                 // le O quitte sa case…
+          ox = nx;                            // …et va sur la case d'arrivée
+          oy = ny;
+          poser(ox, oy, ALPHABET[14]);
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Le O se déplace avec la croix dans les couloirs ; il ne traverse ni le cadre, ni les piliers.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(1) }
+      c.avancer(20)
+      tenir('right', () => c.variable('ox') === 2)
+      c.presser('down', 30)
+      const bas = c.variable('oy')
+      c.presser('up', 30)
+      const haut = c.variable('oy')
+      return [
+        ['à droite : le O va en (2, 1)', c.variable('ox') === 2 && c.mot(2, 1, 1) === 'O' && c.mot(1, 1, 1) === ' '],
+        ['en bas, le pilier (2, 2) l’arrête', bas === 1 && c.mot(2, 2, 1) === 'X', ` (oy = ${bas})`],
+        ['en haut, le cadre l’arrête', haut === 1 && c.mot(2, 0, 1) === 'X', ` (oy = ${haut})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un jeu de bombes — A pose une bombe',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.93.1, et le bouton A pose une bombe B sous le O. Une seule à la fois. Elle ne se voit que quand le O s’en va ; ensuite, elle lui barre le chemin.',
+    texte: [
+      '**C’est le 0.93.1, avec une chose en plus : la bombe.** Le bouton **A** pose une bombe, une **B**, là où est le O. Pour l’instant, elle n’explose pas : ce sera le 0.93.3.',
+      '**Trois variables :** `bombe` vaut 1 quand une bombe est posée, 0 sinon ; `bx` et `by` retiennent sa place.',
+      '**Poser :** `if (bouton(A) && bombe == 0)` (`&&`, le 0.75). **`bombe == 0`** : une seule bombe à la fois. Tant qu’elle est là, A ne fait plus rien. Alors `bombe = 1;`, et la bombe prend la place du O : `bx = ox; by = oy;`.',
+      '**On ne la voit pas tout de suite :** le O est encore dessus, et c’est lui qu’on voit. **Ce qui est nouveau ici : la B apparaît quand le O s’en va.** Au moment du pas, on efface la case du O, puis : `if (bombe == 1 && ox == bx && oy == by)` : si le O était **sur** la bombe, on pose la B à cette place. Sans ça, `effacer()` effacerait aussi la bombe.',
+      '**Ensuite, la bombe barre le chemin.** Au 0.93.1, le O allait partout sauf sur un X. Il faudrait maintenant dire « ni un X, ni une B »… et bientôt « ni un W, ni une flamme ». Plus simple : **le O ne va que sur une case VIDE.** Une case vide, c’est un espace, la **tuile 0** : `lire(nx, ny) == 0`. X, B, et tout ce qui viendra plus tard, l’arrêtent d’un coup.',
+      '**Déroulons :** O en (3, 1), A : `bombe` = 1, `bx` = 3, `by` = 1. DROITE : `lire(4, 1)` vaut 0, vide. On efface (3, 1) ; le O était sur la bombe (3 == 3 et 1 == 1) : la B est posée en (3, 1). Le O va en (4, 1). GAUCHE : `lire(3, 1)` rend la B, pas 0 : le O ne bouge pas.',
+    ],
+    code: `// ---- UN JEU DE BOMBES ----
+// Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
+// ALPHABET[23] : le X    ALPHABET[14] : le O
+// ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
+uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
+uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
+uint8_t ny = 0;
+uint8_t bombe = 0;        // NOUVEAU : 1 : une bombe est posée ; 0 : pas de bombe
+uint8_t bx = 0;           // la place de la bombe : sa colonne…
+uint8_t by = 0;           // …et sa ligne
+
+int main() {
+  // ---- Le terrain : le cadre et les piliers X (le 0.93) ----
+  for (uint8_t l = 0; l < 17; l++) {
+    for (uint8_t c = 0; c < 19; c++) {
+      if (l == 0 || l == 16 || c == 0 || c == 18) {   // le cadre
+        poser(c, l, ALPHABET[23]);
+      }
+      if (c % 2 == 0 && l % 2 == 0) {                 // les piliers : colonne ET ligne paires
+        poser(c, l, ALPHABET[23]);
+      }
+    }
+  }
+
+  poser(ox, oy, ALPHABET[14]);            // le O à sa place (le 0.93)
+
+  while (true) {
+    image();
+
+    // ---- le O bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+    if (chaque(150)) {
+      // 1. la case d'ARRIVÉE : on part de la case actuelle (le 0.82).
+      //    else if : une seule flèche à la fois, pas de pas en diagonale.
+      nx = ox;
+      ny = oy;
+      if (bouton(DROITE)) {
+        nx = ox + 1;
+      } else if (bouton(GAUCHE)) {
+        nx = ox - 1;
+      } else if (bouton(BAS)) {
+        ny = oy + 1;
+      } else if (bouton(HAUT)) {
+        ny = oy - 1;
+      }
+
+      // 2. une flèche est tenue (l'arrivée n'est pas la case où l'on est)…
+      if (nx != ox || ny != oy) {
+        // 3. NOUVEAU : …et l'arrivée est VIDE : ni X, ni B.
+        //    lire() rend 0 pour une case vide : c'est l'espace, la tuile 0.
+        if (lire(nx, ny) == 0) {
+          effacer(ox, oy, 1);                 // le O quitte sa case…
+          if (bombe == 1 && ox == bx && oy == by) {
+            poser(bx, by, ALPHABET[1]);         // NOUVEAU : …mais s'il était sur la bombe, la B apparaît
+          }
+          ox = nx;                            // …et va sur la case d'arrivée
+          oy = ny;
+          poser(ox, oy, ALPHABET[14]);
+        }
+      }
+    }
+
+    // ---- NOUVEAU : A : poser une bombe, là où est le O ----
+    // bombe == 0 : une seule bombe à la fois.
+    if (bouton(A) && bombe == 0) {
+      bombe = 1;
+      bx = ox;                              // la bombe est sous le O
+      by = oy;
+    }
+  }
+}
+`,
+    aVoir: 'A pose une B sous le O ; elle apparaît quand il s’en va, et il ne peut plus repasser dessus.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(1) }
+      c.avancer(20)
+      tenir('right', () => c.variable('ox') === 3)
+      c.presser('a', 3)
+      tenir('right', () => c.variable('ox') === 4)
+      c.presser('left', 30)
+      c.presser('a', 3)
+      return [
+        ['A : une bombe en (3, 1)', c.variable('bombe') === 1 && c.variable('bx') === 3 && c.variable('by') === 1],
+        ['le O parti, la B apparaît : B O', c.mot(3, 1, 2) === 'BO'],
+        ['la B barre le chemin : le O reste en (4, 1)', c.variable('ox') === 4],
+        ['une seule bombe à la fois', c.variable('bx') === 3],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un jeu de bombes — la bombe explose',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.93.2, et la bombe explose au bout de 2 secondes : des flammes - et | sur sa case et une case autour, sauf dans les X. Une demi-seconde plus tard, elles s’éteignent.',
+    texte: [
+      '**C’est le 0.93.2, avec une chose en plus : l’explosion.** Deux secondes après la pose, la B disparaît et des **flammes** apparaissent : sur sa case, et **une case** à droite, à gauche, en bas, en haut. Une demi-seconde après, elles s’éteignent.',
+      '**Les flammes sont des signes :** `-` pour les flammes couchées (à gauche, à droite, et le centre), **`|`** pour les flammes debout (en haut, en bas). `texte(c, l, "-")` les écrit, comme un mot d’une lettre.',
+      '**Compter le temps :** `bdelai` compte les images depuis la pose (`bdelai = 0;` quand on pose). À chaque image : `bdelai = bdelai + 1;`. `image()` revient 60 fois par seconde : à **120**, deux secondes ont passé, la bombe explose. Les flammes, elles, comptent dans `fdelai` jusqu’à **30** : une demi-seconde.',
+      '**Au moment d’exploser :** `bombe = 0;` (plus de bombe), le centre de l’explosion est rangé dans `fx` et `fy`, `feu = 1;` (les flammes sont là), et `flammes(1);` les dessine.',
+      '**Ce qui est nouveau ici : une fonction qui dessine OU efface.** `flammes(allume)` passe sur les cases de l’explosion ; pour chacune, elle appelle `caseFeu(c, l, allume, debout)`. Si `allume` vaut 1, `caseFeu` écrit la flamme ; s’il vaut 0, elle efface la case. **Pourquoi une seule fonction ?** Pour être sûr que `flammes(0)` efface **exactement** les cases que `flammes(1)` a dessinées. Des fonctions avec des paramètres : le 0.33.',
+      '**Le X arrête la flamme :** avant chaque case autour du centre, `if (lire(fx + 1, fy) != ALPHABET[23])`. Un pilier ou le cadre ne brûle pas. Le centre, lui, est toujours brûlé : c’est la case de la bombe.',
+      '**`debout` :** le 4e paramètre de `caseFeu`. 1 : `|` ; 0 : `-`. En bas et en haut, on passe 1 ; au centre, à droite et à gauche, 0.',
+      '**Deux précautions :** 1. On ne pose pas de nouvelle bombe tant que les flammes sont là (`&& feu == 0`) : sinon `fx` et `fy` changeraient, et `flammes(0)` effacerait au mauvais endroit. 2. Après `flammes(0)`, on **redessine le O** : s’il était resté dans une flamme, l’effacement l’a effacé aussi.',
+      '**Le O ne marche pas dans les flammes :** elles ne sont pas une case vide (le 0.93.2). Pour l’instant, elles ne lui font rien s’il est dessus ; au 0.93.8, elles le feront perdre.',
+    ],
+    code: `// ---- UN JEU DE BOMBES ----
+// Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
+// ALPHABET[23] : le X    ALPHABET[14] : le O
+// ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
+uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
+uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
+uint8_t ny = 0;
+uint8_t bombe = 0;        // 1 : une bombe est posée ; 0 : pas de bombe (le 0.93.2)
+uint8_t bx = 0;           // la place de la bombe : sa colonne…
+uint8_t by = 0;           // …et sa ligne
+uint8_t bdelai = 0;       // NOUVEAU : les images passées depuis la pose de la bombe
+uint8_t feu = 0;          // 1 : les flammes sont à l'écran ; 0 : non
+uint8_t fdelai = 0;       // les images passées depuis l'explosion
+uint8_t fx = 0;           // le centre de l'explosion : sa colonne…
+uint8_t fy = 0;           // …et sa ligne
+
+// ---- NOUVEAU : UNE case de flamme ----
+// allume = 1 : on dessine la flamme ; allume = 0 : on l'efface.
+// debout = 1 : une flamme verticale, le | ; debout = 0 : horizontale, le -.
+void caseFeu(uint8_t c, uint8_t l, uint8_t allume, uint8_t debout) {
+  if (allume == 0) {
+    effacer(c, l, 1);                   // la flamme s'éteint : la case est vide
+  } else {
+    if (debout == 1) {
+      texte(c, l, "|");
+    } else {
+      texte(c, l, "-");
+    }
+  }
+}
+
+// ---- NOUVEAU : toute l'explosion, le centre et une case de chaque côté ----
+//
+//        |              le centre : là où était la B
+//      - - -            une case à droite, à gauche, en bas, en haut…
+//        |              …sauf si c'est un X : le mur arrête la flamme
+//
+// flammes(1) dessine, flammes(0) efface : les MÊMES cases, forcément.
+void flammes(uint8_t allume) {
+  caseFeu(fx, fy, allume, 0);                     // le centre
+  if (lire(fx + 1, fy) != ALPHABET[23]) {         // à droite, si ce n'est pas un X
+    caseFeu(fx + 1, fy, allume, 0);
+  }
+  if (lire(fx - 1, fy) != ALPHABET[23]) {         // à gauche
+    caseFeu(fx - 1, fy, allume, 0);
+  }
+  if (lire(fx, fy + 1) != ALPHABET[23]) {         // en bas : une flamme debout
+    caseFeu(fx, fy + 1, allume, 1);
+  }
+  if (lire(fx, fy - 1) != ALPHABET[23]) {         // en haut
+    caseFeu(fx, fy - 1, allume, 1);
+  }
+}
+
+int main() {
+  // ---- Le terrain : le cadre et les piliers X (le 0.93) ----
+  for (uint8_t l = 0; l < 17; l++) {
+    for (uint8_t c = 0; c < 19; c++) {
+      if (l == 0 || l == 16 || c == 0 || c == 18) {   // le cadre
+        poser(c, l, ALPHABET[23]);
+      }
+      if (c % 2 == 0 && l % 2 == 0) {                 // les piliers : colonne ET ligne paires
+        poser(c, l, ALPHABET[23]);
+      }
+    }
+  }
+
+  poser(ox, oy, ALPHABET[14]);            // le O à sa place (le 0.93)
+
+  while (true) {
+    image();
+
+    // ---- le O bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+    if (chaque(150)) {
+      // 1. la case d'ARRIVÉE : on part de la case actuelle (le 0.82).
+      //    else if : une seule flèche à la fois, pas de pas en diagonale.
+      nx = ox;
+      ny = oy;
+      if (bouton(DROITE)) {
+        nx = ox + 1;
+      } else if (bouton(GAUCHE)) {
+        nx = ox - 1;
+      } else if (bouton(BAS)) {
+        ny = oy + 1;
+      } else if (bouton(HAUT)) {
+        ny = oy - 1;
+      }
+
+      // 2. une flèche est tenue (l'arrivée n'est pas la case où l'on est)…
+      if (nx != ox || ny != oy) {
+        // 3. …et l'arrivée est VIDE : ni X, ni B, ni flamme. (le 0.93.2)
+        //    lire() rend 0 pour une case vide : c'est l'espace, la tuile 0.
+        if (lire(nx, ny) == 0) {
+          effacer(ox, oy, 1);                 // le O quitte sa case…
+          if (bombe == 1 && ox == bx && oy == by) {
+            poser(bx, by, ALPHABET[1]);         // …mais s'il était sur la bombe, la B apparaît (le 0.93.2)
+          }
+          ox = nx;                            // …et va sur la case d'arrivée
+          oy = ny;
+          poser(ox, oy, ALPHABET[14]);
+        }
+      }
+    }
+
+    // ---- A : poser une bombe, là où est le O (le 0.93.2) ----
+    // bombe == 0 : une seule bombe à la fois.
+    // feu == 0 : pas pendant les flammes (le 0.93.3).
+    if (bouton(A) && bombe == 0 && feu == 0) {
+      bombe = 1;
+      bx = ox;                              // la bombe est sous le O
+      by = oy;
+      bdelai = 0;                           // on commence à compter (le 0.93.3)
+    }
+
+    // ---- NOUVEAU : la bombe explose au bout de 2 secondes ----
+    // image() revient 60 fois par seconde : 120 images, 2 secondes.
+    if (bombe == 1) {
+      bdelai = bdelai + 1;
+      if (bdelai == 120) {
+        bombe = 0;                          // plus de bombe…
+        fx = bx;                            // …elle explose, là où elle était
+        fy = by;
+        feu = 1;
+        fdelai = 0;
+        flammes(1);                         // on dessine les flammes
+      }
+    }
+
+    // ---- NOUVEAU : les flammes s'éteignent au bout d'une demi-seconde (30 images) ----
+    if (feu == 1) {
+      fdelai = fdelai + 1;
+      if (fdelai == 30) {
+        feu = 0;
+        flammes(0);                         // on efface les MÊMES cases
+        poser(ox, oy, ALPHABET[14]);        // le O était peut-être dans une flamme : on le remet
+      }
+    }
+  }
+}
+`,
+    aVoir: 'A, puis on s’écarte : deux secondes après, la bombe explose en croix (- et |), puis les flammes s’éteignent.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(1) }
+      c.avancer(20)
+      c.presser('a', 3)
+      tenir('right', () => c.variable('ox') === 3)
+      tenir('b', () => c.variable('feu') === 1, 200)
+      c.avancer(2)
+      const feu = c.mot(1, 1, 2) === '--' && c.mot(1, 2, 1) === '|' && c.mot(0, 1, 1) === 'X' && c.mot(1, 0, 1) === 'X'
+      tenir('b', () => c.variable('feu') === 0, 100)
+      c.avancer(2)
+      return [
+        ['l’explosion : - en (1, 1) et (2, 1), | en (1, 2)', feu],
+        ['les X du cadre ne brûlent pas', c.mot(0, 1, 1) === 'X' && c.mot(1, 0, 1) === 'X'],
+        ['les flammes s’éteignent, le O est toujours là', c.mot(1, 1, 2) === '  ' && c.mot(1, 2, 1) === ' ' && c.mot(3, 1, 1) === 'O'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un jeu de bombes — des flammes plus longues',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.93.3, mais chaque bras de flamme va jusqu’à 2 cases, et s’arrête au premier X : une boucle for et break.',
+    texte: [
+      '**C’est le 0.93.3, avec une chose en plus : des bras de deux cases.** L’explosion fait maintenant une croix plus grande : jusqu’à 2 cases de chaque côté.',
+      '**Ce qui est nouveau ici : un bras est une boucle.** Pour la droite : `for (uint8_t k = 1; k <= 2; k++)`. `k` vaut 1, puis 2 : la case `fx + 1`, puis la case `fx + 2`. `<=` : « plus petit ou égal », donc 2 compris.',
+      '**`break` : le mur arrête le bras.** Dans la boucle, d’abord : `if (lire(fx + k, fy) == ALPHABET[23]) break;`. **`break`** sort de la boucle tout de suite (le 0.33) : les cases suivantes ne sont même pas regardées. La flamme ne **traverse** pas un pilier.',
+      '**Déroulons, bombe en (1, 1) :** à droite, `k` = 1 : (2, 1) vide, flamme. `k` = 2 : (3, 1) vide, flamme. À gauche, `k` = 1 : (0, 1), le cadre : `break`, rien. En bas, `k` = 1 : (1, 2), flamme. `k` = 2 : (1, 3), flamme. En haut : (1, 0), le cadre : rien.',
+      '**Et bombe en (2, 1) ?** En bas, `k` = 1 : (2, 2), un pilier : `break` tout de suite. Rien en dessous.',
+      '**Pourquoi `break` protège aussi les nombres :** à gauche, `fx - k`. Si `fx` vaut 1, `fx - 2` ne donnerait pas -1 mais 255 (le 0.91.6). Mais (0, 1) est toujours un X : `break` arrive avant `k` = 2. Le cadre garde les calculs dans le terrain.',
+      '**Le reste ne change pas :** `flammes(0)` fait les mêmes boucles, avec les mêmes `break` : elle efface exactement les mêmes cases.',
+    ],
+    code: `// ---- UN JEU DE BOMBES ----
+// Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
+// ALPHABET[23] : le X    ALPHABET[14] : le O
+// ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
+uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
+uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
+uint8_t ny = 0;
+uint8_t bombe = 0;        // 1 : une bombe est posée ; 0 : pas de bombe (le 0.93.2)
+uint8_t bx = 0;           // la place de la bombe : sa colonne…
+uint8_t by = 0;           // …et sa ligne
+uint8_t bdelai = 0;       // les images passées depuis la pose de la bombe (le 0.93.3)
+uint8_t feu = 0;          // 1 : les flammes sont à l'écran ; 0 : non
+uint8_t fdelai = 0;       // les images passées depuis l'explosion
+uint8_t fx = 0;           // le centre de l'explosion : sa colonne…
+uint8_t fy = 0;           // …et sa ligne
+
+// ---- UNE case de flamme (le 0.93.3) ----
+// allume = 1 : on dessine la flamme ; allume = 0 : on l'efface.
+// debout = 1 : une flamme verticale, le | ; debout = 0 : horizontale, le -.
+void caseFeu(uint8_t c, uint8_t l, uint8_t allume, uint8_t debout) {
+  if (allume == 0) {
+    effacer(c, l, 1);                   // la flamme s'éteint : la case est vide
+  } else {
+    if (debout == 1) {
+      texte(c, l, "|");
+    } else {
+      texte(c, l, "-");
+    }
+  }
+}
+
+// ---- Toute l'explosion (le 0.93.3) : NOUVEAU : des bras de DEUX cases ----
+//
+//          |
+//          |            chaque bras : jusqu'à 2 cases,
+//      - - - - -        mais il s'arrête au premier X.
+//          |            break : on sort de la boucle, tout de suite.
+//          |
+void flammes(uint8_t allume) {
+  caseFeu(fx, fy, allume, 0);                     // le centre
+  for (uint8_t k = 1; k <= 2; k++) {              // à droite : fx + 1, puis fx + 2
+    if (lire(fx + k, fy) == ALPHABET[23]) break;  // un X : le bras s'arrête là
+    caseFeu(fx + k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // à gauche : fx - 1, puis fx - 2
+    if (lire(fx - k, fy) == ALPHABET[23]) break;
+    caseFeu(fx - k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en bas
+    if (lire(fx, fy + k) == ALPHABET[23]) break;
+    caseFeu(fx, fy + k, allume, 1);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en haut
+    if (lire(fx, fy - k) == ALPHABET[23]) break;
+    caseFeu(fx, fy - k, allume, 1);
+  }
+}
+
+int main() {
+  // ---- Le terrain : le cadre et les piliers X (le 0.93) ----
+  for (uint8_t l = 0; l < 17; l++) {
+    for (uint8_t c = 0; c < 19; c++) {
+      if (l == 0 || l == 16 || c == 0 || c == 18) {   // le cadre
+        poser(c, l, ALPHABET[23]);
+      }
+      if (c % 2 == 0 && l % 2 == 0) {                 // les piliers : colonne ET ligne paires
+        poser(c, l, ALPHABET[23]);
+      }
+    }
+  }
+
+  poser(ox, oy, ALPHABET[14]);            // le O à sa place (le 0.93)
+
+  while (true) {
+    image();
+
+    // ---- le O bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+    if (chaque(150)) {
+      // 1. la case d'ARRIVÉE : on part de la case actuelle (le 0.82).
+      //    else if : une seule flèche à la fois, pas de pas en diagonale.
+      nx = ox;
+      ny = oy;
+      if (bouton(DROITE)) {
+        nx = ox + 1;
+      } else if (bouton(GAUCHE)) {
+        nx = ox - 1;
+      } else if (bouton(BAS)) {
+        ny = oy + 1;
+      } else if (bouton(HAUT)) {
+        ny = oy - 1;
+      }
+
+      // 2. une flèche est tenue (l'arrivée n'est pas la case où l'on est)…
+      if (nx != ox || ny != oy) {
+        // 3. …et l'arrivée est VIDE : ni X, ni B, ni flamme. (le 0.93.2)
+        //    lire() rend 0 pour une case vide : c'est l'espace, la tuile 0.
+        if (lire(nx, ny) == 0) {
+          effacer(ox, oy, 1);                 // le O quitte sa case…
+          if (bombe == 1 && ox == bx && oy == by) {
+            poser(bx, by, ALPHABET[1]);         // …mais s'il était sur la bombe, la B apparaît (le 0.93.2)
+          }
+          ox = nx;                            // …et va sur la case d'arrivée
+          oy = ny;
+          poser(ox, oy, ALPHABET[14]);
+        }
+      }
+    }
+
+    // ---- A : poser une bombe, là où est le O (le 0.93.2) ----
+    // bombe == 0 : une seule bombe à la fois.
+    // feu == 0 : pas pendant les flammes (le 0.93.3).
+    if (bouton(A) && bombe == 0 && feu == 0) {
+      bombe = 1;
+      bx = ox;                              // la bombe est sous le O
+      by = oy;
+      bdelai = 0;                           // on commence à compter (le 0.93.3)
+    }
+
+    // ---- la bombe explose au bout de 2 secondes (le 0.93.3) ----
+    // image() revient 60 fois par seconde : 120 images, 2 secondes.
+    if (bombe == 1) {
+      bdelai = bdelai + 1;
+      if (bdelai == 120) {
+        bombe = 0;                          // plus de bombe…
+        fx = bx;                            // …elle explose, là où elle était
+        fy = by;
+        feu = 1;
+        fdelai = 0;
+        flammes(1);                         // on dessine les flammes
+      }
+    }
+
+    // ---- les flammes s'éteignent au bout d'une demi-seconde (30 images) (le 0.93.3) ----
+    if (feu == 1) {
+      fdelai = fdelai + 1;
+      if (fdelai == 30) {
+        feu = 0;
+        flammes(0);                         // on efface les MÊMES cases
+        poser(ox, oy, ALPHABET[14]);        // le O était peut-être dans une flamme : on le remet
+      }
+    }
+  }
+}
+`,
+    aVoir: 'L’explosion fait une croix de 2 cases de chaque côté ; un X arrête le bras.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(1) }
+      c.avancer(20)
+      c.presser('a', 3)
+      tenir('right', () => c.variable('ox') === 5)
+      tenir('b', () => c.variable('feu') === 1, 200)
+      c.avancer(2)
+      return [
+        ['à droite : 2 cases, - - -, puis rien', c.mot(1, 1, 4) === '--- '],
+        ['en bas : | en (1, 2) et (1, 3), puis rien', c.mot(1, 2, 1) === '|' && c.mot(1, 3, 1) === '|' && c.mot(1, 4, 1) === ' '],
+        ['le cadre arrête le bras de gauche et du haut', c.mot(0, 1, 1) === 'X' && c.mot(1, 0, 1) === 'X'],
+        ['le O, à 4 cases, n’est pas touché', c.mot(5, 1, 1) === 'O'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un jeu de bombes — un ennemi W',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.93.4, et un ennemi W, en bas à droite. Toutes les 400 ms, il tire une direction au hasard (hasard() % 4) et y va, si la case est vide.',
+    texte: [
+      '**C’est le 0.93.4, avec une chose en plus : un ennemi.** Un **W** part du coin en bas à droite, (17, 15), et se promène **au hasard**.',
+      '**Ce qui est nouveau ici : une direction tirée au hasard.** `d = hasard() % 4;` : `hasard()` rend un nombre de 0 à 255 (le 0.81.2) ; `% 4` en garde le reste par 4 : **0, 1, 2 ou 3**. Comme `sens` au 0.91.7 : 0 droite, 1 bas, 2 gauche, 3 haut. Exemple : `hasard()` rend 201 ; 201 = 50 × 4 + 1 : `d` vaut 1, le W veut descendre.',
+      '**Puis la même méthode que pour le O :** la case d’arrivée dans `nx` et `ny` (`nx` et `ny` servent pour le O, puis pour le W : chacun les calcule juste avant de s’en servir). Si `lire(nx, ny) == 0`, une case **vide**, le W y va. Sinon, il reste ; il tirera une autre direction au pas suivant.',
+      '**Une case vide seulement :** comme le O (le 0.93.2), le W ne va ni dans les X, ni sur la bombe, ni dans les flammes, ni sur le O.',
+      '**`chaque(400)`** : un pas toutes les 400 ms. Le W est plus lent que le O (150 ms) : on peut le fuir. Ce chronomètre est à lui : il ne gêne pas le `chaque(150)` du O.',
+      '**Après les flammes, on redessine aussi le W :** comme le O, il a pu être sous une flamme (pour l’instant, elle ne lui fait rien ; au 0.93.7, si).',
+    ],
+    code: `// ---- UN JEU DE BOMBES ----
+// Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
+// ALPHABET[23] : le X    ALPHABET[14] : le O
+// ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
+uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
+uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
+uint8_t ny = 0;
+uint8_t bombe = 0;        // 1 : une bombe est posée ; 0 : pas de bombe (le 0.93.2)
+uint8_t bx = 0;           // la place de la bombe : sa colonne…
+uint8_t by = 0;           // …et sa ligne
+uint8_t bdelai = 0;       // les images passées depuis la pose de la bombe (le 0.93.3)
+uint8_t feu = 0;          // 1 : les flammes sont à l'écran ; 0 : non
+uint8_t fdelai = 0;       // les images passées depuis l'explosion
+uint8_t fx = 0;           // le centre de l'explosion : sa colonne…
+uint8_t fy = 0;           // …et sa ligne
+uint8_t ex = 17;          // NOUVEAU : le W, l'ennemi : sa colonne…
+uint8_t ey = 15;          // …et sa ligne. Il part du coin en bas à droite.
+uint8_t d = 0;            // NOUVEAU : la direction tirée au hasard, 0 à 3
+
+// ---- UNE case de flamme (le 0.93.3) ----
+// allume = 1 : on dessine la flamme ; allume = 0 : on l'efface.
+// debout = 1 : une flamme verticale, le | ; debout = 0 : horizontale, le -.
+void caseFeu(uint8_t c, uint8_t l, uint8_t allume, uint8_t debout) {
+  if (allume == 0) {
+    effacer(c, l, 1);                   // la flamme s'éteint : la case est vide
+  } else {
+    if (debout == 1) {
+      texte(c, l, "|");
+    } else {
+      texte(c, l, "-");
+    }
+  }
+}
+
+// ---- Toute l'explosion (le 0.93.3) : des bras de DEUX cases (le 0.93.4) ----
+//
+//          |
+//          |            chaque bras : jusqu'à 2 cases,
+//      - - - - -        mais il s'arrête au premier X.
+//          |            break : on sort de la boucle, tout de suite.
+//          |
+void flammes(uint8_t allume) {
+  caseFeu(fx, fy, allume, 0);                     // le centre
+  for (uint8_t k = 1; k <= 2; k++) {              // à droite : fx + 1, puis fx + 2
+    if (lire(fx + k, fy) == ALPHABET[23]) break;  // un X : le bras s'arrête là
+    caseFeu(fx + k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // à gauche : fx - 1, puis fx - 2
+    if (lire(fx - k, fy) == ALPHABET[23]) break;
+    caseFeu(fx - k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en bas
+    if (lire(fx, fy + k) == ALPHABET[23]) break;
+    caseFeu(fx, fy + k, allume, 1);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en haut
+    if (lire(fx, fy - k) == ALPHABET[23]) break;
+    caseFeu(fx, fy - k, allume, 1);
+  }
+}
+
+int main() {
+  // ---- Le terrain : le cadre et les piliers X (le 0.93) ----
+  for (uint8_t l = 0; l < 17; l++) {
+    for (uint8_t c = 0; c < 19; c++) {
+      if (l == 0 || l == 16 || c == 0 || c == 18) {   // le cadre
+        poser(c, l, ALPHABET[23]);
+      }
+      if (c % 2 == 0 && l % 2 == 0) {                 // les piliers : colonne ET ligne paires
+        poser(c, l, ALPHABET[23]);
+      }
+    }
+  }
+
+  poser(ox, oy, ALPHABET[14]);            // le O à sa place (le 0.93)
+  poser(ex, ey, ALPHABET[22]);            // NOUVEAU : le W, en bas à droite
+
+  while (true) {
+    image();
+
+    // ---- le O bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+    if (chaque(150)) {
+      // 1. la case d'ARRIVÉE : on part de la case actuelle (le 0.82).
+      //    else if : une seule flèche à la fois, pas de pas en diagonale.
+      nx = ox;
+      ny = oy;
+      if (bouton(DROITE)) {
+        nx = ox + 1;
+      } else if (bouton(GAUCHE)) {
+        nx = ox - 1;
+      } else if (bouton(BAS)) {
+        ny = oy + 1;
+      } else if (bouton(HAUT)) {
+        ny = oy - 1;
+      }
+
+      // 2. une flèche est tenue (l'arrivée n'est pas la case où l'on est)…
+      if (nx != ox || ny != oy) {
+        // 3. …et l'arrivée est VIDE : ni X, ni B, ni W, ni flamme. (le 0.93.2)
+        //    lire() rend 0 pour une case vide : c'est l'espace, la tuile 0.
+        if (lire(nx, ny) == 0) {
+          effacer(ox, oy, 1);                 // le O quitte sa case…
+          if (bombe == 1 && ox == bx && oy == by) {
+            poser(bx, by, ALPHABET[1]);         // …mais s'il était sur la bombe, la B apparaît (le 0.93.2)
+          }
+          ox = nx;                            // …et va sur la case d'arrivée
+          oy = ny;
+          poser(ox, oy, ALPHABET[14]);
+        }
+      }
+    }
+
+    // ---- A : poser une bombe, là où est le O (le 0.93.2) ----
+    // bombe == 0 : une seule bombe à la fois.
+    // feu == 0 : pas pendant les flammes (le 0.93.3).
+    if (bouton(A) && bombe == 0 && feu == 0) {
+      bombe = 1;
+      bx = ox;                              // la bombe est sous le O
+      by = oy;
+      bdelai = 0;                           // on commence à compter (le 0.93.3)
+    }
+
+    // ---- la bombe explose au bout de 2 secondes (le 0.93.3) ----
+    // image() revient 60 fois par seconde : 120 images, 2 secondes.
+    if (bombe == 1) {
+      bdelai = bdelai + 1;
+      if (bdelai == 120) {
+        bombe = 0;                          // plus de bombe…
+        fx = bx;                            // …elle explose, là où elle était
+        fy = by;
+        feu = 1;
+        fdelai = 0;
+        flammes(1);                         // on dessine les flammes
+      }
+    }
+
+    // ---- les flammes s'éteignent au bout d'une demi-seconde (30 images) (le 0.93.3) ----
+    if (feu == 1) {
+      fdelai = fdelai + 1;
+      if (fdelai == 30) {
+        feu = 0;
+        flammes(0);                         // on efface les MÊMES cases
+        poser(ox, oy, ALPHABET[14]);        // le O était peut-être dans une flamme : on le remet
+        poser(ex, ey, ALPHABET[22]);        // et le W
+      }
+    }
+
+    // ---- NOUVEAU : le W se promène au hasard, un pas toutes les 400 ms ----
+    if (chaque(400)) {
+      d = hasard() % 4;                     // 0 droite, 1 bas, 2 gauche, 3 haut (le 0.81.2)
+      nx = ex;
+      ny = ey;
+      if (d == 0) nx = ex + 1;
+      if (d == 1) ny = ey + 1;
+      if (d == 2) nx = ex - 1;
+      if (d == 3) ny = ey - 1;
+      if (lire(nx, ny) == 0) {              // seulement sur une case VIDE
+        effacer(ex, ey, 1);
+        ex = nx;
+        ey = ny;
+        poser(ex, ey, ALPHABET[22]);
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Un W se promène au hasard dans les couloirs, sans traverser les X.',
+    controle: (c) => {
+      c.avancer(20)
+      const places = new Set()
+      for (let t = 0; t < 20; t++) { c.avancer(24); places.add(c.variable('ex') + ',' + c.variable('ey')) }
+      let w = 0
+      for (let l = 0; l < 17; l++) w += [...c.mot(0, l, 20)].filter((ch) => ch === 'W').length
+      const ex = c.variable('ex'), ey = c.variable('ey')
+      return [
+        ['il se promène : plusieurs places en 8 secondes', places.size > 1, ` (${places.size} places)`],
+        ['un seul W, dans un couloir', w === 1 && c.mot(ex, ey, 1) === 'W' && (ex % 2 === 1 || ey % 2 === 1)],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un jeu de bombes — trois ennemis',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.93.5, mais trois W, dans trois coins : leurs places sont dans deux tableaux, ex[3] et ey[3], et une boucle les fait bouger l’un après l’autre.',
+    texte: [
+      '**C’est le 0.93.5, avec une chose en plus : trois W.** Un en bas à droite, un en haut à droite, un en bas à gauche.',
+      '**Ce qui est nouveau ici : les places dans des tableaux.** `uint8_t ex[3];` : trois colonnes, `ex[0]`, `ex[1]` et `ex[2]` ; `ey[3]` : trois lignes. Le W n° `i` est en (`ex[i]`, `ey[i]`). Les tableaux, on les a vus au 0.32 ; plusieurs ennemis dans un tableau, au 0.85.',
+      '**Au départ,** on remplit les tableaux une case à la fois : `ex[0] = 17; ey[0] = 15;` (en bas à droite), `ex[1] = 17; ey[1] = 1;` (en haut à droite), `ex[2] = 1; ey[2] = 15;` (en bas à gauche). Puis une boucle pose les trois W.',
+      '**Les faire bouger :** le code du 0.93.5, à l’intérieur de `for (uint8_t i = 0; i < 3; i++)`. Partout où il y avait `ex`, on écrit `ex[i]`. Tour `i` = 0 : le W n° 0 tire sa direction et fait son pas ; tour `i` = 1 : le n° 1 ; tour `i` = 2 : le n° 2.',
+      '**Chacun tire sa propre direction :** `hasard()` est appelé une fois par W, et rend à chaque fois un autre nombre. Les trois W ne vont donc pas du même côté.',
+      '**Un W ne marche pas sur un autre :** la case d’un W n’est pas vide. S’ils se croisent dans un couloir, l’un attend que l’autre parte.',
+      '**Pourquoi trois et pas plus ?** Pour ajouter un W, il suffirait d’agrandir les tableaux et de changer le `3` des boucles. On garde trois : assez pour que ce soit difficile.',
+    ],
+    code: `// ---- UN JEU DE BOMBES ----
+// Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
+// ALPHABET[23] : le X    ALPHABET[14] : le O
+// ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
+uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
+uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
+uint8_t ny = 0;
+uint8_t bombe = 0;        // 1 : une bombe est posée ; 0 : pas de bombe (le 0.93.2)
+uint8_t bx = 0;           // la place de la bombe : sa colonne…
+uint8_t by = 0;           // …et sa ligne
+uint8_t bdelai = 0;       // les images passées depuis la pose de la bombe (le 0.93.3)
+uint8_t feu = 0;          // 1 : les flammes sont à l'écran ; 0 : non
+uint8_t fdelai = 0;       // les images passées depuis l'explosion
+uint8_t fx = 0;           // le centre de l'explosion : sa colonne…
+uint8_t fy = 0;           // …et sa ligne
+uint8_t ex[3];            // NOUVEAU : les TROIS W : leurs colonnes…
+uint8_t ey[3];            // …et leurs lignes. Le W n° i est en (ex[i], ey[i]).
+uint8_t d = 0;            // la direction tirée au hasard, 0 à 3 (le 0.93.5)
+
+// ---- UNE case de flamme (le 0.93.3) ----
+// allume = 1 : on dessine la flamme ; allume = 0 : on l'efface.
+// debout = 1 : une flamme verticale, le | ; debout = 0 : horizontale, le -.
+void caseFeu(uint8_t c, uint8_t l, uint8_t allume, uint8_t debout) {
+  if (allume == 0) {
+    effacer(c, l, 1);                   // la flamme s'éteint : la case est vide
+  } else {
+    if (debout == 1) {
+      texte(c, l, "|");
+    } else {
+      texte(c, l, "-");
+    }
+  }
+}
+
+// ---- Toute l'explosion (le 0.93.3) : des bras de DEUX cases (le 0.93.4) ----
+//
+//          |
+//          |            chaque bras : jusqu'à 2 cases,
+//      - - - - -        mais il s'arrête au premier X.
+//          |            break : on sort de la boucle, tout de suite.
+//          |
+void flammes(uint8_t allume) {
+  caseFeu(fx, fy, allume, 0);                     // le centre
+  for (uint8_t k = 1; k <= 2; k++) {              // à droite : fx + 1, puis fx + 2
+    if (lire(fx + k, fy) == ALPHABET[23]) break;  // un X : le bras s'arrête là
+    caseFeu(fx + k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // à gauche : fx - 1, puis fx - 2
+    if (lire(fx - k, fy) == ALPHABET[23]) break;
+    caseFeu(fx - k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en bas
+    if (lire(fx, fy + k) == ALPHABET[23]) break;
+    caseFeu(fx, fy + k, allume, 1);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en haut
+    if (lire(fx, fy - k) == ALPHABET[23]) break;
+    caseFeu(fx, fy - k, allume, 1);
+  }
+}
+
+int main() {
+  // ---- Le terrain : le cadre et les piliers X (le 0.93) ----
+  for (uint8_t l = 0; l < 17; l++) {
+    for (uint8_t c = 0; c < 19; c++) {
+      if (l == 0 || l == 16 || c == 0 || c == 18) {   // le cadre
+        poser(c, l, ALPHABET[23]);
+      }
+      if (c % 2 == 0 && l % 2 == 0) {                 // les piliers : colonne ET ligne paires
+        poser(c, l, ALPHABET[23]);
+      }
+    }
+  }
+
+  poser(ox, oy, ALPHABET[14]);            // le O à sa place (le 0.93)
+
+  // NOUVEAU : les trois W, dans trois coins
+  ex[0] = 17;                             // le n° 0 : en bas à droite
+  ey[0] = 15;
+  ex[1] = 17;                             // le n° 1 : en haut à droite
+  ey[1] = 1;
+  ex[2] = 1;                              // le n° 2 : en bas à gauche
+  ey[2] = 15;
+  for (uint8_t i = 0; i < 3; i++) {
+    poser(ex[i], ey[i], ALPHABET[22]);
+  }
+
+  while (true) {
+    image();
+
+    // ---- le O bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+    if (chaque(150)) {
+      // 1. la case d'ARRIVÉE : on part de la case actuelle (le 0.82).
+      //    else if : une seule flèche à la fois, pas de pas en diagonale.
+      nx = ox;
+      ny = oy;
+      if (bouton(DROITE)) {
+        nx = ox + 1;
+      } else if (bouton(GAUCHE)) {
+        nx = ox - 1;
+      } else if (bouton(BAS)) {
+        ny = oy + 1;
+      } else if (bouton(HAUT)) {
+        ny = oy - 1;
+      }
+
+      // 2. une flèche est tenue (l'arrivée n'est pas la case où l'on est)…
+      if (nx != ox || ny != oy) {
+        // 3. …et l'arrivée est VIDE : ni X, ni B, ni W, ni flamme. (le 0.93.2)
+        //    lire() rend 0 pour une case vide : c'est l'espace, la tuile 0.
+        if (lire(nx, ny) == 0) {
+          effacer(ox, oy, 1);                 // le O quitte sa case…
+          if (bombe == 1 && ox == bx && oy == by) {
+            poser(bx, by, ALPHABET[1]);         // …mais s'il était sur la bombe, la B apparaît (le 0.93.2)
+          }
+          ox = nx;                            // …et va sur la case d'arrivée
+          oy = ny;
+          poser(ox, oy, ALPHABET[14]);
+        }
+      }
+    }
+
+    // ---- A : poser une bombe, là où est le O (le 0.93.2) ----
+    // bombe == 0 : une seule bombe à la fois.
+    // feu == 0 : pas pendant les flammes (le 0.93.3).
+    if (bouton(A) && bombe == 0 && feu == 0) {
+      bombe = 1;
+      bx = ox;                              // la bombe est sous le O
+      by = oy;
+      bdelai = 0;                           // on commence à compter (le 0.93.3)
+    }
+
+    // ---- la bombe explose au bout de 2 secondes (le 0.93.3) ----
+    // image() revient 60 fois par seconde : 120 images, 2 secondes.
+    if (bombe == 1) {
+      bdelai = bdelai + 1;
+      if (bdelai == 120) {
+        bombe = 0;                          // plus de bombe…
+        fx = bx;                            // …elle explose, là où elle était
+        fy = by;
+        feu = 1;
+        fdelai = 0;
+        flammes(1);                         // on dessine les flammes
+      }
+    }
+
+    // ---- les flammes s'éteignent au bout d'une demi-seconde (30 images) (le 0.93.3) ----
+    if (feu == 1) {
+      fdelai = fdelai + 1;
+      if (fdelai == 30) {
+        feu = 0;
+        flammes(0);                         // on efface les MÊMES cases
+        poser(ox, oy, ALPHABET[14]);        // le O était peut-être dans une flamme : on le remet
+        for (uint8_t i = 0; i < 3; i++) {   // et les W
+          poser(ex[i], ey[i], ALPHABET[22]);
+        }
+      }
+    }
+
+    // ---- les W se promènent au hasard (le 0.93.5) : NOUVEAU : les TROIS, un par un ----
+    if (chaque(400)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        d = hasard() % 4;                     // sa direction, au hasard (le 0.93.5)
+        nx = ex[i];
+        ny = ey[i];
+        if (d == 0) nx = ex[i] + 1;
+        if (d == 1) ny = ey[i] + 1;
+        if (d == 2) nx = ex[i] - 1;
+        if (d == 3) ny = ey[i] - 1;
+        if (lire(nx, ny) == 0) {              // seulement sur une case VIDE
+          effacer(ex[i], ey[i], 1);
+          ex[i] = nx;
+          ey[i] = ny;
+          poser(ex[i], ey[i], ALPHABET[22]);
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Trois W partent de trois coins et se promènent chacun de son côté.',
+    controle: (c) => {
+      const lesW = () => {
+        let w = 0
+        for (let l = 0; l < 17; l++) w += [...c.mot(0, l, 20)].filter((ch) => ch === 'W').length
+        return w
+      }
+      c.avancer(20)
+      const debut = lesW()
+      c.avancer(400)
+      const w = lesW()
+      return [
+        ['au départ, trois W', debut === 3, ` (${debut})`],
+        ['après un moment, toujours trois W à l’écran', w === 3, ` (${w})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un jeu de bombes — la flamme détruit les W',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.93.6, et une flamme qui tombe sur un W le détruit : vivant[i] passe à 0, le score gagne 1. Un W détruit ne bouge plus.',
+    texte: [
+      '**C’est le 0.93.6, avec une chose en plus : détruire les W.** Si une flamme tombe sur un W, il disparaît, et le **score** gagne 1. Le score s’affiche sous le terrain, ligne 17.',
+      '**Un troisième tableau, `vivant[3]` :** `vivant[i]` vaut 1 si le W n° `i` est là, 0 s’il a été détruit. Au départ, les trois valent 1.',
+      '**Ce qui est nouveau ici : chercher QUEL W est sous la flamme.** Dans `caseFeu`, juste avant d’écrire une flamme : `if (lire(c, l) == ALPHABET[22])` : « y a-t-il un W sur cette case ? ». L’écran dit **qu’il y a** un W, mais pas **lequel**. La fonction `toucheW(c, l)` le cherche : elle passe sur les trois, et celui qui est **vivant ET** en (`c`, `l`) est détruit : `vivant[i] = 0;`, `score = score + 1;`.',
+      '**`vivant[i] == 1 && ex[i] == c && ey[i] == l` :** trois conditions, toutes vraies à la fois (`&&`, le 0.75). `vivant[i] == 1` évite de compter deux fois un W déjà détruit qui aurait gardé la même place.',
+      '**La flamme recouvre le W :** `texte()` écrit la flamme **par-dessus** la lettre W. Quand la flamme s’éteint, `effacer()` vide la case : le W a disparu de l’écran.',
+      '**Un W détruit ne fait plus rien :** dans la boucle des W, `if (vivant[i] == 1)` entoure tout son pas. Après les flammes, on ne redessine que les W vivants.',
+      '**Le score :** `texte(0, 17, "SCORE")` une fois au départ, puis `nombre(6, 17, score)` à chaque image, comme dans le serpent.',
+      '**`toucheW` est écrite avant `caseFeu` :** en C++, une fonction doit être écrite **avant** celles qui l’appellent.',
+    ],
+    code: `// ---- UN JEU DE BOMBES ----
+// Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
+// ALPHABET[23] : le X    ALPHABET[14] : le O
+// ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
+uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
+uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
+uint8_t ny = 0;
+uint8_t bombe = 0;        // 1 : une bombe est posée ; 0 : pas de bombe (le 0.93.2)
+uint8_t bx = 0;           // la place de la bombe : sa colonne…
+uint8_t by = 0;           // …et sa ligne
+uint8_t bdelai = 0;       // les images passées depuis la pose de la bombe (le 0.93.3)
+uint8_t feu = 0;          // 1 : les flammes sont à l'écran ; 0 : non
+uint8_t fdelai = 0;       // les images passées depuis l'explosion
+uint8_t fx = 0;           // le centre de l'explosion : sa colonne…
+uint8_t fy = 0;           // …et sa ligne
+uint8_t ex[3];            // les TROIS W : leurs colonnes… (le 0.93.6)
+uint8_t ey[3];            // …et leurs lignes. Le W n° i est en (ex[i], ey[i]).
+uint8_t d = 0;            // la direction tirée au hasard, 0 à 3 (le 0.93.5)
+uint8_t vivant[3];        // NOUVEAU : vivant[i] : 1 si le W n° i est là, 0 s'il est détruit
+uint8_t score = 0;        // les W détruits
+
+// ---- NOUVEAU : une flamme sur la case (c, l) : y a-t-il un W ? ----
+// On cherche le W n° i qui est vivant ET sur cette case. S'il y en a un,
+// il est détruit (vivant[i] = 0) et le score gagne 1.
+void toucheW(uint8_t c, uint8_t l) {
+  for (uint8_t i = 0; i < 3; i++) {
+    if (vivant[i] == 1 && ex[i] == c && ey[i] == l) {
+      vivant[i] = 0;
+      score = score + 1;
+    }
+  }
+}
+
+// ---- UNE case de flamme (le 0.93.3) ----
+// allume = 1 : on dessine la flamme ; allume = 0 : on l'efface.
+// debout = 1 : une flamme verticale, le | ; debout = 0 : horizontale, le -.
+void caseFeu(uint8_t c, uint8_t l, uint8_t allume, uint8_t debout) {
+  if (allume == 0) {
+    effacer(c, l, 1);                   // la flamme s'éteint : la case est vide
+  } else {
+    if (lire(c, l) == ALPHABET[22]) {   // NOUVEAU : un W sous la flamme ?
+      toucheW(c, l);
+    }
+    if (debout == 1) {
+      texte(c, l, "|");
+    } else {
+      texte(c, l, "-");
+    }
+  }
+}
+
+// ---- Toute l'explosion (le 0.93.3) : des bras de DEUX cases (le 0.93.4) ----
+//
+//          |
+//          |            chaque bras : jusqu'à 2 cases,
+//      - - - - -        mais il s'arrête au premier X.
+//          |            break : on sort de la boucle, tout de suite.
+//          |
+void flammes(uint8_t allume) {
+  caseFeu(fx, fy, allume, 0);                     // le centre
+  for (uint8_t k = 1; k <= 2; k++) {              // à droite : fx + 1, puis fx + 2
+    if (lire(fx + k, fy) == ALPHABET[23]) break;  // un X : le bras s'arrête là
+    caseFeu(fx + k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // à gauche : fx - 1, puis fx - 2
+    if (lire(fx - k, fy) == ALPHABET[23]) break;
+    caseFeu(fx - k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en bas
+    if (lire(fx, fy + k) == ALPHABET[23]) break;
+    caseFeu(fx, fy + k, allume, 1);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en haut
+    if (lire(fx, fy - k) == ALPHABET[23]) break;
+    caseFeu(fx, fy - k, allume, 1);
+  }
+}
+
+int main() {
+  // ---- Le terrain : le cadre et les piliers X (le 0.93) ----
+  for (uint8_t l = 0; l < 17; l++) {
+    for (uint8_t c = 0; c < 19; c++) {
+      if (l == 0 || l == 16 || c == 0 || c == 18) {   // le cadre
+        poser(c, l, ALPHABET[23]);
+      }
+      if (c % 2 == 0 && l % 2 == 0) {                 // les piliers : colonne ET ligne paires
+        poser(c, l, ALPHABET[23]);
+      }
+    }
+  }
+
+  poser(ox, oy, ALPHABET[14]);            // le O à sa place (le 0.93)
+
+  // les trois W, dans trois coins (le 0.93.6)
+  ex[0] = 17;                             // le n° 0 : en bas à droite
+  ey[0] = 15;
+  ex[1] = 17;                             // le n° 1 : en haut à droite
+  ey[1] = 1;
+  ex[2] = 1;                              // le n° 2 : en bas à gauche
+  ey[2] = 15;
+  for (uint8_t i = 0; i < 3; i++) {
+    vivant[i] = 1;                        // NOUVEAU : au départ, les trois sont vivants
+    poser(ex[i], ey[i], ALPHABET[22]);
+  }
+  texte(0, 17, "SCORE");                  // NOUVEAU : le score, sous le terrain
+
+  while (true) {
+    image();
+
+    // ---- le O bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+    if (chaque(150)) {
+      // 1. la case d'ARRIVÉE : on part de la case actuelle (le 0.82).
+      //    else if : une seule flèche à la fois, pas de pas en diagonale.
+      nx = ox;
+      ny = oy;
+      if (bouton(DROITE)) {
+        nx = ox + 1;
+      } else if (bouton(GAUCHE)) {
+        nx = ox - 1;
+      } else if (bouton(BAS)) {
+        ny = oy + 1;
+      } else if (bouton(HAUT)) {
+        ny = oy - 1;
+      }
+
+      // 2. une flèche est tenue (l'arrivée n'est pas la case où l'on est)…
+      if (nx != ox || ny != oy) {
+        // 3. …et l'arrivée est VIDE : ni X, ni B, ni W, ni flamme. (le 0.93.2)
+        //    lire() rend 0 pour une case vide : c'est l'espace, la tuile 0.
+        if (lire(nx, ny) == 0) {
+          effacer(ox, oy, 1);                 // le O quitte sa case…
+          if (bombe == 1 && ox == bx && oy == by) {
+            poser(bx, by, ALPHABET[1]);         // …mais s'il était sur la bombe, la B apparaît (le 0.93.2)
+          }
+          ox = nx;                            // …et va sur la case d'arrivée
+          oy = ny;
+          poser(ox, oy, ALPHABET[14]);
+        }
+      }
+    }
+
+    // ---- A : poser une bombe, là où est le O (le 0.93.2) ----
+    // bombe == 0 : une seule bombe à la fois.
+    // feu == 0 : pas pendant les flammes (le 0.93.3).
+    if (bouton(A) && bombe == 0 && feu == 0) {
+      bombe = 1;
+      bx = ox;                              // la bombe est sous le O
+      by = oy;
+      bdelai = 0;                           // on commence à compter (le 0.93.3)
+    }
+
+    // ---- la bombe explose au bout de 2 secondes (le 0.93.3) ----
+    // image() revient 60 fois par seconde : 120 images, 2 secondes.
+    if (bombe == 1) {
+      bdelai = bdelai + 1;
+      if (bdelai == 120) {
+        bombe = 0;                          // plus de bombe…
+        fx = bx;                            // …elle explose, là où elle était
+        fy = by;
+        feu = 1;
+        fdelai = 0;
+        flammes(1);                         // on dessine les flammes
+      }
+    }
+
+    // ---- les flammes s'éteignent au bout d'une demi-seconde (30 images) (le 0.93.3) ----
+    if (feu == 1) {
+      fdelai = fdelai + 1;
+      if (fdelai == 30) {
+        feu = 0;
+        flammes(0);                         // on efface les MÊMES cases
+        poser(ox, oy, ALPHABET[14]);        // le O était peut-être dans une flamme : on le remet
+        for (uint8_t i = 0; i < 3; i++) {   // et les W encore vivants
+          if (vivant[i] == 1) {
+            poser(ex[i], ey[i], ALPHABET[22]);
+          }
+        }
+      }
+    }
+
+    // ---- les W se promènent au hasard (le 0.93.5) : les TROIS, un par un (le 0.93.6) ----
+    if (chaque(400)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        if (vivant[i] == 1) {               // NOUVEAU : un W détruit ne bouge plus
+          d = hasard() % 4;                     // sa direction, au hasard (le 0.93.5)
+          nx = ex[i];
+          ny = ey[i];
+          if (d == 0) nx = ex[i] + 1;
+          if (d == 1) ny = ey[i] + 1;
+          if (d == 2) nx = ex[i] - 1;
+          if (d == 3) ny = ey[i] - 1;
+          if (lire(nx, ny) == 0) {              // seulement sur une case VIDE
+            effacer(ex[i], ey[i], 1);
+            ex[i] = nx;
+            ey[i] = ny;
+            poser(ex[i], ey[i], ALPHABET[22]);
+          }
+        }
+      }
+    }
+
+    nombre(6, 17, score);                   // NOUVEAU : le score, à chaque image
+  }
+}
+`,
+    aVoir: 'Pose des bombes sur le chemin des W : une flamme qui en touche un le détruit, et le SCORE monte.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(1) }
+      c.avancer(20)
+      const depart = c.mot(0, 17, 9) === 'SCORE 000'
+      // le robot : il pose une bombe en (9, 7), s'abrite en (11, 8), attend la fin des flammes, et revient
+      const v = (n) => c.variable(n)
+      const fini = () => false
+      tenir('right', () => v('ox') === 9)
+      tenir('down', () => v('oy') === 7)
+      for (let tour = 0; tour < 40 && !v('score') >= 1 && !fini(); tour++) {
+        c.presser('a', 3)
+        tenir('right', () => v('ox') === 11 || fini(), 60)
+        tenir('down', () => v('oy') === 8 || fini(), 60)
+        tenir('b', () => v('feu') === 1 || fini(), 200)
+        tenir('b', () => v('feu') === 0 || fini(), 100)
+        tenir('up', () => v('oy') === 7 || fini(), 60)
+        tenir('left', () => v('ox') === 9 || fini(), 60)
+      }
+      let w = 0
+      for (let l = 0; l < 17; l++) w += [...c.mot(0, l, 20)].filter((ch) => ch === 'W').length
+      return [
+        ['au départ : SCORE 000', depart],
+        ['à force de bombes, un W est détruit', v('score') >= 1, ` (score = ${v('score')})`],
+        ['il ne reste que les W vivants à l’écran', w === 3 - v('score'), ` (${w} W)`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un jeu de bombes — touché : la partie s’arrête',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.93.7, et le O peut perdre : touché par un W, ou par une flamme. L’écran FIN montre le score ; START relance une partie (nouvellePartie(), comme au 0.91.2).',
+    texte: [
+      '**C’est le 0.93.7, avec une chose en plus : on peut perdre.** Le O est **touché** si un W arrive sur lui, s’il marche sur un W ou dans une flamme, ou si une flamme tombe sur lui (attention à sa propre bombe !). Alors, l’écran **FIN** et le score ; **START** : on rejoue.',
+      '**Ce qui est nouveau ici : `mort`, un drapeau.** `uint8_t mort = 0;` passe à 1 dès que le O est touché, **où que ce soit** dans le programme. On ne s’arrête pas tout de suite : à la **fin** du tour, `if (mort == 1) finPartie();`. Ainsi, on n’écrit jamais l’écran FIN au milieu d’une explosion.',
+      '**Les trois façons d’être touché :** 1. Dans `caseFeu` : la flamme tombe sur le O (`c == ox && l == oy`). 2. Dans la boucle des W : l’arrivée du W est la case du O (`nx == ox && ny == oy`). 3. Quand le O bouge : l’arrivée n’est pas vide, **et** ce n’est ni un X, ni une B. Qu’est-ce qui reste ? **Un W ou une flamme.** `else if (lire(nx, ny) != ALPHABET[23] && lire(nx, ny) != ALPHABET[1])`.',
+      '**Deux écrans :** `ecran` vaut 0 pour le JEU, 1 pour la FIN, comme dans le serpent (le 0.91). Tout le jeu est dans `if (ecran == 0) { … }` ; sur la fin, seul START compte.',
+      '**Rejouer : tout remettre au départ.** Le début de `main()` (le terrain, le O, les W, le SCORE) devient la fonction **`nouvellePartie()`**, avec en plus les remises à zéro : le O en (1, 1), pas de bombe, pas de flammes, le score à 0, `mort` à 0. `main()` l’appelle une fois au début, et START l’appelle à chaque nouvelle partie. `viderEcran()` et `finPartie()` sont celles du serpent.',
+      '**Déroulons : A, et on ne bouge pas.** La bombe est sous le O. 2 secondes après, `flammes(1)` : le centre est la case du O : `mort = 1`. À la fin du tour : `finPartie()`, FIN, SCORE 000.',
+    ],
+    code: `// ---- UN JEU DE BOMBES ----
+// Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
+// ALPHABET[23] : le X    ALPHABET[14] : le O
+// ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
+uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
+uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
+uint8_t ny = 0;
+uint8_t bombe = 0;        // 1 : une bombe est posée ; 0 : pas de bombe (le 0.93.2)
+uint8_t bx = 0;           // la place de la bombe : sa colonne…
+uint8_t by = 0;           // …et sa ligne
+uint8_t bdelai = 0;       // les images passées depuis la pose de la bombe (le 0.93.3)
+uint8_t feu = 0;          // 1 : les flammes sont à l'écran ; 0 : non
+uint8_t fdelai = 0;       // les images passées depuis l'explosion
+uint8_t fx = 0;           // le centre de l'explosion : sa colonne…
+uint8_t fy = 0;           // …et sa ligne
+uint8_t ex[3];            // les TROIS W : leurs colonnes… (le 0.93.6)
+uint8_t ey[3];            // …et leurs lignes. Le W n° i est en (ex[i], ey[i]).
+uint8_t d = 0;            // la direction tirée au hasard, 0 à 3 (le 0.93.5)
+uint8_t vivant[3];        // vivant[i] : 1 si le W n° i est là, 0 s'il est détruit (le 0.93.7)
+uint8_t score = 0;        // les W détruits
+uint8_t ecran = 0;        // NOUVEAU : 0 = le JEU, 1 = la FIN
+uint8_t mort = 0;         // 1 : le O vient d'être touché
+
+// ---- une flamme sur la case (c, l) : y a-t-il un W ? (le 0.93.7) ----
+// On cherche le W n° i qui est vivant ET sur cette case. S'il y en a un,
+// il est détruit (vivant[i] = 0) et le score gagne 1.
+void toucheW(uint8_t c, uint8_t l) {
+  for (uint8_t i = 0; i < 3; i++) {
+    if (vivant[i] == 1 && ex[i] == c && ey[i] == l) {
+      vivant[i] = 0;
+      score = score + 1;
+    }
+  }
+}
+
+// ---- UNE case de flamme (le 0.93.3) ----
+// allume = 1 : on dessine la flamme ; allume = 0 : on l'efface.
+// debout = 1 : une flamme verticale, le | ; debout = 0 : horizontale, le -.
+void caseFeu(uint8_t c, uint8_t l, uint8_t allume, uint8_t debout) {
+  if (allume == 0) {
+    effacer(c, l, 1);                   // la flamme s'éteint : la case est vide
+  } else {
+    if (lire(c, l) == ALPHABET[22]) {   // un W sous la flamme ? (le 0.93.7)
+      toucheW(c, l);
+    }
+    if (c == ox && l == oy) {           // NOUVEAU : le O sous la flamme : perdu
+      mort = 1;
+    }
+    if (debout == 1) {
+      texte(c, l, "|");
+    } else {
+      texte(c, l, "-");
+    }
+  }
+}
+
+// ---- Toute l'explosion (le 0.93.3) : des bras de DEUX cases (le 0.93.4) ----
+//
+//          |
+//          |            chaque bras : jusqu'à 2 cases,
+//      - - - - -        mais il s'arrête au premier X.
+//          |            break : on sort de la boucle, tout de suite.
+//          |
+void flammes(uint8_t allume) {
+  caseFeu(fx, fy, allume, 0);                     // le centre
+  for (uint8_t k = 1; k <= 2; k++) {              // à droite : fx + 1, puis fx + 2
+    if (lire(fx + k, fy) == ALPHABET[23]) break;  // un X : le bras s'arrête là
+    caseFeu(fx + k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // à gauche : fx - 1, puis fx - 2
+    if (lire(fx - k, fy) == ALPHABET[23]) break;
+    caseFeu(fx - k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en bas
+    if (lire(fx, fy + k) == ALPHABET[23]) break;
+    caseFeu(fx, fy + k, allume, 1);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en haut
+    if (lire(fx, fy - k) == ALPHABET[23]) break;
+    caseFeu(fx, fy - k, allume, 1);
+  }
+}
+
+// ---- NOUVEAU : vider l'écran, comme dans le serpent ----
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+// ---- NOUVEAU : une partie qui commence, TOUT au départ ----
+// C'était le début de main() ; c'est maintenant une fonction, pour pouvoir
+// la rappeler quand on rejoue.
+void nouvellePartie() {
+  ox = 1;                               // le O revient dans son coin
+  oy = 1;
+  bombe = 0;                            // pas de bombe
+  feu = 0;                              // pas de flammes
+  score = 0;
+  mort = 0;
+  ecran = 0;                            // on est sur le JEU
+  viderEcran();
+
+  // ---- Le terrain : le cadre et les piliers X (le 0.93) ----
+  for (uint8_t l = 0; l < 17; l++) {
+    for (uint8_t c = 0; c < 19; c++) {
+      if (l == 0 || l == 16 || c == 0 || c == 18) {   // le cadre
+        poser(c, l, ALPHABET[23]);
+      }
+      if (c % 2 == 0 && l % 2 == 0) {                 // les piliers : colonne ET ligne paires
+        poser(c, l, ALPHABET[23]);
+      }
+    }
+  }
+
+  poser(ox, oy, ALPHABET[14]);            // le O à sa place (le 0.93)
+
+  // les trois W, dans trois coins (le 0.93.6)
+  ex[0] = 17;                             // le n° 0 : en bas à droite
+  ey[0] = 15;
+  ex[1] = 17;                             // le n° 1 : en haut à droite
+  ey[1] = 1;
+  ex[2] = 1;                              // le n° 2 : en bas à gauche
+  ey[2] = 15;
+  for (uint8_t i = 0; i < 3; i++) {
+    vivant[i] = 1;                        // au départ, les trois sont vivants
+    poser(ex[i], ey[i], ALPHABET[22]);
+  }
+  texte(0, 17, "SCORE");                  // le score, sous le terrain (le 0.93.7)
+}
+
+// ---- NOUVEAU : la partie s'arrête : l'écran FIN ----
+void finPartie() {
+  ecran = 1;                            // on est sur la FIN
+  viderEcran();
+  texte(8, 6, "FIN");
+  texte(5, 9, "SCORE");
+  nombre(11, 9, score);
+  texte(2, 13, "START : REJOUER");
+}
+
+int main() {
+  nouvellePartie();                     // NOUVEAU : la première partie
+
+  while (true) {
+    image();
+
+    if (ecran == 0) {                   // NOUVEAU : le JEU
+      // ---- le O bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+      if (chaque(150)) {
+        // 1. la case d'ARRIVÉE : on part de la case actuelle (le 0.82).
+        //    else if : une seule flèche à la fois, pas de pas en diagonale.
+        nx = ox;
+        ny = oy;
+        if (bouton(DROITE)) {
+          nx = ox + 1;
+        } else if (bouton(GAUCHE)) {
+          nx = ox - 1;
+        } else if (bouton(BAS)) {
+          ny = oy + 1;
+        } else if (bouton(HAUT)) {
+          ny = oy - 1;
+        }
+
+        // 2. une flèche est tenue (l'arrivée n'est pas la case où l'on est)…
+        if (nx != ox || ny != oy) {
+          // 3. l'arrivée est VIDE (le 0.93.2) : le O y va.
+          if (lire(nx, ny) == 0) {
+            effacer(ox, oy, 1);                 // le O quitte sa case…
+            if (bombe == 1 && ox == bx && oy == by) {
+              poser(bx, by, ALPHABET[1]);         // …mais s'il était sur la bombe, la B apparaît (le 0.93.2)
+            }
+            ox = nx;                            // …et va sur la case d'arrivée
+            oy = ny;
+            poser(ox, oy, ALPHABET[14]);
+          } else if (lire(nx, ny) != ALPHABET[23] && lire(nx, ny) != ALPHABET[1]) {
+            mort = 1;                         // NOUVEAU : ni vide, ni X, ni B : un W ou une flamme !
+          }
+        }
+      }
+
+      // ---- A : poser une bombe, là où est le O (le 0.93.2) ----
+      // bombe == 0 : une seule bombe à la fois.
+      // feu == 0 : pas pendant les flammes (le 0.93.3).
+      if (bouton(A) && bombe == 0 && feu == 0) {
+        bombe = 1;
+        bx = ox;                              // la bombe est sous le O
+        by = oy;
+        bdelai = 0;                           // on commence à compter (le 0.93.3)
+      }
+
+      // ---- la bombe explose au bout de 2 secondes (le 0.93.3) ----
+      // image() revient 60 fois par seconde : 120 images, 2 secondes.
+      if (bombe == 1) {
+        bdelai = bdelai + 1;
+        if (bdelai == 120) {
+          bombe = 0;                          // plus de bombe…
+          fx = bx;                            // …elle explose, là où elle était
+          fy = by;
+          feu = 1;
+          fdelai = 0;
+          flammes(1);                         // on dessine les flammes
+        }
+      }
+
+      // ---- les flammes s'éteignent au bout d'une demi-seconde (30 images) (le 0.93.3) ----
+      if (feu == 1) {
+        fdelai = fdelai + 1;
+        if (fdelai == 30) {
+          feu = 0;
+          flammes(0);                         // on efface les MÊMES cases
+          poser(ox, oy, ALPHABET[14]);        // le O était peut-être dans une flamme : on le remet
+          for (uint8_t i = 0; i < 3; i++) {   // et les W encore vivants
+            if (vivant[i] == 1) {
+              poser(ex[i], ey[i], ALPHABET[22]);
+            }
+          }
+        }
+      }
+
+      // ---- les W se promènent au hasard (le 0.93.5) : les TROIS, un par un (le 0.93.6) ----
+      if (chaque(400)) {
+        for (uint8_t i = 0; i < 3; i++) {
+          if (vivant[i] == 1) {               // un W détruit ne bouge plus (le 0.93.7)
+            d = hasard() % 4;                     // sa direction, au hasard (le 0.93.5)
+            nx = ex[i];
+            ny = ey[i];
+            if (d == 0) nx = ex[i] + 1;
+            if (d == 1) ny = ey[i] + 1;
+            if (d == 2) nx = ex[i] - 1;
+            if (d == 3) ny = ey[i] - 1;
+            if (nx == ox && ny == oy) {
+              mort = 1;                           // NOUVEAU : le W arrive sur le O : perdu
+            }
+            if (lire(nx, ny) == 0) {              // seulement sur une case VIDE
+              effacer(ex[i], ey[i], 1);
+              ex[i] = nx;
+              ey[i] = ny;
+              poser(ex[i], ey[i], ALPHABET[22]);
+            }
+          }
+        }
+      }
+
+      nombre(6, 17, score);                   // le score, à chaque image (le 0.93.7)
+
+      // ---- NOUVEAU : touché (par un W ou une flamme) : la partie s'arrête ----
+      if (mort == 1) {
+        finPartie();
+      }
+    }
+
+    // ---- NOUVEAU : sur la FIN, START : on rejoue ----
+    if (ecran == 1 && bouton(START)) {
+      nouvellePartie();
+    }
+  }
+}
+`,
+    aVoir: 'Touché par un W ou par une flamme : FIN et le score. START : une nouvelle partie.',
+    controle: (c) => {
+      c.avancer(20)
+      c.presser('a', 3)
+      c.avancer(150)
+      const ecran = c.variable('ecran')
+      const fin = ecran === 1 && c.mot(8, 6, 3) === 'FIN' && c.mot(11, 9, 3) === '000'
+      c.presser('start', 6)
+      c.avancer(30)
+      return [
+        ['sa propre bombe, sans bouger : FIN, SCORE 000', fin, ` (ecran = ${ecran})`],
+        ['START : une nouvelle partie', c.variable('ecran') === 0 && c.variable('mort') === 0 && c.mot(1, 1, 1) === 'O' && c.mot(0, 0, 19) === 'X'.repeat(19)],
+        ['les trois W sont revenus', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].reduce((n, l) => n + [...c.mot(0, l, 20)].filter((ch) => ch === 'W').length, 0) === 3],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un jeu de bombes — les trois W détruits : gagné',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.93.8, et une façon de gagner : quand le score arrive à 3, les trois W sont détruits. L’écran FIN, avec BRAVO ! au-dessus.',
+    texte: [
+      '**C’est le 0.93.8, avec une chose en plus : gagner.** Quand les **trois** W sont détruits, la partie s’arrête sur **BRAVO !**, au-dessus de FIN et du score.',
+      '**Ce qui est nouveau ici : savoir qu’il ne reste plus de W.** On pourrait regarder `vivant[0]`, `vivant[1]` et `vivant[2]`. Plus simple : chaque W détruit ajoute **1** au score, et un W ne peut être détruit qu’une fois (le `vivant[i] == 1` du 0.93.7). Donc **`score == 3`** veut dire : les trois sont détruits.',
+      '**À la fin du tour, avec `mort` :** `if (mort == 1) { … } else if (score == 3) { … }`. **Perdre passe d’abord :** si la dernière flamme détruit le dernier W **et** touche le O, c’est perdu.',
+      '**Gagner réutilise `finPartie()` :** le même écran FIN, le score (003), START pour rejouer. On ajoute juste `texte(6, 3, "BRAVO !")` au-dessus. Le point d’exclamation fait partie des signes de la console.',
+      '**Le jeu est complet :** se déplacer, poser des bombes, fuir les flammes et les W, les détruire tous. **Pour aller plus loin :** des briques qu’une bombe peut casser, plusieurs bombes à la fois, des flammes plus longues en bonus, des W plus rapides à chaque niveau…',
+    ],
+    code: `// ---- UN JEU DE BOMBES ----
+// Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
+// ALPHABET[23] : le X    ALPHABET[14] : le O
+// ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
+uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
+uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
+uint8_t ny = 0;
+uint8_t bombe = 0;        // 1 : une bombe est posée ; 0 : pas de bombe (le 0.93.2)
+uint8_t bx = 0;           // la place de la bombe : sa colonne…
+uint8_t by = 0;           // …et sa ligne
+uint8_t bdelai = 0;       // les images passées depuis la pose de la bombe (le 0.93.3)
+uint8_t feu = 0;          // 1 : les flammes sont à l'écran ; 0 : non
+uint8_t fdelai = 0;       // les images passées depuis l'explosion
+uint8_t fx = 0;           // le centre de l'explosion : sa colonne…
+uint8_t fy = 0;           // …et sa ligne
+uint8_t ex[3];            // les TROIS W : leurs colonnes… (le 0.93.6)
+uint8_t ey[3];            // …et leurs lignes. Le W n° i est en (ex[i], ey[i]).
+uint8_t d = 0;            // la direction tirée au hasard, 0 à 3 (le 0.93.5)
+uint8_t vivant[3];        // vivant[i] : 1 si le W n° i est là, 0 s'il est détruit (le 0.93.7)
+uint8_t score = 0;        // les W détruits
+uint8_t ecran = 0;        // 0 = le JEU, 1 = la FIN (le 0.93.8)
+uint8_t mort = 0;         // 1 : le O vient d'être touché
+
+// ---- une flamme sur la case (c, l) : y a-t-il un W ? (le 0.93.7) ----
+// On cherche le W n° i qui est vivant ET sur cette case. S'il y en a un,
+// il est détruit (vivant[i] = 0) et le score gagne 1.
+void toucheW(uint8_t c, uint8_t l) {
+  for (uint8_t i = 0; i < 3; i++) {
+    if (vivant[i] == 1 && ex[i] == c && ey[i] == l) {
+      vivant[i] = 0;
+      score = score + 1;
+    }
+  }
+}
+
+// ---- UNE case de flamme (le 0.93.3) ----
+// allume = 1 : on dessine la flamme ; allume = 0 : on l'efface.
+// debout = 1 : une flamme verticale, le | ; debout = 0 : horizontale, le -.
+void caseFeu(uint8_t c, uint8_t l, uint8_t allume, uint8_t debout) {
+  if (allume == 0) {
+    effacer(c, l, 1);                   // la flamme s'éteint : la case est vide
+  } else {
+    if (lire(c, l) == ALPHABET[22]) {   // un W sous la flamme ? (le 0.93.7)
+      toucheW(c, l);
+    }
+    if (c == ox && l == oy) {           // le O sous la flamme : perdu (le 0.93.8)
+      mort = 1;
+    }
+    if (debout == 1) {
+      texte(c, l, "|");
+    } else {
+      texte(c, l, "-");
+    }
+  }
+}
+
+// ---- Toute l'explosion (le 0.93.3) : des bras de DEUX cases (le 0.93.4) ----
+//
+//          |
+//          |            chaque bras : jusqu'à 2 cases,
+//      - - - - -        mais il s'arrête au premier X.
+//          |            break : on sort de la boucle, tout de suite.
+//          |
+void flammes(uint8_t allume) {
+  caseFeu(fx, fy, allume, 0);                     // le centre
+  for (uint8_t k = 1; k <= 2; k++) {              // à droite : fx + 1, puis fx + 2
+    if (lire(fx + k, fy) == ALPHABET[23]) break;  // un X : le bras s'arrête là
+    caseFeu(fx + k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // à gauche : fx - 1, puis fx - 2
+    if (lire(fx - k, fy) == ALPHABET[23]) break;
+    caseFeu(fx - k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en bas
+    if (lire(fx, fy + k) == ALPHABET[23]) break;
+    caseFeu(fx, fy + k, allume, 1);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en haut
+    if (lire(fx, fy - k) == ALPHABET[23]) break;
+    caseFeu(fx, fy - k, allume, 1);
+  }
+}
+
+// ---- vider l'écran, comme dans le serpent (le 0.93.8) ----
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+// ---- une partie qui commence, TOUT au départ (le 0.93.8) ----
+// C'était le début de main() ; c'est maintenant une fonction, pour pouvoir
+// la rappeler quand on rejoue.
+void nouvellePartie() {
+  ox = 1;                               // le O revient dans son coin
+  oy = 1;
+  bombe = 0;                            // pas de bombe
+  feu = 0;                              // pas de flammes
+  score = 0;
+  mort = 0;
+  ecran = 0;                            // on est sur le JEU
+  viderEcran();
+
+  // ---- Le terrain : le cadre et les piliers X (le 0.93) ----
+  for (uint8_t l = 0; l < 17; l++) {
+    for (uint8_t c = 0; c < 19; c++) {
+      if (l == 0 || l == 16 || c == 0 || c == 18) {   // le cadre
+        poser(c, l, ALPHABET[23]);
+      }
+      if (c % 2 == 0 && l % 2 == 0) {                 // les piliers : colonne ET ligne paires
+        poser(c, l, ALPHABET[23]);
+      }
+    }
+  }
+
+  poser(ox, oy, ALPHABET[14]);            // le O à sa place (le 0.93)
+
+  // les trois W, dans trois coins (le 0.93.6)
+  ex[0] = 17;                             // le n° 0 : en bas à droite
+  ey[0] = 15;
+  ex[1] = 17;                             // le n° 1 : en haut à droite
+  ey[1] = 1;
+  ex[2] = 1;                              // le n° 2 : en bas à gauche
+  ey[2] = 15;
+  for (uint8_t i = 0; i < 3; i++) {
+    vivant[i] = 1;                        // au départ, les trois sont vivants
+    poser(ex[i], ey[i], ALPHABET[22]);
+  }
+  texte(0, 17, "SCORE");                  // le score, sous le terrain (le 0.93.7)
+}
+
+// ---- la partie s'arrête : l'écran FIN (le 0.93.8) ----
+void finPartie() {
+  ecran = 1;                            // on est sur la FIN
+  viderEcran();
+  texte(8, 6, "FIN");
+  texte(5, 9, "SCORE");
+  nombre(11, 9, score);
+  texte(2, 13, "START : REJOUER");
+}
+
+int main() {
+  nouvellePartie();                     // la première partie (le 0.93.8)
+
+  while (true) {
+    image();
+
+    if (ecran == 0) {                   // le JEU (le 0.93.8)
+      // ---- le O bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+      if (chaque(150)) {
+        // 1. la case d'ARRIVÉE : on part de la case actuelle (le 0.82).
+        //    else if : une seule flèche à la fois, pas de pas en diagonale.
+        nx = ox;
+        ny = oy;
+        if (bouton(DROITE)) {
+          nx = ox + 1;
+        } else if (bouton(GAUCHE)) {
+          nx = ox - 1;
+        } else if (bouton(BAS)) {
+          ny = oy + 1;
+        } else if (bouton(HAUT)) {
+          ny = oy - 1;
+        }
+
+        // 2. une flèche est tenue (l'arrivée n'est pas la case où l'on est)…
+        if (nx != ox || ny != oy) {
+          // 3. l'arrivée est VIDE (le 0.93.2) : le O y va.
+          if (lire(nx, ny) == 0) {
+            effacer(ox, oy, 1);                 // le O quitte sa case…
+            if (bombe == 1 && ox == bx && oy == by) {
+              poser(bx, by, ALPHABET[1]);         // …mais s'il était sur la bombe, la B apparaît (le 0.93.2)
+            }
+            ox = nx;                            // …et va sur la case d'arrivée
+            oy = ny;
+            poser(ox, oy, ALPHABET[14]);
+          } else if (lire(nx, ny) != ALPHABET[23] && lire(nx, ny) != ALPHABET[1]) {
+            mort = 1;                         // ni vide, ni X, ni B : un W ou une flamme ! (le 0.93.8)
+          }
+        }
+      }
+
+      // ---- A : poser une bombe, là où est le O (le 0.93.2) ----
+      // bombe == 0 : une seule bombe à la fois.
+      // feu == 0 : pas pendant les flammes (le 0.93.3).
+      if (bouton(A) && bombe == 0 && feu == 0) {
+        bombe = 1;
+        bx = ox;                              // la bombe est sous le O
+        by = oy;
+        bdelai = 0;                           // on commence à compter (le 0.93.3)
+      }
+
+      // ---- la bombe explose au bout de 2 secondes (le 0.93.3) ----
+      // image() revient 60 fois par seconde : 120 images, 2 secondes.
+      if (bombe == 1) {
+        bdelai = bdelai + 1;
+        if (bdelai == 120) {
+          bombe = 0;                          // plus de bombe…
+          fx = bx;                            // …elle explose, là où elle était
+          fy = by;
+          feu = 1;
+          fdelai = 0;
+          flammes(1);                         // on dessine les flammes
+        }
+      }
+
+      // ---- les flammes s'éteignent au bout d'une demi-seconde (30 images) (le 0.93.3) ----
+      if (feu == 1) {
+        fdelai = fdelai + 1;
+        if (fdelai == 30) {
+          feu = 0;
+          flammes(0);                         // on efface les MÊMES cases
+          poser(ox, oy, ALPHABET[14]);        // le O était peut-être dans une flamme : on le remet
+          for (uint8_t i = 0; i < 3; i++) {   // et les W encore vivants
+            if (vivant[i] == 1) {
+              poser(ex[i], ey[i], ALPHABET[22]);
+            }
+          }
+        }
+      }
+
+      // ---- les W se promènent au hasard (le 0.93.5) : les TROIS, un par un (le 0.93.6) ----
+      if (chaque(400)) {
+        for (uint8_t i = 0; i < 3; i++) {
+          if (vivant[i] == 1) {               // un W détruit ne bouge plus (le 0.93.7)
+            d = hasard() % 4;                     // sa direction, au hasard (le 0.93.5)
+            nx = ex[i];
+            ny = ey[i];
+            if (d == 0) nx = ex[i] + 1;
+            if (d == 1) ny = ey[i] + 1;
+            if (d == 2) nx = ex[i] - 1;
+            if (d == 3) ny = ey[i] - 1;
+            if (nx == ox && ny == oy) {
+              mort = 1;                           // le W arrive sur le O : perdu (le 0.93.8)
+            }
+            if (lire(nx, ny) == 0) {              // seulement sur une case VIDE
+              effacer(ex[i], ey[i], 1);
+              ex[i] = nx;
+              ey[i] = ny;
+              poser(ex[i], ey[i], ALPHABET[22]);
+            }
+          }
+        }
+      }
+
+      nombre(6, 17, score);                   // le score, à chaque image (le 0.93.7)
+
+      // ---- touché (par un W ou une flamme) : la partie s'arrête (le 0.93.8) ----
+      if (mort == 1) {
+        finPartie();
+      } else if (score == 3) {
+        // ---- NOUVEAU : les trois W détruits : GAGNÉ ----
+        finPartie();                          // le même écran FIN, avec le score…
+        texte(6, 3, "BRAVO !");               // …et BRAVO au-dessus
+      }
+    }
+
+    // ---- sur la FIN, START : on rejoue (le 0.93.8) ----
+    if (ecran == 1 && bouton(START)) {
+      nouvellePartie();
+    }
+  }
+}
+`,
+    aVoir: 'Détruis les trois W sans te faire toucher : BRAVO ! au-dessus de FIN et du score.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(1) }
+      c.avancer(69)                     // ce départ-là mène le robot à la victoire
+      // le robot : il pose une bombe en (9, 7), s'abrite en (11, 8), attend la fin des flammes, et revient
+      const v = (n) => c.variable(n)
+      const fini = () => v('ecran') !== 0
+      tenir('right', () => v('ox') === 9)
+      tenir('down', () => v('oy') === 7)
+      for (let tour = 0; tour < 60 && !false && !fini(); tour++) {
+        c.presser('a', 3)
+        tenir('right', () => v('ox') === 11 || fini(), 60)
+        tenir('down', () => v('oy') === 8 || fini(), 60)
+        tenir('b', () => v('feu') === 1 || fini(), 200)
+        tenir('b', () => v('feu') === 0 || fini(), 100)
+        tenir('up', () => v('oy') === 7 || fini(), 60)
+        tenir('left', () => v('ox') === 9 || fini(), 60)
+      }
+      c.avancer(30)
+      return [
+        ['le robot détruit les trois W : BRAVO !, FIN, SCORE 003', v('ecran') === 1 && c.mot(6, 3, 7) === 'BRAVO !' && c.mot(8, 6, 3) === 'FIN' && c.mot(11, 9, 3) === '003', ` (score = ${v('score')})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un jeu de bombes, avec des briques — des briques M',
+    difficulte: 0,
+    idee: 'Le jeu du 0.93.9, et des briques M, posées au hasard dans les couloirs, une case sur trois environ. Elles bloquent le O, les W et les flammes, comme les X. Le coin du départ reste libre.',
+    texte: [
+      '**C’est le jeu du 0.93.9, avec une chose en plus : des briques.** Des **M** remplissent une partie des couloirs, au hasard : quand on rejoue, le terrain change. Pour l’instant, elles sont aussi dures que les X ; au 0.94.1, les bombes les casseront.',
+      '**Ce qui est nouveau ici : poser les briques au hasard.** Deux boucles passent sur l’intérieur du terrain (lignes 1 à 15, colonnes 1 à 17), comme pour les piliers (le 0.93). Une brique est posée si **trois** conditions sont vraies à la fois (`&&`, le 0.75).',
+      '**1. C’est un couloir :** `c % 2 == 1 || l % 2 == 1`. Un pilier a sa colonne **et** sa ligne paires ; un couloir a sa colonne **ou** sa ligne impaire (`% 2 == 1`). Les **parenthèses** autour de cette condition la calculent d’abord, comme au 0.91.6 : « couloir » ET le reste.',
+      '**2. Ce n’est pas le coin du départ :** `c + l > 5`. En (1, 1), 1 + 1 = 2 ; en (3, 1), 4 ; en (3, 2), 5 ; en (1, 4), 5 : jamais de brique. En (5, 1), 6 : une brique possible. Ce coin libre, c’est de la place pour poser sa première bombe et s’abriter : de (1, 1), on peut aller en (3, 2), hors des bras de la flamme.',
+      '**3. Une fois sur trois :** `hasard() % 3 == 0`. Le reste par 3 vaut 0, 1 ou 2 : il vaut 0 une fois sur trois environ. Exemple : `hasard()` rend 201, 201 = 67 × 3 + 0 : une brique. 202 : reste 1, pas de brique.',
+      '**Les briques sont posées AVANT le O et les W.** Si le hasard met un M dans le coin d’un W, le W est posé par-dessus : il est là, mais enfermé jusqu’à ce qu’une bombe le libère.',
+      '**Le M bloque tout le monde :** les W ne vont que sur une case vide (le 0.93.5) ; le O aussi (le 0.93.2). Mais attention au 0.93.8 : quand le O essayait d’aller sur une case « ni vide, ni X, ni B », c’était un W ou une flamme, et il **perdait**. Un M n’est ni l’un ni l’autre : on ajoute **`&& lire(nx, ny) != ALPHABET[12]`**, sinon toucher une brique ferait perdre.',
+      '**Le M arrête les flammes, comme un X :** dans `flammes`, `if (lire(…) == ALPHABET[23] || lire(…) == ALPHABET[12]) break;` (`||`, « ou »). Une brique **protège** ce qu’il y a derrière elle.',
+      '**Le jeu devient plus dur :** les W sont souvent enfermés, et il faut faire son chemin entre les briques. Au 0.94.1, on pourra le **creuser** avec les bombes.',
+    ],
+    code: `// ---- UN JEU DE BOMBES ----
+// Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi,
+// M = une brique (NOUVEAU).
+// ALPHABET[23] : le X    ALPHABET[14] : le O
+// ALPHABET[1]  : le B    ALPHABET[22] : le W
+// ALPHABET[12] : le M
+
+uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
+uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
+uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
+uint8_t ny = 0;
+uint8_t bombe = 0;        // 1 : une bombe est posée ; 0 : pas de bombe (le 0.93.2)
+uint8_t bx = 0;           // la place de la bombe : sa colonne…
+uint8_t by = 0;           // …et sa ligne
+uint8_t bdelai = 0;       // les images passées depuis la pose de la bombe (le 0.93.3)
+uint8_t feu = 0;          // 1 : les flammes sont à l'écran ; 0 : non
+uint8_t fdelai = 0;       // les images passées depuis l'explosion
+uint8_t fx = 0;           // le centre de l'explosion : sa colonne…
+uint8_t fy = 0;           // …et sa ligne
+uint8_t ex[3];            // les TROIS W : leurs colonnes… (le 0.93.6)
+uint8_t ey[3];            // …et leurs lignes. Le W n° i est en (ex[i], ey[i]).
+uint8_t d = 0;            // la direction tirée au hasard, 0 à 3 (le 0.93.5)
+uint8_t vivant[3];        // vivant[i] : 1 si le W n° i est là, 0 s'il est détruit (le 0.93.7)
+uint8_t score = 0;        // les W détruits
+uint8_t ecran = 0;        // 0 = le JEU, 1 = la FIN (le 0.93.8)
+uint8_t mort = 0;         // 1 : le O vient d'être touché
+
+// ---- une flamme sur la case (c, l) : y a-t-il un W ? (le 0.93.7) ----
+// On cherche le W n° i qui est vivant ET sur cette case. S'il y en a un,
+// il est détruit (vivant[i] = 0) et le score gagne 1.
+void toucheW(uint8_t c, uint8_t l) {
+  for (uint8_t i = 0; i < 3; i++) {
+    if (vivant[i] == 1 && ex[i] == c && ey[i] == l) {
+      vivant[i] = 0;
+      score = score + 1;
+    }
+  }
+}
+
+// ---- UNE case de flamme (le 0.93.3) ----
+// allume = 1 : on dessine la flamme ; allume = 0 : on l'efface.
+// debout = 1 : une flamme verticale, le | ; debout = 0 : horizontale, le -.
+void caseFeu(uint8_t c, uint8_t l, uint8_t allume, uint8_t debout) {
+  if (allume == 0) {
+    effacer(c, l, 1);                   // la flamme s'éteint : la case est vide
+  } else {
+    if (lire(c, l) == ALPHABET[22]) {   // un W sous la flamme ? (le 0.93.7)
+      toucheW(c, l);
+    }
+    if (c == ox && l == oy) {           // le O sous la flamme : perdu (le 0.93.8)
+      mort = 1;
+    }
+    if (debout == 1) {
+      texte(c, l, "|");
+    } else {
+      texte(c, l, "-");
+    }
+  }
+}
+
+// ---- Toute l'explosion (le 0.93.3) : des bras de DEUX cases (le 0.93.4) ----
+//
+//          |
+//          |            chaque bras : jusqu'à 2 cases,
+//      - - - - -        mais il s'arrête au premier X.
+//          |            break : on sort de la boucle, tout de suite.
+//          |
+void flammes(uint8_t allume) {
+  caseFeu(fx, fy, allume, 0);                     // le centre
+  for (uint8_t k = 1; k <= 2; k++) {              // à droite : fx + 1, puis fx + 2
+    if (lire(fx + k, fy) == ALPHABET[23] || lire(fx + k, fy) == ALPHABET[12]) break;  // un X ou un M (NOUVEAU) : le bras s'arrête
+    caseFeu(fx + k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // à gauche : fx - 1, puis fx - 2
+    if (lire(fx - k, fy) == ALPHABET[23] || lire(fx - k, fy) == ALPHABET[12]) break;
+    caseFeu(fx - k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en bas
+    if (lire(fx, fy + k) == ALPHABET[23] || lire(fx, fy + k) == ALPHABET[12]) break;
+    caseFeu(fx, fy + k, allume, 1);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en haut
+    if (lire(fx, fy - k) == ALPHABET[23] || lire(fx, fy - k) == ALPHABET[12]) break;
+    caseFeu(fx, fy - k, allume, 1);
+  }
+}
+
+// ---- vider l'écran, comme dans le serpent (le 0.93.8) ----
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+// ---- une partie qui commence, TOUT au départ (le 0.93.8) ----
+// C'était le début de main() ; c'est maintenant une fonction, pour pouvoir
+// la rappeler quand on rejoue.
+void nouvellePartie() {
+  ox = 1;                               // le O revient dans son coin
+  oy = 1;
+  bombe = 0;                            // pas de bombe
+  feu = 0;                              // pas de flammes
+  score = 0;
+  mort = 0;
+  ecran = 0;                            // on est sur le JEU
+  viderEcran();
+
+  // ---- Le terrain : le cadre et les piliers X (le 0.93) ----
+  for (uint8_t l = 0; l < 17; l++) {
+    for (uint8_t c = 0; c < 19; c++) {
+      if (l == 0 || l == 16 || c == 0 || c == 18) {   // le cadre
+        poser(c, l, ALPHABET[23]);
+      }
+      if (c % 2 == 0 && l % 2 == 0) {                 // les piliers : colonne ET ligne paires
+        poser(c, l, ALPHABET[23]);
+      }
+    }
+  }
+
+  // ---- NOUVEAU : les briques M, au hasard, dans les couloirs ----
+  // Une case est un couloir si sa colonne OU sa ligne est impaire
+  // (% 2 == 1) : ce n'est pas un pilier (le 0.93).
+  // c + l > 5 : le coin du départ reste libre. (1, 1), (2, 1), (3, 1),
+  //   (4, 1), (1, 2), (3, 2), (1, 3)… ont c + l <= 5 : jamais de brique.
+  //   Sans ça, le O pourrait être enfermé, et sa première bombe le tuerait.
+  // hasard() % 3 == 0 : le reste par 3 vaut 0, 1 ou 2 ; 0 une fois sur trois.
+  for (uint8_t l = 1; l < 16; l++) {
+    for (uint8_t c = 1; c < 18; c++) {
+      if ((c % 2 == 1 || l % 2 == 1) && c + l > 5 && hasard() % 3 == 0) {
+        poser(c, l, ALPHABET[12]);
+      }
+    }
+  }
+
+  poser(ox, oy, ALPHABET[14]);            // le O à sa place (le 0.93)
+
+  // les trois W, dans trois coins (le 0.93.6)
+  ex[0] = 17;                             // le n° 0 : en bas à droite
+  ey[0] = 15;
+  ex[1] = 17;                             // le n° 1 : en haut à droite
+  ey[1] = 1;
+  ex[2] = 1;                              // le n° 2 : en bas à gauche
+  ey[2] = 15;
+  for (uint8_t i = 0; i < 3; i++) {
+    vivant[i] = 1;                        // au départ, les trois sont vivants
+    poser(ex[i], ey[i], ALPHABET[22]);
+  }
+  texte(0, 17, "SCORE");                  // le score, sous le terrain (le 0.93.7)
+}
+
+// ---- la partie s'arrête : l'écran FIN (le 0.93.8) ----
+void finPartie() {
+  ecran = 1;                            // on est sur la FIN
+  viderEcran();
+  texte(8, 6, "FIN");
+  texte(5, 9, "SCORE");
+  nombre(11, 9, score);
+  texte(2, 13, "START : REJOUER");
+}
+
+int main() {
+  nouvellePartie();                     // la première partie (le 0.93.8)
+
+  while (true) {
+    image();
+
+    if (ecran == 0) {                   // le JEU (le 0.93.8)
+      // ---- le O bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+      if (chaque(150)) {
+        // 1. la case d'ARRIVÉE : on part de la case actuelle (le 0.82).
+        //    else if : une seule flèche à la fois, pas de pas en diagonale.
+        nx = ox;
+        ny = oy;
+        if (bouton(DROITE)) {
+          nx = ox + 1;
+        } else if (bouton(GAUCHE)) {
+          nx = ox - 1;
+        } else if (bouton(BAS)) {
+          ny = oy + 1;
+        } else if (bouton(HAUT)) {
+          ny = oy - 1;
+        }
+
+        // 2. une flèche est tenue (l'arrivée n'est pas la case où l'on est)…
+        if (nx != ox || ny != oy) {
+          // 3. l'arrivée est VIDE (le 0.93.2) : le O y va.
+          if (lire(nx, ny) == 0) {
+            effacer(ox, oy, 1);                 // le O quitte sa case…
+            if (bombe == 1 && ox == bx && oy == by) {
+              poser(bx, by, ALPHABET[1]);         // …mais s'il était sur la bombe, la B apparaît (le 0.93.2)
+            }
+            ox = nx;                            // …et va sur la case d'arrivée
+            oy = ny;
+            poser(ox, oy, ALPHABET[14]);
+          } else if (lire(nx, ny) != ALPHABET[23] && lire(nx, ny) != ALPHABET[1] && lire(nx, ny) != ALPHABET[12]) {
+            mort = 1;                         // ni vide, ni X, ni B, ni M (NOUVEAU) : un W ou une flamme ! (le 0.93.8)
+          }
+        }
+      }
+
+      // ---- A : poser une bombe, là où est le O (le 0.93.2) ----
+      // bombe == 0 : une seule bombe à la fois.
+      // feu == 0 : pas pendant les flammes (le 0.93.3).
+      if (bouton(A) && bombe == 0 && feu == 0) {
+        bombe = 1;
+        bx = ox;                              // la bombe est sous le O
+        by = oy;
+        bdelai = 0;                           // on commence à compter (le 0.93.3)
+      }
+
+      // ---- la bombe explose au bout de 2 secondes (le 0.93.3) ----
+      // image() revient 60 fois par seconde : 120 images, 2 secondes.
+      if (bombe == 1) {
+        bdelai = bdelai + 1;
+        if (bdelai == 120) {
+          bombe = 0;                          // plus de bombe…
+          fx = bx;                            // …elle explose, là où elle était
+          fy = by;
+          feu = 1;
+          fdelai = 0;
+          flammes(1);                         // on dessine les flammes
+        }
+      }
+
+      // ---- les flammes s'éteignent au bout d'une demi-seconde (30 images) (le 0.93.3) ----
+      if (feu == 1) {
+        fdelai = fdelai + 1;
+        if (fdelai == 30) {
+          feu = 0;
+          flammes(0);                         // on efface les MÊMES cases
+          poser(ox, oy, ALPHABET[14]);        // le O était peut-être dans une flamme : on le remet
+          for (uint8_t i = 0; i < 3; i++) {   // et les W encore vivants
+            if (vivant[i] == 1) {
+              poser(ex[i], ey[i], ALPHABET[22]);
+            }
+          }
+        }
+      }
+
+      // ---- les W se promènent au hasard (le 0.93.5) : les TROIS, un par un (le 0.93.6) ----
+      if (chaque(400)) {
+        for (uint8_t i = 0; i < 3; i++) {
+          if (vivant[i] == 1) {               // un W détruit ne bouge plus (le 0.93.7)
+            d = hasard() % 4;                     // sa direction, au hasard (le 0.93.5)
+            nx = ex[i];
+            ny = ey[i];
+            if (d == 0) nx = ex[i] + 1;
+            if (d == 1) ny = ey[i] + 1;
+            if (d == 2) nx = ex[i] - 1;
+            if (d == 3) ny = ey[i] - 1;
+            if (nx == ox && ny == oy) {
+              mort = 1;                           // le W arrive sur le O : perdu (le 0.93.8)
+            }
+            if (lire(nx, ny) == 0) {              // seulement sur une case VIDE
+              effacer(ex[i], ey[i], 1);
+              ex[i] = nx;
+              ey[i] = ny;
+              poser(ex[i], ey[i], ALPHABET[22]);
+            }
+          }
+        }
+      }
+
+      nombre(6, 17, score);                   // le score, à chaque image (le 0.93.7)
+
+      // ---- touché (par un W ou une flamme) : la partie s'arrête (le 0.93.8) ----
+      if (mort == 1) {
+        finPartie();
+      } else if (score == 3) {
+        // ---- les trois W détruits : GAGNÉ (le 0.93.9) ----
+        finPartie();                          // le même écran FIN, avec le score…
+        texte(6, 3, "BRAVO !");               // …et BRAVO au-dessus
+      }
+    }
+
+    // ---- sur la FIN, START : on rejoue (le 0.93.8) ----
+    if (ecran == 1 && bouton(START)) {
+      nouvellePartie();
+    }
+  }
+}
+`,
+    aVoir: 'Des briques M au hasard dans les couloirs ; le coin du départ est libre ; ni le O, ni les W, ni les flammes ne passent.',
+    controle: (c) => {
+      c.avancer(40)
+      let m = 0, mauvais = 0, coin = 0
+      for (let l = 0; l < 17; l++) {
+        for (let x = 0; x < 19; x++) {
+          if (c.mot(x, l, 1) !== 'M') continue
+          m++
+          if (x % 2 === 0 && l % 2 === 0) mauvais++
+          if (x + l <= 5) coin++
+        }
+      }
+      const ox = c.variable('ox')
+      c.presser('right', 200)
+      const devant = c.mot(c.variable('ox') + 1, 1, 1)
+      return [
+        ['des briques M dans le terrain', m > 10, ` (${m} M)`],
+        ['jamais sur un pilier ni dans le coin du départ', mauvais === 0 && coin === 0],
+        ['à droite, le O s’arrête devant un M ou un X, sans perdre', c.variable('ecran') === 0 && (devant === 'M' || devant === 'X'), ` (devant lui : « ${devant} »)`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un jeu de bombes, avec des briques — la flamme casse les briques',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.94, et une flamme qui atteint une brique M la casse : le bras s’arrête sur elle, et quand les flammes s’éteignent, la brique disparaît avec elles.',
+    texte: [
+      '**C’est le 0.94, avec une chose en plus : casser les briques.** Une bombe posée près d’un M le détruit. On peut maintenant **se creuser un chemin**, et aller chercher les W enfermés.',
+      '**La brique arrête le bras, puis brûle.** Comme dans le vrai Bomberman : la flamme **ne passe pas** au-delà de la brique (ce qu’il y a derrière est protégé), mais la brique, elle, est détruite.',
+      '**Ce qui est nouveau ici : la brique disparaît QUAND les flammes s’éteignent.** Dans chaque bras de `flammes`, on regarde d’abord le X (`break`, comme avant). Puis : `if (lire(…) == ALPHABET[12])` : une brique. Si `allume == 0` (les flammes s’éteignent), on l’efface. Et dans les deux cas, `break` : le bras s’arrête là.',
+      '**Pourquoi pas tout de suite, pendant l’explosion ?** Parce que `flammes(0)` doit effacer **exactement** les cases que `flammes(1)` a dessinées (le 0.93.3). Si la brique disparaissait à l’explosion, `flammes(0)` ne la trouverait plus : le bras ne s’arrêterait plus au même endroit, et il effacerait la case d’après… peut-être un W, ou une autre brique ! En laissant la brique jusqu’à la fin, les deux passages s’arrêtent **sur la même case**.',
+      '**Déroulons : une bombe en (3, 1), un M en (5, 1).** `flammes(1)`, à droite : `k` = 1, (4, 1) est vide, flamme. `k` = 2, (5, 1) est un M : `allume` vaut 1, on ne l’efface pas ; `break`. Pendant une demi-seconde, on voit `- - M`. Puis `flammes(0)`, à droite : (4, 1) est effacée ; (5, 1) est toujours un M : `allume` vaut 0, on l’**efface** ; `break`. Il ne reste rien.',
+      '**Une brique à la fois par bras :** le bras s’arrête sur la première. Deux briques l’une derrière l’autre demandent deux bombes.',
+      '**Le reste du jeu ne change pas :** trois W à détruire, attention aux flammes et aux W, BRAVO ! quand les trois sont détruits.',
+    ],
+    code: `// ---- UN JEU DE BOMBES ----
+// Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi,
+// M = une brique (le 0.94).
+// ALPHABET[23] : le X    ALPHABET[14] : le O
+// ALPHABET[1]  : le B    ALPHABET[22] : le W
+// ALPHABET[12] : le M
+
+uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
+uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
+uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
+uint8_t ny = 0;
+uint8_t bombe = 0;        // 1 : une bombe est posée ; 0 : pas de bombe (le 0.93.2)
+uint8_t bx = 0;           // la place de la bombe : sa colonne…
+uint8_t by = 0;           // …et sa ligne
+uint8_t bdelai = 0;       // les images passées depuis la pose de la bombe (le 0.93.3)
+uint8_t feu = 0;          // 1 : les flammes sont à l'écran ; 0 : non
+uint8_t fdelai = 0;       // les images passées depuis l'explosion
+uint8_t fx = 0;           // le centre de l'explosion : sa colonne…
+uint8_t fy = 0;           // …et sa ligne
+uint8_t ex[3];            // les TROIS W : leurs colonnes… (le 0.93.6)
+uint8_t ey[3];            // …et leurs lignes. Le W n° i est en (ex[i], ey[i]).
+uint8_t d = 0;            // la direction tirée au hasard, 0 à 3 (le 0.93.5)
+uint8_t vivant[3];        // vivant[i] : 1 si le W n° i est là, 0 s'il est détruit (le 0.93.7)
+uint8_t score = 0;        // les W détruits
+uint8_t ecran = 0;        // 0 = le JEU, 1 = la FIN (le 0.93.8)
+uint8_t mort = 0;         // 1 : le O vient d'être touché
+
+// ---- une flamme sur la case (c, l) : y a-t-il un W ? (le 0.93.7) ----
+// On cherche le W n° i qui est vivant ET sur cette case. S'il y en a un,
+// il est détruit (vivant[i] = 0) et le score gagne 1.
+void toucheW(uint8_t c, uint8_t l) {
+  for (uint8_t i = 0; i < 3; i++) {
+    if (vivant[i] == 1 && ex[i] == c && ey[i] == l) {
+      vivant[i] = 0;
+      score = score + 1;
+    }
+  }
+}
+
+// ---- UNE case de flamme (le 0.93.3) ----
+// allume = 1 : on dessine la flamme ; allume = 0 : on l'efface.
+// debout = 1 : une flamme verticale, le | ; debout = 0 : horizontale, le -.
+void caseFeu(uint8_t c, uint8_t l, uint8_t allume, uint8_t debout) {
+  if (allume == 0) {
+    effacer(c, l, 1);                   // la flamme s'éteint : la case est vide
+  } else {
+    if (lire(c, l) == ALPHABET[22]) {   // un W sous la flamme ? (le 0.93.7)
+      toucheW(c, l);
+    }
+    if (c == ox && l == oy) {           // le O sous la flamme : perdu (le 0.93.8)
+      mort = 1;
+    }
+    if (debout == 1) {
+      texte(c, l, "|");
+    } else {
+      texte(c, l, "-");
+    }
+  }
+}
+
+// ---- Toute l'explosion (le 0.93.3) : des bras de DEUX cases (le 0.93.4) ----
+//
+//          |
+//          |            chaque bras : jusqu'à 2 cases,
+//      - - - - -        mais il s'arrête au premier X.
+//          |            break : on sort de la boucle, tout de suite.
+//          |
+// NOUVEAU : un M arrête aussi le bras, mais il BRÛLE. Pendant les flammes,
+// il reste là (le bras s'arrête devant) ; quand elles s'éteignent
+// (allume == 0), on l'efface avec elles. Ainsi, flammes(1) et flammes(0)
+// s'arrêtent toujours sur la même case : le M est encore là pour les deux.
+void flammes(uint8_t allume) {
+  caseFeu(fx, fy, allume, 0);                     // le centre
+  for (uint8_t k = 1; k <= 2; k++) {              // à droite : fx + 1, puis fx + 2
+    if (lire(fx + k, fy) == ALPHABET[23]) break;
+    if (lire(fx + k, fy) == ALPHABET[12]) {           // NOUVEAU : une brique
+      if (allume == 0) {                              // les flammes s'éteignent :
+        effacer(fx + k, fy, 1);                   // la brique disparaît avec elles
+      }
+      break;                                        // et le bras s'arrête là
+    }
+    caseFeu(fx + k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // à gauche : fx - 1, puis fx - 2
+    if (lire(fx - k, fy) == ALPHABET[23]) break;
+    if (lire(fx - k, fy) == ALPHABET[12]) {
+      if (allume == 0) {
+        effacer(fx - k, fy, 1);
+      }
+      break;
+    }
+    caseFeu(fx - k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en bas
+    if (lire(fx, fy + k) == ALPHABET[23]) break;
+    if (lire(fx, fy + k) == ALPHABET[12]) {
+      if (allume == 0) {
+        effacer(fx, fy + k, 1);
+      }
+      break;
+    }
+    caseFeu(fx, fy + k, allume, 1);
+  }
+  for (uint8_t k = 1; k <= 2; k++) {              // en haut
+    if (lire(fx, fy - k) == ALPHABET[23]) break;
+    if (lire(fx, fy - k) == ALPHABET[12]) {
+      if (allume == 0) {
+        effacer(fx, fy - k, 1);
+      }
+      break;
+    }
+    caseFeu(fx, fy - k, allume, 1);
+  }
+}
+
+// ---- vider l'écran, comme dans le serpent (le 0.93.8) ----
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+// ---- une partie qui commence, TOUT au départ (le 0.93.8) ----
+// C'était le début de main() ; c'est maintenant une fonction, pour pouvoir
+// la rappeler quand on rejoue.
+void nouvellePartie() {
+  ox = 1;                               // le O revient dans son coin
+  oy = 1;
+  bombe = 0;                            // pas de bombe
+  feu = 0;                              // pas de flammes
+  score = 0;
+  mort = 0;
+  ecran = 0;                            // on est sur le JEU
+  viderEcran();
+
+  // ---- Le terrain : le cadre et les piliers X (le 0.93) ----
+  for (uint8_t l = 0; l < 17; l++) {
+    for (uint8_t c = 0; c < 19; c++) {
+      if (l == 0 || l == 16 || c == 0 || c == 18) {   // le cadre
+        poser(c, l, ALPHABET[23]);
+      }
+      if (c % 2 == 0 && l % 2 == 0) {                 // les piliers : colonne ET ligne paires
+        poser(c, l, ALPHABET[23]);
+      }
+    }
+  }
+
+  // ---- Les briques M, au hasard, dans les couloirs (le 0.94) ----
+  // Une case est un couloir si sa colonne OU sa ligne est impaire
+  // (% 2 == 1) : ce n'est pas un pilier (le 0.93).
+  // c + l > 5 : le coin du départ reste libre. (1, 1), (2, 1), (3, 1),
+  //   (4, 1), (1, 2), (3, 2), (1, 3)… ont c + l <= 5 : jamais de brique.
+  //   Sans ça, le O pourrait être enfermé, et sa première bombe le tuerait.
+  // hasard() % 3 == 0 : le reste par 3 vaut 0, 1 ou 2 ; 0 une fois sur trois.
+  for (uint8_t l = 1; l < 16; l++) {
+    for (uint8_t c = 1; c < 18; c++) {
+      if ((c % 2 == 1 || l % 2 == 1) && c + l > 5 && hasard() % 3 == 0) {
+        poser(c, l, ALPHABET[12]);
+      }
+    }
+  }
+
+  poser(ox, oy, ALPHABET[14]);            // le O à sa place (le 0.93)
+
+  // les trois W, dans trois coins (le 0.93.6)
+  ex[0] = 17;                             // le n° 0 : en bas à droite
+  ey[0] = 15;
+  ex[1] = 17;                             // le n° 1 : en haut à droite
+  ey[1] = 1;
+  ex[2] = 1;                              // le n° 2 : en bas à gauche
+  ey[2] = 15;
+  for (uint8_t i = 0; i < 3; i++) {
+    vivant[i] = 1;                        // au départ, les trois sont vivants
+    poser(ex[i], ey[i], ALPHABET[22]);
+  }
+  texte(0, 17, "SCORE");                  // le score, sous le terrain (le 0.93.7)
+}
+
+// ---- la partie s'arrête : l'écran FIN (le 0.93.8) ----
+void finPartie() {
+  ecran = 1;                            // on est sur la FIN
+  viderEcran();
+  texte(8, 6, "FIN");
+  texte(5, 9, "SCORE");
+  nombre(11, 9, score);
+  texte(2, 13, "START : REJOUER");
+}
+
+int main() {
+  nouvellePartie();                     // la première partie (le 0.93.8)
+
+  while (true) {
+    image();
+
+    if (ecran == 0) {                   // le JEU (le 0.93.8)
+      // ---- le O bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+      if (chaque(150)) {
+        // 1. la case d'ARRIVÉE : on part de la case actuelle (le 0.82).
+        //    else if : une seule flèche à la fois, pas de pas en diagonale.
+        nx = ox;
+        ny = oy;
+        if (bouton(DROITE)) {
+          nx = ox + 1;
+        } else if (bouton(GAUCHE)) {
+          nx = ox - 1;
+        } else if (bouton(BAS)) {
+          ny = oy + 1;
+        } else if (bouton(HAUT)) {
+          ny = oy - 1;
+        }
+
+        // 2. une flèche est tenue (l'arrivée n'est pas la case où l'on est)…
+        if (nx != ox || ny != oy) {
+          // 3. l'arrivée est VIDE (le 0.93.2) : le O y va.
+          if (lire(nx, ny) == 0) {
+            effacer(ox, oy, 1);                 // le O quitte sa case…
+            if (bombe == 1 && ox == bx && oy == by) {
+              poser(bx, by, ALPHABET[1]);         // …mais s'il était sur la bombe, la B apparaît (le 0.93.2)
+            }
+            ox = nx;                            // …et va sur la case d'arrivée
+            oy = ny;
+            poser(ox, oy, ALPHABET[14]);
+          } else if (lire(nx, ny) != ALPHABET[23] && lire(nx, ny) != ALPHABET[1] && lire(nx, ny) != ALPHABET[12]) {
+            mort = 1;                         // ni vide, ni X, ni B, ni M (le 0.94) : un W ou une flamme ! (le 0.93.8)
+          }
+        }
+      }
+
+      // ---- A : poser une bombe, là où est le O (le 0.93.2) ----
+      // bombe == 0 : une seule bombe à la fois.
+      // feu == 0 : pas pendant les flammes (le 0.93.3).
+      if (bouton(A) && bombe == 0 && feu == 0) {
+        bombe = 1;
+        bx = ox;                              // la bombe est sous le O
+        by = oy;
+        bdelai = 0;                           // on commence à compter (le 0.93.3)
+      }
+
+      // ---- la bombe explose au bout de 2 secondes (le 0.93.3) ----
+      // image() revient 60 fois par seconde : 120 images, 2 secondes.
+      if (bombe == 1) {
+        bdelai = bdelai + 1;
+        if (bdelai == 120) {
+          bombe = 0;                          // plus de bombe…
+          fx = bx;                            // …elle explose, là où elle était
+          fy = by;
+          feu = 1;
+          fdelai = 0;
+          flammes(1);                         // on dessine les flammes
+        }
+      }
+
+      // ---- les flammes s'éteignent au bout d'une demi-seconde (30 images) (le 0.93.3) ----
+      if (feu == 1) {
+        fdelai = fdelai + 1;
+        if (fdelai == 30) {
+          feu = 0;
+          flammes(0);                         // on efface les MÊMES cases
+          poser(ox, oy, ALPHABET[14]);        // le O était peut-être dans une flamme : on le remet
+          for (uint8_t i = 0; i < 3; i++) {   // et les W encore vivants
+            if (vivant[i] == 1) {
+              poser(ex[i], ey[i], ALPHABET[22]);
+            }
+          }
+        }
+      }
+
+      // ---- les W se promènent au hasard (le 0.93.5) : les TROIS, un par un (le 0.93.6) ----
+      if (chaque(400)) {
+        for (uint8_t i = 0; i < 3; i++) {
+          if (vivant[i] == 1) {               // un W détruit ne bouge plus (le 0.93.7)
+            d = hasard() % 4;                     // sa direction, au hasard (le 0.93.5)
+            nx = ex[i];
+            ny = ey[i];
+            if (d == 0) nx = ex[i] + 1;
+            if (d == 1) ny = ey[i] + 1;
+            if (d == 2) nx = ex[i] - 1;
+            if (d == 3) ny = ey[i] - 1;
+            if (nx == ox && ny == oy) {
+              mort = 1;                           // le W arrive sur le O : perdu (le 0.93.8)
+            }
+            if (lire(nx, ny) == 0) {              // seulement sur une case VIDE
+              effacer(ex[i], ey[i], 1);
+              ex[i] = nx;
+              ey[i] = ny;
+              poser(ex[i], ey[i], ALPHABET[22]);
+            }
+          }
+        }
+      }
+
+      nombre(6, 17, score);                   // le score, à chaque image (le 0.93.7)
+
+      // ---- touché (par un W ou une flamme) : la partie s'arrête (le 0.93.8) ----
+      if (mort == 1) {
+        finPartie();
+      } else if (score == 3) {
+        // ---- les trois W détruits : GAGNÉ (le 0.93.9) ----
+        finPartie();                          // le même écran FIN, avec le score…
+        texte(6, 3, "BRAVO !");               // …et BRAVO au-dessus
+      }
+    }
+
+    // ---- sur la FIN, START : on rejoue (le 0.93.8) ----
+    if (ecran == 1 && bouton(START)) {
+      nouvellePartie();
+    }
+  }
+}
+`,
+    aVoir: 'Une bombe près d’un M : la flamme s’arrête dessus, puis la brique disparaît avec les flammes.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(1) }
+      const lesM = () => { let m = 0; for (let l = 0; l < 17; l++) m += [...c.mot(0, l, 20)].filter((ch) => ch === 'M').length; return m }
+      c.avancer(40)                     // le terrain du démarrage a un M en (6, 1)
+      const v = (n) => c.variable(n)
+      const avant = lesM()
+      const brique = c.mot(6, 1, 1) === 'M'
+      tenir('right', () => v('ox') === 4)
+      c.presser('a', 3)                 // la bombe en (4, 1)
+      tenir('left', () => v('ox') === 3, 60)
+      tenir('down', () => v('oy') === 2, 60)   // à l'abri en (3, 2)
+      tenir('b', () => v('feu') === 1, 200)
+      c.avancer(2)
+      const pendant = c.mot(3, 1, 4) === '---M'
+      tenir('b', () => v('feu') === 0, 100)
+      c.avancer(2)
+      return [
+        ['un M en (6, 1), à 2 cases de la bombe posée en (4, 1)', brique],
+        ['pendant les flammes, le bras s’arrête sur le M : - - - M', pendant],
+        ['les flammes éteintes, le M a disparu', c.mot(6, 1, 1) === ' ' && lesM() === avant - 1, ` (${avant} M, puis ${lesM()})`],
+        ['le O, à l’abri en (3, 2), n’a rien', v('ecran') === 0 && c.mot(3, 2, 1) === 'O'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un micro Zelda — des salles, des murs, deux portes',
+    difficulte: 0,
+    partie: 'Un micro Zelda',
+    idee: 'Un autre jeu : le A se promène dans un monde de quatre salles. Il passe d’un écran à l’autre par les ouvertures du cadre ; les murs X l’arrêtent ; deux portes P l’envoient d’une salle à l’autre.',
+    texte: [
+      '**Un nouveau jeu, façon Zelda.** Le héros, c’est le **A**. Le monde est plus grand que l’écran : **quatre salles**, deux de large et deux de haut. L’écran n’en montre qu’une à la fois. Quand le A sort par un bord, la salle d’à côté **remplace** celle-ci, et le A y entre par le bord opposé.',
+      '**Ce qui vient d’avant :** le pas toutes les 150 ms avec `chaque(150)`, la case d’arrivée `nx`, `ny` calculée avant de bouger (le 0.82), `lire()` pour savoir ce qu’il y a sur une case, « seulement sur une case vide » (`lire(nx, ny) == 0`, le 0.93.2), et `viderEcran()` (le 0.93.8).',
+      '**Ce qui est nouveau ici (1) : où est-on dans le monde ?** Deux variables : `sx`, la colonne de la salle (0 à gauche, 1 à droite), et `sy`, sa ligne (0 en haut, 1 en bas). Le numéro de la salle se calcule : `salle = sx + sy + sy`. Salle en haut à gauche : 0 + 0 + 0 = **0**. En haut à droite : 1 + 0 + 0 = **1**. En bas à gauche : 0 + 1 + 1 = **2**. En bas à droite : 1 + 1 + 1 = **3**. `ax` et `ay`, eux, disent où est le A **dans** la salle : colonne 0 à 19, ligne 0 à 16.',
+      '**Ce qui est nouveau ici (2) : deux fonctions pour les murs.** `mur(c, l, n)` pose **n** X à la suite vers la droite : `mur(4, 4, 12)` pose des X de (4, 4) à (15, 4). `murDebout(c, l, n)` fait pareil vers le bas : `murDebout(6, 3, 11)` pose des X de (6, 3) à (6, 13). Dans la boucle `for`, `i` vaut 0, 1, 2… jusqu’à n - 1, et chaque tour pose un X en `c + i` (ou en `l + i`).',
+      '**Ce qui est nouveau ici (3) : dessiner la salle.** `dessinerSalle()` vide l’écran, puis : 1. le cadre en entier (lignes 0 et 16, colonnes 0 et 19) ; 2. **les ouvertures** : on efface le cadre là où une salle voisine existe. `sx == 0` : il y a une salle à droite, on ouvre les lignes 7, 8, 9 de la colonne 19. `sy == 0` : une salle en bas, on ouvre les colonnes 9 et 10 de la ligne 16. Et pareil à gauche et en haut. Une salle au bord du monde reste fermée de ce côté : le A ne peut pas sortir du monde. 3. les murs **propres à chaque salle**, avec des `if (salle == …)`, et les deux portes ; 4. le numéro de la salle, sous le cadre.',
+      '**Ce qui est nouveau ici (4) : sortir de l’écran.** L’écran a les colonnes 0 à 19, et le terrain les lignes 0 à 16. Si l’arrivée est la colonne **20**, le A sort à droite : `sx = sx + 1`, et il entre dans la nouvelle salle en colonne **0**. Si l’arrivée est la ligne **17**, il sort en bas : `sy = sy + 1`, et il entre en ligne **0**.',
+      '**Et à gauche ? Pourquoi 255 ?** Un `uint8_t` va de 0 à 255, jamais en dessous. Quand `ax` vaut 0, `ax - 1` ne donne pas -1 : le nombre **fait le tour** et donne **255**, comme un compteur qui repart de la fin. Donc `nx == 255`, c’est « sorti à gauche » : `sx = sx - 1`, et il entre en colonne **19**. De même, `ny == 255`, c’est « sorti en haut » : il entre en ligne **16**. Ensuite, dans tous les cas : `dessinerSalle()`, et le A posé à sa nouvelle place.',
+      '**Ce qui est nouveau ici (5) : les deux portes.** Une porte **P** dans la salle 0, en (3, 12), et une dans la salle 3, en (15, 4). Marcher sur un P, c’est `lire(nx, ny) == ALPHABET[15]`. Si l’on est dans la salle 0, on part dans la salle 3 (`sx = 1`, `sy = 1`) ; sinon, on revient dans la salle 0. C’est un **raccourci** : à pied, il faut passer par la salle 1 ou la salle 2.',
+      '**Pourquoi arriver À CÔTÉ de la porte, et pas dessus ?** Sur le P, le A le cacherait : on ne verrait plus la porte. En (14, 4), juste à gauche du P en (15, 4), on la voit, et c’est au joueur de décider d’y retourner (DROITE).',
+      '**L’ordre des tests compte.** Dans la boucle : d’abord « hors de l’écran ? », car `lire(20, 8)` n’a pas de sens : la case n’existe pas. Puis « une porte ? ». Puis « une case vide ? ». Un X n’est dans aucun de ces cas : **il ne se passe rien**, le A reste où il est. C’est tout ce qu’il faut pour les murs.',
+      '**Déroulons.** Le A part de (9, 8), salle 0. DROITE : (10, 8), (11, 8)… jusqu’à (19, 8), l’ouverture du cadre. Encore DROITE : l’arrivée est (20, 8), hors de l’écran. `sx` passe à 1, `nx` à 0 : on est dans la **salle 1**, en (0, 8), et l’écran la montre. GAUCHE : l’arrivée est 0 - 1 = **255** : `sx` redevient 0, `nx` devient 19 : retour dans la salle 0, en (19, 8). Puis GAUCHE jusqu’en (4, 12), et encore GAUCHE : (3, 12) est la porte. On arrive dans la **salle 3**, en (14, 4). DROITE : (15, 4) est l’autre porte : retour dans la salle 0, en (4, 12).',
+      '**Essaie :** ajoute un mur dans la salle 2 avec `mur()` ou `murDebout()`, ou déplace une porte (change aussi la place d’arrivée, à côté d’elle).',
+    ],
+    code: `// ---- UN MICRO ZELDA ----
+// Tout ce qui suit « // » sur une ligne est un COMMENTAIRE : la console
+// ne le lit pas. Il n'est là que pour toi, pour expliquer le code.
+//
+// Les lettres : A = le héros, X = un mur, P = une porte.
+// ALPHABET[0]  : le A    ALPHABET[23] : le X    ALPHABET[15] : le P
+// ALPHABET[n] : la n-ième lettre, en comptant à partir de 0 (pas de 1) :
+//   A = 0, B = 1, C = 2, D = 3… O = 14, P = 15… W = 22, X = 23.
+//
+// Le monde : QUATRE salles, deux de large, deux de haut.
+// L'écran n'en montre qu'une à la fois, comme dans Zelda.
+//
+//      sx = 0      sx = 1
+//   +---------+---------+
+//   | salle 0 | salle 1 |   sy = 0
+//   +---------+---------+
+//   | salle 2 | salle 3 |   sy = 1
+//   +---------+---------+
+//
+// sx : la colonne de la salle dans le monde (0 = à gauche, 1 = à droite).
+// sy : la ligne de la salle dans le monde   (0 = en haut,  1 = en bas).
+// Le numéro de la salle se calcule :
+//   salle = sx + sy + sy
+//   en haut à gauche : 0 + 0 + 0 = 0
+//   en haut à droite : 1 + 0 + 0 = 1
+//   en bas à gauche  : 0 + 1 + 1 = 2
+//   en bas à droite  : 1 + 1 + 1 = 3
+//
+// Dans UNE salle, les cases vont :
+//   colonne 0 (à gauche) à 19 (à droite) : 20 colonnes, toute la largeur de l'écran ;
+//   ligne   0 (en haut)  à 16 (en bas)   : 17 lignes pour le terrain.
+//   La ligne 17, tout en bas de l'écran, sert à écrire le numéro de la salle.
+// Une case s'écrit (colonne, ligne) : (9, 8), c'est la colonne 9, la ligne 8.
+
+// ---- Les variables ----
+// Une variable, c'est une boîte qui garde un nombre, et qu'on peut changer.
+// uint8_t : le genre de la boîte. Elle garde un nombre de 0 à 255,
+//   jamais en dessous de 0, jamais au-dessus de 255.
+// « = 9 » : le nombre qu'elle a au départ.
+// Elles sont écrites ICI, hors de toute fonction : tout le programme les voit.
+uint8_t ax = 9;           // le A, le héros : sa colonne…
+uint8_t ay = 8;           // …et sa ligne, DANS la salle où il est. Il part de (9, 8).
+uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82) :
+uint8_t ny = 0;           // on regarde ce qu'il y a dessus, PUIS on décide de bouger ou non.
+uint8_t sx = 0;           // la salle : sa colonne dans le monde (0 ou 1)…
+uint8_t sy = 0;           // …et sa ligne (0 ou 1). On part de la salle 0, en haut à gauche.
+uint8_t salle = 0;        // son numéro, 0 à 3, calculé dans dessinerSalle()
+
+// ---- n murs X à la suite, vers la DROITE, à partir de (c, l) ----
+// void : la fonction fait quelque chose, mais ne rend pas de nombre.
+// (uint8_t c, uint8_t l, uint8_t n) : ce qu'on lui donne en l'appelant.
+//   c : la colonne du premier X, l : sa ligne, n : combien de X.
+// Exemple : mur(4, 4, 3) pose un X en (4, 4), (5, 4) et (6, 4).
+void mur(uint8_t c, uint8_t l, uint8_t n) {
+  // for (départ ; tant que… ; après chaque tour) :
+  //   uint8_t i = 0 : i commence à 0 ;
+  //   i < n         : on continue tant que i est plus petit que n ;
+  //   i++           : après chaque tour, i gagne 1.
+  // Avec n = 3 : i vaut 0, puis 1, puis 2. À 3, « 3 < 3 » est faux : on s'arrête.
+  // La boucle fait donc n tours : n X.
+  for (uint8_t i = 0; i < n; i++) {
+    poser(c + i, l, ALPHABET[23]);      // un X, i cases à droite du départ ; la ligne ne change pas
+    // mur(4, 4, 3) : i = 0 → (4, 4) ; i = 1 → (5, 4) ; i = 2 → (6, 4)
+  }
+}
+
+// ---- n murs X à la suite, vers le BAS, à partir de (c, l) ----
+// Exemple : murDebout(6, 3, 3) pose un X en (6, 3), (6, 4) et (6, 5).
+void murDebout(uint8_t c, uint8_t l, uint8_t n) {
+  for (uint8_t i = 0; i < n; i++) {     // la même boucle que dans mur()…
+    poser(c, l + i, ALPHABET[23]);      // …mais c'est la LIGNE qui avance, pas la colonne
+    // murDebout(6, 3, 3) : i = 0 → (6, 3) ; i = 1 → (6, 4) ; i = 2 → (6, 5)
+  }
+}
+
+// ---- vider l'écran, comme dans le serpent (le 0.93.8) ----
+// Les 18 lignes de l'écran (0 à 17) : chacune est effacée sur ses 20 cases.
+void viderEcran() {
+  for (uint8_t l = 0; l < 18; l++) {    // l vaut 0, 1, 2… jusqu'à 17
+    effacer(0, l, 20);                  // effacer(colonne, ligne, combien de cases) :
+                                        // 20 cases à partir de la colonne 0 : toute la ligne
+  }
+}
+
+// ---- dessiner la salle (sx, sy) : tout l'écran ----
+// On l'appelle au départ, et chaque fois que le A change de salle :
+// l'ancienne salle disparaît, la nouvelle est dessinée à sa place.
+// Elle ne dessine PAS le A : c'est fait après l'appel, là où on l'appelle.
+void dessinerSalle() {
+  viderEcran();                         // on part d'un écran vide
+  salle = sx + sy + sy;                 // le numéro de la salle (voir le dessin, tout en haut)
+
+  // 1. le cadre, en entier : les lignes 0 et 16, les colonnes 0 et 19
+  mur(0, 0, 20);                        // en haut : 20 X, de (0, 0) à (19, 0)
+  mur(0, 16, 20);                       // en bas : 20 X, de (0, 16) à (19, 16)
+  murDebout(0, 0, 17);                  // à gauche : 17 X, de (0, 0) à (0, 16)
+  murDebout(19, 0, 17);                 // à droite : 17 X, de (19, 0) à (19, 16)
+  // Les coins, comme (0, 0), reçoivent deux X : l'un sur l'autre, on n'en voit qu'un.
+
+  // 2. les OUVERTURES : on efface le cadre du côté où il y a une salle voisine.
+  //    Du côté où il n'y en a pas, le cadre reste : on ne sort pas du monde.
+  //    « == » compare deux nombres (est-ce égal ?) ;
+  //    « = » tout seul, lui, range un nombre dans une variable.
+  if (sx == 0) {                // on est à gauche du monde : il y a une salle À DROITE
+    effacer(19, 7, 1);          // 3 cases ouvertes dans la colonne 19 :
+    effacer(19, 8, 1);          // les lignes 7, 8 et 9
+    effacer(19, 9, 1);          // (une case à la fois : effacer() va vers la droite, pas vers le bas)
+  }
+  if (sx == 1) {                // on est à droite du monde : il y a une salle À GAUCHE
+    effacer(0, 7, 1);           // les mêmes lignes, dans la colonne 0 :
+    effacer(0, 8, 1);           // les deux ouvertures sont en face l'une de l'autre,
+    effacer(0, 9, 1);           // le A sort par l'une et entre par l'autre
+  }
+  if (sy == 0) {                // on est en haut du monde : il y a une salle EN BAS
+    effacer(9, 16, 2);          // 2 cases ouvertes dans la ligne 16 : les colonnes 9 et 10
+  }
+  if (sy == 1) {                // on est en bas du monde : il y a une salle EN HAUT
+    effacer(9, 0, 2);           // les mêmes colonnes, dans la ligne 0
+  }
+  // Exemple : la salle 0 (sx = 0, sy = 0) est ouverte à droite et en bas ;
+  // la salle 3 (sx = 1, sy = 1) est ouverte à gauche et en haut.
+
+  // 3. les murs DANS la salle : chaque salle a les siens.
+  //    Un seul de ces quatre « if » est vrai : celui de la salle où l'on est.
+  if (salle == 0) {
+    mur(4, 4, 12);              // une barre en haut : 12 X, de (4, 4) à (15, 4)
+    poser(3, 12, ALPHABET[15]); // la PORTE de la salle 0, un P en (3, 12)
+  }
+  if (salle == 1) {
+    murDebout(6, 3, 11);        // une colonne de (6, 3) à (6, 13) : on passe en haut ou en bas…
+    murDebout(13, 1, 11);       // …une autre de (13, 1) à (13, 11) : on passe en bas seulement
+  }
+  if (salle == 2) {
+    mur(3, 5, 6);               // une barre de (3, 5) à (8, 5)…
+    mur(11, 11, 6);             // …et une autre de (11, 11) à (16, 11)
+  }
+  if (salle == 3) {
+    mur(3, 8, 12);              // une barre au milieu : de (3, 8) à (14, 8)
+    poser(15, 4, ALPHABET[15]); // la PORTE de la salle 3, un P en (15, 4)
+  }
+
+  // 4. sous le cadre, sur la ligne 17 : le numéro de la salle
+  texte(0, 17, "SALLE");                // le mot, à partir de la case (0, 17)
+  nombre(6, 17, salle);                 // le nombre, à partir de la case (6, 17)
+}
+
+// ---- main() : c'est ICI que la console commence ----
+int main() {
+  // ---- Le départ ----
+  dessinerSalle();                        // la salle 0 (sx = 0, sy = 0)
+  poser(ax, ay, ALPHABET[0]);             // le A à sa place, en (9, 8)
+
+  // while (true) : « tant que vrai » : la boucle ne s'arrête jamais.
+  // Tout ce qui est entre ses accolades { } recommence, encore et encore.
+  while (true) {
+    image();                              // on attend l'image suivante : 60 par seconde
+
+    // ---- le A bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+    // chaque(150) est vrai une fois toutes les 150 millisecondes,
+    // faux le reste du temps : le A fait environ 6 pas par seconde.
+    if (chaque(150)) {
+      // 1. la case d'ARRIVÉE (le 0.82). On part de la case où l'on est…
+      nx = ax;
+      ny = ay;
+      // …et une flèche la change d'une case.
+      // bouton(DROITE) est vrai tant que la flèche droite est tenue.
+      // else if : « sinon, si… ». Dès qu'une flèche est trouvée, on ne
+      // regarde pas les autres : une seule à la fois, pas de pas en diagonale.
+      if (bouton(DROITE)) {
+        nx = ax + 1;                      // une colonne à droite
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;                      // une colonne à gauche (et 0 - 1 donne 255 !)
+      } else if (bouton(BAS)) {
+        ny = ay + 1;                      // une ligne plus bas
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;                      // une ligne plus haut (et 0 - 1 donne 255 !)
+      }
+      // Pourquoi 255 ? Un uint8_t ne descend jamais sous 0 : 0 - 1 « fait
+      // le tour » et donne 255, comme un compteur qui repart de la fin.
+
+      // 2. une flèche est tenue : l'arrivée n'est pas la case où l'on est.
+      //    « != » veut dire « différent de ». Sans flèche, nx == ax et
+      //    ny == ay : rien à faire, on saute tout ce bloc.
+      if (nx != ax || ny != ay) {
+        // « || » veut dire « ou » : il suffit d'UNE des quatre conditions.
+        if (nx == 20 || nx == 255 || ny == 17 || ny == 255) {
+          // 3. …et l'arrivée est HORS de la salle : on change de SALLE.
+          //    Ce test vient EN PREMIER : lire(20, 8) n'aurait pas de sens,
+          //    la case (20, 8) n'existe pas.
+          //    On ne peut sortir que par une ouverture : ailleurs, le cadre
+          //    X est sur le chemin, et le A s'arrête avant (le cas 6).
+          if (nx == 20) {       // sorti à droite (19 + 1 = 20) :
+            sx = sx + 1;        //   la salle de droite (sx : 0 → 1)…
+            nx = 0;             //   …où l'on entre par la gauche, en colonne 0
+          }
+          if (nx == 255) {      // sorti à gauche (0 - 1 = 255) :
+            sx = sx - 1;        //   la salle de gauche (sx : 1 → 0)…
+            nx = 19;            //   …où l'on entre par la droite, en colonne 19
+          }
+          if (ny == 17) {       // sorti en bas (16 + 1 = 17) :
+            sy = sy + 1;        //   la salle d'en bas (sy : 0 → 1)…
+            ny = 0;             //   …où l'on entre par le haut, en ligne 0
+          }
+          if (ny == 255) {      // sorti en haut (0 - 1 = 255) :
+            sy = sy - 1;        //   la salle d'en haut (sy : 1 → 0)…
+            ny = 16;            //   …où l'on entre par le bas, en ligne 16
+          }
+          // La ligne (ou la colonne) qui ne change pas reste la même :
+          // sorti à droite en ligne 8, on entre à gauche… en ligne 8.
+          ax = nx;                          // le A prend sa place dans la nouvelle salle
+          ay = ny;
+          dessinerSalle();                  // la nouvelle salle remplace l'ancienne
+          poser(ax, ay, ALPHABET[0]);       // et le A y est dessiné
+        } else if (lire(nx, ny) == ALPHABET[15]) {
+          // 4. …l'arrivée est une PORTE P : elle mène à l'autre porte.
+          //    lire(colonne, ligne) rend la lettre posée sur cette case.
+          //    On n'arrive pas SUR la porte, mais à côté : on la voit encore,
+          //    et c'est au joueur de décider d'y retourner.
+          if (salle == 0) {     // la porte de la salle 0 mène à la salle 3…
+            sx = 1;             //   (sx = 1, sy = 1 : en bas à droite)
+            sy = 1;
+            ax = 14;            // …à côté de sa porte, en (15, 4) : une case à gauche
+            ay = 4;
+          } else {              // sinon, on est dans la salle 3 : sa porte ramène à la salle 0…
+            sx = 0;             //   (sx = 0, sy = 0 : en haut à gauche)
+            sy = 0;
+            ax = 4;             // …à côté de sa porte, en (3, 12) : une case à droite
+            ay = 12;
+          }
+          // C'est un RACCOURCI : à pied, de la salle 0 à la salle 3, il faut
+          // passer par la salle 1 ou par la salle 2.
+          dessinerSalle();                  // l'autre salle remplace celle-ci
+          poser(ax, ay, ALPHABET[0]);       // et le A y est dessiné
+        } else if (lire(nx, ny) == 0) {
+          // 5. …l'arrivée est VIDE (la tuile 0, un espace) : le A y va.
+          effacer(ax, ay, 1);               // le A quitte sa case (elle redevient vide)…
+          ax = nx;                          // …prend la case d'arrivée…
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);       // …et y est dessiné
+        }
+        // 6. …sinon, l'arrivée est un X : aucun des cas du dessus.
+        //    Il ne se passe rien, le A reste où il est. C'est ça, un mur :
+        //    il n'y a même pas besoin d'écrire un « if » pour lui.
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Le A passe d’une salle à l’autre par les ouvertures du cadre ; les X l’arrêtent ; le P de la salle 0 mène à la salle 3, et celui de la salle 3 ramène à la salle 0.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 400) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(30) }
+      const v = (n) => c.variable(n)
+      c.avancer(30)
+      const depart = c.mot(0, 17, 5) === 'SALLE' && c.mot(9, 8, 1) === 'A' && c.mot(3, 12, 1) === 'P'
+      tenir('up', () => false, 200)
+      const ligne = v('ay')
+      const arrete = ligne === 5 && c.mot(9, 4, 1) === 'X'
+      tenir('down', () => v('ay') === 8)
+      tenir('right', () => v('salle') === 1)
+      const droite = v('salle') === 1 && v('ax') === 0 && c.mot(0, 8, 1) === 'A'
+      tenir('left', () => v('salle') === 0)
+      const gauche = v('salle') === 0 && v('ax') === 19 && c.mot(19, 8, 1) === 'A'
+      tenir('left', () => v('ax') === 4)
+      tenir('down', () => v('ay') === 12)
+      tenir('left', () => v('salle') === 3)
+      const porte1 = v('salle') === 3 && v('ax') === 14 && v('ay') === 4 && c.mot(14, 4, 2) === 'AP'
+      tenir('right', () => v('salle') === 0)
+      const porte2 = v('salle') === 0 && v('ax') === 4 && v('ay') === 12 && c.mot(3, 12, 2) === 'PA'
+      return [
+        ['la salle 0 : le cadre, le A en (9, 8), la porte P en (3, 12)', depart],
+        ['HAUT : le mur X en (9, 4) arrête le A en (9, 5)', arrete, ` (le A en ligne ${ligne})`],
+        ['sorti à droite, le A entre dans la salle 1 par la gauche', droite],
+        ['sorti à gauche (255), il revient dans la salle 0, en colonne 19', gauche],
+        ['la porte de la salle 0 mène à la salle 3, à côté de sa porte', porte1],
+        ['la porte de la salle 3 ramène à la salle 0', porte2],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un micro Zelda — l’écran glisse dans le sens du A',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.95, et à chaque passage d’une salle à une autre, l’écran GLISSE dans le sens où va le A : de gauche à droite, de droite à gauche, de haut en bas, de bas en haut. Avec defiler(x, y), 2 pixels par image.',
+    texte: [
+      '**C’est le 0.95, avec une chose en plus : le glissement.** Quand le A passe d’une salle à une autre, la nouvelle salle n’apparaît plus d’un coup : l’écran **glisse**, comme dans Zelda, **dans le sens où va le A**. Il va à **gauche** : l’ancienne salle part vers la droite, la nouvelle arrive par la gauche. À **droite** : l’ancienne part vers la gauche, la nouvelle arrive par la droite. En **haut** : l’ancienne descend, la nouvelle arrive par le haut. En **bas** : l’ancienne monte, la nouvelle arrive par le bas. Les **portes**, elles, téléportent : d’un coup, comme au 0.95.',
+      '**Ce qui vient d’avant :** tout le 0.95 (les quatre salles, `sx`, `sy`, les murs, les portes, le 255 d’un `uint8_t` qui fait le tour), et `defiler(x, y)` du 0.90.3 : il ne bouge pas une lettre, il déplace **la caméra** qui regarde le décor, au pixel près. `x` la pousse vers la droite, `y` vers le bas.',
+      '**Ce qui est nouveau ici (1) : le monde fait le tour.** Chaque salle a maintenant **quatre sorties** : à gauche, à droite, en haut, en bas. À droite de la salle 1, on revient à la salle 0 ; à gauche de la salle 0, on arrive à la salle 1 ; en haut de la salle 0, on arrive à la salle 2. Ainsi, **chaque** sortie mène à une salle, et l’écran glisse à chaque fois, dès le départ. Avec deux colonnes de salles, changer de colonne s’écrit `sx = 1 - sx` : 1 - 0 = **1**, 1 - 1 = **0**. Pareil pour les lignes : `sy = 1 - sy`.',
+      '**Ce qui est nouveau ici (2) : le décor est plus grand que l’écran.** Le décor de la console fait **32 colonnes sur 32 lignes** (256 × 256 pixels) ; l’écran n’en montre que **20 sur 18** (160 × 144 pixels). Le reste attend, caché. Et le décor est un **ruban**, dans les deux sens : après la colonne 31 revient la colonne 0, après la ligne 31 revient la ligne 0.',
+      '**Ce qui est nouveau ici (3) : la salle n’est plus toujours dans le coin (0, 0) du décor.** Deux variables le retiennent : `bord`, la colonne du décor où commence la salle, et `haut`, la ligne. Une case (c, l) **de la salle** est la case `((c + bord) % 32, (l + haut) % 32)` **du décor**. `% 32`, le reste de la division par 32, fait le tour du ruban : avec `bord` = 12, la colonne 19 de la salle est (19 + 12) % 32 = **31** ; une colonne 20 serait (20 + 12) % 32 = 32 % 32 = **0**. La caméra suit : `camx = bord × 8`, `camy = haut × 8` (8 pixels par case).',
+      '**Ce qui est nouveau ici (4) : poserSalle() et lireSalle().** Elles font ce calcul pour nous : `poserSalle(c, l, tuile)` au lieu de `poser()`, `lireSalle(c, l)` au lieu de `lire()`. Tout le programme passe par elles, et `ax`, `ay` restent des cases **de la salle**. `lireSalle()` **rend** un nombre : `uint8_t` devant son nom, et `return` pour dire lequel. Pour effacer, on pose la tuile **0** (une case vide). Et « SALLE n » s’écrit maintenant lettre par lettre avec `poserSalle()` (le chiffre n est la tuile `27 + n`) : `texte()` et `nombre()` ne savent pas ajouter `bord` et `haut`.',
+      '**Ce qui est nouveau ici (5) : dessiner une seule colonne, ou une seule ligne.** Le dessin de la salle (cadre, ouvertures, murs, portes, « SALLE n ») devient la fonction `dessinerMurs()`. Deux variables disent ce qu’elle dessine : `seule` (une colonne) et `seuleL` (une ligne) ; **255** veut dire « toutes ». C’est `poserSalle()` qui trie : `(seule == 255 || c == seule) && (seuleL == 255 || l == seuleL)`. `&&` veut dire « et » : les deux doivent être vrais. `colonneSalle(c)` vide la colonne c, puis la dessine, elle seule ; `ligneSalle(l)` fait pareil pour une ligne.',
+      '**Ce qui est nouveau ici (6) : les quatre glissements.** Quand le A sort à **gauche**, `glisserAGauche()` : la nouvelle salle se met 20 colonnes plus à gauche (`bord + 12`, car 32 - 20 = 12 sur le ruban). Puis 20 tours : on dessine la colonne qui va entrer par la gauche (19, puis 18… jusqu’à 0), et la caméra **recule** d’une case en **4 petits pas de 2 pixels**, un par image : `camx = camx - 2`, `defiler(camx, camy)`. À **droite**, `glisserADroite()` : 20 colonnes plus à droite (`bord + 20`), on dessine les colonnes 0, 1… 19, et la caméra **avance** : `camx = camx + 2`. En **haut** et en **bas**, c’est pareil, mais debout : ligne par ligne avec `ligneSalle()`, et c’est `camy` qui bouge. La salle a 18 lignes : 18 lignes plus haut, c’est `haut + 14` (32 - 18 = 14) ; plus bas, `haut + 18`.',
+      '**Déroulons, à gauche, depuis le départ** (`bord` = 0, caméra à 0). Le A va jusqu’en (0, 8), l’ouverture, puis encore GAUCHE : l’arrivée est 0 - 1 = **255**, sorti à gauche. `sx` devient 1 - 0 = 1, `bord` devient 12. Tour 0 : la colonne 19 de la salle 1 va dans la colonne (19 + 12) % 32 = **31** du décor, cachée ; la caméra passe à 0 - 2 = **254** (elle fait le tour), puis 252, 250, 248 : la colonne 31 entre par la gauche, 2 pixels à chaque image. … Tour 11 : la colonne 8 va dans la colonne **20**, la dernière colonne cachée. Tour 12 : la colonne 7 va dans la colonne **19**. C’était l’ancienne salle ! Mais elle vient de sortir de l’écran par la droite : on peut la remplacer. … Tour 19 : la colonne 0 va dans la colonne 12 ; la caméra est à **96** (12 × 8) : l’écran montre les colonnes 12 à 31, toute la salle 1. Le A est posé en (19, 8).',
+      '**Pourquoi 4 petits pas de 2 pixels ?** 8 pixels d’un coup à chaque image, c’est trop rapide : les 20 colonnes passeraient en 20 images, un tiers de seconde, et l’œil ne verrait pas glisser. Avec 2 pixels par image : 20 × 4 = **80 images** à gauche et à droite, 18 × 4 = **72** en haut et en bas, un peu plus d’une seconde.',
+      '**Pourquoi vider la colonne (ou la ligne) avant de la dessiner ?** Au milieu du glissement, elle contient encore l’ancienne salle. `dessinerMurs()` ne pose que des X, des P, des lettres et quelques cases vides : un X de l’ancienne salle, là où la nouvelle n’en a pas, resterait.',
+      '**Le A pendant le glissement :** on le retire avant (sinon, il partirait avec l’ancienne salle), et on le pose après, du côté par où il entre : sorti à gauche, il entre à droite, en colonne 19 ; sorti en haut, il entre en bas, en ligne 16. L’autre coordonnée ne change pas.',
+      '**Et les portes ?** `dessinerSalle()` redessine d’un coup, et remet tout à zéro : `bord` = 0, `haut` = 0, la caméra à (0, 0). `viderEcran()` efface maintenant **tout** le décor, 32 lignes de 32 cases : les parties cachées doivent être vides, car un glissement va les montrer.',
+      '**Essaie :** pour glisser plus vite, fais 2 petits pas de 4 pixels : `p < 2` et `camx = camx - 4` (2 × 4 = 8, toujours une case). Plus lentement : 8 petits pas de 1 pixel. La règle : le nombre de pas × les pixels par pas = 8.',
+    ],
+    code: `// ---- UN MICRO ZELDA : L'ÉCRAN GLISSE DANS LE SENS DU A ----
+// C'est le 0.95, avec une chose en plus : à CHAQUE passage d'une salle
+// à une autre, la nouvelle salle n'apparaît plus d'un coup. L'écran
+// GLISSE, dans le sens où va le A :
+//   le A va à GAUCHE : l'ancienne salle part vers la droite, la nouvelle arrive par la gauche ;
+//   le A va à DROITE : l'ancienne salle part vers la gauche, la nouvelle arrive par la droite ;
+//   le A va en HAUT  : l'ancienne salle part vers le bas, la nouvelle arrive par le haut ;
+//   le A va en BAS   : l'ancienne salle part vers le haut, la nouvelle arrive par le bas.
+// Les portes, elles, téléportent : elles redessinent d'un coup, comme au 0.95.
+//
+// Tout ce qui suit « // » sur une ligne est un COMMENTAIRE : la console
+// ne le lit pas. Il n'est là que pour toi, pour expliquer le code.
+//
+// Les lettres : A = le héros, X = un mur, P = une porte.
+// ALPHABET[0]  : le A    ALPHABET[23] : le X    ALPHABET[15] : le P
+// ALPHABET[n] : la n-ième lettre, en comptant à partir de 0 (pas de 1) :
+//   A = 0, B = 1, C = 2, D = 3, E = 4… L = 11… P = 15, S = 18… X = 23.
+// La tuile 0, c'est une case VIDE (un espace).
+// La tuile 27, c'est le chiffre 0 ; 28 le 1, 29 le 2, 30 le 3 : 27 + n, le chiffre n.
+//
+// Le monde : QUATRE salles, deux de large, deux de haut (le 0.95).
+//
+//      sx = 0      sx = 1
+//   +---------+---------+
+//   | salle 0 | salle 1 |   sy = 0
+//   +---------+---------+
+//   | salle 2 | salle 3 |   sy = 1
+//   +---------+---------+
+//
+// salle = sx + sy + sy   (0 + 0 + 0 = 0, 1 + 0 + 0 = 1, 0 + 1 + 1 = 2, 1 + 1 + 1 = 3)
+//
+// NOUVEAU : LE MONDE FAIT LE TOUR, dans les deux sens.
+// Chaque salle a une sortie de chaque côté : à gauche, à droite, en haut,
+// en bas. À droite de la salle 1, on revient à la salle 0 ; à gauche de la
+// salle 0, on arrive à la salle 1. En bas de la salle 2, on revient à la
+// salle 0 ; en haut de la salle 0, on arrive à la salle 2. Ainsi, CHAQUE
+// sortie mène à une salle, et l'écran glisse à chaque fois.
+// Avec deux colonnes de salles, changer de colonne, c'est : sx = 1 - sx
+//   1 - 0 = 1 (on passe de la colonne 0 à la colonne 1),
+//   1 - 1 = 0 (on passe de la colonne 1 à la colonne 0).
+// Et changer de ligne de salles : sy = 1 - sy.
+//
+// NOUVEAU : LE DÉCOR EST PLUS GRAND QUE L'ÉCRAN.
+// Le décor de la console fait 32 colonnes sur 32 lignes (256 × 256 pixels) ;
+// l'écran n'en montre que 20 colonnes sur 18 lignes (160 × 144 pixels).
+// defiler(x, y) choisit QUEL morceau on regarde : x et y sont la place de
+// la « caméra », en pixels (8 pixels = 1 case).
+//
+//   colonnes du décor :  0 ............ 19 20 ...... 31
+//                        [    l'écran, camx = 0  ][ caché ]
+//   (et pareil en hauteur : les lignes 0 à 17 à l'écran, 18 à 31 cachées)
+//
+// Le décor est un RUBAN, dans les deux sens : après la colonne 31 revient
+// la colonne 0 ; après la ligne 31 revient la ligne 0.
+//
+// La salle, elle, garde ses colonnes 0 à 19 et ses lignes 0 à 17 :
+// les lignes 0 à 16 pour le terrain, la ligne 17 pour « SALLE n ».
+// bord dit dans quelle colonne DU DÉCOR est sa colonne 0 ;
+// haut dit dans quelle ligne DU DÉCOR est sa ligne 0 :
+//   colonne du décor = (colonne de la salle + bord) % 32
+//   ligne du décor   = (ligne de la salle + haut) % 32
+// % 32 : le reste de la division par 32 ; il fait « le tour du ruban ».
+//   Exemple, bord = 12 : la colonne 19 de la salle est (19 + 12) % 32 = 31,
+//   et s'il y avait une colonne 20 : (20 + 12) % 32 = 32 % 32 = 0.
+// La caméra regarde toujours la salle : camx = bord × 8, camy = haut × 8.
+
+// ---- Les variables ----
+// uint8_t : une boîte qui garde un nombre de 0 à 255, jamais en dessous de 0.
+uint8_t ax = 9;           // le A, le héros : sa colonne DANS LA SALLE (0 à 19)…
+uint8_t ay = 8;           // …et sa ligne (0 à 16). Il part de (9, 8).
+uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
+uint8_t ny = 0;
+uint8_t sx = 0;           // la salle : sa colonne dans le monde (0 ou 1)…
+uint8_t sy = 0;           // …et sa ligne (0 ou 1). On part de la salle 0.
+uint8_t salle = 0;        // son numéro, 0 à 3
+uint8_t bord = 0;         // NOUVEAU : la colonne du décor où commence la salle (0 à 31)
+uint8_t haut = 0;         // NOUVEAU : la ligne du décor où commence la salle (0 à 31)
+uint8_t camx = 0;         // NOUVEAU : la place de la caméra, en pixels : de gauche à droite…
+uint8_t camy = 0;         // …et de haut en bas. defiler(camx, camy).
+uint8_t seule = 255;      // NOUVEAU : 255 = toutes les colonnes ; 0 à 19 = CETTE colonne seulement
+uint8_t seuleL = 255;     // NOUVEAU : 255 = toutes les lignes ;   0 à 17 = CETTE ligne seulement
+
+// ---- NOUVEAU : poser une lettre sur une case DE LA SALLE ----
+// Au 0.95, on écrivait poser(c, l, …) : la salle était toujours dans les
+// colonnes 0 à 19 et les lignes 0 à 17 du décor. Maintenant, elle peut être
+// ailleurs : on ajoute bord et haut, et % 32 fait le tour du ruban.
+// Et si seule (ou seuleL) n'est pas 255, on ne pose QUE dans cette colonne
+// (ou cette ligne) : le reste n'est pas touché (c'est pour le glissement).
+// && : « et ». Il faut que les DEUX conditions soient vraies.
+void poserSalle(uint8_t c, uint8_t l, uint8_t t) {
+  if ((seule == 255 || c == seule) && (seuleL == 255 || l == seuleL)) {
+    poser((c + bord) % 32, (l + haut) % 32, t);  // t : une lettre, un chiffre, ou 0 pour vide
+  }
+}
+
+// ---- NOUVEAU : lire la lettre d'une case DE LA SALLE ----
+// Même calcul que poserSalle(). « uint8_t » devant le nom : cette fonction
+// REND un nombre (la tuile lue). « return » dit lequel.
+uint8_t lireSalle(uint8_t c, uint8_t l) {
+  return lire((c + bord) % 32, (l + haut) % 32);
+}
+
+// ---- n murs X à la suite, vers la DROITE, à partir de (c, l) (le 0.95) ----
+// Exemple : mur(4, 4, 3) pose un X en (4, 4), (5, 4) et (6, 4).
+// Seul changement : poserSalle() au lieu de poser().
+void mur(uint8_t c, uint8_t l, uint8_t n) {
+  for (uint8_t i = 0; i < n; i++) {     // i vaut 0, puis 1, puis 2… jusqu'à n - 1
+    poserSalle(c + i, l, ALPHABET[23]); // un X, i cases à droite du départ
+  }
+}
+
+// ---- n murs X à la suite, vers le BAS, à partir de (c, l) (le 0.95) ----
+// Exemple : murDebout(6, 3, 3) pose un X en (6, 3), (6, 4) et (6, 5).
+void murDebout(uint8_t c, uint8_t l, uint8_t n) {
+  for (uint8_t i = 0; i < n; i++) {
+    poserSalle(c, l + i, ALPHABET[23]); // c'est la LIGNE qui avance, pas la colonne
+  }
+}
+
+// ---- vider TOUT le décor ----
+// Les 32 lignes, sur leurs 32 colonnes (et plus 18 × 20 comme au 0.95) :
+// les parties cachées doivent être vides elles aussi, car le glissement
+// va les montrer.
+void viderEcran() {
+  for (uint8_t l = 0; l < 32; l++) {    // l vaut 0, 1, 2… jusqu'à 31
+    effacer(0, l, 32);                  // 32 cases à partir de la colonne 0 : toute la ligne du décor
+  }
+}
+
+// ---- NOUVEAU : toute la salle (sx, sy) : murs, portes, et « SALLE n » ----
+// C'était le milieu de dessinerSalle() au 0.95. On le met à part pour
+// pouvoir l'appeler de plusieurs façons :
+//   seule = 255, seuleL = 255 : toute la salle est dessinée ;
+//   seule = 7                 : seule la colonne 7 est dessinée ;
+//   seuleL = 5                : seule la ligne 5 est dessinée.
+// C'est poserSalle() qui trie : les autres cases sont ignorées.
+// Les ouvertures s'écrivent poserSalle(…, 0) : poser une case vide, c'est
+// effacer. (effacer() ne sait pas qu'il faut ajouter bord et haut.)
+void dessinerMurs() {
+  salle = sx + sy + sy;                 // le numéro de la salle
+
+  // 1. le cadre, en entier : les lignes 0 et 16, les colonnes 0 et 19
+  mur(0, 0, 20);                        // en haut : de (0, 0) à (19, 0)
+  mur(0, 16, 20);                       // en bas : de (0, 16) à (19, 16)
+  murDebout(0, 0, 17);                  // à gauche : de (0, 0) à (0, 16)
+  murDebout(19, 0, 17);                 // à droite : de (19, 0) à (19, 16)
+
+  // 2. NOUVEAU : les OUVERTURES, de chaque côté, TOUJOURS (le monde fait le tour).
+  //    Plus besoin de « if » : chaque salle a ses quatre sorties.
+  poserSalle(0, 7, 0);                  // à gauche : les lignes 7, 8, 9 de la colonne 0
+  poserSalle(0, 8, 0);
+  poserSalle(0, 9, 0);
+  poserSalle(19, 7, 0);                 // à droite : les lignes 7, 8, 9 de la colonne 19
+  poserSalle(19, 8, 0);
+  poserSalle(19, 9, 0);
+  poserSalle(9, 0, 0);                  // en haut : les colonnes 9 et 10 de la ligne 0
+  poserSalle(10, 0, 0);
+  poserSalle(9, 16, 0);                 // en bas : les colonnes 9 et 10 de la ligne 16
+  poserSalle(10, 16, 0);
+
+  // 3. les murs DANS la salle : chaque salle a les siens (le 0.95)
+  if (salle == 0) {
+    mur(4, 4, 12);                      // une barre en haut : de (4, 4) à (15, 4)
+    poserSalle(3, 12, ALPHABET[15]);    // la PORTE de la salle 0, en (3, 12)
+  }
+  if (salle == 1) {
+    murDebout(6, 3, 11);                // une colonne de (6, 3) à (6, 13)…
+    murDebout(13, 1, 11);               // …une autre de (13, 1) à (13, 11)
+  }
+  if (salle == 2) {
+    mur(3, 5, 6);                       // une barre de (3, 5) à (8, 5)…
+    mur(11, 11, 6);                     // …et une autre de (11, 11) à (16, 11)
+  }
+  if (salle == 3) {
+    mur(3, 8, 12);                      // une barre au milieu : de (3, 8) à (14, 8)
+    poserSalle(15, 4, ALPHABET[15]);    // la PORTE de la salle 3, en (15, 4)
+  }
+
+  // 4. NOUVEAU : « SALLE » et son numéro, sur la ligne 17, lettre par lettre.
+  //    texte() et nombre() ne savent pas ajouter bord et haut ; poserSalle(), si.
+  //    Et comme ça, la ligne 17 glisse avec la salle.
+  poserSalle(0, 17, ALPHABET[18]);      // S
+  poserSalle(1, 17, ALPHABET[0]);       // A
+  poserSalle(2, 17, ALPHABET[11]);      // L
+  poserSalle(3, 17, ALPHABET[11]);      // L
+  poserSalle(4, 17, ALPHABET[4]);       // E
+  poserSalle(6, 17, 27 + salle);        // le chiffre : 27 + 0 = le 0, 27 + 3 = le 3
+}
+
+// ---- dessiner la salle D'UN COUP (le 0.95) ----
+// Au départ, et pour les portes. On remet tout à zéro : la salle revient
+// dans les colonnes 0 à 19 et les lignes 0 à 17 du décor, la caméra aussi.
+void dessinerSalle() {
+  viderEcran();                         // le décor vide, en entier
+  bord = 0;                             // la salle commence à la colonne 0…
+  haut = 0;                             // …et à la ligne 0 du décor
+  camx = 0;                             // la caméra la regarde depuis le coin (0, 0)
+  camy = 0;
+  defiler(camx, camy);
+  seule = 255;                          // toute la salle
+  seuleL = 255;
+  dessinerMurs();
+}
+
+// ---- NOUVEAU : UNE colonne de la nouvelle salle ----
+// D'abord, on la vide, lignes 0 à 17 : l'ancienne salle y avait peut-être
+// un X, que la nouvelle n'a pas. Puis on y dessine la colonne c, et elle seule.
+void colonneSalle(uint8_t c) {
+  seule = c;                            // on ne touche QUE la colonne c
+  for (uint8_t l = 0; l < 18; l++) {
+    poserSalle(c, l, 0);                // vider, du haut (0) au bas (17)
+  }
+  dessinerMurs();                       // puis dessiner : seule la colonne c est posée
+  seule = 255;                          // de nouveau toutes les colonnes
+}
+
+// ---- NOUVEAU : UNE ligne de la nouvelle salle ----
+// La même chose, couchée : on vide la ligne l, colonnes 0 à 19, puis on la dessine.
+void ligneSalle(uint8_t l) {
+  seuleL = l;                           // on ne touche QUE la ligne l
+  for (uint8_t c = 0; c < 20; c++) {
+    poserSalle(c, l, 0);                // vider, de la gauche (0) à la droite (19)
+  }
+  dessinerMurs();
+  seuleL = 255;
+}
+
+// ---- NOUVEAU : le GLISSEMENT quand le A sort à GAUCHE ----
+//
+// La nouvelle salle se met 20 colonnes à GAUCHE de l'ancienne :
+//   bord - 20, sur le ruban de 32, c'est bord + 12 (32 - 20 = 12).
+//   Exemple : bord = 0 → la nouvelle salle commence en colonne 12 du décor.
+// La caméra RECULE (camx diminue) : l'ancienne salle part vers la droite.
+// Juste avant chaque pas, on dessine la colonne qui va entrer par la GAUCHE :
+// la 19, puis la 18… jusqu'à la 0.
+//   tour 0  : la colonne 19 de la salle, dans la colonne (19 + 12) % 32 = 31 du décor, cachée
+//   tour 11 : la colonne 8, dans la colonne 20 (la dernière colonne cachée)
+//   tour 12 : la colonne 7, dans la colonne 19. C'était l'ancienne salle, mais
+//             elle vient de sortir de l'écran par la droite : on peut la remplacer.
+//   tour 19 : la colonne 0, dans la colonne 12. Fini : camx = 96, l'écran montre 12 à 31.
+// Chaque colonne entre en 4 PETITS PAS de 2 pixels, un par image (4 × 2 = 8 pixels) :
+// 20 colonnes × 4 images = 80 images, un peu plus d'une seconde.
+void glisserAGauche() {
+  sx = 1 - sx;                          // l'autre colonne du monde (0 → 1, 1 → 0)
+  bord = (bord + 12) % 32;              // la nouvelle salle : 20 colonnes plus à gauche
+  for (uint8_t k = 0; k < 20; k++) {    // 20 tours : une colonne par tour
+    colonneSalle(19 - k);               // la colonne qui va entrer à gauche : 19, 18… 0
+    for (uint8_t p = 0; p < 4; p++) {   // 4 petits pas de 2 pixels (p vaut 0, 1, 2, 3)
+      image();                          // un petit pas par image
+      camx = camx - 2;                  // la caméra RECULE : 0, 254, 252… (0 - 2 fait le tour : 254)
+      defiler(camx, camy);              // le décor glisse vers la DROITE
+    }
+  }
+}
+
+// ---- NOUVEAU : le GLISSEMENT quand le A sort à DROITE ----
+// Le même, dans l'autre sens.
+// La nouvelle salle se met 20 colonnes à DROITE de l'ancienne : bord + 20.
+//   Exemple : bord = 0 → la nouvelle salle commence en colonne 20 du décor
+//   (les colonnes 20 à 31, puis 0 à 7 : le ruban fait le tour).
+// La caméra AVANCE (camx augmente) : l'ancienne salle part vers la gauche.
+// On dessine la colonne qui va entrer par la DROITE : la 0, puis la 1… jusqu'à la 19.
+//   tour 0  : la colonne 0 de la salle, dans la colonne (0 + 20) % 32 = 20 du décor, cachée
+//   tour 12 : la colonne 12, dans la colonne (12 + 20) % 32 = 0. C'était l'ancienne
+//             salle, mais elle vient de sortir de l'écran par la gauche.
+void glisserADroite() {
+  sx = 1 - sx;                          // l'autre colonne du monde
+  bord = (bord + 20) % 32;              // la nouvelle salle : 20 colonnes plus à droite
+  for (uint8_t k = 0; k < 20; k++) {
+    colonneSalle(k);                    // la colonne qui va entrer à droite : 0, 1… 19
+    for (uint8_t p = 0; p < 4; p++) {
+      image();
+      camx = camx + 2;                  // la caméra AVANCE : 0, 2, 4… (254 + 2 fait le tour : 0)
+      defiler(camx, camy);              // le décor glisse vers la GAUCHE
+    }
+  }
+}
+
+// ---- NOUVEAU : le GLISSEMENT quand le A sort en HAUT ----
+// Pareil, mais debout : on travaille ligne par ligne, et c'est camy qui bouge.
+// La salle a 18 lignes (0 à 17) ; le décor en a 32.
+// La nouvelle salle se met 18 lignes AU-DESSUS : haut - 18, sur le ruban de 32,
+// c'est haut + 14 (32 - 18 = 14).
+// On dessine la ligne qui va entrer par le HAUT : la 17, puis la 16… jusqu'à la 0.
+// 18 lignes × 4 images = 72 images.
+void glisserEnHaut() {
+  sy = 1 - sy;                          // l'autre ligne du monde (0 → 1, 1 → 0)
+  haut = (haut + 14) % 32;              // la nouvelle salle : 18 lignes plus haut
+  for (uint8_t k = 0; k < 18; k++) {    // 18 tours : une ligne par tour
+    ligneSalle(17 - k);                 // la ligne qui va entrer en haut : 17, 16… 0
+    for (uint8_t p = 0; p < 4; p++) {
+      image();
+      camy = camy - 2;                  // la caméra MONTE : le décor glisse vers le BAS
+      defiler(camx, camy);
+    }
+  }
+}
+
+// ---- NOUVEAU : le GLISSEMENT quand le A sort en BAS ----
+// La nouvelle salle se met 18 lignes AU-DESSOUS : haut + 18.
+// On dessine la ligne qui va entrer par le BAS : la 0, puis la 1… jusqu'à la 17.
+void glisserEnBas() {
+  sy = 1 - sy;
+  haut = (haut + 18) % 32;              // la nouvelle salle : 18 lignes plus bas
+  for (uint8_t k = 0; k < 18; k++) {
+    ligneSalle(k);                      // la ligne qui va entrer en bas : 0, 1… 17
+    for (uint8_t p = 0; p < 4; p++) {
+      image();
+      camy = camy + 2;                  // la caméra DESCEND : le décor glisse vers le HAUT
+      defiler(camx, camy);
+    }
+  }
+}
+
+// ---- main() : c'est ICI que la console commence ----
+int main() {
+  dessinerSalle();                        // la salle 0, d'un coup
+  poserSalle(ax, ay, ALPHABET[0]);        // le A à sa place, en (9, 8)
+
+  while (true) {                          // la boucle ne s'arrête jamais
+    image();                              // on attend l'image suivante : 60 par seconde
+
+    // ---- le A bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+    if (chaque(150)) {
+      // 1. la case d'ARRIVÉE (le 0.82) ; une seule flèche à la fois (else if)
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;                      // une colonne à droite
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;                      // une colonne à gauche (0 - 1 donne 255 !)
+      } else if (bouton(BAS)) {
+        ny = ay + 1;                      // une ligne plus bas
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;                      // une ligne plus haut (0 - 1 donne 255 !)
+      }
+
+      // 2. une flèche est tenue : l'arrivée n'est pas la case où l'on est (!= : « différent de »)
+      if (nx != ax || ny != ay) {
+        // 3. NOUVEAU : l'arrivée est HORS de la salle : l'écran GLISSE vers la nouvelle.
+        //    Ces tests viennent en premier : lireSalle(255, 8) n'aurait pas de sens.
+        //    Avant de glisser, on retire le A de l'ancienne salle (sinon, il
+        //    partirait avec elle) ; après, on le pose, du côté par où il entre.
+        if (nx == 255) {                  // sorti à GAUCHE (0 - 1 = 255)
+          poserSalle(ax, ay, 0);
+          glisserAGauche();
+          ax = 19;                        // il entre par la DROITE, sur la même ligne
+          poserSalle(ax, ay, ALPHABET[0]);
+        } else if (nx == 20) {            // sorti à DROITE (19 + 1 = 20)
+          poserSalle(ax, ay, 0);
+          glisserADroite();
+          ax = 0;                         // il entre par la GAUCHE
+          poserSalle(ax, ay, ALPHABET[0]);
+        } else if (ny == 255) {           // sorti en HAUT (0 - 1 = 255)
+          poserSalle(ax, ay, 0);
+          glisserEnHaut();
+          ay = 16;                        // il entre par le BAS, dans la même colonne
+          poserSalle(ax, ay, ALPHABET[0]);
+        } else if (ny == 17) {            // sorti en BAS (16 + 1 = 17)
+          poserSalle(ax, ay, 0);
+          glisserEnBas();
+          ay = 0;                         // il entre par le HAUT
+          poserSalle(ax, ay, ALPHABET[0]);
+        } else if (lireSalle(nx, ny) == ALPHABET[15]) {
+          // 4. …l'arrivée est une PORTE P : elle mène à l'autre porte (le 0.95)
+          if (salle == 0) {     // la porte de la salle 0 mène à la salle 3…
+            sx = 1;
+            sy = 1;
+            ax = 14;            // …à côté de sa porte, en (15, 4) : une case à gauche
+            ay = 4;
+          } else {              // sinon, la porte de la salle 3 ramène à la salle 0…
+            sx = 0;
+            sy = 0;
+            ax = 4;             // …à côté de sa porte, en (3, 12) : une case à droite
+            ay = 12;
+          }
+          dessinerSalle();                  // une porte téléporte : d'un coup
+          poserSalle(ax, ay, ALPHABET[0]);
+        } else if (lireSalle(nx, ny) == 0) {
+          // 5. …l'arrivée est VIDE : le A y va.
+          poserSalle(ax, ay, 0);            // le A quitte sa case (on y pose du vide)…
+          ax = nx;                          // …prend la case d'arrivée…
+          ay = ny;
+          poserSalle(ax, ay, ALPHABET[0]);  // …et y est dessiné
+        }
+        // 6. …sinon, l'arrivée est un X : il ne se passe rien. C'est ça, un mur.
+      }
+    }
+  }
+}
+`,
+    aVoir: 'À chaque sortie, l’écran glisse dans le sens du A : à gauche, à droite, en haut, en bas. Les portes P téléportent d’un coup.',
+    controle: (c) => {
+      const v = (n) => c.variable(n)
+      const cle = () => v('camx') + 256 * v('camy')
+      /* On tient la flèche jusqu'à ce que la caméra bouge, puis on compte
+         les places par où elle passe pendant le glissement. */
+      const glisse = (b) => {
+        c.gb.setButton(b, true)
+        let t = 0
+        const depart = cle()
+        while (cle() === depart && t < 400) { c.avancer(1); t++ }
+        c.gb.setButton(b, false)
+        const places = new Set([cle()])
+        for (let i = 0; i < 100; i++) { c.avancer(1); places.add(cle()) }
+        return places.size
+      }
+      const aller = (b, cond) => { let t = 0; c.gb.setButton(b, true); while (t < 300 && !cond()) { c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(20) }
+      const leA = () => c.mot((v('ax') + v('bord')) % 32, (v('ay') + v('haut')) % 32, 1) === 'A'
+      c.avancer(30)
+      const g = glisse('left')
+      const gauche = v('salle') === 1 && v('bord') === 12 && v('camx') === 96 && v('ax') === 19 && leA()
+      const d = glisse('right')
+      const droite = v('salle') === 0 && v('bord') === 0 && v('camx') === 0 && v('ax') === 0 && leA()
+      aller('right', () => v('ax') === 9)
+      const b = glisse('down')
+      const bas = v('salle') === 2 && v('haut') === 18 && v('camy') === 144 && v('ay') === 0 && leA()
+      const murs2 = c.mot(3, 23, 6) === 'XXXXXX'
+      const h = glisse('up')
+      const enHaut = v('salle') === 0 && v('haut') === 0 && v('camy') === 0 && v('ay') === 16 && leA()
+      return [
+        ['sorti à GAUCHE : l’écran glisse, 2 pixels par image, vers la salle 1', g >= 78 && gauche, ` (${g} places de caméra)`],
+        ['sorti à DROITE : il glisse dans l’autre sens, retour à la salle 0', d >= 78 && droite, ` (${d} places)`],
+        ['sorti en BAS : il glisse vers le haut, la salle 2 arrive par le bas', b >= 70 && bas && murs2, ` (${b} places)`],
+        ['sorti en HAUT : il glisse vers le bas, retour à la salle 0', h >= 70 && enHaut, ` (${h} places)`],
       ]
     },
   },
@@ -13788,6 +20854,48 @@ export function numeros(liste) {
     if (l.difficulte === 0) return l.suite ? `0.${zero - 1}.${++s}` : (s = 0, `0.${zero++}`)
     return l.suite ? `${n}.${++s}` : (s = 0, String(++n))
   })
+}
+
+/**
+ * La partie d'une leçon, dans un niveau : { lettre, nom }, ou null.
+ *
+ * Le chapitre 0 compte près de trois cents leçons : sous un seul titre, on
+ * ne s'y retrouve plus. Il est donc coupé en parties — « Écrire des lettres »,
+ * « Le temps », « Déplacer une lettre »… Comme le niveau, la partie n'est
+ * écrite que sur la leçon qui l'OUVRE (`partie: 'Le temps'`) : on remonte
+ * jusqu'à elle, sans sortir du niveau. Les lettres A, B, C… se comptent
+ * toutes seules ; les numéros des leçons, eux, ne changent pas.
+ */
+export function partieDe(liste, index) {
+  // Le niveau de la leçon demandée (0 pour le chapitre 0, 1 à 10 ensuite).
+  // On ne cherchera sa partie QUE dans ce niveau.
+  const niveau = liste[index].difficulte
+
+  // 1. Trouver la leçon qui OUVRE la partie : on part de la leçon demandée
+  //    et l'on recule d'une leçon à la fois (ouverture--), tant que
+  //    - on n'est pas sorti du début de la liste (ouverture >= 0),
+  //    - on est encore dans le même niveau,
+  //    - et la leçon regardée ne porte pas de « partie: '…' ».
+  //    Exemple : pour le 0.13.2, on recule 0.13.1, 0.13, 0.12.2, 0.12.1,
+  //    puis on s'arrête sur le 0.12, qui porte « partie: 'Le temps' ».
+  let ouverture = index
+  while (ouverture >= 0 && liste[ouverture].difficulte === niveau && !liste[ouverture].partie) ouverture--
+
+  // Si l'on est sorti de la liste, ou du niveau, sans rien trouver, ce
+  // niveau n'est pas coupé en parties (les niveaux 1 à 10) : pas de partie.
+  if (ouverture < 0 || liste[ouverture].difficulte !== niveau) return null
+
+  // 2. La lettre : combien de parties s'ouvrent AVANT celle-ci, dans le
+  //    même niveau ? 0 → A, 1 → B, 2 → C… On recule encore depuis la leçon
+  //    d'ouverture, et l'on compte chaque « partie: » rencontrée.
+  //    Exemple : avant « Le temps » (0.12), il n'y a que « Écrire des
+  //    lettres » (0.0) : rang = 1, donc la lettre B.
+  let rang = 0
+  for (let i = ouverture - 1; i >= 0 && liste[i].difficulte === niveau; i--) if (liste[i].partie) rang++
+
+  // 65 est le code de la lettre A : 65 + 0 = « A », 65 + 1 = « B »…
+  // Le nom est celui écrit sur la leçon d'ouverture.
+  return { lettre: String.fromCharCode(65 + rang), nom: liste[ouverture].partie }
 }
 
 /** Combien de leçons « pleines » : le « sur N » de « leçon 3 sur N ». */

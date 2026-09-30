@@ -27,7 +27,7 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { LECONS, NIVEAUX, numeros, principales } from '../tuto/lecons.js'
+import { LECONS, NIVEAUX, numeros, partieDe, principales } from '../tuto/lecons.js'
 
 const NUMEROS = numeros(LECONS)
 const TOTAL = principales(LECONS)
@@ -183,9 +183,13 @@ async function photographierLesAteliers() {
 
 /* ------------------------------------------------------- l'apparence */
 
+/* Les repères en haut d'une leçon : le niveau, puis la PARTIE (chapitre 0
+   seulement, par exemple « Partie D — Des formes » ; ailleurs partieDe rend
+   null et l'on n'écrit rien), le numéro, la difficulté et les ateliers. */
 const reperesDe = (lecon, index) => `
   <p class="reperes">
     <span class="niveau">Niveau ${lecon.difficulte} — ${echapper(NIVEAUX[lecon.difficulte])}</span>
+    ${partieDe(LECONS, index) ? `<span class="niveau">Partie ${partieDe(LECONS, index).lettre} — ${echapper(partieDe(LECONS, index).nom)}</span>` : ''}
     <span>leçon ${NUMEROS[index]} sur ${TOTAL}</span>
     <span class="jauge" style="--part: ${lecon.difficulte * 10}%">difficulté ${lecon.difficulte} / 10</span>
     ${lecon.dessin ? '<span class="outil">à la souris : atelier de dessin</span>' : ''}
@@ -287,11 +291,19 @@ la cartouche se refait dans la seconde. C’est le même texte, écrit autrement
 /** Le livret complet : les vingt leçons, une page chacune. */
 function livretComplet(matieres, ateliers) {
   const sommaire = []
-  let niveau = 0
+  /* null, et non 0 : sinon le titre du niveau 0 ne paraîtrait jamais. */
+  let niveau = null
   for (const [index, lecon] of LECONS.entries()) {
     if (lecon.difficulte !== niveau) {
       niveau = lecon.difficulte
       sommaire.push(`<li class="niveau">Niveau ${niveau} — ${echapper(NIVEAUX[niveau])}</li>`)
+    }
+    // Sur la leçon qui ouvre une partie, son titre dans le sommaire, avec le
+    // même style que celui d'un niveau : par exemple « B. Le temps ».
+    // echapper() protège le nom (un < ou un & casserait le HTML).
+    if (lecon.partie) {
+      const { lettre, nom } = partieDe(LECONS, index)
+      sommaire.push(`<li class="niveau">${lettre}. ${echapper(nom)}</li>`)
     }
     sommaire.push(`<li><span class="numero">${NUMEROS[index]}</span> ${echapper(lecon.titre)}
       <span class="points">difficulté ${lecon.difficulte}/10</span></li>`)

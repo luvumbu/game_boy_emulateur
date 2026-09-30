@@ -13,6 +13,8 @@ if exist "%ProgramFiles%\nodejs\node.exe" goto chemin
 
 echo.
 echo Node.js n'est pas installe sur ce PC. L'atelier en a besoin pour fonctionner.
+
+:proposer
 echo.
 choice /c ON /m "Voulez-vous l'installer automatiquement maintenant"
 if errorlevel 2 goto refus
@@ -44,6 +46,15 @@ set "PATH=%ProgramFiles%\nodejs;%PATH%"
 echo Node.js est pret.
 
 :lancer
+rem --- Node.js est-il assez recent ? Il faut la version 18 ou plus ---
+rem (fetch, AbortSignal.timeout... : une version 16 plantait au demarrage
+rem avec un message incomprehensible). node rend 1 si la version est trop vieille.
+node -e "process.exit(Number(process.versions.node.split('.')[0]) < 18 ? 1 : 0)"
+if errorlevel 1 goto tropVieux
+
+rem --- le fichier qui demarre l'atelier est-il la ? ---
+if not exist "demarrer.mjs" goto incomplet
+
 node demarrer.mjs
 if errorlevel 1 (
   echo.
@@ -52,9 +63,21 @@ if errorlevel 1 (
 )
 exit /b 0
 
+:tropVieux
+echo.
+for /f %%v in ('node -p "process.versions.node"') do echo Node.js %%v est installe, mais il est trop ancien : l'atelier demande la version 18 ou plus.
+goto proposer
+
+:incomplet
+echo.
+echo Le fichier demarrer.mjs manque dans ce dossier : le projet est incomplet.
+echo Recopiez le dossier en entier (ou retelechargez-le), en gardant de cote le dossier projets.
+pause
+exit /b 1
+
 :refus
 echo.
-echo Sans Node.js, l'atelier ne peut pas demarrer.
+echo Sans Node.js (version 18 ou plus), l'atelier ne peut pas demarrer.
 echo Pour l'installer plus tard : https://nodejs.org  puis relancer ce fichier.
 pause
 exit /b 1

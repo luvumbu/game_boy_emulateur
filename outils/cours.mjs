@@ -166,6 +166,7 @@ function pageDeLecon(lecon, index, matiere) {
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <title>Cours ${ou.numero} — ${echapper(lecon.titre)}</title>
 <style>${STYLE}${PLUS}</style>
 </head>
@@ -262,7 +263,9 @@ function sommaire() {
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <title>Apprendre à programmer — le sommaire</title>
+<script src="../recherche-page.js" defer></script>
 <style>${STYLE}${PLUS}</style>
 </head>
 <body>

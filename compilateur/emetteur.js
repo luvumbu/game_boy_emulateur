@@ -25,7 +25,7 @@
  * moment de compiler, en nommant le cycle.
  */
 
-import { numeroDe, octetsDesTuiles, NOMBRE_DE_TUILES } from './police.js'
+import { numeroDe, octetsDesTuiles, NOMBRE_DE_TUILES, lettresGrasses, pixelsDe } from './police.js'
 import { analyser } from './analyseur.js'
 
 /* Les guichets du matériel, nommés en français comme dans le reste du projet. */
@@ -5120,6 +5120,50 @@ function preparerLesFormes(programme, siennes) {
       return
     }
 
+    /*
+     * La couleur des lettres, sur Game Boy Color.
+     *
+     * Les lettres de la police sont dessinées dans la TEINTE 3 (la plus
+     * foncée). Et toute case du fond est dans la palette 0, tant qu'on ne l'a
+     * pas teinte autrement. Donc :
+     *
+     *   couleurTexte(31, 0, 0);           devient   couleurFond(0, 3, 31, 0, 0);
+     *     la teinte 3 de la palette 0 : toutes les lettres, en rouge
+     *
+     *   texteCouleur(5, 6, "ABC", 2);     devient   { texte(5, 6, "ABC");
+     *                                                 teindre(5, 6, 2);
+     *                                                 teindre(5 + 1, 6, 2);
+     *                                                 teindre(5 + 2, 6, 2); }
+     *     le mot, et chacune de ses cases dans la palette 2
+     *
+     * Ce ne sont que des réécritures : couleurFond et teindre font le travail,
+     * et refusent un programme en 4 nuances, comme elles l'ont toujours fait.
+     */
+    if (noeud.genre === 'expression' && appel?.genre === 'appel' && appel.nom === 'couleurTexte' && !siennes.has('couleurTexte')) {
+      if (appel.arguments.length !== 3) {
+        throw new Error(`ligne ${noeud.ligne} : couleurTexte(rouge, vert, bleu) veut trois nombres, de 0 à 31 : comme couleurTexte(31, 0, 0) pour du rouge`)
+      }
+      appel.nom = 'couleurFond'
+      appel.arguments = [{ genre: 'nombre', valeur: 0, ligne: noeud.ligne }, { genre: 'nombre', valeur: 3, ligne: noeud.ligne }, ...appel.arguments]
+      return
+    }
+    if (noeud.genre === 'expression' && appel?.genre === 'appel' && appel.nom === 'texteCouleur' && !siennes.has('texteCouleur')) {
+      const [x, y, mot, palette] = appel.arguments
+      if (appel.arguments.length !== 4 || mot?.genre !== 'texte') {
+        throw new Error(`ligne ${noeud.ligne} : texteCouleur(x, y, "MOT", palette) veut un texte entre guillemets et une palette de 0 à 7 : comme texteCouleur(5, 6, "BONJOUR", 2)`)
+      }
+      const ici = noeud.ligne
+      const lignes = [{ genre: 'expression', ligne: ici, valeur: { genre: 'appel', nom: 'texte', ligne: ici, arguments: [x, y, mot] } }]
+      for (let i = 0; i < [...mot.valeur].length; i++) {
+        const colonne = i === 0 ? structuredClone(x)
+          : { genre: 'calcul', operateur: '+', gauche: structuredClone(x), droite: { genre: 'nombre', valeur: i, ligne: ici }, ligne: ici }
+        lignes.push({ genre: 'expression', ligne: ici, valeur: { genre: 'appel', nom: 'teindre', ligne: ici, arguments: [colonne, structuredClone(y), structuredClone(palette)] } })
+      }
+      for (const cle of Object.keys(noeud)) delete noeud[cle]
+      Object.assign(noeud, { genre: 'bloc', corps: lignes, ligne: ici })
+      return
+    }
+
     /* « chaque(250) » devient « chaque_minuteur(k, ms(250)) » : son numéro
        caché, et la durée traduite en images. */
     if (noeud.genre === 'appel' && noeud.nom === 'chaque' && !siennes.has('chaque')) {
@@ -5164,6 +5208,164 @@ function preparerLesFormes(programme, siennes) {
   }
   preparer(programme)
   return vitesseReglee
+}
+
+/*
+ * texteGrand(x, y, "TEXTE", taille) : un texte AGRANDI, de 1 à 20 fois.
+ *
+ *   texteGrand(0, 0, "A", 3);      un A trois fois plus grand : 3 × 3 cases
+ *
+ * Chaque pixel de la police devient un carré de taille × taille pixels : les
+ * proportions sont gardées, et rien n'est dessiné à la main. Le compilateur
+ * CALCULE les tuiles de la lettre agrandie, avant le jeu — d'où la règle :
+ * le texte et la taille s'écrivent en clair. Seules les tuiles de ce texte, à
+ * cette taille, sont fabriquées ; une tuile identique à une autre (souvent
+ * toute pleine, aux grandes tailles) n'est fabriquée qu'une fois ; une tuile
+ * vide est la tuile 0, l'espace de la police.
+ *
+ * La ligne devient un bloc : la place est rangée dans deux variables, puis une
+ * petite fonction pose les tuiles, rangée par rangée, depuis un tableau gravé
+ * dans la cartouche.
+ */
+function preparerLesTextesGrands(programme, siennes) {
+  if (siennes.has('texteGrand')) return ''
+  const tuiles = new Map()          // le dessin d'une tuile (64 chiffres) → son nom
+  const sources = []
+  let k = 0
+
+  const tuileDe = (chiffres) => {
+    if (!/[1-3]/.test(chiffres)) return '0'                 // vide : l'espace de la police
+    if (!tuiles.has(chiffres)) tuiles.set(chiffres, 'GRAND_' + tuiles.size)
+    return tuiles.get(chiffres)
+  }
+
+  /*
+   * texteGrandS(x, y, "TEXTE", taille) : texteGrand qui VA À LA LIGNE, comme
+   * textS pour les petites lettres. Les lettres qui ne tiennent plus dans la
+   * largeur (20 cases) repartent en colonne 0, une rangée de lettres plus bas
+   * (taille cases). Si le texte dépasse le BAS de l'écran (18 cases), c'est
+   * une erreur, qui dit combien de lignes il faudrait.
+   *
+   * Le découpage se fait avant le jeu : x et y s'écrivent donc en clair, comme
+   * le texte et la taille. Chaque ligne devient un texteGrand ordinaire.
+   */
+  const decouper = (noeud) => {
+    const appel = noeud.valeur
+    const [x, y, texte, taille] = appel.arguments
+    if (appel.arguments.length !== 4 || [x, y, taille].some((a) => a?.genre !== 'nombre') || texte?.genre !== 'texte') {
+      throw new Error(
+        `ligne ${noeud.ligne} : texteGrandS(x, y, "TEXTE", taille) veut tout écrit en clair — la place, le texte et la taille : ` +
+          'comme texteGrandS(0, 0, "BONJOUR", 3). Le découpage en lignes se fait avant le jeu',
+      )
+    }
+    const n = taille.valeur
+    const lignes = [{ colonne: x.valeur, lettres: '' }]
+    let colonne = x.valeur
+    for (const lettre of texte.valeur) {
+      if (colonne + n > 20) {                        // plus de place sur la ligne : on passe à la suivante,
+        colonne = 0                                  // en colonne 0, comme textS
+        lignes.push({ colonne, lettres: '' })
+      }
+      lignes.at(-1).lettres += lettre
+      colonne += n
+    }
+    /* Une première ligne restée vide (la première lettre ne tenait pas dès la
+       colonne de départ) compte quand même : la suite commence en dessous. */
+    const bas = y.valeur + lignes.length * n
+    if (bas > 18) {
+      throw new Error(
+        `ligne ${noeud.ligne} : texteGrandS : « ${texte.valeur} » à la taille ${n} demande ${lignes.length} ligne(s) de ${n} cases, ` +
+          `jusqu'à la case ${bas} ; l'écran n'en a que 18 — un texte plus court, plus petit, ou plus haut`,
+      )
+    }
+    const nombre = (valeur) => ({ genre: 'nombre', valeur, ligne: noeud.ligne })
+    const appels = lignes.map((l, i) => l.lettres && ({
+      genre: 'expression', ligne: noeud.ligne,
+      valeur: { genre: 'appel', nom: 'texteGrand', ligne: noeud.ligne, arguments: [nombre(l.colonne), nombre(y.valeur + i * n), { genre: 'texte', valeur: l.lettres, ligne: noeud.ligne }, taille] },
+    })).filter(Boolean)
+    for (const cle of Object.keys(noeud)) delete noeud[cle]
+    Object.assign(noeud, { genre: 'bloc', corps: appels, ligne: appels[0].ligne })
+  }
+
+  const preparer = (noeud) => {
+    if (Array.isArray(noeud)) { noeud.forEach(preparer); return }
+    if (!noeud || typeof noeud !== 'object') return
+    const appel = noeud.valeur
+    if (noeud.genre === 'expression' && appel?.genre === 'appel' && appel.nom === 'texteGrandS') {
+      decouper(noeud)                    // devient un bloc de texteGrand, un par ligne…
+      preparer(noeud.corps)              // …que l'on prépare aussitôt
+      return
+    }
+    if (noeud.genre === 'expression' && appel?.genre === 'appel' && appel.nom === 'texteGrand') {
+      const [x, y, texte, taille] = appel.arguments
+      if (appel.arguments.length !== 4 || texte?.genre !== 'texte' || taille?.genre !== 'nombre') {
+        throw new Error(
+          `ligne ${noeud.ligne} : texteGrand(x, y, "TEXTE", taille) veut un texte entre guillemets et une taille ` +
+            'écrite en clair, de 1 à 20 : comme texteGrand(0, 0, "A", 3). Les deux sont calculés avant le jeu',
+        )
+      }
+      /* 20 au plus : une lettre fait 7 pixels de haut, l'écran 144 ; 7 × 20 =
+         140, elle tient encore entière. Au-delà, elle dépasserait de l'écran. */
+      const n = taille.valeur
+      if (n < 1 || n > 20) throw new Error(`ligne ${noeud.ligne} : texteGrand agrandit de 1 à 20 fois ; ${n} est hors de ces limites (au-delà, la lettre dépasse de l'écran)`)
+      const lettres = [...texte.valeur]
+      const pixels = lettres.map((c) => {
+        const p = pixelsDe(c)
+        if (!p) throw new Error(`ligne ${noeud.ligne} : texteGrand ne connaît pas le caractère « ${c} »`)
+        return p
+      })
+      const largeur = lettres.length * n                    // en cases
+      const hauteur = n
+      if (largeur > 255) {
+        throw new Error(`ligne ${noeud.ligne} : texteGrand : ${largeur} cases de large, c'est trop (255 au plus) — un texte plus court, ou plus petit`)
+      }
+      /* Le pixel (px, py) du grand dessin vient du pixel (px / n, py / n) de la
+         police. Une table PAR RANGÉE de cases : un octet ne compte que jusqu'à
+         255, et 20 × 20 cases en font 400 ; une rangée n'en a jamais plus de 255. */
+      const rangees = []
+      for (let tr = 0; tr < hauteur; tr++) {
+        const table = []
+        rangees.push(table)
+        for (let tc = 0; tc < largeur; tc++) {
+          let chiffres = ''
+          for (let py = 0; py < 8; py++) {
+            for (let px = 0; px < 8; px++) {
+              const gx = tc * 8 + px, gy = tr * 8 + py              // le pixel dans le grand texte
+              const lettre = Math.floor(gx / (8 * n))
+              const fx = Math.floor((gx % (8 * n)) / n), fy = Math.floor(gy / n)
+              chiffres += pixels[lettre][fy][fx]
+            }
+          }
+          table.push(tuileDe(chiffres))
+        }
+      }
+      sources.push(`uint8_t grand_x_${k} = 0;
+uint8_t grand_y_${k} = 0;
+${rangees.map((t, r) => `const uint8_t GRAND_TABLE_${k}_${r}[] = { ${t.join(', ')} };`).join('\n')}
+void texte_grand_${k}() {
+${rangees.map((t, r) => `  for (uint8_t c = 0; c < ${largeur}; c++) {
+    poser(grand_x_${k} + c, grand_y_${k} + ${r}, GRAND_TABLE_${k}_${r}[c]);
+  }`).join('\n')}
+}
+`)
+      const ranger = (nom, valeur) => ({ genre: 'affecter', cible: { genre: 'variable', nom, ligne: noeud.ligne }, operateur: '=', valeur, ligne: noeud.ligne })
+      const lignes = [
+        ranger(`grand_x_${k}`, x),
+        ranger(`grand_y_${k}`, y),
+        { genre: 'expression', valeur: { genre: 'appel', nom: `texte_grand_${k}`, arguments: [], ligne: noeud.ligne }, ligne: noeud.ligne },
+      ]
+      for (const cle of Object.keys(noeud)) delete noeud[cle]
+      Object.assign(noeud, { genre: 'bloc', corps: lignes, ligne: lignes[0].ligne })
+      k++
+      return
+    }
+    for (const v of Object.values(noeud)) preparer(v)
+  }
+  preparer(programme)
+  if (!k) return ''
+  const dessins = [...tuiles].map(([chiffres, nom]) =>
+    `Tuile ${nom} = {\n${[...Array(8)].map((_, r) => '  "' + chiffres.slice(r * 8, r * 8 + 8) + '",').join('\n')}\n};\n`).join('')
+  return dessins + sources.join('')
 }
 
 /*
@@ -5236,6 +5438,27 @@ function rangerLaPosition(noeud, siennes) {
   for (const v of Object.values(noeud)) rangerLaPosition(v, siennes)
 }
 
+/*
+ * ALPHABET_GRAS : l'alphabet en gras, de A à Z, à côté d'ALPHABET (qui ne
+ * change pas). « ALPHABET_GRAS[0] » est le A gras, « [25] » le Z gras.
+ *
+ * Ce ne sont que des tuiles dessinées, écrites dans le langage : 26
+ * « Tuile GRAS_A = { … }; » (voir lettresGrasses, dans police.js), puis un
+ * tableau qui les range dans l'ordre. Le compilateur les ajoute SEULEMENT si
+ * le programme parle d'ALPHABET_GRAS : sinon, pas un octet de plus.
+ */
+const SOURCE_ALPHABET_GRAS = lettresGrasses().map(({ lettre, lignes }) =>
+  `Tuile GRAS_${lettre} = {\n${lignes.map((l) => `  "${l}",`).join('\n')}\n};\n`).join('') +
+  `const uint8_t ALPHABET_GRAS[] = { ${lettresGrasses().map(({ lettre }) => 'GRAS_' + lettre).join(', ')} };\n`
+
+/** Le programme nomme-t-il `nom` quelque part (une variable, un tableau) ? */
+function nomme(noeud, nom) {
+  if (Array.isArray(noeud)) return noeud.some((n) => nomme(n, nom))
+  if (!noeud || typeof noeud !== 'object') return false
+  if (noeud.nom === nom && noeud.genre !== 'declarer') return true
+  return Object.values(noeud).some((v) => nomme(v, nom))
+}
+
 /** Le programme appelle-t-il `nom(…)` quelque part ? On fouille tout l'arbre. */
 function appelle(noeud, nom) {
   if (Array.isArray(noeud)) return noeud.some((n) => appelle(n, nom))
@@ -5252,6 +5475,7 @@ function appelle(noeud, nom) {
 function avecLesFonctionsEnC(programme) {
   const siennes = new Set(programme.filter((n) => n.genre === 'fonction').map((n) => n.nom))
   const vitesseReglee = preparerLesFormes(programme, siennes)
+  const textesGrands = preparerLesTextesGrands(programme, siennes)   // les tuiles agrandies et leurs tables
   rangerLaPosition(programme, siennes)
   const ajoutees = []
   for (const [nom, source] of Object.entries(FONCTIONS_EN_C)) {
@@ -5263,6 +5487,10 @@ function avecLesFonctionsEnC(programme) {
   const deplacements = ['deplace_x', 'deplace_y', 'deplace', 'va_a', 'un_pas', 'deplace_croix', 'glisse_croix']
   const bouge = deplacements.some((nom) => !siennes.has(nom) && appelle(programme, nom))
   if (bouge || vitesseReglee) ajoutees.unshift(...analyser(SOURCE_LIGNE_RENDUE))
+  if (textesGrands) ajoutees.unshift(...analyser(textesGrands))
+  /* L'alphabet en gras, si le programme en parle (et n'a pas le sien). */
+  const siensGlobaux = new Set(programme.filter((n) => n.genre === 'declarer').map((n) => n.nom))
+  if (!siensGlobaux.has('ALPHABET_GRAS') && nomme(programme, 'ALPHABET_GRAS')) ajoutees.unshift(...analyser(SOURCE_ALPHABET_GRAS))
   return [...ajoutees, ...programme]
 }
 

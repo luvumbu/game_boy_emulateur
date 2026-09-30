@@ -298,9 +298,19 @@ try {
       && reperes.includes('difficulté 3 / 10') && reperes.includes('atelier'),
     `\n      ${reperes}`)
 
-  const niveaux = await evaluer(`document.querySelectorAll('#sommaire li.partie').length`)
+  const niveaux = await evaluer(`document.querySelectorAll('#sommaire li.partie:not(.sous-partie)').length`)
   const attendus = new Set(LECONS.map((l) => l.difficulte)).size
   controle('le sommaire est découpé en niveaux', niveaux === attendus, ` (${niveaux} niveaux sur ${attendus})`)
+
+  /* Les parties d'un niveau (le 0 en a dix), chacune sous son titre.
+     On lit le texte de chaque titre de partie du sommaire (« A. Écrire des
+     lettres », « B. Le temps »…), puis on vérifie qu'il y en a autant que de
+     leçons portant « partie: », et que la première commence bien par A. */
+  const parties = await evaluer(`[...document.querySelectorAll('#sommaire li.sous-partie')].map(p => p.textContent)`)
+  const partiesAttendues = LECONS.filter((l) => l.partie).length
+  controle('le niveau 0 est découpé en parties, A, B, C…',
+    parties.length === partiesAttendues && parties[0]?.startsWith('A. '),
+    ` (${parties.length} parties sur ${partiesAttendues} : ${parties.slice(0, 3).join(', ')}…)`)
 
   /* --- la partition : écrire un air à la souris --- */
 

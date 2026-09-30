@@ -104,9 +104,19 @@ const DESSINS_LARGES = {
  */
 export const ORDRE = [' ', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.-:#|']
 
+/*
+ * La police n'a que des MAJUSCULES, sans accents. Un caractère est donc mis en
+ * majuscule, et débarrassé de son accent, avant d'être cherché :
+ * « a » → A, « é », « è », « ê » → E, « à » → A, « ç » → C, « ô » → O…
+ * (NFD sépare la lettre de son accent ; on ne garde que la lettre.)
+ */
+export function normaliser(caractere) {
+  return caractere.normalize('NFD').replace(/\p{M}/gu, '').toUpperCase()
+}
+
 /** Le numéro de tuile d'un caractère. Les inconnus deviennent des espaces. */
 export function numeroDe(caractere) {
-  const index = ORDRE.indexOf(caractere.toUpperCase())
+  const index = ORDRE.indexOf(normaliser(caractere))
   return index === -1 ? 0 : index
 }
 
@@ -150,3 +160,49 @@ export function octetsDesTuiles() {
 
 /** Combien de tuiles la police occupe. */
 export const NOMBRE_DE_TUILES = ORDRE.length
+
+/*
+ * L'alphabet EN GRAS, pour ALPHABET_GRAS : les mêmes lettres, aux traits
+ * épaissis d'un pixel vers la droite (chaque rangée de 5 bits, placée aux
+ * colonnes 1 à 5 comme la police, est recopiée une colonne plus à droite).
+ * Rien n'est dessiné à la main, sauf M, N et W : leurs traits sont si serrés
+ * que l'épaississement les remplirait ; ils sont redessinés sur 8 colonnes,
+ * en gardant leurs creux.
+ *
+ * Rend 26 dessins, de A à Z : 8 chaînes de 8 chiffres chacun, 0 le fond, 3 le
+ * trait — la forme d'une « Tuile » du langage.
+ */
+const GRAS_A_LA_MAIN = {
+  M: ['33000033', '33300333', '33333333', '33033033', '33000033', '33000033', '33000033', '00000000'],
+  N: ['33000033', '33300033', '33330033', '33033033', '33003333', '33000333', '33000033', '00000000'],
+  W: ['33000033', '33000033', '33000033', '33033033', '33333333', '33300333', '33000033', '00000000'],
+}
+export function lettresGrasses() {
+  return [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].map((lettre) => {
+    if (GRAS_A_LA_MAIN[lettre]) return { lettre, lignes: GRAS_A_LA_MAIN[lettre] }
+    const lignes = []
+    for (let y = 0; y < 8; y++) {
+      const r = DESSINS[lettre][y] ?? 0
+      const gras = ((r << 2) | (r << 1)) & 0xff        // colonnes 1 à 5, et une de plus à droite
+      lignes.push([...Array(8)].map((_, x) => ((gras >> (7 - x)) & 1 ? '3' : '0')).join(''))
+    }
+    return { lettre, lignes }
+  })
+}
+
+/*
+ * Les pixels d'un caractère, tels qu'ils sont posés dans sa tuile : 8 rangées
+ * de 8 nombres (0 le fond, 3 le trait), comme le fait octetsDesTuiles. Sert à
+ * texteGrand, qui AGRANDIT ces pixels. Rend null pour un caractère inconnu.
+ */
+export function pixelsDe(caractere) {
+  caractere = normaliser(caractere)             // minuscules et accents : la majuscule simple
+  if (!ORDRE.includes(caractere)) return null
+  const large = DESSINS_LARGES[caractere]
+  if (large) return large.map((r) => [...r].map(Number))
+  const rangees = DESSINS[caractere] ?? DESSINS[' ']
+  return [...Array(8)].map((_, y) => {
+    const r = ((rangees[y] ?? 0) << 2) & 0xff
+    return [...Array(8)].map((_, x) => ((r >> (7 - x)) & 1 ? 3 : 0))
+  })
+}

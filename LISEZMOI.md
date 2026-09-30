@@ -325,6 +325,9 @@ Deux noms sont fournis par la console, sans rien déclarer :
 | Nom | Ce que c'est |
 |---|---|
 | `ALPHABET` | les 26 lettres de la police : `ALPHABET[0]` est A (la tuile 1), `ALPHABET[25]` est Z. `sizeof(ALPHABET)` vaut 26. Rien n'est recopié : `ALPHABET[i]` se calcule `1 + i`. Il se lit, il ne s'écrit pas, et le nom est réservé |
+| `ALPHABET_GRAS` | un **second alphabet, en gras** : les mêmes 26 lettres, aux traits de 2 pixels (`ALPHABET_GRAS[0]` est le A gras). `sizeof(ALPHABET_GRAS)` vaut 26. Ajouté à la cartouche seulement si le programme s’en sert ; `ALPHABET` ne change pas |
+| `texteGrand(x, y, "…", taille)` | un texte **agrandi de 1 à 20 fois** (à 20, une lettre remplit l’écran), calculé à partir de la police : chaque pixel devient un carré de taille × taille, les proportions sont gardées. Une lettre prend taille × taille cases. Le texte et la taille s’écrivent en clair ; seules les tuiles utiles sont fabriquées, une fois chacune |
+| `texteGrandS(x, y, "…", taille)` | comme `texteGrand`, mais qui **va à la ligne** quand le texte est trop large (comme `textS`) ; **refusé** s’il dépasse le bas de l’écran, avec le nombre de lignes qu’il faudrait. Tout s’écrit en clair |
 | `Mot` | un type : **la place et le texte sous un seul nom**. `Mot SALUT = { 5, 6, "BONJOUR" };` puis `texte(SALUT)` et `effacer(SALUT)`. La colonne et la ligne peuvent être des variables : elles sont relues à chaque appel |
 
 Le numéro d'un lutin **peut être calculé** : `sprite(i, …)` dans une boucle
@@ -370,6 +373,8 @@ plus bas) ; on peut aussi les écrire à la main.
 | Fonction | Ce qu'elle fait |
 |---|---|
 | `couleurFond(palette, teinte, rouge, vert, bleu)` | une couleur du décor : palette 0 à 7, teinte 0 à 3, composantes 0 à 31 |
+| `couleurTexte(rouge, vert, bleu)` | la couleur de **toutes les lettres** (0 à 31 chacune) ; c’est `couleurFond(0, 3, r, v, b)` |
+| `texteCouleur(x, y, "…", palette)` | écrit le mot **et** met ses cases dans une palette (0 à 7) : le mot prend sa couleur |
 | `couleurLutin(palette, teinte, rouge, vert, bleu)` | une couleur des personnages (la teinte 0 est transparente) |
 | `teindre(colonne, ligne, palette)` | la case du fond prend cette palette. `teindre(c, l, 2 \| DEVANT)` : la case passe **devant les personnages** (un buisson, un pont) |
 | `teindrePanneau(colonne, ligne, palette)` | une case du **panneau** (le HUD, les dialogues) prend cette palette |
@@ -1256,7 +1261,17 @@ node verification/verifier-tuto.mjs       # 317 contrôles — les quatre-vingts
 node verification/verifier-tutoriels.mjs  #  61 contrôles — les 59 blocs de TUTORIELS.md, compilés pour de vrai
 node verification/verifier-inclusion.mjs  #  9 contrôles — cinq fichiers, une seule cartouche
 node verification/verifier-portage.mjs    #  3 contrôles — mais chacun compare 500 images
+node verification/verifier-disponible.mjs # 34 contrôles — l'atelier quand quelque chose MANQUE (npm run disponible)
+node verification/verifier-recherche.mjs  # 34 contrôles — chaque recherche, essayée dans un navigateur (npm run recherche)
 ```
+
+**`verifier-disponible.mjs` casse tout, exprès.** Dans une copie du projet, il
+retire chaque fichier de l'atelier tour à tour, prive le navigateur du son ou
+du stockage, lance `demarrer.mjs` sans PHP, sur un port déjà pris, deux fois de
+suite, et `lancer.bat` avec un Node trop vieux. À chaque fois, l'atelier doit
+marcher quand même, ou le dire en clair — jamais une page figée et muette. Le
+bandeau rouge qui le dit vient de `garde.js`. Il demande Node 22 et un Chrome,
+un Brave ou un Edge.
 
 **`verifier-langage.mjs` est le cœur.** `exemples/langage.cpp` calcule trente
 choses et les range dans un tableau ; le contrôle relit ce tableau dans la

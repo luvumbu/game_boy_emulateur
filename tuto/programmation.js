@@ -18,6 +18,12 @@
  *   6. les struct        — ce qui va ensemble, jusqu'au petit jeu complet
  *   7. les 4 nuances     — dessiner et animer sur la Game Boy d'origine
  *   8. la couleur        — les palettes de la Game Boy Color
+ *   9. le mouvement      — les lutins au pixel près, la vitesse, l’animation
+ *  10. les collisions    — deux boîtes, un mur, glisser le long
+ *  11. le hasard, le temps — une plage, une place libre, le chrono
+ *  12. les états du jeu  — enum, switch, le record gardé
+ *  13. le son            — une note, un bruit, un air
+ *  14. le défilement     — defiler(), la caméra
  *
  * L'ORDRE EST CELUI DU FICHIER : rien n'est trié. Le champ `difficulte` porte
  * ici le numéro du CHAPITRE, pour que les outils des leçons (la page, le
@@ -41,6 +47,12 @@ export const CHAPITRES = {
   6: 'Les struct : ce qui va ensemble',
   7: 'Les quatre nuances : la Game Boy d’origine',
   8: 'La couleur : la Game Boy Color',
+  9: 'Le mouvement : les lutins au pixel près',
+  10: 'Les collisions : se toucher, se cogner',
+  11: 'Le hasard et le temps',
+  12: 'Les états du jeu : titre, partie, fin',
+  13: 'Le son : notes, bruits, airs',
+  14: 'Le défilement : un monde plus grand que l’écran',
 }
 
 /** La nuance (0 à 3) d'un pixel de l'écran, sur la Game Boy d'origine. */
@@ -2734,6 +2746,1525 @@ int main() {
         ['DROITE déplace le héros', x1 > x0, ` (${x0} puis ${x1})`],
         ['le héros est rouge', heros === '31/4/2', ` (${heros})`],
         ['le sol est vert', sol === '4/18/2', ` (${sol})`],
+      ]
+    },
+  },
+  /* ================================================ 9 — le mouvement et les lutins */
+
+  {
+    titre: 'Au pixel près : le lutin glisse',
+    difficulte: 9,
+    provenance: 'cours',
+    idee: 'Une lettre saute de case en case, 8 pixels d’un coup ; un lutin avance d’un seul pixel.',
+    texte: [
+      'Jusqu’ici, presque tout bougeait **case par case** : `texte()` et `poser()` écrivent dans la grille du fond, 20 colonnes sur 18 lignes. Une case fait **8 × 8 pixels** : passer d’une case à la suivante, c’est un saut de 8 pixels. À l’œil, ça **saute**.',
+      'Un **lutin** (chapitre 7) ne vit pas dans la grille. `sprite(0, x, y, HEROS)` le pose **au pixel près** : `x` va de 0 (tout à gauche) à 152 (tout à droite : 160 pixels de large, moins les 8 du lutin), `y` de 0 à 136. Ajouter 1 à `x`, c’est avancer d’**un seul pixel** : le mouvement devient doux.',
+      '**Ce qui est nouveau ici : une seule variable, deux façons de la montrer.** `x` compte en pixels. Le lutin est posé à `x`. Le O, lui, est écrit à la colonne `x / 8` : la division entière du chapitre 1 range le pixel dans sa case. De 0 à 7 → case 0 ; de 8 à 15 → case 1 ; 76 / 8 = 9 (reste 4) → case 9.',
+      'Pousse DROITE et regarde : le lutin glisse, et le O ne bouge qu’**un pas sur huit**, d’un bloc. C’est toute la différence entre un jeu de cases (le snake, un jeu de plateau) et un jeu d’action (Mario, Zelda).',
+      '`case_o` retient la colonne où le O est écrit. On ne réécrit le O **que quand `x / 8` change** : `texte()` attend le VBlank (chapitre 3), et le lutin, lui, n’attend rien. Si on réécrivait le O à chaque image, le lutin ralentirait.',
+      '**À toi :** ajoute HAUT et BAS, avec `y`, et fais suivre le O sur les lignes avec `y / 8`.',
+    ],
+    code: `/* Le heros : un lutin de 8 x 8 pixels.
+   Les points '.' sont l'indice 0 : chez un lutin, ils sont TRANSPARENTS. */
+Tuile HEROS = {
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+uint8_t x = 76;        // la position du lutin, EN PIXELS : 0 a gauche ... 152 a droite
+uint8_t case_o = 9;    // la colonne ou le O est ecrit en ce moment : 76 / 8 = 9
+
+int main() {
+  texte(1, 1, "EN CASES : 8 PIXELS");
+  texte(1, 7, "EN PIXELS : 1 PIXEL");
+  texte(case_o, 4, "O");       // le O, dans la grille du fond (ligne 4)
+
+  while (true) {
+    image();                   // une image : 60 par seconde
+
+    /* le pixel : un de plus, ou un de moins, a chaque image */
+    if (bouton(DROITE) && x < 152) x++;
+    if (bouton(GAUCHE) && x > 0) x--;
+
+    /* le lutin suit x au pixel pres (ligne de pixels 80 : sous le texte) */
+    sprite(0, x, 80, HEROS);
+
+    /* la case : x / 8. Le O ne change de place que quand elle change. */
+    if (x / 8 != case_o) {
+      texte(case_o, 4, " ");   // on efface l'ancien O
+      case_o = x / 8;          // la nouvelle case : 77 / 8 = 9, 80 / 8 = 10 ...
+      texte(case_o, 4, "O");   // et on l'ecrit la
+    }
+  }
+}
+`,
+    aVoir: 'Un O dans la grille, un petit héros en dessous. DROITE et GAUCHE : le héros glisse pixel par pixel, le O saute de case en case.',
+    controle: (c) => {
+      const x0 = c.lutin(0).x
+      c.gb.setButton('right', true)
+      const xs = []
+      for (let k = 0; k < 24; k++) { c.avancer(1); xs.push(c.lutin(0).x) }
+      c.gb.setButton('right', false)
+      c.avancer(10)
+      const pasDeUn = xs.slice(1).every((x, k) => x - xs[k] <= 1)
+      const x1 = c.variable('x')
+      const o = c.mot(0, 4, 20).indexOf('O')
+      return [
+        ['le lutin part du pixel 76', x0 === 76],
+        ['il avance d’un pixel à la fois', pasDeUn && x1 > x0 + 10, ` (${x0} puis ${x1})`],
+        ['le lutin est bien à x', c.lutin(0).x === x1],
+        ['le O est dans la case x / 8', o === Math.floor(x1 / 8), ` (case ${o}, x ${x1})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La vitesse : un pas toutes les N images',
+    difficulte: 9,
+    provenance: 'cours',
+    idee: 'Un pixel par image, c’est 60 pixels par seconde. Pour aller moins vite, on n’avance pas à chaque image.',
+    texte: [
+      'La leçon d’avant avançait d’un pixel **à chaque image** : 60 pixels par seconde, l’écran traversé en moins de trois secondes. C’est vif. Un personnage qui marche lentement, une tortue, un nuage, doivent aller **moins vite**.',
+      'On ne peut pas avancer d’un demi-pixel. Alors on **saute des images** : on n’avance qu’**une image sur N**. Une sur 2 : 30 pixels par seconde. Une sur 4 : 15.',
+      '**Ce qui est nouveau ici : `lenteur`, une variable qui règle la vitesse.** `attente` compte les images ; quand elle atteint `lenteur`, on la remet à 0 et on fait **un pas**. C’est la montre du chapitre 3 (« une boucle qui dure plusieurs images »), mise au service du mouvement.',
+      'Déroulons avec `lenteur = 4` : image 1, `attente` vaut 1 → rien. Image 2 → 2, rien. Image 3 → 3, rien. Image 4 → 4 : **un pas**, et `attente` revient à 0. Un pas toutes les 4 images.',
+      'A règle `lenteur` à 1 (le plus rapide : un pas par image), B à 4 (quatre fois plus lent). Pour aller **plus vite** qu’un pixel par image, on ferait `x = x + 2` : deux pixels d’un coup. Au-delà de 3 ou 4 pixels, l’œil recommence à voir des sauts.',
+      '**À toi :** donne à GAUCHE et DROITE deux lenteurs différentes — un personnage qui recule plus lentement qu’il n’avance.',
+    ],
+    code: `Tuile HEROS = {
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+uint8_t x = 20;          // la position, en pixels
+uint8_t lenteur = 4;     // un pas toutes les 4 images, au depart
+uint8_t attente = 0;     // les images comptees depuis le dernier pas
+
+int main() {
+  texte(1, 1, "A: RAPIDE  1");
+  texte(1, 2, "B: LENT    4");
+
+  while (true) {
+    image();
+
+    if (bouton(A)) lenteur = 1;        // un pas a chaque image : 60 pixels par seconde
+    if (bouton(B)) lenteur = 4;        // un pas toutes les 4 images : 15 par seconde
+
+    attente++;                         // une image de plus
+    if (attente >= lenteur) {          // c'est le moment d'un pas ?
+      attente = 0;                     // oui : on recommence a compter
+      if (bouton(DROITE) && x < 152) x++;
+      if (bouton(GAUCHE) && x > 0) x--;
+    }
+
+    sprite(0, x, 72, HEROS);
+  }
+}
+`,
+    aVoir: 'Un héros que DROITE et GAUCHE déplacent lentement ; après A, il file quatre fois plus vite ; B le ralentit de nouveau.',
+    controle: (c) => {
+      const mesurer = () => {
+        const avant = c.variable('x')
+        c.gb.setButton('right', true)
+        c.avancer(40)
+        c.gb.setButton('right', false)
+        c.avancer(2)
+        return c.variable('x') - avant
+      }
+      const lent = mesurer()
+      c.presser('a', 3)
+      const rapide = mesurer()
+      c.presser('b', 3)
+      const denouveau = mesurer()
+      return [
+        ['lent : environ un pixel toutes les 4 images', lent >= 9 && lent <= 11, ` (${lent} pixels en 40 images)`],
+        ['après A : un pixel par image', rapide >= 38 && rapide <= 40, ` (${rapide} pixels en 40 images)`],
+        ['B le ralentit de nouveau', denouveau >= 9 && denouveau <= 11, ` (${denouveau})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Animer : deux dessins pour marcher',
+    difficulte: 9,
+    provenance: 'cours',
+    idee: 'Un personnage qui glisse sans bouger les jambes a l’air d’un meuble. Deux dessins, alternés, et il marche.',
+    texte: [
+      'Une animation, au cinéma comme sur Game Boy, n’est qu’une suite d’images fixes montrées vite. Pour marcher, **deux dessins** suffisent : jambes écartées, jambes serrées.',
+      '**Ce qui est nouveau ici : le lutin change de dessin.** `sprite(0, x, y, PAS1)` ou `sprite(0, x, y, PAS2)` : le même lutin n° 0, au même endroit, mais une autre tuile. La console ne redessine rien : elle lit simplement une autre tuile.',
+      '`dessin` vaut 0 ou 1 : lequel des deux montrer. `compte` compte les images ; toutes les 8 images, `dessin = 1 - dessin` le fait **basculer** : 1 - 0 = 1, puis 1 - 1 = 0, puis 1 - 0 = 1… Un interrupteur en une ligne.',
+      'Quand aucune flèche n’est enfoncée, on remet `dessin` à 0 : le héros s’arrête **debout**, sur son premier dessin, et pas figé au milieu d’un pas.',
+      'Pourquoi 8 images ? À chaque image, les jambes battraient 30 fois par seconde : un tremblement. Toutes les 30 images, le héros aurait l’air de glisser entre deux pas. Entre 6 et 12 images, l’œil voit une marche.',
+      '**À toi :** ajoute un troisième dessin (`PAS3`) et fais tourner `dessin` de 0 à 2 avec `dessin = (dessin + 1) % 3`.',
+    ],
+    code: `/* Deux dessins : jambes ecartees, jambes serrees. Le haut est le meme. */
+Tuile PAS1 = {
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile PAS2 = {
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  "..#..#..",
+  "..##.##.",
+};
+
+uint8_t x = 76;
+uint8_t dessin = 0;     // 0 : PAS1, 1 : PAS2
+uint8_t compte = 0;     // les images depuis le dernier changement de dessin
+
+int main() {
+  texte(1, 1, "GAUCHE  DROITE");
+
+  while (true) {
+    image();
+
+    uint8_t bouge = 0;                         // 1 si le heros avance cette image
+    if (bouton(DROITE) && x < 152) { x++; bouge = 1; }
+    if (bouton(GAUCHE) && x > 0)   { x--; bouge = 1; }
+
+    if (bouge) {
+      compte++;
+      if (compte >= 8) {         // toutes les 8 images ...
+        compte = 0;
+        dessin = 1 - dessin;     // ... on bascule : 0 -> 1 -> 0 -> 1
+      }
+    } else {
+      dessin = 0;                // a l'arret : debout, sur le premier dessin
+      compte = 0;
+    }
+
+    if (dessin == 0) {
+      sprite(0, x, 72, PAS1);
+    } else {
+      sprite(0, x, 72, PAS2);
+    }
+  }
+}
+`,
+    aVoir: 'Un héros immobile ; avec DROITE ou GAUCHE, ses jambes battent pendant qu’il avance.',
+    controle: (c) => {
+      const auRepos = c.lutin(0).tuile
+      c.gb.setButton('right', true)
+      const tuiles = new Set()
+      for (let k = 0; k < 40; k++) { c.avancer(1); tuiles.add(c.lutin(0).tuile) }
+      c.gb.setButton('right', false)
+      c.avancer(5)
+      return [
+        ['en marchant, le lutin montre deux dessins', tuiles.size === 2, ` (${tuiles.size})`],
+        ['à l’arrêt, il revient à son premier dessin', c.lutin(0).tuile === auRepos && c.variable('dessin') === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'Regarder à gauche ou à droite : le miroir',
+    difficulte: 9,
+    provenance: 'cours',
+    idee: 'Un seul dessin, tourné vers la droite ; la console le retourne pour aller à gauche.',
+    texte: [
+      'Un héros qui recule **de face** et avance de face a l’air de reculer. Il doit **regarder** où il va. On pourrait dessiner une seconde tuile, tournée vers la gauche ; il y a mieux : la console sait **retourner** un lutin, sans rien dessiner.',
+      '**Ce qui est nouveau ici : le 5e argument de `sprite()`, `MIROIR_X`.** `sprite(0, x, y, HEROS, MIROIR_X)` montre le dessin **retourné de gauche à droite**, comme dans un miroir. `MIROIR_Y` le retourne de haut en bas (un personnage qui tombe la tête en bas).',
+      'On range ce choix dans une **variable**, `regard` : `0` pour « tel quel » (vers la droite), `MIROIR_X` pour « retourné » (vers la gauche). GAUCHE met `regard = MIROIR_X`, DROITE le remet à 0. On le passe à `sprite()` à chaque image.',
+      'Remarque ce qui se passe quand on **lâche** la flèche : rien ne remet `regard` à 0. Le héros reste tourné **du côté où il allait**. C’est ce que font tous les jeux : une variable retient la dernière direction.',
+      'Le retournement ne coûte rien : c’est un bit dans les quatre octets qui décrivent chaque lutin à la console. Un seul dessin sert aux deux côtés, la moitié de la mémoire à dessiner.',
+      '**À toi :** avec HAUT, mets `regard = MIROIR_Y` et regarde ton héros la tête en bas.',
+    ],
+    code: `/* Le heros regarde a DROITE : son oeil et son nez sont du cote droit. */
+Tuile HEROS = {
+  "..####..",
+  ".######.",
+  ".####-#.",
+  ".#######",
+  ".####...",
+  "..###...",
+  "..#.#...",
+  ".##.##..",
+};
+
+uint8_t x = 76;
+uint8_t regard = 0;     // 0 : vers la droite (tel quel), MIROIR_X : vers la gauche
+
+int main() {
+  texte(1, 1, "GAUCHE  DROITE");
+
+  while (true) {
+    image();
+
+    if (bouton(DROITE) && x < 152) {
+      x++;
+      regard = 0;             // tel quel : il regarde a droite
+    }
+    if (bouton(GAUCHE) && x > 0) {
+      x--;
+      regard = MIROIR_X;      // retourne : il regarde a gauche
+    }
+
+    /* le 5e argument : 0 ou MIROIR_X, selon la derniere direction */
+    sprite(0, x, 72, HEROS, regard);
+  }
+}
+`,
+    aVoir: 'Un héros tourné vers la droite ; GAUCHE le retourne, et il reste tourné vers la gauche quand on lâche.',
+    controle: (c) => {
+      const attributs = () => c.gb.mmu.read(0xfe03)
+      const auDebut = attributs() & 0x20
+      c.presser('left', 10)
+      const aGauche = attributs() & 0x20
+      c.avancer(20)
+      const resteAGauche = attributs() & 0x20
+      c.presser('right', 10)
+      const aDroite = attributs() & 0x20
+      return [
+        ['au départ, le héros est tel quel', auDebut === 0],
+        ['GAUCHE le retourne', aGauche === 0x20],
+        ['il reste retourné quand on lâche', resteAGauche === 0x20],
+        ['DROITE le remet tel quel', aDroite === 0],
+      ]
+    },
+  },
+  /* ================================================ 10 — les collisions */
+
+  {
+    titre: 'Deux boîtes qui se touchent',
+    difficulte: 10,
+    provenance: 'cours',
+    idee: 'Deux lutins se touchent si leurs carrés se chevauchent : quatre comparaisons, pas une de plus.',
+    texte: [
+      'Ramasser une pièce, se faire toucher par un ennemi, recevoir une flèche : c’est toujours la même question. **Deux lutins se touchent-ils ?** Au pixel près, on ne peut plus demander « sont-ils dans la même case ? » : il faut comparer des **boîtes**.',
+      'Chaque lutin occupe un carré de 8 × 8 pixels. Le héros va de `x` à `x + 7` en largeur, la pièce de `px` à `px + 7`. Ils se chevauchent en largeur **si aucun des deux n’est entièrement à côté de l’autre** : le héros commence avant la fin de la pièce (`x < px + 8`) **et** la pièce commence avant la fin du héros (`px < x + 8`).',
+      'Exemple chiffré : héros en `x = 60`, pièce en `px = 66`. 60 < 74 : oui. 66 < 68 : oui. Ils se chevauchent (sur 2 pixels, de 66 à 67). Héros en `x = 50` : 66 < 58 ? non — la pièce commence après la fin du héros. Pas de contact.',
+      '**Ce qui est nouveau ici : `touche()`, quatre comparaisons liées par `&&`.** Deux pour la largeur, deux pour la hauteur, avec les mêmes règles sur `y` et `py`. Les quatre doivent être vraies : si une seule est fausse, les boîtes sont séparées par au moins une ligne ou une colonne de pixels.',
+      'Quand ça touche, `score` augmente et la pièce **saute** à la place suivante d’une table gravée (chapitre 4). `(i + 1) % 3` fait tourner `i` sur 0, 1, 2, 0, 1… : le modulo du chapitre 1.',
+      '**À toi :** rétrécis la boîte de la pièce (compare avec `px + 2` et `px + 6`) : il faut alors vraiment marcher dessus. Beaucoup de jeux donnent aux objets une boîte plus petite que leur dessin, pour être justes avec le joueur.',
+    ],
+    code: `Tuile HEROS = {
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile PIECE = {
+  "..####..",
+  ".#----#.",
+  "#-#--#-#",
+  "#-#--#-#",
+  "#-#--#-#",
+  "#-#--#-#",
+  ".#----#.",
+  "..####..",
+};
+
+/* Les trois places de la piece, l'une apres l'autre (en pixels). */
+const uint8_t PX[] = { 120,  24,  80 };
+const uint8_t PY[] = {  72, 104,  40 };
+
+uint8_t x = 40;          // le heros
+uint8_t y = 72;
+uint8_t i = 0;           // la place de la piece en ce moment : 0, 1 ou 2
+uint8_t score = 0;
+
+/* 1 si la boite du heros chevauche celle de la piece, 0 sinon. */
+uint8_t touche() {
+  return x < PX[i] + 8 && PX[i] < x + 8     // en largeur
+      && y < PY[i] + 8 && PY[i] < y + 8;    // et en hauteur
+}
+
+int main() {
+  texte(1, 1, "SCORE");
+  nombre(7, 1, score);
+
+  while (true) {
+    image();
+
+    if (bouton(DROITE) && x < 152) x++;
+    if (bouton(GAUCHE) && x > 0) x--;
+    if (bouton(BAS) && y < 136) y++;
+    if (bouton(HAUT) && y > 16) y--;
+
+    if (touche()) {
+      score++;
+      i = (i + 1) % 3;         // la piece saute a la place suivante
+      nombre(7, 1, score);     // on n'ecrit le score QUE quand il change
+    }
+
+    sprite(0, x, y, HEROS);
+    sprite(1, PX[i], PY[i], PIECE);
+  }
+}
+`,
+    aVoir: 'Un héros et une pièce sur la même ligne ; en marchant dessus, le score monte et la pièce saute ailleurs.',
+    controle: (c) => {
+      const avant = c.variable('score')
+      let contactX = null
+      c.gb.setButton('right', true)
+      for (let k = 0; k < 200 && c.variable('score') === avant; k++) { c.avancer(1); contactX = c.variable('x') }
+      c.gb.setButton('right', false)
+      c.avancer(5)
+      return [
+        ['au départ, le score est 0', avant === 0],
+        ['en marchant sur la pièce, le score monte', c.variable('score') === 1],
+        ['le contact arrive quand les boîtes se chevauchent : x = 113', contactX === 113, ` (x = ${contactX})`],
+        ['la pièce a sauté à sa deuxième place', c.lutin(1).x === 24 && c.lutin(1).y === 104],
+      ]
+    },
+  },
+
+  {
+    titre: 'Lire la case devant soi : le mur',
+    difficulte: 10,
+    provenance: 'cours',
+    idee: 'Avant de faire un pas, on regarde quelle tuile il y a là où l’on va.',
+    texte: [
+      'Les murs ne sont pas des lutins : ils sont **dans le décor**, posés avec `poser()`. Pour savoir si le héros peut avancer, on ne compare donc pas des boîtes : on **lit la case** où il va entrer, avec `lire(colonne, ligne)` qui rend la tuile posée là.',
+      'Le héros compte en **pixels**, la grille en **cases**. Le pont entre les deux est la division de la leçon « au pixel près » : le pixel `p` est dans la case `p / 8`.',
+      '**Ce qui est nouveau ici : lire la case du pixel qu’on va toucher.** Le héros occupe les pixels `x` à `x + 7`. Un pas à droite le fait entrer dans le pixel `x + 8` : on lit la case `(x + 8) / 8`. Un pas à gauche, dans le pixel `x - 1` : on lit la case `(x - 1) / 8`.',
+      'Déroulons à droite. Le mur est en colonne 16, qui couvre les pixels 128 à 135. Héros en `x = 119` : son prochain pixel est 127, case 127 / 8 = 15, vide — il avance. En `x = 120` : prochain pixel 128, case 16 : **le mur**. Il s’arrête, collé contre lui, sans le traverser d’un seul pixel.',
+      'À gauche, le mur est en colonne 3 (pixels 24 à 31). Le héros s’arrête en `x = 32` : son prochain pixel serait 31, dans le mur.',
+      'Le héros est posé sur la ligne de pixels 64 = 8 × 8 : il est **pile** dans la ligne de cases 8. Il n’y a donc qu’une ligne de cases à regarder. La leçon suivante le libère de haut en bas.',
+      '**À toi :** pose un deuxième mur en colonne 10 et vérifie que le héros s’y arrête des deux côtés.',
+    ],
+    code: `Tuile HEROS = {
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+/* Un bloc de mur, dessine en quatre nuances. */
+Tuile MUR = {
+  "33333333",
+  "31111113",
+  "31222213",
+  "31222213",
+  "31222213",
+  "31222213",
+  "31111113",
+  "33333333",
+};
+
+uint8_t x = 76;      // en pixels ; le heros occupe les pixels x a x + 7
+uint8_t y = 64;      // 64 = 8 x 8 : pile sur la ligne de cases 8
+
+int main() {
+  texte(1, 1, "GAUCHE  DROITE");
+  poser(3, 8, MUR);      // colonne 3 : les pixels 24 a 31
+  poser(16, 8, MUR);     // colonne 16 : les pixels 128 a 135
+
+  while (true) {
+    image();
+
+    /* a droite : le prochain pixel est x + 8, dans la case (x + 8) / 8 */
+    if (bouton(DROITE) && lire((x + 8) / 8, 8) != MUR) x++;
+
+    /* a gauche : le prochain pixel est x - 1, dans la case (x - 1) / 8 */
+    if (bouton(GAUCHE) && lire((x - 1) / 8, 8) != MUR) x--;
+
+    sprite(0, x, y, HEROS);
+  }
+}
+`,
+    aVoir: 'Un héros entre deux blocs de mur ; il avance jusqu’à les toucher, et s’arrête pile contre eux.',
+    controle: (c) => {
+      tenir(c, 'right', () => false, 120)
+      const droite = c.variable('x')
+      tenir(c, 'left', () => false, 150)
+      const gauche = c.variable('x')
+      return [
+        ['à droite, il s’arrête contre le mur : x = 120', droite === 120, ` (${droite})`],
+        ['à gauche aussi : x = 32', gauche === 32, ` (${gauche})`],
+        ['les murs sont toujours là', c.lire(3, 8) !== 0 && c.lire(16, 8) !== 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'Glisser le long d’un mur : un axe à la fois',
+    difficulte: 10,
+    provenance: 'cours',
+    idee: 'Tester la largeur, puis la hauteur, séparément : le héros bloqué d’un côté continue de l’autre.',
+    texte: [
+      'Maintenant le héros va partout, et en diagonale. Il occupe un carré de pixels qui peut chevaucher **deux lignes** de cases, ou **deux colonnes**. Avant d’avancer, on regarde donc **deux coins** : ceux qui vont entrer les premiers dans la case suivante.',
+      'Pour ne pas écrire quatre fois `lire(p / 8, q / 8) != MUR`, on en fait une fonction, `libre(px, py)` : « le pixel (px, py) est-il hors d’un mur ? ». Le chapitre 5 dans toute sa force : un nom clair, et chaque test tient en une ligne.',
+      'À droite, les deux coins qui entrent sont **en haut à droite** et **en bas à droite** du prochain pas : `(x + 8, y)` et `(x + 8, y + 7)`. À gauche, `(x - 1, y)` et `(x - 1, y + 7)`. En bas, `(x, y + 8)` et `(x + 7, y + 8)`. En haut, `(x, y - 1)` et `(x + 7, y - 1)`.',
+      '**Ce qui est nouveau ici : un axe à la fois.** On essaie d’abord le pas en largeur, **puis** le pas en hauteur, chacun avec son test. Pousse DROITE et BAS contre le mur vertical : le pas à droite est refusé, mais le pas vers le bas est accepté. Le héros **glisse** le long du mur au lieu de s’y coller.',
+      'Si l’on testait la diagonale d’un coup (« le coin en bas à droite, en `(x + 8, y + 8)`, est-il libre ? »), le moindre mur arrêterait **les deux** mouvements : le héros resterait collé dès qu’il frôle quelque chose. C’est la sensation « poisseuse » des jeux mal réglés.',
+      '**À toi :** retire le test des deux coins à droite pour n’en garder qu’un (`libre(x + 8, y)`), et regarde le héros entrer à moitié dans le mur par le bas.',
+    ],
+    code: `Tuile HEROS = {
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile MUR = {
+  "33333333", "31111113", "31222213", "31222213",
+  "31222213", "31222213", "31111113", "33333333",
+};
+
+uint8_t x = 40;
+uint8_t y = 40;
+
+/* 1 si le PIXEL (px, py) n'est pas dans un mur. */
+uint8_t libre(uint8_t px, uint8_t py) {
+  return lire(px / 8, py / 8) != MUR;
+}
+
+int main() {
+  ecran(0);
+  texte(1, 1, "DROITE ET BAS");
+  for (uint8_t l = 3; l < 17; l++) poser(12, l, MUR);    // un mur debout, colonne 12
+  for (uint8_t c = 0; c < 20; c++) poser(c, 16, MUR);    // le sol, ligne 16
+  ecran(1);
+
+  while (true) {
+    image();
+
+    /* 1. la largeur : les deux coins du cote ou l'on va */
+    if (bouton(DROITE) && libre(x + 8, y) && libre(x + 8, y + 7)) x++;
+    if (bouton(GAUCHE) && x > 0 && libre(x - 1, y) && libre(x - 1, y + 7)) x--;
+
+    /* 2. puis la hauteur, a part : bloque d'un cote, on avance de l'autre */
+    if (bouton(BAS) && libre(x, y + 8) && libre(x + 7, y + 8)) y++;
+    if (bouton(HAUT) && y > 16 && libre(x, y - 1) && libre(x + 7, y - 1)) y--;
+
+    sprite(0, x, y, HEROS);
+  }
+}
+`,
+    aVoir: 'Un mur debout et un sol ; en poussant DROITE et BAS, le héros descend en frôlant le mur, puis s’arrête sur le sol.',
+    controle: (c) => {
+      c.gb.setButton('right', true)
+      c.gb.setButton('down', true)
+      c.avancer(60)
+      const xColle = c.variable('x')
+      const yEnRoute = c.variable('y')
+      c.avancer(80)
+      c.gb.setButton('right', false)
+      c.gb.setButton('down', false)
+      c.avancer(5)
+      return [
+        ['le mur arrête le pas à droite : x = 88', xColle === 88, ` (${xColle})`],
+        ['mais le héros continue de descendre', yEnRoute > 60, ` (y = ${yEnRoute})`],
+        ['il s’arrête sur le sol : y = 120', c.variable('y') === 120, ` (${c.variable('y')})`],
+        ['sans entrer dans le mur', c.variable('x') === 88],
+      ]
+    },
+  },
+  /* ================================================ 11 — le hasard et le temps */
+
+  {
+    titre: 'Le hasard dans une plage choisie',
+    difficulte: 11,
+    provenance: 'cours',
+    idee: 'hasard() rend 0 à 255 ; « début + hasard() % combien » le range entre deux bornes.',
+    texte: [
+      '`hasard()` rend un nombre imprévisible de **0 à 255**. On ne veut presque jamais ça : on veut un dé de 1 à 6, une colonne de 2 à 17, une chance sur quatre.',
+      '**Ce qui est nouveau ici : la formule `debut + hasard() % combien`.** Le modulo (chapitre 1) rend un reste **de 0 à combien - 1** ; on ajoute le début. Pour un dé : `1 + hasard() % 6` → reste de 0 à 5, plus 1 → **1 à 6**. Pour une colonne de 2 à 17 : il y a 16 colonnes, donc `2 + hasard() % 16` → **2 à 17**.',
+      'Exemples chiffrés : si `hasard()` rend 200, 200 % 6 = 2 (car 6 × 33 = 198, reste 2) → face 3. S’il rend 17 : 17 % 6 = 5 → face 6. S’il rend 0 : face 1.',
+      '**Un appui, un tirage.** `bouton(A)` reste vrai **tant que** A est enfoncé : plusieurs images de suite, donc plusieurs tirages. On veut un tirage **au moment où on appuie**. `avant` retient l’état de A à l’image d’avant ; `a && !avant` n’est vrai qu’à la première image de l’appui (enfoncé maintenant, relâché avant). On appelle cela un **front**.',
+      'Un détail honnête : 256 n’est pas divisible par 6 (256 = 6 × 42 + 4). Les faces 1 à 4 sortent donc 43 fois sur 256, les faces 5 et 6 seulement 42 fois. La différence est minuscule pour un jeu ; elle compterait pour un casino.',
+      '**À toi :** tire une chance sur quatre (`hasard() % 4 == 0`) et affiche « BONUS! » quand elle tombe.',
+    ],
+    code: `uint8_t de = 1;         // le dernier de tire : 1 a 6
+uint8_t colonne = 2;    // la derniere colonne tiree : 2 a 17
+uint8_t avant = 0;      // A etait-il enfonce a l'image d'avant ?
+
+int main() {
+  texte(1, 1, "A: LANCER");
+  texte(1, 4, "DE");
+  texte(1, 8, "|                  |");    // la piste : colonnes 1 et 18 sont les bords
+  nombre(5, 4, de, 1);
+  texte(colonne, 8, "P");
+
+  while (true) {
+    image();
+
+    uint8_t a = bouton(A);        // A, maintenant
+    if (a && !avant) {            // enfonce maintenant, pas avant : un FRONT
+      de = 1 + hasard() % 6;      // reste 0 a 5, plus 1 : 1 a 6
+      nombre(5, 4, de, 1);
+
+      texte(colonne, 8, " ");     // efface l'ancien P
+      colonne = 2 + hasard() % 16;  // reste 0 a 15, plus 2 : 2 a 17
+      texte(colonne, 8, "P");
+    }
+    avant = a;                    // on retient A pour l'image suivante
+  }
+}
+`,
+    aVoir: 'Un dé et un P sur une piste ; chaque appui sur A tire une face de 1 à 6 et une nouvelle place pour le P, toujours entre les deux bords.',
+    controle: (c) => {
+      const des = []
+      const colonnes = []
+      for (let k = 0; k < 40; k++) {
+        c.presser('a', 3)
+        c.avancer(3)
+        des.push(c.variable('de'))
+        colonnes.push(c.variable('colonne'))
+      }
+      const pistes = c.mot(0, 8, 20)
+      return [
+        ['chaque dé est entre 1 et 6', des.every((d) => d >= 1 && d <= 6), ` (${[...new Set(des)].sort().join(' ')})`],
+        ['plusieurs faces sortent', new Set(des).size >= 4],
+        ['chaque colonne est entre 2 et 17', colonnes.every((x) => x >= 2 && x <= 17)],
+        ['un seul P sur la piste, à sa colonne', pistes.split('P').length === 2 && pistes.indexOf('P') === c.variable('colonne')],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une place libre : tirer encore',
+    difficulte: 11,
+    provenance: 'cours',
+    idee: 'Le hasard ne sait pas où sont les murs. On tire, on regarde, et on recommence tant que c’est pris.',
+    texte: [
+      'On veut semer quinze pièces P dans une salle. Tirer une colonne et une ligne au hasard ne suffit pas : le hasard ne sait rien de l’écran. Il peut tomber **sur un mur**, ou **sur une pièce déjà posée** — on en verrait alors quatorze, et le jeu ne se finirait jamais.',
+      '**Ce qui est nouveau ici : tirer jusqu’à trouver une case vide.** C’est exactement le travail de `do … while` (chapitre 3) : **au moins un** tirage, puis on recommence **tant que** la case n’est pas vide. Une case vide, c’est la tuile 0 : `lire(c, l) != 0` veut dire « déjà prise ».',
+      'Déroulons une pièce. Premier tirage : (0, 5). `lire(0, 5)` rend un X, le bord : ce n’est pas 0, on retire. Deuxième tirage : (7, 9) : vide. On sort du `do … while` et on pose le P. La pièce suivante ne pourra plus tomber en (7, 9) : `lire` y trouve un P.',
+      'Pourquoi ça finit ? Parce qu’il reste beaucoup de cases vides : sur 20 × 18 = 360 cases, il y a une soixantaine de murs et quinze pièces. Même au pire, un tirage sur deux ou trois tombe bien. **Si la salle était pleine, la boucle ne finirait jamais** : un jeu doit toujours garder de la place pour ce qu’il sème.',
+      'Tout se fait **écran éteint** (`ecran(0)`) : les quinze pièces et les murs apparaissent d’un coup, sans attendre un VBlank par écriture.',
+      '**À toi :** remplace `do … while` par un seul tirage, et compte les P : de temps en temps, il en manque.',
+    ],
+    code: `const uint8_t PIECES = 15;
+
+int main() {
+  ecran(0);
+
+  /* le cadre : les bords de l'ecran en X */
+  for (uint8_t c = 0; c < 20; c++) {
+    texte(c, 0, "X");
+    texte(c, 17, "X");
+  }
+  for (uint8_t l = 1; l < 17; l++) {
+    texte(0, l, "X");
+    texte(19, l, "X");
+  }
+  /* et un mur au milieu */
+  for (uint8_t c = 4; c < 16; c++) texte(c, 8, "X");
+
+  /* quinze pieces, jamais sur un X, jamais sur un P */
+  for (uint8_t i = 0; i < PIECES; i++) {
+    uint8_t c = 0;
+    uint8_t l = 0;
+    do {
+      c = hasard() % 20;          // 0 a 19 : n'importe quelle colonne
+      l = hasard() % 18;          // 0 a 17 : n'importe quelle ligne
+    } while (lire(c, l) != 0);    // deja prise ? on tire encore
+    texte(c, l, "P");             // ici, c'est vide : on pose
+  }
+
+  ecran(1);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Une salle bordée de X, un mur au milieu, et quinze P semés au hasard — jamais sur un X.',
+    controle: (c) => {
+      let p = 0
+      let x = 0
+      for (let l = 0; l < 18; l++) {
+        const ligne = c.mot(0, l, 20)
+        p += ligne.split('P').length - 1
+        x += ligne.split('X').length - 1
+      }
+      const murIntact = c.mot(4, 8, 12) === 'XXXXXXXXXXXX'
+      return [
+        ['exactement quinze P', p === 15, ` (${p})`],
+        ['aucun X recouvert : 20 + 20 + 16 + 16 + 12 = 84', x === 84, ` (${x})`],
+        ['le mur du milieu est entier', murIntact],
+      ]
+    },
+  },
+
+  {
+    titre: 'Compter les secondes : un chronomètre',
+    difficulte: 11,
+    provenance: 'cours',
+    idee: 'images() compte les images même quand la boucle prend du retard : c’est l’horloge fidèle.',
+    texte: [
+      'La console affiche **60 images par seconde**. Compter les secondes, c’est donc compter les images par paquets de 60. Mais **qui** compte ?',
+      'Si l’on écrit `compte++` à chaque tour de boucle, on se trompe dès qu’un tour dure **plus d’une image** — et c’est le cas à chaque `nombre()`, qui attend le VBlank (chapitre 3). Le chronomètre retarderait un peu plus à chaque affichage.',
+      '**Ce qui est nouveau ici : `images()`, l’horloge de la console.** Elle compte les images depuis l’allumage, **toute seule**, même quand la boucle est en retard. Elle tient dans un octet : après 255, elle repart à 0.',
+      'On retient dans `top` le moment de la dernière seconde. `ecoule = images() - top` dit combien d’images ont passé depuis. Quand il atteint 60, une seconde est écoulée : `sec++`, et `top = top + 60` avance le repère d’**exactement** une seconde. On n’écrit pas `top = images()` : si le tour avait pris une image de retard, on la perdrait, et le chrono dériverait.',
+      'Le passage de 255 à 0 ne gêne pas : un octet déborde aussi dans la soustraction. Si `top` vaut 250 et `images()` vaut 54 (il a fait le tour), `54 - 250` donne 60 : 54 + 256 - 250. C’est la règle de l’octet (chapitre 1), qui travaille enfin pour nous.',
+      'Les minutes suivent la même idée : à 60 secondes, `sec` revient à 0 et `min` augmente. On n’écrit l’heure **qu’une fois par seconde**, quand elle change. A remet tout à zéro.',
+      '**À toi :** ajoute un bouton B qui met le chrono en pause (indice : une variable `marche`, et on ne compte que si elle vaut 1 — sans oublier de recaler `top` à la reprise).',
+    ],
+    code: `uint8_t top = 0;     // images() au debut de la seconde en cours
+uint8_t sec = 0;
+uint8_t min = 0;
+
+void afficher() {
+  nombre(7, 6, min, 2);      // 2 chiffres : 00 a 99
+  nombre(10, 6, sec, 2);
+}
+
+int main() {
+  texte(4, 3, "CHRONOMETRE");
+  texte(9, 6, ":");
+  texte(3, 12, "A: REMETTRE A 0");
+  afficher();
+  top = images();            // le depart : maintenant
+
+  while (true) {
+    image();
+
+    uint8_t ecoule = images() - top;   // les images depuis le debut de la seconde
+    if (ecoule >= 60) {                // 60 images : une seconde
+      top = top + 60;                  // le repere avance d'exactement une seconde
+      sec++;
+      if (sec == 60) {                 // 60 secondes : une minute
+        sec = 0;
+        min++;
+      }
+      afficher();                      // on n'ecrit que quand ca change
+    }
+
+    if (bouton(A)) {
+      sec = 0;
+      min = 0;
+      top = images();
+      afficher();
+    }
+  }
+}
+`,
+    aVoir: 'Un chronomètre 00:00 qui avance d’une seconde par seconde ; A le remet à zéro.',
+    controle: (c) => {
+      c.avancer(600)
+      const dix = c.variable('sec')
+      const ecrit = c.mot(10, 6, 2)
+      c.presser('a', 3)
+      const zero = c.variable('sec')
+      c.avancer(125)
+      const deux = c.variable('sec')
+      return [
+        ['600 images plus tard : 10 secondes', dix === 10 || dix === 11, ` (${dix})`],
+        ['l’écran dit la même chose', ecrit === String(dix).padStart(2, '0'), ` (${ecrit})`],
+        ['A remet à zéro', zero === 0],
+        ['puis il repart : 2 secondes après 125 images', deux === 2, ` (${deux})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un compte à rebours',
+    difficulte: 11,
+    provenance: 'cours',
+    idee: 'Le chronomètre à l’envers : dix secondes, puis « FINI! » — sans jamais passer sous zéro.',
+    texte: [
+      'Beaucoup de jeux se jouent **contre la montre** : trouver la sortie avant la fin du temps. C’est le chronomètre de la leçon d’avant, à l’envers : `reste` part de 10 et perd une seconde à chaque paquet de 60 images.',
+      'Le piège du zéro (chapitre 3) revient : un octet à 0 qui perd 1 devient **255**. Un compte à rebours sans garde affiche « FINI! », puis repart de 255 secondes. D’où la garde : on ne compte que **si `reste > 0`**.',
+      '**Ce qui est nouveau ici : un événement, une seule fois.** Au moment précis où `reste` tombe à 0, on écrit « FINI! ». Ce `if` est **dans** celui de la seconde écoulée : il ne peut se déclencher qu’une fois, à la dernière seconde, et pas à chaque image pendant tout le reste du jeu.',
+      'A relance : `reste` revient à 10, `top` repart de maintenant, et on efface « FINI! ». Le même programme sert donc à plusieurs parties : c’est l’idée qui mènera, au chapitre suivant, aux **états** du jeu.',
+      '**À toi :** fais clignoter le nombre pendant les trois dernières secondes (le modulo du chapitre 1 et un `effacer`).',
+    ],
+    code: `uint8_t top = 0;
+uint8_t reste = 10;      // les secondes qui restent
+
+int main() {
+  texte(3, 3, "COMPTE A REBOURS");
+  texte(3, 12, "A: RELANCER");
+  nombre(9, 6, reste, 2);
+  top = images();
+
+  while (true) {
+    image();
+
+    uint8_t ecoule = images() - top;
+    if (reste > 0 && ecoule >= 60) {     // la garde : jamais sous zero
+      top = top + 60;
+      reste--;
+      nombre(9, 6, reste, 2);
+      if (reste == 0) {                  // la derniere seconde, une seule fois
+        texte(7, 8, "FINI!");
+      }
+    }
+
+    if (bouton(A)) {
+      reste = 10;
+      top = images();
+      nombre(9, 6, reste, 2);
+      texte(7, 8, "     ");              // on efface FINI!
+    }
+  }
+}
+`,
+    aVoir: 'Un nombre qui descend de 10 à 0, une seconde à la fois, puis « FINI! » ; A relance.',
+    controle: (c) => {
+      c.avancer(300)
+      const cinq = c.variable('reste')
+      c.avancer(400)
+      const fin = c.variable('reste')
+      const fini = c.mot(7, 8, 5)
+      c.avancer(200)
+      const resteAZero = c.variable('reste')
+      c.presser('a', 3)
+      c.avancer(5)
+      return [
+        ['en route, il descend', cinq >= 4 && cinq <= 6, ` (${cinq})`],
+        ['au bout de dix secondes : 0', fin === 0],
+        ['FINI! s’affiche', fini === 'FINI!'],
+        ['et il ne passe jamais sous zéro', resteAZero === 0],
+        ['A relance à 10, et efface FINI!', c.variable('reste') === 10 && c.mot(7, 8, 5) === '     '],
+      ]
+    },
+  },
+  /* ================================================ 12 — les états du jeu */
+
+  {
+    titre: 'enum : un nom pour chaque écran',
+    difficulte: 12,
+    provenance: 'cours',
+    idee: 'Un jeu passe d’écran en écran : titre, partie, perdu. Une variable dit où l’on en est, et chaque valeur a un nom.',
+    texte: [
+      'Un vrai jeu n’est pas une seule boucle qui fait toujours la même chose. Il y a **l’écran titre**, qui attend START ; **la partie** ; **l’écran perdu**, qui attend qu’on recommence. Les mêmes boutons n’y font pas la même chose : START lance la partie au titre, et ramène au titre quand on a perdu.',
+      'On range donc, dans **une variable**, l’écran où l’on est : son **état**. On pourrait écrire 0 pour le titre, 1 pour la partie, 2 pour perdu. Mais `if (etat == 2)`, dans trois semaines, ne dira plus rien à personne.',
+      '**Ce qui est nouveau ici : `enum`.** `enum Etat { TITRE, JEU, PERDU };` crée **trois noms** pour les nombres 0, 1 et 2, dans l’ordre, et un **type** `Etat`. `Etat etat = TITRE;` déclare une variable de ce type. Pour la console, c’est un octet ; pour qui lit, `if (etat == PERDU)` se comprend tout seul.',
+      'La boucle regarde l’état et ne fait **que ce qui le concerne** : au titre, elle attend START ; en jeu, A fait perdre (en attendant un vrai jeu) ; perdu, START ramène au titre.',
+      '**Le front de START** (chapitre 11) est indispensable : sans lui, un appui de quelques images ferait TITRE → JEU, puis, dès qu’on perd, PERDU → TITRE → JEU d’un seul coup, trop vite pour être vu.',
+      '`dessine` retient l’état **déjà montré** à l’écran. Quand `etat` change, les deux diffèrent : on redessine **une fois**, puis `dessine = etat`. C’est l’idée de toujours : n’écrire que ce qui change.',
+      '**À toi :** ajoute un état `PAUSE`, où l’on entre et d’où l’on sort avec SELECT pendant la partie.',
+    ],
+    code: `/* Les trois ecrans du jeu : TITRE vaut 0, JEU vaut 1, PERDU vaut 2. */
+enum Etat { TITRE, JEU, PERDU };
+
+Etat etat = TITRE;       // ou l'on en est
+uint8_t dessine = 255;   // l'etat deja montre : 255, aucun, pour dessiner au debut
+uint8_t avant = 0;       // START a l'image d'avant
+
+int main() {
+  while (true) {
+    image();
+
+    /* le front de START : enfonce maintenant, pas a l'image d'avant */
+    uint8_t start = bouton(START);
+    uint8_t appui = start && !avant;
+    avant = start;
+
+    /* chaque etat ne fait que ce qui le concerne */
+    if (etat == TITRE) {
+      if (appui) etat = JEU;
+    } else if (etat == JEU) {
+      if (bouton(A)) etat = PERDU;
+    } else if (etat == PERDU) {
+      if (appui) etat = TITRE;
+    }
+
+    /* l'etat a change ? on redessine l'ecran, une seule fois */
+    if (etat != dessine) {
+      dessine = etat;
+      texte(0, 8, "                    ");
+      texte(0, 10, "                    ");
+      if (etat == TITRE) {
+        texte(6, 8, "MON JEU");
+        texte(4, 10, "START: JOUER");
+      } else if (etat == JEU) {
+        texte(5, 8, "LA PARTIE");
+        texte(3, 10, "A: FAIRE PERDRE");
+      } else {
+        texte(7, 8, "PERDU");
+        texte(4, 10, "START: TITRE");
+      }
+    }
+  }
+}
+`,
+    aVoir: 'MON JEU ; START passe à LA PARTIE ; A affiche PERDU ; START ramène au titre.',
+    controle: (c) => {
+      c.avancer(10)
+      const titre = c.mot(6, 8, 7)
+      const auDebut = c.variable('etat')
+      c.presser('start', 4)
+      c.avancer(10)
+      const jeu = [c.variable('etat'), c.mot(5, 8, 9)]
+      c.presser('a', 4)
+      c.avancer(10)
+      const perdu = [c.variable('etat'), c.mot(7, 8, 5)]
+      c.presser('start', 4)
+      c.avancer(10)
+      return [
+        ['au départ, l’écran titre : etat vaut TITRE (0)', auDebut === 0 && titre === 'MON JEU'],
+        ['START lance la partie : etat vaut JEU (1)', jeu[0] === 1 && jeu[1] === 'LA PARTIE'],
+        ['A fait perdre : PERDU (2)', perdu[0] === 2 && perdu[1] === 'PERDU'],
+        ['START ramène au titre, et pas plus loin', c.variable('etat') === 0 && c.mot(6, 8, 7) === 'MON JEU'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un switch, et une fonction par état',
+    difficulte: 12,
+    provenance: 'cours',
+    idee: 'La boucle ne fait plus qu’aiguiller : chaque état a sa fonction, et une seule fonction change d’état.',
+    texte: [
+      'Avec un vrai jeu dans l’état `JEU`, le `if … else if` de la leçon d’avant grossirait jusqu’à ne plus tenir sur l’écran. On range donc **chaque état dans sa fonction** : `titre()`, `jeu()`, `perdu()`.',
+      '**Ce qui est nouveau ici : le `switch` sur l’état, et `changer()`.** Le `switch` (chapitre 2) aiguille vers la fonction de l’état en cours ; `main` ne fait plus rien d’autre. Et **une seule** fonction, `changer(nouvel)`, a le droit de changer d’état : elle efface l’écran, dessine le nouveau, et prépare ses variables.',
+      'Pourquoi une seule ? Parce que chaque état a quelque chose à faire **en entrant** : la partie remet le score à 0 et lance le chrono ; l’écran de fin affiche le score. Si trois endroits du programme changeaient `etat` à la main, on oublierait une fois sur deux de remettre le score à zéro.',
+      '`changer(Etat nouvel)` prend un argument de type `Etat` : on ne peut lui passer que TITRE, JEU ou PERDU. Même le compilateur lit le programme plus facilement.',
+      'La partie est un petit jeu : **appuyer sur A le plus de fois possible en cinq secondes**. Le front de A (un appui, un point), le compte à rebours du chapitre 11, et quand il tombe à 0 : `changer(PERDU)`.',
+      'Le changement d’écran se fait **écran éteint** : `ecran(0)`, on efface et on écrit, `ecran(1)`. Rien ne se voit à moitié dessiné.',
+      '**À toi :** ajoute l’état `PAUSE` avec sa fonction `pause()`, et vérifie que le temps ne s’écoule pas pendant la pause.',
+    ],
+    code: `enum Etat { TITRE, JEU, PERDU };
+
+Etat etat = TITRE;
+uint8_t score = 0;
+uint8_t reste = 5;       // les secondes de la partie
+uint8_t top = 0;
+uint8_t avantStart = 0;
+uint8_t avantA = 0;
+
+/* 1 a la premiere image d'un appui sur START, 0 sinon (le front) */
+uint8_t appuiStart() {
+  uint8_t s = bouton(START);
+  uint8_t front = s && !avantStart;
+  avantStart = s;
+  return front;
+}
+
+/* LA SEULE fonction qui change d'etat : elle dessine le nouvel ecran. */
+void changer(Etat nouvel) {
+  etat = nouvel;
+  ecran(0);
+  for (uint8_t l = 4; l < 14; l++) texte(0, l, "                    ");
+
+  switch (etat) {
+    case TITRE:
+      texte(5, 6, "LE JEU DU A");
+      texte(4, 10, "START: JOUER");
+      break;
+    case JEU:
+      score = 0;               // en entrant dans la partie : tout repart de zero
+      reste = 5;
+      top = images();
+      texte(3, 6, "APPUIE SUR A!");
+      texte(3, 9, "POINTS");
+      nombre(10, 9, score);
+      texte(3, 10, "TEMPS");
+      nombre(10, 10, reste, 1);
+      break;
+    case PERDU:
+      texte(7, 6, "FINI!");
+      texte(3, 9, "POINTS");
+      nombre(10, 9, score);
+      texte(4, 12, "START: TITRE");
+      break;
+  }
+  ecran(1);
+}
+
+void titre() {
+  if (appuiStart()) changer(JEU);
+}
+
+void jeu() {
+  uint8_t a = bouton(A);
+  if (a && !avantA) {          // un appui, un point
+    score++;
+    nombre(10, 9, score);
+  }
+  avantA = a;
+
+  uint8_t ecoule = images() - top;
+  if (ecoule >= 60) {          // une seconde de moins
+    top = top + 60;
+    reste--;
+    nombre(10, 10, reste, 1);
+    if (reste == 0) changer(PERDU);
+  }
+}
+
+void perdu() {
+  if (appuiStart()) changer(TITRE);
+}
+
+int main() {
+  changer(TITRE);
+
+  while (true) {
+    image();
+    switch (etat) {            // la boucle ne fait plus qu'aiguiller
+      case TITRE: titre(); break;
+      case JEU:   jeu();   break;
+      case PERDU: perdu(); break;
+    }
+  }
+}
+`,
+    aVoir: 'LE JEU DU A ; START lance cinq secondes où chaque appui sur A marque un point ; puis FINI! et le score ; START revient au titre.',
+    controle: (c) => {
+      c.avancer(10)
+      const titre = c.mot(5, 6, 11)
+      c.presser('start', 4)
+      c.avancer(5)
+      for (let k = 0; k < 7; k++) c.presser('a', 3)
+      const pendantLaPartie = c.variable('etat')
+      attendre(c, () => c.variable('etat') === 2, 400)
+      c.avancer(10)
+      const score = c.variable('score')
+      const fini = c.mot(7, 6, 5)
+      const ecrit = c.mot(10, 9, 3)
+      c.presser('start', 4)
+      c.avancer(10)
+      return [
+        ['l’écran titre', titre === 'LE JEU DU A'],
+        ['START lance la partie', pendantLaPartie === 1],
+        ['sept appuis, sept points', score === 7, ` (${score})`],
+        ['au bout de cinq secondes, FINI! et le score', fini === 'FINI!' && ecrit === '007', ` (${ecrit})`],
+        ['START ramène au titre', c.variable('etat') === 0 && c.mot(5, 6, 11) === 'LE JEU DU A'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Le record, gardé dans la cartouche',
+    difficulte: 12,
+    provenance: 'cours',
+    idee: 'Le meilleur score survit à l’extinction : la cartouche a une petite mémoire à pile.',
+    texte: [
+      'Toutes les variables vivent dans la mémoire de la console, qui s’efface quand on l’éteint. Un record qui disparaît à chaque extinction n’en est pas un.',
+      'Certaines cartouches portent une **pile** et une petite mémoire à elles. **Ce qui est nouveau ici : `sauver(numero, valeur)` et `sauvegarde(numero)`.** `sauver(1, record)` écrit dans la case n° 1 de cette mémoire ; `sauvegarde(1)` la relit, même des mois plus tard.',
+      'La toute première fois, cette mémoire contient **n’importe quoi**. On ne peut pas faire confiance à la case 1 : elle vaut peut-être 173, un record que personne n’a fait. D’où la **marque** : dans la case 0, le jeu écrit un nombre à lui, 42. Au démarrage, s’il ne retrouve pas 42, la mémoire est neuve : il y écrit la marque et un record de 0.',
+      'Le record n’est comparé qu’à **un seul** endroit : en entrant dans l’état `PERDU`, dans `changer()`. La leçon d’avant y avait mis le dessin de l’écran de fin ; c’est aussi le bon moment pour dire « nouveau record! » et le sauver. Voilà pourquoi une seule fonction change d’état.',
+      'On ne sauve **que** si le score bat le record : écrire dans cette mémoire est plus lent, et elle s’use un peu à chaque écriture.',
+      '**À toi :** garde aussi le nombre de parties jouées, dans la case 2.',
+    ],
+    code: `enum Etat { TITRE, JEU, PERDU };
+
+const uint8_t MARQUE = 42;   // « cette cartouche a deja servi a ce jeu »
+
+Etat etat = TITRE;
+uint8_t score = 0;
+uint8_t record = 0;
+uint8_t reste = 5;
+uint8_t top = 0;
+uint8_t avantStart = 0;
+uint8_t avantA = 0;
+
+uint8_t appuiStart() {
+  uint8_t s = bouton(START);
+  uint8_t front = s && !avantStart;
+  avantStart = s;
+  return front;
+}
+
+void changer(Etat nouvel) {
+  etat = nouvel;
+  ecran(0);
+  for (uint8_t l = 4; l < 14; l++) texte(0, l, "                    ");
+
+  switch (etat) {
+    case TITRE:
+      texte(5, 6, "LE JEU DU A");
+      texte(3, 8, "RECORD");
+      nombre(10, 8, record);
+      texte(4, 11, "START: JOUER");
+      break;
+    case JEU:
+      score = 0;
+      reste = 5;
+      top = images();
+      texte(3, 6, "APPUIE SUR A!");
+      texte(3, 9, "POINTS");
+      nombre(10, 9, score);
+      texte(3, 10, "TEMPS");
+      nombre(10, 10, reste, 1);
+      break;
+    case PERDU:
+      texte(7, 6, "FINI!");
+      texte(3, 9, "POINTS");
+      nombre(10, 9, score);
+      if (score > record) {          // un nouveau record ?
+        record = score;
+        sauver(1, record);           // dans la cartouche : il survivra
+        texte(2, 11, "NOUVEAU RECORD!");
+      }
+      texte(4, 13, "START: TITRE");
+      break;
+  }
+  ecran(1);
+}
+
+void titre() {
+  if (appuiStart()) changer(JEU);
+}
+
+void jeu() {
+  uint8_t a = bouton(A);
+  if (a && !avantA) {
+    score++;
+    nombre(10, 9, score);
+  }
+  avantA = a;
+
+  uint8_t ecoule = images() - top;
+  if (ecoule >= 60) {
+    top = top + 60;
+    reste--;
+    nombre(10, 10, reste, 1);
+    if (reste == 0) changer(PERDU);
+  }
+}
+
+void perdu() {
+  if (appuiStart()) changer(TITRE);
+}
+
+int main() {
+  /* la cartouche a-t-elle deja servi ? */
+  if (sauvegarde(0) != MARQUE) {
+    sauver(0, MARQUE);       // non : on la marque
+    sauver(1, 0);            // et le record part de 0
+  }
+  record = sauvegarde(1);    // on relit le record garde
+
+  changer(TITRE);
+
+  while (true) {
+    image();
+    switch (etat) {
+      case TITRE: titre(); break;
+      case JEU:   jeu();   break;
+      case PERDU: perdu(); break;
+    }
+  }
+}
+`,
+    aVoir: 'Le titre montre RECORD 000 ; après une partie, NOUVEAU RECORD! ; de retour au titre, le record est là — et il y serait encore après avoir éteint.',
+    controle: (c) => {
+      c.avancer(10)
+      const marque = c.gb.mmu.externalRam[0]
+      c.presser('start', 4)
+      c.avancer(5)
+      for (let k = 0; k < 5; k++) c.presser('a', 3)
+      attendre(c, () => c.variable('etat') === 2, 400)
+      c.avancer(10)
+      const nouveau = c.mot(2, 11, 15)
+      c.presser('start', 4)
+      c.avancer(10)
+      return [
+        ['la marque 42 est écrite dans la cartouche', marque === 42],
+        ['cinq points : NOUVEAU RECORD!', nouveau === 'NOUVEAU RECORD!'],
+        ['le record est gardé dans la cartouche', c.gb.mmu.externalRam[1] === 5, ` (${c.gb.mmu.externalRam[1]})`],
+        ['le titre l’affiche', c.mot(10, 8, 3) === '005'],
+      ]
+    },
+  },
+  /* ================================================ 13 — le son */
+
+  {
+    titre: 'Une note : sa hauteur, sa durée, son volume',
+    difficulte: 13,
+    provenance: 'cours',
+    idee: 'note(voix, hauteur, duree, volume) joue une note toute seule, pendant que le jeu continue.',
+    texte: [
+      'La Game Boy a **quatre voix** : deux qui chantent des notes (la 1 et la 2), une troisième pour des sons dessinés, et la quatrième pour le **bruit** (un souffle, un choc). Ce chapitre se sert de la 1, de la 2 et de la 4.',
+      '**Ce qui est nouveau ici : `note(voix, hauteur, duree, volume)`.** • La **voix** : 1 ou 2. • La **hauteur** : un nom de note suivi de son **octave**, `DO4`, `RE4`, `MI4`… jusqu’à `SI4`, puis `DO5` recommence un cran plus haut. `DO5` sonne deux fois plus aigu que `DO4` : 523 vibrations par seconde contre 262. • La **durée**, en images : 20 images, un tiers de seconde. • Le **volume**, de 0 (muet) à 15.',
+      '**La note ne bloque pas.** `note()` lance le son et rend la main aussitôt : c’est la puce sonore qui le tient, et le coupe toute seule au bout de la durée. Le jeu continue pendant ce temps, sans le moindre retard.',
+      'On joue la note sur le **front** du bouton (chapitre 11). Sans lui, tenir A relancerait la note à chaque image : 60 débuts de note par seconde, un grésillement au lieu d’un son.',
+      'Les noms des notes suivent la gamme : DO, RE, MI, FA, SOL, LA, SI. `LA4` est le « la » du diapason, 440 vibrations par seconde. Les dièses s’écrivent avec un D : `DOD4` est le do dièse.',
+      '**À toi :** donne à BAS la note `SOL4`, à GAUCHE `MI4`, à DROITE `DO5` : avec A (DO5) et B (DO4), tu as de quoi jouer « Au clair de la lune ».',
+    ],
+    code: `uint8_t avantA = 0;
+uint8_t avantB = 0;
+
+int main() {
+  texte(2, 3, "A: DO AIGU  DO5");
+  texte(2, 5, "B: DO GRAVE DO4");
+
+  while (true) {
+    image();
+
+    uint8_t a = bouton(A);
+    if (a && !avantA) {
+      note(1, DO5, 20, 12);    // voix 1, do aigu, 20 images, volume 12
+    }
+    avantA = a;
+
+    uint8_t b = bouton(B);
+    if (b && !avantB) {
+      note(1, DO4, 20, 12);    // le meme do, une octave plus bas
+    }
+    avantB = b;
+  }
+}
+`,
+    aVoir: 'Rien ne bouge à l’écran — mais A joue un do aigu, B un do grave, un tiers de seconde chacun.',
+    controle: (c) => {
+      const silence = c.voix(1).joue
+      c.gb.setButton('a', true)
+      c.avancer(3)
+      const aigu = c.voix(1)
+      c.gb.setButton('a', false)
+      c.avancer(40)
+      const apres = c.voix(1).joue
+      c.gb.setButton('b', true)
+      c.avancer(3)
+      const grave = c.voix(1)
+      c.gb.setButton('b', false)
+      c.avancer(10)
+      return [
+        ['au départ, silence', !silence],
+        ['A joue un do aigu, vers 523 vibrations par seconde', aigu.joue && Math.abs(aigu.hertz - 523) <= 3, ` (${aigu.hertz})`],
+        ['la note s’arrête toute seule', !apres],
+        ['B joue le do grave, vers 262', grave.joue && Math.abs(grave.hertz - 262) <= 3, ` (${grave.hertz})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un son pour chaque action',
+    difficulte: 13,
+    provenance: 'cours',
+    idee: 'Une note quand on ramasse, un « toc » quand on se cogne : le joueur entend ce qui se passe.',
+    texte: [
+      'Dans un jeu, le son **dit** ce qui arrive, avant même qu’on le voie : la pièce ramassée tinte, le mur fait « toc ». Ce programme reprend le mur de la leçon « lire la case devant soi » et la pièce de « deux boîtes qui se touchent », et donne à chacun son son.',
+      '**Ce qui est nouveau ici : `bruit(duree, volume)`.** Il frappe sur la **voix 4**, celle du bruit : pas une note, un choc. `bruit(4, 10)` : une frappe très courte (durée 4), au volume 10. Un troisième argument, le **grain**, le rend plus sourd ou plus sifflant.',
+      'La pièce joue sur la **voix 1**, le mur sur la **voix 4** : ils peuvent sonner **en même temps** sans se couper. Deux sons sur la même voix, c’est le second qui remplace le premier.',
+      'Le « toc » n’est joué qu’**une fois par choc**. Tant qu’on pousse contre le mur, `bloque` reste vrai ; on ne joue le bruit qu’au **front** de `bloque` : vrai maintenant, faux à l’image d’avant. C’est le même front que pour un bouton — il marche pour **n’importe quelle** condition.',
+      '**À toi :** donne au mur de gauche un grain différent (`bruit(4, 10, 3)`) : les deux murs ne sonnent plus pareil.',
+    ],
+    code: `Tuile HEROS = {
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile PIECE = {
+  "..####..", ".#----#.", "#-#--#-#", "#-#--#-#",
+  "#-#--#-#", "#-#--#-#", ".#----#.", "..####..",
+};
+
+Tuile MUR = {
+  "33333333", "31111113", "31222213", "31222213",
+  "31222213", "31222213", "31111113", "33333333",
+};
+
+const uint8_t PX[] = { 100, 48 };   // les deux places de la piece
+
+uint8_t x = 60;
+uint8_t i = 0;
+uint8_t score = 0;
+uint8_t avantBloque = 0;    // poussait-on contre un mur a l'image d'avant ?
+
+int main() {
+  texte(1, 1, "SCORE");
+  nombre(7, 1, score);
+  poser(3, 8, MUR);
+  poser(16, 8, MUR);
+
+  while (true) {
+    image();
+
+    uint8_t bloque = 0;
+    if (bouton(DROITE)) {
+      if (lire((x + 8) / 8, 8) != MUR) x++; else bloque = 1;
+    }
+    if (bouton(GAUCHE)) {
+      if (lire((x - 1) / 8, 8) != MUR) x--; else bloque = 1;
+    }
+    if (bloque && !avantBloque) {
+      bruit(4, 10);             // toc : une fois par choc, sur la voix 4
+    }
+    avantBloque = bloque;
+
+    if (x < PX[i] + 8 && PX[i] < x + 8) {   // la piece est sur la meme ligne :
+      score++;                               // la largeur suffit
+      i = 1 - i;
+      nombre(7, 1, score);
+      note(1, MI5, 8, 12);      // ding : sur la voix 1
+    }
+
+    sprite(0, x, 64, HEROS);
+    sprite(1, PX[i], 64, PIECE);
+  }
+}
+`,
+    aVoir: 'Un héros entre deux murs et une pièce ; la pièce tinte quand on la ramasse, le mur fait « toc » à chaque choc.',
+    controle: (c) => {
+      c.gb.setButton('right', true)
+      let ding = null
+      for (let k = 0; k < 60 && c.variable('score') === 0; k++) c.avancer(1)
+      ding = c.voix(1)
+      /* La frappe est si brève qu'on la reconnaît à son volume : il passe de
+         0 à 10 quand bruit() frappe, et y reste. */
+      for (let k = 0; k < 80 && c.variable('x') < 120; k++) c.avancer(1)
+      const avantLeMur = c.voix(4).volume
+      c.avancer(2)
+      const toc = c.voix(4).volume
+      /* On remet le volume à 0 à la main : s'il remonte, c'est un 2e toc. */
+      c.gb.apu.bruit.volume = 0
+      c.avancer(40)
+      const deuxieme = c.voix(4).volume
+      c.gb.setButton('right', false)
+      c.avancer(5)
+      return [
+        ['la pièce ramassée tinte sur la voix 1 (MI5, vers 659)', ding.joue && Math.abs(ding.hertz - 659) <= 4, ` (${ding.hertz})`],
+        ['le mur fait toc sur la voix 4', avantLeMur === 0 && toc === 10],
+        ['un seul toc, même en poussant encore', deuxieme === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un petit air qui joue tout seul',
+    difficulte: 13,
+    provenance: 'cours',
+    idee: 'Un Air s’écrit comme une tuile se dessine : une suite de pas, gravée dans le programme.',
+    texte: [
+      'Une mélodie, c’est une suite de notes. On pourrait appeler `note()` au bon moment, image après image, avec un compteur ; la console sait le faire toute seule.',
+      '**Ce qui est nouveau ici : `Air`, et `jouer(voix, AIR, vitesse)`.** Un `Air` est une **liste de pas**, comme une tuile est une liste de rangées. Chaque pas est une note et son volume, `"DO4 12"`, ou l’un de ces deux signes : `"--"` fait taire la voix, `"=="` laisse la note d’avant continuer (c’est ce qui fait les notes longues).',
+      '`jouer(1, CLAIR, 10)` joue l’air sur la voix 1, à raison d’un pas toutes les **10 images**. Ensuite, le programme n’a plus rien à faire : l’air avance tout seul, soixante fois par seconde, même si la boucle du jeu est en retard.',
+      '`airFini(1)` rend 1 quand l’air de la voix 1 est arrivé au bout. On s’en sert ici pour écrire « FIN » **une fois** (la variable `fini` évite de le réécrire à chaque image), et A relance l’air depuis le début.',
+      'Pour une musique de fond qui ne s’arrête jamais, on ajoute un 4e argument : `jouer(1, CLAIR, 10, 1)` recommence sans fin. Et une deuxième voix peut jouer un autre `Air` en même temps : une basse sous la mélodie.',
+      '**À toi :** écris la suite de la chanson (« mon ami Pierrot ») à la fin de `CLAIR`.',
+    ],
+    code: `/* Au clair de la lune : chaque pas dure 10 images. */
+Air CLAIR = {
+  "DO4 12", "DO4 12", "DO4 12", "RE4 12",
+  "MI4 12", "==",     "RE4 12", "==",
+  "DO4 12", "MI4 12", "RE4 12", "RE4 12",
+  "DO4 12", "==",     "==",     "--",
+};
+
+uint8_t fini = 0;      // 1 quand FIN est deja ecrit
+
+int main() {
+  texte(2, 3, "AU CLAIR DE LA LUNE");
+  texte(2, 10, "A: REJOUER");
+
+  jouer(1, CLAIR, 10);       // voix 1, un pas toutes les 10 images
+
+  while (true) {
+    image();
+
+    if (airFini(1) && !fini) {     // l'air vient de finir : une seule fois
+      texte(8, 6, "FIN");
+      fini = 1;
+    }
+
+    if (bouton(A) && fini) {       // on ne relance qu'un air fini
+      jouer(1, CLAIR, 10);
+      texte(8, 6, "   ");
+      fini = 0;
+    }
+  }
+}
+`,
+    aVoir: 'Au clair de la lune joue une fois, puis « FIN » ; A la rejoue.',
+    controle: (c) => {
+      c.avancer(5)
+      const joue = c.voix(1).joue
+      const debut = c.voix(1).hertz
+      attendre(c, () => c.variable('fini') === 1, 400)
+      c.avancer(3)
+      const fin = c.mot(8, 6, 3)
+      c.presser('a', 3)
+      c.avancer(3)
+      return [
+        ['l’air commence par un do (DO4, vers 262)', joue && Math.abs(debut - 262) <= 3, ` (${debut})`],
+        ['il finit tout seul : FIN', fin === 'FIN'],
+        ['A le relance', c.voix(1).joue && c.variable('fini') === 0],
+      ]
+    },
+  },
+  /* ================================================ 14 — le défilement */
+
+  {
+    titre: 'Faire glisser le décor',
+    difficulte: 14,
+    provenance: 'cours',
+    idee: 'L’écran ne montre qu’un morceau de la carte ; defiler() choisit lequel, au pixel près.',
+    texte: [
+      'L’écran fait **20 cases** de large. Mais la carte du fond, dans la console, en fait **32** : 256 pixels. On ne voit jamais qu’un **morceau** de cette carte, comme par une fenêtre.',
+      '**Ce qui est nouveau ici : `defiler(x, y)`.** Elle dit à la console **où poser la fenêtre** sur la carte, en pixels. `defiler(0, 0)` : on voit les colonnes 0 à 19. `defiler(8, 0)` : la fenêtre a glissé d’une case, on voit les colonnes 1 à 20. `defiler(3, 0)` : trois pixels, entre deux cases — le glissement est doux.',
+      'On ne redessine rien : le décor est posé **une fois**, écran éteint, sur les 32 colonnes (`c < 32`, et non `c < 20`). Faire défiler ne coûte qu’**une écriture** par image, comme la palette du chapitre 7. C’est pourquoi les jeux Game Boy défilent sans ralentir.',
+      'Les chiffres 0 à 7, un toutes les 4 colonnes, disent où l’on est sur la carte. Pousse DROITE longtemps : après le 7, le 0 revient. `sx` est un octet : après 255, il repart à 0, et la carte, qui fait justement 256 pixels, **boucle** au même moment. La règle de l’octet (chapitre 1) et la taille de la carte vont ensemble.',
+      'Le héros ne bouge pas : c’est un lutin, et les lutins ne défilent pas avec le fond. Rester au milieu pendant que le monde passe, c’est l’illusion de tous les jeux de course. En revanche, le texte du haut **défile avec le reste** : il est dans le fond. Pour un score qui reste en place, on se sert du **panneau** (`textePanneau`), une seconde couche que `defiler()` ne touche pas.',
+      '**À toi :** fais défiler aussi en hauteur avec HAUT et BAS (`sy`, et `defiler(sx, sy)`).',
+    ],
+    code: `Tuile HEROS = {
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile SOL = {
+  "33333333", "12121212", "21212121", "22222222",
+  "22222222", "22222222", "22222222", "22222222",
+};
+
+uint8_t sx = 0;      // ou est la fenetre sur la carte, en pixels : 0 a 255
+
+int main() {
+  ecran(0);
+  texte(1, 1, "GAUCHE  DROITE");
+  for (uint8_t c = 0; c < 32; c++) {       // TOUTE la carte : 32 colonnes
+    poser(c, 12, SOL);
+    poser(c, 13, SOL);
+    if (c % 4 == 0) nombre(c, 10, c / 4, 1);  // 0 en colonne 0, 1 en 4, ... 7 en 28
+  }
+  ecran(1);
+
+  while (true) {
+    image();
+
+    if (bouton(DROITE)) sx++;      // la fenetre glisse vers la droite : le decor part a gauche
+    if (bouton(GAUCHE)) sx--;      // 0 - 1 donne 255 : la carte boucle aussi a l'envers
+
+    defiler(sx, 0);                // une seule ecriture par image
+    sprite(0, 76, 88, HEROS);      // le heros ne bouge pas
+  }
+}
+`,
+    aVoir: 'Un sol et des chiffres de 0 à 7 ; DROITE fait glisser le décor vers la gauche, et après le 7 le 0 revient.',
+    controle: (c) => {
+      const debut = c.defilement()
+      c.gb.setButton('right', true)
+      c.avancer(40)
+      const quarante = c.defilement()
+      c.avancer(230)
+      const tour = c.defilement()
+      c.gb.setButton('right', false)
+      c.avancer(2)
+      return [
+        ['au départ, la fenêtre est en 0', debut === 0],
+        ['DROITE la fait glisser d’un pixel par image', quarante >= 39 && quarante <= 41, ` (${quarante})`],
+        ['après 255, elle repart à 0 : la carte boucle', tour < quarante, ` (${tour})`],
+        ['le décor est posé jusqu’à la colonne 31', c.lire(31, 12) === c.lire(0, 12) && c.lire(28, 10) !== 0],
+        ['le héros n’a pas bougé', c.lutin(0).x === 76],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une carte plus grande que l’écran : la caméra',
+    difficulte: 14,
+    provenance: 'cours',
+    idee: 'Le héros a une place dans le monde ; la caméra le suit ; l’écran montre le monde moins la caméra.',
+    texte: [
+      'Dans un vrai jeu, le héros **marche** dans un monde plus large que l’écran, et le décor glisse pour le garder en vue. Il y a donc **deux** positions : celle du héros **dans le monde** (`wx`, de 0 à 248 sur une carte de 256 pixels), et celle de la **caméra**, `cam` : le bord gauche de ce qu’on voit.',
+      '**Ce qui est nouveau ici : l’écran = le monde - la caméra.** Le décor, on le fait glisser de `cam` : `defiler(cam, 0)`. Le héros, on le pose à `wx - cam` sur l’écran. Exemple : héros en `wx = 150`, caméra en `cam = 74` : il est dessiné au pixel 150 - 74 = 76, le milieu de l’écran.',
+      'La caméra **suit** le héros : elle veut le garder au milieu, donc `cam = wx - 76`. Mais elle ne doit pas sortir de la carte. À gauche, si `wx < 76`, `wx - 76` passerait sous zéro (pour `wx = 30`, 30 - 76 donnerait 210 : la règle de l’octet, chapitre 1) : on la bloque à 0. À droite, l’écran fait 160 pixels et la carte 256 : la caméra ne va pas plus loin que 256 - 160 = **96**.',
+      'Déroulons. `wx = 30` : trop à gauche, `cam = 0`, le héros est à 30 sur l’écran — il marche, le décor ne bouge pas. `wx = 150` : `cam = 74`, héros au milieu, le décor défile. `wx = 240` : `wx - 76 = 164`, plus que 96, donc `cam = 96`, et le héros est à 240 - 96 = 144 : il marche de nouveau seul vers le bord.',
+      'C’est la caméra de presque tous les jeux de plateforme. Les chiffres du sol disent où l’on est dans le monde.',
+      '**À toi :** au lieu de garder le héros pile au milieu, laisse-le libre entre les pixels 60 et 92 de l’écran (une « zone morte ») : la caméra ne bouge que s’il en sort.',
+    ],
+    code: `Tuile HEROS = {
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile SOL = {
+  "33333333", "12121212", "21212121", "22222222",
+  "22222222", "22222222", "22222222", "22222222",
+};
+
+const uint8_t MILIEU = 76;        // le pixel du milieu de l'ecran, pour le heros
+const uint8_t CAM_MAX = 96;       // 256 - 160 : la camera ne va pas plus loin
+
+uint8_t wx = 8;       // le heros, DANS LE MONDE : 0 a 248
+uint8_t cam = 0;      // le bord gauche de ce qu'on voit, dans le monde : 0 a 96
+
+int main() {
+  ecran(0);
+  for (uint8_t c = 0; c < 32; c++) {
+    poser(c, 12, SOL);
+    poser(c, 13, SOL);
+    if (c % 4 == 0) nombre(c, 10, c / 4, 1);
+  }
+  ecran(1);
+
+  while (true) {
+    image();
+
+    if (bouton(DROITE) && wx < 248) wx++;
+    if (bouton(GAUCHE) && wx > 0) wx--;
+
+    /* la camera suit le heros, sans sortir de la carte */
+    if (wx < MILIEU) {
+      cam = 0;                      // trop a gauche : la camera reste au bord
+    } else if (wx - MILIEU > CAM_MAX) {
+      cam = CAM_MAX;                // trop a droite : elle s'arrete a 96
+    } else {
+      cam = wx - MILIEU;            // sinon : le heros au milieu
+    }
+
+    defiler(cam, 0);                // le decor : decale de cam
+    sprite(0, wx - cam, 88, HEROS); // le heros : le monde moins la camera
+  }
+}
+`,
+    aVoir: 'Le héros part à gauche et marche seul ; au milieu de l’écran, c’est le décor qui défile ; au bout de la carte, il marche de nouveau seul jusqu’au bord.',
+    controle: (c) => {
+      const depart = [c.lutin(0).x, c.defilement()]
+      tenir(c, 'right', () => c.variable('wx') >= 150)
+      const milieu = [c.variable('wx'), c.variable('cam'), c.lutin(0).x, c.defilement()]
+      tenir(c, 'right', () => c.variable('wx') >= 248)
+      const bout = [c.variable('cam'), c.lutin(0).x, c.defilement()]
+      return [
+        ['au départ : pas de défilement, le héros à 8', depart[0] === 8 && depart[1] === 0],
+        ['au milieu du monde, le héros reste au milieu de l’écran', milieu[2] === 76 && milieu[1] === milieu[0] - 76, ` (wx ${milieu[0]}, cam ${milieu[1]})`],
+        ['et le décor défile de cam', milieu[3] === milieu[1]],
+        ['au bout, la caméra s’arrête à 96', bout[0] === 96 && bout[2] === 96],
+        ['et le héros va seul jusqu’au bord : 248 - 96 = 152', bout[1] === 152, ` (${bout[1]})`],
       ]
     },
   },

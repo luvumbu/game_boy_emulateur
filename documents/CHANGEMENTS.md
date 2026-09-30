@@ -1594,6 +1594,24 @@ Toujours la même lettre, et une seule idée nouvelle par chapitre.
 | 0.83 | Un son quand on ramasse : note | `note(1, DO5, 10, 12)` ; + 0.83.1 `bruit(4, 8)` contre un mur, dans le `else` |
 | 0.84 | Des vies et une fin de partie | 3 vies, l’état du jeu (`etat` 0 / 1), PERDU, START pour recommencer |
 | 0.85 | Plusieurs ennemis : un tableau de struct | `Position ennemis[3]`, `ennemis[i].x`, départ au hasard, une boucle `for` |
+| 0.86 | L’alphabet en gras, avec poserS | `ALPHABET_GRAS` (26 lettres, traits de 2 pixels) avec `poserS` ; + 0.86.1 lignes 5 et 6 ; + 0.86.2 l’ancien et le gras l’un au-dessus de l’autre |
+| 0.87 | Agrandir une lettre : texteGrand | `texteGrand(2, 2, "A", 3)` ; + 0.87.1 les tailles 1 à 4 côte à côte ; + 0.87.2 dix fois ; + 0.87.3 un mot, JEU ; + 0.87.4 vingt fois, tout l’écran ; + 0.87.5 `texteGrandS`, qui va à la ligne |
+| 0.88 | Des lettres en couleur : couleurTexte | `couleurTexte(31, 0, 0)` : un A rouge ; + 0.88.1 un mot en bleu ; + 0.88.2 changer de couleur en route, avec `chaque(500)` |
+| 0.89 | Chaque mot sa couleur : texteCouleur | trois palettes, trois mots ; + 0.89.1 un arc-en-ciel, une palette par lettre avec `teindre` |
+| 0.90 | Un titre agrandi, en couleur | `texteGrand` + `couleurTexte` : un grand JEU orange ; + 0.90.1 START vide l’écran (boucle sur 18 lignes) et affiche un autre écran, une variable ecranTitre pour ne le faire qu’une fois ; + 0.90.2 un B qui file (`defile`) ; + 0.90.3 tout l’écran glisse (`defiler`, d-- et l’octet qui boucle) ; + 0.90.4 un bandeau : effacer, avancer, réécrire, une seule ligne bouge ; + 0.90.5 la consigne qui clignote (`visible = 1 - visible`) ; + 0.90.6 SELECT, retour au titre (`dessinerTitre()`, `viderEcran()`) ; + 0.90.7 trois écrans (`ecran` 0, 1, 2 ; la fin ramène au jeu) |
+| 0.91 | Le titre, puis le jeu | le titre du 0.90 et le jeu du 0.81 : le jeu n’existe qu’après START ; + 0.91.1 trente secondes (`chaque(1000)`, écran FIN) ; + 0.91.2 le score à la fin, START rejoue (`nouvellePartie()`) ; + 0.91.3 un cadre de murs X, le A qui y entre revient à sa place d’avant ; + 0.91.4 la pièce ramassée réapparaît au hasard, dans le cadre (`1 + hasard() % 18`) ; + 0.91.5 une queue O qui suit le A (la case qu’il quitte, `x != ax \|\| y != ay`) ; + 0.91.6 la queue grandit à chaque pièce (tableaux `qx[50]`, `qy[50]`, boucle qui recule `i--` ; le A seul au départ, `longueur > 0 &&` contre le 0 − 1 = 255) ; + 0.91.7 le A avance tout seul, la croix choisit `sens` (0 à 3) ; + 0.91.8 le mur fait perdre (`finPartie()`, `continue;`) ; + 0.91.9 sans limite de temps (tout ce qui touchait au temps enlevé) |
+| 0.92 | Le snake, avec un menu | un 4e écran, le MENU : GAUCHE / DROITE choisissent la couleur du serpent (palette 1, `teindre` après chaque `poser`, `couleurFond(1, 3, …)`, `(couleur + 3) % 4` pour reculer ; `viderEcran()` remet les cases en palette 0, `effacer()` ne le fait pas) ; + 0.92.1 le pas compté en images (`compte`, `attente` : `chaque()` n’accepte qu’un nombre en clair ; ~267 ms au lieu de 250, le tour qui dessine déborde) ; + 0.92.2 B : VITESSE FIXE / MONTE (`monte = 1 - monte`, une image d’attente de moins par P, jusqu’à 5) |
+| 0.93 | Un jeu de bombes | le terrain façon Bomberman : cadre X et piliers X (`c % 2 == 0 && l % 2 == 0`), 19 colonnes, le O en (1, 1) ; + 0.93.1 le O bouge, `lire()` et les X l’arrêtent (`else if` : pas de diagonale) ; + 0.93.2 A pose une B, qui apparaît quand le O s’en va (le O ne va plus que sur une case vide, `lire() == 0`) ; + 0.93.3 l’explosion au bout de 120 images, flammes `-` et `\|` (`flammes(allume)` et `caseFeu`, la même fonction dessine et efface) ; + 0.93.4 des bras de 2 cases, `break` au premier X ; + 0.93.5 un W au hasard (`hasard() % 4`, `chaque(400)`) ; + 0.93.6 trois W (`ex[3]`, `ey[3]`) ; + 0.93.7 la flamme détruit les W (`vivant[3]`, `toucheW`, SCORE) ; + 0.93.8 touché par un W ou une flamme : FIN, START rejoue (le drapeau `mort`, `nouvellePartie()`) ; + 0.93.9 `score == 3` : BRAVO ! |
+| 0.94 | Un jeu de bombes, avec des briques | le 0.93.9 et des briques M au hasard dans les couloirs (`(c % 2 == 1 \|\| l % 2 == 1) && c + l > 5 && hasard() % 3 == 0` : couloir, hors du coin de départ, une fois sur trois) ; elles bloquent le O, les W et les flammes, et le O qui s’y cogne ne perd pas (`!= ALPHABET[12]`) ; + 0.94.1 la flamme casse les briques : le bras s’arrête sur le M, qui disparaît quand les flammes s’éteignent (`flammes(1)` et `flammes(0)` s’arrêtent ainsi sur la même case) |
+| 0.95 | Un micro Zelda | le A héros dans quatre salles (2 × 2, `sx`, `sy`), des murs (`mur()`, `murDebout()`), deux portes P qui téléportent, le monde qui fait le tour ; + 0.95.1 l’écran glisse dans le sens du A, dans les quatre sens, à chaque passage (anciennement 0.94.2 et 0.94.3) |
+
+Les leçons 0.91.4 à 0.93.9 (2026-09-27) : chacune reprend le code de la précédente,
+avec **une** nouveauté marquée « NOUVEAU » ; les anciennes portent « (le 0.x) ».
+Quand une demande contenait plusieurs choses (la couleur ET la vitesse au 0.92, le
+Bomberman entier au 0.93), elle a été coupée en plusieurs leçons. Les contrôles des
+bombes font jouer un petit robot (poser en (9, 7), s’abriter en (11, 8)) ; celui du
+0.93.9 part après 69 images, un départ qui le mène à la victoire — si le code du jeu
+change, ce nombre est à rechercher.
 
 La série du déplacement (0.18 à 0.64) est **progressive** : chaque leçon reprend
 le code de la précédente et n’ajoute **qu’une chose** — une ligne, ou un réglage
@@ -1747,8 +1765,28 @@ deux images par tour garde la même vitesse de lettre.
   il relève le compteur d’images par seconde au bout de 1,2 s.
 - **`#include` refuse un commentaire sur sa ligne** (« # n’est compris que dans
   #include, seul sur sa ligne ») : on pourrait l’accepter.
+- **`ALPHABET_GRAS`** (fait) : `lettresGrasses()` dans `police.js` épaissit chaque lettre d’un pixel vers la droite ; M, N et W sont redessinés à la main (8 colonnes) pour garder leurs creux. Le compilateur ajoute 26 `Tuile GRAS_A…Z` et le tableau `ALPHABET_GRAS` seulement si le programme le nomme. `ALPHABET` n’a pas changé.
+- **`texteGrand`** (fait) : `pixelsDe()` dans `police.js` ; `preparerLesTextesGrands` calcule, pour chaque appel, les tuiles du texte agrandi (le pixel (px, py) vient de (px / n, py / n)), n’en garde qu’un exemplaire (une tuile vide = la tuile 0), et remplace la ligne par un bloc : la place dans deux variables, puis une fonction qui pose les tuiles depuis un tableau gravé. Taille de 1 à 20 (7 pixels × 20 = 140, la lettre tient dans les 144 de l’écran), texte et taille en clair ; une table par rangée de cases, pour dépasser les 255 cases d’un octet.
+- **La couleur des lettres** (fait) : `couleurTexte(r, v, b)` devient `couleurFond(0, 3, r, v, b)` (les lettres de la police sont en teinte 3, les cases en palette 0) ; `texteCouleur(x, y, "MOT", p)` devient `texte(…)` suivi d’un `teindre` par case. Réécrits avant le jeu, dans `preparerLesFormes`.
+- **`texteGrandS`** (fait) : découpe le texte en lignes avant le jeu (une ligne de 20 cases tient 20 ÷ taille lettres ; la suite repart en colonne 0), chaque ligne devenant un `texteGrand` ; refus si le bas dépasse la case 18.
+- **« ⟲ Reset »** (réglé) : en mode leçons, il remet le code d’ORIGINE de la leçon et la relance (avant, il relançait la cartouche du code modifié). **Minuscules et accents** : `normaliser()` dans `police.js` (é, è → E ; a → A) sert à `texte`, `textS`, `Mot` et `texteGrand`.
+- **Le plein écran** (fait) : le bouton « ⛶ Plein écran » existe maintenant aussi sur `tuto.html` et `cours.html` (même agrandissement entier que la page principale) ; la touche **F** entre et sort sur les trois pages, sauf quand on écrit dans un champ, et sur la page principale sauf si F est la touche d’un bouton de la console dans les réglages. Un `favicon.svg` (un A en pixels, vert Game Boy) sur les quatre pages.
 - **La suite du jeu**, proposée : un écran titre (`enum`), des niveaux, un temps
   limité, tirer, le record, des portes et des clés, le jeu complet en fichiers.
+- **Le snake (0.91.4 à 0.92.2), ses défauts connus**, pour de prochaines leçons :
+  le A peut faire demi-tour sur sa queue et la traverser sans perdre ; le P peut
+  réapparaître sur la queue (on ne le voit plus) ou sur la case du A (compté deux
+  fois).
+- **Le jeu de bombes (0.93 à 0.94.1), la suite proposée** : ~~des briques qu’une
+  bombe casse~~ **fait** (0.94, 0.94.1) ; un bonus F caché sous une brique (des
+  flammes plus longues), plusieurs bombes à la fois, des W plus rapides à chaque
+  niveau. À savoir : au premier allumage, `hasard()` donne toujours le même
+  terrain (l’émulateur démarre toujours pareil) ; il change
+  quand on rejoue. Le contrôle du 0.94.1 compte sur la brique en (6, 1) de ce
+  premier terrain.
+- **Le bilan des leçons 0.91.4 à 0.94.1** : seul `verifier-tuto` a tourné (406
+  leçons, 1118 contrôles, tout vert). Restent à faire ensemble : les autres
+  vérifications, `TUTORIELS.md`, les livrets, les captures, et l’envoi sur GitHub.
 
 ### Le bilan de la séance
 
@@ -1757,6 +1795,153 @@ Toutes les vérifications ont tourné (`verifier-tuto`, `verifier-cours`,
 livrets et les captures sont régénérés ; tout est envoyé sur GitHub.
 `verifier-portage.mjs` échoue seul : il cherche `../gameboy2/exemples/ecrans.gb`,
 un dossier voisin qui n’est pas sur ce disque.
+
+## 9. Le chapitre 0 rangé en dix parties
+
+> 29 septembre 2026. Le chapitre 0 comptait 298 leçons sous un seul titre,
+> « Niveau 0 — Avant tout », du programme vide jusqu’au Zelda. On ne s’y
+> retrouvait plus.
+
+Il est coupé en **dix parties**. **Aucun numéro de leçon ne change**, sauf celui
+du Zelda :
+
+| Partie | Leçons | Ce qu’on y fait |
+|---|---|---|
+| A. Écrire des lettres | 0.0 – 0.11.2 | une lettre, ALPHABET, les boucles, `poserS`, `textS` |
+| B. Le temps | 0.12 – 0.17.2 | les secondes, `attendre`, deux rythmes, les millisecondes |
+| C. Déplacer une lettre | 0.18 – 0.33.2 | `deplace_x`, `deplace_y`, `deplace`, `va_a`, `un_pas`, sa fonction |
+| D. Des formes | 0.34 – 0.64.2 | `carre` et ses réglages, `Carre`, losange, rectangle, spirale, aller-retour |
+| E. La croix : le joueur | 0.65 – 0.80.2 | la manette, `lire`, le lutin, `deplace_croix`, `glisse_croix`, déclencheurs, `chaque`, `struct` |
+| F. Un premier jeu | 0.81 – 0.85 | pièces, murs, son, vies, ennemis |
+| G. Les lettres et l’écran titre | 0.86 – 0.90.7 | gras, `texteGrand`, couleur, l’écran titre |
+| H. Du titre au snake | 0.91 – 0.92.2 | le titre puis le jeu, le snake, son menu |
+| I. Le jeu de bombes | 0.93 – 0.94.1 | le jeu façon Bomberman, les briques |
+| J. Un micro Zelda | 0.95 – 0.95.1 | les salles, les portes, l’écran qui glisse |
+
+- **Où c’est écrit.** `partie: 'Le temps'` sur la leçon qui ouvre la partie,
+  rien sur les autres. `partieDe(liste, index)` (dans `tuto/lecons.js`) remonte
+  jusqu’à elle et compte la lettre : insérer une leçon ne demande rien d’autre.
+- **Où ça se voit.** Le sommaire de `tuto.html` (un titre sous celui du niveau),
+  le menu des leçons de l’atelier (un groupe par partie), les repères de la
+  leçon (« Partie D — Des formes »), `TUTORIELS.md` (un tableau des parties, puis
+  un titre par partie) et les livrets.
+- **Le Zelda** avait pris les numéros 0.94.2 et 0.94.3, comme s’il prolongeait
+  les briques : il devient **0.95** et **0.95.1**, et ses quinze renvois au
+  « 0.94.2 » sont devenus « 0.95 ».
+- **Des titres remis à leur place** : les 0.90.1 à 0.90.7 s’appellent
+  « L’écran titre — … » (au lieu de « Un titre agrandi, en couleur — … ») ; les
+  0.91.5 à 0.91.9, où naît le serpent, s’appellent « Le snake — … ». Le 0.91.4 (la
+  pièce qui revient au hasard) reste « Le titre, puis le jeu ».
+- **Un défaut réglé au passage** : le sommaire du livret complet ne montrait pas
+  le titre « Niveau 0 » (il partait de `niveau = 0`).
+- **Vérifié** : 22 vérificateurs sont verts (408 leçons, 1128 contrôles) ;
+  `verifier-portage` n’a pas tourné (il cherche `../gameboy2`, absent) ;
+  `verifier-tuto-page` contrôle en plus que le sommaire montre les dix parties.
+  `TUTORIELS.md` est régénéré. **Restent à faire au bilan** : les livrets (ils
+  s’arrêtent au 0.85) et l’envoi sur GitHub.
+- **Tout le code des parties est commenté ligne par ligne** (demandé ensuite :
+  « le plus de commentaires possible ») : `partieDe` avec des exemples chiffrés
+  (du 0.13.2 on remonte au 0.12 ; une partie avant « Le temps », donc la lettre
+  B ; 65 + 1 = « B »), la clé des groupes du menu de l’atelier (« 0 B », « 3 »),
+  le titre de partie du sommaire et sa feuille de style, le tableau des parties
+  de `TUTORIELS.md` (du 0.12 jusqu’au 0.17.2), les livrets, et le calcul
+  11 + 10 − 1 = 20 groupes du contrôle de `verifier-page`. Le code C++ des
+  leçons n’a pas été touché par cette passe.
+
+## 10. L’atelier disponible, quelles que soient les conditions
+
+> 29 septembre 2026. Un grand contrôle : que se passe-t-il quand quelque chose
+> MANQUE ? Un module effacé, un navigateur sans son, un stockage bloqué, PHP
+> absent, Node trop vieux, un port pris, la page ouverte par un double-clic…
+> L’atelier doit marcher quand même, ou DIRE ce qui ne va pas. Jamais une
+> page figée et muette.
+
+**Ce que le contrôle a trouvé, et ce qui est corrigé :**
+
+| Situation | Avant | Maintenant |
+|---|---|---|
+| Un fichier .js de l’atelier manque (39 modules essayés, 78 cas) | la page restait figée, sans un mot | un bandeau rouge nomme le fichier et celui qui le demande (`garde.js`) |
+| Une faute de frappe dans un module | page figée | le bandeau donne le fichier et la ligne |
+| `index.html` ouvert par un double-clic (`file://`) | page figée | le bandeau dit d’utiliser `lancer.bat` |
+| Navigateur sans son (pas de Web Audio) | **les trois pages** ne démarraient pas | la console tourne, muette |
+| Stockage interdit (navigation privée stricte) | l’atelier ne démarrait pas | il démarre (`lireLeStockage`) |
+| `lancer.bat` lancé deux fois | « Une erreur est survenue » (Node plantait sur `process.exit` après `fetch`) | « L’atelier tourne déjà », proprement |
+| `lancer.bat` lancé deux fois, **avec PHP** (XAMPP) | « Un ANCIEN atelier tourne encore » : le serveur PHP ne connaît pas `__atelier` et répond par la page d’accueil | reconnu comme un atelier à jour (PHP lit le disque à chaque demande) : la page s’ouvre |
+| `node …\demarrer.mjs` lancé depuis un autre dossier | servait ce mauvais dossier | sert toujours le dossier du projet |
+| `projets-serveur.mjs` absent | le lanceur plantait avant de dire un mot | l’atelier démarre, et dit que les projets ne s’enregistreront pas |
+| Un fichier de l’atelier manque, au lancement | rien | la fenêtre noire le nomme tout de suite |
+| Node 16 installé | erreur incompréhensible | `lancer.bat` dit « trop ancien » et propose la mise à jour |
+| `demarrer.mjs` absent | erreur de Node | `lancer.bat` dit que le dossier est incomplet |
+| Les pages `cours/*.html` | pas d’icône : un `favicon.ico` introuvable (404) | l’icône du projet |
+| Le navigateur ne s’ouvre pas tout seul | le serveur pouvait planter | il affiche l’adresse à ouvrir |
+
+**Ce qui marchait déjà**, et qui est maintenant contrôlé : sans PHP comme avec
+celui de XAMPP ; le port pris par un autre programme ; un dossier au nom
+difficile (espaces, accents) ; `projets.php` injoignable ; le dossier `projets/`
+absent ; pas de plein écran ; aucune ressource prise sur Internet (tout marche
+hors ligne) ; aucune dépendance npm ; tous les liens ont la bonne casse (un
+serveur Linux la respecte, Windows non).
+
+**`garde.js`** : un petit script chargé en premier par `index.html`, `tuto.html`
+et `cours.html`, sans « module », pour tourner même quand tout le reste échoue.
+Si la page n’a pas appelé `window.atelierPret()` (dernière ligne de son
+programme) peu après une erreur, il suit lui-même les `import`, trouve le
+fichier qui manque, et l’affiche.
+
+**`verification/verifier-disponible.mjs`** (`npm run disponible`) refait tout
+cela à chaque fois, dans une copie du projet (le vrai n’est jamais touché) :
+le lanceur lancé pour de vrai, `lancer.bat` avec un Node qui ment sur sa
+version, les 47 pages, les navigateurs privés de quelque chose, chaque module
+retiré tour à tour. Il demande Node 22 (pour parler au navigateur) ; l’atelier,
+lui, Node 18. `demarrer.mjs` accepte pour cela `--port`, `--sans-navigateur`
+et `--sans-php` ; un double-clic n’en donne aucun.
+
+**Vérifié** : `verifier-disponible` tout vert (34 contrôles, dont 78 essais de modules retirés), et les 22 autres
+vérificateurs verts.
+
+**Ce qui reste, connu** : `verifier-portage.mjs` et deux outils de portage
+(`outils/porter.mjs`, `outils/traduction.js`) visent le projet voisin
+`../gameboy2`, absent de ce disque — ce ne sont pas des morceaux de l’atelier.
+Et, déjà noté : la page fait une image de console par rafraîchissement de
+l’écran, si bien qu’un écran à 120 ou 144 Hz fait tourner les jeux plus vite.
+
+## 11. Chercher, partout
+
+> 29 septembre 2026. 408 leçons, 42 cours, 27 exemples, des projets, des
+> modèles, 62 réglages : il fallait faire défiler pour trouver quoi que ce soit.
+
+Chaque liste a maintenant son champ de recherche, et **tous se comportent
+pareil**, parce qu’ils passent par un seul module, `recherche.js` :
+
+- **sans accents ni majuscules** : « lecon » trouve « Leçon » ;
+- **plusieurs mots** : « snake menu » ne garde que ce qui contient les deux ;
+- **un numéro** : « 0.93 » trouve le 0.93 et ses intermédiaires, pas le 0.930 ;
+- **dans le code** : « texteGrand » trouve les leçons qui APPELLENT cette
+  fonction (les commentaires ne comptent pas : « mur » y est partout) ;
+- **au clavier** : `/` amène dans la recherche, Entrée ouvre le premier
+  résultat, Échap efface ; un compteur, et « rien ne contient … » sinon.
+
+| Où | Ce qu’on y cherche |
+|---|---|
+| `tuto.html`, `cours.html` : le sommaire | numéro, titre, idée, niveau, partie, fonctions utilisées ; les titres de niveau et de partie restent au-dessus de leurs résultats |
+| l’atelier, mode Leçons et Cours | pareil, dans une recherche à côté du menu des leçons |
+| l’atelier : les exemples, 🖼 les modèles, 📂 les projets, 🧩 les modèles de jeux | leurs noms et leurs descriptions |
+| l’atelier : ⚙ les réglages | déjà là ; désormais sans accents et à plusieurs mots, comme les autres |
+| **🔎 Tout chercher** (`Ctrl+K`, ou le bouton 🔎) | tout à la fois : leçons, cours, exemples, projets, fonctions, réglages, modèles. Une fonction emmène aux leçons qui l’utilisent |
+| `sommaire.html`, `cours/index.html` | leurs cartes et leurs cours (`recherche-page.js`, un script ordinaire : il marche même ouvert par un double-clic) |
+
+**Deux défauts réglés au passage :**
+- dans le sommaire de `tuto.html` et de `cours.html`, chaque ligne héritait des
+  marges de la grande zone de la leçon (même classe `lecon`) : 95 px de haut au
+  lieu de 33, et de grands trous entre les leçons ;
+- la pastille numérotée d’une leçon était comptée par la feuille de style :
+  une recherche l’aurait renumérotée 1, 2, 3… Le numéro est maintenant écrit
+  sur chaque ligne (`data-rang`).
+
+**Vérifié** : `verification/verifier-recherche.mjs` (`npm run recherche`)
+tape dans chaque champ, dans un vrai navigateur, et contrôle les résultats —
+calculés depuis les leçons, jamais écrits à la main ; 34 contrôles verts. Les
+autres vérificateurs restent verts.
 
 ## Les fichiers ajoutés ou mis à jour
 
@@ -1776,3 +1961,26 @@ un dossier voisin qui n’est pas sur ce disque.
 | `outils/livret.mjs`, `outils/tutoriels.mjs`, `outils/lancer-tutoriels.mjs` | les numéros et les fichiers voisins |
 | `verification/verifier-*.mjs` | adaptés à la nouvelle numérotation |
 | `LISEZMOI.md` | les nouvelles fonctions ; `documents/TUTORIELS.md` régénéré |
+
+Ajoutés ou mis à jour le 29 septembre 2026 (§9 et §10) :
+
+| Fichier | Rôle |
+|---|---|
+| `tuto/lecons.js` | `partie:` sur dix leçons, `partieDe()` ; le Zelda en 0.95 ; titres « L’écran titre — … » et « Le snake — … » |
+| `tuto.html` | les parties dans le sommaire et les repères ; le son facultatif ; `garde.js` |
+| `index.html` | un groupe par partie dans le menu des leçons ; le son facultatif ; `lireLeStockage` ; `garde.js` |
+| `cours.html` | le son facultatif ; `garde.js` |
+| `garde.js` | **nouveau** : le bandeau qui dit pourquoi une page ne démarre pas |
+| `demarrer.mjs` | le dossier du script ; `projets-serveur.mjs` facultatif ; la liste des fichiers manquants ; `demander()` au lieu de `fetch` ; `--port`, `--sans-navigateur`, `--sans-php` |
+| `lancer.bat` | Node trop ancien ; `demarrer.mjs` absent |
+| `outils/tutoriels.mjs`, `outils/livret.mjs` | les parties ; le titre « Niveau 0 » du livret complet |
+| `outils/cours.mjs`, `cours/*.html` | l’icône du projet |
+| `verification/verifier-disponible.mjs` | **nouveau** : le grand contrôle (`npm run disponible`) |
+| `verification/verifier-page.mjs`, `verification/verifier-tuto-page.mjs` | les parties comptées à part des niveaux |
+| `package.json` | le script `disponible` |
+| `documents/TUTORIELS.md` | régénéré, avec les parties |
+| `recherche.js` | **nouveau** (§11) : la recherche commune — comparer, le champ, filtrer un sommaire, un menu, une grille |
+| `recherche-globale.js` | **nouveau** (§11) : la fenêtre « Tout chercher » (Ctrl+K) |
+| `recherche-page.js` | **nouveau** (§11) : la recherche de `sommaire.html` et `cours/index.html` |
+| `projets.js` | `apresLaListe` : la page réapplique sa recherche quand la grille est refaite |
+| `verification/verifier-recherche.mjs` | **nouveau** (§11) : chaque recherche essayée dans un navigateur (`npm run recherche`) |

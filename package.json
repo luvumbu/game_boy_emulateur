@@ -29,6 +29,8 @@
     "fiche": "node outils/fiche-ecrans.mjs",
     "desassembler": "node outils/desassembler.mjs",
     "retour": "node verification/verifier-retour.mjs",
-    "projets": "node verification/verifier-projets.mjs"
+    "projets": "node verification/verifier-projets.mjs",
+    "disponible": "node verification/verifier-disponible.mjs",
+    "recherche": "node verification/verifier-recherche.mjs"
   }
 }

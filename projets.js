@@ -55,6 +55,7 @@ export function installer({
   bandeau, nomCourant, cheminCourant, pointModifie,
   voile, grille, cheminDuDossier,
   lireProjet, poserProjet, capture, cartouches, demanderUnNom, dire,
+  apresLaListe = () => {},   // appelé quand la grille des projets vient d'être refaite (pour la recherche)
 }) {
   let courant = null // le nom du projet ouvert, ou null : « pas dans un projet »
   let modifie = false
@@ -406,6 +407,7 @@ export function installer({
       carte.append(rangee)
       grille.append(carte)
     }
+    apresLaListe()   // la page réapplique sa recherche à la grille toute neuve
   }
 
   /* ------------------------------------------------ au démarrage */
