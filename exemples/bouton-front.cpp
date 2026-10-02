@@ -12,6 +12,10 @@
  * change de 0 à 1 — une seule fois par appui, quelle que soit sa durée.
  */
 
+#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+#include <nombre>   // écrit un nombre en chiffres
+
 uint8_t avantA = 0;
 uint8_t avantB = 0;
 uint8_t coups = 0;

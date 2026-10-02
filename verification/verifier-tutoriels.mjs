@@ -17,7 +17,7 @@
 
 import { readFileSync, existsSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
-import { LECONS } from '../tuto/lecons.js'
+import { LECONS, NIVEAUX } from '../tuto/lecons.js'
 import { enrichir } from '../tuto/enrichir.js'
 import { bulletin } from '../outils/controle.mjs'
 
@@ -53,8 +53,10 @@ b.verifier('chaque leçon porte son programme',
 const mesures = (apres.match(/^\*\*Ce qu’il coûte\*\* — \d+ octets/gm) ?? []).length
 b.egal('chacune annonce ce qu’elle coûte, mesuré', mesures, LECONS.length)
 
-b.verifier('les dix niveaux sont annoncés',
-  [...Array(10).keys()].every((n) => apres.includes(`## Niveau ${n + 1} —`)))
+/* Le parcours est en chapitres (tuto/parcours.js) : chacun a son titre. */
+const chapitres = Object.keys(NIVEAUX).map(Number).filter((n) => n > 0)
+b.verifier(`les ${chapitres.length} chapitres du parcours sont annoncés`,
+  chapitres.every((n) => apres.includes(`## Chapitre ${n} —`)))
 
 /*
  * Aucun accent grave ne doit ARRIVER À L'ÉCRAN.

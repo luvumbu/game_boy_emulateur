@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 27.1 — La fonction ecran() — éteindre et rallumer l’écran</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 5 — Les boucles : répéter</span>
+    
+    
+    <span>leçon 27.1 sur 143</span>
+    <span class="jauge" style="--part: 50%">difficulté 5 / 10</span>
+    
+    
+    
+  </p>
+<h1>27.1. La fonction ecran() — éteindre et rallumer l’écran</h1>
+<p class="idee">#include &lt;ecran&gt; : ecran(0) éteint l’écran, ecran(1) le rallume — le temps de dessiner beaucoup d’un coup.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>Ce qu’elle fait :</strong> <code>ecran(0)</code> <strong>éteint</strong> l’écran, <code>ecran(1)</code> le <strong>rallume</strong>. Écran éteint, on peut écrire dans toutes les cases sans attendre : c’est le moment d’un gros dessin, comme tout un niveau.</p>
+<p><strong>La ligne à écrire : <code>#include &lt;ecran&gt;</code>.</strong></p>
+<p><strong>Son argument :</strong> 0 ou 1, écrit en clair.</p>
+<p><strong>Ce qu’elle coûte :</strong> environ <strong>90 octets</strong> avec la mise en place de l’écran ; un appel seul, quatre octets.</p>
+<p><strong>Essaie :</strong> enlève <code>ecran(1)</code> : l’écran reste blanc, le programme continue pourtant.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">On retrouve ecran dans 31 leçons</p>
+  <p style="margin: 0;"><a href="lecon-28-l-ecran-ne-s-ecrit-que-pendant-le-vblank.html">28</a>, <a href="lecon-29-compter-a-l-envers-et-le-piege-du-zero.html">29</a>, <a href="lecon-30-une-boucle-dans-une-boucle-la-grille.html">30</a>, <a href="lecon-31-break-et-continue-sortir-ou-sauter-un-to.html">31</a>, <a href="lecon-33-une-boucle-qui-dure-plusieurs-images.html">33</a>, <a href="lecon-67-un-tableau-plusieurs-cases-sous-un-seul-.html">67</a>, <a href="lecon-68-parcourir-le-total-le-plus-grand-le-plus.html">68</a>, <a href="lecon-69-une-table-gravee-dessiner-un-niveau.html">69</a>, <a href="lecon-70-chercher-et-changer-une-case.html">70</a>, <a href="lecon-71-une-grille-un-tableau-a-deux-dimensions.html">71</a>, <a href="lecon-79-une-fonction-donner-un-nom-a-un-geste.html">79</a>, <a href="lecon-80-des-arguments-le-meme-geste-ailleurs.html">80</a>, <a href="lecon-94-le-petit-jeu-tout-ensemble.html">94</a>, <a href="lecon-95-quatre-nuances-deux-bits-par-pixel.html">95</a>, <a href="lecon-96-dessiner-avec-quatre-nuances-lumiere-et-.html">96</a>, <a href="lecon-97-la-palette-un-indice-n-est-pas-une-nuanc.html">97</a>, <a href="lecon-98-un-fondu-au-noir-et-retour.html">98</a>, <a href="lecon-99-les-lutins-trois-nuances-et-la-transpare.html">99</a>, <a href="lecon-101-allumer-la-couleur-rouge-vert-bleu.html">101</a>, <a href="lecon-102-melanger-la-lumiere.html">102</a>, <a href="lecon-103-huit-palettes-et-teindre-chaque-case.html">103</a>, <a href="lecon-105-animer-les-couleurs-l-eau-qui-scintille.html">105</a>, <a href="lecon-106-un-jeu-lisible-en-couleur-comme-en-nuanc.html">106</a>, <a href="lecon-113-glisser-le-long-d-un-mur-un-axe-a-la-foi.html">113</a>, <a href="lecon-115-une-place-libre-tirer-encore.html">115</a>, <a href="lecon-119-un-switch-et-une-fonction-par-etat.html">119</a>, <a href="lecon-120-le-record-garde-dans-la-cartouche.html">120</a>, <a href="lecon-124-faire-glisser-le-decor.html">124</a>, <a href="lecon-125-une-carte-plus-grande-que-l-ecran-la-cam.html">125</a>, <a href="lecon-126-passer-d-un-ecran-a-l-autre.html">126</a>, <a href="lecon-134-passer-a-la-salle-suivante-sans-bouton.html">134</a></p>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>288 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()           89 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← ecran()  — attend que l’écran soit libre
+  AdresseCase      10 o  ← poser()  — trouve l’adresse d’une case de l’écran
+  Diviser          17 o  ← poser()  — divise — le processeur ne sait pas le faire
+  Reste            10 o  ← poser()  — le reste d’une division
+  CopierTuiles     31 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles           16 o  ← CopierTuiles  — 1 lettre sur 43
+Lettres gravées : A
+Pas gravé (jamais appelé) : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser()  × 1    43 o sur place, dans main()  + AdresseCase (10 o), Diviser (17 o), Reste (10 o)
+  ecran()  × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+  poserS() × 1     0 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// ---- #include &lt;ecran&gt; : éteindre et rallumer l'écran ----
+// Écran éteint, on remplit trois lignes d'un coup, puis on le rallume.
+
+#include &lt;ecran&gt;      // ecran() : éteindre (0), rallumer (1)
+#include &lt;poserS&gt;
+#include &lt;ALPHABET&gt;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  ecran(0);                          // éteint : on écrit sans attendre
+  for (uint8_t i = 0; i &lt; 60; i++) {
+    poserS(i, 4, ALPHABET[0]);       // 60 A : trois lignes pleines
+  }
+  ecran(1);                          // rallumé : tout apparaît d'un coup
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABmUlEQVR4nO3XsQmEQBBA0Q0twdD+q7EEyzA00EDMRfw8+MEwd8HBYw9mbPuqcOPzX6BXAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcLwLeJqXs8fH9n/fj3N7/4a5NAOOz+P+rh+v2z6w94LjM+D4DDg+u4PjuYPje3/R8RlwfHYHx/decHwGHJ8Bx2d3cDx3cHzvLzo+A47P7uD43guOz4DjM+D47A6OBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOdwAxRvad7Ok8OAAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Trois lignes pleines de A, apparues d’un seul coup.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>l’écran est rallumé </li>
+
+  <li>les trois lignes sont pleines </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>28. L’écran ne s’écrit que pendant le VBlank</strong> — chapitre 5 : Les boucles : répéter.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

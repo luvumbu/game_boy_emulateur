@@ -93,7 +93,7 @@
 <body>
 
 <h1>Apprendre à programmer, sur Game&nbsp;Boy</h1>
-<p class="idee">42 leçons en huit chapitres qui se suivent : chaque notion est
+<p class="idee">61 leçons en huit chapitres qui se suivent : chaque notion est
 vue en profondeur avant de passer à la suivante. Chaque programme a été compilé, et
 chaque image est l’écran de la console émulée.</p>
 
@@ -141,7 +141,7 @@ il ne les remplace pas.</p>
       — <span class="detail">Départ, condition, pas : les trois morceaux d’une boucle qui compte, sur une seule ligne.</span></li>
 <li><span class="numero">12</span>
       <a href="12-l-ecran-ne-s-ecrit-que-pendant-le-vblank.html">L’écran ne s’écrit que pendant le VBlank</a>
-      — <span class="detail">La console dessine l’écran soixante fois par seconde ; on ne peut lui écrire que pendant la courte pause entre deux images.</span></li>
+      — <span class="detail">La console dessine l’écran ligne par ligne, soixante fois par seconde ; on ne peut lui écrire que pendant ses pauses : le VBlank, et la toute petite pause au bout de chaque ligne.</span></li>
 <li><span class="numero">13</span>
       <a href="13-compter-a-l-envers-et-le-piege-du-zero.html">Compter à l’envers, et le piège du zéro</a>
       — <span class="detail">Un octet n’est jamais plus petit que zéro : « i &gt;= 0 » est toujours vrai.</span></li>
@@ -237,6 +237,69 @@ il ne les remplace pas.</p>
 <li><span class="numero">42</span>
       <a href="42-un-jeu-lisible-en-couleur-comme-en-nuanc.html">Un jeu lisible en couleur comme en nuances</a>
       — <span class="detail">Dessiner d’abord en quatre nuances, colorier ensuite : un jeu qui se lit toujours.</span></li>
+<li class="chapitre">Chapitre 9 — Le mouvement : les lutins au pixel près</li>
+<li><span class="numero">43</span>
+      <a href="43-au-pixel-pres-le-lutin-glisse.html">Au pixel près : le lutin glisse</a>
+      — <span class="detail">Une lettre saute de case en case, 8 pixels d’un coup ; un lutin avance d’un seul pixel.</span></li>
+<li><span class="numero">44</span>
+      <a href="44-la-vitesse-un-pas-toutes-les-n-images.html">La vitesse : un pas toutes les N images</a>
+      — <span class="detail">Un pixel par image, c’est 60 pixels par seconde. Pour aller moins vite, on n’avance pas à chaque image.</span></li>
+<li><span class="numero">45</span>
+      <a href="45-animer-deux-dessins-pour-marcher.html">Animer : deux dessins pour marcher</a>
+      — <span class="detail">Un personnage qui glisse sans bouger les jambes a l’air d’un meuble. Deux dessins, alternés, et il marche.</span></li>
+<li><span class="numero">46</span>
+      <a href="46-regarder-a-gauche-ou-a-droite-le-miroir.html">Regarder à gauche ou à droite : le miroir</a>
+      — <span class="detail">Un seul dessin, tourné vers la droite ; la console le retourne pour aller à gauche.</span></li>
+<li class="chapitre">Chapitre 10 — Les collisions : se toucher, se cogner</li>
+<li><span class="numero">47</span>
+      <a href="47-deux-boites-qui-se-touchent.html">Deux boîtes qui se touchent</a>
+      — <span class="detail">Deux lutins se touchent si leurs carrés se chevauchent : quatre comparaisons, pas une de plus.</span></li>
+<li><span class="numero">48</span>
+      <a href="48-lire-la-case-devant-soi-le-mur.html">Lire la case devant soi : le mur</a>
+      — <span class="detail">Avant de faire un pas, on regarde quelle tuile il y a là où l’on va.</span></li>
+<li><span class="numero">49</span>
+      <a href="49-glisser-le-long-d-un-mur-un-axe-a-la-foi.html">Glisser le long d’un mur : un axe à la fois</a>
+      — <span class="detail">Tester la largeur, puis la hauteur, séparément : le héros bloqué d’un côté continue de l’autre.</span></li>
+<li class="chapitre">Chapitre 11 — Le hasard et le temps</li>
+<li><span class="numero">50</span>
+      <a href="50-le-hasard-dans-une-plage-choisie.html">Le hasard dans une plage choisie</a>
+      — <span class="detail">hasard() rend 0 à 255 ; « début + hasard() % combien » le range entre deux bornes.</span></li>
+<li><span class="numero">51</span>
+      <a href="51-une-place-libre-tirer-encore.html">Une place libre : tirer encore</a>
+      — <span class="detail">Le hasard ne sait pas où sont les murs. On tire, on regarde, et on recommence tant que c’est pris.</span></li>
+<li><span class="numero">52</span>
+      <a href="52-compter-les-secondes-un-chronometre.html">Compter les secondes : un chronomètre</a>
+      — <span class="detail">images() compte les images même quand la boucle prend du retard : c’est l’horloge fidèle.</span></li>
+<li><span class="numero">53</span>
+      <a href="53-un-compte-a-rebours.html">Un compte à rebours</a>
+      — <span class="detail">Le chronomètre à l’envers : dix secondes, puis « FINI! » — sans jamais passer sous zéro.</span></li>
+<li class="chapitre">Chapitre 12 — Les états du jeu : titre, partie, fin</li>
+<li><span class="numero">54</span>
+      <a href="54-enum-un-nom-pour-chaque-ecran.html">enum : un nom pour chaque écran</a>
+      — <span class="detail">Un jeu passe d’écran en écran : titre, partie, perdu. Une variable dit où l’on en est, et chaque valeur a un nom.</span></li>
+<li><span class="numero">55</span>
+      <a href="55-un-switch-et-une-fonction-par-etat.html">Un switch, et une fonction par état</a>
+      — <span class="detail">La boucle ne fait plus qu’aiguiller : chaque état a sa fonction, et une seule fonction change d’état.</span></li>
+<li><span class="numero">56</span>
+      <a href="56-le-record-garde-dans-la-cartouche.html">Le record, gardé dans la cartouche</a>
+      — <span class="detail">Le meilleur score survit à l’extinction : la cartouche a une petite mémoire à pile.</span></li>
+<li class="chapitre">Chapitre 13 — Le son : notes, bruits, airs</li>
+<li><span class="numero">57</span>
+      <a href="57-une-note-sa-hauteur-sa-duree-son-volume.html">Une note : sa hauteur, sa durée, son volume</a>
+      — <span class="detail">note(voix, hauteur, duree, volume) joue une note toute seule, pendant que le jeu continue.</span></li>
+<li><span class="numero">58</span>
+      <a href="58-un-son-pour-chaque-action.html">Un son pour chaque action</a>
+      — <span class="detail">Une note quand on ramasse, un « toc » quand on se cogne : le joueur entend ce qui se passe.</span></li>
+<li><span class="numero">59</span>
+      <a href="59-un-petit-air-qui-joue-tout-seul.html">Un petit air qui joue tout seul</a>
+      — <span class="detail">Un Air s’écrit comme une tuile se dessine : une suite de pas, gravée dans le programme.</span></li>
+<li class="chapitre">Chapitre 14 — Le défilement : un monde plus grand que l’écran</li>
+<li><span class="numero">60</span>
+      <a href="60-faire-glisser-le-decor.html">Faire glisser le décor</a>
+      — <span class="detail">L’écran ne montre qu’un morceau de la carte ; defiler() choisit lequel, au pixel près.</span></li>
+<li><span class="numero">61</span>
+      <a href="61-une-carte-plus-grande-que-l-ecran-la-cam.html">Une carte plus grande que l’écran : la caméra</a>
+      — <span class="detail">Le héros a une place dans le monde ; la caméra le suit ; l’écran montre le monde moins la caméra.</span></li>
 </ol>
 
 <p class="pied">gameboy3 — apprendre à programmer, en écrivant pour la Game Boy</p>

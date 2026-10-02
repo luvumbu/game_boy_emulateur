@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 3 — Les boucles : répéter</span>
   <span>leçon 6 sur 9 dans ce chapitre</span>
-  <span>14 sur 42 dans le cours</span>
+  <span>14 sur 61 dans le cours</span>
 </p>
 <h1>14. Une boucle dans une boucle : la grille</h1>
 <p class="idee">Pour chaque ligne, toutes les colonnes : c’est ainsi qu’on remplit un écran.</p>
@@ -109,37 +109,78 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1528 octets</strong> de cartouche.</p>
+<strong>588 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          190 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← texte()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles     40 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          176 o  ← CopierTuiles  — 11 lettres sur 43
+  "#"               1 o  ← texte()  — un texte gravé
+  "#"               1 o  ← texte()  — un texte gravé
+Lettres gravées : 0123456789#
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 2    52 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  ecran()  × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  nombre() × 2    20 o sur place, dans main()  + EcrireNombre (33 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  ecran(0);
-  uint8_t cases = 0;
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : dessine un rectangle puis un triangle de #, et compte les cases.
+//
+// Ce qui est nouveau : une boucle DANS une boucle.
+// La boucle du dehors choisit la ligne ; pour CHAQUE ligne, la boucle du
+// dedans parcourt toutes les colonnes.
 
-  /* un rectangle : 4 lignes de 8 colonnes */
-  for (uint8_t ligne = 0; ligne &lt; 4; ligne++) {
-    for (uint8_t colonne = 0; colonne &lt; 8; colonne++) {
-      texte(1 + colonne, 1 + ligne, "#");
-      cases++;
+#include &lt;ecran&gt;    // éteint ou rallume l’écran
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                              // Le jeu commence ici.
+  ecran(0);                               // On dessine écran éteint (plus rapide).
+  uint8_t cases = 0;                      // Le nombre de # posés.
+
+  // Un rectangle : 4 lignes de 8 colonnes.
+  for (uint8_t ligne = 0; ligne &lt; 4; ligne++) {         // ligne = 0, 1, 2, 3
+    for (uint8_t colonne = 0; colonne &lt; 8; colonne++) { //   colonne = 0 à 7, pour chaque ligne
+      texte(1 + colonne, 1 + ligne, "#");               //   « 1 + » décale d'une case
+                                                        //   pour ne pas coller au bord.
+      cases++;                                          //   un # de plus.
     }
   }
-  nombre(12, 2, cases);
+  nombre(12, 2, cases);                   // 4 lignes × 8 colonnes = 32 : affiche 032.
 
-  /* un triangle : la ligne n a n + 1 cases */
+  // Un triangle : la ligne n a n + 1 cases.
   uint8_t triangle = 0;
-  for (uint8_t ligne = 0; ligne &lt; 6; ligne++) {
-    for (uint8_t colonne = 0; colonne &lt;= ligne; colonne++) {
-      texte(1 + colonne, 7 + ligne, "#");
+  for (uint8_t ligne = 0; ligne &lt; 6; ligne++) {             // 6 lignes : 0 à 5
+    for (uint8_t colonne = 0; colonne &lt;= ligne; colonne++) { // la colonne va jusqu'à ligne :
+                                                             // ligne 0 → 1 case, ligne 1 → 2 ...
+      texte(1 + colonne, 7 + ligne, "#");                    // le triangle commence ligne 7.
       triangle++;
     }
   }
-  nombre(12, 10, triangle);
-  ecran(1);
+  nombre(12, 10, triangle);               // 1 + 2 + 3 + 4 + 5 + 6 = 21 : affiche 021.
+  ecran(1);                               // On rallume : tout apparaît.
 
-  while (true) {
+  while (true) {                          // La boucle du jeu.
     image();
   }
 }</code></pre>

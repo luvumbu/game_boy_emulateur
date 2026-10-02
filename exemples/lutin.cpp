@@ -1,5 +1,10 @@
 /* La même tuile, mais en LUTIN : elle bouge au pixel près, hors de la grille. */
 
+#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+
 Tuile BALLE = { "..####..", ".#----#.", "#--++--#", "#-+##+-#", "#-+##+-#", "#--++--#", ".#----#.", "..####.." };
 
 uint8_t x = 76;

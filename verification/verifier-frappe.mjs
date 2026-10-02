@@ -139,7 +139,9 @@ async function taper(texte) {
  * des guillemets, et des retours à la ligne après une accolade — c'est là que
  * l'indentation automatique s'ajoute à ce qu'on a tapé.
  */
-const VOULU = `struct Point {
+const VOULU = `#include <texte>
+#include <nombre>
+struct Point {
 uint8_t x, y;
 void avancer() { x++; }
 };

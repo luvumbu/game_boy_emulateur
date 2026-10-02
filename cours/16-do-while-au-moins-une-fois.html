@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 3 — Les boucles : répéter</span>
   <span>leçon 8 sur 9 dans ce chapitre</span>
-  <span>16 sur 42 dans le cours</span>
+  <span>16 sur 61 dans le cours</span>
 </p>
 <h1>16. do … while : au moins une fois</h1>
 <p class="idee">Quand il faut d’abord essayer pour savoir si c’est bon, la condition se pose APRÈS.</p>
@@ -109,34 +109,81 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1439 octets</strong> de cartouche.</p>
+<strong>763 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        58 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          135 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  Reste            10 o  ← main()  — le reste d’une division
+  CopierTuiles     94 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Hasard           25 o  ← hasard()  — tire un nombre au hasard
+  Tuiles          304 o  ← CopierTuiles  — 19 lettres sur 43
+  "DE:"             3 o  ← texte()  — un texte gravé
+  "AVANT:"          6 o  ← texte()  — un texte gravé
+  "ESSAIS:"         7 o  ← texte()  — un texte gravé
+Lettres gravées : ADEINSTV0123456789:
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, Diviser, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 3    33 o sur place, dans main()  + EcrireTexte (10 o)
+  nombre() × 3    30 o sur place, dans main()  + EcrireNombre (33 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+  hasard() × 1     3 o sur place, dans main()  + Hasard (25 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  uint8_t de = 1;
-  uint8_t ancien = 1;
-  uint8_t essais = 0;
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : lance un dé toutes les demi-secondes, sans jamais retomber
+// sur la même face que la fois d'avant.
+//
+// Ce qui est nouveau : do ... while.
+//   do ... while (condition);  fait le bloc AU MOINS UNE FOIS,
+//   puis le recommence TANT QUE la condition est vraie.
+//   (Un while normal teste AVANT ; do ... while teste APRÈS.)
 
-  texte(1, 3, "DE:");
+#include &lt;reste&gt;   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;hasard&gt;   // tire un nombre au hasard
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                    // Le jeu commence ici.
+  uint8_t de = 1;               // La face actuelle (1 à 6).
+  uint8_t ancien = 1;           // La face d'avant.
+  uint8_t essais = 0;           // Combien de lancers il a fallu cette fois.
+
+  texte(1, 3, "DE:");           // Les trois titres.
   texte(1, 5, "AVANT:");
   texte(1, 7, "ESSAIS:");
 
-  while (true) {
-    for (uint8_t i = 0; i &lt; 30; i++) image();
+  while (true) {                // La boucle du jeu :
+    for (uint8_t i = 0; i &lt; 30; i++) image();   // attend 30 images = une demi-seconde.
+                                // (Sans accolades, le for ne répète que image().)
 
-    ancien = de;
-    essais = 0;
-    do {
-      de = hasard() % 6 + 1;
-      essais++;
-    } while (de == ancien);     // la meme face : on relance
+    ancien = de;                // On retient la face d'avant.
+    essais = 0;                 // On recommence à compter les essais.
+    do {                        // FAIS (au moins une fois) :
+      de = hasard() % 6 + 1;    //   hasard() rend un nombre au hasard de 0 à 255.
+                                //   % 6 garde le reste par 6 : 0 à 5 ; + 1 : 1 à 6.
+      essais++;                 //   un essai de plus.
+    } while (de == ancien);     // la même face : on relance
 
-    nombre(9, 3, de, 1);
-    nombre(9, 5, ancien, 1);
-    nombre(9, 7, essais, 1);
+    nombre(9, 3, de, 1);        // La nouvelle face.
+    nombre(9, 5, ancien, 1);    // L'ancienne : jamais la même.
+    nombre(9, 7, essais, 1);    // Souvent 1, parfois 2 ou plus.
   }
 }</code></pre>
   </div>
@@ -165,12 +212,12 @@ instants qui comptent. Une image identique à la précédente n’est pas montr�
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACS0lEQVR4nO3bTU7bQACAUZY9Asve/zQ9Asdg2UUlVEHsxM448Xx50idkTH6GeXhIbHj7+PyjcG9PH4EODXA8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPHWgH+9//5qaf+3L52qWcZ5aFeAr26v3+sknXBID2s88Nmaa7TD2wk817o3yziPqH8EzzvmIZV/B8/+Qzmk8qvo/4f69JE8K++D4wGOBzge4HiA4wGOBzge4HiA410BXjqTdXF76+0fc0bMmay1qRm1/fXpz7lemv0hKq9M+68HAX/7+BgDuhsuNtx+pK7c/uJqefTibIlem6BDt5f2jMrlwp3AS+vtWOD7SQDvB7665wxHsOvB3gf3AxwPcDzA8QDHAxwPcDzA8QDH23Ox4cZ/eri4f+kpVp76zu/wlU9jbThVOWr/1lOed4K9+HnKKYG3BnhtanYvrUuPcyPnwIsEgO+amq1H7aEL8kGPMHXzAW8FA7w2NUt/grP1JfTSdG96nB25Hux9cDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcLy/FxfERedDrHAAAAAASUVORK5CYII=" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACSUlEQVR4nO3bQW6bQABA0Sx7hCx7/9P0CDlGll1UiqrEgw0GA58nfUWEOPZ4nsD2kLx9fP5RuLfdR6BNAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcLwp4F/vv78a7f/2o0N1lnFu2h3gu9vTv7VvxxnJjq0PfJwcvsuBTzdxJxrqupWP4NFzuVRXeQ0+zqheXPld9P9D3X0ke+VzcDzA8QDHAxwPcDzA8QDHAxwPcLw7wKOVrJvbc2//mhUxK1lTU7PW9te3P+d6NPurqFyZ9l8vAv729TUGdGdcbHj8SJ24/c2z5dYnZ6foqQnadHu0Z61cLlwIPDrfrgv8PAng5cB39xzhCHY92OfgfoDjAY4HOB7geIDjAY4HOB7geEsuNjz4Tw83948eYuKhn3yGV17GmrFUudb+uUueT4JdfJ3ylMBzAzw1NYtPraP7eZBzxYsEgJ+amrlH7aYn5I3u4dSdD3guGOCpqRn9Cc7ct9Cj6Z51PwtyPdjn4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4Hh/AYkivQ0iecgJAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>au bout de trois secondes — image 180</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACR0lEQVR4nO3bQW7aQABA0Sx7hC57/9P0CD1Gl9lFVcoY29jY/n7SV0QIgWGexsA4+fjz97fCfRw+Au0a4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA400B//j566vR9d9+dKquMs5dewL89PL0bx3beUZyYNsDnyfLdz3w5SbuQkPdtvIKHj2XW3WX1+DzjOrNld9F/zvUw0dyVD4HxwMcD3A8wPEAxwMcD3A8wPEAx3sCPNrJenh56e3fsyN2522sDfaiZ17++vb/6R4BbAJz833K9wF/+7o55MxnccPmnmyYv1Inbv9wPQHetfet4NF0A961NcCj4+22wFvBAJ41NXNgTriCnQ/2OTge4HiA4wGOBzge4HiA4wGOBzjempMNM//p4eH1o4eYeOgXn+Gdt7EWbFVudf3SLc8XwW6+T3lJ4KUBnpqa1YfW0f3M5NzwJAHgl6Zm6ard9YC80z1cuusBLwUDPDU1oz/BWfoWejTdi+5nRc4H+xwcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMc7xOYeskV4Nsl5gAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACRUlEQVR4nO3bQXKbMABA0Sx7hC57/9P0CD1Gl91lkRpbEGFbnzfzJ0MIMTJvILaIP/78/a1wHy8fgU4NcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8e4B//j567Ot9V9+9IYtMcjzegD8cPn+b728txrMS5oP/D6tMs5TOwi8xPV5lXGe2lXO4FXGPL3y32DA/VfRSwzy1LwPjgc4HuB4gOMBjgc4HuB4gOMBjvcAeGsm6+by3u2fMyN25WmsCXPRg8uf3/5/uLcApsBcfJ7yecBfvk6HHHwWF2z0ZsP4mXpn+5vnE+BTe94ZvHW4AZ/aEeCt6+1c4FkwgIcOzQjMG57B7gd7HxwPcDzA8QDHAxwPcDzA8QDHAxzvyM2GwQ893Fy/tYs7u/7O0zOTNTpVOWv93inP8b3s3e9FWg/4WIBvH5TDl9atxxnknHtpvazuwTN4ZJtZd5O+b3Nl3SWBd4FdXPf4v+zsfQm9dcR3Pc7eFvoc82uAFQhwPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHO8fRjrERVnmEbIAAAAASUVORK5CYII=" alt="l’écran">
     <figcaption>au bout de sept secondes — image 420</figcaption>
   </figure>
 </div>
@@ -186,7 +233,7 @@ exige de cette leçon. Ils viennent d’être joués, et voici ce qu’ils ont m
 
 <ul class="controles">
 
-  <li>chaque face est entre 1 et 6 <span class="detail"> (6 2 4 6 3 2 2 5 2 1 5 1)</span></li>
+  <li>chaque face est entre 1 et 6 <span class="detail"> (6 1 2 6 5 2 3 5 1 6 4 1)</span></li>
 
   <li>jamais deux fois de suite la même </li>
 

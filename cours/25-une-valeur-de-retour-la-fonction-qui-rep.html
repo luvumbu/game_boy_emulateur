@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 5 — Les fonctions : nommer un geste</span>
   <span>leçon 3 sur 4 dans ce chapitre</span>
-  <span>25 sur 42 dans le cours</span>
+  <span>25 sur 61 dans le cours</span>
 </p>
 <h1>25. Une valeur de retour : la fonction qui répond</h1>
 <p class="idee">Certaines fonctions font ; d’autres calculent, et « return » rapporte le résultat.</p>
@@ -109,15 +109,88 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1639 octets</strong> de cartouche.</p>
+<strong>973 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage           49 o  ← la console, à l’allumage  — la mise en route de la console
+  plusGrand()         15 o  ← nombre()  — ta fonction
+  limiter()           27 o  ← main()  — ta fonction
+  dansLaZone()        20 o  ← main()  — ta fonction
+  main()             182 o  ← démarrage  — ta fonction
+  VBlank               8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage       28 o  ← image()  — attend l’image suivante
+  AttendreVBlank      16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces       12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase         10 o  ← texte()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte         10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre        33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles       103 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte        14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette         37 o  ← bouton()  — lit les huit boutons
+  Tuiles             384 o  ← CopierTuiles  — 24 lettres sur 43
+  "PLUS GRAND 3 8:"   15 o  ← texte()  — un texte gravé
+  " "                  1 o  ← texte()  — un texte gravé
+  "#"                  1 o  ← texte()  — un texte gravé
+  "ZONE"               4 o  ← texte()  — un texte gravé
+  "    "               4 o  ← texte()  — un texte gravé
+Lettres gravées : ADEGLNOPRSUZ0123456789:#
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()      × 5    69 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  nombre()     × 2    18 o sur place, dans main()  + plusGrand() (15 o), EcrireNombre (33 o)
+  bouton()     × 2    10 o sur place, dans main()  + LireManette (37 o)
+  image()      × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  limiter()    × 1    15 o sur place, dans main()
+  plusGrand()  × 1    11 o sur place, dans main()
+  dansLaZone() × 1     7 o sur place, dans main()</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. une fonction — plusGrand()</p>
-    <pre><code>uint8_t plusGrand(uint8_t a, uint8_t b) {
-  if (a &gt; b) return a;
-  return b;
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : un # bouge avec GAUCHE et DROITE, sans sortir des colonnes 2 à 17 ;
+// ZONE s'affiche quand il est entre les colonnes 8 et 12.
+//
+// Ce qui est nouveau : une fonction qui RÉPOND (une « valeur de retour »).
+//   uint8_t plusGrand(...) : le mot devant le nom (uint8_t) dit ce qu'elle rend.
+//   return a;  = « la réponse est a » ; la fonction s'arrête tout de suite.
+
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres
+#include &lt;bouton&gt;   // lit un bouton de la manette</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une fonction — plusGrand()</p>
+    <pre><code>uint8_t plusGrand(uint8_t a, uint8_t b) {   // Rend le plus grand de a et b.
+  if (a &gt; b) return a;                      // a est plus grand : on rend a (et on s'arrête).
+  return b;                                 // Sinon, on arrive ici : on rend b.
+}                                           // plusGrand(3, 8) → 3 &gt; 8 est faux → rend 8.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une fonction — limiter()</p>
+    <pre><code>uint8_t limiter(uint8_t v, uint8_t mini, uint8_t maxi) {  // Garde v entre mini et maxi.
+  if (v &lt; mini) return mini;                // Trop petit : on rend mini.
+  if (v &gt; maxi) return maxi;                // Trop grand : on rend maxi.
+  return v;                                 // Entre les deux : v ne change pas.
+}                                           // limiter(20, 2, 17) → 17 ; limiter(1, 2, 17) → 2.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une fonction — dansLaZone()</p>
+    <pre><code>uint8_t dansLaZone(uint8_t x) {             // Rend 1 si x est entre 8 et 12, sinon 0.
+  return x &gt;= 8 &amp;&amp; x &lt;= 12;                 // La comparaison elle-même est la réponse.
 }</code></pre>
   </div>
   <div></div>
@@ -125,52 +198,31 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. une fonction — limiter()</p>
-    <pre><code>uint8_t limiter(uint8_t v, uint8_t mini, uint8_t maxi) {
-  if (v &lt; mini) return mini;
-  if (v &gt; maxi) return maxi;
-  return v;
-}</code></pre>
-  </div>
-  <div></div>
-</div>
-
-<div class="morceau">
-  <div>
-    <p class="quoi">3. une fonction — dansLaZone()</p>
-    <pre><code>uint8_t dansLaZone(uint8_t x) {
-  return x &gt;= 8 &amp;&amp; x &lt;= 12;
-}</code></pre>
-  </div>
-  <div></div>
-</div>
-
-<div class="morceau">
-  <div>
-    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
+    <p class="quoi">5. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                                // Le jeu commence ici.
   texte(1, 1, "PLUS GRAND 3 8:");
-  nombre(17, 1, plusGrand(3, 8));
+  nombre(17, 1, plusGrand(3, 8));           // La réponse de la fonction s'affiche : 008.
 
-  uint8_t x = 5;
-  uint8_t ancien = 0;
+  uint8_t x = 5;                            // La colonne du #.
+  uint8_t ancien = 0;                       // Où il était dessiné avant.
 
-  while (true) {
-    image();
+  while (true) {                            // La boucle du jeu :
+    image();                                // une image.
 
-    if (bouton(DROITE)) x++;
-    if (bouton(GAUCHE)) x--;
-    x = limiter(x, 2, 17);
+    if (bouton(DROITE)) x++;                // DROITE tenue : un pas à droite.
+    if (bouton(GAUCHE)) x--;                // GAUCHE tenue : un pas à gauche.
+    x = limiter(x, 2, 17);                  // On range dans x la réponse de limiter :
+                                            // x reste entre 2 et 17.
 
-    if (x != ancien) {
-      texte(ancien, 9, " ");
-      texte(x, 9, "#");
-      nombre(1, 5, x);
+    if (x != ancien) {                      // Le # a bougé ?
+      texte(ancien, 9, " ");                //   efface l'ancien,
+      texte(x, 9, "#");                     //   dessine le nouveau,
+      nombre(1, 5, x);                      //   affiche la colonne.
 
-      if (dansLaZone(x)) texte(6, 5, "ZONE");
-      else texte(6, 5, "    ");
+      if (dansLaZone(x)) texte(6, 5, "ZONE");  // La réponse sert de condition : 1 ou 0.
+      else texte(6, 5, "    ");                // 4 espaces pour effacer ZONE.
 
-      ancien = x;
+      ancien = x;                           // On retient la place.
     }
   }
 }</code></pre>
@@ -203,7 +255,7 @@ relâché. Voici l’écran juste après.</p>
 <div class="etapes">
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAChUlEQVR4nO3bwY2bQABA0T2mhBxTRGpJDSk3JaSMHHOzVraBgcFa+/lLTyuWxXjg22BLOx9///0J7OPLR5CHKjCuwLgC4wqMKzCuwLi1wN++/7i4Wr+0/dI2S7vafOrBnWyO82r52GAmx3/AruO9u34j8Ei8w9vPPO/g8uXXU8Y2XnflIePPeMp5ePbA8wf8+efM2ObD7PX51Xl3n0vrdwQ+/RI9fmC3D1kZz90/7ToRpzeev0Svv0Bv109doicD7zpHI+/I8e3Hl89qfOI7eOkWM37reb3Ad1+2Dw187vZPeg++Wr95tVzafvzYVi65p3z4OjaeB22/dz/nfIoOoMC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswbiPw/H/WH3Bg5sTS8oFJDJjZ6aNnTeqaHMPmZKy3NRT40dMyNwewvv/1aZZvbjvw5PzUs+oOzjqcnGTm2Z4AfveEjs9PPavuF94mXtoz3oP3zj8u8Io+ReP6HowrMK7AuALjCowrMK7AuALjCowrMK7AuALjCowrMK7AuALjCowrMK7AuALjCowrMK7AuALjCox7+cBX0xfefB7DLSHw4Mr3hAT++fvXRYE/KzCuwLgC45DAIyvfkxC4r0krXj5w1hUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXEFxhUYV2BcgXH/AXAiazbKJ7mmAAAAAElFTkSuQmCC" alt="l’écran après DROITE">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACbklEQVR4nO3bUY6aUABA0fnsEvrZRXQtXUOXO0voMvrZjybGqMATnsG5OcnJhEHAh1cBE/n48/eTsI/TR8BLCRwncJzAcQLHCRwncNxa4G/ff1zczF9afmmZpU1tPvXgRjbHeTO9bzAHx7/DU/v7cP5G4JF4u5c/8ryD05d/p4xtvO7KKuPPOOV1ePfAx3f4+u+RsR0P86zrd+fDbS7NfyLw9EP0+I7dr7IynocPPfVCTG98/BC9/ga9n3/oEH0w8FOv0cgncnz58elZjSd+gpdOMeOnnq8X+OHb9qWB5y7/pufgm/mbR8ul5cf3beWQO+Xia994XrT8s9uZcxVNgMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdw3EbglV/or/ysfsqP+pliz+2j9/frra/LiYYCL90Gs7kip9sOPHLT5sh8TrF9A/hl+v7Rh6ucvktc23kOFvir2HkVvTL/9F3imu/BcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQK/qZubrXffdS3wm5p165fAb+p/y5+/f10InCJwnMBxAse5yIrzNYkhAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdw3D+Czi4tl9N5zAAAAABJRU5ErkJggg==" alt="l’écran après DROITE">
     <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
   </figure>
 

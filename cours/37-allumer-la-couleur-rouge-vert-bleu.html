@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 8 — La couleur : la Game Boy Color</span>
   <span>leçon 1 sur 6 dans ce chapitre</span>
-  <span>37 sur 42 dans le cours</span>
+  <span>37 sur 61 dans le cours</span>
 </p>
 <h1>37. Allumer la couleur : rouge, vert, bleu</h1>
 <p class="idee">Sur Game Boy Color, chaque indice 0–3 d’une tuile devient une vraie couleur, que tu choisis.</p>
@@ -109,13 +109,57 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1434 octets</strong> de cartouche.</p>
+<strong>488 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          118 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← poser()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles     85 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          128 o  ← CopierTuiles  — 7 lettres sur 43, et 1 tuile dessinée
+  "EN COULEUR"     10 o  ← texte()  — un texte gravé
+Lettres gravées : CELNORU
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  couleurFond() × 4    48 o sur place, dans main()
+  ecran()       × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  poser()       × 1    13 o sur place, dans main()  + AdresseCase (10 o)
+  texte()       × 1    11 o sur place, dans main()  + EcrireTexte (10 o)
+  image()       × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. un dessin — BANDES</p>
-    <pre><code>Tuile BANDES = {
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME (Game Boy Color) : la même bande de 4 indices qu'en nuances,
+// mais chaque indice reçoit une vraie couleur : blanc, orange, prune, bleu nuit.
+//
+// Ce qui est nouveau : couleurFond(palette, indice, rouge, vert, bleu)
+//   palette : laquelle des 8 palettes du fond (0 à 7) ; ici la 0.
+//   indice  : lequel des 4 indices de la tuile on colore (0 à 3).
+//   rouge, vert, bleu : trois lumières, de 0 (éteinte) à 31 (à fond).
+//   Exemples : 31, 31, 31 = blanc ; 0, 0, 0 = noir ; 31, 0, 0 = rouge pur.
+// Attention : il faut choisir la console « En couleur » dans l'atelier.
+
+#include &lt;Tuile&gt;         // un dessin de 8 × 8 pixels
+#include &lt;couleurFond&gt;   // choisit une couleur d’une palette du fond
+#include &lt;ecran&gt;         // éteint ou rallume l’écran
+#include &lt;texte&gt;         // écrit un texte à l’écran
+#include &lt;poser&gt;         // pose une tuile sur une case du fond</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — BANDES</p>
+    <pre><code>Tuile BANDES = {                  // 2 rangées de chaque indice : 0, 1, 2, 3.
   "00000000", "00000000", "11111111", "11111111",
   "22222222", "22222222", "33333333", "33333333",
 };</code></pre>
@@ -125,22 +169,23 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  /* La palette 0 : quatre teintes, de 0 a 31 pour rouge, vert, bleu. */
-  couleurFond(0, 0, 31, 31, 31);   // indice 0 : blanc
-  couleurFond(0, 1, 31, 20,  0);   // indice 1 : orange
-  couleurFond(0, 2, 20,  0, 10);   // indice 2 : prune
-  couleurFond(0, 3,  0,  0, 12);   // indice 3 : bleu nuit
+    <p class="quoi">3. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                      // Le jeu commence ici.
+  // La palette 0 : quatre teintes, de 0 à 31 pour rouge, vert, bleu.
+  couleurFond(0, 0, 31, 31, 31);   // indice 0 : blanc   (les trois lumières à fond)
+  couleurFond(0, 1, 31, 20,  0);   // indice 1 : orange  (beaucoup de rouge, un peu de vert)
+  couleurFond(0, 2, 20,  0, 10);   // indice 2 : prune   (rouge et un peu de bleu)
+  couleurFond(0, 3,  0,  0, 12);   // indice 3 : bleu nuit (un peu de bleu seulement)
 
-  ecran(0);
-  texte(2, 2, "EN COULEUR");
+  ecran(0);                       // Dessin écran éteint.
+  texte(2, 2, "EN COULEUR");      // Les lettres sont en indice 3 sur un fond d'indice 0 :
+                                  // du bleu nuit sur du blanc.
   for (uint8_t c = 0; c &lt; 20; c++) {
-    poser(c, 7, BANDES);
+    poser(c, 7, BANDES);          // La bande, sur toute la ligne 7.
   }
-  ecran(1);
+  ecran(1);                       // On rallume.
 
-  while (true) {
+  while (true) {                  // La boucle du jeu.
     image();
   }
 }</code></pre>

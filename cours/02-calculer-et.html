@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 1 — Les variables : la mémoire de la console</span>
   <span>leçon 2 sur 4 dans ce chapitre</span>
-  <span>2 sur 42 dans le cours</span>
+  <span>2 sur 61 dans le cours</span>
 </p>
 <h1>2. Calculer : + - * / et %</h1>
 <p class="idee">Diviser des entiers laisse un reste — et ce reste est souvent ce qu’on cherche.</p>
@@ -108,34 +108,88 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1503 octets</strong> de cartouche.</p>
+<strong>994 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          187 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  Diviser          17 o  ← main()  — divise — le processeur ne sait pas le faire
+  Reste            10 o  ← main()  — le reste d’une division
+  Multiplier       14 o  ← main()  — multiplie — le processeur ne sait pas le faire
+  CopierTuiles    112 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          432 o  ← CopierTuiles  — 27 lettres sur 43
+  "IMAGES:"         7 o  ← texte()  — un texte gravé
+  "SECONDES:"       9 o  ← texte()  — un texte gravé
+  "ET IMAGES:"     10 o  ← texte()  — un texte gravé
+  "TOTAL:"          6 o  ← texte()  — un texte gravé
+  "SANS PAR.:"     10 o  ← texte()  — un texte gravé
+  "AVEC PAR.:"     10 o  ← texte()  — un texte gravé
+Lettres gravées : ACDEGILMNOPRSTV0123456789.:
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 6    66 o sur place, dans main()  + EcrireTexte (10 o)
+  nombre() × 6    60 o sur place, dans main()  + EcrireNombre (33 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  uint8_t duree = 200;            // des images : 60 par seconde
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : fait des calculs avec + - * / et %, puis affiche les résultats.
+//
+// Rappel : « // » commence un commentaire, que la console ignore.
+// uint8_t = une case de mémoire qui garde un nombre entier de 0 à 255.
 
-  uint8_t secondes = duree / 60;  // la division entière : 3
-  uint8_t reste = duree % 60;     // ce qui reste : 20
+#include &lt;diviser&gt;      // a / b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include &lt;reste&gt;        // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include &lt;multiplier&gt;   // a * b, quand les deux se calculent
 
-  uint8_t pieces = 7;
-  uint8_t prix = 12;
-  uint8_t total = pieces * prix;  // 84
+#include &lt;texte&gt;        // écrit un texte à l’écran
+#include &lt;nombre&gt;       // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
 
-  uint8_t calcul = 2 + 3 * 4;     // 14 : la multiplication d'abord
-  uint8_t autre = (2 + 3) * 4;    // 20 : les parentheses decident
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                      // Le jeu commence ici.
+  uint8_t duree = 200;            // 200 images. La console en montre 60 par seconde.
 
-  texte(1, 2, "IMAGES:");     nombre(14, 2, duree);
-  texte(1, 4, "SECONDES:");   nombre(14, 4, secondes);
-  texte(1, 5, "ET IMAGES:");  nombre(14, 5, reste);
-  texte(1, 8, "TOTAL:");      nombre(14, 8, total);
-  texte(1, 11, "SANS PAR.:"); nombre(14, 11, calcul);
-  texte(1, 12, "AVEC PAR.:"); nombre(14, 12, autre);
+  uint8_t secondes = duree / 60;  // « / » = la DIVISION ENTIÈRE : 200 / 60 = 3.
+                                  // (3 fois 60 = 180 ; ce qui dépasse est jeté,
+                                  //  il n'y a pas de nombres à virgule.)
+  uint8_t reste = duree % 60;     // « % » = le RESTE de cette division (on dit « modulo ») :
+                                  // 200 - 180 = 20. Donc 200 images = 3 secondes et 20 images.
 
-  while (true) {
-    image();
+  uint8_t pieces = 7;             // 7 pièces...
+  uint8_t prix = 12;              // ... à 12 chacune...
+  uint8_t total = pieces * prix;  // ... « * » = multiplier : 7 fois 12 = 84.
+
+  uint8_t calcul = 2 + 3 * 4;     // La multiplication passe AVANT l'addition :
+                                  // 3 * 4 = 12, puis 2 + 12 = 14.
+  uint8_t autre = (2 + 3) * 4;    // Les parenthèses passent avant tout :
+                                  // 2 + 3 = 5, puis 5 * 4 = 20.
+
+  // On affiche tout. texte(colonne, ligne, "MOT") écrit un mot ;
+  // nombre(colonne, ligne, valeur) écrit un nombre sur 3 chiffres.
+  // On peut mettre deux instructions sur la même ligne : chacune finit par « ; ».
+  texte(1, 2, "IMAGES:");     nombre(14, 2, duree);     // 200
+  texte(1, 4, "SECONDES:");   nombre(14, 4, secondes);  // 003
+  texte(1, 5, "ET IMAGES:");  nombre(14, 5, reste);     // 020
+  texte(1, 8, "TOTAL:");      nombre(14, 8, total);     // 084
+  texte(1, 11, "SANS PAR.:"); nombre(14, 11, calcul);   // 014
+  texte(1, 12, "AVEC PAR.:"); nombre(14, 12, autre);    // 020
+
+  while (true) {                  // Répète pour toujours...
+    image();                      // ... attendre l'image suivante. Le jeu reste allumé.
   }
 }</code></pre>
   </div>

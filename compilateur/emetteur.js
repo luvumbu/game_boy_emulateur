@@ -25,8 +25,9 @@
  * moment de compiler, en nommant le cycle.
  */
 
-import { numeroDe, octetsDesTuiles, NOMBRE_DE_TUILES, lettresGrasses, pixelsDe } from './police.js'
+import { numeroDe, octetsDesTuiles, NOMBRE_DE_TUILES, lettresGrasses, pixelsDe, ORDRE } from './police.js'
 import { analyser } from './analyseur.js'
+import { BIBLIOTHEQUES } from './inclusion.js'
 
 /* Les guichets du matériel, nommés en français comme dans le reste du projet. */
 const MANETTE = 0x00 // $FF00
@@ -374,6 +375,146 @@ export class Emetteur {
 
     this.prochaineRapide = PREMIERE_VARIABLE
     this.prochainOctet = PREMIER_OCTET_LIBRE
+
+    /*
+     * Ne graver que ce qui sert — comme l'éditeur de liens d'un compilateur C.
+     *
+     * Le code est découpé en BLOCS : le démarrage, chaque fonction, chaque
+     * routine de la console, chaque donnée (la police, les notes, un texte…).
+     * Un premier essai note qui appelle qui ; seuls les blocs qu'on peut
+     * atteindre depuis le démarrage sont gardés au second.
+     *
+     *   blocs     où chaque bloc commence, au premier essai
+     *   garder    les noms des blocs à graver au second ; null : tout
+     *   muet      le bloc en cours n'est pas gardé : ses octets partent ailleurs
+     */
+    this.blocs = []
+    this.garder = null
+    this.muet = null
+    /*
+     * Les lettres de la police dont le programme se sert.
+     *
+     *   lettres          les numéros de tuile vus en clair (« poser(0, 0, 1) »)
+     *   policeEntiere    un numéro CALCULÉ a été vu : toute lettre peut sortir
+     *   police           au second essai, les lettres à graver ; null : toutes
+     */
+    this.lettres = new Set()
+    this.policeEntiere = false
+    this.police = null
+    /*
+     * Qui a demandé quoi : « EcrireTexte » ← « texte() ». La fonction du
+     * langage en cours de compilation, et ce qu'elle a fait graver.
+     */
+    this.fonctionDuLangage = null
+    this.demandes = new Map()
+    /*
+     * Ce que la mise en route prépare, seulement si le programme s'en sert.
+     *
+     *   lutins    les 40 lutins rangés, et leur copie installée
+     *   fond      les lettres copiées, les cartes vidées, le fond affiché
+     *   son       la puce sonore allumée
+     *   airs      l'état des airs remis à zéro, la musique à chaque image
+     *   hasard    la première semence du tirage
+     *   horloge   l'interruption qui compte les images
+     *
+     *   besoins      au premier essai : chaque besoin, et les blocs qui l'ont
+     *   necessaire   au second : les besoins à préparer ; null : tous
+     *   blocCourant  le bloc en cours, à qui l'on attribue un besoin
+     */
+    this.besoins = new Map()
+    this.demandeurs = []
+    this.necessaire = null
+    this.blocCourant = 'Debut'
+    /*
+     * Chaque appel écrit dans le programme, mesuré : « texte() » × 6, tant
+     * d'octets écrits sur place. Une fonction comme poser() n'a pas de
+     * routine à elle — son code est écrit DANS main() — : sans ce compte,
+     * elle ne serait nommée nulle part.
+     *
+     *   appels   nom → { fois, octets, dans (les blocs), langage }
+     *   cadres   les appels en cours : un appel dans les arguments d'un
+     *            autre a ses octets à lui, ôtés de ceux de l'autre
+     */
+    this.appels = new Map()
+    this.cadres = []
+  }
+
+  /** Le bloc en cours a besoin de quelque chose que la mise en route prépare. */
+  noterBesoin(quoi) {
+    if (!this.besoins.has(quoi)) this.besoins.set(quoi, new Set())
+    this.besoins.get(quoi).add(this.blocCourant)
+    /* Et qui l'a demandé — « texte() » —, pour le dire dans le panneau ROM. */
+    this.demandeurs.push({ quoi, bloc: this.blocCourant, par: this.fonctionDuLangage })
+  }
+
+  /** Faut-il le préparer ? Au premier essai, tout l'est. */
+  faut(quoi) {
+    return this.necessaire === null || this.necessaire.has(quoi)
+  }
+
+  /*
+   * Le réglage de l'écran : allumé, tuiles en $8000, fenêtre en $9C00 ; le
+   * fond (bit 0) et les lutins (bit 1) seulement s'ils servent. Un fond
+   * éteint, c'est un écran blanc — et non le logo laissé par la console.
+   */
+  reglageEcran() {
+    return 0b11010000 | (this.faut('lutins') ? 0b10 : 0) | (this.faut('fond') ? 0b01 : 0)
+  }
+
+  /** Une étiquette citée pendant une fonction du langage : elle l'a demandée. */
+  noterDemande(nom) {
+    if (!this.fonctionDuLangage || this.muet) return
+    if (!this.demandes.has(nom)) this.demandes.set(nom, new Set())
+    this.demandes.get(nom).add(this.fonctionDuLangage)
+  }
+
+  /* ------------------------------------------------------- les blocs */
+
+  /**
+   * Un bloc commence ici, et le précédent s'arrête.
+   *
+   * Un bloc qui n'est pas gardé est quand même COMPILÉ — ses textes, ses
+   * dessins, ses numéros d'étiquettes restent les mêmes qu'au premier essai —
+   * mais ses octets sont écrits dans un brouillon que personne ne relit.
+   */
+  bloc(nom) {
+    this.finirBloc()
+    this.blocCourant = nom
+    if (this.garder && !this.garder.has(nom)) {
+      this.muet = { octets: this.octets, etiquettes: this.etiquettes, retouches: this.retouches }
+      this.octets = []
+      this.etiquettes = new Map()
+      this.retouches = []
+      return
+    }
+    this.blocs.push({ nom, debut: this.position })
+  }
+
+  /** Le brouillon d'un bloc écarté est jeté : on revient à la vraie cartouche. */
+  finirBloc() {
+    if (!this.muet) return
+    ;({ octets: this.octets, etiquettes: this.etiquettes, retouches: this.retouches } = this.muet)
+    this.muet = null
+  }
+
+  /**
+   * Une tuile passée à poser(), sprite()… : est-ce une lettre de la police ?
+   *
+   * Écrite en clair, on sait laquelle. Calculée (« ALPHABET[i] », une
+   * variable), elle peut valoir n'importe quelle lettre : la police reste
+   * alors entière.
+   */
+  noterTuile(argument, cote) {
+    const numero = constante(argument)
+    if (numero === null) {
+      /* La raison est gardée : elle sera dite à côté de la police. */
+      this.policeEntiere ||= `${this.fonctionDuLangage ?? 'une tuile'} reçoit un numéro calculé`
+      return
+    }
+    const combien = cote === 16 ? 4 : 1
+    for (let i = 0; i < combien; i++) {
+      if (numero + i < NOMBRE_DE_TUILES) this.lettres.add(numero + i)
+    }
   }
 
   /* ------------------------------------------------------- la mémoire */
@@ -567,12 +708,14 @@ export class Emetteur {
 
   /** Écrit une adresse provisoire, à corriger plus tard. */
   adresse(nom, decalage = 0) {
+    this.noterDemande(nom)
     this.retouches.push({ position: this.position, nom, decalage, genre: 'absolue' })
     this.ecrire(0, 0)
   }
 
   /** Écrit un déplacement provisoire, pour un saut court. */
   deplacement(nom) {
+    this.noterDemande(nom)
     this.retouches.push({ position: this.position, nom, decalage: 0, genre: 'relative' })
     this.ecrire(0)
   }
@@ -748,34 +891,42 @@ export class Emetteur {
    * — ce processeur ne sait pas multiplier.
    */
   adresseCarte(colonne, ligne, valeurDe, base = CARTE_FOND) {
-    valeurDe(this, ligne)
-    this.ldLA()
-    this.ldH(0)
-    for (let i = 0; i < 5; i++) this.addHLHL() // × 32
-    this.ldDE(base)
-    this.addHLDE()
+    /* Deux nombres écrits en clair : l'adresse est connue, trois octets. */
+    const x = constante(colonne)
+    const y = constante(ligne)
+    if (x !== null && y !== null) {
+      this.ldHL((base + y * 32 + x) & 0xffff)
+      return
+    }
 
     /*
-     * `hl` porte maintenant l'adresse de la ligne — et la colonne reste à
-     * calculer. Si ce calcul se sert de `hl`, il faut la mettre à l'abri.
+     * Sinon, le calcul est fait UNE fois, dans la routine AdresseCase : la
+     * colonne dans `e`, la carte dans `d`, la ligne dans `a`. Huit octets
+     * par appel au lieu de vingt — et un programme qui pose, écrit, efface
+     * et lit à des places calculées en a vite une dizaine.
      *
-     * C'est ce qui manquait : « poser(XS[i], YS[i], MUR) » lisait sa colonne
-     * dans une table, ce qui passe par `hl` — et la tuile partait à une adresse
-     * quelconque. Rien ne le disait ; la case visée restait simplement vide, et
-     * l'on cherchait la faute dans le programme.
-     *
-     * Une colonne écrite en clair, ou lue dans une variable d'un octet, ne
-     * touche pas `hl` : le cas courant ne paie pas les deux octets.
+     * La colonne d'abord. Si la ligne se calcule sans toucher aux registres
+     * (un nombre, une variable, « y + 1 »), `e` l'attend là ; sinon, elle
+     * attend sur la pile.
      */
-    const risque = colonne.genre !== 'nombre' && constante(colonne) === null &&
-      !(colonne.genre === 'variable' && colonne.symbole && colonne.symbole.genre === 'octet')
-
-    if (risque) this.pushHL()
-    valeurDe(this, colonne)
-    this.ldEA()
-    this.ldD(0)
-    if (risque) this.popHL()
-    this.addHLDE()
+    if (x !== null && sansToucherHL(ligne)) {
+      this.ecrire(0x1e, x) // ld e, x — une colonne en clair va droit dans `e`
+      valeurDe(this, ligne)
+    } else if (sansToucherHL(ligne)) {
+      valeurDe(this, colonne)
+      this.ldEA()
+      valeurDe(this, ligne)
+    } else {
+      valeurDe(this, colonne)
+      this.pushAF()
+      valeurDe(this, ligne)
+      this.ldLA()
+      this.popAF()
+      this.ldEA()
+      this.ecrire(0x7d) // ld a, l
+    }
+    this.ldD(base >> 8)
+    this.call('AdresseCase')
   }
 }
 
@@ -1977,7 +2128,7 @@ function lieu(e, n) {
         }
         const depart = grille.genre === 'table'
           ? { etiquette: grille.etiquette, decalage: 0, index: null, rom: true }
-          : { fixe: grille.base, rom: false }
+          : { fixe: grille.base, rom: false, finZone: grille.base + grille.taille }
         return indexer(e, depart, grille.element, decalage, n.ligne)
       }
     }
@@ -2004,7 +2155,7 @@ function lieu(e, n) {
     }
     const base = s.genre === 'table'
       ? { etiquette: s.etiquette, decalage: 0, index: null, rom: true }
-      : { fixe: s.base, rom: false }
+      : { fixe: s.base, rom: false, finZone: s.base + s.taille }
     return indexer(e, base, s.element, n.index, n.ligne)
   }
 
@@ -2084,6 +2235,23 @@ function adresserLieu(e, place) {
       e.ldDE(place.decalage & 0xffff)
       e.addHLDE()
     }
+    return
+  }
+
+  /*
+   * Un tableau d'octets qui tient dans une seule page de 256 octets — tous
+   * ses octets ont le même octet du haut d'adresse : l'index s'ajoute à
+   * l'octet du bas, et l'octet du haut est connu.
+   *
+   *   ldh a, [i] : add a, $1e : ld l, a : ld h, $c1      7 octets au lieu de 9
+   */
+  const debut = place.etiquette ? null : (place.base + place.decalage) & 0xffff
+  if (debut !== null && place.echelle === 1 && place.finZone !== undefined &&
+      debut >> 8 === (place.finZone - 1) >> 8) {
+    valeur(e, place.index)
+    if (debut & 0xff) e.addN(debut & 0xff)
+    e.ldLA()
+    e.ldH(debut >> 8)
     return
   }
 
@@ -2246,23 +2414,172 @@ function appliquer(e, operateur, droite, ligne) {
   valeur(e, droite)
   e.ldBA()
   e.popAF() // la gauche revient dans a
+  operer(e, operateur, ligne)
+}
 
+/** `a` porte la gauche, `b` la droite : l'opérateur, et rien d'autre. */
+function operer(e, operateur, ligne) {
   switch (operateur) {
     case '+': return e.addB()
     case '-': return e.subB()
     case '&': return e.andB()
     case '|': return e.orB()
     case '^': return e.xorB()
-    case '*': return e.call('Multiplier')
-    case '/': return e.call('Diviser')
-    case '%': return e.call('Reste')
-    case '<<': return e.call('DecalerGauche')
-    case '>>': return e.call('DecalerDroite')
+    case '*': exiger(e, 'multiplier', ligne); return e.call('Multiplier')
+    case '/': exiger(e, 'diviser', ligne); return e.call('Diviser')
+    case '%': exiger(e, 'reste', ligne); return e.call('Reste')
+    case '<<': exiger(e, 'decaler', ligne); return e.call('DecalerGauche')
+    case '>>': exiger(e, 'decaler', ligne); return e.call('DecalerDroite')
     default: throw new Error(`ligne ${ligne} : opérateur « ${operateur} » non compris`)
   }
 }
 
 /* ---------------------------------------------------------- les expressions */
+
+/*
+ * Une comparaison, réduite à ses drapeaux.
+ *
+ * Elle rend le drapeau qui dit « vrai » : 'z', 'nz', 'c' ou 'nc'. À qui l'a
+ * demandée de sauter dessus — un « if » saute droit à sa fin, sans passer par
+ * un 0 ou un 1 qu'il faudrait ensuite retester.
+ *
+ * Quand un côté est un nombre connu, il va à droite et devient « cp n » :
+ *
+ *   x < 20    →  ldh a, [x] : cp 20 : (vrai si c)          4 octets
+ *   x == 0    →  ldh a, [x] : or a  : (vrai si z)          3 octets
+ *
+ * au lieu de « push af, ld a, 20, ld b, a, pop af, sub b », puis d'un 0 ou
+ * d'un 1 fabriqué, puis d'un « or a » pour le relire : quinze octets de plus
+ * par comparaison, dans chaque « if » et chaque boucle.
+ */
+const MIROIR = { '<': '>', '>': '<', '<=': '>=', '>=': '<=', '==': '==', '!=': '!=' }
+const DRAPEAU = { '==': 'z', '!=': 'nz', '<': 'c', '>=': 'nc' }
+
+function comparer(e, n) {
+  if (!(n.operateur in MIROIR)) throw new Error(`ligne ${n.ligne} : comparaison « ${n.operateur} » non comprise`)
+  let gauche = n.gauche
+  let droite = n.droite
+  let operateur = n.operateur
+
+  /* « 20 > x » se lit « x < 20 » : le nombre passe à droite. */
+  if (constante(gauche) !== null && constante(droite) === null) {
+    [gauche, droite] = [droite, gauche]
+    operateur = MIROIR[operateur]
+  }
+
+  const connu = constante(droite)
+  /* « x > 5 » est « x >= 6 », « x <= 5 » est « x < 6 » — sauf contre 255,
+     qui n'a pas de suivant : ceux-là prennent le chemin général. */
+  if (connu !== null && (operateur in DRAPEAU || connu < 255)) {
+    let k = connu
+    if (operateur === '>') { operateur = '>='; k++ }
+    if (operateur === '<=') { operateur = '<'; k++ }
+    valeur(e, gauche)
+    if (k === 0 && (operateur === '==' || operateur === '!=')) e.orA()
+    else e.cpN(k)
+    return DRAPEAU[operateur]
+  }
+
+  /* Une seule soustraction sert à toutes les comparaisons. « plus grand »
+     et « plus petit ou égal » se font en échangeant les deux côtés, plutôt
+     qu'en recalculant : recalculer une expression pourrait la rejouer, avec
+     ses effets. */
+  const inverse = operateur === '>' || operateur === '<='
+  const premier = inverse ? droite : gauche
+  const second = inverse ? gauche : droite
+  if (sansToucherHL(premier) && !aDesEffets(second)) {
+    /* Le premier se charge sans rien toucher : le second d'abord, dans `b`. */
+    valeur(e, second)
+    e.ldBA()
+    valeur(e, premier)
+  } else {
+    valeur(e, premier)
+    e.pushAF()
+    valeur(e, second)
+    e.ldBA()
+    e.popAF()
+  }
+  e.subB() // premier - second : les drapeaux disent tout
+  return DRAPEAU[inverse ? MIROIR[operateur] : operateur]
+}
+
+const CONTRAIRE = { z: 'nz', nz: 'z', c: 'nc', nc: 'c' }
+
+/** Saute à `cible` sur ce drapeau : « jp » (loin) ou « jr » (tout près). */
+function sauterDrapeau(e, drapeau, cible, loin = true) {
+  const sauts = loin
+    ? { z: () => e.jpZ(cible), nz: () => e.jpNZ(cible), c: () => e.jpC(cible), nc: () => e.jpNC(cible) }
+    : { z: () => e.jrZ(cible), nz: () => e.jrNZ(cible), c: () => e.jrC(cible), nc: () => e.jrNC(cible) }
+  sauts[drapeau]()
+}
+
+/*
+ * Saute à `cible` si la condition vaut `siVrai` — sinon, continue tout droit.
+ *
+ * C'est ainsi que « if », « while », « for » et « do » testent leur
+ * condition. Rien n'est rangé dans `a` pour être relu : la comparaison, le
+ * bouton, le « && » sautent directement.
+ *
+ *   if (bouton(A) && ax < 19)
+ *     call LireManette : bit 4, a : jp z, fin     ← pas pressé : on sort
+ *     ldh a, [ax] : cp 19 : jp nc, fin            ← trop à droite : on sort
+ *
+ * « && » et « || » s'arrêtent toujours dès que la réponse est connue, comme
+ * en C++ : « if (i < n && t[i] == 0) » compte là-dessus pour ne pas lire une
+ * case hors du tableau.
+ */
+function sauterSi(e, n, cible, siVrai) {
+  const connu = constante(n)
+  if (connu !== null) {
+    if ((connu !== 0) === siVrai) e.jp(cible)
+    return
+  }
+
+  switch (n.genre) {
+    case 'non':
+      sauterSi(e, n.valeur, cible, !siVrai)
+      return
+
+    case 'logique': {
+      const et = n.operateur === '&&'
+      /* « a && b » est faux dès que l'un l'est ; « a || b » vrai dès que l'un
+         l'est : les deux côtés sautent au même endroit. */
+      if (et !== siVrai) {
+        sauterSi(e, n.gauche, cible, siVrai)
+        sauterSi(e, n.droite, cible, siVrai)
+        return
+      }
+      /* Sinon, la gauche seule ne suffit pas à sauter : elle peut seulement
+         dire « inutile de regarder la droite ». */
+      const passe = neuve('court')
+      sauterSi(e, n.gauche, passe, !siVrai)
+      sauterSi(e, n.droite, cible, siVrai)
+      e.poser(passe)
+      return
+    }
+
+    case 'comparer': {
+      const drapeau = comparer(e, n)
+      sauterDrapeau(e, siVrai ? drapeau : CONTRAIRE[drapeau], cible)
+      return
+    }
+
+    case 'appel':
+      /* bouton(A) : le « bit » posé par la console suffit — pressé, c'est nz. */
+      if (n.nom === 'bouton' && !n.signature) {
+        e.boutonEnDrapeau = true
+        try { appel(e, n) } finally { e.boutonEnDrapeau = false }
+        sauterDrapeau(e, siVrai ? 'nz' : 'z', cible)
+        return
+      }
+      break
+  }
+
+  valeur(e, n)
+  e.orA()
+  if (siVrai) e.jpNZ(cible)
+  else e.jpZ(cible)
+}
 
 /** Met la valeur de l'expression dans `a`. */
 function valeur(e, n) {
@@ -2290,35 +2607,40 @@ function valeur(e, n) {
          où il sera déroulé. */
       const commutatif = ['*', '+', '&', '|', '^'].includes(n.operateur)
       const echange = commutatif && constante(n.gauche) !== null && constante(n.droite) === null
-      valeur(e, echange ? n.droite : n.gauche)
-      appliquer(e, n.operateur, echange ? n.gauche : n.droite, n.ligne)
+      const gauche = echange ? n.droite : n.gauche
+      const droite = echange ? n.gauche : n.droite
+      /*
+       * Une gauche qui se charge sans rien toucher (« x », « x + 1 ») peut
+       * attendre : la droite d'abord, dans `b`, puis la gauche dans `a`.
+       * C'est la pile en moins — « push af » et « pop af ». Seulement quand la
+       * droite ne change rien en passant : l'ordre des deux ne se voit pas.
+       */
+      if (constante(droite) === null && sansToucherHL(gauche) && !aDesEffets(droite)) {
+        valeur(e, droite)
+        e.ldBA()
+        valeur(e, gauche)
+        operer(e, n.operateur, n.ligne)
+        return
+      }
+      valeur(e, gauche)
+      /* Un calcul écrit par le compilateur lui-même (le passage à la ligne de
+         textS, poserS : « x % 20 ») ne demande pas d'« #include » — l'élève ne
+         l'a pas écrit. Seul l'opérateur est exempté : sa droite est un nombre
+         écrit en clair, rien de l'élève n'est calculé pendant ce temps. */
+      if (n.deLaConsole && constante(droite) !== null && !e.dansLaConsole) {
+        e.dansLaConsole = true
+        try { appliquer(e, n.operateur, droite, n.ligne) } finally { e.dansLaConsole = false }
+        return
+      }
+      appliquer(e, n.operateur, droite, n.ligne)
       return
     }
 
     case 'comparer': {
-      /* Une seule soustraction sert à toutes les comparaisons. « plus grand »
-         et « plus petit ou égal » se font en échangeant les deux côtés, plutôt
-         qu'en recalculant : recalculer une expression pourrait la rejouer, avec
-         ses effets. */
-      const inverse = n.operateur === '>' || n.operateur === '<='
-      const premier = inverse ? n.droite : n.gauche
-      const second = inverse ? n.gauche : n.droite
-
-      valeur(e, premier)
-      e.pushAF()
-      valeur(e, second)
-      e.ldBA()
-      e.popAF()
-      e.subB() // premier - second : les drapeaux disent tout
-
       const vrai = neuve('vrai')
       const suite = neuve('suite')
 
-      if (n.operateur === '==') e.jrZ(vrai)
-      else if (n.operateur === '!=') e.jrNZ(vrai)
-      else if (n.operateur === '<' || n.operateur === '>') e.jrC(vrai)
-      else if (n.operateur === '>=' || n.operateur === '<=') e.jrNC(vrai)
-      else throw new Error(`ligne ${n.ligne} : comparaison « ${n.operateur} » non comprise`)
+      sauterDrapeau(e, comparer(e, n), vrai, false)
 
       e.xorA()
       e.jr(suite)
@@ -2333,38 +2655,16 @@ function valeur(e, n) {
      * Ce n'est pas une optimisation : « if (i < n && t[i] == 0) » compte
      * là-dessus pour ne pas lire une case hors du tableau.
      */
-    case 'logique': {
-      const court = neuve('court')
-      const suite = neuve('suite')
-
-      valeur(e, n.gauche)
-      e.orA()
-      if (n.operateur === '&&') e.jpZ(court)
-      else e.jpNZ(court)
-
-      valeur(e, n.droite)
-      e.orA()
-      if (n.operateur === '&&') e.jpZ(court)
-      else e.jpNZ(court)
-
-      e.ldA(n.operateur === '&&' ? 1 : 0)
-      e.jr(suite)
-      e.poser(court)
-      e.ldA(n.operateur === '&&' ? 0 : 1)
-      e.poser(suite)
-      return
-    }
-
+    case 'logique':
     case 'non': {
-      const vrai = neuve('pas')
+      /* Les mêmes sauts qu'un « if », puis un 1 ou un 0 au bout. */
+      const faux = neuve('court')
       const suite = neuve('suite')
-      valeur(e, n.valeur)
-      e.orA()
-      e.jrZ(vrai)
-      e.xorA()
-      e.jr(suite)
-      e.poser(vrai)
+      sauterSi(e, n, faux, false)
       e.ldA(1)
+      e.jr(suite)
+      e.poser(faux)
+      e.xorA()
       e.poser(suite)
       return
     }
@@ -2383,9 +2683,7 @@ function valeur(e, n) {
     case 'ternaire': {
       const sinon = neuve('sinon')
       const suite = neuve('suite')
-      valeur(e, n.condition)
-      e.orA()
-      e.jpZ(sinon)
+      sauterSi(e, n.condition, sinon, false)
       valeur(e, n.alors)
       e.jp(suite)
       e.poser(sinon)
@@ -2491,6 +2789,7 @@ const TUILE_ATTENDUE = new Map([
  * fois dépenserait seize tuiles pour un seul personnage.
  */
 function tuileSurPlace(e, liste, cote, nom) {
+  exiger(e, cote === 16 ? 'Perso' : 'Tuile', liste.ligne)
   const rangees = liste.valeurs.map((v) => {
     if (v.genre !== 'texte') {
       throw new Error(
@@ -2518,6 +2817,26 @@ function appelMethode(e, n) {
   else e.ldHL(place.fixe & 0xffff)
   e.rangerHL(n.signature.pointeur)
   e.call(n.signature.etiquette)
+}
+
+/**
+ * Une valeur qui se calcule dans `a` seul : un nombre, une variable d'un
+ * octet, ou « x + 1 ». Elle ne touche ni à `hl` ni à la mémoire.
+ */
+function sansToucherHL(n) {
+  if (constante(n) !== null) return true
+  if (n.genre === 'variable') return n.symbole?.genre === 'octet'
+  if (n.genre === 'calcul') {
+    return ['+', '-', '&', '|', '^'].includes(n.operateur) && constante(n.droite) !== null && sansToucherHL(n.gauche)
+  }
+  return false
+}
+
+/** Cette expression change-t-elle quelque chose en passant : « i++ », un appel ? */
+function aDesEffets(n) {
+  if (!n || typeof n !== 'object') return false
+  if (['incrementer', 'affecter', 'appel', 'appelMethode'].includes(n.genre)) return true
+  return Object.values(n).some((v) => (Array.isArray(v) ? v.some(aDesEffets) : aDesEffets(v)))
 }
 
 /** Un appel de fonction se cache-t-il quelque part dans cette expression ? */
@@ -2596,9 +2915,64 @@ function porteUnTexte(m) {
   return m.genre === 'calcul' && m.operateur === '+' && (porteUnTexte(m.gauche) || porteUnTexte(m.droite))
 }
 
+/**
+ * Un appel, et la fonction du langage qui le fait — pour pouvoir dire
+ * ensuite « EcrireTexte est gravé parce que le programme appelle texte() ».
+ */
+/*
+ * Ce que chaque fonction du langage demande à la mise en route.
+ *
+ * Une fonction absente de SANS_FOND touche l'écran : le fond est préparé.
+ * La liste dit ce qui N'Y touche PAS — une fonction oubliée ici coûte
+ * quelques octets, jamais un écran faux.
+ */
+const BESOINS = {
+  image: ['horloge'], attendre: ['horloge'], retard: ['horloge'], images: ['horloge'],
+  hasard: ['hasard'],
+  note: ['son'], bruit: ['son'], silence: ['son'], volumeSon: ['son'], airFini: ['son'],
+  jouer: ['airs', 'son', 'horloge'],
+  sprite: ['lutins'], sprite16: ['lutins'], cacher: ['lutins'], cacher16: ['lutins'],
+  couleurLutin: ['lutins'], teindreLutin: ['lutins'], paletteLutins: ['lutins'],
+}
+const SANS_FOND = new Set([...Object.keys(BESOINS), 'semer', 'bouton', 'sauver', 'sauvegarde'])
+
+function noterBesoinsDe(e, nom) {
+  for (const quoi of BESOINS[nom] ?? []) e.noterBesoin(quoi)
+  if (!SANS_FOND.has(nom)) e.noterBesoin('fond')
+}
+
 function appel(e, n) {
+  const avant = e.fonctionDuLangage
+  if (!n.signature) e.fonctionDuLangage = n.nom + '()'
+  /* « texte(SALUT) » se redéplie en texte(x, y, "…") : c'est le même appel,
+     il ne compte qu'une fois. */
+  const cadre = n.deplie ? null : { debut: e.position, enfants: 0 }
+  if (cadre) e.cadres.push(cadre)
+  try {
+    appelSansTrace(e, n)
+  } finally {
+    e.fonctionDuLangage = avant
+    if (cadre) {
+      e.cadres.pop()
+      const total = e.position - cadre.debut
+      if (e.cadres.length) e.cadres[e.cadres.length - 1].enfants += total
+      /* Un bloc écarté n'est pas gravé : ses appels ne comptent pas. */
+      if (!e.muet) {
+        const nom = n.nom + '()'
+        if (!e.appels.has(nom)) e.appels.set(nom, { fois: 0, octets: 0, dans: new Set(), langage: !n.signature })
+        const a = e.appels.get(nom)
+        a.fois++
+        a.octets += total - cadre.enfants
+        a.dans.add(e.blocCourant)
+      }
+    }
+  }
+}
+
+function appelSansTrace(e, n) {
   const nom = n.nom
   const args = n.arguments
+  if (!n.signature) noterBesoinsDe(e, nom)
 
   /* Le dessin écrit sur place, s'il y en a un, devient son numéro AVANT tout
      le reste : la suite de la fonction n'a plus à savoir qu'il a existé. */
@@ -2606,6 +2980,8 @@ function appel(e, n) {
   if (attendue && args[attendue.rang] && args[attendue.rang].genre === 'liste') {
     args[attendue.rang] = tuileSurPlace(e, args[attendue.rang], attendue.cote, nom)
   }
+  /* La tuile posée : une lettre de la police, peut-être — elle sera gravée. */
+  if (attendue && args[attendue.rang]) e.noterTuile(args[attendue.rang], attendue.cote)
 
   /* Une fonction écrite par l'utilisateur : chaque argument est rangé dans
      l'octet qui lui est réservé, puis l'on appelle. */
@@ -2640,7 +3016,7 @@ function appel(e, n) {
           `et s'efface avec effacer(${args[0].nom})`,
       )
     }
-    appel(e, { ...n, arguments: [mot.x, mot.y, mot.texte] })
+    appel(e, { ...n, arguments: [mot.x, mot.y, mot.texte], deplie: true })
     return
   }
 
@@ -2700,7 +3076,7 @@ function appel(e, n) {
 
     const longueur = quoi.genre === 'texte' ? quoi.valeur.length
       : nomme ? nomme.texte.length
-      : null
+      : constante(quoi) // un nombre en clair : « ld b, 1 », sans passer par a
 
     if (longueur !== null && longueur === 0) return
 
@@ -2764,7 +3140,8 @@ function appel(e, n) {
     if (args.length !== 3) throw new Error(`ligne ${n.ligne} : poserS(colonne, ligne, tuile) prend trois arguments`)
     const [x, y, tuile] = args
     const nombre = (v) => ({ genre: 'nombre', valeur: v, ligne: n.ligne })
-    const calcul = (operateur, gauche, droite) => ({ genre: 'calcul', operateur, gauche, droite, ligne: n.ligne })
+    /* « deLaConsole » : ce calcul, c'est le compilateur qui l'écrit — il ne demande pas d'« #include ». */
+    const calcul = (operateur, gauche, droite) => ({ genre: 'calcul', operateur, gauche, droite, ligne: n.ligne, deLaConsole: true })
     const colonneFixe = constante(x)
     const ligneFixe = constante(y)
     const colonne = colonneFixe !== null ? nombre(colonneFixe % 20) : calcul('%', x, nombre(20))
@@ -2788,7 +3165,8 @@ function appel(e, n) {
     if (!contenu.length) return
 
     const nombre = (v) => ({ genre: 'nombre', valeur: v, ligne: n.ligne })
-    const calcul = (operateur, gauche, droite) => ({ genre: 'calcul', operateur, gauche, droite, ligne: n.ligne })
+    /* « deLaConsole » : ce calcul, c'est le compilateur qui l'écrit — il ne demande pas d'« #include ». */
+    const calcul = (operateur, gauche, droite) => ({ genre: 'calcul', operateur, gauche, droite, ligne: n.ligne, deLaConsole: true })
 
     /* Position écrite en clair : le compilateur découpe lui-même, ligne par
        ligne, en texte() ordinaires. Rien de plus dans la cartouche. */
@@ -3029,8 +3407,9 @@ function appel(e, n) {
     e.call('AttendreImage')
     /* Le VBlank vient de commencer : c'est le seul moment où la table des
        lutins accepte d'être remplie. On y verse la copie tenue en mémoire de
-       travail — c'est ce qui fait qu'un lutin déplacé apparaît vraiment. */
-    e.ecrire(0xcd, ROUTINE_TRANSFERT & 0xff, (ROUTINE_TRANSFERT >> 8) & 0xff)
+       travail — c'est ce qui fait qu'un lutin déplacé apparaît vraiment.
+       Sans lutin, il n'y a ni copie ni routine pour la faire. */
+    if (e.faut('lutins')) e.ecrire(0xcd, ROUTINE_TRANSFERT & 0xff, (ROUTINE_TRANSFERT >> 8) & 0xff)
     return
   }
 
@@ -3063,6 +3442,11 @@ function appel(e, n) {
     if (bit > 7) throw new Error(`ligne ${n.ligne} : il n'y a que huit boutons`)
     e.call('LireManette')
     e.bitA(bit)
+    /* Dans une condition, le drapeau suffit : sauterSi() saute dessus. */
+    if (e.boutonEnDrapeau) {
+      e.boutonEnDrapeau = false
+      return
+    }
     const vrai = neuve('presse')
     const suite = neuve('suite')
     e.jrNZ(vrai)
@@ -3352,6 +3736,9 @@ function appel(e, n) {
    */
   if (nom === 'changerDessin') {
     if (args.length !== 2) throw new Error(`ligne ${n.ligne} : changerDessin(tuile, dessin) prend deux arguments : la tuile qui change, et le dessin qu'elle prend`)
+    /* Le dessin est lu dans la cartouche, à « Tuiles » + 16 × son numéro :
+       la police doit y être entière, chaque lettre à sa place. */
+    e.policeEntiere ||= 'changerDessin() lit les dessins à leur place'
     /*
      * Une LETTRE à la place de la tuile — changerDessin("A", MON_A) — : c'est la
      * police qu'on change. Chaque lettre est une tuile comme une autre ; tous
@@ -3393,6 +3780,14 @@ function appel(e, n) {
 
   if (nom === 'poser' || nom === 'poserPanneau') {
     if (args.length !== 3) throw new Error(`ligne ${n.ligne} : ${nom}(colonne, ligne, tuile) prend trois arguments`)
+    /* Une tuile qui se charge sans toucher à `hl` vient APRÈS l'adresse :
+       elle n'a pas à l'attendre dans le brouillon. */
+    if (sansToucherHL(args[2]) && !aDesEffets(args[0]) && !aDesEffets(args[1])) {
+      e.adresseCarte(args[0], args[1], valeur, nom === 'poserPanneau' ? CARTE_PANNEAU : CARTE_FOND)
+      valeur(e, args[2])
+      e.ldHLA()
+      return
+    }
     valeur(e, args[2])
     e.ldhDepuisA(BROUILLON2)
     e.adresseCarte(args[0], args[1], valeur, nom === 'poserPanneau' ? CARTE_PANNEAU : CARTE_FOND)
@@ -3430,7 +3825,7 @@ function appel(e, n) {
        */
       e.ldhVersA(ECRAN)
       e.andN(0b00100000) // on ne garde que « la fenêtre est-elle allumée ? »
-      e.orN(0b11010011)
+      e.orN(e.reglageEcran())
       e.ldhDepuisA(ECRAN)
 
       /*
@@ -3917,8 +4312,10 @@ function appel(e, n) {
     valeur(e, args[0])
     e.andN(0x07)
     e.ldBA()
+    /* × 16 : le même volume à gauche (bits 4 à 6) et à droite (bits 0 à 2).
+       Un « srl » suivait, et divisait par deux le côté gauche : volumeSon(3)
+       donnait 1 à gauche et 3 à droite. */
     e.swapA()
-    e.srlA() // × 16 puis ÷ 2 : le même volume à gauche et à droite
     e.orB()
     e.ldhDepuisA(SON_VOLUME)
     return
@@ -4083,6 +4480,20 @@ function instruction(e, n) {
       const place = lieu(e, n.cible)
 
       if (n.operateur === '=') {
+        /*
+         * « vole[i] = 1 », « tx[i] = ax + 1 » : l'adresse d'abord, la valeur
+         * ensuite, et « ld [hl], a ». La valeur n'a plus à attendre dans un
+         * octet de brouillon pendant qu'on calcule l'adresse — quatre octets
+         * de moins par écriture. Seulement quand ni l'une ni l'autre ne
+         * change rien en passant : l'ordre des deux ne se voit alors pas.
+         */
+        if (estCalcule(place) && !place.rom && sansToucherHL(n.valeur) && !aDesEffets(place.index)) {
+          verifierLieu(place, n.ligne)
+          adresserLieu(e, place)
+          valeur(e, n.valeur)
+          e.ldHLA()
+          return
+        }
         valeur(e, n.valeur)
         rangerLieu(e, place, n.ligne)
         return
@@ -4111,9 +4522,7 @@ function instruction(e, n) {
       }
       const sinon = neuve('sinon')
       const fin = neuve('finsi')
-      valeur(e, n.condition)
-      e.orA()
-      e.jpZ(n.sinon ? sinon : fin)
+      sauterSi(e, n.condition, n.sinon ? sinon : fin, false)
       for (const x of n.alors) instruction(e, x)
       if (n.sinon) {
         e.jp(fin)
@@ -4130,11 +4539,7 @@ function instruction(e, n) {
       e.poser(debut)
       /* « while (true) » n'a pas besoin d'être testé à chaque tour. */
       const toujours = constante(n.condition) === 1
-      if (!toujours) {
-        valeur(e, n.condition)
-        e.orA()
-        e.jpZ(fin)
-      }
+      if (!toujours) sauterSi(e, n.condition, fin, false)
       e.boucles.push({ fin, suite: debut })
       for (const x of n.corps) instruction(e, x)
       e.boucles.pop()
@@ -4152,9 +4557,7 @@ function instruction(e, n) {
       for (const x of n.corps) instruction(e, x)
       e.boucles.pop()
       e.poser(test)
-      valeur(e, n.condition)
-      e.orA()
-      e.jpNZ(debut)
+      sauterSi(e, n.condition, debut, true)
       e.poser(fin)
       return
     }
@@ -4165,11 +4568,7 @@ function instruction(e, n) {
       const fin = neuve('finpour')
       for (const x of n.debut) instruction(e, x)
       e.poser(debut)
-      if (n.condition && constante(n.condition) !== 1) {
-        valeur(e, n.condition)
-        e.orA()
-        e.jpZ(fin)
-      }
+      if (n.condition && constante(n.condition) !== 1) sauterSi(e, n.condition, fin, false)
       /* « continue » saute au PAS, et non au test : sinon la boucle
          n'avancerait plus, et le programme tournerait sans fin. */
       e.boucles.push({ fin, suite: pas })
@@ -4232,6 +4631,7 @@ function instruction(e, n) {
     case 'retour':
       if (n.valeur) valeur(e, n.valeur)
       e.ret()
+      e.retourIci = e.position
       return
 
     /* Un appel écrit pour lui seul. C'est le seul endroit où une fonction
@@ -4239,6 +4639,9 @@ function instruction(e, n) {
     case 'expression':
       if (n.valeur.genre === 'appel') appel(e, n.valeur)
       else if (n.valeur.genre === 'appelMethode') appelMethode(e, n.valeur)
+      /* « i++ » seul sur sa ligne : la valeur d'avant ne sert à personne,
+         inutile de la garder — c'est « ++i », deux octets de moins. */
+      else if (n.valeur.genre === 'incrementer') valeur(e, { ...n.valeur, prefixe: true })
       else valeur(e, n.valeur)
       return
 
@@ -5491,7 +5894,73 @@ function avecLesFonctionsEnC(programme) {
   /* L'alphabet en gras, si le programme en parle (et n'a pas le sien). */
   const siensGlobaux = new Set(programme.filter((n) => n.genre === 'declarer').map((n) => n.nom))
   if (!siensGlobaux.has('ALPHABET_GRAS') && nomme(programme, 'ALPHABET_GRAS')) ajoutees.unshift(...analyser(SOURCE_ALPHABET_GRAS))
+  /* Ce qui vient de la console, et non du programme : on ne lui demande pas
+     ses « #include ». */
+  for (const n of ajoutees) n.deLaConsole = true
   return [...ajoutees, ...programme]
+}
+
+/* ------------------------------------------------------------ les #include */
+
+/*
+ * Ce que le programme emploie de la console, et qu'il doit inclure.
+ *
+ * Relevé sur l'arbre tel que le programme l'écrit, AVANT les réécritures :
+ * « chaque(250) » demande <chaque>, même s'il devient ensuite un appel à
+ * chaque_minuteur ; « couleurTexte » demande <couleurTexte>, même s'il devient
+ * couleurFond. Une fonction écrite par le programme sous le même nom est la
+ * sienne : elle ne s'inclut pas.
+ *
+ * Les calculs (« a * b ») et les dessins écrits sur place sont relevés plus
+ * tard, à la traduction : c'est là qu'on sait s'ils coûtent une routine.
+ */
+const TYPES_A_INCLURE = new Set(['Tuile', 'Perso', 'Mot', 'Carre', 'Air'])
+
+function inclusionsEmployees(programme) {
+  const siennes = new Set(programme.filter((n) => n.genre === 'fonction').map((n) => n.nom))
+  const sesGlobales = new Set(programme.filter((n) => n.genre === 'declarer').map((n) => n.nom))
+  const vues = new Map()
+  const noter = (nom, ligne) => { if (!vues.has(nom)) vues.set(nom, { nom, ligne }) }
+  const fouiller = (n) => {
+    if (Array.isArray(n)) { n.forEach(fouiller); return }
+    if (!n || typeof n !== 'object') return
+    if (n.genre === 'appel' && Object.hasOwn(BIBLIOTHEQUES, n.nom) && !siennes.has(n.nom)) noter(n.nom, n.ligne)
+    if (n.genre === 'declarer' && TYPES_A_INCLURE.has(n.type?.nom)) noter(n.type.nom, n.ligne)
+    if (n.genre === 'variable' && (n.nom === 'ALPHABET' || n.nom === 'ALPHABET_GRAS') && !sesGlobales.has(n.nom)) noter(n.nom, n.ligne)
+    for (const v of Object.values(n)) fouiller(v)
+  }
+  fouiller(programme)
+  return [...vues.values()].sort((a, b) => a.ligne - b.ligne)
+}
+
+const inclusDe = (programme) => new Set(programme.filter((n) => n.genre === 'inclusion').map((n) => n.nom))
+
+/** Ce qui manque, en une phrase : la première ligne fautive, et les lignes à écrire. */
+function messageInclusions(manquantes) {
+  const CALCULS = { multiplier: '« * »', diviser: '« / »', reste: '« % »', decaler: '« << » ou « >> »' }
+  const nomme = (nom) => (TYPES_A_INCLURE.has(nom) || nom.startsWith('ALPHABET') ? nom
+    : CALCULS[nom] ? `le calcul ${CALCULS[nom]} (${BIBLIOTHEQUES[nom]})` : `${nom}()`)
+  const [premiere] = manquantes
+  const lignes = manquantes.map((m) => `#include <${m.nom}>`).join('   ')
+  return `ligne ${premiere.ligne} : il faut « #include <${premiere.nom}> » pour employer ${nomme(premiere.nom)}. ` +
+    'Chaque fonction de la console prend de la place dans la cartouche : elle ne s’emploie qu’incluse. ' +
+    `Écrire en haut du programme : ${lignes}`
+}
+
+/**
+ * Un calcul ou un dessin qui coûte, rencontré à la traduction : est-il inclus ?
+ * Le code de la console (ses fonctions écrites en C) n'a rien à inclure.
+ */
+function exiger(e, nom, ligne) {
+  e.employes ??= new Set()
+  e.employes.add(nom)
+  if (e.libre || e.dansLaConsole || e.inclus.includes(nom)) return
+  if (e.releverInclusions) {
+    e.manquantes ??= []
+    if (!e.manquantes.some((m) => m.nom === nom)) e.manquantes.push({ nom, ligne })
+    return
+  }
+  throw new Error(messageInclusions([{ nom, ligne }]))
 }
 
 /* ------------------------------------------------------------ la traduction */
@@ -5500,9 +5969,303 @@ function avecLesFonctionsEnC(programme) {
  * Compile un programme analysé, et rend les octets à poser dans la cartouche.
  */
 export function compiler(programme, options = {}) {
+  /*
+   * Deux essais, comme un compilateur C et son éditeur de liens.
+   *
+   * Le premier grave TOUT, et note qui appelle qui. On en déduit ce qu'on
+   * peut atteindre depuis le démarrage ; le second ne grave que cela. Un
+   * programme qui n'écrit qu'un « A » ne porte plus ni la division, ni la
+   * manette, ni les notes de musique, ni les quarante-trois autres lettres.
+   *
+   * Le premier essai travaille sur une COPIE de l'arbre : compiler le modifie
+   * en passant (un dessin écrit sur place y devient son numéro), et le second
+   * doit partir du même arbre que le premier.
+   *
+   * « { tout: true } » grave tout, en un seul essai, comme avant : c'est ce
+   * que veut le décompilateur pour relever l'empreinte de chaque routine.
+   */
+  /* Ce que le programme emploie sans l'avoir inclus : refusé, avant tout. */
+  const employees = inclusionsEmployees(programme)
+  const inclus = inclusDe(programme)
+  const manquantes = options.libre ? [] : employees.filter((m) => !inclus.has(m.nom))
+  if (manquantes.length && !options.releverInclusions) throw new Error(messageInclusions(manquantes))
+
+  if (options.tout) {
+    const { rendu, e } = compilerUneFois(programme, options)
+    rendu.grave = ceQuiEstGrave(e, [])
+    return rendu
+  }
+  let essai = compilerUneFois(structuredClone(programme), options)
+  let { garder, police, necessaire } = ceQuiSert(essai.e)
+  /* Tout ce qui aurait pu être gravé : pour dire ensuite ce qui ne l'est pas. */
+  const possibles = essai.e.blocs.map((b) => b.nom).map((nom) => nomLisible(essai.e, nom))
+
+  /*
+   * Les fonctions jamais appelées sont ôtées de l'arbre, et l'on refait
+   * l'essai sans elles.
+   *
+   * Ne pas graver leur code ne suffit pas : leurs paramètres et leurs
+   * variables ont chacun un octet réservé, le plus souvent dans la mémoire
+   * rapide (HRAM). Ôtées, elles ne réservent plus rien. Si l'arbre ne compile
+   * plus sans elles — une fonction nommée sans être appelée —, on les garde :
+   * leur code, lui, ne sera de toute façon pas gravé.
+   */
+  const mortes = new Set(essai.e.blocs
+    .filter((b) => b.nom.startsWith('fn_') && !garder.has(b.nom))
+    .map((b) => b.nom.slice(3)))
+  let sans = null
+  if (mortes.size) {
+    try {
+      essai = compilerUneFois(structuredClone(programme), options, null, null, mortes)
+      ;({ garder, police, necessaire } = ceQuiSert(essai.e))
+      sans = mortes
+    } catch {
+      /* on garde l'essai avec elles */
+    }
+  }
+
+  const { rendu, e } = compilerUneFois(programme, options, garder, police, sans, necessaire)
+  rendu.grave = ceQuiEstGrave(e, possibles)
+  /* « releverInclusions » : rien n'est refusé, la liste est rendue — c'est ce
+     qui sert à écrire les « #include » d'un programme qui n'en a pas. */
+  if (options.releverInclusions) {
+    const toutes = [...manquantes, ...(e.manquantes ?? [])]
+    rendu.inclusionsManquantes = [...new Map(toutes.map((m) => [m.nom, m])).values()]
+  }
+  /*
+   * Chaque « #include » écrit, et s'il sert : « emploi » — le programme s'en
+   * sert —, ou « inutile » — la ligne peut partir, elle ne grave rien.
+   */
+  const servent = new Set([...employees.map((m) => m.nom), ...(e.employes ?? [])])
+  rendu.grave.bibliotheques = Object.fromEntries([...inclus].map((nom) => [nom, { etat: servent.has(nom) ? 'emploi' : 'inutile' }]))
+  return rendu
+}
+
+/**
+ * Les liens entre blocs : chaque adresse écrite dans le code relie le bloc
+ * où elle est écrite au bloc où elle mène.
+ */
+function liensEntreBlocs(e) {
+  const noms = new Set(e.blocs.map((b) => b.nom))
+  /* Le bloc qui contient un octet : le dernier commencé avant lui. */
+  const blocA = (position) => {
+    let trouve = e.blocs[0]
+    for (const b of e.blocs) {
+      if (b.debut > position) break
+      trouve = b
+    }
+    return trouve.nom
+  }
+  const liens = []
+  for (const r of e.retouches) {
+    /* Une étiquette qui EST un bloc mène à lui, même vide (une table sans
+       valeur commence là où commence la suivante). */
+    liens.push({ depuis: blocA(r.position), vers: noms.has(r.nom) ? r.nom : blocA(e.etiquettes.get(r.nom)) })
+  }
+  return liens
+}
+
+/** À quoi sert chaque morceau que la console apporte. */
+const ROLES = {
+  Debut: 'la mise en route de la console',
+  VBlank: 'compte les images, 60 fois par seconde',
+  AttendreImage: 'attend l’image suivante',
+  AvancerAirs: 'fait avancer la musique à chaque image',
+  AttendreVBlank: 'attend que l’écran soit libre',
+  AttendreAcces: 'attend de pouvoir écrire une case',
+  AttendreFinVBlank: 'attend la fin du VBlank',
+  AdresseCase: 'trouve l’adresse d’une case de l’écran',
+  EffacerCases: 'efface des cases',
+  EcrireTexte: 'écrit un texte, lettre par lettre',
+  AttendreSecondes: 'attend des secondes entières',
+  EcrireTexteS: 'écrit un texte qui passe à la ligne',
+  EcrireNombre: 'écrit un nombre en chiffres',
+  Diviser: 'divise — le processeur ne sait pas le faire',
+  Reste: 'le reste d’une division',
+  Multiplier: 'multiplie — le processeur ne sait pas le faire',
+  DecalerGauche: 'décale vers la gauche d’un nombre calculé de rangs',
+  DecalerDroite: 'décale vers la droite d’un nombre calculé de rangs',
+  RangerLutins: 'range les 40 lutins hors de l’écran',
+  InstallerTransfert: 'installe la copie des lutins en mémoire rapide',
+  CopierTuiles: 'copie les lettres et les dessins en mémoire vidéo',
+  EffacerCarte: 'vide les deux cartes de l’écran',
+  Hasard: 'tire un nombre au hasard',
+  EffacerFond: 'vide tout le fond',
+  EffacerPanneau: 'vide tout le panneau',
+  LireManette: 'lit les huit boutons',
+  DonneesTransfert: 'la petite routine qui copie les lutins',
+  Notes: 'la table des notes de musique',
+}
+
+/** Le nom d'un bloc, tel qu'on le lit dans le programme. */
+function nomLisible(e, nom) {
+  if (nom === 'Debut') return 'démarrage'
+  if (nom.startsWith('fn_')) return nom.slice(3) + '()'
+  const texte = e.textes.find((t) => t.etiquette === nom)
+  if (texte) return `"${texte.contenu.length > 16 ? texte.contenu.slice(0, 15) + '…' : texte.contenu}"`
+  if (nom.startsWith('table_')) return nom.slice(6).replace(/_d+$/, '')
+  return nom
+}
+
+/**
+ * Ce que la cartouche porte, nommé : chaque morceau gravé, sa taille, qui
+ * l'a demandé et à quoi il sert ; puis ce qui ne l'est pas.
+ *
+ * C'est l'équivalent des « #include » d'un programme C, sauf qu'on n'a pas à
+ * les écrire : le compilateur les déduit des appels, et les montre.
+ */
+function ceQuiEstGrave(e, possibles) {
+  const liens = liensEntreBlocs(e)
+  const elements = e.blocs.map((b, i) => {
+    const fin = e.blocs[i + 1]?.debut ?? e.octets.length
+    /* Qui l'appelle : la fonction du langage (texte(), image()…) si c'en est
+       une, sinon le morceau du programme qui y mène. */
+    const fonctions = [...(e.demandes.get(b.nom) ?? [])]
+    const blocs = [...new Set(liens.filter((l) => l.vers === b.nom && l.depuis !== b.nom).map((l) => nomLisible(e, l.depuis)))]
+    let role = ROLES[b.nom]
+    if (!role && b.nom.startsWith('fn_')) role = FONCTIONS_EN_C[b.nom.slice(3)] ? 'une fonction fournie par le langage' : 'ta fonction'
+    if (!role && b.nom.startsWith('table_')) role = 'une table gravée'
+    if (!role && e.textes.some((t) => t.etiquette === b.nom)) role = 'un texte gravé'
+    if (b.nom === 'Tuiles') {
+      const dessins = e.prochaineTuile - NOMBRE_DE_TUILES
+      role = (e.police ? `${e.police.length} lettre${e.police.length > 1 ? 's' : ''} sur ${NOMBRE_DE_TUILES - 1}` : 'la police entière')
+        + (dessins ? `, et ${dessins} tuile${dessins > 1 ? 's' : ''} dessinée${dessins > 1 ? 's' : ''}` : '')
+    }
+    /* Ces deux-là, personne ne les appelle dans le programme : la console y
+       saute toute seule, à l'allumage et à chaque image. */
+    const parLaConsole = { Debut: ['la console, à l’allumage'], VBlank: ['la console, à chaque image'] }[b.nom]
+    return {
+      nom: nomLisible(e, b.nom),
+      taille: fin - b.debut,
+      appelePar: parLaConsole ?? (fonctions.length ? fonctions : blocs),
+      role: role ?? '',
+    }
+  })
+  const graves = new Set(elements.map((x) => x.nom))
+  /*
+   * Les appels écrits dans le programme, du plus lourd au plus léger : ce
+   * qu'ils coûtent sur place, et les routines qu'ils font graver en plus.
+   */
+  const appels = [...e.appels].map(([nom, a]) => ({
+    nom,
+    fois: a.fois,
+    octets: a.octets,
+    dans: [...a.dans].map((b) => nomLisible(e, b)),
+    langage: a.langage,
+    routines: a.langage
+      ? elements.filter((x) => x.appelePar.includes(nom) && !x.nom.startsWith('"')).map((x) => ({ nom: x.nom, taille: x.taille }))
+      : [],
+  })).sort((a, b) => b.octets - a.octets)
+  return {
+    elements,
+    appels,
+    ecartes: [...new Set(possibles.filter((nom) => !graves.has(nom)))],
+    /* Les lettres gravées, ou pourquoi la police l'est entière. */
+    lettres: e.police ? e.police.map((n) => ORDRE[n]).join('') : null,
+    policeEntiere: e.police ? null : (typeof e.policeEntiere === 'string' ? e.policeEntiere : 'gravée en entier'),
+  }
+}
+
+/**
+ * Ce que le premier essai a réellement employé.
+ *
+ * Chaque adresse écrite dans le code (un « call », un saut, une donnée lue)
+ * relie le bloc où elle est écrite au bloc où elle mène. On part du démarrage
+ * et de l'interruption — le matériel y saute tout seul — et l'on suit les
+ * liens : ce qui n'est jamais atteint n'est pas gravé.
+ */
+function ceQuiSert(e) {
+  const liens = new Map()
+  for (const { depuis, vers } of liensEntreBlocs(e)) {
+    if (!liens.has(depuis)) liens.set(depuis, new Set())
+    liens.get(depuis).add(vers)
+  }
+
+  /*
+   * La mise en route mène à tout — lutins, lettres, horloge —, mais elle
+   * n'en préparera que ce qui sert. Ces liens-là ne comptent donc pas au
+   * départ : on suit d'abord le programme, on en déduit ses besoins, et
+   * l'on ajoute seulement alors ce que la mise en route devra appeler.
+   *
+   *   bloc : [qui l'appelle d'office, le besoin qui le fait garder]
+   */
+  const preparePar = {
+    AttendreVBlank: ['Debut', 'eteindre'],
+    CopierTuiles: ['Debut', 'memoireVideo'], EffacerCarte: ['Debut', 'fond'],
+    RangerLutins: ['Debut', 'lutins'], InstallerTransfert: ['Debut', 'lutins'],
+    VBlank: [null, 'horloge'], AvancerAirs: ['VBlank', 'airs'],
+  }
+  const garder = new Set()
+  const aVoir = ['Debut']
+  const suivre = () => {
+    while (aVoir.length) {
+      const nom = aVoir.pop()
+      if (garder.has(nom)) continue
+      garder.add(nom)
+      for (const suivant of liens.get(nom) ?? []) {
+        if (preparePar[suivant]?.[0] !== nom) aVoir.push(suivant)
+      }
+    }
+  }
+  /* Un besoin peut en amener un autre (l'horloge garde le VBlank, qui garde
+     les airs…) : on recommence tant que quelque chose s'ajoute. */
+  let necessaire
+  for (let avant = -1; avant !== garder.size;) {
+    avant = garder.size
+    suivre()
+    necessaire = new Set([...e.besoins]
+      .filter(([, blocs]) => [...blocs].some((b) => garder.has(b)))
+      .map(([quoi]) => quoi))
+    /* Sur Game Boy Color, un fond éteint reste affiché : la console y garde
+       son logo. Des lutins, ou une horloge qui laisse l'écran allumé, y
+       demandent donc un fond vidé. */
+    if ((necessaire.has('lutins') || necessaire.has('horloge')) && (e.cible === 'gbc' || e.couleur)) necessaire.add('fond')
+    if (necessaire.has('fond') || necessaire.has('lutins')) necessaire.add('memoireVideo')
+    /* L'écran s'éteint au départ pour remplir la mémoire vidéo — ou pour de
+       bon, quand rien ne s'y montre et que rien ne compte les images. */
+    if (necessaire.has('memoireVideo') || !necessaire.has('horloge')) necessaire.add('eteindre')
+    for (const [nom, [, quoi]] of Object.entries(preparePar)) {
+      if (necessaire.has(quoi)) aVoir.push(nom)
+    }
+    suivre()
+  }
+
+  /*
+   * Les lettres. Celles des textes gardés, celles posées en clair, et les dix
+   * chiffres si un nombre s'affiche. Un numéro calculé quelque part, et la
+   * police reste entière : on ne sait pas quelle lettre il donnera.
+   */
+  let police = null
+  if (!e.policeEntiere) {
+    const lettres = new Set(e.lettres)
+    for (const { etiquette, contenu } of e.textes) {
+      if (garder.has(etiquette)) for (const c of contenu) lettres.add(numeroDe(c))
+    }
+    if (garder.has('EcrireNombre')) for (let i = 0; i < 10; i++) lettres.add(numeroDe('0') + i)
+    lettres.delete(0) // l'espace est une tuile vide : la remise à zéro la donne
+    police = [...lettres].sort((a, b) => a - b)
+  }
+
+  return { garder, police, necessaire }
+}
+
+function compilerUneFois(programme, options, garder = null, police = null, sans = null, necessaire = null) {
+  /* « #include <texte> » : ce que le programme a inclus. Ce ne sont pas des
+     instructions : on les met à part. */
+  const inclus = [...new Set(programme.filter((n) => n.genre === 'inclusion').map((n) => n.nom))]
+  programme = programme.filter((n) => n.genre !== 'inclusion')
   programme = avecLesFonctionsEnC(programme)
+  if (sans) programme = programme.filter((n) => !(n.genre === 'fonction' && sans.has(n.nom)))
   compteur = 0
   const e = new Emetteur()
+  e.garder = garder
+  e.police = police
+  e.necessaire = necessaire
+  e.inclus = inclus
+  e.libre = Boolean(options.libre)
+  e.releverInclusions = Boolean(options.releverInclusions)
+  /* Un « #include » ne grave rien par lui-même : il permet. Ce qui est gravé,
+     c'est ce que le programme emploie — une ligne de trop ne coûte rien. */
   if (options.cible) e.cible = options.cible
   /* La moitié Game Boy de « les deux » : les couleurs ne sont pas refusées,
      elles ne sont pas ÉMISES. Voir « couleurIci ». */
@@ -5512,6 +6275,7 @@ export function compiler(programme, options = {}) {
   const initialisations = resoudreProgramme(e, programme)
 
   /* --- la mise en route, avant le programme de l'utilisateur --- */
+  e.bloc('Debut') // toujours gardé : la console y arrive
   e.di()
 
   /* La pile s'installe en haut de la mémoire de travail, et non dans la page
@@ -5519,15 +6283,52 @@ export function compiler(programme, options = {}) {
      routine de copie des lutins, et une pile qui accueille les appels
      imbriqués. Huit kilo-octets sous la pile, c'est plus qu'il n'en faut. */
   e.ldSP(0xdfff)
-  e.call('AttendreVBlank')
-  e.xorA()
-  e.ldhDepuisA(ECRAN) // écran éteint : la mémoire vidéo est libre
-  e.ldA(0b11100100)
-  e.ldhDepuisA(PALETTE_FOND)
-  e.ldhDepuisA(PALETTE_OBJETS) // les lutins prennent les mêmes nuances
-  e.xorA()
-  e.ldhDepuisA(DEFILEMENT_X)
-  e.ldhDepuisA(DEFILEMENT_Y)
+
+  /*
+   * Chaque morceau de la mise en route n'est gravé que si le programme s'en
+   * sert : un programme sans lutin ne les range pas, un programme muet
+   * n'allume pas la puce sonore. Voir « faut() ».
+   *
+   * L'écran reste allumé s'il montre quelque chose, ou si l'horloge en a
+   * besoin : écran éteint, il n'y a plus de VBlank, donc plus d'images.
+   */
+  const memoireVideo = e.faut('fond') || e.faut('lutins')
+  const allume = memoireVideo || e.faut('horloge')
+  if (memoireVideo || !allume) e.call('AttendreVBlank')
+
+  /*
+   * Une première semence, prise dans le compteur du matériel.
+   *
+   * Lue TOUT DE SUITE après l'attente du VBlank : le compteur y a toujours
+   * la même valeur pour un même programme, quoi que la mise en route grave
+   * ou non ensuite. Lue plus loin, elle changeait dès qu'on ôtait le son ou
+   * les lutins — et la partie avec elle.
+   *
+   * L'étiquette est prise même quand rien n'est gravé : les numéros des
+   * suivantes ne bougent pas d'un essai à l'autre.
+   */
+  const semenceOk = neuve('semenceOk')
+  if (e.faut('hasard')) {
+    e.ldhVersA(0x04)
+    e.orA()
+    e.jrNZ(semenceOk)
+    e.ldA(0xb8)
+    e.poser(semenceOk)
+    e.ldhDepuisA(GRAINE)
+  }
+
+  if (memoireVideo || !allume) {
+    e.xorA()
+    e.ldhDepuisA(ECRAN) // écran éteint : la mémoire vidéo est libre
+  }
+  if (memoireVideo) e.ldA(0b11100100)
+  if (e.faut('fond')) e.ldhDepuisA(PALETTE_FOND)
+  if (e.faut('lutins')) e.ldhDepuisA(PALETTE_OBJETS) // les lutins prennent les mêmes nuances
+  if (e.faut('fond')) {
+    e.xorA()
+    e.ldhDepuisA(DEFILEMENT_X)
+    e.ldhDepuisA(DEFILEMENT_Y)
+  }
   /*
    * La puce sonore s'allume.
    *
@@ -5536,21 +6337,14 @@ export function compiler(programme, options = {}) {
    * pour toutes, à plein volume, les quatre voix dirigées vers les deux
    * côtés — et le programme n'a plus qu'à jouer.
    */
-  e.ldA(0x80)
-  e.ldhDepuisA(SON_ALLUME)
-  e.ldA(0x77) // volume 7 à gauche, 7 à droite
-  e.ldhDepuisA(SON_VOLUME)
-  e.ldA(0xff) // chaque voix des deux côtés
-  e.ldhDepuisA(SON_ROUTAGE)
-
-  /* Une première semence, prise dans le compteur du matériel. */
-  e.ldhVersA(0x04)
-  e.orA()
-  const semenceOk = neuve('semenceOk')
-  e.jrNZ(semenceOk)
-  e.ldA(0xb8)
-  e.poser(semenceOk)
-  e.ldhDepuisA(GRAINE)
+  if (e.faut('son')) {
+    e.ldA(0x80)
+    e.ldhDepuisA(SON_ALLUME)
+    e.ldA(0x77) // volume 7 à gauche, 7 à droite
+    e.ldhDepuisA(SON_VOLUME)
+    e.ldA(0xff) // chaque voix des deux côtés
+    e.ldhDepuisA(SON_ROUTAGE)
+  }
 
   /*
    * L'état des airs, remis à zéro.
@@ -5559,23 +6353,29 @@ export function compiler(programme, options = {}) {
    * ménage, un « actif » resté à 1 par hasard ferait lire une partition qui
    * n'existe pas, et la console jouerait la mémoire.
    */
-  e.ldHL(MUSIQUE)
-  e.ldB(OCTETS_PAR_VOIX * 2)
-  e.xorA()
   const ranger = neuve('rangerAirs')
-  e.poser(ranger)
-  e.ldHLplusA()
-  e.decB()
-  e.jrNZ(ranger)
+  if (e.faut('airs')) {
+    e.ldHL(MUSIQUE)
+    e.ldB(OCTETS_PAR_VOIX * 2)
+    e.xorA()
+    e.poser(ranger)
+    e.ldHLplusA()
+    e.decB()
+    e.jrNZ(ranger)
+  }
 
-  e.call('CopierTuiles')
-  e.call('EffacerCarte')
-  e.call('RangerLutins')
-  e.call('InstallerTransfert')
-  /* Écran allumé, tuiles en $8000, fond ET lutins affichés, et la fenêtre —
-     éteinte pour l'instant — ira lire la seconde carte, en $9C00. */
-  e.ldA(0b11010011)
-  e.ldhDepuisA(ECRAN)
+  if (memoireVideo) e.call('CopierTuiles')
+  if (e.faut('fond')) e.call('EffacerCarte')
+  if (e.faut('lutins')) {
+    e.call('RangerLutins')
+    e.call('InstallerTransfert')
+  }
+  /* Écran allumé, tuiles en $8000, fond et lutins affichés s'ils servent, et
+     la fenêtre — éteinte pour l'instant — ira lire la seconde carte, en $9C00. */
+  if (allume) {
+    e.ldA(e.reglageEcran())
+    e.ldhDepuisA(ECRAN)
+  }
 
   /*
    * L'interruption du VBlank est autorisée, et elle seule.
@@ -5586,14 +6386,16 @@ export function compiler(programme, options = {}) {
    * aussi à « image() » de mettre le processeur en sommeil au lieu de
    * l'occuper à relire le compteur de ligne des milliers de fois.
    */
-  e.xorA()
-  e.ldhDepuisA(COMPTEUR_IMAGES)
-  e.ldhDepuisA(DERNIER_REVEIL)
-  e.ldhDepuisA(RETARD)
-  e.ldhDepuisA(0x0f) // les interruptions en attente, oubliées
-  e.ldA(0b00000001) // VBlank, et rien d'autre
-  e.ecrire(0xea, 0xff, 0xff) // ld [$FFFF], a
-  e.ei()
+  if (e.faut('horloge')) {
+    e.xorA()
+    e.ldhDepuisA(COMPTEUR_IMAGES)
+    e.ldhDepuisA(DERNIER_REVEIL)
+    e.ldhDepuisA(RETARD)
+    e.ldhDepuisA(0x0f) // les interruptions en attente, oubliées
+    e.ldA(0b00000001) // VBlank, et rien d'autre
+    e.ecrire(0xea, 0xff, 0xff) // ld [$FFFF], a
+    e.ei()
+  }
 
   /* Les globales prennent leur valeur avant main(), dans l'ordre du fichier —
      c'est ce que fait C++, et c'est ce qu'on attend en lisant le programme. */
@@ -5609,17 +6411,25 @@ export function compiler(programme, options = {}) {
   for (const n of programme) {
     if (n.genre !== 'fonction') continue
     e.fonctionCourante = e.signatures.get(n.nom)
+    e.dansLaConsole = Boolean(n.deLaConsole)
+    e.bloc('fn_' + n.nom) // une fonction jamais appelée n'est pas gravée
     e.poser('fn_' + n.nom)
+    e.retourIci = -1
     for (const x of n.corps) instruction(e, x)
-    e.ret()
+    /* Un « return » vient de finir la fonction : un second « ret » derrière
+       lui ne servirait à rien — sauf si un saut y mène. */
+    const sautIci = [...e.etiquettes.values()].includes(e.position)
+    if (e.retourIci !== e.position || sautIci) e.ret()
     e.fonctionCourante = null
+    e.dansLaConsole = false
   }
 
   routines(e)
   donnees(e)
+  e.finirBloc()
 
   e.corriger(BASE)
-  return {
+  const rendu = {
     octets: e.octets,
     base: BASE,
     variables: e.variables,
@@ -5659,8 +6469,11 @@ export function compiler(programme, options = {}) {
     etiquettes: e.etiquettes,
     /* Où le matériel doit sauter quand le VBlank arrive. La cartouche pose le
        saut en $0040 : c'est l'adresse que la console y cherche. */
-    vecteurVBlank: BASE + e.etiquettes.get('VBlank'),
+    /* Sans horloge, l'interruption n'est jamais autorisée : le vecteur
+       mène à la fin du programme, où la console ne sautera jamais. */
+    vecteurVBlank: BASE + (e.etiquettes.get('VBlank') ?? e.etiquettes.get('Fin')),
   }
+  return { rendu, e }
 }
 
 /* -------------------------------------------------------------- les airs */
@@ -5681,6 +6494,7 @@ export function compiler(programme, options = {}) {
  * ce qu'il fait.
  */
 function airs(e) {
+  e.bloc('AvancerAirs')
   e.poser('AvancerAirs')
   if (!e.utiliseAirs) {
     e.ret()
@@ -5810,6 +6624,65 @@ function avancerUneVoix(e, quelle) {
 
 /* ------------------------------------------------------------ les routines */
 
+/**
+ * La copie des tuiles quand la police n'est pas gravée entière.
+ *
+ * Chaque lettre garde son numéro — « A » reste la tuile 1, et tout ce qui
+ * s'écrit à l'écran est inchangé — mais la cartouche ne porte que les lettres
+ * employées, serrées l'une contre l'autre. On les remet donc chacune à sa
+ * place en mémoire vidéo, par plages de lettres qui se suivent, puis les
+ * dessins du programme derrière la police, comme avant.
+ *
+ * `de` part de « Tuiles » et avance tout seul d'une plage à la suivante :
+ * elles sont rangées dans la cartouche dans le même ordre.
+ */
+function copierLaPoliceEmployee(e) {
+  /* D'abord la place de la police vidée. La console s'allume avec son logo
+     dans ces tuiles-là : une lettre absente doit être du vide, pas un
+     morceau de « Nintendo ». */
+  e.ldHL(MEMOIRE_TUILES)
+  e.ldBC(NOMBRE_DE_TUILES * 16)
+  const vider = neuve('viderPolice')
+  e.poser(vider)
+  e.xorA()
+  e.ldHLplusA()
+  e.ecrire(0x0b) // dec bc
+  e.ecrire(0x79) // ld a, c
+  e.ecrire(0xb0) // or b
+  e.jrNZ(vider)
+
+  /* Les plages : des lettres qui se suivent se copient d'un seul coup. */
+  const plages = []
+  for (const numero of e.police) {
+    const derniere = plages[plages.length - 1]
+    if (derniere && derniere.debut + derniere.combien === numero) derniere.combien++
+    else plages.push({ debut: numero, combien: 1 })
+  }
+  const dessinees = e.prochaineTuile - NOMBRE_DE_TUILES
+  if (dessinees) plages.push({ debut: NOMBRE_DE_TUILES, combien: dessinees })
+  if (!plages.length) {
+    e.ret()
+    return
+  }
+
+  /* Toutes les plages appellent la copie, sauf la dernière, qui y tombe. */
+  const copier = neuve('copierOctets')
+  plages.forEach(({ debut, combien }, i) => {
+    e.ldHL(MEMOIRE_TUILES + debut * 16)
+    e.ldBC(combien * 16)
+    if (i < plages.length - 1) e.call(copier)
+  })
+  e.poser(copier)
+  e.ldAdeDE()
+  e.ldHLplusA()
+  e.incDE()
+  e.ecrire(0x0b) // dec bc
+  e.ecrire(0x79) // ld a, c
+  e.ecrire(0xb0) // or b
+  e.jrNZ(copier)
+  e.ret()
+}
+
 function routines(e) {
   /*
    * L'interruption du VBlank. Le matériel saute ici soixante fois par seconde,
@@ -5819,6 +6692,7 @@ function routines(e) {
    * volerait du temps au jeu, et à un moment qu'il ne choisit pas. Elle compte
    * une image, et rend la main.
    */
+  e.bloc('VBlank')
   e.poser('VBlank')
   e.pushAF()
   e.ldhVersA(COMPTEUR_IMAGES)
@@ -5835,7 +6709,7 @@ function routines(e) {
    * L'interruption reste courte : un programme qui ne joue rien n'y trouve
    * qu'un « ret », et le séquenceur, lui, empile ce dont il se sert.
    */
-  e.call('AvancerAirs')
+  if (e.faut('airs')) e.call('AvancerAirs')
   e.popAF()
   e.reti()
 
@@ -5860,6 +6734,7 @@ function routines(e) {
    * la console se figerait pour toujours. On rend donc la main tout de suite —
    * la mémoire vidéo est de toute façon libre en permanence.
    */
+  e.bloc('AttendreImage')
   e.poser('AttendreImage')
   e.ldhVersA(ECRAN)
   e.andN(0x80)
@@ -5911,6 +6786,7 @@ function routines(e) {
    * du dessin pour écrire sans risque sur une vraie console. Là, on attend
    * le VBlank suivant, comme avant.
    */
+  e.bloc('AttendreVBlank')
   e.poser('AttendreVBlank')
   e.ldhVersA(ECRAN)
   e.andN(0x80) // bit 7 : l'écran est-il allumé ?
@@ -5924,6 +6800,35 @@ function routines(e) {
   e.jrNC(a1) // lignes 152 et 153 : trop tard, on attend le VBlank suivant
   e.ret()
 
+  /*
+   * Attendre qu'on puisse écrire UNE case : pas une image entière, une ligne
+   * au plus.
+   *
+   * La mémoire vidéo n'est fermée que pendant le mode 3, quand la console
+   * lit la ligne qu'elle dessine. Entre deux lignes (mode 0) et pendant le
+   * VBlank (mode 1), elle est ouverte ; le mode 2 qui suit laisse encore
+   * vingt cycles. Le bit 1 de STAT à zéro, c'est le mode 0 ou 1 : on écrit
+   * tout de suite après, une case, et l'on revient demander pour la suivante.
+   *
+   * C'est ce qui rendait les tirs saccadés. « texte » attendait le VBlank
+   * entier ; une boucle qui calculait un peu avant d'écrire l'avait manqué,
+   * attendait le suivant, et le jeu perdait une image — à chaque pas d'un
+   * tir, 46 % des images au pire. Attendre une ligne ne perd plus rien.
+   * `changerDessin` le faisait déjà ainsi, octet par octet.
+   */
+  e.bloc('AttendreAcces')
+  e.poser('AttendreAcces')
+  e.ldhVersA(ECRAN)
+  e.andN(0x80)
+  e.ecrire(0xc8) // ret z — écran éteint : la mémoire vidéo est libre
+  const acces = neuve('acces')
+  e.poser(acces)
+  e.ldhVersA(0x41) // STAT : le mode de l'écran
+  e.andN(2)        // modes 2 et 3 : on attend le 0 ou le 1
+  e.jrNZ(acces)
+  e.ret()
+
+  e.bloc('AttendreFinVBlank')
   e.poser('AttendreFinVBlank')
   e.ldhVersA(ECRAN)
   e.andN(0x80)
@@ -5945,23 +6850,41 @@ function routines(e) {
    * C'est le genre de bogue qui n'arrive que le jour où la longueur est
    * calculée, et qui efface alors la moitié de l'écran.
    */
+  /*
+   * L'adresse d'une case de la carte : d × 256 + e + a × 32.
+   *
+   * `a` la ligne, `e` la colonne, `d` le haut de la carte ($98 le fond, $9C
+   * le panneau) ; `hl` en sort. La multiplication par trente-deux se fait en
+   * doublant cinq fois — ce processeur ne sait pas multiplier. Elle est
+   * écrite une fois ici plutôt qu'à chaque poser(), texte(), effacer()…
+   */
+  e.bloc('AdresseCase')
+  e.poser('AdresseCase')
+  e.ldLA()
+  e.ldH(0)
+  for (let i = 0; i < 5; i++) e.addHLHL() // × 32
+  e.addHLDE()
+  e.ret()
+
+  e.bloc('EffacerCases')
   e.poser('EffacerCases')
   e.ldAB()
   e.orA()
   e.retZ()
-  e.call('AttendreVBlank')
   const vider = neuve('effacer')
   e.poser(vider)
+  e.call('AttendreAcces') // une case à la fois, entre deux lignes
   e.xorA()
   e.ldHLplusA()
   e.decB()
   e.jrNZ(vider)
   e.ret()
 
+  e.bloc('EcrireTexte')
   e.poser('EcrireTexte')
-  e.call('AttendreVBlank')
   const boucle = neuve('ecrire')
   e.poser(boucle)
+  e.call('AttendreAcces') // une lettre à la fois, entre deux lignes
   e.ldAdeDE()
   e.ldHLplusA()
   e.incDE()
@@ -5983,6 +6906,7 @@ function routines(e) {
    * programme s'en sert.
    */
   if (e.besoinAttendre) {
+    e.bloc('AttendreSecondes')
     e.poser('AttendreSecondes')
     e.orA()
     e.retZ() // attendre(0) : rien à attendre
@@ -5994,7 +6918,7 @@ function routines(e) {
     e.poser(uneImage)
     e.ecrire(0xc5) // push bc
     e.call('AttendreImage')
-    e.ecrire(0xcd, ROUTINE_TRANSFERT & 0xff, (ROUTINE_TRANSFERT >> 8) & 0xff) // les lutins, comme image()
+    if (e.faut('lutins')) e.ecrire(0xcd, ROUTINE_TRANSFERT & 0xff, (ROUTINE_TRANSFERT >> 8) & 0xff) // les lutins, comme image()
     e.ecrire(0xc1) // pop bc
     e.ecrire(0x0d) // dec c
     e.jrNZ(uneImage)
@@ -6004,11 +6928,12 @@ function routines(e) {
   }
 
   if (e.besoinTexteS) {
+    e.bloc('EcrireTexteS')
     e.poser('EcrireTexteS')
-    e.call('AttendreVBlank')
     const lettre = neuve('textS')
     const suite = neuve('textS')
     e.poser(lettre)
+    e.call('AttendreAcces') // une lettre à la fois, entre deux lignes
     e.ldAdeDE()
     e.ldHLplusA()
     e.incDE()
@@ -6047,13 +6972,9 @@ function routines(e) {
    * cinq tours au pire, une fois par chiffre. C'est court, et cela tient en
    * vingt octets.
    */
+  e.bloc('EcrireNombre')
   e.poser('EcrireNombre')
   e.pushAF()
-  /* L'attente D'ABORD, et la valeur mise à l'abri pendant ce temps :
-     « AttendreVBlank » relit le registre de l'écran, donc écrase `a`. Le
-     nombre affiché était alors le numéro de la ligne balayée — un « 144 »
-     parfaitement stable, qu'on prend d'abord pour un calcul faux. */
-  e.call('AttendreVBlank')
   e.ldAB()
   e.decA()
   e.ldEA()
@@ -6074,6 +6995,13 @@ function routines(e) {
   e.jr(retirerDix)
   e.poser(resteTrouve)
   e.addN(numeroDe('0')) // le reste devient la tuile de son chiffre
+  /* L'attente, chiffre par chiffre, et la tuile mise à l'abri dans `e` :
+     « AttendreAcces » relit le registre de l'écran, donc écrase `a`. Le
+     nombre affiché était alors l'état de l'écran — des chiffres faux, mais
+     stables, qu'on prend d'abord pour un calcul faux. */
+  e.ecrire(0x5f) // ld e, a
+  e.call('AttendreAcces')
+  e.ecrire(0x7b) // ld a, e
   e.ldHLA()
   e.decHL()
   e.ldAD() // le quotient devient la valeur du chiffre suivant
@@ -6090,6 +7018,7 @@ function routines(e) {
    * Diviser par zéro rend zéro, plutôt que de faire tourner la console pour
    * toujours : une console figée n'apprend rien à personne.
    */
+  e.bloc('Diviser')
   e.poser('Diviser')
   e.ldC(0) // le quotient
   e.ecrire(0x57) // ld d, a — a est mis de côté
@@ -6111,6 +7040,7 @@ function routines(e) {
 
   /* Le reste, par le même chemin : on retire b tant qu'on peut, et ce qui
      reste est le reste. Un reste par zéro laisse a tel quel. */
+  e.bloc('Reste')
   e.poser('Reste')
   e.ecrire(0x57) // ld d, a
   e.ldAB()
@@ -6127,6 +7057,7 @@ function routines(e) {
   /* a × b, par additions successives. Ce processeur ne sait pas multiplier :
      on ajoute « a » autant de fois que « b » l'indique. Le résultat déborde
      au-delà de 255, comme toute valeur d'un octet. */
+  e.bloc('Multiplier')
   e.poser('Multiplier')
   e.ecrire(0x4f) // ld c, a — c garde la valeur à additionner
   e.xorA() //        le total démarre à zéro
@@ -6147,6 +7078,7 @@ function routines(e) {
 
   /* a décalé de b rangs. Écrit « x << n » quand n n'est pas connu d'avance ;
      quand il l'est, le compilateur déroule et n'appelle pas ceci. */
+  e.bloc('DecalerGauche')
   e.poser('DecalerGauche')
   const bcleGauche = neuve('decg')
   const finGauche = neuve('findecg')
@@ -6163,6 +7095,7 @@ function routines(e) {
   e.ecrire(0x7a) // ld a, d
   e.ret()
 
+  e.bloc('DecalerDroite')
   e.poser('DecalerDroite')
   const bcleDroite = neuve('decd')
   const finDroite = neuve('findecd')
@@ -6181,6 +7114,7 @@ function routines(e) {
 
   /* Tous les lutins hors de l'écran : sans cela, la table contient ce que la
      console avait en mémoire à l'allumage, et des carrés apparaissent. */
+  e.bloc('RangerLutins')
   e.poser('RangerLutins')
   e.ldHL(OAM_OMBRE)
   e.ldB(160)
@@ -6194,6 +7128,7 @@ function routines(e) {
 
   /* La routine de copie déménage dans la page rapide : pendant le transfert,
      le processeur ne peut plus lire la cartouche. */
+  e.bloc('InstallerTransfert')
   e.poser('InstallerTransfert')
   e.ldDEetiquette('DonneesTransfert')
   e.ldHL(ROUTINE_TRANSFERT)
@@ -6208,25 +7143,31 @@ function routines(e) {
   e.ret()
 
   /* Les dessins partent en mémoire vidéo. Écran éteint : c'est permis. */
+  e.bloc('CopierTuiles')
   e.poser('CopierTuiles')
   e.ldDEetiquette('Tuiles')
-  e.ldHL(MEMOIRE_TUILES)
-  e.ldBC(e.prochaineTuile * 16)
-  const copie = neuve('copie')
-  e.poser(copie)
-  e.ldAdeDE()
-  e.ldHLplusA()
-  e.incDE()
-  e.ecrire(0x0b) // dec bc
-  e.ecrire(0x79) // ld a, c
-  e.ecrire(0xb0) // or b — reste-t-il quelque chose ?
-  e.jrNZ(copie)
-  e.ret()
+  if (e.police) {
+    copierLaPoliceEmployee(e)
+  } else {
+    e.ldHL(MEMOIRE_TUILES)
+    e.ldBC(e.prochaineTuile * 16)
+    const copie = neuve('copie')
+    e.poser(copie)
+    e.ldAdeDE()
+    e.ldHLplusA()
+    e.incDE()
+    e.ecrire(0x0b) // dec bc
+    e.ecrire(0x79) // ld a, c
+    e.ecrire(0xb0) // or b — reste-t-il quelque chose ?
+    e.jrNZ(copie)
+    e.ret()
+  }
 
   /* Les DEUX cartes à la tuile 0, qui est le vide : celle du décor et celle
      du panneau. Effacer la première seule laissait dans la seconde ce que la
      console avait en mémoire à l'allumage, et le panneau s'ouvrait sur des
      caractères au hasard. */
+  e.bloc('EffacerCarte')
   e.poser('EffacerCarte')
   e.ldHL(CARTE_FOND)
   e.ldBC(32 * 32 * 2)
@@ -6253,6 +7194,7 @@ function routines(e) {
    * versé pour que deux parties ne se ressemblent pas. Le zéro est écarté :
    * un tel registre, une fois à zéro, y reste pour toujours.
    */
+  e.bloc('Hasard')
   e.poser('Hasard')
   e.ldhVersA(GRAINE)
   for (let pas = 0; pas < 2; pas++) {
@@ -6274,6 +7216,7 @@ function routines(e) {
 
   /* Le panneau seul, remis à du vide. Le décor, lui, n'est pas touché. */
   /* Vider tout le fond : les 32 × 32 de la carte, et non les 20 × 18 vus. */
+  e.bloc('EffacerFond')
   e.poser('EffacerFond')
   e.call('AttendreVBlank')
   e.ldHL(CARTE_FOND)
@@ -6288,6 +7231,7 @@ function routines(e) {
   e.jrNZ(videFond)
   e.ret()
 
+  e.bloc('EffacerPanneau')
   e.poser('EffacerPanneau')
   e.call('AttendreVBlank')
   e.ldHL(CARTE_PANNEAU)
@@ -6303,6 +7247,7 @@ function routines(e) {
   e.ret()
 
   /* Les huit boutons dans un seul octet, comme sur la vraie console. */
+  e.bloc('LireManette')
   e.poser('LireManette')
   e.ldA(0b00100000)
   e.ldhDepuisA(MANETTE)
@@ -6345,8 +7290,16 @@ function octetsDeLaRangee(rangee) {
 function donnees(e) {
   /* La police d'abord, les dessins du programme ensuite, sans trou : la copie
      vers la mémoire vidéo se fait d'un seul bloc. */
+  e.bloc('Tuiles')
   e.poser('Tuiles')
-  e.ecrire(...octetsDesTuiles())
+  if (e.police) {
+    /* Seulement les lettres employées, l'une après l'autre : « CopierTuiles »
+       remet chacune à sa place en mémoire vidéo. */
+    const toutes = octetsDesTuiles()
+    for (const numero of e.police) e.ecrire(...toutes.slice(numero * 16, numero * 16 + 16))
+  } else {
+    e.ecrire(...octetsDesTuiles())
+  }
   for (const { rangees, cote } of e.dessins.values()) {
     if (cote === 16) {
       /* Les quatre quarts, dans l'ordre : haut-gauche, haut-droite,
@@ -6363,6 +7316,7 @@ function donnees(e) {
 
   /* La routine de copie des lutins, telle qu'elle sera recopiée en page
      rapide. Ses sauts sont relatifs : elle fonctionne où qu'elle soit. */
+  e.bloc('DonneesTransfert')
   e.poser('DonneesTransfert')
   e.ecrire(0x3e, (OAM_OMBRE >> 8) & 0xff) // ld a, page haute de la copie
   e.ecrire(0xe0, TRANSFERT) // ldh [$FF46], a — le matériel part
@@ -6374,15 +7328,18 @@ function donnees(e) {
   e.ret()
 
   /* Les notes : deux octets chacune, dans l'ordre de DO2 à SI6. */
+  e.bloc('Notes')
   e.poser('Notes')
   e.ecrire(...octetsDesNotes())
 
   for (const { etiquette, contenu } of e.textes) {
+    e.bloc(etiquette)
     e.poser(etiquette)
     for (const caractere of contenu) e.ecrire(numeroDe(caractere))
   }
 
   for (const { etiquette, valeurs } of e.tables) {
+    e.bloc(etiquette)
     e.poser(etiquette)
     if (valeurs.length) e.ecrire(...valeurs)
   }

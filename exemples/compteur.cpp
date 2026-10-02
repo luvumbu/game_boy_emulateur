@@ -2,6 +2,9 @@
 //
 //   node gb3.mjs exemples/compteur.cpp
 
+#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+
 const uint8_t MAXIMUM = 9;
 
 uint8_t valeur = 5;

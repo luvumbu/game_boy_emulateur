@@ -15,6 +15,27 @@
  * fonctionnent tous, et qu'ils ne se gênent pas.
  */
 
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <Perso>          // un dessin de 16 × 16 pixels, pour un lutin
+#include <poser>          // pose une tuile sur une case du fond
+#include <ecran>          // éteint ou rallume l’écran
+#include <textePanneau>   // écrit un texte sur le panneau
+#include <panneau>        // montre le panneau, à une place choisie
+#include <poserPanneau>   // pose une tuile sur le panneau
+#include <sauvegarde>     // relit un nombre gardé dans la cartouche
+#include <sauver>         // garde un nombre dans la cartouche, même éteinte
+#include <semer>          // choisit le départ du hasard
+#include <sprite16>       // place un lutin de 16 × 16 au pixel près
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <defiler>        // fait glisser tout le fond
+#include <note>           // joue une note
+#include <bruit>          // joue un bruit
+#include <paletteFond>    // choisit les quatre nuances du fond
+#include <bouton>         // lit un bouton de la manette
+#include <silence>        // fait taire une voix
+#include <diviser>        // a / b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <reste>          // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
 Tuile SOL = {
   "33333333",
   "32222223",

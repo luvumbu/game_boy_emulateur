@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 6 — Les struct : ce qui va ensemble</span>
   <span>leçon 2 sur 4 dans ce chapitre</span>
-  <span>28 sur 42 dans le cours</span>
+  <span>28 sur 61 dans le cours</span>
 </p>
 <h1>28. Un tableau de struct, parcouru par une boucle</h1>
 <p class="idee">Quatre ennemis, un tableau, une boucle : le code d’un seul, appliqué à tous.</p>
@@ -108,23 +108,59 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1817 octets</strong> de cartouche.</p>
+<strong>645 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          449 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← texte()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles     31 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles           16 o  ← CopierTuiles  — 1 lettre sur 43
+  " "               1 o  ← texte()  — un texte gravé
+  "X"               1 o  ← texte()  — un texte gravé
+Lettres gravées : X
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 2   120 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+  images() × 1     2 o sur place, dans main()</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. une constante — COMBIEN</p>
-    <pre><code>const uint8_t COMBIEN = 4;</code></pre>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : quatre ennemis X font des allers-retours sur l'écran.
+//
+// Ce qui est nouveau : un TABLEAU de struct.
+//   Ennemi troupe[4]   = 4 ennemis ; chacun a son x, son y et son sens.
+//   troupe[i].x        = la case x de l'ennemi numéro i.
+// Une seule boucle for s'occupe de tous les ennemis.
+
+#include &lt;texte&gt;   // écrit un texte à l’écran</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. un enregistrement — Ennemi</p>
-    <pre><code>struct Ennemi {
-  uint8_t x;
-  uint8_t y;
+    <p class="quoi">2. une constante — COMBIEN</p>
+    <pre><code>const uint8_t COMBIEN = 4;      // Le nombre d'ennemis. const : il ne change jamais.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un enregistrement — Ennemi</p>
+    <pre><code>struct Ennemi {                 // Le modèle d'un ennemi :
+  uint8_t x;                    //   sa colonne,
+  uint8_t y;                    //   sa ligne,
   uint8_t sens;       // 1 : vers la droite, 0 : vers la gauche
 };</code></pre>
   </div>
@@ -133,36 +169,36 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">3. un tableau — troupe</p>
-    <pre><code>Ennemi troupe[COMBIEN];</code></pre>
+    <p class="quoi">4. un tableau — troupe</p>
+    <pre><code>Ennemi troupe[COMBIEN];         // 4 ennemis : troupe[0] à troupe[3].</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  for (uint8_t i = 0; i &lt; COMBIEN; i++) {
-    troupe[i].x = 2 + i * 4;
-    troupe[i].y = 4 + i * 3;
-    troupe[i].sens = i % 2;
+    <p class="quoi">5. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                    // Le jeu commence ici.
+  for (uint8_t i = 0; i &lt; COMBIEN; i++) {  // Pour chaque ennemi i (0 à 3) :
+    troupe[i].x = 2 + i * 4;    //   colonne 2, 6, 10, 14
+    troupe[i].y = 4 + i * 3;    //   ligne   4, 7, 10, 13
+    troupe[i].sens = i % 2;     //   reste par 2 : 0, 1, 0, 1 (un sur deux part à droite)
   }
 
-  while (true) {
+  while (true) {                // La boucle du jeu :
     image();
-    if (images() % 8 != 0) continue;    // une image sur huit
+    if (images() % 8 != 0) continue;    // une image sur huit (sinon, on saute la suite)
 
-    for (uint8_t i = 0; i &lt; COMBIEN; i++) {
-      texte(troupe[i].x, troupe[i].y, " ");
+    for (uint8_t i = 0; i &lt; COMBIEN; i++) {   // Pour chaque ennemi :
+      texte(troupe[i].x, troupe[i].y, " ");   //   efface-le à sa place actuelle,
 
-      if (troupe[i].sens == 1) troupe[i].x++;
+      if (troupe[i].sens == 1) troupe[i].x++; //   avance dans son sens,
       else troupe[i].x--;
 
-      if (troupe[i].x == 19) troupe[i].sens = 0;
-      if (troupe[i].x == 0)  troupe[i].sens = 1;
+      if (troupe[i].x == 19) troupe[i].sens = 0;  // au bord droit : repart à gauche,
+      if (troupe[i].x == 0)  troupe[i].sens = 1;  // au bord gauche : repart à droite,
 
-      texte(troupe[i].x, troupe[i].y, "X");
+      texte(troupe[i].x, troupe[i].y, "X");   //   dessine-le à sa nouvelle place.
     }
   }
 }</code></pre>
@@ -182,22 +218,22 @@ instants qui comptent. Une image identique à la précédente n’est pas montr�
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABqklEQVR4nO3aMQrCUBBAQUuPYOn9T+MRPIalha0oBv1hnwNTpAw8NktgD9fbhbDD7m/ATwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3Dcq8DH0/npM4MIHPfmE/3oqu5c73ewuqOZ4Dg7OE7gOP/BcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcZMCuzDZQOC4SYFdeW4wLLC6nxoW2AR/alJgO3gDgeMmBWYDgeMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4cmAXIAL3lQO7wuwH/vO6/cAmuBzYDha4rxwYgfsEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4gdfZ5cJE4HUE7lt/5SnwaovP/wReygSX2cFxAvN9AscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxd7IxoNPwyeEKAAAAAElFTkSuQmCC" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABrklEQVR4nO3aMQrCQBBA0ZQewdL7n8YjeAxLEUVtdgthSfg8eIXphM9kCMx2u18J23b/BywlcJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcc/Ap/Pl8/z7mwCB496v6FdXdXu+O1jdJBMcZwfHCRznOzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEziuENhFyoTAcYXArkInIoHVHYkENsEjhcB28ITAcYXATAgcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxxUCu+iYEDiuENhV5UQksLojkcAmeKQQ2A6eEDiuEJgJgeMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4gfe39CJF4P0J3LfuKlTgo1h0LijwIZjgMjs4TmD+J3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkc9wCyMaDTOKdEZAAAAABJRU5ErkJggg==" alt="l’écran">
     <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABoUlEQVR4nO3asQkCQRBAUUNLMLT/aizBMgzNjAS5PcXdfw9+sOHCY5hkTvfHTeFOf/+BfhrgeIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjlYHPl+vb96ECHK8M/HI9rG4f+OC6fWATXAa2gwH3KwMLcD/A8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxxvJWAXGgMBjrcSsCvJgRYDpru1xYBN8NZWAraDBwIcbyVgDQQ4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgd43r5ywQJ43gD3239FCnj2dp4XAp46E1zODo4HWJ8DHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMd7Ai8fwBuTOnWfAAAAAElFTkSuQmCC" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABrUlEQVR4nO3aMQrCQBBA0ZQewdL7n8YjeAxLC1tBSDbs+n3wipSBz2QIzPZ43gnbpr8BpxI4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4mYEv19vHZwYSOG7yJ/rdVd3zzN/B6p7KBMfZwXECx83fwZxK4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4P1+4iJF4P0E7lv/KlTgo1auK/BRJrjMDo4TmPkEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geNGBv6JC4d/I3Dc4E/0+leG/2b8DlZ3KSY4zg6OEzjOf3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwOsaciEj8LoE7jt+pSrw6g6eLwq8NBNcZgfHCcx3AscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxL0u/oNMDk0RIAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>au bout d’une seconde — image 60</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABqUlEQVR4nO3cMQrCQBBA0ZQewdL7n8YjeAxLOysxkFWy+XnwipSBz2YIDLs8nnfClt3fgL8SOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7guHLgy/X28flUBI4rB353PW3dfuCT1+0HdoLLgc1ggfvKgRG4T+A4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhN4Xj/ZSBF4XgL3jW+FCjy7wXVBgafmBJeZwXECs07gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOO5bYDfFBQgct/KJdlvr0a3PYHUPzQmOM4PjBI7zHxwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwn8HaH2HgReDuB++bfOhV41Mx1BR7lBJeZwXECsz+B4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LgXKZmg0zy+f78AAAAASUVORK5CYII=" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABq0lEQVR4nO3aMWrDQBBAUZc+Qkrf/zQ+Qo6RMoULNwZtBCaevw9eoVLwGQ2CuXz/3Am7/Psb8FYCxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ/A816/by+eXBJ5H4L5H18O6Ag+2UlfgqUxwmR0cJzBPAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxOwb+00XEdAILXLR+lTjdpoE3qbtvYBNcZgfHCUyHwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwMdGX4AIfEzgvrlXmAKvmlhX4FUmuMwOjhOYzyVwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHHcm8OgLh90IHHfyEz33ynA353ewuiOY4Dg7OE7gOP/BcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcb8Hc6DTbI59bAAAAABJRU5ErkJggg==" alt="l’écran">
     <figcaption>au bout de trois secondes — image 180</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABsklEQVR4nO3csWkFMRBAwR+6BIfuvxqX4DIcOnDq6JCs1WNgggsPHrrlYNHr6/uTsNfxN2ArgeMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhN4vbf3jz+fjxB4PYH7frseryvwRhPqCryLE1xmBscJzP8ROE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI6bGHjURsTtBI6bGHjUVuLthgZWd5WhgZ3gVSYGNoMXEjhuYmAWEjhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOE/i8rRssAp8ncN++LVKBp9i0XijwCE5wmRkcJzDPCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHPQnsJrqLCBz38BPtNthbPJ/B6l7BCY4zg+MEjvMfHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHPcDS7+g028DPB4AAAAASUVORK5CYII=" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABqklEQVR4nO3cMQrCQBBAUUuPYOn9T+MRPIalhYWNYCyMzt8Hr0gZ+GyGwLCH6+1C2OHnb8BXCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzA7x1P55fPIwj8nsB9j67j6gr8gYl1Bd7KCS4zg+ME5n8JHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJPM9HGyYCzyNw3/YtT4Gn2rj+J/BITnCZGRwnME8CxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHF7BB59U9x0Asft9Imee1vrdPvNYHV/wgmOM4PjBI7zHxwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRy3YuClNkwEFrhonS3PRQMvUnfdwE5wmRkcJzAdAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxd+U+oNMghKkmAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>au bout de sept secondes — image 420</figcaption>
   </figure>
 </div>

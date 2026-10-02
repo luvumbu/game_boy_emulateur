@@ -18,7 +18,113 @@
  * fichiers. La ligne de commande les lit, la page les demande au serveur.
  */
 
-const MOTIF = /^[ \t]*#\s*include\s*(?:"([^"]+)"|<([^>]+)>)[ \t]*$/
+const MOTIF = /^[ \t]*#\s*include\s*(?:"([^"]+)"|<([^>]+)>)[ \t]*(?:\/\/.*)?$/
+
+/*
+ * Les fonctions de la console : aucune n'est là d'office.
+ *
+ *   #include <texte>          texte() existe
+ *   #include <ALPHABET>       ALPHABET existe
+ *
+ * Une fonction de la console prend de la place dans la cartouche — son code,
+ * ses routines, ses tables. La règle est donc celle du C : ce qu'on veut
+ * employer, on l'inclut, par son nom, écrit exactement comme dans le
+ * programme. Sans la ligne, le compilateur refuse l'appel et dit quelle ligne
+ * écrire. Avec elle, il ne grave que ce que le programme emploie vraiment :
+ * une ligne de trop ne coûte rien.
+ *
+ * Ce n'est pas un fichier : la ligne reste dans le texte, et c'est le
+ * compilateur qui la lit.
+ *
+ * Restent natives, parce qu'elles ne coûtent rien : image(), images(),
+ * retard(), ms() et secondes() — la boucle du jeu et ses horloges.
+ */
+export const BIBLIOTHEQUES = {
+  /* écrire et poser sur le fond */
+  texte: 'écrit un texte à l’écran',
+  textS: 'écrit un texte qui passe à la ligne tout seul',
+  texteGrand: 'écrit un texte agrandi, de 1 à 20 fois',
+  texteGrandS: 'écrit un texte agrandi qui passe à la ligne',
+  texteCouleur: 'écrit un mot dans une palette de couleur',
+  nombre: 'écrit un nombre en chiffres',
+  effacer: 'efface des cases, ou tout le fond',
+  poser: 'pose une tuile sur une case du fond',
+  poserS: 'pose une tuile, et passe à la ligne au bord',
+  lire: 'lit la tuile posée sur une case',
+  changerDessin: 'change le dessin d’une tuile partout à la fois',
+  defiler: 'fait glisser tout le fond',
+  ecran: 'éteint ou rallume l’écran',
+  /* le panneau, par-dessus le fond */
+  panneau: 'montre le panneau, à une place choisie',
+  cacherPanneau: 'cache le panneau',
+  effacerPanneau: 'efface des cases du panneau, ou tout le panneau',
+  textePanneau: 'écrit un texte sur le panneau',
+  nombrePanneau: 'écrit un nombre sur le panneau',
+  poserPanneau: 'pose une tuile sur le panneau',
+  lirePanneau: 'lit une tuile du panneau',
+  /* les dessins et les lettres */
+  ALPHABET: 'les lettres de la police : ALPHABET[0] est le A',
+  ALPHABET_GRAS: 'l’alphabet en gras : ALPHABET_GRAS[0] est le A gras',
+  Tuile: 'un dessin de 8 × 8 pixels',
+  Perso: 'un dessin de 16 × 16 pixels, pour un lutin',
+  Mot: 'un texte et sa place, sous un seul nom',
+  /* les lutins */
+  sprite: 'place un lutin de 8 × 8 au pixel près',
+  sprite16: 'place un lutin de 16 × 16 au pixel près',
+  cacher: 'cache un lutin',
+  cacher16: 'cache un lutin de 16 × 16',
+  /* les couleurs (Game Boy Color) et les nuances */
+  couleurFond: 'choisit une couleur d’une palette du fond',
+  couleurTexte: 'choisit la couleur des lettres',
+  couleurLutin: 'choisit une couleur d’une palette des lutins',
+  teindre: 'met une case du fond dans une palette',
+  teindrePanneau: 'met une case du panneau dans une palette',
+  teindreLutin: 'met un lutin dans une palette',
+  paletteFond: 'choisit les quatre nuances du fond',
+  paletteLutins: 'choisit les quatre nuances des lutins',
+  /* bouger */
+  deplace_x: 'fait avancer une tuile sur sa ligne',
+  deplace_y: 'fait avancer une tuile sur sa colonne',
+  deplace: 'fait avancer une tuile sur les deux axes',
+  va_a: 'mène une tuile jusqu’à une case',
+  un_pas: 'fait faire un seul pas à une tuile',
+  vitesse: 'règle la vitesse des déplacements',
+  deplace_croix: 'une tuile qui suit la croix, case par case',
+  glisse_croix: 'un lutin qui suit la croix, au pixel près',
+  carre: 'une tuile qui tourne en carré',
+  Carre: 'les sept réglages d’un carré sous un seul nom',
+  losange: 'une tuile qui tourne en losange',
+  rectangle: 'une tuile qui tourne en rectangle',
+  spirale: 'une tuile qui tourne en spirale',
+  aller_retour: 'une tuile qui va et revient',
+  tourne_carre: 'une tuile qui tourne en carré sans arrêter le jeu',
+  defile: 'une tuile qui file sur sa ligne sans arrêter le jeu',
+  /* le temps, la manette, le hasard */
+  chaque: 'répond 1 toutes les n millisecondes',
+  attendre: 'attend des secondes entières',
+  bouton: 'lit un bouton de la manette',
+  hasard: 'tire un nombre au hasard',
+  semer: 'choisit le départ du hasard',
+  /* le son */
+  note: 'joue une note',
+  bruit: 'joue un bruit',
+  silence: 'fait taire une voix',
+  volumeSon: 'règle le volume général',
+  Air: 'un air de musique, note par note',
+  jouer: 'joue un air tout seul',
+  airFini: 'dit si un air est fini',
+  /* la mémoire de la cartouche */
+  sauver: 'garde un nombre dans la cartouche, même éteinte',
+  sauvegarde: 'relit un nombre gardé dans la cartouche',
+  /* les calculs que le processeur ne sait pas faire seul */
+  multiplier: 'a * b, quand les deux se calculent',
+  diviser: 'a / b, sauf par 1, 2, 4, 8, 16… écrits en clair',
+  reste: 'a % b, sauf par 1, 2, 4, 8, 16… écrits en clair',
+  decaler: 'a << b et a >> b, quand b se calcule',
+}
+
+/** « #include <texte> » : une demande au compilateur, pas un fichier. */
+const estUneBibliotheque = (coup) => Boolean(coup && coup[2] && Object.hasOwn(BIBLIOTHEQUES, coup[2].trim()))
 
 /** Les fichiers qu'un programme demande, dans l'ordre, sans doublon. */
 export function fichiersDemandes(texte) {
@@ -26,6 +132,7 @@ export function fichiersDemandes(texte) {
 
   for (const ligne of texte.split('\n')) {
     const coup = ligne.match(MOTIF)
+    if (estUneBibliotheque(coup)) continue
     const nom = coup && (coup[1] ?? coup[2])
     if (nom && !demandes.includes(nom)) demandes.push(nom)
   }
@@ -65,7 +172,8 @@ export function rassembler(lire, principal) {
     sesLignes.forEach((ligne, i) => {
       const coup = ligne.match(MOTIF)
 
-      if (coup) {
+      /* Une bibliothèque reste écrite : le compilateur la lira. */
+      if (coup && !estUneBibliotheque(coup)) {
         verser(coup[1] ?? coup[2])
         return
       }

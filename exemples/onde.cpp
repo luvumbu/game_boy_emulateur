@@ -4,6 +4,11 @@
    UNE table gravée relue avec un décalage — cos(angle) = sin(angle + 90°),
    et 90° fait un quart de tour, donc 8 pas sur les 32 de la table. */
 
+#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <bouton>   // lit un bouton de la manette
+#include <texte>    // écrit un texte à l’écran
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+
 Tuile BALLE = { "..####..", ".#----#.", "#--++--#", "#-+##+-#", "#-+##+-#", "#--++--#", ".#----#.", "..####.." };
 
 /* Chaque valeur vaut 40 + 40*sin(angle) : toujours entre 0 et 80, jamais de

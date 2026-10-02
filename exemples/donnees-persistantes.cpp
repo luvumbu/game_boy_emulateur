@@ -14,6 +14,12 @@
  * écrit ici, et le record part de zéro plutôt que d'un nombre au hasard.
  */
 
+#include <sauvegarde>   // relit un nombre gardé dans la cartouche
+#include <sauver>       // garde un nombre dans la cartouche, même éteinte
+#include <texte>        // écrit un texte à l’écran
+#include <nombre>       // écrit un nombre en chiffres
+#include <bouton>       // lit un bouton de la manette
+
 const uint8_t CASE_MARQUE = 0;
 const uint8_t CASE_RECORD = 1;
 const uint8_t MARQUE = 42;

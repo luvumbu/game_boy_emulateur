@@ -133,7 +133,9 @@ try {
   /* ============================================================ cours.html */
   titre('cours.html — le sommaire du cours')
   {
-    const attendus = COURS.filter((c) => /struct/i.test([c.titre, c.idee, c.code].join(' ')))
+    /* Le cours a rejoint le parcours : cours.html mène à tuto.html, où l'on
+       cherche parmi toutes les étapes — les cours compris. */
+    const attendus = LECONS.filter((c) => /struct/i.test([c.titre, c.idee, c.code].join(' ')))
     const p = await ouvrir('cours.html', 5000)
     const r = await p.evaluer(`${OUTILS}
       const champ = document.querySelector('.sommaire .recherche input')
@@ -142,7 +144,7 @@ try {
       const n = lecons().length
       await touche(champ, 'Enter')
       return { n, titre: document.getElementById('titre').textContent, premier: lecons()[0]?.textContent }`)
-    b.verifier('« struct » trouve des cours', r.n > 0 && r.n <= attendus.length + 2, ` (${r.n})`)
+    b.verifier('« struct » trouve des étapes du parcours, cours compris', r.n > 0 && r.n <= attendus.length + 2, ` (${r.n})`)
     b.verifier('Entrée ouvre le premier', r.titre === r.premier, ` (« ${r.titre} »)`)
     b.verifier('aucune erreur dans la page', !p.erreurs.length, p.erreurs.join(' | '))
     p.fermer()

@@ -30,6 +30,7 @@ import { COURS, CHAPITRES } from '../tuto/programmation.js'
 import { STYLE } from '../tuto/style.js'
 import { enrichir, echapper } from '../tuto/enrichir.js'
 import { consoleDuProgramme } from '../tuto/console.mjs'
+import { lignesGravees } from '../analyse-rom.js'
 import { decouperLeProgramme, etapesDeLExecution, controlesJoues, imageDeLEcran } from '../tuto/etapes.mjs'
 import { lireDessins } from '../editeur-tuiles.js'
 import { png } from '../compilateur/png.mjs'
@@ -115,7 +116,7 @@ function etapesEnCouleur(lecon) {
 
 function matiereDeLaLecon(lecon) {
   const dessins = new Map(lireDessins(lecon.code).map((d) => [d.nom, d]))
-  const { gb, octets } = consoleDuProgramme(lecon.code, lecon.titre)
+  const { gb, octets, grave } = consoleDuProgramme(lecon.code, lecon.titre)
 
   return {
     morceaux: decouperLeProgramme(lecon.code, dessins),
@@ -123,6 +124,7 @@ function matiereDeLaLecon(lecon) {
     controles: controlesJoues(lecon),
     apercu: imageDe(gb),
     octets: octets.length,
+    grave: lignesGravees(grave).join('\n'),
   }
 }
 
@@ -186,6 +188,8 @@ ${lecon.texte.map((p) => `<p>${enrichir(p)}</p>`).join('\n')}
 ${titre('Le programme, morceau par morceau')}
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
 <strong>${matiere.octets} octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>${echapper(matiere.grave)}</code></pre>
 
 ${matiere.morceaux.map((m, k) => `
 <div class="morceau">

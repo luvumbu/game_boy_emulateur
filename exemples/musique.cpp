@@ -18,6 +18,16 @@
  */
 
 /* La mélodie : deux mesures qui montent, deux qui redescendent. */
+
+#include <Air>       // un air de musique, note par note
+#include <Tuile>     // un dessin de 8 × 8 pixels
+#include <poser>     // pose une tuile sur une case du fond
+#include <texte>     // écrit un texte à l’écran
+#include <jouer>     // joue un air tout seul
+#include <bouton>    // lit un bouton de la manette
+#include <silence>   // fait taire une voix
+#include <airFini>   // dit si un air est fini
+
 Air THEME = {
   "DO4 12",  "==",      "MI4 12",  "==",      "SOL4 12", "==",      "DO5 13",  "==",
   "SI4 11",  "==",      "SOL4 11", "==",      "MI4 11",  "==",      "--",      "--",
@@ -117,9 +127,10 @@ int main() {
     /*
      * L'état ne se réécrit QUE lorsqu'il change.
      *
-     * Vingt lettres par image suffisent à faire rater le VBlank : le jeu tombe
-     * à trente images par seconde, « retard() » s'allume, et le témoin bat deux
-     * fois trop lentement. La musique, elle, ne bronche pas — elle avance dans
+     * Chaque lettre attend une pause de la console : réécrire l'état à chaque
+     * image, c'est du temps perdu à attendre, pour rien. Et un jeu trop chargé
+     * finit par rater une image — « retard() » s'allume, le témoin bat plus
+     * lentement. La musique, elle, ne bronche pas : elle avance dans
      * l'interruption, et c'est précisément pour cela qu'elle y est.
      */
     if (joue != ancienEtat) {

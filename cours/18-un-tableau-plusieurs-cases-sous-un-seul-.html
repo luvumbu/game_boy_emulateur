@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 4 — Les tableaux : ranger beaucoup de valeurs</span>
   <span>leçon 1 sur 5 dans ce chapitre</span>
-  <span>18 sur 42 dans le cours</span>
+  <span>18 sur 61 dans le cours</span>
 </p>
 <h1>18. Un tableau : plusieurs cases sous un seul nom</h1>
 <p class="idee">Cinq scores, ce n’est pas cinq variables : c’est un tableau de cinq cases, et une boucle.</p>
@@ -109,33 +109,79 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1462 octets</strong> de cartouche.</p>
+<strong>660 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage         66 o  ← la console, à l’allumage  — la mise en route de la console
+  main()           136 o  ← démarrage  — ta fonction
+  VBlank             8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage     28 o  ← image()  — attend l’image suivante
+  AttendreVBlank    16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces     12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase       10 o  ← texte(), nombre()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte       10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre      33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles      76 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte      14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles           240 o  ← CopierTuiles  — 15 lettres sur 43
+  "JOUEUR"           6 o  ← texte()  — un texte gravé
+  scores_depart_0    5 o  ← démarrage  — une table gravée
+Lettres gravées : EJORU0123456789
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  nombre() × 2    60 o sur place, dans main()  + AdresseCase (10 o), EcrireNombre (33 o)
+  texte()  × 1    25 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  ecran()  × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. un tableau — scores</p>
-    <pre><code>uint8_t scores[5] = { 12, 40, 7, 99, 25 };</code></pre>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : range 5 scores dans UN tableau, en change un, et les affiche tous.
+//
+// Ce qui est nouveau : le TABLEAU. Plusieurs cases sous un seul nom.
+//   uint8_t scores[5]   = 5 cases uint8_t, nommées scores[0], scores[1] ... scores[4].
+//   Le numéro entre crochets s'appelle l'INDICE. Il commence à 0, pas à 1 !
+
+#include &lt;ecran&gt;    // éteint ou rallume l’écran
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  ecran(0);
-  scores[2] = 50;             // la troisieme case : l'indice 2
+    <p class="quoi">2. un tableau — scores</p>
+    <pre><code>uint8_t scores[5] = { 12, 40, 7, 99, 25 };  // Les 5 valeurs de départ, dans l'ordre :
+                                            // scores[0] = 12, scores[1] = 40,
+                                            // scores[2] = 7,  scores[3] = 99, scores[4] = 25.
+                                            // Écrit HORS de main : le tableau existe
+                                            // pendant tout le jeu.</code></pre>
+  </div>
+  <div></div>
+</div>
 
-  for (uint8_t i = 0; i &lt; sizeof(scores); i++) {
-    texte(2, 3 + i * 2, "JOUEUR");
-    nombre(9, 3 + i * 2, i, 1);
-    nombre(13, 3 + i * 2, scores[i]);
+<div class="morceau">
+  <div>
+    <p class="quoi">3. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                  // Le jeu commence ici.
+  ecran(0);                   // Dessin écran éteint.
+  scores[2] = 50;             // la troisième case : l'indice 2. Elle passe de 7 à 50.
+
+  for (uint8_t i = 0; i &lt; sizeof(scores); i++) {  // sizeof(scores) = la taille du tableau : 5.
+                                                  // Donc i = 0, 1, 2, 3, 4 : une fois par case.
+    texte(2, 3 + i * 2, "JOUEUR");                // La ligne : 3 + i * 2 → 3, 5, 7, 9, 11
+                                                  // (une ligne vide entre deux joueurs).
+    nombre(9, 3 + i * 2, i, 1);                   // Le numéro du joueur : i.
+    nombre(13, 3 + i * 2, scores[i]);             // scores[i] : la case numéro i.
+                                                  // i = 0 → 12 ; i = 2 → 50 ; i = 4 → 25.
   }
 
-  ecran(1);
+  ecran(1);                   // On rallume : tout apparaît.
 
-  while (true) {
+  while (true) {              // La boucle du jeu.
     image();
   }
 }</code></pre>

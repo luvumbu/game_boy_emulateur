@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 0.99 — Une lettre qui tire — le A bouge, le tir garde sa ligne</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie K — Une lettre qui tire</span>
+    <span>leçon 0.99 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
+    
+    
+    
+  </p>
+<h1>0.99. Une lettre qui tire — le A bouge, le tir garde sa ligne</h1>
+<p class="idee">Le 0.98, et le A bouge avec la croix. Le tir part de là où est le A ; sa ligne, ty, est recopiée une fois au départ : si le A s’en va, le tir continue tout droit.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>C’est le 0.98, avec une chose en plus : le A bouge.</strong> La croix le déplace, un pas toutes les 150 ms, exactement comme le O du 0.93.1 : on calcule la case d’arrivée <code>nx</code>, <code>ny</code>, on regarde si elle est dans l’écran et vide, puis on y va.</p>
+<p><strong>Dans l’écran :</strong> <code>nx &lt; 20 &amp;&amp; ny &lt; 17</code>. Et à gauche ? En colonne 0, <code>ax - 1</code> ne donne pas -1 : un <code>uint8_t</code> fait le tour et donne <strong>255</strong> (le 0.95). 255 n’est pas plus petit que 20 : sortir à gauche est refusé par le même test. Pareil en haut.</p>
+<p><strong>Ce qui est nouveau ici : le tir a SA ligne, <code>ty</code>.</strong> Au 0.98, le tir avançait sur la ligne <code>ay</code>, celle du A. Mais si le A monte pendant que le tir vole, le tir monterait avec lui ! Un tir ne fait pas ça : une fois parti, il va <strong>tout droit</strong>.</p>
+<p><strong>La solution : recopier.</strong> Au départ du tir, <code>ty = ay</code> : <code>ty</code> prend la valeur que <code>ay</code> a <strong>à ce moment-là</strong>. Ensuite, le tir n’utilise plus que <code>ty</code>. Le A peut bouger, <code>ay</code> peut changer : <code>ty</code>, lui, ne change pas.</p>
+<p><strong><code>ax &lt; 19</code> :</strong> en colonne 19, il n’y a plus de case à droite du A. On ne lance pas.</p>
+<p><strong>Le A ne marche pas sur son tir :</strong> il ne va que sur une case <strong>vide</strong> (<code>lire(nx, ny) == 0</code>), et le « . » n’est pas vide.</p>
+<p><strong>Déroulons :</strong> A en (2, 8). BAS, BAS, BAS : A en (2, 11). Bouton A : <code>tx</code> = 3, <code>ty</code> = 11. HAUT : le A remonte en (2, 10), <code>ay</code> = 10 ; mais <code>ty</code> vaut toujours 11 : le tir continue sur la ligne 11.</p>
+<p><strong>Essaie :</strong> remplace <code>ty</code> par <code>ay</code> dans le bloc qui fait avancer le tir, et bouge pendant qu’il vole : le tir suit le A comme une ombre.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+  <li><code>#include &lt;chaque&gt;</code> → <a href="lecon-00-29.3-la-fonction-chaque-toutes-les-n-millisec.html">0.29.3. La fonction chaque() — toutes les n millisecondes</a></li>
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+  <li><code>#include &lt;lire&gt;</code> → <a href="lecon-00-68.4-la-fonction-lire-lire-une-case.html">0.68.4. La fonction lire() — lire une case</a></li>
+  <li><code>#include &lt;effacer&gt;</code> → <a href="lecon-00-16.3-la-fonction-effacer-effacer-des-cases.html">0.16.3. La fonction effacer() — effacer des cases</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>716 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage           72 o  ← la console, à l’allumage  — la mise en route de la console
+  chaque_minuteur()  124 o  ← main()  — une fonction fournie par le langage
+  main()             299 o  ← démarrage  — ta fonction
+  VBlank               8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage       28 o  ← image()  — attend l’image suivante
+  AttendreVBlank      16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces       12 o  ← EffacerCases, EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase         10 o  ← poser(), lire(), effacer(), texte()  — trouve l’adresse d’une case de l’écran
+  EffacerCases        12 o  ← effacer()  — efface des cases
+  EcrireTexte         10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles        40 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte        14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette         37 o  ← bouton()  — lit les huit boutons
+  Tuiles              32 o  ← CopierTuiles  — 2 lettres sur 43
+  "."                  1 o  ← texte()  — un texte gravé
+  "."                  1 o  ← texte()  — un texte gravé
+Lettres gravées : A.
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()           × 2    36 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  effacer()         × 2    30 o sur place, dans main()  + AdresseCase (10 o), EffacerCases (12 o)
+  poser()           × 2    26 o sur place, dans main()  + AdresseCase (10 o)
+  bouton()          × 5    25 o sur place, dans main()  + LireManette (37 o)
+  lire()            × 1    11 o sur place, dans main()  + AdresseCase (10 o)
+  image()           × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+  images()          × 1     2 o sur place, dans chaque_minuteur()
+Tes fonctions appelées :
+  chaque_minuteur() × 2    21 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// ---- UNE LETTRE QUI TIRE : le A bouge, le tir garde sa ligne ----
+// Le 0.98, et le A bouge avec la croix (comme le O du 0.93.1).
+// Le tir part de là où est le A… puis il garde SA ligne, même si le A s'en va.
+
+#include &lt;poser&gt;      // pose une tuile sur une case du fond
+#include &lt;ALPHABET&gt;   // les lettres de la police : ALPHABET[0] est le A
+#include &lt;chaque&gt;     // répond 1 toutes les n millisecondes
+#include &lt;bouton&gt;     // lit un bouton de la manette
+#include &lt;lire&gt;       // lit la tuile posée sur une case
+#include &lt;effacer&gt;    // efface des cases, ou tout le fond
+#include &lt;texte&gt;      // écrit un texte à l’écran</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une variable — ax</p>
+    <pre><code>uint8_t ax = 2;              // le A : sa colonne…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une variable — ay</p>
+    <pre><code>uint8_t ay = 8;              // …et sa ligne</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une variable — nx</p>
+    <pre><code>uint8_t nx = 0;              // la case d'ARRIVÉE du A, calculée AVANT de bouger (le 0.82)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une variable — ny</p>
+    <pre><code>uint8_t ny = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">6. une variable — tx</p>
+    <pre><code>uint8_t tx = 0;              // le tir : sa colonne…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">7. une variable — ty</p>
+    <pre><code>uint8_t ty = 0;              // NOUVEAU : …et SA ligne, à lui</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">8. une variable — vole</p>
+    <pre><code>uint8_t vole = 0;            // 1 = le tir est en vol ; 0 = pas de tir</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">9. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+    if (chaque(150)) {
+      nx = ax;               // 1. l'arrivée : on part de la case actuelle…
+      ny = ay;
+      if (bouton(DROITE)) {  //    …et la flèche la change d'une case.
+        nx = ax + 1;         //    else if : une seule flèche à la fois.
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;         //    en colonne 0, 0 - 1 donne 255 (le uint8_t fait le tour)
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+      }
+      // 2. l'arrivée est dans l'écran : colonnes 0 à 19, lignes 0 à 16.
+      //    255 n'est pas plus petit que 20 : sortir à gauche ou en haut est refusé aussi.
+      if (nx &lt; 20 &amp;&amp; ny &lt; 17) {
+        // 3. …et c'est une case VIDE (la tuile 0) : le A y va.
+        //    Le tir n'est pas vide : le A ne marche pas dessus.
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- A lance le tir, depuis la case du A ----
+    // ax &lt; 19 : en colonne 19, il n'y a plus de place à droite pour le tir.
+    if (bouton(A) &amp;&amp; vole == 0 &amp;&amp; ax &lt; 19) {
+      vole = 1;
+      tx = ax + 1;           // juste à droite du A…
+      ty = ay;               // NOUVEAU : …sur la ligne où est le A MAINTENANT.
+      texte(tx, ty, ".");    // ty est recopiée UNE fois, au départ du tir.
+    }
+
+    // ---- le tir avance sur SA ligne, ty ----
+    // Si le A monte ou descend pendant le vol, ay change, mais pas ty :
+    // le tir continue tout droit, là où il a été lancé.
+    if (chaque(100)) {
+      if (vole == 1) {
+        effacer(tx, ty, 1);
+        tx = tx + 1;
+        if (tx &lt; 20) {
+          texte(tx, ty, ".");
+        } else {
+          vole = 0;
+        }
+      }
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABg0lEQVR4nO3XsQkDMRAAQYUuwaH7r8YluAyHH3yiSIHAyCwDU8AdywU3Pt83YeP4BPyUwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECx20Gfjxft+MLsLYTeO6q8Z8TOG4z8Oz4Diy44DiB4wSO8wfHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHXUf98qO/YU8NAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABh0lEQVR4nO3XsQ2EMBAAQUJKIKT/aijhyyD84BMiAouX0WqkKcCn9QW3fM6DsGX6C/grgeMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhsMvG77z/QBuDcS+NpV45cTOG4w8NX0Gbhhg+MEjntvYF/nEe7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7guC8ZOvA7SIv10AAAAABJRU5ErkJggg==" alt="l’écran après A">
+    <figcaption><strong>A</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABg0lEQVR4nO3XsQmAQBAAQUNLMLT/aizBMgwNTCzg5WUZmALuWC645bwOwpbpE/ApgeMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhsceN32x/TFeIwM/O6q8U8IHDc48Nv03XDBfQLH9QP/Z5Ip/MFxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxN9Y28DuV7nIPAAAAAElFTkSuQmCC" alt="l’écran après DROITE">
+    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABhklEQVR4nO3XsQ2DQBQFQUJKcEj/1VCCy3BIQEJEcBI6sxppCrin1Q9u+f52wpbpL+BRAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHDcYeP1sp+kDuDcS+NpV4z8ncNxg4KvpG7jhguMEjhN4ZPWL+AfHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHHXPJ8DuFF67oAAAAAElFTkSuQmCC" alt="l’écran après GAUCHE">
+    <figcaption><strong>GAUCHE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABiElEQVR4nO3YsQ2EMBAAQUJKIPz+q/kSvgxCAhIiAkuP0WqkKcCnlYO75bd/CVumv4C/EjhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LjBwOv2OU0fgHsjga9dNX45geMGA19Nn4EbfnCcwHECx9mD4wSOEzhO4DiB4wSOEzhO4Kc9fDkQOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOO4A8GTwO2KsnPUAAAAASUVORK5CYII=" alt="l’écran après HAUT">
+    <figcaption><strong>HAUT</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABiElEQVR4nO3XsQ2DQBAAQUJKIHT/1bgEyiB04IQIWS+hx6uRpoC/X11wy368CVumv4BbCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncNxg4HV7fU0fgGsjgc9dNX44geMGA59Nn4ELNjhO4DiB/9WPP+8OjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjvsAzljwO5Odq1cAAAAASUVORK5CYII=" alt="l’écran après BAS">
+    <figcaption><strong>BAS</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Le A bouge avec la croix. Le bouton A lance un « . » à sa droite ; si le A monte ou descend ensuite, le tir continue sur la ligne où il est parti.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>BAS : le A descend en (2, 11) </li>
+
+  <li>A : le tir part à sa droite, ty = 11 </li>
+
+  <li>le A remonte en ligne 9 : le tir reste sur la ligne 11 <span class="detail"> (ay = 9, ty = 11)</span></li>
+
+  <li>le tir finit par disparaître au bord </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>0.99.1. Une lettre qui tire — le A bouge, chaque tir garde sa ligne</strong> — chapitre 0 : Avant tout.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

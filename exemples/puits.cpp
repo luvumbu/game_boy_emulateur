@@ -17,6 +17,11 @@
 //      chaque image demande bien plus de temps qu'une image n'en contient : la
 //      descente devenait trois fois trop lente, sans que rien ne le signale.
 
+#include <poser>    // pose une tuile sur une case du fond
+#include <texte>    // écrit un texte à l’écran
+#include <ecran>    // éteint ou rallume l’écran
+#include <bouton>   // lit un bouton de la manette
+
 const uint8_t LARGEUR = 10;
 const uint8_t HAUTEUR = 16;
 const uint8_t COLONNE = 5; // où le puits commence à l'écran

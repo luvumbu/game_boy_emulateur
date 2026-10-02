@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 0.33.3 — La fonction carre() — tourner en carré</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie C — Déplacer une lettre</span>
+    <span>leçon 0.33.3 sur 143</span>
+    <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
+    
+    
+    
+  </p>
+<h1>0.33.3. La fonction carre() — tourner en carré</h1>
+<p class="idee">#include &lt;carre&gt; : carre(x, y, tuile, taille, sens, vitesse, tours) fait tourner la tuile en carré autour de (x, y).</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>Ce qu’elle fait :</strong> <code>carre(x, y, tuile, taille, sens, vitesse, tours)</code> fait faire à la tuile des <strong>tours en carré</strong> autour de la case (x, y). Taille 1 : un carré de 3 × 3 ; taille 2 : 5 × 5. Elle part du centre et y revient.</p>
+<p><strong>La ligne à écrire : <code>#include &lt;carre&gt;</code>.</strong></p>
+<p><strong>Ses arguments :</strong> le centre, la tuile, la taille, le sens (1 : aiguilles d’une montre, -1 : l’autre), la vitesse en ms par pas (en clair), le nombre de tours.</p>
+<p><strong>Ce qu’elle coûte :</strong> environ <strong>500 octets</strong>, plus la police entière.</p>
+<p><strong>Essaie :</strong> <code>carre(10, 8, ALPHABET[0], 3, -1, 100, 2);</code>.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">On retrouve carre dans 63 leçons</p>
+  <p style="margin: 0;"><a href="lecon-00-34-un-carre-autour-d-une-lettre-avec-carre.html">0.34</a>, <a href="lecon-00-34.1-un-carre-autour-d-une-lettre-avec-carre-.html">0.34.1</a>, <a href="lecon-00-34.2-un-carre-autour-d-une-lettre-avec-carre-.html">0.34.2</a>, <a href="lecon-00-35-taille-2-un-carre-de-5-5.html">0.35</a>, <a href="lecon-00-35.1-taille-2-un-carre-de-5-5-de-base-ailleur.html">0.35.1</a>, <a href="lecon-00-35.2-taille-2-un-carre-de-5-5-double-deux-pos.html">0.35.2</a>, <a href="lecon-00-36-taille-3-un-carre-de-7-7.html">0.36</a>, <a href="lecon-00-36.1-taille-3-un-carre-de-7-7-de-base-ailleur.html">0.36.1</a>, <a href="lecon-00-36.2-taille-3-un-carre-de-7-7-double-deux-pos.html">0.36.2</a>, <a href="lecon-00-37-taille-4-un-carre-de-9-9.html">0.37</a>, <a href="lecon-00-37.1-taille-4-un-carre-de-9-9-de-base-ailleur.html">0.37.1</a>, <a href="lecon-00-37.2-taille-4-un-carre-de-9-9-double-deux-pos.html">0.37.2</a>, <a href="lecon-00-38-taille-5-un-carre-de-11-11.html">0.38</a>, <a href="lecon-00-38.1-taille-5-un-carre-de-11-11-de-base-aille.html">0.38.1</a>, <a href="lecon-00-38.2-taille-5-un-carre-de-11-11-double-deux-p.html">0.38.2</a>, <a href="lecon-00-39-taille-6-un-carre-de-13-13.html">0.39</a>, <a href="lecon-00-39.1-taille-6-un-carre-de-13-13-de-base-aille.html">0.39.1</a>, <a href="lecon-00-39.2-taille-6-un-carre-de-13-13-double-deux-p.html">0.39.2</a>, <a href="lecon-00-40-taille-7-un-carre-de-15-15.html">0.40</a>, <a href="lecon-00-40.1-taille-7-un-carre-de-15-15-de-base-aille.html">0.40.1</a>, <a href="lecon-00-40.2-taille-7-un-carre-de-15-15-double-deux-p.html">0.40.2</a>, <a href="lecon-00-41-taille-8-un-carre-de-17-17.html">0.41</a>, <a href="lecon-00-41.1-taille-8-un-carre-de-17-17-de-base-aille.html">0.41.1</a>, <a href="lecon-00-41.2-taille-8-un-carre-de-17-17-double-deux-p.html">0.41.2</a>, <a href="lecon-00-42-dans-l-autre-sens-sens-1.html">0.42</a>, <a href="lecon-00-42.1-dans-l-autre-sens-sens-1-de-base-ailleur.html">0.42.1</a>, <a href="lecon-00-42.2-dans-l-autre-sens-sens-1-double-deux-pos.html">0.42.2</a>, <a href="lecon-00-43-plus-lentement-vitesse-500.html">0.43</a>, <a href="lecon-00-43.1-plus-lentement-vitesse-500-de-base-aille.html">0.43.1</a>, <a href="lecon-00-43.2-plus-lentement-vitesse-500-double-deux-p.html">0.43.2</a>, <a href="lecon-00-44-plus-vite-vitesse-100.html">0.44</a>, <a href="lecon-00-44.1-plus-vite-vitesse-100-de-base-ailleurs.html">0.44.1</a>, <a href="lecon-00-44.2-plus-vite-vitesse-100-double-deux-positi.html">0.44.2</a>, <a href="lecon-00-45-tres-vite-vitesse-50.html">0.45</a>, <a href="lecon-00-45.1-tres-vite-vitesse-50-de-base-ailleurs.html">0.45.1</a>, <a href="lecon-00-45.2-tres-vite-vitesse-50-double-deux-positio.html">0.45.2</a>, <a href="lecon-00-46-deux-tours.html">0.46</a>, <a href="lecon-00-46.1-deux-tours-de-base-ailleurs.html">0.46.1</a>, <a href="lecon-00-46.2-deux-tours-double-deux-positions.html">0.46.2</a>, <a href="lecon-00-47-trois-tours.html">0.47</a>, <a href="lecon-00-47.1-trois-tours-de-base-ailleurs.html">0.47.1</a>, <a href="lecon-00-47.2-trois-tours-double-deux-positions.html">0.47.2</a>, <a href="lecon-00-48-les-reglages-sous-un-nom-carre.html">0.48</a>, <a href="lecon-00-48.1-les-reglages-sous-un-nom-carre-de-base-a.html">0.48.1</a>, <a href="lecon-00-48.2-les-reglages-sous-un-nom-carre-double-de.html">0.48.2</a>, <a href="lecon-00-49-de-plus-en-plus-grand-1-puis-2.html">0.49</a>, <a href="lecon-00-49.1-de-plus-en-plus-grand-1-puis-2-de-base-a.html">0.49.1</a>, <a href="lecon-00-49.2-de-plus-en-plus-grand-1-puis-2-double-de.html">0.49.2</a>, <a href="lecon-00-50-de-plus-en-plus-grand-et-3.html">0.50</a>, <a href="lecon-00-50.1-de-plus-en-plus-grand-et-3-de-base-aille.html">0.50.1</a>, <a href="lecon-00-50.2-de-plus-en-plus-grand-et-3-double-deux-p.html">0.50.2</a>, <a href="lecon-00-51-jusqu-au-plus-grand-une-boucle.html">0.51</a>, <a href="lecon-00-51.1-jusqu-au-plus-grand-une-boucle-de-base-a.html">0.51.1</a>, <a href="lecon-00-51.2-jusqu-au-plus-grand-une-boucle-double-de.html">0.51.2</a>, <a href="lecon-00-52-deux-carres-a-la-suite.html">0.52</a>, <a href="lecon-00-52.1-deux-carres-a-la-suite-de-base-ailleurs.html">0.52.1</a>, <a href="lecon-00-52.2-deux-carres-a-la-suite-double-deux-posit.html">0.52.2</a>, <a href="lecon-00-53-deux-lettres-deux-carres.html">0.53</a>, <a href="lecon-00-53.1-deux-lettres-deux-carres-de-base-ailleur.html">0.53.1</a>, <a href="lecon-00-53.2-deux-lettres-deux-carres-double-deux-pos.html">0.53.2</a>, <a href="lecon-00-54-trois-lettres-trois-carres.html">0.54</a>, <a href="lecon-00-54.1-trois-lettres-trois-carres-de-base-aille.html">0.54.1</a>, <a href="lecon-00-54.2-trois-lettres-trois-carres-double-deux-p.html">0.54.2</a></p>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1349 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  carre()         440 o  ← main()  — une fonction fournie par le langage
+  main()           38 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EffacerCases  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← poser(), effacer()  — trouve l’adresse d’une case de l’écran
+  EffacerCases     12 o  ← effacer()  — efface des cases
+  CopierTuiles     18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          704 o  ← CopierTuiles  — la police entière
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser()   × 4    52 o sur place, dans carre()  + AdresseCase (10 o)
+  effacer() × 3    45 o sur place, dans carre()  + AdresseCase (10 o), EffacerCases (12 o)
+  image()   × 4    12 o sur place, dans carre(), main()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  carre()   × 1    31 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// ---- #include &lt;carre&gt; : tourner en carré ----
+
+#include &lt;carre&gt;      // carre() : des tours en carré
+#include &lt;ALPHABET&gt;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  carre(10, 8, ALPHABET[0], 1, 1, 250, 1);   // centre (10, 8), taille 1, un tour
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgUlEQVR4nO3RoQ1CQRRE0ZWUgKT/aiiBMpBffLMCS15y9iZHjJzkrs/3Hdgaf5C/KjCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwDg88OP5uo0/mSIH3rse27jAODzwbvzPCDzwz32UAuMKjJMDp8C+AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCsw7gKFfPKje1PJIgAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgklEQVR4nO3UsQnDQBBFwQtVgkP3X41KcBkOFQh8di5x+DEwBXx47I7XeydsLF/ArQSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4B/b43lavuQqAk/fXTONBZ4Ejvv859KXFnhywXECxwnM/xE4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjjsApPTyow4LrsoAAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>au bout d’une seconde — image 60</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgUlEQVR4nO3UsQmAUBAFQUNLMLT/aizBMgwNBDEwFWH/wAQXHiy8aT82wqbfP+BTAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHDdo4HlZL79/8rURAz+75hsLLHDOvc8jrPSggV/vJIEFzhGYDoHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7guBPF3fKjNuRuCAAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout de trois secondes — image 180</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Un A qui fait un tour en carré autour du milieu, puis s’y arrête.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>les quatre coins, dans le sens des aiguilles <span class="detail"> (9,7 11,7 11,9 9,9)</span></li>
+
+  <li>le A revient au centre </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>0.34. Un carré autour d’une lettre, avec carre</strong> — chapitre 0 : Avant tout.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

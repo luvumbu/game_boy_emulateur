@@ -79,9 +79,11 @@
 
 
   <p class="reperes">
-    <span class="niveau">Niveau 0 — Avant tout</span>
-    <span>leçon 0.33.2 sur 82</span>
-    <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie C — Déplacer une lettre</span>
+    <span>leçon 0.33.2 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
@@ -93,47 +95,92 @@
 <p><strong>C’est le 0.33 et le 0.33.1 réunis</strong> : quatre appels à la même fonction.</p>
 <p><strong>Écrite une fois, servie autant qu’on veut :</strong> la fonction ne sait rien du A ni du B ; elle bouge ce qu’on lui donne, et rend la colonne. <code>x =</code> et <code>xb =</code> rangent chaque résultat dans la bonne variable.</p>
 
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;effacer&gt;</code> → <a href="lecon-00-16.3-la-fonction-effacer-effacer-des-cases.html">0.16.3. La fonction effacer() — effacer des cases</a></li>
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+</ul>
+</div>
+
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1649 octets</strong> de cartouche.</p>
+<strong>1122 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage         55 o  ← la console, à l’allumage  — la mise en route de la console
+  mon_deplace_x()  156 o  ← main()  — ta fonction
+  main()            89 o  ← démarrage  — ta fonction
+  VBlank             8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage     28 o  ← image()  — attend l’image suivante
+  AttendreVBlank    16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces     12 o  ← EffacerCases  — attend de pouvoir écrire une case
+  AdresseCase       10 o  ← poser(), effacer()  — trouve l’adresse d’une case de l’écran
+  EffacerCases      12 o  ← effacer()  — efface des cases
+  CopierTuiles      18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte      14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles           704 o  ← CopierTuiles  — la police entière
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser()         × 2    26 o sur place, dans mon_deplace_x()  + AdresseCase (10 o)
+  effacer()       × 1    15 o sur place, dans mon_deplace_x()  + AdresseCase (10 o), EffacerCases (12 o)
+  image()         × 2     6 o sur place, dans mon_deplace_x(), main()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  mon_deplace_x() × 4    74 o sur place, dans main()</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. une variable — x</p>
-    <pre><code>uint8_t x = 0;        // le A</code></pre>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>#include &lt;poser&gt;      // pose une tuile sur une case du fond
+#include &lt;effacer&gt;    // efface des cases, ou tout le fond
+#include &lt;ALPHABET&gt;   // les lettres de la police : ALPHABET[0] est le A</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. une variable — xb</p>
-    <pre><code>uint8_t xb = 0;       // le B
-
-// Notre fonction, la même qu'au 0.33.</code></pre>
+    <p class="quoi">2. une variable — x</p>
+    <pre><code>uint8_t x = 0;        // le A : sa colonne</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">3. une fonction — mon_deplace_x()</p>
+    <p class="quoi">3. une variable — xb</p>
+    <pre><code>uint8_t xb = 0;       // le B : sa colonne
+
+// Notre fonction, la même qu'au 0.33 : elle fait avancer (ou reculer) une tuile
+// de « pas » cases sur une ligne, un quart de seconde par case, puis REND la
+// colonne d'arrivée.
+//   uint8_t (devant le nom) = ce qu'elle REND : un octet, la colonne d'arrivée.
+//   (colonne, ligne, tuile, pas) = ce qu'elle reçoit : des COPIES des valeurs.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une fonction — mon_deplace_x()</p>
     <pre><code>uint8_t mon_deplace_x(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t pas) {
-  uint8_t recule = pas &gt; 127;
-  if (recule) pas = 0 - pas;
-  poser(colonne, ligne, tuile);
-  while (pas &gt; 0) {
-    for (uint8_t i = 0; i &lt; 15; i++) image();
-    if (recule &amp;&amp; colonne == 0) break;
-    if (!recule &amp;&amp; colonne == 19) break;
-    effacer(colonne, ligne, 1);
-    if (recule) colonne--;
-    else colonne++;
-    poser(colonne, ligne, tuile);
-    pas--;
+  uint8_t recule = pas &gt; 127;          // -5 est rangé 251 : au-delà de 127, on recule
+  if (recule) pas = 0 - pas;           // 251 redevient 5 : le nombre de cases
+  poser(colonne, ligne, tuile);        // la lettre à sa place de départ
+  while (pas &gt; 0) {                    // tant qu'il reste des pas
+    for (uint8_t i = 0; i &lt; 15; i++) image();   // un quart de seconde (15 images)
+    if (recule &amp;&amp; colonne == 0) break;          // bord gauche : on sort de la boucle
+    if (!recule &amp;&amp; colonne == 19) break;        // bord droit  : on sort de la boucle
+    effacer(colonne, ligne, 1);        // 1. efface l'ancienne place (1 case)
+    if (recule) colonne--;             // 2. une colonne plus à gauche…
+    else colonne++;                    //    …ou plus à droite
+    poser(colonne, ligne, tuile);      // 3. la lettre à sa nouvelle place
+    pas--;                             // un pas de moins à faire
   }
-  return colonne;
+  return colonne;                      // REND la colonne d'arrivée, et termine
 }</code></pre>
   </div>
   <div></div>
@@ -141,15 +188,17 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  x = mon_deplace_x(x, 0, ALPHABET[0], 5);
-  x = mon_deplace_x(x, 0, ALPHABET[0], -5);      // le A (le 0.33)
-  xb = mon_deplace_x(xb, 8, ALPHABET[1], 5);
-  xb = mon_deplace_x(xb, 8, ALPHABET[1], -5);    // le B (le 0.33.1)
+    <p class="quoi">5. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                           // Le programme commence ici.
+  // Le A sur la ligne 0 (le 0.33), avec sa variable x :
+  x = mon_deplace_x(x, 0, ALPHABET[0], 5);       // aller : x vaut 5
+  x = mon_deplace_x(x, 0, ALPHABET[0], -5);      // le A (le 0.33) : retour, x vaut 0
+  // Puis le B sur la ligne 8 (le 0.33.1), avec SA variable xb :
+  xb = mon_deplace_x(xb, 8, ALPHABET[1], 5);     // aller : xb vaut 5
+  xb = mon_deplace_x(xb, 8, ALPHABET[1], -5);    // le B (le 0.33.1) : retour, xb vaut 0
 
-  while (true) {
-    image();
+  while (true) {                       // La boucle de jeu, pour toujours :
+    image();                           //   attendre l'image suivante.
   }
 }</code></pre>
   </div>
@@ -212,7 +261,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 
 <p class="pied">
-  Ensuite : <strong>0.34. Un carré autour d’une lettre, avec carre</strong> — niveau 0 sur 10.
+  Ensuite : <strong>0.33.3. La fonction carre() — tourner en carré</strong> — chapitre 0 : Avant tout.
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 

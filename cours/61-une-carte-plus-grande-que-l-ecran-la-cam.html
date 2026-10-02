@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<title>Cours 61 — Une carte plus grande que l’écran : la caméra</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+
+  a { color: var(--vert); }
+  .navigation { display: flex; justify-content: space-between; gap: 12pt; margin-top: 18pt; font-size: 9.5pt; }
+  .sommaire-cours { list-style: none; padding: 0; margin: 0; }
+  .sommaire-cours li { padding: 2pt 0; }
+  .sommaire-cours li.chapitre {
+    color: var(--vert); font-weight: 700; text-transform: uppercase;
+    font-size: 9pt; letter-spacing: .05em; padding-top: 12pt;
+  }
+  .sommaire-cours .numero {
+    display: inline-grid; place-items: center; width: 16pt; height: 16pt; border-radius: 50%;
+    background: var(--vert-clair); color: var(--vert); font-size: 8pt; font-weight: 700; margin-right: 4pt;
+  }
+</style>
+</head>
+<body>
+
+<p class="reperes">
+  <span class="niveau">Chapitre 14 — Le défilement : un monde plus grand que l’écran</span>
+  <span>leçon 2 sur 2 dans ce chapitre</span>
+  <span>61 sur 61 dans le cours</span>
+</p>
+<h1>61. Une carte plus grande que l’écran : la caméra</h1>
+<p class="idee">Le héros a une place dans le monde ; la caméra le suit ; l’écran montre le monde moins la caméra.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>Dans un vrai jeu, le héros <strong>marche</strong> dans un monde plus large que l’écran, et le décor glisse pour le garder en vue. Il y a donc <strong>deux</strong> positions : celle du héros <strong>dans le monde</strong> (<code>wx</code>, de 0 à 248 sur une carte de 256 pixels), et celle de la <strong>caméra</strong>, <code>cam</code> : le bord gauche de ce qu’on voit.</p>
+<p><strong>Ce qui est nouveau ici : l’écran = le monde - la caméra.</strong> Le décor, on le fait glisser de <code>cam</code> : <code>defiler(cam, 0)</code>. Le héros, on le pose à <code>wx - cam</code> sur l’écran. Exemple : héros en <code>wx = 150</code>, caméra en <code>cam = 74</code> : il est dessiné au pixel 150 - 74 = 76, le milieu de l’écran.</p>
+<p>La caméra <strong>suit</strong> le héros : elle veut le garder au milieu, donc <code>cam = wx - 76</code>. Mais elle ne doit pas sortir de la carte. À gauche, si <code>wx &lt; 76</code>, <code>wx - 76</code> passerait sous zéro (pour <code>wx = 30</code>, 30 - 76 donnerait 210 : la règle de l’octet, chapitre 1) : on la bloque à 0. À droite, l’écran fait 160 pixels et la carte 256 : la caméra ne va pas plus loin que 256 - 160 = <strong>96</strong>.</p>
+<p>Déroulons. <code>wx = 30</code> : trop à gauche, <code>cam = 0</code>, le héros est à 30 sur l’écran — il marche, le décor ne bouge pas. <code>wx = 150</code> : <code>cam = 74</code>, héros au milieu, le décor défile. <code>wx = 240</code> : <code>wx - 76 = 164</code>, plus que 96, donc <code>cam = 96</code>, et le héros est à 240 - 96 = 144 : il marche de nouveau seul vers le bord.</p>
+<p>C’est la caméra de presque tous les jeux de plateforme. Les chiffres du sol disent où l’on est dans le monde.</p>
+<p><strong>À toi :</strong> au lieu de garder le héros pile au milieu, laisse-le libre entre les pixels 60 et 92 de l’écran (une « zone morte ») : la caméra ne bouge que s’il en sort.</p>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>707 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            64 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              217 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase          10 o  ← poser(), nombre()  — trouve l’adresse d’une case de l’écran
+  EcrireNombre         33 o  ← nombre()  — écrit un nombre en chiffres
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         40 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette          37 o  ← bouton()  — lit les huit boutons
+  Tuiles              192 o  ← CopierTuiles  — 10 lettres sur 43, et 2 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+Lettres gravées : 0123456789
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireTexte, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, Notes
+Fonctions du langage appelées :
+  sprite()  × 1    27 o sur place, dans main()
+  poser()   × 2    26 o sur place, dans main()  + AdresseCase (10 o)
+  nombre()  × 1    25 o sur place, dans main()  + AdresseCase (10 o), EcrireNombre (33 o)
+  ecran()   × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  bouton()  × 2    10 o sur place, dans main()  + LireManette (37 o)
+  defiler() × 1     7 o sur place, dans main()
+  image()   × 1     6 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : un héros marche dans un monde plus large que l'écran ;
+// une « caméra » le suit, sans jamais sortir de la carte.
+//
+// Ce qui est nouveau : deux positions.
+//   wx  = la place du héros DANS LE MONDE (0 à 248).
+//   cam = le bord gauche de ce qu'on voit, dans le monde (0 à 96).
+//   Sur l'écran, le héros est à : wx - cam  (le monde moins la caméra).
+//   Exemple : wx = 150, cam = 74 → dessiné au pixel 150 - 74 = 76, le milieu.
+
+#include &lt;Tuile&gt;     // un dessin de 8 × 8 pixels
+#include &lt;ecran&gt;     // éteint ou rallume l’écran
+#include &lt;poser&gt;     // pose une tuile sur une case du fond
+#include &lt;nombre&gt;    // écrit un nombre en chiffres
+#include &lt;bouton&gt;    // lit un bouton de la manette
+#include &lt;defiler&gt;   // fait glisser tout le fond
+#include &lt;sprite&gt;    // place un lutin de 8 × 8 au pixel près</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — HEROS</p>
+    <pre><code>Tuile HEROS = {
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAeUlEQVR4nO3XsQ2AMAxE0ZSMQJkRGYOxGIERMgYlPZGMFQUj+b50rc+viayUdp2vWdY6JZ5dBRAgAVBftB/bI571nilAgBRAnurIAAKkAIo8roAAaYL+DSBA+UDGn814nN9NAQKkABormkUEBCgfyLhzAaA+gAClA93R8clXI4wb5wAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un dessin — SOL</p>
+    <pre><code>Tuile SOL = {
+  "33333333", "12121212", "21212121", "22222222",
+  "22222222", "22222222", "22222222", "22222222",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAW0lEQVR4nO3OMQ2AMABE0Y5IYEQEWtDAWBnIqrTuZSUcKS/54yX3yrJun6rEBUBAT4OuVof28xh6cwMENB8oe3/fAAH9AZQNCAgIKB0QEBBQOiAgIKB0QEDTgToHpZj5e6jqUwAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une constante — MILIEU</p>
+    <pre><code>const uint8_t MILIEU = 76;        // le pixel du milieu de l'écran, pour le héros</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une constante — CAM_MAX</p>
+    <pre><code>const uint8_t CAM_MAX = 96;       // 256 - 160 : la caméra ne va pas plus loin</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">6. une variable — wx</p>
+    <pre><code>uint8_t wx = 8;       // le héros, DANS LE MONDE : 0 à 248</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">7. une variable — cam</p>
+    <pre><code>uint8_t cam = 0;      // le bord gauche de ce qu'on voit, dans le monde : 0 à 96</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">8. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                           // Le jeu commence ici.
+  ecran(0);                            // Dessin écran éteint.
+  for (uint8_t c = 0; c &lt; 32; c++) {   // Toute la carte (32 colonnes) :
+    poser(c, 12, SOL);                 //   deux rangées de sol,
+    poser(c, 13, SOL);
+    if (c % 4 == 0) nombre(c, 10, c / 4, 1);   //   et un chiffre toutes les 4 colonnes.
+  }
+  ecran(1);                            // On rallume.
+
+  while (true) {                       // La boucle du jeu :
+    image();
+
+    if (bouton(DROITE) &amp;&amp; wx &lt; 248) wx++;   // le héros marche dans le monde
+    if (bouton(GAUCHE) &amp;&amp; wx &gt; 0) wx--;
+
+    // La caméra suit le héros, sans sortir de la carte.
+    if (wx &lt; MILIEU) {
+      cam = 0;                      // trop à gauche : la caméra reste au bord
+                                    // (wx - 76 passerait sous 0 et donnerait 200 et quelques)
+    } else if (wx - MILIEU &gt; CAM_MAX) {
+      cam = CAM_MAX;                // trop à droite : elle s'arrête à 96
+    } else {
+      cam = wx - MILIEU;            // sinon : le héros au milieu
+    }
+    // Déroulé : wx = 30 → cam = 0, héros à 30 ; wx = 150 → cam = 74, héros à 76 ;
+    //           wx = 240 → 164 &gt; 96 → cam = 96, héros à 144.
+
+    defiler(cam, 0);                // le décor : décalé de cam
+    sprite(0, wx - cam, 88, HEROS); // le héros : le monde moins la caméra
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACC0lEQVR4nO3awU3DMABA0RwZgSNDMAszcOwYHasjMAJjcARUhERRW3Gwi7+e9GQVDknqT2JHYnt9eyFsu/kVMJTAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHfQW+u384Gnem0Qcfd/3fB19xiraT4w6downzslyA0VP0I/C0DCs2mPCnMzbwuHNMmKA5pxj3eBt3/O3kxl038LpPiKFr/KQ1ePXVcd1vMWkXvfoud8IWemxgqq4EnvP+xziXAn903R92x7rHDze/XP7qbOCThc19vKhLgX8/ogVejjs47vom6+QDa7myybrwI0u48oi+/Bv+v+3cWkvDtj/sHp+fjNVxu/kVGIeOn4EJEzhO4DiB4wSO8x4c5z04PnoPjo/W4DiB4wSOEzhO4Dj/+B4ncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHvQO57xHMbNXfFAAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACDUlEQVR4nO3asU3DQABAUZeMQMkQzMIMlBkjY2UERmAMSkBBCIKgILlz/PWkp1OgsJ372HeWWJ5fnghbVr8ChhI4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4j8A3t3dH4840+uDjrv/z4FucouXkuEPnaMK8bC7A6Cn6Fnhahi02mPCnMzbwuHNMmKA5pxj3eBt3/OXkxt1u4O0+IYau8ZPW4K2vjtv9FpN20Vvf5U7YQo8NTNUFAs95R+R/zg381nV/2B3rHj+s/pX46qzAJ4uf+/gKnRv45yNa4KviDo67zCbr5APX4wKbrD9+ZHUXeET//RvWtfy2jtKw7A+7+8cHY3VcVr8C49DxPTBhAscJHCdwnMBx3oPjvAfHR+/B8dEaHCdwnMBxAscJHOcf3+MEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4V9nyEcx0JRuoAAAAAElFTkSuQmCC" alt="l’écran après DROITE">
+    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACC0lEQVR4nO3awU3DMABA0RwZgSNDMAszcOwYHasjMAJjcARUhERRW3Gwi7+e9GQVDknqT2JHYnt9eyFsu/kVMJTAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHfQW+u384Gnem0Qcfd/3fB19xiraT4w6downzslyA0VP0I/C0DCs2mPCnMzbwuHNMmKA5pxj3eBt3/O3kxl038LpPiKFr/KQ1ePXVcd1vMWkXvfoud8IWemxgqq4EnvP+xziXAn903R92x7rHDze/XP7qbOCThc19vKhLgX8/ogVejjs47vom6+QDa7myybrwI0u48oi+/Bv+v+3cWkvDtj/sHp+fjNVxu/kVGIeOn4EJEzhO4DiB4wSO8x4c5z04PnoPjo/W4DiB4wSOEzhO4Dj/+B4ncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHvQO57xHMbNXfFAAAAABJRU5ErkJggg==" alt="l’écran après GAUCHE">
+    <figcaption><strong>GAUCHE</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Le héros part à gauche et marche seul ; au milieu de l’écran, c’est le décor qui défile ; au bout de la carte, il marche de nouveau seul jusqu’au bord.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles sont ceux que <code>verification/verifier-cours.mjs</code>
+exige de cette leçon. Ils viennent d’être joués, et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>au départ : pas de défilement, le héros à 8 </li>
+
+  <li>au milieu du monde, le héros reste au milieu de l’écran <span class="detail"> (wx 150, cam 74)</span></li>
+
+  <li>et le décor défile de cam </li>
+
+  <li>au bout, la caméra s’arrête à 96 </li>
+
+  <li>et le héros va seul jusqu’au bord : 248 - 96 = 152 <span class="detail"> (152)</span></li>
+</ul>
+
+<p class="navigation">
+  <span>← <a href="60-faire-glisser-le-decor.html">60. Faire glisser le décor</a></span>
+  <span><a href="index.html">sommaire</a></span>
+  <span>C’est la dernière leçon du cours.</span>
+</p>
+
+<p class="pied">gameboy3 — apprendre à programmer, en écrivant pour la Game Boy</p>
+
+</body>
+</html>

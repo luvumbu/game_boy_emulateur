@@ -1,5 +1,8 @@
 /* Un damier : deux tuiles, et le reste de la division par deux. */
 
+#include <Tuile>   // un dessin de 8 × 8 pixels
+#include <poser>   // pose une tuile sur une case du fond
+
 Tuile PLEIN = { "########", "########", "########", "########", "########", "########", "########", "########" };
 Tuile CREUX = { "#-#-#-#-", "-#-#-#-#", "#-#-#-#-", "-#-#-#-#", "#-#-#-#-", "-#-#-#-#", "#-#-#-#-", "-#-#-#-#" };
 

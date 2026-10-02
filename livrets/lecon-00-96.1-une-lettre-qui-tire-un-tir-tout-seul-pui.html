@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 0.96.1 — Une lettre qui tire — un tir, tout seul, puis plusieurs</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie K — Une lettre qui tire</span>
+    <span>leçon 0.96.1 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
+    
+    
+    
+  </p>
+<h1>0.96.1. Une lettre qui tire — un tir, tout seul, puis plusieurs</h1>
+<p class="idee">Le 0.96, mais le A tire tout seul, sans fin : un tir toutes les 600 ms. Trois tirs volent en même temps : leurs colonnes sont rangées dans un tableau, tx[3], et vole[3] dit lesquels sont en vol.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>C’est le 0.96, avec plusieurs tirs.</strong> Le A tire <strong>tout seul</strong>, toutes les 600 ms, sans jamais s’arrêter. Un tir met 1,7 seconde à traverser l’écran : pendant ce temps, d’autres sont partis. On en voit <strong>trois</strong> en même temps sur la ligne.</p>
+<p><strong>Le problème :</strong> au 0.96, une seule variable <code>tx</code> gardait LA colonne du tir. Trois tirs, ce sont trois colonnes. On pourrait écrire <code>tx1</code>, <code>tx2</code>, <code>tx3</code>… et recopier trois fois le même code. Non : on les range dans un <strong>tableau</strong>, comme la queue du serpent (le 0.91.6).</p>
+<p><strong>Ce qui est nouveau ici (1) : deux tableaux.</strong> <code>uint8_t tx[3];</code> réserve <strong>trois</strong> colonnes : <code>tx[0]</code>, <code>tx[1]</code> et <code>tx[2]</code> (on compte depuis 0). <code>uint8_t vole[3];</code> dit, pour chacune, si le tir est en vol (1) ou libre (0). Au départ, tout vaut 0 : aucun tir ne vole.</p>
+<p><strong>Ce qui est nouveau ici (2) : lancer dans une case libre.</strong> Toutes les 600 ms (<code>chaque(600)</code>), une boucle <code>for</code> passe sur les trois tirs et lance le <strong>premier</strong> qui ne vole pas : <code>vole[i] = 1</code>, <code>tx[i] = 3</code>. La variable <code>lance</code> passe à 1 dès qu’un tir est parti : les suivants, même libres, ne partent pas à ce tour-ci. Un seul tir à la fois sort du A.</p>
+<p><strong>Ce qui est nouveau ici (3) : faire avancer chaque tir.</strong> Toutes les 100 ms, une autre boucle passe sur les trois : si <code>vole[i]</code> vaut 1, c’est <strong>le pas du 0.96</strong>, avec <code>tx[i]</code> au lieu de <code>tx</code>. Quand un tir sort de l’écran, <code>vole[i] = 0</code> : sa case du tableau est <strong>libre</strong>, elle servira au prochain tir.</p>
+<p><strong>Déroulons :</strong> au départ, <code>vole</code> = {0, 0, 0}. 600 ms : le tir 0 part (<code>tx[0]</code> = 3). 1,2 s : le tir 0 est déjà en colonne 9 ; le 1 part. 1,8 s : le 0 est sorti, <code>vole[0]</code> revient à 0 ; le 2 part. 2,4 s : la case 0 est libre, c’est elle qui repart. Les trois cases tournent sans fin.</p>
+<p><strong>Essaie :</strong> <code>chaque(300)</code> : plus de tirs voudraient partir, mais les trois cases sont souvent pleines, et il y a des trous dans la rafale. Passe alors à <code>tx[5]</code> et <code>vole[5]</code>, et <code>i &lt; 5</code> dans les deux boucles.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+  <li><code>#include &lt;chaque&gt;</code> → <a href="lecon-00-29.3-la-fonction-chaque-toutes-les-n-millisec.html">0.29.3. La fonction chaque() — toutes les n millisecondes</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;effacer&gt;</code> → <a href="lecon-00-16.3-la-fonction-effacer-effacer-des-cases.html">0.16.3. La fonction effacer() — effacer des cases</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>612 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage           52 o  ← la console, à l’allumage  — la mise en route de la console
+  chaque_minuteur()  124 o  ← main()  — une fonction fournie par le langage
+  main()             252 o  ← démarrage  — ta fonction
+  VBlank               8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage       28 o  ← image()  — attend l’image suivante
+  AttendreVBlank      16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces       12 o  ← EffacerCases, EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase         10 o  ← texte(), effacer()  — trouve l’adresse d’une case de l’écran
+  EffacerCases        12 o  ← effacer()  — efface des cases
+  EcrireTexte         10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles        40 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte        14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              32 o  ← CopierTuiles  — 2 lettres sur 43
+  "."                  1 o  ← texte()  — un texte gravé
+  "."                  1 o  ← texte()  — un texte gravé
+Lettres gravées : A.
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()           × 2    48 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  effacer()         × 1    21 o sur place, dans main()  + AdresseCase (10 o), EffacerCases (12 o)
+  poser()           × 1     6 o sur place, dans main()
+  image()           × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+  images()          × 1     2 o sur place, dans chaque_minuteur()
+Tes fonctions appelées :
+  chaque_minuteur() × 2    21 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// ---- UNE LETTRE QUI TIRE : un tir, tout seul — plusieurs tirs ----
+// Le 0.96, mais le A tire TOUT SEUL, sans fin : un nouveau tir toutes les
+// 600 ms. Plusieurs tirs volent en même temps : leurs colonnes sont rangées
+// dans un TABLEAU (comme la queue du serpent, le 0.91.6).
+
+// ---- NOUVEAU : trois tirs, rangés dans deux tableaux ----
+// uint8_t tx[3] : TROIS cases, tx[0], tx[1] et tx[2] (on compte depuis 0).
+// tx[i] : la colonne du tir numéro i ; vole[i] : 1 s'il est en vol.
+// Au départ, toutes les cases valent 0 : aucun tir ne vole.
+
+#include &lt;poser&gt;      // pose une tuile sur une case du fond
+#include &lt;ALPHABET&gt;   // les lettres de la police : ALPHABET[0] est le A
+#include &lt;chaque&gt;     // répond 1 toutes les n millisecondes
+#include &lt;texte&gt;      // écrit un texte à l’écran
+#include &lt;effacer&gt;    // efface des cases, ou tout le fond</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un tableau — tx</p>
+    <pre><code>uint8_t tx[3];</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un tableau — vole</p>
+    <pre><code>uint8_t vole[3];</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une variable — lance</p>
+    <pre><code>uint8_t lance = 0;           // 1 = un tir vient de partir, à ce tour-ci</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  poser(2, 8, ALPHABET[0]);  // la lettre A, celle qui tire : (2, 8)
+
+  while (true) {
+    image();
+
+    // ---- NOUVEAU : un tir part toutes les 600 ms, dans une case LIBRE ----
+    // La boucle regarde les trois tirs ; le premier qui ne vole pas part.
+    // lance passe à 1 : les suivants, même libres, attendent le prochain tour.
+    if (chaque(600)) {
+      lance = 0;
+      for (uint8_t i = 0; i &lt; 3; i++) {    // i vaut 0, puis 1, puis 2
+        if (lance == 0 &amp;&amp; vole[i] == 0) {
+          vole[i] = 1;                     // le tir n° i est en vol…
+          tx[i] = 3;                       // …il part juste à droite du A…
+          texte(tx[i], 8, ".");            // …et on le dessine
+          lance = 1;
+        }
+      }
+    }
+
+    // ---- CHAQUE tir avance : le pas du 0.96, dans une boucle ----
+    // Le même code, avec tx[i] au lieu de tx, et vole[i] pour savoir
+    // s'il faut s'en occuper.
+    if (chaque(100)) {
+      for (uint8_t i = 0; i &lt; 3; i++) {
+        if (vole[i] == 1) {
+          effacer(tx[i], 8, 1);            // 1. il quitte sa case
+          tx[i] = tx[i] + 1;               // 2. une colonne plus loin
+          if (tx[i] &lt; 20) {                // 3. encore dans l'écran : on le dessine
+            texte(tx[i], 8, ".");
+          } else {                         //    sorti : sa case du tableau est libre,
+            vole[i] = 0;                   //    elle servira au prochain tir
+          }
+        }
+      }
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABg0lEQVR4nO3XsQkDMRAAQYUuwaH7r8YluAyHH3yiSIHAyCwDU8AdywU3Pt83YeP4BPyUwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECx20Gfjxft+MLsLYTeO6q8Z8TOG4z8Oz4Diy44DiB4wSO8wfHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHXUf98qO/YU8NAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABiElEQVR4nO3XsQ2DQBAAQUJKIHT/1bgEyiB04IQIyS+hx6uRpoA/7V9wy368CVumv4BbCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncNxg4HV7fU0fgGsjgc9dNX44geMGA59Nn4ELNjhO4Lj/C+xL/cQdHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHPcBUvrwOw5QxaEAAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>au bout d’une seconde — image 60</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABiUlEQVR4nO3XsQ2DQBQFQUJKIKT/aijBZRA6cEJEcBI+tBppCnhfqwtu+ZwHYcv0BTxK4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wYDr9v+M/0A7o0EvnbV+OUEjhsMfDX9Bm54wXECx/UDv23hn/f4B8cJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAsd9AZ+V7dMxYKb6AAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>au bout de trois secondes — image 180</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABiklEQVR4nO3XoQ3DMBBA0cCOENj9p+kIGSOwoCQowFJk9+tJb4A7/TPwdpwfwrbpE/AogeMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhsM/NrfP9MX4N5I4GtXjRcncNxg4KvpO3DDC44TOO7/Aq92UovP4x8cJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkc9wV4sOtrkNSY/gAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout de sept secondes — image 420</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Le A en (2, 8) tire tout seul, un « . » toutes les 600 ms ; trois tirs volent en même temps sur la ligne 8, et chacun disparaît au bord.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>le A reste en (2, 8) </li>
+
+  <li>plusieurs tirs volent en même temps sur la ligne 8, jamais plus de trois <span class="detail"> (au plus 3)</span></li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>0.97. Une lettre qui tire — A lance le tir</strong> — chapitre 0 : Avant tout.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

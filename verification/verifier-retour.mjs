@@ -117,12 +117,20 @@ for (const nom of ENTIERS) {
  * sont là pour qu'une reconnaissance qui casse le dise — un émetteur qui change
  * une forme fait tomber son exemple, et rien d'autre ne le signalerait.
  */
+/*
+ * Mesurés de nouveau quand l'émetteur a appris à faire court (conditions qui
+ * sautent directement, routine AdresseCase). surplace, console et palettes
+ * sont descendus SANS rien perdre : leurs poser() et leurs tests prennent
+ * moins d'instructions, et ce qui reste non reconnu — lutins, couleurs — pèse
+ * donc plus lourd dans le compte. De même pour un point ou deux ailleurs : le
+ * « ret » doublé en fin de fonction, qui comptait comme reconnu, a disparu.
+ */
 const PLANCHERS = {
   bonjour: 100, minimal: 100, ligne: 100, 'une-tuile': 100,
-  nuances: 90, ecrans: 85, compteur: 80, damier: 78, lutin: 75, surplace: 72,
-  menu: 70, 'sans-dessin': 58, chute: 55, puits: 48, tetris: 46, mario: 44,
-  langage: 40, marche: 38, musique: 36, console: 25, methodes: 22,
-  palettes: 15, couleur: 13,
+  nuances: 90, ecrans: 83, compteur: 94, damier: 82, lutin: 82, surplace: 46,
+  menu: 79, 'sans-dessin': 78, chute: 65, puits: 58, tetris: 57, mario: 60,
+  langage: 52, marche: 42, musique: 40, console: 17, methodes: 21,
+  palettes: 10, couleur: 13,
 }
 
 console.log()

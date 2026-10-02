@@ -30,9 +30,11 @@ import { instruction } from './desassembleur.js'
 import { ORDRE } from './compilateur/police.js'
 import { analyser } from './compilateur/analyseur.js'
 import { compiler } from './compilateur/emetteur.js'
+import { avecLesInclusions } from './compilateur/inclusions-auto.js'
 
 const CARTE_FOND = 0x9800
 const CARTE_PANNEAU = 0x9c00
+const BROUILLON = 0xfffe
 const BROUILLON2 = 0xfffd
 const ROUTINE_TRANSFERT = 0xfff0
 
@@ -133,10 +135,15 @@ export function empreinteDe(octets, depuis, jusqu) {
  * elle est reconnue sans qu'on touche à ce fichier ; le jour où il en change
  * une, l'empreinte suit. Une table écrite à la main aurait menti au premier
  * changement, et en silence.
+ *
+ * Chaque témoin est compilé deux fois : avec TOUT, pour relever chaque
+ * routine, et tel quel, pour relever leurs formes réduites — le VBlank d'un
+ * programme muet n'appelle pas la musique, l'image() d'un programme sans
+ * lutin ne les copie pas.
  */
 const TEMOINS = [
   'int main() { while (true) { image(); } return 0; }\n',
-  'Air A1 = { "DO4 12", "--" };\nint main() { jouer(1, A1, 8, 0); while (true) { image(); } return 0; }\n',
+  '#include <Air>\n#include <jouer>\nAir A1 = { "DO4 12", "--" };\nint main() { jouer(1, A1, 8, 0); while (true) { image(); } return 0; }\n',
 ]
 
 /** Une étiquette de routine : ni « fn_… », ni une étiquette interne « nom_12 ». */
@@ -149,8 +156,8 @@ export function empreintesDesRoutines() {
   if (empreintesConnues) return empreintesConnues
   empreintesConnues = new Map()
 
-  for (const source of TEMOINS) {
-    const rendu = compiler(analyser(source))
+  for (const [source, options] of TEMOINS.flatMap((t) => [[t, { tout: true }], [t, {}]])) {
+    const rendu = compiler(analyser(source), options) // { tout: true } : toutes les routines, même inemployées
     const octets = new Uint8Array(rendu.octets)
     const finDuCode = rendu.etiquettes.get('Tuiles') ?? rendu.octets.length
 
@@ -312,30 +319,132 @@ export function creerLecteur({ octets, base, noms, routines, fonctions, nomsDeTu
     return nom ? nu(nom) : null
   }
 
+  /** Le nom d'un tableau de la mémoire de travail, à son adresse de départ. */
+  const tableauEn = (adresse) => {
+    if (adresse < 0xc000 || adresse >= 0xe000) return null
+    const nom = noms.get(adresse)
+    return nom ? nu(nom) : null
+  }
+
   /**
-   * L'adresse d'une case, calculée par le compilateur.
+   * L'adresse d'une case de tableau dans `hl` : « t[i] ».
    *
-   * Il ne replie JAMAIS ce calcul, même quand les deux nombres sont écrits en
-   * clair : la ligne part dans `hl`, se multiplie par trente-deux à coups de
-   * « add hl, hl », et la colonne s'ajoute ensuite. C'est cette suite-là qu'on
-   * reconnaît, et elle rend la ligne et la colonne, chacune constante ou lue
-   * dans une variable.
+   * Deux formes. Le tableau tient dans une page de 256 octets : l'index
+   * s'ajoute à l'octet du bas, l'octet du haut est écrit en clair.
+   *
+   *   ldh a, [i] : add a, $1e : ld l, a : ld h, $c1
+   *
+   * Sinon, l'index passe en seize bits et la base s'y ajoute :
+   *
+   *   ldh a, [i] : ld l, a : ld h, 0 : ld de, $c11e : add hl, de
+   */
+  const caseDeTableau = (l, i) => {
+    const index = valeurDans(l[i])
+    if (!index) return null
+    let k = i + 1
+    let bas = 0
+    if (l[k]?.opcode === 0xc6) { bas = l[k].n; k++ } // add a, n
+    if (l[k]?.opcode !== 0x6f || l[k + 1]?.opcode !== 0x26) return null // ld l, a : ld h, n
+    let adresse
+    if (l[k + 1].n !== 0) {
+      adresse = (l[k + 1].n << 8) | bas
+      k += 2
+    } else {
+      if (bas || l[k + 2]?.opcode !== 0x11 || l[k + 3]?.opcode !== 0x19) return null // ld de, nn : add hl, de
+      adresse = l[k + 2].nn
+      k += 4
+    }
+    const nom = tableauEn(adresse)
+    return nom ? { cpp: `${nom}[${index.cpp}]`, apres: k } : null
+  }
+
+  /**
+   * Une valeur mise dans `a`, sur une instruction ou plusieurs : un nombre,
+   * une variable, « x + 1 », une case de tableau, ou ce que lit « lire() ».
+   * `combien` dit sur combien d'instructions elle s'étend.
+   */
+  const valeurA = (l, i, avecLire = true) => {
+    const lue = valeurLue(l, i, avecLire)
+    if (!lue || lue.constante !== null) return lue
+    /* « x + 1 », « t[i] - 1 » : un nombre ajouté ou ôté. Pas quand « ld l, a »
+       suit : c'est alors l'index d'un tableau qui se décale. */
+    const k = i + lue.combien
+    if ((l[k]?.opcode === 0xc6 || l[k]?.opcode === 0xd6) && l[k + 1]?.opcode !== 0x6f) {
+      return { cpp: `${lue.cpp} ${l[k].opcode === 0xc6 ? '+' : '-'} ${l[k].n}`, constante: null, combien: lue.combien + 1 }
+    }
+    return lue
+  }
+
+  /** La valeur lue, avant tout calcul : un nombre, une variable, une case. */
+  const valeurLue = (l, i, avecLire) => {
+    const tableau = caseDeTableau(l, i)
+    if (tableau && l[tableau.apres]?.opcode === 0x7e) { // ld a, [hl]
+      return { cpp: tableau.cpp, constante: null, combien: tableau.apres + 1 - i }
+    }
+    if (avecLire) {
+      const ou = adresseDUneCase(l, i)
+      if (ou && l[ou.apres]?.opcode === 0x7e) {
+        return {
+          cpp: `${ou.panneau ? 'lirePanneau' : 'lire'}(${ou.colonne}, ${ou.ligne})`,
+          constante: null,
+          combien: ou.apres + 1 - i,
+        }
+      }
+    }
+    const simple = valeurDans(l[i])
+    return simple ? { ...simple, combien: 1 } : null
+  }
+
+  /**
+   * L'adresse d'une case de l'écran, dans `hl`.
+   *
+   * Deux nombres écrits en clair : l'adresse est connue, « ld hl, $9909 ».
+   * Sinon, la routine AdresseCase la calcule : la colonne dans `e`, la ligne
+   * dans `a`, le haut de la carte dans `d`.
+   *
+   *   ld e, 3 : ldh a, [y] : ld d, $98 : call AdresseCase
+   *   ldh a, [x] : ld e, a : ldh a, [y] : ld d, $98 : call AdresseCase
+   *
+   * Et quand la ligne se calcule (une case de tableau), la colonne attend sur
+   * la pile : « push af … ld l, a : pop af : ld e, a : ld a, l ».
    */
   const adresseDUneCase = (l, i) => {
-    const ligne = valeurDans(l[i])
-    if (!ligne) return null
-    if (l[i + 1]?.opcode !== 0x6f) return null // ld l, a
-    if (!(l[i + 2]?.opcode === 0x26 && l[i + 2].n === 0)) return null // ld h, 0
-    for (let k = 0; k < 5; k++) if (l[i + 3 + k]?.opcode !== 0x29) return null // add hl, hl
-    const carte = l[i + 8]
-    if (carte?.opcode !== 0x11) return null // ld de, nn
-    if (l[i + 9]?.opcode !== 0x19) return null // add hl, de
-    const colonne = valeurDans(l[i + 10])
-    if (!colonne) return null
-    if (l[i + 11]?.opcode !== 0x5f) return null // ld e, a
-    if (!(l[i + 12]?.opcode === 0x16 && l[i + 12].n === 0)) return null // ld d, 0
-    if (l[i + 13]?.opcode !== 0x19) return null // add hl, de
-    return { colonne: colonne.cpp, ligne: ligne.cpp, panneau: carte.nn === CARTE_PANNEAU, apres: i + 14 }
+    if (l[i]?.opcode === 0x21) { // ld hl, nn
+      const ou = caseDe(l[i].nn)
+      return ou ? { colonne: String(ou.colonne), ligne: String(ou.ligne), panneau: ou.ou === 'panneau', apres: i + 1 } : null
+    }
+
+    let colonne
+    let ligne
+    let k
+    if (l[i]?.opcode === 0x1e) { // ld e, n
+      colonne = String(l[i].n)
+      ligne = valeurA(l, i + 1, false)
+      if (!ligne) return null
+      k = i + 1 + ligne.combien
+    } else {
+      const c = valeurA(l, i, false)
+      if (!c) return null
+      colonne = c.cpp
+      k = i + c.combien
+      if (l[k]?.opcode === 0x5f) { // ld e, a
+        ligne = valeurA(l, k + 1, false)
+        if (!ligne) return null
+        k += 1 + ligne.combien
+      } else if (l[k]?.opcode === 0xf5) { // push af
+        ligne = valeurA(l, k + 1, false)
+        if (!ligne) return null
+        k += 1 + ligne.combien
+        const attendu = [0x6f, 0xf1, 0x5f, 0x7d] // ld l, a : pop af : ld e, a : ld a, l
+        if (attendu.some((op, j) => l[k + j]?.opcode !== op)) return null
+        k += 4
+      } else {
+        return null
+      }
+    }
+    if (l[k]?.opcode !== 0x16) return null // ld d, n
+    if (nomDeRoutine(l[k + 1]?.cible) !== 'AdresseCase') return null
+    return { colonne, ligne: ligne.cpp, panneau: l[k].n === CARTE_PANNEAU >> 8, apres: k + 2 }
   }
 
   /** Le nom du dessin qui porte ce numéro, quand on le connaît. */
@@ -345,49 +454,77 @@ export function creerLecteur({ octets, base, noms, routines, fonctions, nomsDeTu
   /* ------------------------------------------------ les conditions */
 
   /*
-   * Une condition laisse toujours 0 ou 1 dans `a`, par la même suite : on
-   * calcule, on saute si c'est vrai, sinon « xor a », et « ld a, 1 » sur la
-   * branche vraie. Ce squelette-là est invariable ; ce qui change, c'est ce
-   * qu'on a calculé avant. On reconnaît donc le squelette, puis le calcul.
+   * Une condition saute : un « if » ou un « while » calcule, puis saute à sa
+   * fin si c'est FAUX. Le saut dit la comparaison — « cp 20 : jp nc » saute
+   * quand ce n'est pas plus petit : la condition était « < 20 ».
    */
-  const SAUTS = { 0x28: '==', 0x20: '!=', 0x38: '<', 0x30: '>=' }
+  const SI_FAUX = { 0xc2: '==', 0xca: '!=', 0xd2: '<', 0xda: '>=' }
 
-  /** « jr cc, vrai ; xor a ; jr suite ; ld a, 1 » — quatre instructions. */
-  const squelette = (l, i) => {
-    if (!l[i] || SAUTS[l[i].opcode] === undefined) return null
-    if (l[i + 1]?.opcode !== 0xaf) return null // xor a
-    if (l[i + 2]?.opcode !== 0x18) return null // jr suite
-    if (!(l[i + 3]?.opcode === 0x3e && l[i + 3].n === 1)) return null // ld a, 1
-    return { operateur: SAUTS[l[i].opcode], apres: i + 4 }
-  }
-
-  /** Ce qui produit un booléen à partir de `i` : son C++, et sa longueur. */
-  const conditionA = (l, i) => {
-    /* bouton(X) : la manette lue, puis un bit testé. */
-    if (nomDeRoutine(l[i]?.cible) === 'LireManette' && l[i + 1]?.opcode === 0xcb) {
+  /** Un test qui saute quand il est faux : son C++, sa longueur, où il saute. */
+  const testA = (l, i) => {
+    /* bouton(X) : la manette lue, un bit testé, et « jp z » s'il n'est pas pressé. */
+    if (nomDeRoutine(l[i]?.cible) === 'LireManette' && l[i + 1]?.opcode === 0xcb && l[i + 2]?.opcode === 0xca) {
       const bit = (l[i + 1].second - 0x47) / 8
-      const forme = squelette(l, i + 2)
-      if (Number.isInteger(bit) && bit >= 0 && bit < 8 && forme && forme.operateur === '!=') {
-        return { cpp: `bouton(${BOUTONS[bit]})`, combien: forme.apres - i }
+      if (Number.isInteger(bit) && bit >= 0 && bit < 8) {
+        return { cpp: `bouton(${BOUTONS[bit]})`, combien: 3, cible: l[i + 2].cible }
       }
     }
 
-    /* Une comparaison : le premier poussé, le second, la soustraction. */
-    const premier = valeurDans(l[i])
-    if (premier && l[i + 1]?.opcode === 0xf5) { // push af
-      const second = valeurDans(l[i + 2])
-      if (second && l[i + 3]?.opcode === 0x47 && l[i + 4]?.opcode === 0xf1 && l[i + 5]?.opcode === 0x90) {
-        const forme = squelette(l, i + 6)
-        if (forme) return { cpp: `${premier.cpp} ${forme.operateur} ${second.cpp}`, combien: forme.apres - i }
+    const premier = valeurA(l, i)
+    if (!premier) return null
+    const k = i + premier.combien
+
+    /* « x < limite » : la droite chargée d'abord, dans `b`, puis la gauche. */
+    if (l[k]?.opcode === 0x47) { // ld b, a
+      const gauche = valeurA(l, k + 1)
+      const j = gauche ? k + 1 + gauche.combien : -1
+      if (gauche && l[j]?.opcode === 0x90 && SI_FAUX[l[j + 1]?.opcode]) {
+        return { cpp: `${gauche.cpp} ${SI_FAUX[l[j + 1].opcode]} ${premier.cpp}`, combien: j + 2 - i, cible: l[j + 1].cible }
       }
     }
 
-    /* Une variable seule : « if (vivant) ». */
-    if (premier && premier.constante === null && l[i + 1]?.opcode === 0xb7) {
-      return { cpp: premier.cpp, combien: 1 }
+    /* « x < 20 » : cp 20, puis le saut. */
+    if (l[k]?.opcode === 0xfe && SI_FAUX[l[k + 1]?.opcode]) {
+      return { cpp: `${premier.cpp} ${SI_FAUX[l[k + 1].opcode]} ${l[k].n}`, combien: premier.combien + 2, cible: l[k + 1].cible }
+    }
+
+    /* « if (vivant) » : or a : jp z — et « x == 0 » : or a : jp nz. */
+    if (l[k]?.opcode === 0xb7 && (l[k + 1]?.opcode === 0xca || l[k + 1]?.opcode === 0xc2)) {
+      const cpp = l[k + 1].opcode === 0xca ? premier.cpp : `${premier.cpp} == 0`
+      return { cpp, combien: premier.combien + 2, cible: l[k + 1].cible }
+    }
+
+    /* Deux valeurs calculées : la première poussée, la seconde, la soustraction. */
+    if (l[k]?.opcode === 0xf5) { // push af
+      const second = valeurA(l, k + 1)
+      const j = second ? k + 1 + second.combien : -1
+      if (second && l[j]?.opcode === 0x47 && l[j + 1]?.opcode === 0xf1 && l[j + 2]?.opcode === 0x90 &&
+          SI_FAUX[l[j + 3]?.opcode]) {
+        return {
+          cpp: `${premier.cpp} ${SI_FAUX[l[j + 3].opcode]} ${second.cpp}`,
+          combien: j + 4 - i,
+          cible: l[j + 3].cible,
+        }
+      }
     }
 
     return null
+  }
+
+  /**
+   * Des tests qui sautent tous au MÊME endroit : c'est un « && ». Le premier
+   * faux sort ; tous vrais, on entre.
+   */
+  const conditionA = (l, i) => {
+    const premier = testA(l, i)
+    if (!premier) return null
+    const parties = [premier.cpp]
+    let combien = premier.combien
+    for (let suite = testA(l, i + combien); suite && suite.cible === premier.cible; suite = testA(l, i + combien)) {
+      parties.push(suite.cpp)
+      combien += suite.combien
+    }
+    return { cpp: parties.join(' && '), combien, cible: premier.cible }
   }
 
   /* ------------------------------------------------ les instructions */
@@ -401,15 +538,16 @@ export function creerLecteur({ octets, base, noms, routines, fonctions, nomsDeTu
 
     /* texte(colonne, ligne, "…") — la case, la table, la longueur, l'appel. */
     (l, i) => {
-      if (l[i]?.opcode !== 0x21) return null // ld hl, nn
-      const ou = caseDe(l[i].nn)
-      if (!ou || l[i + 1]?.opcode !== 0x11 || l[i + 2]?.opcode !== 0x06) return null
-      if (nomDeRoutine(l[i + 3]?.cible) !== 'EcrireTexte') return null
-      const mot = texteGrave(octets, base, l[i + 1].nn, l[i + 2].n)
+      const ou = adresseDUneCase(l, i)
+      if (!ou) return null
+      const k = ou.apres
+      if (l[k]?.opcode !== 0x11 || l[k + 1]?.opcode !== 0x06) return null // ld de, nn : ld b, n
+      if (nomDeRoutine(l[k + 2]?.cible) !== 'EcrireTexte') return null
+      const mot = texteGrave(octets, base, l[k].nn, l[k + 1].n)
       if (mot === null) return null
       return {
-        cpp: `${ou.ou === 'panneau' ? 'textePanneau' : 'texte'}(${ou.colonne}, ${ou.ligne}, "${mot}");`,
-        combien: 4,
+        cpp: `${ou.panneau ? 'textePanneau' : 'texte'}(${ou.colonne}, ${ou.ligne}, "${mot}");`,
+        combien: k + 3 - i,
       }
     },
 
@@ -428,13 +566,12 @@ export function creerLecteur({ octets, base, noms, routines, fonctions, nomsDeTu
 
     /* effacer(colonne, ligne, combien) — la même case, sans table. */
     (l, i) => {
-      if (l[i]?.opcode !== 0x21) return null
-      const ou = caseDe(l[i].nn)
-      if (!ou || l[i + 1]?.opcode !== 0x06) return null
-      if (nomDeRoutine(l[i + 2]?.cible) !== 'EffacerCases') return null
+      const ou = adresseDUneCase(l, i)
+      if (!ou || l[ou.apres]?.opcode !== 0x06) return null // ld b, n
+      if (nomDeRoutine(l[ou.apres + 1]?.cible) !== 'EffacerCases') return null
       return {
-        cpp: `${ou.ou === 'panneau' ? 'effacerPanneau' : 'effacer'}(${ou.colonne}, ${ou.ligne}, ${l[i + 1].n});`,
-        combien: 3,
+        cpp: `${ou.panneau ? 'effacerPanneau' : 'effacer'}(${ou.colonne}, ${ou.ligne}, ${l[ou.apres].n});`,
+        combien: ou.apres + 2 - i,
       }
     },
 
@@ -444,12 +581,26 @@ export function creerLecteur({ octets, base, noms, routines, fonctions, nomsDeTu
       return { cpp: `ecran(${l[i].n & 0x80 ? 1 : 0});`, combien: 2 }
     },
 
-    /* poser(colonne, ligne, tuile) — la tuile mise de côté, l'adresse calculée. */
+    /* poser(colonne, ligne, tuile) — l'adresse, la tuile, « ld [hl], a ». */
     (l, i) => {
-      const tuile = valeurDans(l[i])
+      const ou = adresseDUneCase(l, i)
+      if (!ou) return null
+      const tuile = valeurA(l, ou.apres, false)
+      if (!tuile || l[ou.apres + tuile.combien]?.opcode !== 0x77) return null // ld [hl], a
+      return {
+        cpp: `${ou.panneau ? 'poserPanneau' : 'poser'}(${ou.colonne}, ${ou.ligne}, ${tuileDe(tuile)});`,
+        combien: ou.apres + tuile.combien + 1 - i,
+      }
+    },
+
+    /* poser(…) d'une tuile calculée : elle attend dans le brouillon pendant
+       qu'on calcule l'adresse. */
+    (l, i) => {
+      const tuile = valeurA(l, i)
       if (!tuile) return null
-      if (!(l[i + 1]?.opcode === 0xe0 && (0xff00 | l[i + 1].n) === BROUILLON2)) return null
-      const ou = adresseDUneCase(l, i + 2)
+      const k = i + tuile.combien
+      if (!(l[k]?.opcode === 0xe0 && (0xff00 | l[k].n) === BROUILLON2)) return null
+      const ou = adresseDUneCase(l, k + 1)
       if (!ou) return null
       const reprise = l[ou.apres]
       if (!(reprise?.opcode === 0xf0 && (0xff00 | reprise.n) === BROUILLON2)) return null
@@ -460,19 +611,40 @@ export function creerLecteur({ octets, base, noms, routines, fonctions, nomsDeTu
       }
     },
 
-    /* x = lire(colonne, ligne) — la même adresse, mais on relit la case. */
+    /* t[i] = v — l'adresse de la case, la valeur, « ld [hl], a ». */
     (l, i) => {
-      const ou = adresseDUneCase(l, i)
-      if (!ou || l[ou.apres]?.opcode !== 0x7e) return null // ld a, [hl]
-      const cible = ecritDans(l[ou.apres + 1])
-      if (!cible) return null
-      return {
-        cpp: `${cible} = ${ou.panneau ? 'lirePanneau' : 'lire'}(${ou.colonne}, ${ou.ligne});`,
-        combien: ou.apres + 2 - i,
-      }
+      const place = caseDeTableau(l, i)
+      if (!place) return null
+      const valeur = valeurA(l, place.apres)
+      if (!valeur || l[place.apres + valeur.combien]?.opcode !== 0x77) return null
+      return { cpp: `${place.cpp} = ${valeur.cpp};`, combien: place.apres + valeur.combien + 1 - i }
     },
 
-    /* x++ — la valeur d'AVANT est gardée dans `c`, comme le veut « x++ ». */
+    /* t[i] = t[i] + 1 — la valeur attend dans le brouillon pendant qu'on
+       calcule l'adresse de la case. */
+    (l, i) => {
+      const valeur = valeurA(l, i)
+      if (!valeur) return null
+      const k = i + valeur.combien
+      if (!(l[k]?.opcode === 0xe0 && (0xff00 | l[k].n) === BROUILLON)) return null
+      const place = caseDeTableau(l, k + 1)
+      if (!place) return null
+      const reprise = l[place.apres]
+      if (!(reprise?.opcode === 0xf0 && (0xff00 | reprise.n) === BROUILLON)) return null
+      if (l[place.apres + 1]?.opcode !== 0x77) return null
+      return { cpp: `${place.cpp} = ${valeur.cpp};`, combien: place.apres + 2 - i }
+    },
+
+    /* x++ seul sur sa ligne : lu, avancé, rangé au même endroit. */
+    (l, i) => {
+      const lu = valeurDans(l[i])
+      if (!lu || lu.constante !== null) return null
+      const pas = l[i + 1]?.opcode === 0x3c ? '++' : l[i + 1]?.opcode === 0x3d ? '--' : null
+      if (!pas || ecritDans(l[i + 2]) !== lu.cpp) return null
+      return { cpp: `${lu.cpp}${pas};`, combien: 3 }
+    },
+
+    /* x++ dont on garde la valeur d'AVANT, dans `c`, comme le veut « x++ ». */
     (l, i) => {
       const lu = valeurDans(l[i])
       if (!lu || lu.constante !== null || l[i + 1]?.opcode !== 0x4f) return null // ld c, a
@@ -481,12 +653,12 @@ export function creerLecteur({ octets, base, noms, routines, fonctions, nomsDeTu
       return { cpp: `${lu.cpp}${pas};`, combien: 5 }
     },
 
-    /* x = 3 ; x = y — une valeur, rangée quelque part. */
+    /* x = 3 ; x = y + 1 ; x = t[i] ; x = lire(…) — une valeur, rangée. */
     (l, i) => {
-      const valeur = valeurDans(l[i])
-      const cible = ecritDans(l[i + 1])
-      if (!valeur || !cible) return null
-      return { cpp: `${cible} = ${valeur.cpp};`, combien: 2 }
+      const valeur = valeurA(l, i)
+      const cible = valeur ? ecritDans(l[i + valeur.combien]) : null
+      if (!cible) return null
+      return { cpp: `${cible} = ${valeur.cpp};`, combien: valeur.combien + 1 }
     },
 
     /* Une fonction du programme. */
@@ -532,21 +704,18 @@ function rendreBloc(l, debut, fin, lecteur, marge, compte, profondeur = 0) {
       }
 
       if (retour > i) {
+        /* Le test de la boucle saute juste APRÈS le saut de retour : c'est sa sortie. */
         const cond = lecteur.conditionA(l, i)
-        const apres = cond ? i + cond.combien : i
-        const test = l[apres]
-        const saut = l[apres + 1]
         const sortieVoulue = retour + 1 < l.length ? l[retour + 1].adresse : null
-        const avecTest = Boolean(cond) && test?.opcode === 0xb7 && saut?.opcode === 0xca &&
-          saut.cible === sortieVoulue
+        const avecTest = Boolean(cond) && cond.cible === sortieVoulue
 
         dire(`while (${avecTest ? cond.cpp : 'true'}) {`)
         sortie.push(...rendreBloc(
-          l, avecTest ? apres + 2 : i, retour, lecteur, marge + '  ', compte, profondeur + 1,
+          l, avecTest ? i + cond.combien : i, retour, lecteur, marge + '  ', compte, profondeur + 1,
         ))
         dire('}')
         /* Le saut de retour, et le test s'il y en avait un : lus, tous. */
-        const combien = 1 + (avecTest ? cond.combien + 2 : 0)
+        const combien = 1 + (avecTest ? cond.combien : 0)
         compte.reconnues += combien
         compte.total += combien
         i = retour + 1
@@ -554,16 +723,14 @@ function rendreBloc(l, debut, fin, lecteur, marge, compte, profondeur = 0) {
       }
     }
 
-    /* --- une condition : un booléen, puis un saut par-dessus --- */
+    /* --- une condition : un test qui saute par-dessus quand il est faux --- */
     if (profondeur < 12) {
       const cond = lecteur.conditionA(l, i)
-      const test = cond ? l[i + cond.combien] : null
-      const saut = cond ? l[i + cond.combien + 1] : null
-      if (cond && test?.opcode === 0xb7 && saut?.opcode === 0xca) {
-        const finSi = indexDe(saut.cible)
+      if (cond) {
+        const finSi = indexDe(cond.cible)
         if (finSi > i && finSi <= fin) {
-          compte.reconnues += cond.combien + 2
-          compte.total += cond.combien + 2
+          compte.reconnues += cond.combien
+          compte.total += cond.combien
 
           /* Un « else » se voit à un saut inconditionnel juste avant la fin du
              « si » : la branche vraie enjambe la branche fausse. */
@@ -573,7 +740,7 @@ function rendreBloc(l, debut, fin, lecteur, marge, compte, profondeur = 0) {
 
           dire(`if (${cond.cpp}) {`)
           sortie.push(...rendreBloc(
-            l, i + cond.combien + 2, avecSinon ? finSi - 1 : finSi, lecteur, marge + '  ', compte, profondeur + 1,
+            l, i + cond.combien, avecSinon ? finSi - 1 : finSi, lecteur, marge + '  ', compte, profondeur + 1,
           ))
           if (avecSinon) {
             compte.reconnues++
@@ -726,8 +893,21 @@ export function retourAuCpp({ octets, base, finDuCode, rendu = null, dessins = [
     if (globales.length) declarations.push('')
   }
 
+  /*
+   * Les « #include » : le programme remonté emploie des fonctions de la
+   * console, il doit les inclure pour recompiler. On les écrit en tête, comme
+   * le compilateur les relève. Un programme à trous (des instructions laissées
+   * en commentaire) peut ne pas compiler : il reste alors sans eux.
+   */
+  let texte = [...entete, ...declarations, ...corps].join('\n')
+  try {
+    texte = avecLesInclusions(texte)
+  } catch {
+    /* il ne compile pas : rien à relever */
+  }
+
   return {
-    texte: [...entete, ...declarations, ...corps].join('\n'),
+    texte,
     reconnues: compte.reconnues,
     total: compte.total,
     part,

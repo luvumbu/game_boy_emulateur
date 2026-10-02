@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 1 — Les variables : la mémoire de la console</span>
   <span>leçon 1 sur 4 dans ce chapitre</span>
-  <span>1 sur 42 dans le cours</span>
+  <span>1 sur 61 dans le cours</span>
 </p>
 <h1>1. Une variable, une case qui porte un nom</h1>
 <p class="idee">Le programme se souvient de quelque chose : c’est tout ce qu’est une variable.</p>
@@ -104,31 +104,85 @@
 <p><code>uint8_t</code> est le <strong>type</strong> de la case : un nombre entier, sans signe, sur <strong>8 bits</strong> — un octet. C’est le seul type de la Game Boy : son processeur ne manipule qu’un octet à la fois, et la console n’a que 8 Ko de mémoire de travail pour tout le jeu.</p>
 <p><code>vies = vies + 2;</code> se lit <strong>de droite à gauche</strong> : on calcule d’abord <code>vies + 2</code> avec la valeur actuelle (3), puis on range le résultat (5) dans la case. Le signe <code>=</code> n’est pas une égalité de mathématiques, c’est une <strong>flèche</strong> : « ranger dans ».</p>
 <p><code>nombre(colonne, ligne, valeur)</code> écrit la valeur <strong>au moment de l’appel</strong>. Le premier <code>nombre</code> a écrit 003 ; changer <code>vies</code> ensuite ne le réécrit pas — l’écran ne suit pas la variable tout seul. Dans un jeu, c’est pourquoi on redessine le score après chaque changement.</p>
+<p><strong>Les lignes <code>#include &lt;…&gt;</code>, en haut,</strong> disent ce que le programme emploie de la console : <code>#include &lt;texte&gt;</code> pour <code>texte()</code>, <code>#include &lt;nombre&gt;</code> pour <code>nombre()</code>. Aucune fonction de la console n’est là d’office : chacune prend de la <strong>place dans la cartouche</strong>, et ne s’emploie que si on l’<strong>inclut</strong>, par son nom écrit comme dans le programme. Sans la ligne, le compilateur refuse, et dit laquelle écrire. Une ligne de trop ne coûte rien.</p>
 <p><strong>À toi :</strong> ajoute une variable <code>pieces</code>, donne-lui 10, retire-lui 4, et affiche-la sur la ligne 8.</p>
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1341 octets</strong> de cartouche.</p>
+<strong>720 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage           49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              59 o  ← démarrage  — ta fonction
+  VBlank               8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage       28 o  ← image()  — attend l’image suivante
+  AttendreVBlank      16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces       12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  EcrireTexte         10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre        33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles       103 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte        14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles             368 o  ← CopierTuiles  — 23 lettres sur 43
+  "VIES:"              5 o  ← texte()  — un texte gravé
+  "APRES LE BONUS:"   15 o  ← texte()  — un texte gravé
+Lettres gravées : ABEILNOPRSUV0123456789:
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 2    22 o sur place, dans main()  + EcrireTexte (10 o)
+  nombre() × 2    20 o sur place, dans main()  + EcrireNombre (33 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  uint8_t vies = 3;
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : range un nombre dans une variable, l'affiche,
+// le change, puis l'affiche encore.
+//
+// Tout ce qui suit deux barres « // » est un COMMENTAIRE :
+// la console ne le lit pas, il est là seulement pour toi.
 
-  texte(2, 4, "VIES:");
-  nombre(8, 4, vies);
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
 
-  vies = vies + 2;
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                  // main = « principal » : le jeu commence ICI.
+                              // Tout ce qui est entre cette accolade ouvrante
+                              // et la dernière accolade fermante fait partie de main.
 
-  texte(2, 6, "APRES LE BONUS:");
-  nombre(17, 6, vies);
+  uint8_t vies = 3;           // Crée une case de mémoire nommée « vies » et y range 3.
+                              // uint8_t = le TYPE de la case : un nombre entier de 0 à 255.
+                              // Le point-virgule « ; » termine chaque instruction,
+                              // comme le point termine une phrase.
 
-  while (true) {
-    image();
-  }
-}</code></pre>
+  texte(2, 4, "VIES:");       // Écrit le mot VIES: à l'écran.
+                              // 2 = la colonne (de 0 à 19, de gauche à droite)
+                              // 4 = la ligne   (de 0 à 17, de haut en bas)
+                              // Le texte à écrire se met entre guillemets.
+  nombre(8, 4, vies);         // Écrit la VALEUR de vies (3) en colonne 8, ligne 4.
+                              // nombre() écrit toujours 3 chiffres : on voit 003.
+
+  vies = vies + 2;            // Se lit de DROITE à GAUCHE :
+                              //   1) on calcule vies + 2, soit 3 + 2 = 5
+                              //   2) on range 5 dans la case vies.
+                              // Le signe « = » veut dire « ranger dans »,
+                              // ce n'est pas le « égal » des mathématiques.
+
+  texte(2, 6, "APRES LE BONUS:");  // Un deuxième texte, deux lignes plus bas (ligne 6).
+  nombre(17, 6, vies);        // vies vaut maintenant 5 : on voit 005.
+                              // Le 003 de la ligne 4 NE change PAS : l'écran garde
+                              // ce qu'on y a écrit, il ne suit pas la variable tout seul.
+
+  while (true) {              // while (true) = « tant que vrai » : répète pour TOUJOURS
+                              // ce qui est entre les accolades.
+    image();                  // Attend la prochaine image de l'écran (60 par seconde).
+  }                           // Sans cette boucle, main finirait et le jeu s'arrêterait.
+}                             // Fin de main.</code></pre>
   </div>
   <div></div>
 </div>

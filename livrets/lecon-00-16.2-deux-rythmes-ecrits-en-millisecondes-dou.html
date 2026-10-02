@@ -79,9 +79,11 @@
 
 
   <p class="reperes">
-    <span class="niveau">Niveau 0 — Avant tout</span>
-    <span>leçon 0.16.2 sur 82</span>
-    <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie B — Le temps</span>
+    <span>leçon 0.16.2 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
@@ -93,9 +95,32 @@
 <p><strong>C’est le 0.16 et le 0.16.1 réunis</strong> : les deux <code>poser</code> du 0.16, et les deux du 0.16.1.</p>
 <p><strong>Quatre <code>poser</code>, deux variables :</strong> la lente est la même en colonne 0 et en colonne 10, la rapide aussi.</p>
 
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+</ul>
+</div>
+
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1513 octets</strong> de cartouche.</p>
+<strong>964 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        61 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          115 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  CopierTuiles     18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          704 o  ← CopierTuiles  — la police entière
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser() × 4    48 o sur place, dans main()
+  image() × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
@@ -105,7 +130,10 @@
 // LES DURÉES, EN MILLISECONDES (1000 ms = 1 seconde).
 // ms() les traduit en images (60 images = 1000 ms) :
 // ms(1000) = 60 images, ms(250) = 15 images.
-// ─────────────────────────────────────────────────────────────</code></pre>
+// ─────────────────────────────────────────────────────────────
+
+#include &lt;ALPHABET&gt;   // les lettres de la police : ALPHABET[0] est le A
+#include &lt;poser&gt;      // pose une tuile sur une case du fond</code></pre>
   </div>
   <div></div>
 </div>
@@ -246,7 +274,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 
 <p class="pied">
-  Ensuite : <strong>0.17. Une lettre qui avance de 5 cases</strong> — niveau 0 sur 10.
+  Ensuite : <strong>0.16.3. La fonction effacer() — effacer des cases</strong> — chapitre 0 : Avant tout.
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 

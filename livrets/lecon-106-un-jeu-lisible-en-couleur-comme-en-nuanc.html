@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 106 — Un jeu lisible en couleur comme en nuances</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 16 — La couleur : la Game Boy Color</span>
+    <span class="outil">du cours</span>
+    
+    <span>leçon 106 sur 143</span>
+    <span class="jauge" style="--part: 80%">difficulté 8 / 10</span>
+    
+    
+    
+  </p>
+<h1>106. Un jeu lisible en couleur comme en nuances</h1>
+<p class="idee">Dessiner d’abord en quatre nuances, colorier ensuite : un jeu qui se lit toujours.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>On choisit <strong>une</strong> console en haut de l’atelier : <strong>« En couleur »</strong> donne une cartouche <code>.gbc</code>, <strong>« Game Boy »</strong> un <code>.gb</code> en quatre nuances. Mais les couleurs ne changent rien aux <strong>dessins</strong> : une tuile garde ses indices de 0 à 3, et la palette seule dit quelle couleur montre chaque indice.</p>
+<p>D’où la règle d’or : <strong>dessine d’abord en quatre nuances</strong>, avec des contrastes qui se lisent (chapitre 7), <strong>puis</strong> choisis les couleurs. Un rouge et un vert de même clarté se confondent pour qui voit mal les couleurs, sur un écran terne, ou en photo noir et blanc : un jeu qui ne se lit qu’en couleur est un jeu fragile.</p>
+<p>Ici, le héros est dessiné avec un contour en 3, le sol avec une surface en 1 et 2 : il se détache du décor par la <strong>clarté</strong>, pas seulement par la couleur. En couleur, il est rouge sur un sol vert ; en nuances, sombre sur clair.</p>
+<p>Pour vérifier <strong>sans</strong> changer de console : les <strong>réglages</strong> de l’atelier (⚙) ont une case « Voir en quatre nuances », qui montre la cartouche couleur telle qu’une Game Boy d’origine l’afficherait.</p>
+<p>Une vraie <strong>Game Boy Advance</strong> lit aussi les cartouches <code>.gbc</code>, en couleur.</p>
+<p><strong>À toi :</strong> active « Voir en quatre nuances » et vérifie que ton héros se distingue toujours du sol.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;Tuile&gt;</code> → <a href="lecon-00-107.2-tuile-dessiner-une-case.html">0.107.2. Tuile — dessiner une case</a></li>
+  <li><code>#include &lt;couleurFond&gt;</code> → <a href="lecon-00-88.3-la-fonction-couleurfond-une-couleur-du-d.html">0.88.3. La fonction couleurFond() — une couleur du décor</a></li>
+  <li><code>#include &lt;couleurLutin&gt;</code> → <a href="lecon-00-107.4-la-fonction-couleurlutin-une-couleur-des.html">0.107.4. La fonction couleurLutin() — une couleur des personnages</a></li>
+  <li><code>#include &lt;ecran&gt;</code> → <a href="lecon-27-1-la-fonction-ecran-eteindre-et-rallumer-l.html">27.1. La fonction ecran() — éteindre et rallumer l’écran</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;teindre&gt;</code> → <a href="lecon-00-89.1-la-fonction-teindre-une-case-dans-une-pa.html">0.89.1. La fonction teindre() — une case dans une palette</a></li>
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+  <li><code>#include &lt;sprite&gt;</code> → <a href="lecon-00-69.4-la-fonction-sprite-un-lutin-au-pixel-pre.html">0.69.4. La fonction sprite() — un lutin au pixel près</a></li>
+  <li><code>#include &lt;teindreLutin&gt;</code> → <a href="lecon-00-107.5-la-fonction-teindrelutin-un-lutin-dans-u.html">0.107.5. La fonction teindreLutin() — un lutin dans une palette</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>817 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            57 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              283 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase          10 o  ← poser(), teindre()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         85 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette          37 o  ← bouton()  — lit les huit boutons
+  Tuiles              208 o  ← CopierTuiles  — 11 lettres sur 43, et 2 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+  "GAUCHE DROITE"      13 o  ← texte()  — un texte gravé
+Lettres gravées : ACDEGHIORTU
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, Notes
+Fonctions du langage appelées :
+  couleurFond()  × 4    48 o sur place, dans main()
+  couleurLutin() × 3    36 o sur place, dans main()
+  teindre()      × 1    24 o sur place, dans main()  + AdresseCase (10 o)
+  sprite()       × 1    23 o sur place, dans main()
+  ecran()        × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  teindreLutin() × 1    16 o sur place, dans main()
+  poser()        × 1    13 o sur place, dans main()  + AdresseCase (10 o)
+  texte()        × 1    11 o sur place, dans main()  + EcrireTexte (10 o)
+  bouton()       × 2    10 o sur place, dans main()  + LireManette (37 o)
+  image()        × 1     6 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : un héros rouge sur un sol vert, qu'on déplace avec GAUCHE / DROITE.
+// Il reste lisible même sans couleurs : il est SOMBRE (contour en 3) sur un
+// sol CLAIR (1 et 2). La règle d'or : dessiner d'abord en 4 nuances, puis colorer.
+
+#include &lt;Tuile&gt;          // un dessin de 8 × 8 pixels
+#include &lt;couleurFond&gt;    // choisit une couleur d’une palette du fond
+#include &lt;couleurLutin&gt;   // choisit une couleur d’une palette des lutins
+#include &lt;ecran&gt;          // éteint ou rallume l’écran
+#include &lt;texte&gt;          // écrit un texte à l’écran
+#include &lt;poser&gt;          // pose une tuile sur une case du fond
+#include &lt;teindre&gt;        // met une case du fond dans une palette
+#include &lt;bouton&gt;         // lit un bouton de la manette
+#include &lt;sprite&gt;         // place un lutin de 8 × 8 au pixel près
+#include &lt;teindreLutin&gt;   // met un lutin dans une palette</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — HEROS</p>
+    <pre><code>Tuile HEROS = {                   // 0 transparent, 3 = le contour sombre.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAfUlEQVR4nO3VsQ2AMBAEQYeUQEgR1EINhJRBWZRACZRBSI4Dn6xHQn8rbeq/yVyu+2w2jFNIylYBBMgAVB+a1yUkhQgIUD6QMr8f2ytlXnlVrwMC5An6LkCAHEC/+1wBATIAKcS+lC1AgBxAUaf77gAClA8UNR9FBAQoHegBTfQxdrUAfpcAAAAASUVORK5CYII=" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un dessin — SOL</p>
+    <pre><code>Tuile SOL = {                     // Une surface claire (1), puis du 2.
+  "11111111", "12121212", "22222222", "22222222",
+  "22222222", "22222222", "22222222", "22222222",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAUklEQVR4nO3OsQ3AIAADQYbKLMyQkjEYi9HSJzUxoJO+slxc6aMtVYkLgIDmg667vvrzAwR0Hug7ZQMCAgJKBwQEBJQOCAgIKB0QEBBQOqDtQA/PFNCoLNSYUgAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                      // Le jeu commence ici.
+  // La couleur : les palettes de la Game Boy Color
+  // (sur une Game Boy d'origine, on verrait les 4 nuances à la place).
+  couleurFond(0, 0, 20, 28, 31);          // le ciel     (palette 0, indice 0)
+  couleurFond(0, 3,  2,  4, 12);          // le texte    (palette 0, indice 3)
+  couleurFond(1, 1, 16, 30,  8);          // le sol      (palette 1, indice 1 : vert clair)
+  couleurFond(1, 2,  4, 18,  2);          //             (palette 1, indice 2 : vert)
+  couleurLutin(0, 1, 31, 28, 20);         // le héros    (palette 0 des lutins)
+  couleurLutin(0, 2, 31,  4,  2);         //             rouge
+  couleurLutin(0, 3, 10,  0,  0);         //             contour très sombre
+
+  ecran(0);                       // Dessin écran éteint.
+  texte(1, 1, "GAUCHE DROITE");
+  for (uint8_t c = 0; c &lt; 20; c++) {      // Toute la largeur,
+    for (uint8_t l = 12; l &lt; 18; l++) {   // lignes 12 à 17 :
+      poser(c, l, SOL);                   //   le sol,
+      teindre(c, l, 1);                   //   en palette 1.
+    }
+  }
+  ecran(1);                       // On rallume.
+
+  uint8_t x = 76;                 // La place du héros, en pixels.
+
+  while (true) {                  // La boucle du jeu :
+    image();
+
+    if (bouton(DROITE) &amp;&amp; x &lt; 152) x++;   // à droite, jusqu'au pixel 152
+    if (bouton(GAUCHE) &amp;&amp; x &gt; 8) x--;     // à gauche, jusqu'au pixel 8
+
+    sprite(0, x, 88, HEROS);      // Le héros, posé juste au-dessus du sol (88 = 11 × 8).
+    teindreLutin(0, 0);           // Après sprite() : sa palette (0).
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACMElEQVR4nO3XwU3jQBiAUR9TQo4pYmuhBo6UQVmUsCVsGRw5WMqiTUjsjSHRN096GgWI7IFPTPxPf95/EzbdfQd8K4HjBI4TOE7gOIHjBI67Eni3P8yWfP/zl6c/Wv7+45vP3vrCJr+66cL9X9jn2Uut3efDBb4Q4MdeL7Htvb66+/J3PpSlgbf6g669jsDfHnj50fQfga8efTcGXvtRsjbwg5/Pdzii117/xsBXE/oPvvPr2wOffeIT+O/vsPwo3uqpe8On6E32eSHw45/S5uA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4gQLv9oeju2/mx4wSeLc//Hp+Ohqn8RCB57qvby9z3fnFII0HCvwPgVMc0X0esso+dx2q8RCBT4uO03h6fXshbJpnBmt1nU7nB0oEjhM4TuA4geMEjjMHx5mD46sjOk7gOIHjBI4TOE7gOHNwnDk4vjqi4wSOEzhO4DiB4wSOMwfHmYPjqyM6TuA4geMEjhM4TuA4c3CcOTi+OqLjBI4TOE7gOIHjBI4zB8eZg+OrIzpO4DiB4wSOEzhO4LgP31T60I7GzmoAAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACL0lEQVR4nO3XwU0CURRA0VlSAkuKsBZrcGkZlmUJlmAZLl0MARWEGRmE3Jzk5AeVzHy94TtveP94I2y4+Q64KoHjBI4TOE7gOIHjBI47E3i13oymfP/rl4c/mv7+3ZuP3vrEJn+76cT9n9jn0UvN3efdBT4R4N9eT7HsvX67+/R33pWpgZf6g869jsBXDzz9aPpD4LNH34WB5/4rmRv4zs/nGxzRc69/YeCzCX2Cb/z68sBHn/gE3v8O04/ipZ66F3yKXmSfJwLf/yltDo4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4T+JvVerNz880sQuC91Xrz8PS402gs8NZY9+X1eaw7vgg0Fnjrx8c38yEWeM8R3echq+xr10xjgbcOizYaDy+vz4QN4zxgra7D4WxAicBxAscJHCdwnMBx5uA4c3B8dUTHCRwncJzAcQLHCRxnDo4zB8dXR3ScwHECxwkcJ3CcwHHm4DhzcHx1RMcJHCdwnMBxAscJHGcOjjMHx1dHdJzAcQLHCRwncJzAcebgOHNwfHVExwkcJ3CcwHECxwkc9wmXR/rQ7t35TgAAAABJRU5ErkJggg==" alt="l’écran après DROITE">
+    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACMElEQVR4nO3XwU3jQBiAUR9TQo4pYmuhBo6UQVmUsCVsGRw5WMqiTUjsjSHRN096GgWI7IFPTPxPf95/EzbdfQd8K4HjBI4TOE7gOIHjBI67Eni3P8yWfP/zl6c/Wv7+45vP3vrCJr+66cL9X9jn2Uut3efDBb4Q4MdeL7Htvb66+/J3PpSlgbf6g669jsDfHnj50fQfga8efTcGXvtRsjbwg5/Pdzii117/xsBXE/oPvvPr2wOffeIT+O/vsPwo3uqpe8On6E32eSHw45/S5uA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4gQLv9oeju2/mx4wSeLc//Hp+Ohqn8RCB57qvby9z3fnFII0HCvwPgVMc0X0esso+dx2q8RCBT4uO03h6fXshbJpnBmt1nU7nB0oEjhM4TuA4geMEjjMHx5mD46sjOk7gOIHjBI4TOE7gOHNwnDk4vjqi4wSOEzhO4DiB4wSOMwfHmYPjqyM6TuA4geMEjhM4TuA4c3CcOTi+OqLjBI4TOE7gOIHjBI4zB8eZg+OrIzpO4DiB4wSOEzhO4LgP31T60I7GzmoAAAAASUVORK5CYII=" alt="l’écran après GAUCHE">
+    <figcaption><strong>GAUCHE</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Un héros rouge sur un sol vert, que GAUCHE et DROITE déplacent ; avec « Voir en quatre nuances », un héros sombre sur un sol clair.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>la cartouche est en couleur </li>
+
+  <li>DROITE déplace le héros <span class="detail"> (76 puis 96)</span></li>
+
+  <li>le héros est rouge <span class="detail"> (31/4/2)</span></li>
+
+  <li>le sol est vert <span class="detail"> (4/18/2)</span></li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>106.1. Chapitre 17 — Le mouvement : les lutins au pixel près : ce qui vient</strong> — chapitre 17 : Le mouvement : les lutins au pixel près.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

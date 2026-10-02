@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 0.107.1 — Une lettre qui tire — une explosion plus grande</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie K — Une lettre qui tire</span>
+    <span>leçon 0.107.1 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
+    
+    
+    
+  </p>
+<h1>0.107.1. Une lettre qui tire — une explosion plus grande</h1>
+<p class="idee">Le 0.107, mais les bras de la croix ont une longueur, PORTEE = 2 : une boucle for les allume case après case. Cinq X cassés au lieu de trois.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>C’est le 0.107, avec une explosion plus grande.</strong> Chaque bras de la croix a maintenant <strong>deux</strong> cases : l’explosion casse cinq X dans le mur, des lignes 6 à 10.</p>
+<p><strong>Le problème :</strong> au 0.107, <code>exploser()</code> écrivait les cinq cases une par une. Avec des bras de deux cases, il en faudrait neuf ; de trois, treize… Et autant dans <code>eteindreTout()</code>.</p>
+<p><strong>Ce qui est nouveau ici : une boucle pour les bras.</strong> <code>PORTEE</code> dit la longueur d’un bras. Après le centre, <code>for (uint8_t k = 1; k &lt;= PORTEE; k++)</code> : <code>k</code> vaut 1, puis 2. À chaque tour, les <strong>quatre</strong> bras gagnent une case : <code>(ex + k, ey)</code>, <code>(ex - k, ey)</code>, <code>(ex, ey + k)</code>, <code>(ex, ey - k)</code>. <code>&lt;=</code> veut dire « plus petit ou égal » : avec <code>PORTEE</code> = 2, le tour <code>k</code> = 2 se fait aussi.</p>
+<p><strong><code>eteindreTout()</code> fait la même boucle</strong>, avec <code>eteindre()</code> à la place d’<code>allumer()</code>. Les deux passent sur les mêmes cases.</p>
+<p><strong>Au bord de l’écran :</strong> <code>ex - 2</code> peut donner 254 ou 255 ; <code>allumer()</code> et <code>eteindre()</code> le refusent déjà (le 0.107).</p>
+<p><strong>Déroulons :</strong> la boule touche (12, 8). Le centre, puis <code>k</code> = 1 : (13, 8), (11, 8), (12, 9), (12, 7). <code>k</code> = 2 : (14, 8), (10, 8), (12, 10), (12, 6). Neuf « # », cinq X cassés.</p>
+<p><strong>Essaie :</strong> <code>PORTEE = 4</code>, et regarde la croix traverser presque tout le mur. Et <code>PORTEE = 0</code> ? La boucle ne fait aucun tour : il ne reste que le centre.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;lire&gt;</code> → <a href="lecon-00-68.4-la-fonction-lire-lire-une-case.html">0.68.4. La fonction lire() — lire une case</a></li>
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+  <li><code>#include &lt;effacer&gt;</code> → <a href="lecon-00-16.3-la-fonction-effacer-effacer-des-cases.html">0.16.3. La fonction effacer() — effacer des cases</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;chaque&gt;</code> → <a href="lecon-00-29.3-la-fonction-chaque-toutes-les-n-millisec.html">0.29.3. La fonction chaque() — toutes les n millisecondes</a></li>
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1814 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage          107 o  ← la console, à l’allumage  — la mise en route de la console
+  chaque_minuteur()  124 o  ← main()  — une fonction fournie par le langage
+  dessinerFeu()       54 o  ← main()  — ta fonction
+  allumer()           64 o  ← exploser()  — ta fonction
+  eteindre()          46 o  ← eteindreTout()  — ta fonction
+  exploser()         101 o  ← main()  — ta fonction
+  eteindreTout()      96 o  ← main()  — ta fonction
+  main()             923 o  ← démarrage  — ta fonction
+  VBlank               8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage       28 o  ← image()  — attend l’image suivante
+  AttendreVBlank      16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces       12 o  ← EffacerCases, EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase         10 o  ← texte(), lire(), effacer(), poser()  — trouve l’adresse d’une case de l’écran
+  EffacerCases        12 o  ← effacer()  — efface des cases
+  EcrireTexte         10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles        67 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte        14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette         37 o  ← bouton()  — lit les huit boutons
+  Tuiles              80 o  ← CopierTuiles  — 5 lettres sur 43
+  "O"                  1 o  ← texte()  — un texte gravé
+  "#"                  1 o  ← texte()  — un texte gravé
+  "#"                  1 o  ← texte()  — un texte gravé
+  "."                  1 o  ← texte()  — un texte gravé
+  "."                  1 o  ← texte()  — un texte gravé
+Lettres gravées : AOX.#
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()           × 5   122 o sur place, dans dessinerFeu(), allumer(), main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  lire()            × 9    99 o sur place, dans allumer(), eteindre(), main()  + AdresseCase (10 o)
+  effacer()         × 5    91 o sur place, dans eteindre(), main()  + AdresseCase (10 o), EffacerCases (12 o)
+  poser()           × 3    38 o sur place, dans main()  + AdresseCase (10 o)
+  bouton()          × 6    30 o sur place, dans main()  + LireManette (37 o)
+  image()           × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+  images()          × 1     2 o sur place, dans chaque_minuteur()
+Tes fonctions appelées :
+  allumer()         × 5    71 o sur place, dans exploser()
+  eteindre()        × 5    71 o sur place, dans eteindreTout()
+  chaque_minuteur() × 4    43 o sur place, dans main()
+  dessinerFeu()     × 2     6 o sur place, dans main()
+  exploser()        × 1     3 o sur place, dans main()
+  eteindreTout()    × 1     3 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// ---- UNE LETTRE QUI TIRE : une explosion plus grande ----
+// Le 0.107, mais les bras de la croix ont une LONGUEUR : 2 cases de chaque
+// côté au lieu d'une. Une boucle for allume les bras, case après case.
+// Change PORTEE, et l'explosion grandit toute seule.
+// ALPHABET[23] : le X. Le « # » est la tuile 42 de la police :
+//   espace = 0, A = 1 … Z = 26, 0 = 27 … 9 = 36, ! = 37, ? = 38,
+//   . = 39, - = 40, : = 41, # = 42.
+// ALPHABET[23] : le X.
+
+#include &lt;texte&gt;      // écrit un texte à l’écran
+#include &lt;lire&gt;       // lit la tuile posée sur une case
+#include &lt;ALPHABET&gt;   // les lettres de la police : ALPHABET[0] est le A
+#include &lt;effacer&gt;    // efface des cases, ou tout le fond
+#include &lt;poser&gt;      // pose une tuile sur une case du fond
+#include &lt;chaque&gt;     // répond 1 toutes les n millisecondes
+#include &lt;bouton&gt;     // lit un bouton de la manette</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une variable — ax</p>
+    <pre><code>uint8_t ax = 2;              // le A : sa colonne…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une variable — ay</p>
+    <pre><code>uint8_t ay = 8;              // …et sa ligne</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une variable — dx</p>
+    <pre><code>uint8_t dx = 1;              // le sens où regarde le A</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une variable — dy</p>
+    <pre><code>uint8_t dy = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">6. une variable — nx</p>
+    <pre><code>uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">7. une variable — ny</p>
+    <pre><code>uint8_t ny = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">8. un tableau — tx</p>
+    <pre><code>uint8_t tx[3];               // les trois tirs : leurs colonnes…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">9. un tableau — ty</p>
+    <pre><code>uint8_t ty[3];               // …leurs lignes…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">10. un tableau — tdx</p>
+    <pre><code>uint8_t tdx[3];              // …et leurs sens</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">11. un tableau — tdy</p>
+    <pre><code>uint8_t tdy[3];</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">12. un tableau — vole</p>
+    <pre><code>uint8_t vole[3];             // vole[i] = 1 : le tir n° i est en vol</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">13. une variable — lance</p>
+    <pre><code>uint8_t lance = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">14. une variable — fx</p>
+    <pre><code>uint8_t fx = 0;              // NOUVEAU : la boule de feu : sa colonne…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">15. une variable — fy</p>
+    <pre><code>uint8_t fy = 0;              // …sa ligne…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">16. une variable — fdx</p>
+    <pre><code>uint8_t fdx = 0;             // …son sens…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">17. une variable — fdy</p>
+    <pre><code>uint8_t fdy = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">18. une variable — feu</p>
+    <pre><code>uint8_t feu = 0;             // …1 si elle vole, 0 sinon (une seule à la fois)…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">19. une variable — flamme</p>
+    <pre><code>uint8_t flamme = 0;          // …et son dessin : 0 = « O », 1 = « # »</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">20. une variable — boum</p>
+    <pre><code>uint8_t boum = 0;            // NOUVEAU : 1 pendant l'explosion</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">21. une variable — ex</p>
+    <pre><code>uint8_t ex = 0;              // le centre de l'explosion : sa colonne…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">22. une variable — ey</p>
+    <pre><code>uint8_t ey = 0;              // …et sa ligne</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">23. une variable — duree</p>
+    <pre><code>uint8_t duree = 0;           // les images qu'il reste avant de l'éteindre</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">24. une variable — PORTEE</p>
+    <pre><code>uint8_t PORTEE = 2;          // NOUVEAU : la longueur des bras de la croix
+
+// ---- NOUVEAU : dessiner la boule de feu, et changer son dessin ----
+// Une fois « O », la fois suivante « # », puis « O »… : elle clignote.
+// flamme = 1 - flamme : 1 - 0 = 1, et 1 - 1 = 0. Elle passe de l'un à l'autre.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">25. une fonction — dessinerFeu()</p>
+    <pre><code>void dessinerFeu() {
+  if (flamme == 0) {
+    texte(fx, fy, "O");
+  } else {
+    texte(fx, fy, "#");
+  }
+  flamme = 1 - flamme;
+}
+
+// ---- NOUVEAU : allumer UNE case de l'explosion ----
+// Dans l'écran (colonne 255 = sortie à gauche : refusée aussi), et seulement
+// sur une case vide ou un X : le X est cassé, remplacé par le « # ».
+// Le A, un tir… ne sont pas touchés.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">26. une fonction — allumer()</p>
+    <pre><code>void allumer(uint8_t c, uint8_t l) {
+  if (c &lt; 20 &amp;&amp; l &lt; 17) {
+    if (lire(c, l) == 0 || lire(c, l) == ALPHABET[23]) {
+      texte(c, l, "#");
+    }
+  }
+}
+
+// ---- NOUVEAU : éteindre UNE case : seulement si c'est encore un « # » ----</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">27. une fonction — eteindre()</p>
+    <pre><code>void eteindre(uint8_t c, uint8_t l) {
+  if (c &lt; 20 &amp;&amp; l &lt; 17) {
+    if (lire(c, l) == 42) {          // 42 : la tuile du « # »
+      effacer(c, l, 1);
+    }
+  }
+}
+
+// ---- l'explosion, en croix, avec des bras de PORTEE cases ----
+//            #              PORTEE = 2 :
+//            #
+//        # # # # #          le centre, et 2 cases dans chaque sens
+//            #
+//            #
+// NOUVEAU : une boucle for. k vaut 1, puis 2 (jusqu'à PORTEE) :
+//   k = 1 allume les quatre voisines, k = 2 les quatre suivantes.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">28. une fonction — exploser()</p>
+    <pre><code>void exploser() {
+  allumer(ex, ey);                   // le centre
+  for (uint8_t k = 1; k &lt;= PORTEE; k++) {
+    allumer(ex + k, ey);             // à droite
+    allumer(ex - k, ey);             // à gauche (sous 0 : 255, 254… refusés)
+    allumer(ex, ey + k);             // en bas
+    allumer(ex, ey - k);             // en haut
+  }
+  boum = 1;
+  duree = 20;
+}
+
+// ---- éteindre la croix : la même boucle, avec eteindre() ----</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">29. une fonction — eteindreTout()</p>
+    <pre><code>void eteindreTout() {
+  eteindre(ex, ey);
+  for (uint8_t k = 1; k &lt;= PORTEE; k++) {
+    eteindre(ex + k, ey);
+    eteindre(ex - k, ey);
+    eteindre(ex, ey + k);
+    eteindre(ex, ey - k);
+  }
+  boum = 0;
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">30. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  for (uint8_t l = 4; l &lt; 13; l++) {   // le mur : 9 X en colonne 12 (le 0.101)
+    poser(12, l, ALPHABET[23]);
+  }
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge et retient où il regarde ----
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;
+        dy = 0;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;
+        dy = -1;
+      }
+      if (nx &lt; 20 &amp;&amp; ny &lt; 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- le bouton A lance un tir, au plus toutes les 250 ms ----
+    if (chaque(250)) {
+      if (bouton(A)) {
+        nx = ax + dx;
+        ny = ay + dy;
+        // la case de départ doit être dans l'écran ET vide (le 0.101)
+        if (nx &lt; 20 &amp;&amp; ny &lt; 17 &amp;&amp; lire(nx, ny) == 0) {
+          lance = 0;
+          for (uint8_t i = 0; i &lt; 3; i++) {
+            if (lance == 0 &amp;&amp; vole[i] == 0) {
+              vole[i] = 1;
+              tx[i] = nx;
+              ty[i] = ny;
+              tdx[i] = dx;
+              tdy[i] = dy;
+              texte(tx[i], ty[i], ".");
+              lance = 1;
+            }
+          }
+        }
+      }
+    }
+
+    // ---- chaque tir avance, et regarde sa case d'arrivée (le 0.105) ----
+    if (chaque(100)) {
+      for (uint8_t i = 0; i &lt; 3; i++) {
+        if (vole[i] == 1) {
+          nx = tx[i] + tdx[i];
+          ny = ty[i] + tdy[i];
+          effacer(tx[i], ty[i], 1);
+          if (nx &gt;= 20 || ny &gt;= 17) {
+            vole[i] = 0;             // 1. hors de l'écran
+          } else if (lire(nx, ny) == ALPHABET[23]) {
+            effacer(nx, ny, 1);      // 2. un X : le tir le casse (le 0.105)…
+            vole[i] = 0;             //    …et disparaît
+          } else if (lire(nx, ny) != 0) {
+            vole[i] = 0;             // 3. un autre tir : il s'écrase
+          } else {
+            tx[i] = nx;              // 4. une case vide : il y va
+            ty[i] = ny;
+            texte(tx[i], ty[i], ".");
+          }
+        }
+      }
+    }
+    // ---- le bouton B lance la boule de feu (le 0.106, le 0.107) ----
+    // boum == 0 : pas de nouvelle boule tant que l'explosion brûle encore.
+    if (bouton(B) &amp;&amp; feu == 0 &amp;&amp; boum == 0) {
+      nx = ax + dx;
+      ny = ay + dy;
+      if (nx &lt; 20 &amp;&amp; ny &lt; 17 &amp;&amp; lire(nx, ny) == 0) {
+        feu = 1;
+        fx = nx;
+        fy = ny;
+        fdx = dx;                    // elle recopie le sens du A, comme un tir
+        fdy = dy;
+        dessinerFeu();
+      }
+    }
+
+    // ---- la boule avance toutes les 200 ms (le 0.106) ----
+    if (chaque(200)) {
+      if (feu == 1) {
+        nx = fx + fdx;
+        ny = fy + fdy;
+        effacer(fx, fy, 1);          // elle quitte sa case
+        if (nx &gt;= 20 || ny &gt;= 17) {
+          feu = 0;                   // 1. hors de l'écran : elle disparaît
+        } else if (lire(nx, ny) != 0) {
+          // 2. l'arrivée n'est pas vide (un X…) : BOUM ! (le 0.107)
+          //    L'explosion se centre sur la case touchée.
+          feu = 0;
+          ex = nx;
+          ey = ny;
+          exploser();
+        } else {
+          fx = nx;                   // 3. une case vide : elle y va…
+          fy = ny;
+          dessinerFeu();             //    …avec l'autre dessin : elle clignote
+        }
+      }
+    }
+
+    // ---- l'explosion brûle 20 images, puis s'éteint (le 0.107) ----
+    if (boum == 1) {
+      duree = duree - 1;
+      if (duree == 0) {
+        eteindreTout();              // les « # » disparaissent : un trou reste
+      }
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABzUlEQVR4nO3XsW0CQRBAUUJKIKT/alyCy3DogMSBpV2Q4Hb/PekFhIy+RrN3+f75Iuxy+D/grQSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LHr7f7v7y0IPCZw36PrdnUFfsKOdQWeZYPL3OA4gVmXwGM2OE7gPq/ovh3rCjzLBpe5wXECsy6Bx2xwnMB9XtF9O9YVeJYNLnOD4wRmXQKP2eA4gfu8ovt2rCvwLBtc5gbHCcy6Xgx8vd0fDh/gA063wVsPfLZ5BX5i5B2HfTHwX4fP8BmbTmqDnxh5x2EFjs8rcHxe38FxAo/Z4DiB+871ij6nHesKPMsGl7nBcQKzLoHHbHCcwH1e0X071hV4lg0uc4PjBGZdAo/Z4DiB+7yi+3asK/AsG1zmBscJzLoEHrPBcQL3eUX37VhX4Fk2uMwNjhOYdQkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECx/0CBtDZDD2NLggAAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABz0lEQVR4nO3WsW0CQRBAUUJKcEj/1bgEl+HQAYkDS3sgGXb+PekFhMx9jWYvX9+fhF3e/g/4VwLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwn8Nr14/bn7xEEXhO47951XF2BHzCxrsBH2eAyNzhOYPYl8JoNjhO4zyu6b2JdgY+ywWVucJzA7EvgNRscJ3CfV3TfxLoCH2WDy9zgOIHZl8BrNjhO4D6v6L6JdQU+ygaXucFxArOvJwNfP253bx/gBU63waMHPtu8Aj8w8sRhnwz829tneI2hk9rgB0aeOKzA8Xn3DbzPpzxdYAYReM0Gxwncd65X9DlNrCvwUTa4zA2OE5h9Cbxmg+ME7vOK7ptYV+CjbHCZGxwnMPsSeM0Gxwnc5xXdN7GuwEfZ4DI3OE5g9iXwmg2OE7jPK7pvYl2Bj7LBZW5wnMDsS+A4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM47gfX/takrMDSuQAAAABJRU5ErkJggg==" alt="l’écran après A">
+    <figcaption><strong>A</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB8klEQVR4nO3Yu20cMRRAUYUqQaGKcC2uQeW6BJeh0IEAB8IC5OgD8d09wAkmGGCHc/GW3H34+/qHsIcffwK+lcBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJvPb49HzzegSB1wTue+s6rq7AF0ysK/AuE1xmD44TmHMJvGaC4wTuc4rum1hX4F0muMweHCcw5xJ4zQTHCdznFN03sa7Au0xwmT04TmDOJfCaCY4TuM8pum9iXYF3meAye3CcwJzrg4Efn57f7N/5zo+v/NJib16P8JHAlxZ884ZZr0ng9c2/Xn7/N/E13dcp+tKXbSPw0Gc2wdeWPO6xBf769Z6mf8j6/GfdXeCrb2f6z6TR/NGxZoLjBO67r1P0fZpYV+BdJrjMHhwnMOcSeM0Exwnc5xTdN7GuwLtMcJk9OE5gziXwmgmOE7jPKbpvYl2Bd5ngMntwnMCcS+A1ExwncJ9TdN/EugLvMsFl9uA4gTmXwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3DcP4X7d+RfzYPMAAAAAElFTkSuQmCC" alt="l’écran après B">
+    <figcaption><strong>B</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB3UlEQVR4nO3ZwWlCQRRAUZeW4NIiUktqSLkpIWVkmYWQRRBmEn9w5nLgLERQxMv7b76ePj7fCTs9/RPwrwSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LHz5Xr38RYEHhO479Z1u7oC/8KOdQWeZYLL7OA4gVmXwGMmOE7gPqfovh3rCjzLBJfZwXECsy6Bx0xwnMB9TtF9O9YVeJYJLrOD4wRmXQKPmeA4gfucovt2rCvwLBNcZgfHCcy6Dg58vlxvHn+HH57+TW3qyMCHXMruvlDgP1s08Mvb6zeBH3Fw4McvqgIfywTHCRy3aOCZJ5mx3H2w26RjLRd4QX7JihO4z79JfTvWFXiWCS6zg+MEZl0Cj5ngOIH7nKL7dqwr8CwTXGYHxwnMugQeM8FxAvc5RfftWFfgWSa4zA6OE5h1CTxmguME7nOK7tuxrsCzTHCZHRwnMOsSOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI77Av/nmZQ+HN5eAAAAAElFTkSuQmCC" alt="l’écran après DROITE">
+    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAByklEQVR4nO3ZsWkDQRBAUYUqQaH6r8YluAyHDpQ4MOz5wLqdz4MXKNPBZ25G6Pb59UHY7fIn4F8JHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBr98fz188jCLwmcN+r67i6Av/BxLoCH2WCy+zgOIHZl8BrJjhO4D5XdN/EugIfZYLL7OA4gdmXwGsmOE7gPld038S6Ah9lgsvs4DiB2ZfAayY4TuA+V3TfxLoCH2WCy+zgOIHZ18nA98fz5c2Pe9X3znUm8FWvrNGvyqsIHHcy8E9ve1aBTzDBcQLHTQrsij7B7+A4gddGrwaB1wTu829S38S6Ah9lgsvs4DiB2ZfAayY4TuA+V3TfxLoCH2WCy+zgOIHZl8BrJjhO4D5XdN/EugIfZYLL7OA4gdmXwGsmOE7gPld038S6Ah9lgsvs4DiB2ZfAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncNw3yhfR1AvImboAAAAASUVORK5CYII=" alt="l’écran après GAUCHE">
+    <figcaption><strong>GAUCHE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB10lEQVR4nO3ZsW0CQRBAUUJKIKT/alyCy3DogMSSLe2BMNz8e9ILCBl9DTuWT59fH4Sd3v4N+FcCxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ/Da+XL98/MIAq8J3HfrOq6uwHeYWFfgrWxwmTc4TmD2S+A1GxwncJ8rum9iXYG3ssFl3uA4gdkvgddscJzAfa7ovol1Bd7KBpd5g+MEZr8eDHy+XG/ePsALHG6DRw98tHkFvmPkicM+GPint8/wGkMntcF3jDxxWIHj8wocn9ffwXHxwEe7BH8rBx790/osAscJHCdwnMBx5cCu6H5gBF4b/VMv8JrAfcf6b9IxTawr8FY2uMwbHCcw+yXwmg2OE7jPFd03sa7AW9ngMm9wnMDsl8BrNjhO4D5XdN/EugJvZYPLvMFxArNfAq/Z4DiB+1zRfRPrCryVDS7zBscJzH4JHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAsd9A9Hb0dQHuOkTAAAAAElFTkSuQmCC" alt="l’écran après HAUT">
+    <figcaption><strong>HAUT</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB50lEQVR4nO3ZsU0DQRBAUUJKcOgiqIUaKJcSKIOQAInAtrSLJeSbz5NesOHefc3tWn76+Hwn7OnhO+BPCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAa8+n8831CAKvCdz33XVcXYF/YWJdgXeZ4DJncJzAHJfAayY4TuA+t+i+iXUF3mWCy5zBcQJzXAKvmeA4gfvcovsm1hV4lwkucwbHCcxxCbxmguME7nOL7ptYV+BdJrjMGRwnMMd1Z+Dn0/nbwx/g7p1fePjG/sg9gUd/sm5ueNxT7PungV/eXn9MfIp9dwae+3ETePcdXa9HEHj3HV2vRxB49x1dr0dwyYrzM4lLo79YAq8J3OffpL6JdQXeZYLLnMFxAnNcAq+Z4DiB+9yi+ybWFXiXCS5zBscJzHEJvGaC4wTuc4vum1hX4F0muMwZHCcwxyXwmgmOE7jPLbpvYl2Bd5ngMmdwnMAcl8BxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdw3Bd6R5mUFYHHvwAAAABJRU5ErkJggg==" alt="l’écran après BAS">
+    <figcaption><strong>BAS</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">La boule de feu explose en une grande croix de « # », deux cases dans chaque sens : cinq X cassés, des lignes 6 à 10.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>BOUM : une croix de « # » avec des bras de deux cases </li>
+
+  <li>elle s’éteint : cinq X cassés, lignes 6 à 10 </li>
+
+  <li>les X des lignes 5 et 11 restent </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>0.107.2. Tuile — dessiner une case</strong> — chapitre 0 : Avant tout.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

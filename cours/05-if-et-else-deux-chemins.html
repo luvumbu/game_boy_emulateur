@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 2 — Les conditions : choisir</span>
   <span>leçon 1 sur 4 dans ce chapitre</span>
-  <span>5 sur 42 dans le cours</span>
+  <span>5 sur 61 dans le cours</span>
 </p>
 <h1>5. if et else : deux chemins</h1>
 <p class="idee">Le programme ne fait pas tout : il choisit ce qu’il fait, image après image.</p>
@@ -113,93 +113,174 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1960 octets</strong> de cartouche.</p>
+<strong>1115 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              522 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles         67 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette          37 o  ← bouton()  — lit les huit boutons
+  Tuiles              240 o  ← CopierTuiles  — 15 lettres sur 43
+  "TIENS UNE TOUCHE"   16 o  ← texte()  — un texte gravé
+  " "                   1 o  ← texte()  — un texte gravé
+  "A"                   1 o  ← texte()  — un texte gravé
+  "A"                   1 o  ← texte()  — un texte gravé
+  " "                   1 o  ← texte()  — un texte gravé
+  "B"                   1 o  ← texte()  — un texte gravé
+  "B"                   1 o  ← texte()  — un texte gravé
+  "    "                4 o  ← texte()  — un texte gravé
+  "HAUT"                4 o  ← texte()  — un texte gravé
+  "HAUT"                4 o  ← texte()  — un texte gravé
+  "   "                 3 o  ← texte()  — un texte gravé
+  "BAS"                 3 o  ← texte()  — un texte gravé
+  "BAS"                 3 o  ← texte()  — un texte gravé
+  "      "              6 o  ← texte()  — un texte gravé
+  "GAUCHE"              6 o  ← texte()  — un texte gravé
+  "GAUCHE"              6 o  ← texte()  — un texte gravé
+  "      "              6 o  ← texte()  — un texte gravé
+  "DROITE"              6 o  ← texte()  — un texte gravé
+  "DROITE"              6 o  ← texte()  — un texte gravé
+  "     "               5 o  ← texte()  — un texte gravé
+  "START"               5 o  ← texte()  — un texte gravé
+  "START"               5 o  ← texte()  — un texte gravé
+  "      "              6 o  ← texte()  — un texte gravé
+  "SELECT"              6 o  ← texte()  — un texte gravé
+  "SELECT"              6 o  ← texte()  — un texte gravé
+Lettres gravées : ABCDEGHILNORSTU
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 25   275 o sur place, dans main()  + EcrireTexte (10 o)
+  bouton() ×  8    40 o sur place, dans main()  + LireManette (37 o)
+  images() ×  8    16 o sur place, dans main()
+  image()  ×  1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  texte(1, 2, "TIENS UNE TOUCHE");
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : écrit le nom des 8 touches de la console.
+// Quand tu TIENS une touche, son nom clignote. Quand tu la lâches, il reste affiché.
+//
+// Ce qui est nouveau : if et else.
+//   if (condition) ...   = « SI la condition est vraie, fais ceci »
+//   else ...             = « SINON, fais cela »
+// Un seul des deux chemins est pris, jamais les deux.
 
-  while (true) {
-    image();
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;bouton&gt;   // lit un bouton de la manette</code></pre>
+  </div>
+  <div></div>
+</div>
 
-    /* Tenue : son nom clignote. Lâchée : il reste affiché. */
-    if (bouton(A)) {
-      if ((images() / 16) % 2) {
-        texte(4, 5, " ");
-      } else {
-        texte(4, 5, "A");
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                            // Le jeu commence ici.
+  texte(1, 2, "TIENS UNE TOUCHE");      // La consigne, écrite une fois.
+
+  while (true) {                        // Répète pour toujours :
+    image();                            // attend l'image suivante (60 par seconde).
+
+    // Tenue : son nom clignote. Lâchée : il reste affiché.
+
+    // ---- La touche A (colonne 4, ligne 5). Expliquée en détail ;
+    //      les 7 autres touches plus bas font exactement la même chose.
+    if (bouton(A)) {                    // SI la touche A est enfoncée en ce moment...
+                                        // bouton(A) vaut 1 (vrai) quand elle est tenue,
+                                        // 0 (faux) sinon.
+      if ((images() / 16) % 2) {        //   ... alors on choisit selon l'heure :
+                                        //   images() compte les images depuis le début.
+                                        //   / 16 : ce nombre change toutes les 16 images.
+                                        //   % 2  : le reste de la division par 2, 0 ou 1.
+                                        //   Exemple : image 40 : 40 / 16 = 2, 2 % 2 = 0.
+                                        //             image 50 : 50 / 16 = 3, 3 % 2 = 1.
+                                        //   Donc : 16 images à 1, 16 images à 0, etc.
+        texte(4, 5, " ");               //   à 1 : on efface la lettre (un espace).
+      } else {                          //   à 0 :
+        texte(4, 5, "A");               //   on la réécrit. Effacer, écrire... : ça clignote.
       }
-    } else {
-      texte(4, 5, "A");
+    } else {                            // SINON (A n'est pas enfoncée) :
+      texte(4, 5, "A");                 //   la lettre reste simplement écrite.
     }
+
+    // ---- La touche B (ligne 6) : même chose.
     if (bouton(B)) {
       if ((images() / 16) % 2) {
-        texte(4, 6, " ");
+        texte(4, 6, " ");               // 1 espace pour effacer 1 lettre
       } else {
         texte(4, 6, "B");
       }
     } else {
       texte(4, 6, "B");
     }
+    // ---- HAUT (ligne 7).
     if (bouton(HAUT)) {
       if ((images() / 16) % 2) {
-        texte(4, 7, "    ");
+        texte(4, 7, "    ");            // 4 espaces pour effacer les 4 lettres de HAUT
       } else {
         texte(4, 7, "HAUT");
       }
     } else {
       texte(4, 7, "HAUT");
     }
+    // ---- BAS (ligne 8).
     if (bouton(BAS)) {
       if ((images() / 16) % 2) {
-        texte(4, 8, "   ");
+        texte(4, 8, "   ");             // 3 espaces pour BAS
       } else {
         texte(4, 8, "BAS");
       }
     } else {
       texte(4, 8, "BAS");
     }
+    // ---- GAUCHE (ligne 9).
     if (bouton(GAUCHE)) {
       if ((images() / 16) % 2) {
-        texte(4, 9, "      ");
+        texte(4, 9, "      ");          // 6 espaces pour GAUCHE
       } else {
         texte(4, 9, "GAUCHE");
       }
     } else {
       texte(4, 9, "GAUCHE");
     }
+    // ---- DROITE (ligne 10).
     if (bouton(DROITE)) {
       if ((images() / 16) % 2) {
-        texte(4, 10, "      ");
+        texte(4, 10, "      ");         // 6 espaces pour DROITE
       } else {
         texte(4, 10, "DROITE");
       }
     } else {
       texte(4, 10, "DROITE");
     }
+    // ---- START (ligne 11).
     if (bouton(START)) {
       if ((images() / 16) % 2) {
-        texte(4, 11, "     ");
+        texte(4, 11, "     ");          // 5 espaces pour START
       } else {
         texte(4, 11, "START");
       }
     } else {
       texte(4, 11, "START");
     }
+    // ---- SELECT (ligne 12).
     if (bouton(SELECT)) {
       if ((images() / 16) % 2) {
-        texte(4, 12, "      ");
+        texte(4, 12, "      ");         // 6 espaces pour SELECT
       } else {
         texte(4, 12, "SELECT");
       }
     } else {
       texte(4, 12, "SELECT");
     }
-  }
-}</code></pre>
+  }                                     // fin de la boucle : on repart à image()
+}                                       // fin de main</code></pre>
   </div>
   <div></div>
 </div>
@@ -234,13 +315,13 @@ relâché. Voici l’écran juste après.</p>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC+0lEQVR4nO3dQU7jMBhAYZZzBJbc/zRzhDkGSxZIaBRi17/j+LdfnvQJVU0btTwlsZtQ3v59/hXYW/or0K0MDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoarBf7z/vG/00Utjy/dPjzl5WttWefhdnT90ff78n01vv7Q6xwW+PSlV+6vPPJnUeWXciXwkPW3vK+7bw83KfDh5/DAQ9Z/R+DoelYPXN81Ne76+gL/Xn/ffu/WwKVD2E3756lbcHRtHYHdgg08O/Cux+Aho+iOXdOE0Wn7+43ev+goWlszMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhpsU+L6LylQ3I/C064/0m4HhJgW+9dJfVbgFwxkYzsBwzoPhDAxnYDgDwxkYzsBwBoYzMJyB4ZI/yVrnL+GpMgP3fX+FaUMMDJd5Prjjqw8NHOUWDGdguBUD16/CNHCI82C42YOs0qL2pyhkxV20UQcyMFzmLjr6FfrqsOIWXHquOhgYLnkXXbrtLnoU58FwyX8fvO//I9rFisfgLf4Xwi5mBy7dP2ogZuCDeYGvnw+uBJ7//4h2sesuOrr+x9o1sMfgRrNH0RfPBzuKjnIeDLfKyYbSU1ruj17U9yg7HYNL90Qf+SgGhksOHP2oMhr44fvn/MAvE7oFX5Qf+HSOVIlk4JAVzwdHR9Gna3AU/c15MFzyJ1mhi+46Lt5T5unC0tKx06eHMzBc/lf6tw+O6vthA5+aPchq2fKi8+bSerRl4FJLA59K/utCj8F3cx4Mt+I8uHKU7Z43P3b7XuWy2VH3u+s+oAWOLsXLnAe3nIS48viWpXiZ0yS34AlogT0GH6xyVWXj6Do0iv5ZlP5bTuQ8GM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkY7gvGZJepNza0VwAAAABJRU5ErkJggg==" alt="l’écran après B">
-    <figcaption><strong>B</strong> — l’écran a changé</figcaption>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADAUlEQVR4nO3dQU7jMBhAYZZzBJbc/zRzhDkGSxZIaBRi179j+3denvQJVWkbtTzFiZtQ3v59/hXYW/or0FQGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8PVAv95//jf6V0tjy/dPjzl5WttWefhdnT90ff78n01vv7Q6xwW+PSlV5ZXHvlzV+WXciXwkPW3vK/Zt4dbFPjwc3jgIeufETi6nt0D14emxqGvL/Dv9feNe1MDl3Zhk8bnpVtwdG0dgd2CDbw68F33wUOOojuGpgVHp+3vN7p806No3ZqB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3KLA8y4qU92KwMuuP9JvBoZbFHjqpb+qcAuGMzCcgeGcB8OtPshKf8NP4xANZ2A4h2g4t2A4A8M5RMM5D4ZLHqL3+Ut4qszAfd9fYdoQA8Nlng/u+OpDA0e5BcMZGG7HwPWrMA0c4jwYLvmTrJfL3V4v2nGINupABobLHKKjX6GvDjtuwaXnqoOB4ZKH6NJth+hRnAfDJf998H3/H9Fd7LgPnnH7sVYHLi0fdSBm4IN1ga+fD64EXv//iO7irkN0dP2PddfA7oMbrT6Kvng+2KPoKOfBcLucbCg9pWV59KK+R7nTPri0JPrIRzEwXHLg6EeV0cAPH5/zA79M6BZ8UX7g0zlSJZKBQ3Y8Hxw9ij5dg0fR35wHwyV/khW66K7j4j1lni4s3Tt2+vRwBobL/0r/9oOj+jhs4FOrD7JatrzovLm0Ht0ycKmlgU/lf0+W++CpnAfD7TgPruxlu+fNj92+d7lsdtRyh+4DWuDovXiZ8+CWkxBXHt9yL17mNMkteAFaYPfBB7tcVdl4dB06iv65K/23nMh5MJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3BeCC2eJOktvJAAAAABJRU5ErkJggg==" alt="l’écran après B">
+    <figcaption><strong>B</strong> — l’écran n’a pas bougé</figcaption>
   </figure>
 
   <figure>
     <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADAUlEQVR4nO3dQU7jMBhAYZZzBJbc/zRzhDkGSxZIaBRi179j+3denvQJVWkbtTzFiZtQ3v59/hXYW/or0FQGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8PVAv95//jf6V0tjy/dPjzl5WttWefhdnT90ff78n01vv7Q6xwW+PSlV5ZXHvlzV+WXciXwkPW3vK/Zt4dbFPjwc3jgIeufETi6nt0D14emxqGvL/Dv9feNe1MDl3Zhk8bnpVtwdG0dgd2CDbw68F33wUOOojuGpgVHp+3vN7p806No3ZqB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3KLA8y4qU92KwMuuP9JvBoZbFHjqpb+qcAuGMzCcgeGcB8OtPshKf8NP4xANZ2A4h2g4t2A4A8M5RMM5D4ZLHqL3+Ut4qszAfd9fYdoQA8Nlng/u+OpDA0e5BcMZGG7HwPWrMA0c4jwYLvmTrJfL3V4v2nGINupABobLHKKjX6GvDjtuwaXnqoOB4ZKH6NJth+hRnAfDJf998H3/H9Fd7LgPnnH7sVYHLi0fdSBm4IN1ga+fD64EXv//iO7irkN0dP2PddfA7oMbrT6Kvng+2KPoKOfBcLucbCg9pWV59KK+R7nTPri0JPrIRzEwXHLg6EeV0cAPH5/zA79M6BZ8UX7g0zlSJZKBQ3Y8Hxw9ij5dg0fR35wHwyV/khW66K7j4j1lni4s3Tt2+vRwBobL/0r/9oOj+jhs4FOrD7JatrzovLm0Ht0ycKmlgU/lf0+W++CpnAfD7TgPruxlu+fNj92+d7lsdtRyh+4DWuDovXiZ8+CWkxBXHt9yL17mNMkteAFaYPfBB7tcVdl4dB06iv65K/23nMh5MJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3BeCC2eJOktvJAAAAABJRU5ErkJggg==" alt="l’écran après DROITE">
-    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+    <figcaption><strong>DROITE</strong> — l’écran n’a pas bougé</figcaption>
   </figure>
 
   <figure>
@@ -249,13 +330,13 @@ relâché. Voici l’écran juste après.</p>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC8ElEQVR4nO3dQW7qMBgAYZY9Qpe9/2l6hB6jyy4qIRRix05s//ZkpE9PiEAEHcWJIY88fn6/BfYIfwXqysBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdguFzgj8+vV7uLSh6fur15yuFrLVnn5nbt+mvf7+H7Knz9Va+zWeDdl565P/PI56LMH+VK4CbrL3lfvW83Nyjw5t/mgZusv0fg2vXMHjg/NBUOfecCv6//3LjXNXBqF9ZpfB66Bdeu7URgt2ADjw686j64yVH0iaFpwNFp+futvX/So2gtzcBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRhuUOB+J5Upb0TgYecf6Z2B4QYF7nrqrzLcguEMDGdgOOfBcKMPssLf8N04RMMZGM4hGs4tGM7AcA7RcM6D4QwMZ2A4A8MZGM7AcAaGMzCcgeGCP8k6vN8Pvy6K/Cw65Lcb78bAcJFDdO1P6OuEGbfg1HN1goHhgofo1G2H6FacB8MF///gda9HtIoZ98FLXAthFaMDp+5f7momqxgXOH+9oIuBx1+PaBWrDtG167+tVQO7Dy40+ii6MMb81yNahfNguFm+bEg9peT+koMst+CO2u5Hyz+1vm3UVwaGCw5c+1FlbeCbj8/xgQ8TugVfFB94d46UiWTgKjN+H1x7FL27Bo+i/zkPhgv+JKvqpLsTJ+8p8uvC1NK206ebMzBc/E/6lx8c5cdhA+8afZBVsuXVzptT69GSgVMtDbwr/ney3Ad35TwYbsZ5cGYve3refNvte5bTZlvd79C9QQtcuxQvch5c8iXElceXLMWLnCa5BQ9AC+w+eGOWsyoLj66rjqKfi8L/yoGcB8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDw/0BiOX6UaUOP+0AAAAASUVORK5CYII=" alt="l’écran après HAUT">
-    <figcaption><strong>HAUT</strong> — l’écran a changé</figcaption>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADAUlEQVR4nO3dQU7jMBhAYZZzBJbc/zRzhDkGSxZIaBRi179j+3denvQJVWkbtTzFiZtQ3v59/hXYW/or0FQGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8PVAv95//jf6V0tjy/dPjzl5WttWefhdnT90ff78n01vv7Q6xwW+PSlV5ZXHvlzV+WXciXwkPW3vK/Zt4dbFPjwc3jgIeufETi6nt0D14emxqGvL/Dv9feNe1MDl3Zhk8bnpVtwdG0dgd2CDbw68F33wUOOojuGpgVHp+3vN7p806No3ZqB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3KLA8y4qU92KwMuuP9JvBoZbFHjqpb+qcAuGMzCcgeGcB8OtPshKf8NP4xANZ2A4h2g4t2A4A8M5RMM5D4ZLHqL3+Ut4qszAfd9fYdoQA8Nlng/u+OpDA0e5BcMZGG7HwPWrMA0c4jwYLvmTrJfL3V4v2nGINupABobLHKKjX6GvDjtuwaXnqoOB4ZKH6NJth+hRnAfDJf998H3/H9Fd7LgPnnH7sVYHLi0fdSBm4IN1ga+fD64EXv//iO7irkN0dP2PddfA7oMbrT6Kvng+2KPoKOfBcLucbCg9pWV59KK+R7nTPri0JPrIRzEwXHLg6EeV0cAPH5/zA79M6BZ8UX7g0zlSJZKBQ3Y8Hxw9ij5dg0fR35wHwyV/khW66K7j4j1lni4s3Tt2+vRwBobL/0r/9oOj+jhs4FOrD7JatrzovLm0Ht0ycKmlgU/lf0+W++CpnAfD7TgPruxlu+fNj92+d7lsdtRyh+4DWuDovXiZ8+CWkxBXHt9yL17mNMkteAFaYPfBB7tcVdl4dB06iv65K/23nMh5MJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3BeCC2eJOktvJAAAAABJRU5ErkJggg==" alt="l’écran après HAUT">
+    <figcaption><strong>HAUT</strong> — l’écran n’a pas bougé</figcaption>
   </figure>
 
   <figure>
     <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADAUlEQVR4nO3dQU7jMBhAYZZzBJbc/zRzhDkGSxZIaBRi179j+3denvQJVWkbtTzFiZtQ3v59/hXYW/or0FQGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8PVAv95//jf6V0tjy/dPjzl5WttWefhdnT90ff78n01vv7Q6xwW+PSlV5ZXHvlzV+WXciXwkPW3vK/Zt4dbFPjwc3jgIeufETi6nt0D14emxqGvL/Dv9feNe1MDl3Zhk8bnpVtwdG0dgd2CDbw68F33wUOOojuGpgVHp+3vN7p806No3ZqB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3KLA8y4qU92KwMuuP9JvBoZbFHjqpb+qcAuGMzCcgeGcB8OtPshKf8NP4xANZ2A4h2g4t2A4A8M5RMM5D4ZLHqL3+Ut4qszAfd9fYdoQA8Nlng/u+OpDA0e5BcMZGG7HwPWrMA0c4jwYLvmTrJfL3V4v2nGINupABobLHKKjX6GvDjtuwaXnqoOB4ZKH6NJth+hRnAfDJf998H3/H9Fd7LgPnnH7sVYHLi0fdSBm4IN1ga+fD64EXv//iO7irkN0dP2PddfA7oMbrT6Kvng+2KPoKOfBcLucbCg9pWV59KK+R7nTPri0JPrIRzEwXHLg6EeV0cAPH5/zA79M6BZ8UX7g0zlSJZKBQ3Y8Hxw9ij5dg0fR35wHwyV/khW66K7j4j1lni4s3Tt2+vRwBobL/0r/9oOj+jhs4FOrD7JatrzovLm0Ht0ycKmlgU/lf0+W++CpnAfD7TgPruxlu+fNj92+d7lsdtRyh+4DWuDovXiZ8+CWkxBXHt9yL17mNMkteAFaYPfBB7tcVdl4dB06iv65K/23nMh5MJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMwnIHhDAxnYDgDwxkYzsBwBoYzMJyB4QwMZ2A4A8MZGM7AcAaGMzCcgeEMDGdgOAPDGRjOwHAGhjMw3BeCC2eJOktvJAAAAABJRU5ErkJggg==" alt="l’écran après BAS">
-    <figcaption><strong>BAS</strong> — l’écran a changé</figcaption>
+    <figcaption><strong>BAS</strong> — l’écran n’a pas bougé</figcaption>
   </figure>
 
   <figure>

@@ -73,6 +73,9 @@ writeFileSync(join(dossier, 'principal.cpp'), [
   '// de C++. L’ordre compte pour les variables : une globale doit être versée',
   '// avant la fonction qui la nomme, comme si tout était collé bout à bout.',
   '',
+  /* Les fonctions de la console que l'exemple inclut : elles restent ici, en tête. */
+  ...entier.split('\n').filter((ligne) => /^#include </.test(ligne)),
+  '',
   '#include "mesures.cpp"',
   '#include "titre.cpp"',
   '#include "dessins.cpp"',

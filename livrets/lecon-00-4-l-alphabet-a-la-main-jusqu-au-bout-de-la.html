@@ -79,9 +79,11 @@
 
 
   <p class="reperes">
-    <span class="niveau">Niveau 0 — Avant tout</span>
-    <span>leçon 0.4 sur 82</span>
-    <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie A — Écrire des lettres</span>
+    <span>leçon 0.4 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
@@ -94,17 +96,71 @@
 <p>On s’arrête à <strong>T</strong>, la 20e lettre. Il n’y a <strong>pas de colonne 20</strong> : <code>texte(20, 0, "U")</code> est refusé par le compilateur, qui répond que l’écran fait 20 colonnes.</p>
 <p>Vingt lignes presque identiques : c’est long à écrire, et c’est exactement ce qu’une boucle saura faire à notre place.</p>
 
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+</ul>
+</div>
+
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1513 octets</strong> de cartouche.</p>
+<strong>735 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          227 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles     31 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          320 o  ← CopierTuiles  — 20 lettres sur 43
+  "A"               1 o  ← texte()  — un texte gravé
+  "B"               1 o  ← texte()  — un texte gravé
+  "C"               1 o  ← texte()  — un texte gravé
+  "D"               1 o  ← texte()  — un texte gravé
+  "E"               1 o  ← texte()  — un texte gravé
+  "F"               1 o  ← texte()  — un texte gravé
+  "G"               1 o  ← texte()  — un texte gravé
+  "H"               1 o  ← texte()  — un texte gravé
+  "I"               1 o  ← texte()  — un texte gravé
+  "J"               1 o  ← texte()  — un texte gravé
+  "K"               1 o  ← texte()  — un texte gravé
+  "L"               1 o  ← texte()  — un texte gravé
+  "M"               1 o  ← texte()  — un texte gravé
+  "N"               1 o  ← texte()  — un texte gravé
+  "O"               1 o  ← texte()  — un texte gravé
+  "P"               1 o  ← texte()  — un texte gravé
+  "Q"               1 o  ← texte()  — un texte gravé
+  "R"               1 o  ← texte()  — un texte gravé
+  "S"               1 o  ← texte()  — un texte gravé
+  "T"               1 o  ← texte()  — un texte gravé
+Lettres gravées : ABCDEFGHIJKLMNOPQRST
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte() × 20   220 o sur place, dans main()  + EcrireTexte (10 o)
+  image() ×  1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  texte(0, 0, "A");
-  texte(1, 0, "B");
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>#include &lt;texte&gt;   // écrit un texte à l’écran</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {            // Le programme commence ici.
+  // Une lettre par case, de gauche à droite, sur la ligne 0.
+  // texte(colonne, ligne, "LETTRE") : seule la colonne change, de 1 en 1.
+  texte(0, 0, "A");     // colonne 0 : la première à gauche
+  texte(1, 0, "B");     // colonne 1 : juste à droite du A
   texte(2, 0, "C");
   texte(3, 0, "D");
   texte(4, 0, "E");
@@ -113,7 +169,7 @@
   texte(7, 0, "H");
   texte(8, 0, "I");
   texte(9, 0, "J");
-  texte(10, 0, "K");
+  texte(10, 0, "K");    // colonne 10 : le milieu de la ligne
   texte(11, 0, "L");
   texte(12, 0, "M");
   texte(13, 0, "N");
@@ -128,8 +184,8 @@
   // (si on dépasse : texte(20, 0, "U") est refusé par le compilateur,
   //  qui répond « l'écran fait 20 colonnes et 18 lignes ; 20,0 est dehors »)
 
-  while (true) {
-    image();
+  while (true) {        // La boucle de jeu : recommence pour toujours...
+    image();            // ... attendre l'image suivante.
   }
 }</code></pre>
   </div>
@@ -175,7 +231,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 
 <p class="pied">
-  Ensuite : <strong>0.4.1. L’alphabet à la main, jusqu’au bout de la ligne — de base, ailleurs</strong> — niveau 0 sur 10.
+  Ensuite : <strong>0.4.1. L’alphabet à la main, jusqu’au bout de la ligne — de base, ailleurs</strong> — chapitre 0 : Avant tout.
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 

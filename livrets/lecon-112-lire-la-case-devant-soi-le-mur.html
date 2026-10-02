@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 112 — Lire la case devant soi : le mur</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 18 — Les collisions : se toucher, se cogner</span>
+    <span class="outil">du cours</span>
+    
+    <span>leçon 112 sur 143</span>
+    <span class="jauge" style="--part: 90%">difficulté 9 / 10</span>
+    
+    
+    
+  </p>
+<h1>112. Lire la case devant soi : le mur</h1>
+<p class="idee">Avant de faire un pas, on regarde quelle tuile il y a là où l’on va.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>Les murs ne sont pas des lutins : ils sont <strong>dans le décor</strong>, posés avec <code>poser()</code>. Pour savoir si le héros peut avancer, on ne compare donc pas des boîtes : on <strong>lit la case</strong> où il va entrer, avec <code>lire(colonne, ligne)</code> qui rend la tuile posée là.</p>
+<p>Le héros compte en <strong>pixels</strong>, la grille en <strong>cases</strong>. Le pont entre les deux est la division de la leçon « au pixel près » : le pixel <code>p</code> est dans la case <code>p / 8</code>.</p>
+<p><strong>Ce qui est nouveau ici : lire la case du pixel qu’on va toucher.</strong> Le héros occupe les pixels <code>x</code> à <code>x + 7</code>. Un pas à droite le fait entrer dans le pixel <code>x + 8</code> : on lit la case <code>(x + 8) / 8</code>. Un pas à gauche, dans le pixel <code>x - 1</code> : on lit la case <code>(x - 1) / 8</code>.</p>
+<p>Déroulons à droite. Le mur est en colonne 16, qui couvre les pixels 128 à 135. Héros en <code>x = 119</code> : son prochain pixel est 127, case 127 / 8 = 15, vide — il avance. En <code>x = 120</code> : prochain pixel 128, case 16 : <strong>le mur</strong>. Il s’arrête, collé contre lui, sans le traverser d’un seul pixel.</p>
+<p>À gauche, le mur est en colonne 3 (pixels 24 à 31). Le héros s’arrête en <code>x = 32</code> : son prochain pixel serait 31, dans le mur.</p>
+<p>Le héros est posé sur la ligne de pixels 64 = 8 × 8 : il est <strong>pile</strong> dans la ligne de cases 8. Il n’y a donc qu’une ligne de cases à regarder. La leçon suivante le libère de haut en bas.</p>
+<p><strong>À toi :</strong> pose un deuxième mur en colonne 10 et vérifie que le héros s’y arrête des deux côtés.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;Tuile&gt;</code> → <a href="lecon-00-107.2-tuile-dessiner-une-case.html">0.107.2. Tuile — dessiner une case</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+  <li><code>#include &lt;lire&gt;</code> → <a href="lecon-00-68.4-la-fonction-lire-lire-une-case.html">0.68.4. La fonction lire() — lire une case</a></li>
+  <li><code>#include &lt;sprite&gt;</code> → <a href="lecon-00-69.4-la-fonction-sprite-un-lutin-au-pixel-pre.html">0.69.4. La fonction sprite() — un lutin au pixel près</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>673 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            65 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              130 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase          10 o  ← lire()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         85 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette          37 o  ← bouton()  — lit les huit boutons
+  Tuiles              208 o  ← CopierTuiles  — 11 lettres sur 43, et 2 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+  "GAUCHE  DROITE"     14 o  ← texte()  — un texte gravé
+Lettres gravées : ACDEGHIORTU
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, Notes
+Fonctions du langage appelées :
+  lire()   × 2    38 o sur place, dans main()  + AdresseCase (10 o)
+  sprite() × 1    23 o sur place, dans main()
+  poser()  × 2    12 o sur place, dans main()
+  texte()  × 1    11 o sur place, dans main()  + EcrireTexte (10 o)
+  bouton() × 2    10 o sur place, dans main()  + LireManette (37 o)
+  image()  × 1     6 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : un héros va à gauche et à droite entre deux murs,
+// et s'arrête collé contre eux, sans les traverser.
+//
+// Ce qui est nouveau : lire la case du décor où l'on va entrer.
+//   lire(colonne, ligne) rend la tuile posée dans cette case.
+//   Le héros compte en PIXELS, le décor en CASES : le pixel p est dans la case p / 8.
+//   Le héros occupe les pixels x à x + 7 :
+//     un pas à droite le fait entrer dans le pixel x + 8 → la case (x + 8) / 8 ;
+//     un pas à gauche dans le pixel x - 1 → la case (x - 1) / 8.
+
+#include &lt;Tuile&gt;    // un dessin de 8 × 8 pixels
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;poser&gt;    // pose une tuile sur une case du fond
+#include &lt;bouton&gt;   // lit un bouton de la manette
+#include &lt;lire&gt;     // lit la tuile posée sur une case
+#include &lt;sprite&gt;   // place un lutin de 8 × 8 au pixel près</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — HEROS</p>
+    <pre><code>Tuile HEROS = {
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+// Un bloc de mur, dessiné en quatre nuances.</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAeUlEQVR4nO3XsQ2AMAxE0ZSMQJkRGYOxGIERMgYlPZGMFQUj+b50rc+viayUdp2vWdY6JZ5dBRAgAVBftB/bI571nilAgBRAnurIAAKkAIo8roAAaYL+DSBA+UDGn814nN9NAQKkABormkUEBCgfyLhzAaA+gAClA93R8clXI4wb5wAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un dessin — MUR</p>
+    <pre><code>Tuile MUR = {
+  "33333333",
+  "31111113",
+  "31222213",
+  "31222213",
+  "31222213",
+  "31222213",
+  "31111113",
+  "33333333",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAVUlEQVR4nO3OOQ3AIAAAQMZKYKwItFQDIzIqC2kMdUDKk/aSE3DhiOdWwvKBkND40F3LNEJCQo+Ur1cICQkJCQkJCQkJCQkJ9YXGERL6Z2gtIaHPhRq4GfJqCH16wgAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une variable — x</p>
+    <pre><code>uint8_t x = 76;      // en pixels ; le héros occupe les pixels x à x + 7</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une variable — y</p>
+    <pre><code>uint8_t y = 64;      // 64 = 8 x 8 : pile sur la ligne de cases 8</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">6. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                 // Le jeu commence ici.
+  texte(1, 1, "GAUCHE  DROITE");
+  poser(3, 8, MUR);      // colonne 3 : les pixels 24 à 31
+  poser(16, 8, MUR);     // colonne 16 : les pixels 128 à 135
+
+  while (true) {             // La boucle du jeu :
+    image();
+
+    // À droite : le prochain pixel est x + 8, dans la case (x + 8) / 8.
+    // x = 119 : pixel 127, case 15, vide → il avance.
+    // x = 120 : pixel 128, case 16 : le MUR → il s'arrête.
+    if (bouton(DROITE) &amp;&amp; lire((x + 8) / 8, 8) != MUR) x++;
+
+    // À gauche : le prochain pixel est x - 1, dans la case (x - 1) / 8.
+    // x = 32 : pixel 31, case 3 : le MUR → il s'arrête.
+    if (bouton(GAUCHE) &amp;&amp; lire((x - 1) / 8, 8) != MUR) x--;
+
+    sprite(0, x, y, HEROS);  // On pose le héros à sa place.
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACQUlEQVR4nO3dzU3jUBhAUZZTwiwpYmqZGmZJGZRFCZQwZbCcRSSEQn7s4Rm/3BzpLhximY93lBdnEx7+vr0q3MPuE2jTAMcDHA9wPMDxAMcDHO8K8I+fj4eW/Pzjw89PLT///eSTv3p55y5y4eJr/96Tlxo1/+bAFwC+7fgrjZ3h3FTLz5waeNTCrb0O4M2Bl29B/wF8dYvbCHjtW8xa4En25x226LXX3wj4KuEdvYL3Pd4O+OSd4H0Bn9tt1t4tT3gXPWT+C8Dz7NI+B8cDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcbBnz0NeeTfN/5uQl3H+bb1m0k8PPL01HzLOVhvMPaTTjYdus2GPjXn9/vzbOOM+8uW6/bvQB/3qLnmQ3wgNm8gmcfdMiERwczdGPAM99kXXi472A3c5M18zZ48h9g7T7YLX1M0pwBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4/wBFvxHtL3ZwDwAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACRElEQVR4nO3du23bUABAUZcZwWWGyCyewWXGyFgZISNkjJQuBDiBLUpkzMfP9QFuoQ/B98gDPZGN9PD7zy+Fe9h9Bhoa4HiA4wGOBzge4HiA490B/vL49dKc1/99+v6t+du/bnx16PlN7eTGzpce79VdrTX/4cA3ADZ7/JHWncPUrOZveWjgtU7c0v0AHg48fwn6D+C7S9wg4KVfMUuBD7I+77BEL93/IOC7hJ/oE7zv43HAV68EPxfw1Gqz9Gr5gFfRq8z/BvBxVmn3wfEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPFWA37zM+cH+b3zjxzF9iOOGH1N4B8/v7/pXMCXQ7ic380mP/q8rQz87fnptXMB77UCjT5vgP/O//0SDXi7iW5won2C95zoNk39pdLQEc8EfPaLrBtPxw16mousU98mTf177DbjnuA2SccMcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHewFlwhHtaBD/CAAAAABJRU5ErkJggg==" alt="l’écran après DROITE">
+    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACQUlEQVR4nO3dzU3jUBhAUZZTwiwpYmqZGmZJGZRFCZQwZbCcRSSEQn7s4Rm/3BzpLhximY93lBdnEx7+vr0q3MPuE2jTAMcDHA9wPMDxAMcDHO8K8I+fj4eW/Pzjw89PLT///eSTv3p55y5y4eJr/96Tlxo1/+bAFwC+7fgrjZ3h3FTLz5waeNTCrb0O4M2Bl29B/wF8dYvbCHjtW8xa4En25x226LXX3wj4KuEdvYL3Pd4O+OSd4H0Bn9tt1t4tT3gXPWT+C8Dz7NI+B8cDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcbBnz0NeeTfN/5uQl3H+bb1m0k8PPL01HzLOVhvMPaTTjYdus2GPjXn9/vzbOOM+8uW6/bvQB/3qLnmQ3wgNm8gmcfdMiERwczdGPAM99kXXi472A3c5M18zZ48h9g7T7YLX1M0pwBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4/wBFvxHtL3ZwDwAAAABJRU5ErkJggg==" alt="l’écran après GAUCHE">
+    <figcaption><strong>GAUCHE</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Un héros entre deux blocs de mur ; il avance jusqu’à les toucher, et s’arrête pile contre eux.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>à droite, il s’arrête contre le mur : x = 120 <span class="detail"> (120)</span></li>
+
+  <li>à gauche aussi : x = 32 <span class="detail"> (32)</span></li>
+
+  <li>les murs sont toujours là </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>113. Glisser le long d’un mur : un axe à la fois</strong> — chapitre 18 : Les collisions : se toucher, se cogner.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

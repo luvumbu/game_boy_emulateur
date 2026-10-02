@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 0.95.1 — Un micro Zelda — l’écran glisse dans le sens du A</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie J — Un micro Zelda</span>
+    <span>leçon 0.95.1 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
+    
+    
+    
+  </p>
+<h1>0.95.1. Un micro Zelda — l’écran glisse dans le sens du A</h1>
+<p class="idee">Le 0.95, et à chaque passage d’une salle à une autre, l’écran GLISSE dans le sens où va le A : de gauche à droite, de droite à gauche, de haut en bas, de bas en haut. Avec defiler(x, y), 2 pixels par image.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>C’est le 0.95, avec une chose en plus : le glissement.</strong> Quand le A passe d’une salle à une autre, la nouvelle salle n’apparaît plus d’un coup : l’écran <strong>glisse</strong>, comme dans Zelda, <strong>dans le sens où va le A</strong>. Il va à <strong>gauche</strong> : l’ancienne salle part vers la droite, la nouvelle arrive par la gauche. À <strong>droite</strong> : l’ancienne part vers la gauche, la nouvelle arrive par la droite. En <strong>haut</strong> : l’ancienne descend, la nouvelle arrive par le haut. En <strong>bas</strong> : l’ancienne monte, la nouvelle arrive par le bas. Les <strong>portes</strong>, elles, téléportent : d’un coup, comme au 0.95.</p>
+<p><strong>Ce qui vient d’avant :</strong> tout le 0.95 (les quatre salles, <code>sx</code>, <code>sy</code>, les murs, les portes, le 255 d’un <code>uint8_t</code> qui fait le tour), et <code>defiler(x, y)</code> du 0.90.3 : il ne bouge pas une lettre, il déplace <strong>la caméra</strong> qui regarde le décor, au pixel près. <code>x</code> la pousse vers la droite, <code>y</code> vers le bas.</p>
+<p><strong>Ce qui est nouveau ici (1) : le monde fait le tour.</strong> Chaque salle a maintenant <strong>quatre sorties</strong> : à gauche, à droite, en haut, en bas. À droite de la salle 1, on revient à la salle 0 ; à gauche de la salle 0, on arrive à la salle 1 ; en haut de la salle 0, on arrive à la salle 2. Ainsi, <strong>chaque</strong> sortie mène à une salle, et l’écran glisse à chaque fois, dès le départ. Avec deux colonnes de salles, changer de colonne s’écrit <code>sx = 1 - sx</code> : 1 - 0 = <strong>1</strong>, 1 - 1 = <strong>0</strong>. Pareil pour les lignes : <code>sy = 1 - sy</code>.</p>
+<p><strong>Ce qui est nouveau ici (2) : le décor est plus grand que l’écran.</strong> Le décor de la console fait <strong>32 colonnes sur 32 lignes</strong> (256 × 256 pixels) ; l’écran n’en montre que <strong>20 sur 18</strong> (160 × 144 pixels). Le reste attend, caché. Et le décor est un <strong>ruban</strong>, dans les deux sens : après la colonne 31 revient la colonne 0, après la ligne 31 revient la ligne 0.</p>
+<p><strong>Ce qui est nouveau ici (3) : la salle n’est plus toujours dans le coin (0, 0) du décor.</strong> Deux variables le retiennent : <code>bord</code>, la colonne du décor où commence la salle, et <code>haut</code>, la ligne. Une case (c, l) <strong>de la salle</strong> est la case <code>((c + bord) % 32, (l + haut) % 32)</code> <strong>du décor</strong>. <code>% 32</code>, le reste de la division par 32, fait le tour du ruban : avec <code>bord</code> = 12, la colonne 19 de la salle est (19 + 12) % 32 = <strong>31</strong> ; une colonne 20 serait (20 + 12) % 32 = 32 % 32 = <strong>0</strong>. La caméra suit : <code>camx = bord × 8</code>, <code>camy = haut × 8</code> (8 pixels par case).</p>
+<p><strong>Ce qui est nouveau ici (4) : poserSalle() et lireSalle().</strong> Elles font ce calcul pour nous : <code>poserSalle(c, l, tuile)</code> au lieu de <code>poser()</code>, <code>lireSalle(c, l)</code> au lieu de <code>lire()</code>. Tout le programme passe par elles, et <code>ax</code>, <code>ay</code> restent des cases <strong>de la salle</strong>. <code>lireSalle()</code> <strong>rend</strong> un nombre : <code>uint8_t</code> devant son nom, et <code>return</code> pour dire lequel. Pour effacer, on pose la tuile <strong>0</strong> (une case vide). Et « SALLE n » s’écrit maintenant lettre par lettre avec <code>poserSalle()</code> (le chiffre n est la tuile <code>27 + n</code>) : <code>texte()</code> et <code>nombre()</code> ne savent pas ajouter <code>bord</code> et <code>haut</code>.</p>
+<p><strong>Ce qui est nouveau ici (5) : dessiner une seule colonne, ou une seule ligne.</strong> Le dessin de la salle (cadre, ouvertures, murs, portes, « SALLE n ») devient la fonction <code>dessinerMurs()</code>. Deux variables disent ce qu’elle dessine : <code>seule</code> (une colonne) et <code>seuleL</code> (une ligne) ; <strong>255</strong> veut dire « toutes ». C’est <code>poserSalle()</code> qui trie : <code>(seule == 255 || c == seule) &amp;&amp; (seuleL == 255 || l == seuleL)</code>. <code>&amp;&amp;</code> veut dire « et » : les deux doivent être vrais. <code>colonneSalle(c)</code> vide la colonne c, puis la dessine, elle seule ; <code>ligneSalle(l)</code> fait pareil pour une ligne.</p>
+<p><strong>Ce qui est nouveau ici (6) : les quatre glissements.</strong> Quand le A sort à <strong>gauche</strong>, <code>glisserAGauche()</code> : la nouvelle salle se met 20 colonnes plus à gauche (<code>bord + 12</code>, car 32 - 20 = 12 sur le ruban). Puis 20 tours : on dessine la colonne qui va entrer par la gauche (19, puis 18… jusqu’à 0), et la caméra <strong>recule</strong> d’une case en <strong>4 petits pas de 2 pixels</strong>, un par image : <code>camx = camx - 2</code>, <code>defiler(camx, camy)</code>. À <strong>droite</strong>, <code>glisserADroite()</code> : 20 colonnes plus à droite (<code>bord + 20</code>), on dessine les colonnes 0, 1… 19, et la caméra <strong>avance</strong> : <code>camx = camx + 2</code>. En <strong>haut</strong> et en <strong>bas</strong>, c’est pareil, mais debout : ligne par ligne avec <code>ligneSalle()</code>, et c’est <code>camy</code> qui bouge. La salle a 18 lignes : 18 lignes plus haut, c’est <code>haut + 14</code> (32 - 18 = 14) ; plus bas, <code>haut + 18</code>.</p>
+<p><strong>Déroulons, à gauche, depuis le départ</strong> (<code>bord</code> = 0, caméra à 0). Le A va jusqu’en (0, 8), l’ouverture, puis encore GAUCHE : l’arrivée est 0 - 1 = <strong>255</strong>, sorti à gauche. <code>sx</code> devient 1 - 0 = 1, <code>bord</code> devient 12. Tour 0 : la colonne 19 de la salle 1 va dans la colonne (19 + 12) % 32 = <strong>31</strong> du décor, cachée ; la caméra passe à 0 - 2 = <strong>254</strong> (elle fait le tour), puis 252, 250, 248 : la colonne 31 entre par la gauche, 2 pixels à chaque image. … Tour 11 : la colonne 8 va dans la colonne <strong>20</strong>, la dernière colonne cachée. Tour 12 : la colonne 7 va dans la colonne <strong>19</strong>. C’était l’ancienne salle ! Mais elle vient de sortir de l’écran par la droite : on peut la remplacer. … Tour 19 : la colonne 0 va dans la colonne 12 ; la caméra est à <strong>96</strong> (12 × 8) : l’écran montre les colonnes 12 à 31, toute la salle 1. Le A est posé en (19, 8).</p>
+<p><strong>Pourquoi 4 petits pas de 2 pixels ?</strong> 8 pixels d’un coup à chaque image, c’est trop rapide : les 20 colonnes passeraient en 20 images, un tiers de seconde, et l’œil ne verrait pas glisser. Avec 2 pixels par image : 20 × 4 = <strong>80 images</strong> à gauche et à droite, 18 × 4 = <strong>72</strong> en haut et en bas, un peu plus d’une seconde.</p>
+<p><strong>Pourquoi vider la colonne (ou la ligne) avant de la dessiner ?</strong> Au milieu du glissement, elle contient encore l’ancienne salle. <code>dessinerMurs()</code> ne pose que des X, des P, des lettres et quelques cases vides : un X de l’ancienne salle, là où la nouvelle n’en a pas, resterait.</p>
+<p><strong>Le A pendant le glissement :</strong> on le retire avant (sinon, il partirait avec l’ancienne salle), et on le pose après, du côté par où il entre : sorti à gauche, il entre à droite, en colonne 19 ; sorti en haut, il entre en bas, en ligne 16. L’autre coordonnée ne change pas.</p>
+<p><strong>Et les portes ?</strong> <code>dessinerSalle()</code> redessine d’un coup, et remet tout à zéro : <code>bord</code> = 0, <code>haut</code> = 0, la caméra à (0, 0). <code>viderEcran()</code> efface maintenant <strong>tout</strong> le décor, 32 lignes de 32 cases : les parties cachées doivent être vides, car un glissement va les montrer.</p>
+<p><strong>Essaie :</strong> pour glisser plus vite, fais 2 petits pas de 4 pixels : <code>p &lt; 2</code> et <code>camx = camx - 4</code> (2 × 4 = 8, toujours une case). Plus lentement : 8 petits pas de 1 pixel. La règle : le nombre de pas × les pixels par pas = 8.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;lire&gt;</code> → <a href="lecon-00-68.4-la-fonction-lire-lire-une-case.html">0.68.4. La fonction lire() — lire une case</a></li>
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+  <li><code>#include &lt;effacer&gt;</code> → <a href="lecon-00-16.3-la-fonction-effacer-effacer-des-cases.html">0.16.3. La fonction effacer() — effacer des cases</a></li>
+  <li><code>#include &lt;defiler&gt;</code> → <a href="lecon-00-90.3-la-fonction-defiler-faire-glisser-le-fon.html">0.90.3. La fonction defiler() — faire glisser le fond</a></li>
+  <li><code>#include &lt;chaque&gt;</code> → <a href="lecon-00-29.3-la-fonction-chaque-toutes-les-n-millisec.html">0.29.3. La fonction chaque() — toutes les n millisecondes</a></li>
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>2599 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage           92 o  ← la console, à l’allumage  — la mise en route de la console
+  chaque_minuteur()  124 o  ← main()  — une fonction fournie par le langage
+  poserSalle()        62 o  ← mur(), murDebout(), dessinerMurs(), colonneSalle(), ligneSalle(), main()  — ta fonction
+  lireSalle()         28 o  ← main()  — ta fonction
+  mur()               40 o  ← dessinerMurs()  — ta fonction
+  murDebout()         40 o  ← dessinerMurs()  — ta fonction
+  viderEcran()        33 o  ← dessinerSalle()  — ta fonction
+  dessinerMurs()     442 o  ← dessinerSalle(), colonneSalle(), ligneSalle()  — ta fonction
+  dessinerSalle()     35 o  ← main()  — ta fonction
+  colonneSalle()      44 o  ← glisserAGauche(), glisserADroite()  — ta fonction
+  ligneSalle()        44 o  ← glisserEnHaut(), glisserEnBas()  — ta fonction
+  glisserAGauche()    81 o  ← main()  — ta fonction
+  glisserADroite()    77 o  ← main()  — ta fonction
+  glisserEnHaut()     81 o  ← main()  — ta fonction
+  glisserEnBas()      77 o  ← main()  — ta fonction
+  main()             440 o  ← démarrage  — ta fonction
+  VBlank               8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage       28 o  ← image()  — attend l’image suivante
+  AttendreVBlank      16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces       12 o  ← EffacerCases  — attend de pouvoir écrire une case
+  AdresseCase         10 o  ← poser(), lire(), effacer()  — trouve l’adresse d’une case de l’écran
+  EffacerCases        12 o  ← effacer()  — efface des cases
+  CopierTuiles        18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte        14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette         37 o  ← bouton()  — lit les huit boutons
+  Tuiles             704 o  ← CopierTuiles  — la police entière
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  defiler()         ×  5    40 o sur place, dans dessinerSalle(), glisserAGauche(), glisserADroite(), glisserEnHaut(), glisserEnBas()
+  poser()           ×  1    29 o sur place, dans poserSalle()  + AdresseCase (10 o)
+  lire()            ×  1    27 o sur place, dans lireSalle()  + AdresseCase (10 o)
+  bouton()          ×  4    20 o sur place, dans main()  + LireManette (37 o)
+  image()           ×  5    15 o sur place, dans glisserAGauche(), glisserADroite(), glisserEnHaut(), glisserEnBas(), main()  + AttendreImage (28 o)
+  effacer()         ×  1    14 o sur place, dans viderEcran()  + AdresseCase (10 o), EffacerCases (12 o)
+  images()          ×  1     2 o sur place, dans chaque_minuteur()
+Tes fonctions appelées :
+  poserSalle()      × 34   497 o sur place, dans mur(), murDebout(), dessinerMurs(), colonneSalle(), ligneSalle(), main()
+  mur()             ×  6    87 o sur place, dans dessinerMurs()
+  murDebout()       ×  4    57 o sur place, dans dessinerMurs()
+  lireSalle()       ×  2    22 o sur place, dans main()
+  colonneSalle()    ×  2    18 o sur place, dans glisserAGauche(), glisserADroite()
+  ligneSalle()      ×  2    18 o sur place, dans glisserEnHaut(), glisserEnBas()
+  chaque_minuteur() ×  1    10 o sur place, dans main()
+  dessinerMurs()    ×  3     9 o sur place, dans dessinerSalle(), colonneSalle(), ligneSalle()
+  dessinerSalle()   ×  2     6 o sur place, dans main()
+  viderEcran()      ×  1     3 o sur place, dans dessinerSalle()
+  glisserAGauche()  ×  1     3 o sur place, dans main()
+  glisserADroite()  ×  1     3 o sur place, dans main()
+  glisserEnHaut()   ×  1     3 o sur place, dans main()
+  glisserEnBas()    ×  1     3 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// ---- UN MICRO ZELDA : L'ÉCRAN GLISSE DANS LE SENS DU A ----
+// C'est le 0.95, avec une chose en plus : à CHAQUE passage d'une salle
+// à une autre, la nouvelle salle n'apparaît plus d'un coup. L'écran
+// GLISSE, dans le sens où va le A :
+//   le A va à GAUCHE : l'ancienne salle part vers la droite, la nouvelle arrive par la gauche ;
+//   le A va à DROITE : l'ancienne salle part vers la gauche, la nouvelle arrive par la droite ;
+//   le A va en HAUT  : l'ancienne salle part vers le bas, la nouvelle arrive par le haut ;
+//   le A va en BAS   : l'ancienne salle part vers le haut, la nouvelle arrive par le bas.
+// Les portes, elles, téléportent : elles redessinent d'un coup, comme au 0.95.
+//
+// Tout ce qui suit « // » sur une ligne est un COMMENTAIRE : la console
+// ne le lit pas. Il n'est là que pour toi, pour expliquer le code.
+//
+// Les lettres : A = le héros, X = un mur, P = une porte.
+// ALPHABET[0]  : le A    ALPHABET[23] : le X    ALPHABET[15] : le P
+// ALPHABET[n] : la n-ième lettre, en comptant à partir de 0 (pas de 1) :
+//   A = 0, B = 1, C = 2, D = 3, E = 4… L = 11… P = 15, S = 18… X = 23.
+// La tuile 0, c'est une case VIDE (un espace).
+// La tuile 27, c'est le chiffre 0 ; 28 le 1, 29 le 2, 30 le 3 : 27 + n, le chiffre n.
+//
+// Le monde : QUATRE salles, deux de large, deux de haut (le 0.95).
+//
+//      sx = 0      sx = 1
+//   +---------+---------+
+//   | salle 0 | salle 1 |   sy = 0
+//   +---------+---------+
+//   | salle 2 | salle 3 |   sy = 1
+//   +---------+---------+
+//
+// salle = sx + sy + sy   (0 + 0 + 0 = 0, 1 + 0 + 0 = 1, 0 + 1 + 1 = 2, 1 + 1 + 1 = 3)
+//
+// NOUVEAU : LE MONDE FAIT LE TOUR, dans les deux sens.
+// Chaque salle a une sortie de chaque côté : à gauche, à droite, en haut,
+// en bas. À droite de la salle 1, on revient à la salle 0 ; à gauche de la
+// salle 0, on arrive à la salle 1. En bas de la salle 2, on revient à la
+// salle 0 ; en haut de la salle 0, on arrive à la salle 2. Ainsi, CHAQUE
+// sortie mène à une salle, et l'écran glisse à chaque fois.
+// Avec deux colonnes de salles, changer de colonne, c'est : sx = 1 - sx
+//   1 - 0 = 1 (on passe de la colonne 0 à la colonne 1),
+//   1 - 1 = 0 (on passe de la colonne 1 à la colonne 0).
+// Et changer de ligne de salles : sy = 1 - sy.
+//
+// NOUVEAU : LE DÉCOR EST PLUS GRAND QUE L'ÉCRAN.
+// Le décor de la console fait 32 colonnes sur 32 lignes (256 × 256 pixels) ;
+// l'écran n'en montre que 20 colonnes sur 18 lignes (160 × 144 pixels).
+// defiler(x, y) choisit QUEL morceau on regarde : x et y sont la place de
+// la « caméra », en pixels (8 pixels = 1 case).
+//
+//   colonnes du décor :  0 ............ 19 20 ...... 31
+//                        [    l'écran, camx = 0  ][ caché ]
+//   (et pareil en hauteur : les lignes 0 à 17 à l'écran, 18 à 31 cachées)
+//
+// Le décor est un RUBAN, dans les deux sens : après la colonne 31 revient
+// la colonne 0 ; après la ligne 31 revient la ligne 0.
+//
+// La salle, elle, garde ses colonnes 0 à 19 et ses lignes 0 à 17 :
+// les lignes 0 à 16 pour le terrain, la ligne 17 pour « SALLE n ».
+// bord dit dans quelle colonne DU DÉCOR est sa colonne 0 ;
+// haut dit dans quelle ligne DU DÉCOR est sa ligne 0 :
+//   colonne du décor = (colonne de la salle + bord) % 32
+//   ligne du décor   = (ligne de la salle + haut) % 32
+// % 32 : le reste de la division par 32 ; il fait « le tour du ruban ».
+//   Exemple, bord = 12 : la colonne 19 de la salle est (19 + 12) % 32 = 31,
+//   et s'il y avait une colonne 20 : (20 + 12) % 32 = 32 % 32 = 0.
+// La caméra regarde toujours la salle : camx = bord × 8, camy = haut × 8.
+
+// ---- Les variables ----
+// uint8_t : une boîte qui garde un nombre de 0 à 255, jamais en dessous de 0.
+
+#include &lt;poser&gt;      // pose une tuile sur une case du fond
+#include &lt;lire&gt;       // lit la tuile posée sur une case
+#include &lt;ALPHABET&gt;   // les lettres de la police : ALPHABET[0] est le A
+#include &lt;effacer&gt;    // efface des cases, ou tout le fond
+#include &lt;defiler&gt;    // fait glisser tout le fond
+#include &lt;chaque&gt;     // répond 1 toutes les n millisecondes
+#include &lt;bouton&gt;     // lit un bouton de la manette</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une variable — ax</p>
+    <pre><code>uint8_t ax = 9;           // le A, le héros : sa colonne DANS LA SALLE (0 à 19)…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une variable — ay</p>
+    <pre><code>uint8_t ay = 8;           // …et sa ligne (0 à 16). Il part de (9, 8).</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une variable — nx</p>
+    <pre><code>uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une variable — ny</p>
+    <pre><code>uint8_t ny = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">6. une variable — sx</p>
+    <pre><code>uint8_t sx = 0;           // la salle : sa colonne dans le monde (0 ou 1)…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">7. une variable — sy</p>
+    <pre><code>uint8_t sy = 0;           // …et sa ligne (0 ou 1). On part de la salle 0.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">8. une variable — salle</p>
+    <pre><code>uint8_t salle = 0;        // son numéro, 0 à 3</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">9. une variable — bord</p>
+    <pre><code>uint8_t bord = 0;         // NOUVEAU : la colonne du décor où commence la salle (0 à 31)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">10. une variable — haut</p>
+    <pre><code>uint8_t haut = 0;         // NOUVEAU : la ligne du décor où commence la salle (0 à 31)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">11. une variable — camx</p>
+    <pre><code>uint8_t camx = 0;         // NOUVEAU : la place de la caméra, en pixels : de gauche à droite…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">12. une variable — camy</p>
+    <pre><code>uint8_t camy = 0;         // …et de haut en bas. defiler(camx, camy).</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">13. une variable — seule</p>
+    <pre><code>uint8_t seule = 255;      // NOUVEAU : 255 = toutes les colonnes ; 0 à 19 = CETTE colonne seulement</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">14. une variable — seuleL</p>
+    <pre><code>uint8_t seuleL = 255;     // NOUVEAU : 255 = toutes les lignes ;   0 à 17 = CETTE ligne seulement
+
+// ---- NOUVEAU : poser une lettre sur une case DE LA SALLE ----
+// Au 0.95, on écrivait poser(c, l, …) : la salle était toujours dans les
+// colonnes 0 à 19 et les lignes 0 à 17 du décor. Maintenant, elle peut être
+// ailleurs : on ajoute bord et haut, et % 32 fait le tour du ruban.
+// Et si seule (ou seuleL) n'est pas 255, on ne pose QUE dans cette colonne
+// (ou cette ligne) : le reste n'est pas touché (c'est pour le glissement).
+// &amp;&amp; : « et ». Il faut que les DEUX conditions soient vraies.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">15. une fonction — poserSalle()</p>
+    <pre><code>void poserSalle(uint8_t c, uint8_t l, uint8_t t) {
+  if ((seule == 255 || c == seule) &amp;&amp; (seuleL == 255 || l == seuleL)) {
+    poser((c + bord) % 32, (l + haut) % 32, t);  // t : une lettre, un chiffre, ou 0 pour vide
+  }
+}
+
+// ---- NOUVEAU : lire la lettre d'une case DE LA SALLE ----
+// Même calcul que poserSalle(). « uint8_t » devant le nom : cette fonction
+// REND un nombre (la tuile lue). « return » dit lequel.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">16. une fonction — lireSalle()</p>
+    <pre><code>uint8_t lireSalle(uint8_t c, uint8_t l) {
+  return lire((c + bord) % 32, (l + haut) % 32);
+}
+
+// ---- n murs X à la suite, vers la DROITE, à partir de (c, l) (le 0.95) ----
+// Exemple : mur(4, 4, 3) pose un X en (4, 4), (5, 4) et (6, 4).
+// Seul changement : poserSalle() au lieu de poser().</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">17. une fonction — mur()</p>
+    <pre><code>void mur(uint8_t c, uint8_t l, uint8_t n) {
+  for (uint8_t i = 0; i &lt; n; i++) {     // i vaut 0, puis 1, puis 2… jusqu'à n - 1
+    poserSalle(c + i, l, ALPHABET[23]); // un X, i cases à droite du départ
+  }
+}
+
+// ---- n murs X à la suite, vers le BAS, à partir de (c, l) (le 0.95) ----
+// Exemple : murDebout(6, 3, 3) pose un X en (6, 3), (6, 4) et (6, 5).</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">18. une fonction — murDebout()</p>
+    <pre><code>void murDebout(uint8_t c, uint8_t l, uint8_t n) {
+  for (uint8_t i = 0; i &lt; n; i++) {
+    poserSalle(c, l + i, ALPHABET[23]); // c'est la LIGNE qui avance, pas la colonne
+  }
+}
+
+// ---- vider TOUT le décor ----
+// Les 32 lignes, sur leurs 32 colonnes (et plus 18 × 20 comme au 0.95) :
+// les parties cachées doivent être vides elles aussi, car le glissement
+// va les montrer.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">19. une fonction — viderEcran()</p>
+    <pre><code>void viderEcran() {
+  for (uint8_t l = 0; l &lt; 32; l++) {    // l vaut 0, 1, 2… jusqu'à 31
+    effacer(0, l, 32);                  // 32 cases à partir de la colonne 0 : toute la ligne du décor
+  }
+}
+
+// ---- NOUVEAU : toute la salle (sx, sy) : murs, portes, et « SALLE n » ----
+// C'était le milieu de dessinerSalle() au 0.95. On le met à part pour
+// pouvoir l'appeler de plusieurs façons :
+//   seule = 255, seuleL = 255 : toute la salle est dessinée ;
+//   seule = 7                 : seule la colonne 7 est dessinée ;
+//   seuleL = 5                : seule la ligne 5 est dessinée.
+// C'est poserSalle() qui trie : les autres cases sont ignorées.
+// Les ouvertures s'écrivent poserSalle(…, 0) : poser une case vide, c'est
+// effacer. (effacer() ne sait pas qu'il faut ajouter bord et haut.)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">20. une fonction — dessinerMurs()</p>
+    <pre><code>void dessinerMurs() {
+  salle = sx + sy + sy;                 // le numéro de la salle
+
+  // 1. le cadre, en entier : les lignes 0 et 16, les colonnes 0 et 19
+  mur(0, 0, 20);                        // en haut : de (0, 0) à (19, 0)
+  mur(0, 16, 20);                       // en bas : de (0, 16) à (19, 16)
+  murDebout(0, 0, 17);                  // à gauche : de (0, 0) à (0, 16)
+  murDebout(19, 0, 17);                 // à droite : de (19, 0) à (19, 16)
+
+  // 2. NOUVEAU : les OUVERTURES, de chaque côté, TOUJOURS (le monde fait le tour).
+  //    Plus besoin de « if » : chaque salle a ses quatre sorties.
+  poserSalle(0, 7, 0);                  // à gauche : les lignes 7, 8, 9 de la colonne 0
+  poserSalle(0, 8, 0);
+  poserSalle(0, 9, 0);
+  poserSalle(19, 7, 0);                 // à droite : les lignes 7, 8, 9 de la colonne 19
+  poserSalle(19, 8, 0);
+  poserSalle(19, 9, 0);
+  poserSalle(9, 0, 0);                  // en haut : les colonnes 9 et 10 de la ligne 0
+  poserSalle(10, 0, 0);
+  poserSalle(9, 16, 0);                 // en bas : les colonnes 9 et 10 de la ligne 16
+  poserSalle(10, 16, 0);
+
+  // 3. les murs DANS la salle : chaque salle a les siens (le 0.95)
+  if (salle == 0) {
+    mur(4, 4, 12);                      // une barre en haut : de (4, 4) à (15, 4)
+    poserSalle(3, 12, ALPHABET[15]);    // la PORTE de la salle 0, en (3, 12)
+  }
+  if (salle == 1) {
+    murDebout(6, 3, 11);                // une colonne de (6, 3) à (6, 13)…
+    murDebout(13, 1, 11);               // …une autre de (13, 1) à (13, 11)
+  }
+  if (salle == 2) {
+    mur(3, 5, 6);                       // une barre de (3, 5) à (8, 5)…
+    mur(11, 11, 6);                     // …et une autre de (11, 11) à (16, 11)
+  }
+  if (salle == 3) {
+    mur(3, 8, 12);                      // une barre au milieu : de (3, 8) à (14, 8)
+    poserSalle(15, 4, ALPHABET[15]);    // la PORTE de la salle 3, en (15, 4)
+  }
+
+  // 4. NOUVEAU : « SALLE » et son numéro, sur la ligne 17, lettre par lettre.
+  //    texte() et nombre() ne savent pas ajouter bord et haut ; poserSalle(), si.
+  //    Et comme ça, la ligne 17 glisse avec la salle.
+  poserSalle(0, 17, ALPHABET[18]);      // S
+  poserSalle(1, 17, ALPHABET[0]);       // A
+  poserSalle(2, 17, ALPHABET[11]);      // L
+  poserSalle(3, 17, ALPHABET[11]);      // L
+  poserSalle(4, 17, ALPHABET[4]);       // E
+  poserSalle(6, 17, 27 + salle);        // le chiffre : 27 + 0 = le 0, 27 + 3 = le 3
+}
+
+// ---- dessiner la salle D'UN COUP (le 0.95) ----
+// Au départ, et pour les portes. On remet tout à zéro : la salle revient
+// dans les colonnes 0 à 19 et les lignes 0 à 17 du décor, la caméra aussi.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">21. une fonction — dessinerSalle()</p>
+    <pre><code>void dessinerSalle() {
+  viderEcran();                         // le décor vide, en entier
+  bord = 0;                             // la salle commence à la colonne 0…
+  haut = 0;                             // …et à la ligne 0 du décor
+  camx = 0;                             // la caméra la regarde depuis le coin (0, 0)
+  camy = 0;
+  defiler(camx, camy);
+  seule = 255;                          // toute la salle
+  seuleL = 255;
+  dessinerMurs();
+}
+
+// ---- NOUVEAU : UNE colonne de la nouvelle salle ----
+// D'abord, on la vide, lignes 0 à 17 : l'ancienne salle y avait peut-être
+// un X, que la nouvelle n'a pas. Puis on y dessine la colonne c, et elle seule.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">22. une fonction — colonneSalle()</p>
+    <pre><code>void colonneSalle(uint8_t c) {
+  seule = c;                            // on ne touche QUE la colonne c
+  for (uint8_t l = 0; l &lt; 18; l++) {
+    poserSalle(c, l, 0);                // vider, du haut (0) au bas (17)
+  }
+  dessinerMurs();                       // puis dessiner : seule la colonne c est posée
+  seule = 255;                          // de nouveau toutes les colonnes
+}
+
+// ---- NOUVEAU : UNE ligne de la nouvelle salle ----
+// La même chose, couchée : on vide la ligne l, colonnes 0 à 19, puis on la dessine.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">23. une fonction — ligneSalle()</p>
+    <pre><code>void ligneSalle(uint8_t l) {
+  seuleL = l;                           // on ne touche QUE la ligne l
+  for (uint8_t c = 0; c &lt; 20; c++) {
+    poserSalle(c, l, 0);                // vider, de la gauche (0) à la droite (19)
+  }
+  dessinerMurs();
+  seuleL = 255;
+}
+
+// ---- NOUVEAU : le GLISSEMENT quand le A sort à GAUCHE ----
+//
+// La nouvelle salle se met 20 colonnes à GAUCHE de l'ancienne :
+//   bord - 20, sur le ruban de 32, c'est bord + 12 (32 - 20 = 12).
+//   Exemple : bord = 0 → la nouvelle salle commence en colonne 12 du décor.
+// La caméra RECULE (camx diminue) : l'ancienne salle part vers la droite.
+// Juste avant chaque pas, on dessine la colonne qui va entrer par la GAUCHE :
+// la 19, puis la 18… jusqu'à la 0.
+//   tour 0  : la colonne 19 de la salle, dans la colonne (19 + 12) % 32 = 31 du décor, cachée
+//   tour 11 : la colonne 8, dans la colonne 20 (la dernière colonne cachée)
+//   tour 12 : la colonne 7, dans la colonne 19. C'était l'ancienne salle, mais
+//             elle vient de sortir de l'écran par la droite : on peut la remplacer.
+//   tour 19 : la colonne 0, dans la colonne 12. Fini : camx = 96, l'écran montre 12 à 31.
+// Chaque colonne entre en 4 PETITS PAS de 2 pixels, un par image (4 × 2 = 8 pixels) :
+// 20 colonnes × 4 images = 80 images, un peu plus d'une seconde.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">24. une fonction — glisserAGauche()</p>
+    <pre><code>void glisserAGauche() {
+  sx = 1 - sx;                          // l'autre colonne du monde (0 → 1, 1 → 0)
+  bord = (bord + 12) % 32;              // la nouvelle salle : 20 colonnes plus à gauche
+  for (uint8_t k = 0; k &lt; 20; k++) {    // 20 tours : une colonne par tour
+    colonneSalle(19 - k);               // la colonne qui va entrer à gauche : 19, 18… 0
+    for (uint8_t p = 0; p &lt; 4; p++) {   // 4 petits pas de 2 pixels (p vaut 0, 1, 2, 3)
+      image();                          // un petit pas par image
+      camx = camx - 2;                  // la caméra RECULE : 0, 254, 252… (0 - 2 fait le tour : 254)
+      defiler(camx, camy);              // le décor glisse vers la DROITE
+    }
+  }
+}
+
+// ---- NOUVEAU : le GLISSEMENT quand le A sort à DROITE ----
+// Le même, dans l'autre sens.
+// La nouvelle salle se met 20 colonnes à DROITE de l'ancienne : bord + 20.
+//   Exemple : bord = 0 → la nouvelle salle commence en colonne 20 du décor
+//   (les colonnes 20 à 31, puis 0 à 7 : le ruban fait le tour).
+// La caméra AVANCE (camx augmente) : l'ancienne salle part vers la gauche.
+// On dessine la colonne qui va entrer par la DROITE : la 0, puis la 1… jusqu'à la 19.
+//   tour 0  : la colonne 0 de la salle, dans la colonne (0 + 20) % 32 = 20 du décor, cachée
+//   tour 12 : la colonne 12, dans la colonne (12 + 20) % 32 = 0. C'était l'ancienne
+//             salle, mais elle vient de sortir de l'écran par la gauche.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">25. une fonction — glisserADroite()</p>
+    <pre><code>void glisserADroite() {
+  sx = 1 - sx;                          // l'autre colonne du monde
+  bord = (bord + 20) % 32;              // la nouvelle salle : 20 colonnes plus à droite
+  for (uint8_t k = 0; k &lt; 20; k++) {
+    colonneSalle(k);                    // la colonne qui va entrer à droite : 0, 1… 19
+    for (uint8_t p = 0; p &lt; 4; p++) {
+      image();
+      camx = camx + 2;                  // la caméra AVANCE : 0, 2, 4… (254 + 2 fait le tour : 0)
+      defiler(camx, camy);              // le décor glisse vers la GAUCHE
+    }
+  }
+}
+
+// ---- NOUVEAU : le GLISSEMENT quand le A sort en HAUT ----
+// Pareil, mais debout : on travaille ligne par ligne, et c'est camy qui bouge.
+// La salle a 18 lignes (0 à 17) ; le décor en a 32.
+// La nouvelle salle se met 18 lignes AU-DESSUS : haut - 18, sur le ruban de 32,
+// c'est haut + 14 (32 - 18 = 14).
+// On dessine la ligne qui va entrer par le HAUT : la 17, puis la 16… jusqu'à la 0.
+// 18 lignes × 4 images = 72 images.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">26. une fonction — glisserEnHaut()</p>
+    <pre><code>void glisserEnHaut() {
+  sy = 1 - sy;                          // l'autre ligne du monde (0 → 1, 1 → 0)
+  haut = (haut + 14) % 32;              // la nouvelle salle : 18 lignes plus haut
+  for (uint8_t k = 0; k &lt; 18; k++) {    // 18 tours : une ligne par tour
+    ligneSalle(17 - k);                 // la ligne qui va entrer en haut : 17, 16… 0
+    for (uint8_t p = 0; p &lt; 4; p++) {
+      image();
+      camy = camy - 2;                  // la caméra MONTE : le décor glisse vers le BAS
+      defiler(camx, camy);
+    }
+  }
+}
+
+// ---- NOUVEAU : le GLISSEMENT quand le A sort en BAS ----
+// La nouvelle salle se met 18 lignes AU-DESSOUS : haut + 18.
+// On dessine la ligne qui va entrer par le BAS : la 0, puis la 1… jusqu'à la 17.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">27. une fonction — glisserEnBas()</p>
+    <pre><code>void glisserEnBas() {
+  sy = 1 - sy;
+  haut = (haut + 18) % 32;              // la nouvelle salle : 18 lignes plus bas
+  for (uint8_t k = 0; k &lt; 18; k++) {
+    ligneSalle(k);                      // la ligne qui va entrer en bas : 0, 1… 17
+    for (uint8_t p = 0; p &lt; 4; p++) {
+      image();
+      camy = camy + 2;                  // la caméra DESCEND : le décor glisse vers le HAUT
+      defiler(camx, camy);
+    }
+  }
+}
+
+// ---- main() : c'est ICI que la console commence ----</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">28. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  dessinerSalle();                        // la salle 0, d'un coup
+  poserSalle(ax, ay, ALPHABET[0]);        // le A à sa place, en (9, 8)
+
+  while (true) {                          // la boucle ne s'arrête jamais
+    image();                              // on attend l'image suivante : 60 par seconde
+
+    // ---- le A bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+    if (chaque(150)) {
+      // 1. la case d'ARRIVÉE (le 0.82) ; une seule flèche à la fois (else if)
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;                      // une colonne à droite
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;                      // une colonne à gauche (0 - 1 donne 255 !)
+      } else if (bouton(BAS)) {
+        ny = ay + 1;                      // une ligne plus bas
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;                      // une ligne plus haut (0 - 1 donne 255 !)
+      }
+
+      // 2. une flèche est tenue : l'arrivée n'est pas la case où l'on est (!= : « différent de »)
+      if (nx != ax || ny != ay) {
+        // 3. NOUVEAU : l'arrivée est HORS de la salle : l'écran GLISSE vers la nouvelle.
+        //    Ces tests viennent en premier : lireSalle(255, 8) n'aurait pas de sens.
+        //    Avant de glisser, on retire le A de l'ancienne salle (sinon, il
+        //    partirait avec elle) ; après, on le pose, du côté par où il entre.
+        if (nx == 255) {                  // sorti à GAUCHE (0 - 1 = 255)
+          poserSalle(ax, ay, 0);
+          glisserAGauche();
+          ax = 19;                        // il entre par la DROITE, sur la même ligne
+          poserSalle(ax, ay, ALPHABET[0]);
+        } else if (nx == 20) {            // sorti à DROITE (19 + 1 = 20)
+          poserSalle(ax, ay, 0);
+          glisserADroite();
+          ax = 0;                         // il entre par la GAUCHE
+          poserSalle(ax, ay, ALPHABET[0]);
+        } else if (ny == 255) {           // sorti en HAUT (0 - 1 = 255)
+          poserSalle(ax, ay, 0);
+          glisserEnHaut();
+          ay = 16;                        // il entre par le BAS, dans la même colonne
+          poserSalle(ax, ay, ALPHABET[0]);
+        } else if (ny == 17) {            // sorti en BAS (16 + 1 = 17)
+          poserSalle(ax, ay, 0);
+          glisserEnBas();
+          ay = 0;                         // il entre par le HAUT
+          poserSalle(ax, ay, ALPHABET[0]);
+        } else if (lireSalle(nx, ny) == ALPHABET[15]) {
+          // 4. …l'arrivée est une PORTE P : elle mène à l'autre porte (le 0.95)
+          if (salle == 0) {     // la porte de la salle 0 mène à la salle 3…
+            sx = 1;
+            sy = 1;
+            ax = 14;            // …à côté de sa porte, en (15, 4) : une case à gauche
+            ay = 4;
+          } else {              // sinon, la porte de la salle 3 ramène à la salle 0…
+            sx = 0;
+            sy = 0;
+            ax = 4;             // …à côté de sa porte, en (3, 12) : une case à droite
+            ay = 12;
+          }
+          dessinerSalle();                  // une porte téléporte : d'un coup
+          poserSalle(ax, ay, ALPHABET[0]);
+        } else if (lireSalle(nx, ny) == 0) {
+          // 5. …l'arrivée est VIDE : le A y va.
+          poserSalle(ax, ay, 0);            // le A quitte sa case (on y pose du vide)…
+          ax = nx;                          // …prend la case d'arrivée…
+          ay = ny;
+          poserSalle(ax, ay, ALPHABET[0]);  // …et y est dessiné
+        }
+        // 6. …sinon, l'arrivée est un X : il ne se passe rien. C'est ça, un mur.
+      }
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC1ElEQVR4nO3cTY7iMBRF4QxZQg3Z/2pYAstgWAOkKhQSQ36en318pG/gdnehKFc2vtCp6f64XX6u98ftiTTeqoVrPn08tXARBhwb8N+f3+9O7/P7Mm7n+o/PT4v5v/9Mv/P7MsbMu4KbuM7YFZz+PuF7cNzYgAcIWGClFay+bN6i1ZfSFn3WKVS5lk/Rr3+n3m3rwerLth6svnjIgrMHj8gVzOEWDWcP5rMH89mDyezBZB6y4OzBI3IFc7hFw9mD+ezBfPZgMnswmYcsOHvwiGqs4PT/3d/4OPQ+G3D+ODzgCqfotdd3Pvo+1+vBa6/vfOh9dgU3MR93n30Pzh+H3mcDzh+HBywwP8niSNuiVUdpi44+3amOzB6sOnJ6sOrI6cGqw0MWnD14RK5gDrdoOHswnz2Yzx5MZg8m85AFZw8ekQHDGTCcAcMZMJwBwxkwnAHDGTAcPODLz/Up/UqykAP2I1gD5oMH/Cr9elLAA14cD8WA4QwYjhywDJjPgOEMGM6A4QwYzoDhDBjOgOF8soHDR1fgfD6Yz+eD+Xw+mMzng8k8ZMH5fPCIXMEcbtFw9mA+ezCfPZjMHkzmIQvOHjyiM1ewT3rlCt+i3epzhfdgA04X24PdolsQ2IPNNV1sDzbgXFUPWarPHjwiP8ni8KNKOL8P5vP7YD6/Dybz+2AyD1lw9uARuYI53KLh7MF89mA+ezCZPZjMQxacPXhErmAOt2g4ezCfPZjPHkxmDybzkAVnDx5RaQX3Pt6qhWs+fWzAAwRcOEX3Pr8v43au//j85x7c+/y+jDHzruAmrjN2Bae/T/geHDc24AECFtj/e/Di709Zm1x8rcL81t/P4i9zOct8i57d5Y/jtX//zfyas7ZctR6wi/i4+RY9u9GLW+uRLfqba3o96xvwQfND1pGT6okr+HURp9+jrjUa8O6f1cxUPkKvjde27k3zBZ6izwxYYL+AjyRkZR6FWQAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC10lEQVR4nO3cMW7jMBRFUZdeQkrvfzVeQpaRMkUA21EkxpL4+cnLC5yCw5kYgh5I89mjXD6/7teP2+fX/QdpvFcP11x9fOnhIgw4NuDHn//endHnj2Xcz/Wfn7+s5v/3Z8adP5YxZt4V3MV1xq7g9PcJ34PjxgY8QcACK61gjWX3Fq2xlLboWqdQ5Vo/Rb/+nUa3rwdrLPt6sMbiIQvOHjwjVzCHWzScPZjPHsxnDyazB5N5yIKzB8/IFczhFg1nD+azB/PZg8nswWQesuDswTNqsYLT/3d/5+PQ+2zA+ePwgBucorde3/no+9yuB2+9vvOh99kV3MV83H32PTh/HHqfDTh/HB6wwPwkiyNti1YbpS06+nSnNjJ7sNrI6cFqI6cHqw0PWXD24Bm5gjncouHswXz2YD57MJk9mMxDFpw9eEYGDGfAcAYMZ8BwBgxnwHAGDGfAcAb8y/Xj9iP9Smox4CfkR7YG/GTAcI/9mbRLG/CTKxjOgOEMWOMxYDgDhjNgOAOGM2A4A4YzYDgDhvPJBg4fXYHz+WA+nw/m8/lgMp8PJvOQBefzwTNyBXO4RcPZg/nswXz2YDJ7MJmHLDh78IxqrmDek1tjCd+i3epzhfdgA04X24PdonsQ2IPNNV1sDzbgXE0PWWrPHjwjP8ni8KNKOL8P5vP7YD6/Dybz+2AyD1lw9uAZuYI53KLh7MF89mA+ezCZPZjMQxacPXhGrmAOt2g4ezCfPZjPHkxmDybzkAVnD55RaQWPPt6rh2uuPjbgCQIunKJHnz+WcT/Xf37+/x48+vyxjDHzruAurjN2Bae/T/geHDc24AkCFtjzPXj196dsTa6+VmF+7+9n8Ze51LLcohd3+d/x1r9/Z35LrS1XvQfsIj5vuUUvbvTq1npmi37nml7P+gZ80vKQdeakWnEFvy7i9Hs0tE4DPvyzWriUj9Bb462te9d8gafomgEL7BugByRkiXjYPgAAAABJRU5ErkJggg==" alt="l’écran après DROITE">
+    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC1ElEQVR4nO3cTY7iMBRF4QxZQg3Z/2pYAstgWAOkKhQSQ36en318pG/gdnehKFc2vtCp6f64XX6u98ftiTTeqoVrPn08tXARBhwb8N+f3+9O7/P7Mm7n+o/PT4v5v/9Mv/P7MsbMu4KbuM7YFZz+PuF7cNzYgAcIWGClFay+bN6i1ZfSFn3WKVS5lk/Rr3+n3m3rwerLth6svnjIgrMHj8gVzOEWDWcP5rMH89mDyezBZB6y4OzBI3IFc7hFw9mD+ezBfPZgMnswmYcsOHvwiGqs4PT/3d/4OPQ+G3D+ODzgCqfotdd3Pvo+1+vBa6/vfOh9dgU3MR93n30Pzh+H3mcDzh+HBywwP8niSNuiVUdpi44+3amOzB6sOnJ6sOrI6cGqw0MWnD14RK5gDrdoOHswnz2Yzx5MZg8m85AFZw8ekQHDGTCcAcMZMJwBwxkwnAHDGTAcPODLz/Up/UqykAP2I1gD5oMH/Cr9elLAA14cD8WA4QwYjhywDJjPgOEMGM6A4QwYzoDhDBjOgOF8soHDR1fgfD6Yz+eD+Xw+mMzng8k8ZMH5fPCIXMEcbtFw9mA+ezCfPZjMHkzmIQvOHjyiM1ewT3rlCt+i3epzhfdgA04X24PdolsQ2IPNNV1sDzbgXFUPWarPHjwiP8ni8KNKOL8P5vP7YD6/Dybz+2AyD1lw9uARuYI53KLh7MF89mA+ezCZPZjMQxacPXhErmAOt2g4ezCfPZjPHkxmDybzkAVnDx5RaQX3Pt6qhWs+fWzAAwRcOEX3Pr8v43au//j85x7c+/y+jDHzruAmrjN2Bae/T/geHDc24AECFtj/e/Di709Zm1x8rcL81t/P4i9zOct8i57d5Y/jtX//zfyas7ZctR6wi/i4+RY9u9GLW+uRLfqba3o96xvwQfND1pGT6okr+HURp9+jrjUa8O6f1cxUPkKvjde27k3zBZ6izwxYYL+AjyRkZR6FWQAAAABJRU5ErkJggg==" alt="l’écran après GAUCHE">
+    <figcaption><strong>GAUCHE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC50lEQVR4nO2cS27DMAwFs+wRssz9T5Mj9BhZdlEgDRzbqT8UpeEAs1DZxpD1QIovrnz5fty/rrfvx/0X0ngrPcz59PGlh0kocKzAz5/fV2f0+D6N+5n/8fhlVv/3z4wb36cxJm4GdzHP2AxO3yfcg+PGClxAYAGzlsEyFptLtIzFWok+qwuVXOa76Nffyehs88EyFtt8sIyFTRYcfXBFzGAOlmg4+mA++mA++mAy+mAyNllw9MEVMYM5WKLh6IP56IP56IPJ6IPJ2GTB0QdXpEUGp/93f+fj0HVW4PxxuMANuuil6xuPXud2Pnjp+sZD19kM7iIet87uwfnj0HVW4PxxuMACxm+yOKSVaGnDWomO7u6kDZk+WNqQ44OlDTk+WNpgkwVHH1wReAZ/XW+/pM+kzc2+j8kCU+9r0/2Su+hqApfzwc/6XKdK1/LBZrB7MAqbrPwptb9ffTAcBYajwHAUGI4Cw1FgOAoMR4HhKDAcBYajwHAUGI4Cw1FgOAoMR4HhKDAcBYajwHAUGI4Cw1FgOAoMR4HhKDAc8smGapQ7ulKNcueDC1LrfHBNCp0PLkit88HVsMmC4/ngipjBHCzRcPTBfPTBfPTBZPTBZGyy4OiDK3JmBhd882dXhJdoS30u4T5YgdOJ9cGW6B4I9MHqmk6sD1bgXJo2WdIefXBF/CaLg19VwvF5MB+fB/PxeTAZnweTscmCow+uiBnMwRINRx/MRx/MRx9MRh9MxiYLjj64ImYwB0s0HH0wH30wH30wGX0wGZssOPrgiqxl8OjjrfQw59PHClxA4JUuevT4Po37mf/x+GcfPHp8n8aYuBncxTxjMzh9n3APjhsrcAGBBczfHjz7/pSl4Oy1VuJb38/iy1zOYlqiJ6v8cbz09/+JL3FWyZXeBTaJjzMt0ZOFni2tR0r0f+b02usr8EGmTdaRTvXEDH5N4vQ1GppOBd79WZlwWW+hl8ZLpXtTfAW76DMFFjA/H0UkZBb6FeIAAAAASUVORK5CYII=" alt="l’écran après HAUT">
+    <figcaption><strong>HAUT</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC1ElEQVR4nO3cTY7iMBRF4QxZQg3Z/2pYAstgWAOkKhQSQ36en318pG/gdnehKFc2vtCp6f64XX6u98ftiTTeqoVrPn08tXARBhwb8N+f3+9O7/P7Mm7n+o/PT4v5v/9Mv/P7MsbMu4KbuM7YFZz+PuF7cNzYgAcIWGClFay+bN6i1ZfSFn3WKVS5lk/Rr3+n3m3rwerLth6svnjIgrMHj8gVzOEWDWcP5rMH89mDyezBZB6y4OzBI3IFc7hFw9mD+ezBfPZgMnswmYcsOHvwiGqs4PT/3d/4OPQ+G3D+ODzgCqfotdd3Pvo+1+vBa6/vfOh9dgU3MR93n30Pzh+H3mcDzh+HBywwP8niSNuiVUdpi44+3amOzB6sOnJ6sOrI6cGqw0MWnD14RK5gDrdoOHswnz2Yzx5MZg8m85AFZw8ekQHDGTCcAcMZMJwBwxkwnAHDGTAcPODLz/Up/UqykAP2I1gD5oMH/Cr9elLAA14cD8WA4QwYjhywDJjPgOEMGM6A4QwYzoDhDBjOgOF8soHDR1fgfD6Yz+eD+Xw+mMzng8k8ZMH5fPCIXMEcbtFw9mA+ezCfPZjMHkzmIQvOHjyiM1ewT3rlCt+i3epzhfdgA04X24PdolsQ2IPNNV1sDzbgXFUPWarPHjwiP8ni8KNKOL8P5vP7YD6/Dybz+2AyD1lw9uARuYI53KLh7MF89mA+ezCZPZjMQxacPXhErmAOt2g4ezCfPZjPHkxmDybzkAVnDx5RaQX3Pt6qhWs+fWzAAwRcOEX3Pr8v43au//j85x7c+/y+jDHzruAmrjN2Bae/T/geHDc24AECFtj/e/Di709Zm1x8rcL81t/P4i9zOct8i57d5Y/jtX//zfyas7ZctR6wi/i4+RY9u9GLW+uRLfqba3o96xvwQfND1pGT6okr+HURp9+jrjUa8O6f1cxUPkKvjde27k3zBZ6izwxYYL+AjyRkZR6FWQAAAABJRU5ErkJggg==" alt="l’écran après BAS">
+    <figcaption><strong>BAS</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">À chaque sortie, l’écran glisse dans le sens du A : à gauche, à droite, en haut, en bas. Les portes P téléportent d’un coup.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>sorti à GAUCHE : l’écran glisse, 2 pixels par image, vers la salle 1 <span class="detail"> (80 places de caméra)</span></li>
+
+  <li>sorti à DROITE : il glisse dans l’autre sens, retour à la salle 0 <span class="detail"> (80 places)</span></li>
+
+  <li>sorti en BAS : il glisse vers le haut, la salle 2 arrive par le bas <span class="detail"> (72 places)</span></li>
+
+  <li>sorti en HAUT : il glisse vers le bas, retour à la salle 0 <span class="detail"> (72 places)</span></li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>0.96. Une lettre qui tire — un tir, tout seul</strong> — chapitre 0 : Avant tout.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

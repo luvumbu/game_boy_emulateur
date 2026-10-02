@@ -248,6 +248,7 @@ b.egal('onze dessins écrits, neuf tuiles gravées', jeu.dessins.size, 9)
 b.egal('la première tuile nommée garde le numéro 44', jeu.dessins.get('SOL').numero, 44)
 
 const apres = compiler(analyser(
+  '#include <Tuile>\n#include <poser>\n' +
   'Tuile PREMIERE = { "00000000", "00000000", "00000000", "00000000", "00000000", "00000000", "00000000", "00000000" };\n' +
   'int main() {\n' +
   '  poser(0, 0, { "33333333", "33333333", "33333333", "33333333", "33333333", "33333333", "33333333", "33333333" });\n' +
@@ -261,7 +262,7 @@ b.egal('une tuile nommée APRÈS un dessin sur place garde son rang',
 
 /* ------------------------------------------------------------- les refus */
 
-const refuser = (source) => () => compiler(analyser(`int main() {\n${source}\n  return 0;\n}\n`))
+const refuser = (source) => () => compiler(analyser(`int main() {\n${source}\n  return 0;\n}\n`), { libre: true }) // ces refus-là ne portent pas sur les « #include »
 const HUIT = '"########", "########", "########", "########", "########", "########", "########", "########"'
 
 b.refuse('un dessin de sept rangées',

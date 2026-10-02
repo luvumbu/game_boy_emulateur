@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 3 — Les boucles : répéter</span>
   <span>leçon 2 sur 9 dans ce chapitre</span>
-  <span>10 sur 42 dans le cours</span>
+  <span>10 sur 61 dans le cours</span>
 </p>
 <h1>10. while avec une condition : la boucle qui s’arrête</h1>
 <p class="idee">La condition est posée AVANT chaque tour : quand elle devient fausse, on sort.</p>
@@ -108,32 +108,69 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1397 octets</strong> de cartouche.</p>
+<strong>751 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()               79 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre         33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles         76 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              400 o  ← CopierTuiles  — 25 lettres sur 43
+  "COMPTE A REBOURS"   16 o  ← texte()  — un texte gravé
+  "DECOLLAGE!"         10 o  ← texte()  — un texte gravé
+Lettres gravées : ABCDEGLMOPRSTU0123456789!
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 2    22 o sur place, dans main()  + EcrireTexte (10 o)
+  nombre() × 1    10 o sur place, dans main()  + EcrireNombre (33 o)
+  image()  × 2     6 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  uint8_t reste = 5;
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : un compte à rebours 5, 4, 3, 2, 1, puis DECOLLAGE!
+//
+// Ce qui est nouveau : une boucle while qui S'ARRÊTE.
+//   while (condition) ... : répète TANT QUE la condition est vraie.
+//   Avant chaque tour, on teste la condition ; dès qu'elle est fausse, on sort.
+
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                    // Le jeu commence ici.
+  uint8_t reste = 5;            // Le nombre affiché. Il part de 5.
 
   texte(3, 3, "COMPTE A REBOURS");
 
-  while (reste &gt; 0) {
-    nombre(9, 7, reste, 1);
+  while (reste &gt; 0) {           // Tant que reste est plus grand que 0 :
+    nombre(9, 7, reste, 1);     //   affiche reste sur 1 chiffre (5, puis 4, ...).
 
-    uint8_t attente = 0;
-    while (attente &lt; 30) {      // une demi-seconde
-      image();
-      attente++;
+    uint8_t attente = 0;        //   Un petit compteur pour attendre.
+    while (attente &lt; 30) {      //   Une boucle DANS la boucle : 30 tours...
+      image();                  //   ... de une image chacun :
+      attente++;                //   30 images = une demi-seconde.
     }
 
-    reste--;                    // sans lui, la boucle ne finit jamais
-  }
+    reste--;                    //   reste perd 1. Sans lui, la boucle ne finit jamais.
+  }                             // Déroulé : 5, 4, 3, 2, 1. Quand reste vaut 0,
+                                // « 0 &gt; 0 » est faux : on sort de la boucle.
 
-  texte(5, 7, "DECOLLAGE!");
+  texte(5, 7, "DECOLLAGE!");    // Écrit par-dessus le dernier chiffre.
 
-  while (true) {
+  while (true) {                // La boucle de fin : on garde l'écran allumé.
     image();
   }
 }</code></pre>

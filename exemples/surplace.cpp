@@ -17,6 +17,16 @@
  */
 
 /* Celui-là sert partout : il garde son nom. */
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <texte>          // écrit un texte à l’écran
+#include <poser>          // pose une tuile sur une case du fond
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <sprite16>       // place un lutin de 16 × 16 au pixel près
+#include <panneau>        // montre le panneau, à une place choisie
+#include <poserPanneau>   // pose une tuile sur le panneau
+#include <Perso>          // un dessin de 16 × 16 pixels, pour un lutin
+
 Tuile SOL = {
   "22222222",
   "21111112",

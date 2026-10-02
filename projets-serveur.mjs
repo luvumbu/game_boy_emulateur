@@ -60,6 +60,8 @@ function programmeNeuf(titre) {
     ' * arrive, et nulle part ailleurs.',
     ' */',
     '',
+    '#include <texte>   // chaque fonction de la console s\'inclut : texte() écrit un texte',
+    '',
     'int main() {',
     `  texte(4, 6, "${titre}");`,
     '',

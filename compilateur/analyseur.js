@@ -31,6 +31,8 @@
  * « << », qui doit l'être avant « < ». Trier autrement découpe « a <<= 2 » en
  * « a < <= 2 », et l'erreur qui s'ensuit ne parle plus de rien.
  */
+import { BIBLIOTHEQUES } from './inclusion.js'
+
 const SYMBOLES = [
   '<<=', '>>=',
   '==', '!=', '<=', '>=', '&&', '||', '++', '--',
@@ -163,6 +165,27 @@ export function lexer(source) {
     }
 
     if (c === '#') {
+      /* « #include <texte> » : une demande d'inclusion, voir BIBLIOTHEQUES.
+         Un commentaire peut suivre, sur la même ligne. */
+      const fin = source.indexOf('\n', i)
+      const reste = source.slice(i, fin === -1 ? source.length : fin)
+      const demande = reste.match(/^#\s*include\s*<\s*([A-Za-z_0-9]+)\s*>\s*(?:\/\/[^\n]*)?$/)
+      if (demande && Object.hasOwn(BIBLIOTHEQUES, demande[1])) {
+        jetons.push({ genre: 'inclure', valeur: demande[1], ligne })
+        i += reste.length
+        continue
+      }
+      if (demande) {
+        /* « <alphabet> » pour « <ALPHABET> » : le nom s'écrit comme dans le programme. */
+        const proche = Object.keys(BIBLIOTHEQUES).find((nom) => nom.toLowerCase() === demande[1].toLowerCase())
+        throw new Error(
+          `ligne ${ligne} : « <${demande[1]}> » n'existe pas. ` +
+            (proche
+              ? `C'est « #include <${proche}> » : le nom s'écrit exactement comme dans le programme.`
+              : 'On inclut une fonction de la console par son nom, écrit comme dans le programme : ' +
+                Object.keys(BIBLIOTHEQUES).map((nom) => `<${nom}>`).join(', ') + '.'),
+        )
+      }
       throw new Error(
         `ligne ${ligne} : « # » n'est compris que dans « #include "autre.cpp" », ` +
           'seul sur sa ligne. Pour une constante, écrire « const uint8_t NOM = 3; ».',
@@ -186,7 +209,12 @@ export function lexer(source) {
 /* ------------------------------------------------------------ l'analyseur */
 
 export function analyser(source) {
-  const jetons = lexer(source)
+  /* Les demandes d'inclusion sont mises à part : elles ne sont pas du code,
+     elles ouvrent le programme comme des nœuds « inclusion ». */
+  const tous = lexer(source)
+  const inclusions = tous.filter((j) => j.genre === 'inclure')
+    .map((j) => ({ genre: 'inclusion', nom: j.valeur, ligne: j.ligne }))
+  const jetons = tous.filter((j) => j.genre !== 'inclure')
   let p = 0
 
   /*
@@ -901,7 +929,7 @@ export function analyser(source) {
     return declarations(leType, jeton.ligne).map((d) => ({ ...d, globale: true }))
   }
 
-  const programme = []
+  const programme = [...inclusions]
   while (!finies()) programme.push(...haut())
   return programme
 }

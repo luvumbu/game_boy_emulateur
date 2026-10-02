@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 4 — Les tableaux : ranger beaucoup de valeurs</span>
   <span>leçon 5 sur 5 dans ce chapitre</span>
-  <span>22 sur 42 dans le cours</span>
+  <span>22 sur 61 dans le cours</span>
 </p>
 <h1>22. Une grille : un tableau à deux dimensions</h1>
 <p class="idee">Une carte de jeu, c’est des lignes de cases : carte[ligne][colonne].</p>
@@ -108,54 +108,98 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1740 octets</strong> de cartouche.</p>
+<strong>822 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          287 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← texte()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles     76 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          272 o  ← CopierTuiles  — 17 lettres sur 43
+  "#"               1 o  ← texte()  — un texte gravé
+  "."               1 o  ← texte()  — un texte gravé
+  "MURS:"           5 o  ← texte()  — un texte gravé
+Lettres gravées : MRSU0123456789.:#
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 3    63 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  ecran()  × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  nombre() × 1    10 o sur place, dans main()  + EcrireNombre (33 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. un tableau — carte</p>
-    <pre><code>uint8_t carte[8][12];</code></pre>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : une petite carte de 8 lignes sur 12 colonnes, rangée dans une
+// GRILLE (un tableau à deux dimensions), puis dessinée avec des # et des points.
+//
+// Ce qui est nouveau : carte[8][12]
+//   = 8 rangées de 12 cases. carte[l][c] = la case de la ligne l, colonne c.
+//   l va de 0 à 7, c va de 0 à 11.
+
+#include &lt;ecran&gt;    // éteint ou rallume l’écran
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  ecran(0);
-  /* remplir : les bords sont des murs */
-  for (uint8_t l = 0; l &lt; 8; l++) {
-    for (uint8_t c = 0; c &lt; 12; c++) {
+    <p class="quoi">2. un tableau — carte</p>
+    <pre><code>uint8_t carte[8][12];             // 8 × 12 = 96 cases. 1 = un mur, 0 = du sol.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                      // Le jeu commence ici.
+  ecran(0);                       // Dessin écran éteint.
+  // Remplir : les bords sont des murs.
+  for (uint8_t l = 0; l &lt; 8; l++) {         // chaque ligne l (0 à 7)
+    for (uint8_t c = 0; c &lt; 12; c++) {      //   chaque colonne c (0 à 11)
       if (l == 0 || l == 7 || c == 0 || c == 11) carte[l][c] = 1;
-      else carte[l][c] = 0;
+                                  //   première ou dernière ligne, OU première ou
+                                  //   dernière colonne : c'est un bord → mur (1).
+      else carte[l][c] = 0;       //   sinon : du sol (0).
     }
   }
 
-  /* quelques murs a la main */
-  carte[3][4] = 1;
-  carte[4][4] = 1;
-  carte[4][8] = 1;
+  // Quelques murs à la main.
+  carte[3][4] = 1;                // ligne 3, colonne 4
+  carte[4][4] = 1;                // ligne 4, colonne 4
+  carte[4][8] = 1;                // ligne 4, colonne 8
 
-  /* dessiner, et compter les murs */
+  // Dessiner, et compter les murs.
   uint8_t murs = 0;
   for (uint8_t l = 0; l &lt; 8; l++) {
     for (uint8_t c = 0; c &lt; 12; c++) {
-      if (carte[l][c] == 1) {
-        texte(4 + c, 3 + l, "#");
+      if (carte[l][c] == 1) {     // un mur ?
+        texte(4 + c, 3 + l, "#"); //   un # ; « 4 + c » et « 3 + l » placent la carte
+                                  //   à partir de la colonne 4, ligne 3 de l'écran.
         murs++;
-      } else {
-        texte(4 + c, 3 + l, ".");
+      } else {                    // du sol :
+        texte(4 + c, 3 + l, "."); //   un point.
       }
     }
   }
 
   texte(4, 13, "MURS:");
-  nombre(10, 13, murs);
+  nombre(10, 13, murs);           // Les bords : 12 + 12 + 6 + 6 = 36, plus 3 à la main = 39.
 
-  ecran(1);
+  ecran(1);                       // On rallume.
 
-  while (true) {
+  while (true) {                  // La boucle du jeu.
     image();
   }
 }</code></pre>

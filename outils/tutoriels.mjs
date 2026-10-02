@@ -16,7 +16,11 @@ import { writeFileSync } from 'node:fs'
 import { LECONS, NIVEAUX, numeros, partieDe } from '../tuto/lecons.js'
 
 const NUMEROS = numeros(LECONS)
+import { inclusionsDe, fonctionDuTuto, tutosDesFonctions, leconsQuiEmploient } from '../tuto/fonctions.js'
+const TUTOS = tutosDesFonctions(LECONS)
+const EMPLOIS = leconsQuiEmploient(LECONS)
 import { consoleDuProgramme } from '../tuto/console.mjs'
+import { resumeGrave } from '../analyse-rom.js'
 
 const SAUT = String.fromCharCode(10)
 
@@ -29,8 +33,8 @@ const SAUT = String.fromCharCode(10)
  */
 const mesure = (lecon) => {
   try {
-    const { octets, variables } = consoleDuProgramme(lecon.code, lecon.titre, false, lecon.fichiers)
-    return { octets: octets.length, variables: variables.size }
+    const { octets, variables, grave } = consoleDuProgramme(lecon.code, lecon.titre, false, lecon.fichiers)
+    return { octets: octets.length, variables: variables.size, grave }
   } catch (erreur) {
     return { erreur: erreur.message }
   }
@@ -40,9 +44,9 @@ const lignes = []
 const dire = (...quoi) => lignes.push(...quoi)
 
 dire(
-  '# Les leçons, du plus facile au plus dur',
+  '# Apprendre — le parcours, du plus facile au plus dur',
   '',
-  `**${LECONS.length} leçons**, rangées en dix niveaux. Chacune est un **programme`,
+  `**${LECONS.length} étapes** — leçons, cours et fonctions —, rangées en ${Object.keys(NIVEAUX).length} chapitres. Chacune est un **programme`,
   'entier** : le code se colle tel quel dans `http://localhost/gameboy3/`, ou se',
   'compile en ligne de commande, et il tourne.',
   '',
@@ -57,18 +61,24 @@ dire(
   'mal compris.',
   '',
   '> **Cette page est engendrée** — `node tutoriels.mjs`. La source est',
-  '> `tuto/lecons.js` et `tuto/tutoriels.js`, qui alimentent aussi le mode',
-  '> LEÇONS de l’atelier, `tuto.html` et les livrets PDF. Corriger ici ne',
+  '> `tuto/lecons.js`, `tuto/tutoriels.js` et `tuto/programmation.js`, réunis en',
+  '> un seul parcours par `tuto/parcours.js` : ils alimentent aussi le mode',
+  '> APPRENDRE de l’atelier, `tuto.html` et les livrets PDF. Corriger ici ne',
   '> servirait à rien : le fichier serait réécrit à la prochaine passe.',
   '',
   'Les mêmes leçons se lisent **dans l’atelier**, avec une console qui tourne à',
-  'côté et le code modifiable — `http://localhost/gameboy3/` puis « MODE LEÇONS ».',
+  'côté et le code modifiable — `http://localhost/gameboy3/` puis « APPRENDRE ».',
+  '',
+  '**Un seul parcours.** Les leçons, les tutoriels et le cours ne font qu’une suite :',
+  'les chapitres sont entremêlés par sujet, et chaque fonction de la console est',
+  'présentée seule (sa ligne `#include`, ses arguments, ce qu’elle coûte) juste',
+  'avant la première étape qui l’emploie — un `#include` nouveau à la fois.',
   '',
 )
 
 /* --- le sommaire, par niveau --- */
 
-dire('| Niveau | Ce qu’on y apprend | Leçons |', '|---|---|---|')
+dire('| Chapitre | Ce qu’on y apprend | Étapes |', '|---|---|---|')
 for (const [numero, nom] of Object.entries(NIVEAUX)) {
   const dedans = LECONS.filter((l) => l.difficulte === Number(numero))
   if (!dedans.length) continue
@@ -78,7 +88,7 @@ for (const [numero, nom] of Object.entries(NIVEAUX)) {
 }
 dire('')
 
-/* --- les parties d'un niveau (le 0 en a dix), chacune avec ses numéros --- */
+/* --- les parties d'un niveau (le 0 en a onze), chacune avec ses numéros --- */
 
 // La place de chaque leçon qui OUVRE une partie (celles qui portent
 // « partie: '…' »). flatMap garde [i] pour elles, et [] (rien) pour les autres :
@@ -87,7 +97,7 @@ const ouvertures = LECONS.flatMap((l, i) => (l.partie ? [i] : []))
 
 // Un tableau seulement s'il y a des parties : sans elles, rien à écrire.
 if (ouvertures.length) {
-  dire('| Partie | Niveau | Leçons |', '|---|---|---|')   // l'en-tête du tableau markdown
+  dire('| Partie | Chapitre | Étapes |', '|---|---|---|')   // l'en-tête du tableau markdown
   for (const i of ouvertures) {
     const { lettre, nom } = partieDe(LECONS, i)   // par exemple B et « Le temps »
 
@@ -112,7 +122,7 @@ let niveauCourant = null
 LECONS.forEach((lecon, i) => {
   if (lecon.difficulte !== niveauCourant) {
     niveauCourant = lecon.difficulte
-    dire(`## Niveau ${niveauCourant} — ${NIVEAUX[niveauCourant]}`, '')
+    dire(`## Chapitre ${niveauCourant} — ${NIVEAUX[niveauCourant]}`, '')
   }
   // Sur la leçon qui ouvre une partie, un titre avant elle :
   // « ### Partie B — Le temps ». Les autres leçons n'ont pas « partie ».
@@ -137,14 +147,32 @@ LECONS.forEach((lecon, i) => {
 
   for (const paragraphe of lecon.texte) dire(paragraphe, '')
 
-  const { octets, variables, erreur } = mesure(lecon)
+  /* Les fonctions de la leçon, et le tuto de chacune ; sur un tuto, l'autre sens. */
+  const fonction = fonctionDuTuto(lecon)
+  if (fonction) {
+    const emplois = EMPLOIS.get(fonction) ?? []
+    if (emplois.length) dire(`**On retrouve ${fonction} dans** — ${emplois.map((k) => NUMEROS[k]).join(', ')}`, '')
+  } else {
+    const noms = inclusionsDe(lecon)
+    if (noms.length) {
+      dire('**Les fonctions de cette leçon — et le tuto de chacune**', '')
+      for (const nom of noms) {
+        const k = TUTOS.get(nom)
+        dire(`- \`#include <${nom}>\`` + (k === undefined ? '' : ` → ${NUMEROS[k]}. ${LECONS[k].titre}`))
+      }
+      dire('')
+    }
+  }
+
+  const { octets, variables, grave, erreur } = mesure(lecon)
   if (erreur) {
     dire(`**Ce programme ne compile pas** — ${erreur}`, '')
   } else {
     dire(
       `**Ce qu’on doit voir** — ${lecon.aVoir}  `,
       `**Ce qu’il coûte** — ${octets} octets de programme, ` +
-        `${variables} variable${variables > 1 ? 's' : ''}.`,
+        `${variables} variable${variables > 1 ? 's' : ''}.  `,
+      `**Ce qui est gravé** — ${resumeGrave(grave)}`,
       '',
     )
   }

@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 3 — Les boucles : répéter</span>
   <span>leçon 9 sur 9 dans ce chapitre</span>
-  <span>17 sur 42 dans le cours</span>
+  <span>17 sur 61 dans le cours</span>
 </p>
 <h1>17. Une boucle qui dure plusieurs images</h1>
 <p class="idee">Un « for » se fait d’un coup ; pour qu’on VOIE quelque chose se construire, la boucle du jeu doit porter le compte.</p>
@@ -102,43 +102,81 @@
 <h2>1. Ce qu’il faut comprendre</h2>
 <p>C’est la leçon la plus importante du chapitre pour un jeu. Un <code>for</code> <strong>ne rend pas la main</strong> avant son dernier tour : tant qu’il tourne, rien d’autre ne se passe. Le <code>for</code> du haut pose ses 20 # écran éteint, <strong>avant</strong> que le jeu commence : c’est le bon moment pour tout faire d’un coup.</p>
 <p>La ligne du bas se construit <strong>une case toutes les 4 images</strong>. Il n’y a <strong>pas de <code>for</code></strong> : c’est la boucle du jeu elle-même qui fait les tours. La variable <code>pose</code> — déclarée <strong>avant</strong> la boucle, voir le chapitre 1 — retient <strong>où l’on en est</strong> d’une image à l’autre.</p>
-<p>Toute animation d’un jeu est faite ainsi : une porte qui s’ouvre, une barre de vie qui descend, un texte qui s’écrit lettre par lettre. <strong>On ne met jamais un long <code>for</code> qui attend au milieu du jeu</strong> : pendant qu’il tourne, les touches ne sont plus lues, les ennemis ne bougent plus — le jeu est gelé. Souviens-toi de la leçon sur le VBlank : vingt <code>texte()</code> écran allumé, c’est un tiers de seconde de jeu gelé.</p>
+<p>Toute animation d’un jeu est faite ainsi : une porte qui s’ouvre, une barre de vie qui descend, un texte qui s’écrit lettre par lettre. <strong>On ne met jamais un long <code>for</code> qui attend au milieu du jeu</strong> : pendant qu’il tourne, les touches ne sont plus lues, les ennemis ne bougent plus — le jeu est gelé. Même un <code>for</code> court à écrire se paie en images de jeu gelé s’il attend.</p>
 <p>À retenir : un <code>for</code> sert à <strong>tout faire maintenant</strong> (dessiner un décor écran éteint, parcourir un tableau, calculer). Une <strong>variable + la boucle du jeu</strong> sert à <strong>faire un peu à chaque image</strong>.</p>
 <p>Et même sans écrire à l’écran, un <code>for</code> trop long dans la boucle du jeu coûte cher : s’il ne tient plus dans 1/60 de seconde, le jeu <strong>ralentit</strong>. La leçon 76 du tutoriel mesure ce coût.</p>
 <p><strong>À toi :</strong> écris « BONJOUR » lettre par lettre, une toutes les 10 images, avec la même méthode.</p>
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1497 octets</strong> de cartouche.</p>
+<strong>578 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage          49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()            137 o  ← démarrage  — ta fonction
+  VBlank              8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage      28 o  ← image()  — attend l’image suivante
+  AttendreVBlank     16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces      12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase        10 o  ← texte()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte        10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles       76 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte       14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles            192 o  ← CopierTuiles  — 12 lettres sur 43
+  "D UN COUP:"       10 o  ← texte()  — un texte gravé
+  "#"                 1 o  ← texte()  — un texte gravé
+  "PETIT A PETIT:"   14 o  ← texte()  — un texte gravé
+  "#"                 1 o  ← texte()  — un texte gravé
+Lettres gravées : ACDEINOPTU:#
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte() × 4    58 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  ecran() × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  image() × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  /* d'un coup : ecran eteint, avant que le jeu commence */
-  ecran(0);
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : dessine une ligne de # d'un coup, puis une autre PETIT À PETIT,
+// une case toutes les 4 images, pendant que le jeu tourne.
+//
+// L'idée : un travail long (une animation) ne se fait pas dans une boucle for
+// qui bloque tout ; on en fait un petit morceau à chaque image.
+
+#include &lt;ecran&gt;   // éteint ou rallume l’écran
+#include &lt;texte&gt;   // écrit un texte à l’écran</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                            // Le jeu commence ici.
+  // D'un coup : écran éteint, avant que le jeu commence.
+  ecran(0);                             // Écran éteint.
   texte(0, 2, "D UN COUP:");
-  for (uint8_t i = 0; i &lt; 20; i++) {
-    texte(i, 4, "#");
+  for (uint8_t i = 0; i &lt; 20; i++) {    // 20 tours, i = 0 à 19 :
+    texte(i, 4, "#");                   // les 20 # de la ligne 4.
   }
   texte(0, 8, "PETIT A PETIT:");
-  ecran(1);
+  ecran(1);                             // On rallume : la ligne 4 apparaît entière.
 
-  /* petit a petit : une case toutes les 4 images */
-  uint8_t pose = 0;
-  uint8_t attente = 0;
+  // Petit à petit : une case toutes les 4 images.
+  uint8_t pose = 0;                     // Combien de # déjà posés sur la ligne 10 (0 à 20).
+  uint8_t attente = 0;                  // Les images attendues depuis le dernier #.
 
-  while (true) {
-    image();
+  while (true) {                        // La boucle du jeu :
+    image();                            // une image.
 
-    attente++;
-    if (attente == 4 &amp;&amp; pose &lt; 20) {
-      texte(pose, 10, "#");
-      pose++;
-      attente = 0;
+    attente++;                          // Une image de plus.
+    if (attente == 4 &amp;&amp; pose &lt; 20) {    // 4 images passées ET la ligne pas encore finie ?
+      texte(pose, 10, "#");             //   pose un # à la colonne pose (0, puis 1, ...),
+      pose++;                           //   un de plus de posé,
+      attente = 0;                      //   et on recommence à attendre 4 images.
     }
-  }
+  }                                     // 20 cases × 4 images = 80 images ≈ 1,3 seconde.
 }</code></pre>
   </div>
   <div></div>
@@ -156,12 +194,12 @@ instants qui comptent. Une image identique à la précédente n’est pas montr�
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACT0lEQVR4nO3cQW6bQABAUZY9Qpc9RM/SM/S4OUKP0WVVtYoshCeDiwP9edJTZI0xHvIFApSw/Pj5Qthy+gx4KoHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI77HfjT5y+vZj5zu9jM6/GqNr93c3zwXbvm/6EsD4QZ/6IPWc8hr+dnEnZw4NXP+fXMr3/+NU8JvNqVJ9eza/0O0fOeEvjEPZiVqwR+3mH5g+d/5Cx671nu3vX8y9k1K66D4wSOEzhO4DiB4wSOEzhO4DiB45bb21j0LJv3+f68Zzww/jfw1+/fXt1+wPj/Pi5wfFzg+LjA8XEnWfFxl0lxbnTECRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcaMn3a3+hPrN8cGT6O4tf89jC19n/tcxelbleGPuvbt3fLzkzKfOnf/FkwscCXnP7CH6nQPvOiRebf6Xst6D5zfpmnvwFeZ/KQK/33ad4o3Ag6Pc4B9Vdx0Snxr4lPlfiuvgOIHjBI4TOE7gOIHjBI4TOE7guMMehHb6lrDpsEcZnr4lbDrsYaSnbwmbBI4TOE7gOCdZcS6T4tzoiBM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geN+ATSpIUXOtQ5RAAAAAElFTkSuQmCC" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACT0lEQVR4nO3cQW6bQABAUS97hC57iJ6lZ+hxc4QeI8uoahVZyCaDa8L086SnyBpjPOQLBCjh8uv1hbDL4TNgVwLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRz3O/CXr9/ejXzmerGR1+uruvm9N8dXvmvT/E/l8kCY9V/0U9bzlNfjMwl7cuDFz/H1jK9//DW7BF7syoPr2bR+h+hxuwQ+cA9mYZbA+x2WT57/kbPorWe5W9fzL2fXLLgOjhM4TuA4geMEjhM4TuA4geMEjrtc38ai53LzPt+f94wHxv8G/v7zx7vrDxj/38cFjo8LHB8XOD7uJCs+7jIpzo2OOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOG7tSXeLP6H+cHzlSXT3lr/nsYXnmf881p5Vub4x997dOr6+5Minjp3/5MkFjoS8Z/QQ/cmBNx0SZ5v/VJZ78PgmzbkHzzD/qQj8edt1iA8CrxzlVv5RddMhcdfAh8x/Kq6D4wSOEzhO4DiB4wSOEzhO4DiB43Z/ENrhW3hyuz/K8PAtPLndH0Z6+BaenMBxAscJHOckK85lUpwbHXECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3DcG2W/wnaYihMjAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACXUlEQVR4nO3cQW7TQABAUS85AksOwVk4A8ftETgGS4RAVWQSdxzievrzpKcqmjqTSb9sOW7r5cfPF8KW01fAoQSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzjud+BPn7+8GnnO5WYjj7enuvq6V8c3XmvX+p/KckeY7R/0Q+Z5yOPxlYQ9OPDq6/g84/OPP+aQwKtdeXCeXfM7RI87JPCJezArswQ+7rD85PnvOYvee5a7d57/ObtmxefgOIHjBI4TOE7gOIHjBI4TOE7guOXyMhY9y9XrfH++Zzww/jfw1+/fXl0+wfhHHxc4Pi5wfFzg+LiTrPi4j0lxLnTECRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcVt3ulv9CfWb4xt3oru1/S33bTzP+uexda/K7Tdz67t7x7e3HHnWueufPLnAkZC3jB6i3znwrkPibOufynoPHn9Lc+7BM6x/KgK/3/s6xRuBN45yG/+ouuuQeGjgU9Y/FZ+D4wSOEzhO4DiB4wSOEzhO4DiB49wI7UP+lndf4H9HNy7XVcdPL3Fs4HlunnnW+OklBBZYYIEFftLAKxOeBDnJuj8w5cCnr4BDCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcb8Ag/8rGJaqIQcAAAAASUVORK5CYII=" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACaklEQVR4nO3c0W3aUBiAUR47Qh87RGfpDB03I3SMPlZVqwi5xrFTnHv5ONJRhH7AXPIJy1iJLz9+vhB2Gb4CTiVwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxvwN/+vzl1Z7nXD9sz+3tTa2+7up847UOrf+pXN4RZvsXfZft3OX2/pWE3Tnw4uf+7ezf/v7bnBJ48VHeuZ1D27eL3u+UwAM/wSzMEvi83fKT53/PUfTRo9yj2/mfo2sWfA+OEzhO4DiB4wSOEzhO4DiB4wSOu1yfxqLnsnqe78995oH538Bfv397df0E80efCxyfCxyfCxyfO8iKz31NinOiI07gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI7butLd4k+o35xvXInu1uNved+D51n/PLauVbn9Zm7de3S+/cg9zxq7/smTCxwJecveXfQHBz60S5xt/VNZfoL3v6U5P8EzrH8qAn/c+xrijcAbe7mNf1Q9tEs8NfCQ9U/F9+A4geMEjhM4TuA4geMEjhM4TuA4F0K7s+FFVwL/O904XWe+PR9edD3wPBfPfPT58KICCzzlL+5R5sOLCvyUgRcmPHh5lPnwoiuBuaPhRZeBh6+AUwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHG/APtRDsntu2gqAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>au bout d’une seconde — image 60</figcaption>
   </figure>
 
@@ -184,9 +222,9 @@ exige de cette leçon. Ils viennent d’être joués, et voici ce qu’ils ont m
 
   <li>le for a tout posé dès les premières images </li>
 
-  <li>en bas, seulement quelques cases au début <span class="detail"> (3 cases)</span></li>
+  <li>en bas, seulement quelques cases au début <span class="detail"> (4 cases)</span></li>
 
-  <li>la ligne du bas grandit avec le temps <span class="detail"> (3 puis 7)</span></li>
+  <li>la ligne du bas grandit avec le temps <span class="detail"> (4 puis 9)</span></li>
 
   <li>elle finit par être pleine </li>
 </ul>

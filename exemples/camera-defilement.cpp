@@ -13,6 +13,12 @@
  * le décor défile tant que le héros est loin des deux bords de la carte.
  */
 
+#include <Tuile>     // un dessin de 8 × 8 pixels
+#include <poser>     // pose une tuile sur une case du fond
+#include <texte>     // écrit un texte à l’écran
+#include <sprite>    // place un lutin de 8 × 8 au pixel près
+#include <defiler>   // fait glisser tout le fond
+
 Tuile POTEAU = {
   "00111100",
   "00111100",

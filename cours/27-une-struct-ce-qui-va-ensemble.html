@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 6 — Les struct : ce qui va ensemble</span>
   <span>leçon 1 sur 4 dans ce chapitre</span>
-  <span>27 sur 42 dans le cours</span>
+  <span>27 sur 61 dans le cours</span>
 </p>
 <h1>27. Une struct : ce qui va ensemble</h1>
 <p class="idee">La position, la direction et les vies d’un héros ne sont pas trois choses : c’est UN héros.</p>
@@ -108,61 +108,108 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1720 octets</strong> de cartouche.</p>
+<strong>814 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          257 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← texte()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles     76 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette      37 o  ← bouton()  — lit les huit boutons
+  Tuiles          256 o  ← CopierTuiles  — 16 lettres sur 43
+  "VIES:"           5 o  ← texte()  — un texte gravé
+  "#"               1 o  ← texte()  — un texte gravé
+  " "               1 o  ← texte()  — un texte gravé
+  "#"               1 o  ← texte()  — un texte gravé
+Lettres gravées : EISV0123456789:#
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 4    77 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  bouton() × 4    20 o sur place, dans main()  + LireManette (37 o)
+  nombre() × 1    11 o sur place, dans main()  + EcrireNombre (33 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. un enregistrement — Heros</p>
-    <pre><code>struct Heros {
-  uint8_t x;
-  uint8_t y;
-  uint8_t vies;
-};</code></pre>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : un héros # qui se déplace avec les 4 flèches.
+// Sa position et ses vies sont rangées ENSEMBLE, dans une struct.
+//
+// Ce qui est nouveau : la STRUCT.
+//   struct Heros ... ;  = on invente un nouveau type, « Heros »,
+//                         qui contient plusieurs cases (x, y, vies).
+//   Heros joueur;       = on crée une variable de ce type.
+//   joueur.x            = la case x DE joueur (le point veut dire « de »).
+
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres
+#include &lt;bouton&gt;   // lit un bouton de la manette</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. une variable — joueur</p>
-    <pre><code>Heros joueur;</code></pre>
+    <p class="quoi">2. un enregistrement — Heros</p>
+    <pre><code>struct Heros {                  // Le modèle d'un héros :
+  uint8_t x;                    //   sa colonne,
+  uint8_t y;                    //   sa ligne,
+  uint8_t vies;                 //   ses vies.
+};                              // (Le point-virgule après l'accolade est obligatoire.)</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">3. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  joueur.x = 9;
+    <p class="quoi">3. une variable — joueur</p>
+    <pre><code>Heros joueur;                   // UN héros, nommé joueur.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                    // Le jeu commence ici.
+  joueur.x = 9;                 // On remplit ses cases.
   joueur.y = 9;
   joueur.vies = 3;
 
   texte(1, 1, "VIES:");
-  nombre(7, 1, joueur.vies, 1);
-  texte(joueur.x, joueur.y, "#");
+  nombre(7, 1, joueur.vies, 1); // Affiche 3.
+  texte(joueur.x, joueur.y, "#");  // Dessine le héros en (9, 9).
 
-  uint8_t attente = 0;
+  uint8_t attente = 0;          // Pour ralentir : on ne bouge qu'une image sur 4.
 
-  while (true) {
+  while (true) {                // La boucle du jeu :
     image();
 
     attente++;
-    if (attente &lt; 4) continue;      // un tour sur quatre
+    if (attente &lt; 4) continue;      // un tour sur quatre : sinon on saute la suite du tour
     attente = 0;
 
-    uint8_t ancienX = joueur.x;
+    uint8_t ancienX = joueur.x; // On retient la place d'avant...
     uint8_t ancienY = joueur.y;
 
-    if (bouton(DROITE) &amp;&amp; joueur.x &lt; 19) joueur.x++;
-    if (bouton(GAUCHE) &amp;&amp; joueur.x &gt; 0)  joueur.x--;
-    if (bouton(BAS) &amp;&amp; joueur.y &lt; 17)    joueur.y++;
-    if (bouton(HAUT) &amp;&amp; joueur.y &gt; 3)    joueur.y--;
+    // ... puis on bouge, sans sortir de l'écran :
+    if (bouton(DROITE) &amp;&amp; joueur.x &lt; 19) joueur.x++;  // droite, pas plus loin que 19
+    if (bouton(GAUCHE) &amp;&amp; joueur.x &gt; 0)  joueur.x--;  // gauche, pas moins que 0
+    if (bouton(BAS) &amp;&amp; joueur.y &lt; 17)    joueur.y++;  // bas : y grandit vers le bas
+    if (bouton(HAUT) &amp;&amp; joueur.y &gt; 3)    joueur.y--;  // haut, pas au-dessus de la ligne 3
+                                                      // (les lignes 0 à 2 sont pour VIES)
 
-    if (joueur.x != ancienX || joueur.y != ancienY) {
-      texte(ancienX, ancienY, " ");
-      texte(joueur.x, joueur.y, "#");
+    if (joueur.x != ancienX || joueur.y != ancienY) { // A-t-il bougé ?
+      texte(ancienX, ancienY, " ");                   //   efface l'ancienne place,
+      texte(joueur.x, joueur.y, "#");                 //   dessine la nouvelle.
     }
   }
 }</code></pre>
@@ -195,7 +242,7 @@ relâché. Voici l’écran juste après.</p>
 <div class="etapes">
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB20lEQVR4nO3dsW2DQABAUZcZIWWG8CyZIeNmhIyR0gUoRQT4sHAs/zzpFfYhLMQ36K6609f3J2Gnh18BdyVwnMBxAscJHCdwnMBxW4FfXt8WP09fJ4uD24duvtaN32fNjYEHR7bHR44edcq/9fjAe6m7y8GB196fx75XNR73F0/wPdpoPOjKLHq6j4t386jA46m2/3Asur5MWqs7Pos+cOprCr2XdXCcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwLNf27ZltlgTeDa4P+PTEXg2tTx/vP8QOEXgOIHjBI4zyYqzTOIpCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcRdlZQ+LooMYawAAAABJRU5ErkJggg==" alt="l’écran après DROITE">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB3UlEQVR4nO3dvU3DQACA0ZSMQMkQzMIMjJsRGCNlCksUyD/nyCHh40mvSM5yZPmLrbvqTl+XM2Gnh18BdyVwnMBxAscJHCdwnMBxa4FfXt9mP09fJ7OD64duvtaV32fJjYEHR9bHR44edcq/9fjAe6m7y8GBl96fx75XNR73G0/wPdpoPGhjFj3dx9m7eVTg8VTrfzhmbS+TluqOz6IPnPqaQu9lHRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwn8IYf27n9ua3XBN4wuG/j0xJ4w9Ty/fPjm8ApAscJHCdwnElWnGUST03gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI67AkfsD4vv7f4lAAAAAElFTkSuQmCC" alt="l’écran après DROITE">
     <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
   </figure>
 
@@ -205,7 +252,7 @@ relâché. Voici l’écran juste après.</p>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB3ElEQVR4nO3csW3CQBiAUcqMkDJDZJbMkHEZIWNQUlhKEdnHGZkgfTzpFfBbIMsfWHeNTz+XM2Gnp58BDyVwnMBxAscJHCdwnMBxo8Bv7x+rr5e3i9Xh+NDd5zr4frbcGXhyMp7PHD3qIy/r+YH3UneXgwNv3T+Pva9qPO8//sGPaKPxpBur6OU6rl7NowLPpxr/4Fh1e5u0VXd+FX3g0tcSei/74DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4Lhs4D+P3XvZR+SVA08O2+KBP7+/fgmcIvBC4DiB4+KBZ4Zt5cC2SeXALASOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LgrjWgPi7RUGi8AAAAASUVORK5CYII=" alt="l’écran après HAUT">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB3ElEQVR4nO3csW3CQBiAUcqMkDJDZJbMkHEZIWNQUlhKEdnHGZkgfTzpFfBbIMsfWHeNTz+XM2Gnp58BDyVwnMBxAscJHCdwnMBxo8Bv7x+rr5e3i9Xh+NDd5zr4frbcGXhyMp7PHD3qIy/r+YH3UneXgwNv3T+Pva9qPO8//sGPaKPxpBur6OU6rl7NowLPpxr/4Fh1e5u0VXd+FX3g0tcSei/74DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4Lhs4D+PG3jZRwOUA08O2+KBP7+/fgmcIvBC4DiB4+KBZ4Zt5cC2SeXALASOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LgrA/gPi6y/7sAAAAAASUVORK5CYII=" alt="l’écran après HAUT">
     <figcaption><strong>HAUT</strong> — l’écran a changé</figcaption>
   </figure>
 
@@ -230,7 +277,7 @@ exige de cette leçon. Ils viennent d’être joués, et voici ce qu’ils ont m
 
   <li>un seul # à l’écran : l’ancienne case est effacée <span class="detail"> (1)</span></li>
 
-  <li>il s’est déplacé vers la droite et vers le bas <span class="detail"> (13, 14)</span></li>
+  <li>il s’est déplacé vers la droite et vers le bas <span class="detail"> (13, 16)</span></li>
 </ul>
 
 <p class="navigation">

@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 78 — #include, et les onglets de la page</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 11 — Découper son programme</span>
+    
+    
+    <span>leçon 78 sur 143</span>
+    <span class="jauge" style="--part: 70%">difficulté 7 / 10</span>
+    
+    
+    
+  </p>
+<h1>78. #include, et les onglets de la page</h1>
+<p class="idee">Le fichier voisin est versé ici, avant toute compilation.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><code>#include "dessins.cpp"</code> <strong>verse le fichier voisin à cet endroit</strong> avant que le compilateur ne voie quoi que ce soit. Il n’y a donc ni éditeur de liens, ni ordre de compilation à connaître.</p>
+<p>Dans la page, les fichiers voisins sont des <strong>onglets</strong> : <code>#include</code> ne voit pas la différence. Et quand une faute tombe dans un fichier inclus, le message désigne <strong>son</strong> fichier et <strong>sa</strong> ligne — pas la ligne du texte assemblé, que personne n’a jamais vue.</p>
+<p>Le programme ci-dessous tient en un fichier ; la leçon « Découper son programme » en montre un sur cinq.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;nombre&gt;</code> → <a href="lecon-00-8.3-la-fonction-nombre-ecrire-un-nombre.html">0.8.3. La fonction nombre() — écrire un nombre</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>551 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  doubler()         4 o  ← nombre()  — ta fonction
+  main()           33 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles     76 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          256 o  ← CopierTuiles  — 16 lettres sur 43
+  "DOUBLE DE 21"   12 o  ← texte()  — un texte gravé
+Lettres gravées : BDELOU0123456789
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()   × 1    11 o sur place, dans main()  + EcrireTexte (10 o)
+  nombre()  × 1     8 o sur place, dans main()  + doubler() (4 o), EcrireNombre (33 o)
+  image()   × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  doubler() × 1     7 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : affiche le double de 21.
+//
+// Ce programme tient dans un seul fichier. Un plus grand programme peut être
+// découpé en plusieurs fichiers (les onglets de la page) : une ligne
+// #include suivie du nom d'un fichier entre guillemets recopie ce fichier
+// à cet endroit, avant la compilation.
+
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une fonction — doubler()</p>
+    <pre><code>uint8_t doubler(uint8_t n) { return n * 2; }   // Une fonction sur une seule ligne :
+                                               // elle rend n fois 2.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                  // Le jeu commence ici.
+  texte(2, 6, "DOUBLE DE 21");
+  nombre(8, 8, doubler(21));  // 21 × 2 = 42 : affiche 042.
+
+  while (true) {              // Répète pour toujours :
+    image();                  //   attend l'image suivante.
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB/ElEQVR4nO3aTU7CQACAUZYewaX3P41H8Bgu3RGjzMi08vf4km/RlDIMvNBM2h4+Pt8L7nDzGdRFCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLwtwC+vb8dGL/3YOdr+8/jR546OOWeeq+OMvtd8tnfSRuCrbe/5KVfHXx3nCH9zxYB3Ac/nEPBFTtE757k0znxiASP/4P+a1ZULeJcuC7y0ip6srpdWubdaRU+O33aqv3fgeqACxgsYL2C8gPECxgsYL2C8gPEQ4PkVpfOvuHkJwPPrzOc/gEBGAY8sH/dWwf4c4N+W3+Enb7RDgE9azu8aPYOuA3xye7LzSXQR4NVV9IanKh83BLhGBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjfQEOmDCcIpcg6wAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">« DOUBLE DE 21 », et 042 en dessous — la fonction a été appelée.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>le calcul est juste </li>
+
+  <li>l’étiquette est là </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>78.1. Chapitre 12 — Les fonctions : nommer un geste : ce qui vient</strong> — chapitre 12 : Les fonctions : nommer un geste.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

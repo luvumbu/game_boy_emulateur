@@ -6,6 +6,9 @@
  * Une tuile, et un appel. C'est tout ce qu'il faut.
  */
 
+#include <Tuile>   // un dessin de 8 × 8 pixels
+#include <poser>   // pose une tuile sur une case du fond
+
 Tuile COEUR = {
   ".##..##.",
   "########",

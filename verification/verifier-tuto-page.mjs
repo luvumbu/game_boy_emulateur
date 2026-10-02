@@ -170,7 +170,7 @@ try {
   /* --- le code est modifiable, et « remettre » le remet --- */
   await evaluer(`
     const t = document.getElementById('source')
-    t.value = 'int main() { texte(1, 1, "ESSAI"); while (true) { image(); } return 0; }'
+    t.value = '#include <texte>\\nint main() { texte(1, 1, "ESSAI"); while (true) { image(); } return 0; }'
     document.getElementById('lancer').click()
   `)
   await patienter(500)
@@ -211,6 +211,10 @@ try {
   await evaluer(`[...document.querySelectorAll('#planzone .tuile')].find(t => t.title.startsWith('CAISSE')).click()`)
   await patienter(200)
 
+  /* Le plan est amené dans la fenêtre : la souris ne clique que ce qu'on voit,
+     et ce qui précède (le texte, l'encadré des fonctions) peut le repousser plus bas. */
+  await evaluer(`document.querySelector('canvas.plan').scrollIntoView({ block: 'center', behavior: 'instant' })`)
+  await patienter(100)
   const plan = JSON.parse(await evaluer(`JSON.stringify(document.querySelector('canvas.plan').getBoundingClientRect())`))
   const caseX = (c) => plan.x + (plan.width * (c + 0.5)) / 20
   const caseY = (l) => plan.y + (plan.height * (l + 0.5)) / 18
@@ -293,16 +297,18 @@ try {
 
   /* Le repère de progression : le niveau, le numéro, l'atelier. */
   const reperes = await evaluer(`[...document.querySelectorAll('#reperes span')].map(s => s.textContent).join(' | ')`)
-  controle('la leçon annonce son niveau, sa difficulté et son atelier',
-    reperes.includes('Niveau 3') && reperes.includes(`leçon ${numeros(LECONS)[LECON_DU_DESSIN]} sur ${principales(LECONS)}`)
-      && reperes.includes('difficulté 3 / 10') && reperes.includes('atelier'),
+  /* Le parcours est en chapitres ; la jauge garde la difficulté de 1 à 10. */
+  const leDessin = LECONS[LECON_DU_DESSIN]
+  controle('la leçon annonce son chapitre, sa difficulté et son atelier',
+    reperes.includes(`Chapitre ${leDessin.difficulte}`) && reperes.includes(`leçon ${numeros(LECONS)[LECON_DU_DESSIN]} sur ${principales(LECONS)}`)
+      && reperes.includes(`difficulté ${leDessin.niveau} / 10`) && reperes.includes('atelier'),
     `\n      ${reperes}`)
 
   const niveaux = await evaluer(`document.querySelectorAll('#sommaire li.partie:not(.sous-partie)').length`)
   const attendus = new Set(LECONS.map((l) => l.difficulte)).size
   controle('le sommaire est découpé en niveaux', niveaux === attendus, ` (${niveaux} niveaux sur ${attendus})`)
 
-  /* Les parties d'un niveau (le 0 en a dix), chacune sous son titre.
+  /* Les parties d'un niveau (le 0 en a onze), chacune sous son titre.
      On lit le texte de chaque titre de partie du sommaire (« A. Écrire des
      lettres », « B. Le temps »…), puis on vérifie qu'il y en a autant que de
      leçons portant « partie: », et que la première commence bien par A. */

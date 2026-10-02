@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 3 — Les boucles : répéter</span>
   <span>leçon 3 sur 9 dans ce chapitre</span>
-  <span>11 sur 42 dans le cours</span>
+  <span>11 sur 61 dans le cours</span>
 </p>
 <h1>11. for : la boucle qui compte</h1>
 <p class="idee">Départ, condition, pas : les trois morceaux d’une boucle qui compte, sur une seule ligne.</p>
@@ -105,34 +105,74 @@
 <p><code>uint8_t i = 0; while (i &lt; 20) { …; i++; }</code> — tout ce qui concerne le comptage est au même endroit, et on ne risque plus d’oublier le <code>i++</code> en bas du bloc.</p>
 <p><code>i &lt; 20</code> fait <strong>20 tours</strong>, de 0 à 19 — pas de 1 à 20. L’écran a 20 colonnes, numérotées de 0 à 19 : la boucle et l’écran parlent la même langue. <code>i</code> n’existe <strong>que dans la boucle</strong> : après l’accolade, le nom est libre.</p>
 <p>Le pas n’est pas forcément <code>i++</code> : <code>i += 2</code> saute une case sur deux. Et <code>i</code> sert dans des calculs : <code>nombre(i * 2, …)</code> écarte les chiffres.</p>
-<p><strong>Regarde bien l’écran</strong> : les lignes n’apparaissent pas d’un coup, elles se dessinent en une demi-seconde environ. Pourtant la boucle n’appelle jamais <code>image()</code>… C’est <strong>l’écriture à l’écran</strong> qui attend, pas la boucle. La leçon suivante explique pourquoi — c’est <strong>la</strong> règle de la Game Boy.</p>
+<p><strong>Une question</strong> : la boucle n’appelle jamais <code>image()</code>, et pourtant elle ne va pas aussi vite que le processeur le pourrait. C’est <strong>l’écriture à l’écran</strong> qui attend, pas la boucle : chaque <code>texte()</code> attend la courte pause entre deux images. La leçon suivante explique pourquoi — c’est <strong>la</strong> règle de la Game Boy.</p>
 <p><strong>À toi :</strong> trace une colonne de # (la ligne varie, la colonne est fixe) de la ligne 12 à la ligne 17.</p>
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1456 octets</strong> de cartouche.</p>
+<strong>518 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          120 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← texte(), nombre()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles     40 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          176 o  ← CopierTuiles  — 11 lettres sur 43
+  "#"               1 o  ← texte()  — un texte gravé
+  "#"               1 o  ← texte()  — un texte gravé
+Lettres gravées : 0123456789#
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 2    36 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  nombre() × 1    22 o sur place, dans main()  + AdresseCase (10 o), EcrireNombre (33 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  /* vingt tours : i vaut 0, 1, 2 ... 19 */
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : dessine deux rangées de # et une rangée de chiffres, avec « for ».
+//
+// Ce qui est nouveau : la boucle for, la boucle qui COMPTE.
+//   for (DÉPART ; CONDITION ; PAS) ...
+//     DÉPART    : fait une fois, au début       (uint8_t i = 0 : i commence à 0)
+//     CONDITION : testée avant chaque tour      (i &lt; 20 : on continue tant que i &lt; 20)
+//     PAS       : fait à la fin de chaque tour  (i++ : i gagne 1)
+
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                              // Le jeu commence ici.
+  // Vingt tours : i vaut 0, 1, 2 ... 19.
   for (uint8_t i = 0; i &lt; 20; i++) {
-    texte(i, 3, "#");
+    texte(i, 3, "#");                     // Un # en colonne i, ligne 3 : toute la ligne.
+  }                                       // Quand i vaut 20, « 20 &lt; 20 » est faux : fini.
+
+  // Un pas de deux : 0, 2, 4 ... 18.
+  for (uint8_t i = 0; i &lt; 20; i += 2) {   // « i += 2 » = « i = i + 2 ».
+    texte(i, 5, "#");                     // Un # une colonne sur deux.
   }
 
-  /* un pas de deux : 0, 2, 4 ... 18 */
-  for (uint8_t i = 0; i &lt; 20; i += 2) {
-    texte(i, 5, "#");
+  // i sert aussi dans le calcul.
+  for (uint8_t i = 0; i &lt; 10; i++) {      // i vaut 0, 1, 2 ... 9.
+    nombre(i * 2, 8, i, 1);               // En colonne i * 2 : 0, 2, 4 ... 18,
+                                          // on écrit i sur 1 chiffre : 0 1 2 3 ... 9.
   }
 
-  /* i sert aussi dans le calcul */
-  for (uint8_t i = 0; i &lt; 10; i++) {
-    nombre(i * 2, 8, i, 1);
-  }
-
-  while (true) {
+  while (true) {                          // La boucle du jeu : l'écran reste allumé.
     image();
   }
 }</code></pre>
@@ -152,13 +192,8 @@ instants qui comptent. Une image identique à la précédente n’est pas montr�
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABlklEQVR4nO3WsQlCMQBF0ZSOYOkQzuIMjusIjmFpJ4IIFtEfLwdO9Yrkwy3yx/V2IWxs/gV8lcBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAseN3f7AgmYGfl3f3WH/2T458PF8eni+2L7VLnB8Fzi+CxzfJwf+/PG3/99PFguaFnjWQaxJ4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOuwMmNdLZ9jWfmAAAAABJRU5ErkJggg==" alt="l’écran">
-    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
-  </figure>
-
-  <figure>
     <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACMElEQVR4nO3ZQU7CQABAUZYewaWH8CyeweN6BI/h0hiJUUixHRmQn5f81TilQx+1pexe314Ubnf1FWhqgOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjre7u39QuA/gY/bPvxkPjO+BH5+fvvq+gfFbHwccHwccHwccH3eTFR/3NSmeBx3xAMcDHA9wPMDxAMcDHA9wvMUHHUsbmH9b8xcfVZ7Ygfk3NH/xx4bTOzD/VuYDjs8HHJ8POD7fTVZ8vq9J8fkedMQDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDx9sC//m583NbJ619/5U/Zw0sae/2p6x9bzJr5u4PjsmlBA8d99mfo7C87vMn6Dbcen03zfwAPs804UgMfhYEz7Oq6lwPedIwucx5sPUCTljT1enGwi63z1wIPHKNJWn8EmLGqsUvY2BrOvv7Ba/Dsq+nUvUz9l/jf3u/gXfTsu+J5p+MF3u/YiTjplt734HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4Hjvsb+jb94oCWoAAAAASUVORK5CYII=" alt="l’écran">
-    <figcaption>au bout d’une seconde — image 60</figcaption>
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
   </figure>
 </div>
 

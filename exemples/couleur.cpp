@@ -12,6 +12,14 @@
  *   teindre(colonne, ligne, palette)                  quelle palette pour la case
  */
 
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurLutin>   // choisit une couleur d’une palette des lutins
+#include <teindre>        // met une case du fond dans une palette
+#include <poser>          // pose une tuile sur une case du fond
+#include <texte>          // écrit un texte à l’écran
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+
 Tuile BRIQUE = {
   "########", "#..#..#.", "########", "..#..#..",
   "########", "#..#..#.", "########", "..#..#..",

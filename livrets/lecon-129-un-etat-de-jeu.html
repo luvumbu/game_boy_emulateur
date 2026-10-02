@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 129 — Un état de jeu</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 23 — Un vrai jeu</span>
+    
+    
+    <span>leçon 129 sur 143</span>
+    <span class="jauge" style="--part: 90%">difficulté 9 / 10</span>
+    
+    
+    
+  </p>
+<h1>129. Un état de jeu</h1>
+<p class="idee">Quelques scènes, et un `switch` qui dit laquelle est en cours.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>C’est presque toujours la forme d’un jeu : un <code>enum</code> de scènes, et un <code>switch</code>. Le reste — les ennemis, le décor — se branche dans le <code>case JEU</code>.</p>
+<p>Le front est calculé <strong>une fois</strong>, en haut de la boucle, et servi à tous les cas. Le recalculer dans chaque <code>case</code> marcherait aussi — et un jour l’un des trois serait oublié.</p>
+<p>Le score n’est écrit <strong>que lorsqu’il change</strong>, et l’étiquette une seule fois en entrant. Les réécrire à chaque image alourdit la boucle au point qu’elle déborde — et un <code>depuis</code> qui compte les tours avance alors trois fois moins vite que le temps réel.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;nombre&gt;</code> → <a href="lecon-00-8.3-la-fonction-nombre-ecrire-un-nombre.html">0.8.3. La fonction nombre() — écrire un nombre</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>878 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        61 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          208 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles     76 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette      37 o  ← bouton()  — lit les huit boutons
+  Tuiles          336 o  ← CopierTuiles  — 21 lettres sur 43
+  "APPUIE START"   12 o  ← texte()  — un texte gravé
+  "            "   12 o  ← texte()  — un texte gravé
+  "SCORE"           5 o  ← texte()  — un texte gravé
+  "PERDU"           5 o  ← texte()  — un texte gravé
+  "     "           5 o  ← texte()  — un texte gravé
+Lettres gravées : ACDEIOPRSTU0123456789
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 5    55 o sur place, dans main()  + EcrireTexte (10 o)
+  nombre() × 2    20 o sur place, dans main()  + EcrireNombre (33 o)
+  bouton() × 1    12 o sur place, dans main()  + LireManette (37 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : trois états : le TITRE (START pour jouer), le JEU (le score
+// monte tout seul jusqu'à 20), puis PERDU (START pour revenir au titre).
+//
+// enum Scene ... : des noms pour les états : TITRE (0), JEU (1), PERDU (2).
+// switch (ou) : on ne fait que ce qui concerne l'état actuel.
+// Ce qui ne doit se faire qu'une fois (effacer, écrire SCORE) se fait
+// au moment où l'on CHANGE d'état.
+
+#include &lt;bouton&gt;   // lit un bouton de la manette
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. des constantes nommées — Scene</p>
+    <pre><code>enum Scene { TITRE, JEU, PERDU };</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une variable — ou</p>
+    <pre><code>Scene ou = TITRE;             // L'état actuel.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une variable — score</p>
+    <pre><code>uint8_t score = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une variable — avant</p>
+    <pre><code>uint8_t avant = 0;            // START au tour d'avant.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">6. une variable — depuis</p>
+    <pre><code>uint8_t depuis = 0;           // Les images depuis le dernier point.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">7. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                  // Le jeu commence ici.
+  while (true) {              // Répète pour toujours :
+    uint8_t appui = bouton(START);        //   START maintenant ?
+    uint8_t front = appui &amp;&amp; !avant;      //   1 seulement au début de l'appui.
+    avant = appui;
+
+    switch (ou) {                         //   Selon l'état :
+      case TITRE:                         //   --- le titre
+        texte(4, 8, "APPUIE START");
+        if (front) {                      //     START : on entre dans le jeu.
+          texte(4, 8, "            ");    //     efface le message (12 espaces),
+          score = 0; depuis = 0; ou = JEU;  //   remet à zéro, change d'état,
+          texte(2, 4, "SCORE");    // une fois, en entrant
+          nombre(9, 4, score);
+        }
+        break;
+
+      case JEU:                           //   --- le jeu
+        depuis++;
+        if (depuis &gt;= 30) { depuis = 0; score++; nombre(9, 4, score); }
+                                          //     toutes les 30 images : un point.
+        if (score &gt;= 20) ou = PERDU;      //     à 20 points : fin.
+        break;
+
+      case PERDU:                         //   --- la fin
+        texte(5, 8, "PERDU");
+        if (front) { texte(5, 8, "     "); ou = TITRE; }   // START : retour au titre.
+        break;
+    }
+    image();                              //   Attend l'image suivante.
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB1UlEQVR4nO3WMW6DQBRAQZc5Qsrc/zQ5Qo6R0kU6C8NfCeLkaaRXoAXhXY9Zc/v6/lS428tnoEsDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wvF8Cfnv/+GlzcD6+eTy5/8Opw3k+fNbhVFfXNZzP/wB+BnPW8XxkPs/J2bPmCRjwnwc+3PqeXT/5QndGVvfDnev37z9ZVxl4iDQfv+IJXr3b/rpWV3dRgI/nPBnZPPYEL//Gn219p7y1rm6t/oP1+gDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8e5CwpDc9EOBPQAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB2UlEQVR4nO3WQWqDQABA0Sx7hC57/9P0CD1Gl9kFaU3RGYP18+ARZAgy+nWc29f3J2G302fASwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3DcYOC394+H1fFn/991ktVTjc1zcvy6RgI/u/7l+FHHM/7DHE73qsBH3egZj/P8eCn3jl/a7BI9GXjX0j0WePk7Nn5ps5usLW/e32/q6ofwkGtbPiK/H6zt45f2qsC7jjeuBKfM7eoGv8GH7E63LN120ScE5kIEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4gePu3fLUPPQ+xqwAAAAASUVORK5CYII=" alt="l’écran après START">
+    <figcaption><strong>START</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">START lance la partie, le score monte, et à 20 c’est perdu.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>on démarre sur le titre </li>
+
+  <li>START lance la partie <span class="detail"> (score 3)</span></li>
+
+  <li>le score finit par atteindre vingt <span class="detail"> (20)</span></li>
+
+  <li>et l’on passe à « PERDU » </li>
+
+  <li>START ramène au titre </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>129.1. La fonction nombrePanneau() — un nombre dans le panneau</strong> — chapitre 23 : Un vrai jeu.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 68 — Parcourir : le total, le plus grand, le plus petit</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 10 — Les tableaux : ranger beaucoup de valeurs</span>
+    <span class="outil">du cours</span>
+    
+    <span>leçon 68 sur 143</span>
+    <span class="jauge" style="--part: 60%">difficulté 6 / 10</span>
+    
+    
+    
+  </p>
+<h1>68. Parcourir : le total, le plus grand, le plus petit</h1>
+<p class="idee">Une boucle qui passe sur chaque case, et une variable qui retient ce qu’on a vu.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>Presque tout ce qu’on fait avec un tableau suit le même modèle : <strong>une variable de résultat, préparée avant la boucle</strong>, puis <strong>une boucle qui la met à jour à chaque case</strong>.</p>
+<p><strong>Le total</strong> : on part de 0, et on ajoute chaque case. Attention au chapitre 1 : si le total dépasse 255, il déborde. Ici 12 + 40 + 7 + 99 + 25 = 183, ça tient.</p>
+<p><strong>Le plus grand</strong> : on part de la <strong>première case</strong> (et pas de 0 !), puis on la remplace chaque fois qu’on trouve plus grand. On retient aussi <strong>où</strong> on l’a trouvé : <code>ouMax</code> — dans un jeu, c’est « quel joueur a gagné ».</p>
+<p><strong>Le plus petit</strong> : même chose avec <code>&lt;</code>. Si l’on partait de 0 comme pour le total, aucune case ne serait jamais plus petite, et le résultat serait faux : <strong>la valeur de départ est une vraie décision</strong>.</p>
+<p>Une seule boucle suffit pour les trois : on peut mettre à jour plusieurs résultats au même passage.</p>
+<p><strong>À toi :</strong> calcule la <strong>moyenne</strong> (le total divisé par le nombre de cases — division entière).</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;ecran&gt;</code> → <a href="lecon-27-1-la-fonction-ecran-eteindre-et-rallumer-l.html">27.1. La fonction ecran() — éteindre et rallumer l’écran</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;nombre&gt;</code> → <a href="lecon-00-8.3-la-fonction-nombre-ecrire-un-nombre.html">0.8.3. La fonction nombre() — écrire un nombre</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>942 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage         66 o  ← la console, à l’allumage  — la mise en route de la console
+  main()           206 o  ← démarrage  — ta fonction
+  VBlank             8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage     28 o  ← image()  — attend l’image suivante
+  AttendreVBlank    16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces     12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  EcrireTexte       10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre      33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles     103 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte      14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles           400 o  ← CopierTuiles  — 25 lettres sur 43
+  "TOTAL:"           6 o  ← texte()  — un texte gravé
+  "PLUS GRAND:"     11 o  ← texte()  — un texte gravé
+  "PAR LE JOUEUR"   13 o  ← texte()  — un texte gravé
+  "PLUS PETIT:"     11 o  ← texte()  — un texte gravé
+  scores_depart_0    5 o  ← démarrage  — une table gravée
+Lettres gravées : ADEGIJLNOPRSTU0123456789:
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 4    44 o sur place, dans main()  + EcrireTexte (10 o)
+  nombre() × 4    40 o sur place, dans main()  + EcrireNombre (33 o)
+  ecran()  × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : parcourt un tableau de 5 scores pour trouver
+// le total, le plus grand (et qui l'a fait), et le plus petit.
+//
+// La méthode : une seule boucle passe sur chaque case, et met à jour
+// trois « résultats en cours ».
+
+#include &lt;ecran&gt;    // éteint ou rallume l’écran
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un tableau — scores</p>
+    <pre><code>uint8_t scores[5] = { 12, 40, 7, 99, 25 };  // scores[0] = 12 ... scores[4] = 25.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                        // Le jeu commence ici.
+  ecran(0);                         // Dessin écran éteint.
+  uint8_t total = 0;                // La somme, qui commence à 0.
+  uint8_t plusGrand = scores[0];    // Le plus grand VU JUSQU'ICI : au départ, le premier.
+  uint8_t ouMax = 0;                // L'indice (le numéro) du plus grand.
+  uint8_t plusPetit = scores[0];    // Le plus petit vu jusqu'ici : au départ, le premier.
+
+  for (uint8_t i = 0; i &lt; 5; i++) { // i = 0 à 4 : chaque case, une fois.
+    total = total + scores[i];      // On ajoute la case au total.
+                                    // 0 + 12 = 12, + 40 = 52, + 7 = 59, + 99 = 158, + 25 = 183.
+
+    if (scores[i] &gt; plusGrand) {    // Cette case bat-elle le record ?
+      plusGrand = scores[i];        //   oui : c'est le nouveau plus grand,
+      ouMax = i;                    //   et on retient où il est.
+    }                               // (40 bat 12 ; puis 99 bat 40 : ouMax = 3.)
+    if (scores[i] &lt; plusPetit) {    // Plus petit que le plus petit vu ?
+      plusPetit = scores[i];        //   oui : on le garde. (7 bat 12.)
+    }
+  }
+
+  texte(1, 3, "TOTAL:");       nombre(14, 3, total);      // 183
+  texte(1, 5, "PLUS GRAND:");  nombre(14, 5, plusGrand);  // 099
+  texte(1, 6, "PAR LE JOUEUR"); nombre(16, 6, ouMax, 1);  // 3
+  texte(1, 8, "PLUS PETIT:");  nombre(14, 8, plusPetit);  // 007
+
+  ecran(1);                         // On rallume.
+
+  while (true) {                    // La boucle du jeu.
+    image();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADF0lEQVR4nO3aTW7bMBBA4Sx7hC57/9PkCD1Gl90asUgPyRmRfn7AQ2Aoii3xi/X/9ffft4H72r4EVprA8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4PeBfv/88dvmrxfm3r39dl2s3Om61wK0FfZzS/21//v7KvDX/JdXLda9Y5XOB3731cUvpJuDLTdCnAbc20aUD4je4qolNdMWYnAv87vxz43AEcH9TM7RidUePe2ut1Oj09TwPhicwPIHhCQxPYHgCwxMYnsDwBIYXvR/8Y3pr/tY8o1esXt43Dc7fel19+ew9rmSNXi/Nur46es22Dzm6bOujnLX8HwG8PnCPP28Y0Mf37NwePQU4fRMdH6DL+8dDj7yMDnQu8PM/VnAVbgWenr5yvzPyjYzPH3+dCHy5a1gZ2w8CvvxaJALX7YPv150Hnn7aMj5G/Ud81g++Nh5Ft+avWBLPg+HNHGRlfVMnthCRpY1MbL0e3XKkbAm2PRddffCSvitK3DevvM+KdK6uwAcBb9gHT5x3pm+ibwbee8nzoKPozuuhvWbuem75BueqHHceHDlPrQauOD+uWN/IOLwHcHwf/HJTH/9f6ZxfTpwFrByNzxlvuJtkgASGJzA8geEJDE9geALDExiewPBOfC565SZH8ApU9UMdWVfQyoEjeNPzZ31ufKlWpucuf92nC1w1lM/vHHyMt3SRDn0ueuKRoNOAn28mtqaXLs/pj83G//Yo4Ms7ia3ppQsj8MwSxpc/uLs5Dnj6qHV0gIKf2/qriU16SkNH0duADZDA8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGN5/tqPbCfpH4s0AAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Total 183, plus grand 099 (joueur 3), plus petit 007.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>le total est 183 </li>
+
+  <li>le plus grand est 99 </li>
+
+  <li>trouvé chez le joueur 3 </li>
+
+  <li>le plus petit est 7 </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>69. Une table gravée : dessiner un niveau</strong> — chapitre 10 : Les tableaux : ranger beaucoup de valeurs.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

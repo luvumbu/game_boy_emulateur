@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 99 — Les lutins : trois nuances et la transparence</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 15 — Les quatre nuances : la Game Boy d’origine</span>
+    <span class="outil">du cours</span>
+    
+    <span>leçon 99 sur 143</span>
+    <span class="jauge" style="--part: 80%">difficulté 8 / 10</span>
+    
+    
+    
+  </p>
+<h1>99. Les lutins : trois nuances et la transparence</h1>
+<p class="idee">Un lutin n’a que trois nuances : l’indice 0 est un trou, par où l’on voit le décor.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>Les <strong>lutins</strong> (les sprites) ont leurs propres palettes — <strong>deux</strong> sur la Game Boy d’origine — réglées par <code>paletteLutins(numero, n0, n1, n2, n3)</code>.</p>
+<p>Mais chez eux, <strong>l’indice 0 ne s’affiche jamais</strong> : il est <strong>transparent</strong>. Quelle que soit la palette, un pixel 0 laisse voir le décor derrière. C’est ce qui permet à un personnage rond de ne pas se promener dans un carré blanc. Un lutin n’a donc que <strong>trois</strong> nuances visibles : 1, 2 et 3.</p>
+<p>Le premier lutin prend la palette 0 (celle par défaut). Le second demande la palette 1 avec l’option <code>PALETTE1</code> de <code>sprite()</code>. <strong>Le même dessin</strong>, deux palettes : deux personnages différents pour le prix d’une tuile. Les jeux Game Boy s’en servent pour distinguer un ennemi fort d’un faible, ou le joueur 1 du joueur 2.</p>
+<p>Le décor est tramé exprès : regarde les coins des deux pions — on y voit le décor, pas un fond uni.</p>
+<p><strong>À toi :</strong> fais <code>paletteLutins(1, 0, 1, 1, 1)</code> : que devient le second pion ?</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;Tuile&gt;</code> → <a href="lecon-00-107.2-tuile-dessiner-une-case.html">0.107.2. Tuile — dessiner une case</a></li>
+  <li><code>#include &lt;ecran&gt;</code> → <a href="lecon-27-1-la-fonction-ecran-eteindre-et-rallumer-l.html">27.1. La fonction ecran() — éteindre et rallumer l’écran</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;paletteLutins&gt;</code> → <a href="lecon-98-1-la-fonction-palettelutins-les-nuances-de.html">98.1. La fonction paletteLutins() — les nuances des lutins</a></li>
+  <li><code>#include &lt;sprite&gt;</code> → <a href="lecon-00-69.4-la-fonction-sprite-un-lutin-au-pixel-pre.html">0.69.4. La fonction sprite() — un lutin au pixel près</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>584 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            57 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              143 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase          10 o  ← poser()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         85 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              144 o  ← CopierTuiles  — 7 lettres sur 43, et 2 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+  "PALETTE 0   PAL…"   21 o  ← texte()  — un texte gravé
+Lettres gravées : AELPT01
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+Fonctions du langage appelées :
+  sprite()        × 2    47 o sur place, dans main()
+  ecran()         × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  poser()         × 1    13 o sur place, dans main()  + AdresseCase (10 o)
+  texte()         × 1    11 o sur place, dans main()  + EcrireTexte (10 o)
+  image()         × 1     6 o sur place, dans main()  + AttendreImage (28 o)
+  paletteLutins() × 1     4 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : deux pions ronds posés sur un décor gris.
+// Même dessin, mais deux palettes différentes : ils n'ont pas les mêmes nuances.
+//
+// Ce qui est nouveau : le LUTIN (en anglais « sprite »).
+//   Un lutin est un dessin de 8 × 8 qui se pose AU PIXEL près, par-dessus le décor.
+//   sprite(numero, x, y, TUILE) : numero = quel lutin (0 à 39),
+//                                 x, y = sa place en pixels (l'écran fait 160 × 144).
+//   Chez les lutins, l'indice 0 est TRANSPARENT : on voit le décor à travers.
+//   paletteLutins(numero de palette, n0, n1, n2, n3) : comme paletteFond,
+//   pour les lutins. Il y en a deux : la palette 0 et la palette 1.
+
+// Le pion : les coins en 0, donc transparents.
+
+#include &lt;Tuile&gt;           // un dessin de 8 × 8 pixels
+#include &lt;ecran&gt;           // éteint ou rallume l’écran
+#include &lt;poser&gt;           // pose une tuile sur une case du fond
+#include &lt;texte&gt;           // écrit un texte à l’écran
+#include &lt;paletteLutins&gt;   // choisit les quatre nuances des lutins
+#include &lt;sprite&gt;          // place un lutin de 8 × 8 au pixel près</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — PION</p>
+    <pre><code>Tuile PION = {
+  "00111100",
+  "01222210",
+  "12333321",
+  "12333321",
+  "12333321",
+  "12333321",
+  "01222210",
+  "00111100",
+};
+
+// Le décor : une tuile toute en indice 2 (gris sombre).</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAbUlEQVR4nO3XMQ2AQBBFwSuRQIkItKCBEhnIQgISkEGJAIrbkC3I3SSv3j/tlus+q+3HllJkqwABdQB6H5rXJaUIEQioPVBkfhinlCJEICAgICAgICAgICCg3kC/exSBgDoARYjfimwBATUHegDrwwI1GBWKoQAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un dessin — DECOR</p>
+    <pre><code>Tuile DECOR = {
+  "22222222", "22222222", "22222222", "22222222",
+  "22222222", "22222222", "22222222", "22222222",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAQ0lEQVR4nO3OQQ0AIAwAsYlCCxrwrwAXHI8mFdBZZ39l8oGQkJBQPRASEhKqB0JCQkL1QEhISKgeCAkJCdUDISGhxy7gRIJ5S/iFKAAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                          // Le jeu commence ici.
+  ecran(0);                           // Dessin écran éteint.
+  for (uint8_t l = 7; l &lt; 13; l++) {  // Les lignes 7 à 12...
+    for (uint8_t c = 0; c &lt; 20; c++) {  // ... sur toute la largeur :
+      poser(c, l, DECOR);             //   du décor gris.
+    }
+  }
+  texte(1, 2, "PALETTE 0   PALETTE 1");
+  ecran(1);                           // On rallume.
+
+  // La palette 1 des lutins : les indices 1, 2, 3 deviennent 3, 1, 0.
+  // (Le 0 du début est l'indice 0 : il reste transparent quoi qu'on mette.)
+  paletteLutins(1, 0, 3, 1, 0);
+
+  sprite(0, 40, 72, PION);             // Lutin 0, au pixel (40, 72), palette 0 : celle d'origine.
+  sprite(1, 112, 72, PION, PALETTE1);  // Lutin 1 : le même dessin, palette 1.
+                                       // 72 = 9 × 8 : les deux sont au milieu du décor.
+
+  while (true) {                      // La boucle du jeu.
+    image();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACHElEQVR4nO3c0U2DUABA0X46gp8O4SzO4KdjOJYjOIJj+KmJpjaNthRpH15PctMQWgi8AwSShs3L67PCbYZvgc4a4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4x0Cvrq+2fbTV3szj65n9zdLzZ+yC+cYuz8xPkeAZ09P2bFTlzrVacq2/RJ4/ePzL4DPdBL/ifGZc4k+cIk4aT0zduDU6/Pe5+LA6x+fqWfwT/OHH6FHAeYtO3H96x+fOPDsZQF/Pz3j7nfeJWgld9HrHx/PwfEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPE2t/d3Cgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMNBn58etg2fCwWbPfN62O3ZCTwHmrG+N1198AdazwM+INz70gPGH/o7v5pZqwx4IUD/BngywR44QB/5SbrAnlMOksek3ShAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPC8Ejwc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOO9AbxAzHBgxjyZAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Deux pions identiques de forme, posés sur un décor gris : l’un sombre au centre, l’autre clair.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>le coin du premier pion laisse voir le décor </li>
+
+  <li>le coin du second aussi </li>
+
+  <li>le centre du premier : indice 3, nuance 3 </li>
+
+  <li>le centre du second : indice 3, nuance 0 par sa palette </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>100. Faire clignoter un personnage touché</strong> — chapitre 15 : Les quatre nuances : la Game Boy d’origine.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

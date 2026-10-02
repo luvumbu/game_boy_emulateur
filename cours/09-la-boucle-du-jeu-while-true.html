@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 3 — Les boucles : répéter</span>
   <span>leçon 1 sur 9 dans ce chapitre</span>
-  <span>9 sur 42 dans le cours</span>
+  <span>9 sur 61 dans le cours</span>
 </p>
 <h1>9. La boucle du jeu : while (true)</h1>
 <p class="idee">Tout jeu est une boucle : lire, calculer, dessiner, attendre — soixante fois par seconde.</p>
@@ -104,33 +104,69 @@
 <p>Chaque passage dans le bloc s’appelle un <strong>tour</strong> (on dit aussi une <strong>itération</strong>). <code>image()</code> attend que l’écran ait fini de se dessiner : un tour dure donc exactement <strong>une image</strong>, soit 1/60 de seconde. C’est l’<strong>horloge</strong> du jeu.</p>
 <p>Tous les jeux Game Boy ont cette forme : <strong>lire les touches → faire évoluer le monde → dessiner → attendre l’image suivante</strong>, et recommencer. Tetris, Zelda, Pokémon : même boucle, plus de choses dedans.</p>
 <p>Ici, on s’en sert pour faire une <strong>montre</strong>. <code>imagesVues</code> compte les tours ; quand il atteint 60, une seconde est passée : on le remet à zéro et on ajoute une seconde. C’est ainsi que l’on compte plus loin que 255 — avec <strong>deux</strong> variables, comme les heures et les minutes.</p>
-<p>Remarque qu’on n’écrit les secondes à l’écran <strong>qu’au moment où elles changent</strong>, une fois par seconde. Écrire à l’écran à chaque tour ralentirait la boucle : un tour ne durerait plus une image, mais deux. La leçon « L’écran ne s’écrit que pendant le VBlank », un peu plus loin, explique pourquoi.</p>
+<p>Remarque qu’on n’écrit les secondes à l’écran <strong>qu’au moment où elles changent</strong>, une fois par seconde. Écrire à l’écran n’est pas gratuit : chaque lettre doit attendre un moment précis, une courte pause de la console. On n’écrit donc que ce qui change. La leçon « L’écran ne s’écrit que pendant le VBlank », un peu plus loin, explique pourquoi.</p>
 <p><strong>À toi :</strong> ajoute les minutes : quand <code>secondes</code> atteint 60, remets-le à 0 et augmente <code>minutes</code>.</p>
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1351 octets</strong> de cartouche.</p>
+<strong>582 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()           64 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles     67 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          272 o  ← CopierTuiles  — 17 lettres sur 43
+  "SECONDES:"       9 o  ← texte()  — un texte gravé
+Lettres gravées : CDENOS0123456789:
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  nombre() × 2    20 o sur place, dans main()  + EcrireNombre (33 o)
+  texte()  × 1    11 o sur place, dans main()  + EcrireTexte (10 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  uint8_t imagesVues = 0;
-  uint8_t secondes = 0;
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : compte les secondes qui passent, grâce à la boucle du jeu.
+//
+// Ce qui est important : while (true) ... image(); est LA boucle de tout jeu.
+// La console montre 60 images par seconde ; image() attend la suivante.
+// Donc un tour de boucle = une image = 1/60 de seconde.
 
-  texte(1, 5, "SECONDES:");
-  nombre(12, 5, secondes);
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
 
-  while (true) {
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                  // Le jeu commence ici.
+  uint8_t imagesVues = 0;     // Combien d'images depuis la dernière seconde (0 à 59).
+  uint8_t secondes = 0;       // Combien de secondes en tout.
+
+  texte(1, 5, "SECONDES:");   // Le titre...
+  nombre(12, 5, secondes);    // ... et la valeur de départ : 000.
+
+  while (true) {              // Répète pour toujours :
     image();                  // un tour de boucle = une image
 
-    imagesVues++;
-    if (imagesVues == 60) {   // une seconde est passee
-      imagesVues = 0;
-      secondes++;
-      nombre(12, 5, secondes);
-    }
+    imagesVues++;             // Une image de plus : + 1.
+    if (imagesVues == 60) {   // Arrivée à 60 ? (« == » compare ; un seul « = » rangerait)
+                              // Si oui, une seconde est passée :
+      imagesVues = 0;         //   on recommence à compter les images à 0,
+      secondes++;             //   on ajoute une seconde,
+      nombre(12, 5, secondes);  // et on l'affiche.
+    }                         // Sinon (moins de 60), on ne fait rien de plus.
   }
 }</code></pre>
   </div>

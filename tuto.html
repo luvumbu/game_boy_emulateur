@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>gameboy3 — apprendre à écrire une cartouche en C++</title>
+<title>gameboy3 — Apprendre, le parcours</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <!-- En PREMIER, et sans « type=module » : si un fichier du programme manque,
      ce petit script le dit dans un bandeau, au lieu d'une page figée. -->
@@ -174,6 +174,23 @@
 
   .etat.erreur { background: #3a1f24; border-color: var(--rouge); color: #ffc9cd; }
   .etat.bon { border-left: 3px solid var(--vert); }
+  /* Ce que la cartouche occupe, et les boutons « Inclure » : comme dans l'atelier. */
+  .analyse { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+  .analyse:empty { display: none; }
+  .analyse-tete { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; }
+  .analyse-tete span { color: var(--gris); }
+  .analyse-jauge { height: 10px; border-radius: 5px; background: var(--panneau-clair); border: 1px solid var(--bord); overflow: hidden; margin: 4px 0 2px; }
+  .analyse-jauge i { display: block; height: 100%; background: var(--vert); }
+  .analyse-jauge.chargee i { background: #d9a83f; }
+  .analyse-jauge.pleine i { background: var(--rouge); }
+  .analyse-liste { font-size: 12.5px; }
+  .analyse-liste summary { cursor: pointer; color: var(--gris); }
+  .analyse-liste ol { margin: 4px 0 0; padding-left: 20px; }
+  .analyse-grave { font-size: 11.5px; line-height: 1.45; margin: 6px 0 0; padding: 8px; overflow-x: auto; background: var(--panneau-clair); border: 1px solid var(--bord); border-radius: 6px; white-space: pre; }
+  .analyse-inclure { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+  .analyse-inclure > div { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .analyse-inclure button { padding: 2px 10px; font-size: 12px; }
+  .analyse-alerte { margin: 0; padding: 8px 10px; font-size: 12.5px; border: 1px solid #d9a83f; background: #d9a83f1f; border-radius: 6px; }
 
   .rangee { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .aide { font-size: 11px; line-height: 1.7; color: var(--gris); }
@@ -303,6 +320,17 @@
     .corps { grid-template-columns: 1fr; }
     .travail { grid-template-columns: 1fr; }
   }
+  /* Les fonctions de la leçon : chacune mène à son tuto (partie L du chapitre 0). */
+  .fonctions-lecon {
+    border: 1px solid var(--bord); border-left: 3px solid var(--vert); border-radius: 6px;
+    background: var(--panneau-clair); padding: 10px 14px;
+  }
+  .fonctions-lecon h3 { margin: 0 0 6px; font-size: 13px; color: var(--vert); }
+  .fonctions-lecon ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; }
+  .fonctions-lecon li { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .fonctions-lecon code { min-width: 13em; }
+  .fonctions-lecon button { padding: 1px 8px; font-size: 12px; }
+  .fonctions-lecon .ailleurs { display: flex; flex-wrap: wrap; gap: 4px; }
 </style>
 </head>
 <body>
@@ -312,7 +340,7 @@
     <div class="marque">
       <span>JS</span>
       <div>
-        <h1>Apprendre gameboy3</h1>
+        <h1>Apprendre — le parcours</h1>
         <p id="combien">…</p>
       </div>
     </div>
@@ -361,6 +389,8 @@
           <div class="ecran"><canvas id="ecran" width="160" height="144"></canvas></div>
           <p class="avoir" id="avoir"></p>
           <div class="etat" id="etat"></div>
+          <!-- Ce que la cartouche occupe, et ce qu'on peut y inclure. -->
+          <div class="analyse" id="analyse"></div>
           <p class="aide">
             <kbd>↑↓←→</kbd> croix · <kbd>X</kbd> A · <kbd>Z</kbd> B ·
             <kbd>Entrée</kbd> Start · <kbd>Maj</kbd> Select · <kbd>F</kbd> plein écran<br>
@@ -380,9 +410,11 @@
 <script type="module">
 import { analyser } from './compilateur/analyseur.js'
 import { compiler } from './compilateur/emetteur.js'
+import { analyser as analyserLaCartouche, montrer as montrerLAnalyse } from './analyse-rom.js'
 import { fabriquer } from './compilateur/cartouche.js'
 import { GameBoy } from './emulateur.js'
 import { LECONS, NIVEAUX, numeros, partieDe, principales } from './tuto/lecons.js'
+import { inclusionsDe, fonctionDuTuto, tutosDesFonctions, leconsQuiEmploient } from './tuto/fonctions.js'
 import { sommaireCherchable } from './recherche.js'
 const NUMEROS = numeros(LECONS)
 import { installer as installerPlan } from './tuto/plan.js'
@@ -436,11 +468,11 @@ function dessinerSommaire() {
     if (lecon.difficulte !== LECONS[i - 1]?.difficulte) {
       const entete = document.createElement('li')
       entete.className = 'partie'
-      entete.textContent = `Niveau ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`
+      entete.textContent = `Chapitre ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`
       liste.append(entete)
     }
 
-    /* Dans un niveau coupé en parties (le 0 en a dix), le titre de la
+    /* Dans un niveau coupé en parties (le 0 en a onze), le titre de la
        partie paraît sur la leçon qui l'ouvre, un cran sous celui du niveau. */
     // « lecon.partie » n'existe que sur la leçon qui OUVRE une partie (le 0.0,
     // le 0.12, le 0.18…). Sur les autres, il vaut undefined : le && s'arrête
@@ -492,6 +524,63 @@ function paragraphe(texte) {
   return p
 }
 
+/*
+ * « Les fonctions de cette leçon » : chaque « #include » du programme, avec
+ * un bouton vers son tuto. Et sur un tuto, l'autre sens : les leçons qui
+ * emploient cette fonction. Tout est lu dans le code des leçons.
+ */
+const TUTOS = tutosDesFonctions(LECONS)
+const EMPLOIS = leconsQuiEmploient(LECONS)
+
+function boutonVers(i, texte) {
+  const bouton = document.createElement('button')
+  bouton.type = 'button'
+  bouton.textContent = texte
+  bouton.title = `${NUMEROS[i]}. ${LECONS[i].titre}`
+  bouton.addEventListener('click', () => aller(i))
+  return bouton
+}
+
+function encadreDesFonctions(index) {
+  const lecon = LECONS[index]
+  const cadre = document.createElement('section')
+  cadre.className = 'fonctions-lecon'
+  const titre = document.createElement('h3')
+  const liste = document.createElement('ul')
+  const nom = fonctionDuTuto(lecon)
+
+  if (nom) {
+    /* Un tuto : où retrouver cette fonction. */
+    const emplois = EMPLOIS.get(nom) ?? []
+    titre.textContent = emplois.length
+      ? `On retrouve ${nom} dans ${emplois.length} leçon${emplois.length > 1 ? 's' : ''}`
+      : `Aucune autre leçon n’emploie encore ${nom}`
+    if (!emplois.length) return null
+    const li = document.createElement('li')
+    const ailleurs = document.createElement('span')
+    ailleurs.className = 'ailleurs'
+    for (const i of emplois.slice(0, 40)) ailleurs.append(boutonVers(i, NUMEROS[i]))
+    if (emplois.length > 40) ailleurs.append(document.createTextNode(` … et ${emplois.length - 40} autres`))
+    li.append(ailleurs)
+    liste.append(li)
+  } else {
+    const noms = inclusionsDe(lecon)
+    if (!noms.length) return null
+    titre.textContent = 'Les fonctions de cette leçon — et le tuto de chacune'
+    for (const n of noms) {
+      const li = document.createElement('li')
+      const code = document.createElement('code')
+      code.textContent = `#include <${n}>`
+      li.append(code)
+      const i = TUTOS.get(n)
+      if (i !== undefined) li.append(boutonVers(i, `→ ${NUMEROS[i]}. ${LECONS[i].titre}`))
+      liste.append(li)
+    }
+  }
+  cadre.append(titre, liste)
+  return cadre
+}
+
 function aller(index, { defiler = true } = {}) {
   courante = index
   vues.add(index)
@@ -518,14 +607,19 @@ function aller(index, { defiler = true } = {}) {
     reperes.append(balise)
   }
 
-  repere(`Niveau ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`, 'niveau')
+  repere(`Chapitre ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`, 'niveau')
+  /* D'où vient l'étape : une leçon, un cours, ou le tuto d'une fonction. */
+  if (lecon.provenance === 'cours') repere('🎓 du cours', 'outil')
+  else if (fonctionDuTuto(lecon)) repere('📖 tuto d’une fonction', 'outil')
   // La partie, juste après le niveau : « Partie D — Des formes ». Seul le
   // chapitre 0 en a ; ailleurs partieDe rend null, et rien n'est ajouté.
   const partie = partieDe(LECONS, index)
   if (partie) repere(`Partie ${partie.lettre} — ${partie.nom}`, 'niveau')
   repere(`leçon ${NUMEROS[index]} sur ${principales(LECONS)}`, '')
-  repere(`difficulté ${lecon.difficulte} / 10`, 'difficulte')
-  reperes.querySelector('.difficulte').style.setProperty('--part', `${lecon.difficulte * 10}%`)
+  /* La jauge : la difficulté de 1 à 10, et non le numéro du chapitre. */
+  const niveau = lecon.niveau ?? Math.max(1, Math.min(10, lecon.difficulte))
+  repere(`difficulté ${niveau} / 10`, 'difficulte')
+  reperes.querySelector('.difficulte').style.setProperty('--part', `${niveau * 10}%`)
   /* Tout carré écrit dans le code se montre aussi en dessin : le texte et
      l'image sont la même tuile, et l'un se modifie par l'autre. */
   const avecDessin = lecon.dessin || lireDessins(lecon.code).length > 0
@@ -536,6 +630,8 @@ function aller(index, { defiler = true } = {}) {
   const explication = $('explication')
   explication.textContent = ''
   for (const texte of lecon.texte) explication.append(paragraphe(texte))
+  const fonctions = encadreDesFonctions(index)
+  if (fonctions) explication.append(fonctions)
 
   const avoir = $('avoir')
   avoir.textContent = ''
@@ -696,6 +792,21 @@ function dessinerLesOnglets() {
   }
 }
 
+/*
+ * Les boutons « Retirer » : ils effacent — ou écrivent — « #include <texte> »
+ * en tête du programme de la leçon, puis recompilent. La ligne reste lisible
+ * dans le code : c'est elle qui compte.
+ */
+function inclureDansLaCartouche(nom, oui) {
+  fichiersLecon.set(ouvert, $('source').value)
+  const deja = new RegExp(`^[ \\t]*#\\s*include\\s*<\\s*${nom}\\s*>[ \\t]*(?:\\/\\/[^\\n]*)?\\r?\\n?`, 'gm')
+  let texte = fichiersLecon.get(PRINCIPAL).replace(deja, '')
+  if (oui) texte = `#include <${nom}>\n` + texte
+  fichiersLecon.set(PRINCIPAL, texte)
+  if (ouvert === PRINCIPAL) $('source').value = texte
+  compilerEtLancer()
+}
+
 function compilerEtLancer() {
   ouvrirLeSon()
 
@@ -705,7 +816,8 @@ function compilerEtLancer() {
 
   try {
     assemble = assemblerAvec(principal, voisins)
-    const { octets, base, variables, vecteurVBlank } = compiler(analyser(assemble.texte))
+    const rendu = compiler(analyser(assemble.texte))
+    const { octets, base, variables, vecteurVBlank } = rendu
     romActuelle = fabriquer(octets, base, 'LECON ' + (courante + 1), vecteurVBlank)
 
     gb.loadRom(romActuelle)
@@ -716,7 +828,10 @@ function compilerEtLancer() {
     $('etat').textContent =
       `${octets.length} octets de programme\n` +
       `${noms.length} variable${noms.length > 1 ? 's' : ''}` + (noms.length ? ' : ' + noms.join(', ') : '')
+    /* La barre ROM, ce qui est gravé — et nommé —, et les boutons « Inclure ». */
+    montrerLAnalyse($('analyse'), analyserLaCartouche(rendu), { inclure: inclureDansLaCartouche })
   } catch (erreur) {
+    $('analyse').textContent = ''
     tourne = false
     $('etat').className = 'etat erreur'
     $('etat').textContent = assemble ? traduire(erreur.message, assemble.origine) : erreur.message
@@ -882,7 +997,7 @@ window.inspecteur = {
 /* Le sous-titre se compte tout seul : écrit à la main, il resterait à onze le
    jour où l'on en ajoute une douzième. */
 $('combien').textContent =
-  principales(LECONS) + ' leçons pour écrire une cartouche Game Boy en C++'
+  `${LECONS.length} étapes, ${Object.keys(NIVEAUX).length} chapitres — leçons, cours et fonctions, une seule suite pour écrire une cartouche Game Boy en C++`
 
 /*
  * On ouvre sur la leçon demandée dans l'adresse, sinon sur la dernière lue,

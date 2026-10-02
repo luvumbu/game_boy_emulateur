@@ -14,6 +14,7 @@
 import { ecrireCarte } from './editeur-carte.js'
 import { ecrireScene, ecrireReglagesDuJeu, faireDeLaSceneLeJeu, mursVides, HEROS_PAR_DEFAUT, MONSTRE_PAR_DEFAUT } from './editeur-scene.js'
 import { ecrireCouleurs, lireCouleurs, PALETTES_PROPOSEES, PALETTES_LUTINS_PROPOSEES } from './editeur-couleurs.js'
+import { avecLesInclusions } from './compilateur/inclusions-auto.js'
 
 const SAUT = String.fromCharCode(10)
 
@@ -344,3 +345,13 @@ export const MODELES = [
     },
   },
 ]
+
+/*
+ * Chaque modèle écrit ses « #include » : un jeu qui part de là emploie des
+ * fonctions de la console, et chacune s'inclut. Le compilateur relève
+ * lesquelles — rien n'est écrit à la main, rien n'est en trop.
+ */
+for (const modele of MODELES) {
+  const construire = modele.construire
+  modele.construire = (couleur) => avecLesInclusions(construire(couleur))
+}

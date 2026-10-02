@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 3 — Les boucles : répéter</span>
   <span>leçon 5 sur 9 dans ce chapitre</span>
-  <span>13 sur 42 dans le cours</span>
+  <span>13 sur 61 dans le cours</span>
 </p>
 <h1>13. Compter à l’envers, et le piège du zéro</h1>
 <p class="idee">Un octet n’est jamais plus petit que zéro : « i &gt;= 0 » est toujours vrai.</p>
@@ -108,35 +108,79 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1511 octets</strong> de cartouche.</p>
+<strong>753 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          171 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← nombre()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles     76 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          304 o  ← CopierTuiles  — 19 lettres sur 43
+  "DE 9 A 1"        8 o  ← texte()  — un texte gravé
+  "DE 9 A 0"        8 o  ← texte()  — un texte gravé
+  "TOURS:"          6 o  ← texte()  — un texte gravé
+Lettres gravées : ADEORSTU0123456789:
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  nombre() × 3    64 o sur place, dans main()  + AdresseCase (10 o), EcrireNombre (33 o)
+  texte()  × 3    33 o sur place, dans main()  + EcrireTexte (10 o)
+  ecran()  × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  ecran(0);                   // tout le dessin, ecran eteint
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : compte à l'envers avec for : de 9 à 1, puis de 9 à 0.
+//
+// Le piège : un uint8_t ne descend jamais sous 0 (après 0, il revient à 255).
+// Donc « i &gt;= 0 » est TOUJOURS vrai, et une boucle qui s'arrête sur « i &gt;= 0 »
+// ne s'arrête jamais.
+
+#include &lt;ecran&gt;    // éteint ou rallume l’écran
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                          // Le jeu commence ici.
+  ecran(0);                           // Tout le dessin se fait écran éteint (plus rapide).
 
   texte(1, 1, "DE 9 A 1");
-  for (uint8_t i = 9; i &gt; 0; i--) {
-    nombre((9 - i) * 2, 3, i, 1);
+  for (uint8_t i = 9; i &gt; 0; i--) {   // i part de 9 ; on continue tant que i &gt; 0 ;
+                                      // « i-- » retire 1 à chaque tour : 9, 8, ... 1.
+    nombre((9 - i) * 2, 3, i, 1);     // La colonne : (9 - i) * 2.
+                                      // i = 9 → colonne 0 ; i = 8 → colonne 2 ; ...
   }
 
-  /* for (uint8_t i = 9; i &gt;= 0; i--)  ne s'arrete JAMAIS */
+  // for (uint8_t i = 9; i &gt;= 0; i--)  ne s'arrête JAMAIS
+  // (0 - 1 donne 255, qui est encore &gt;= 0).
 
+  // La bonne façon d'aller jusqu'à 0 : compter de 10 à 1, et afficher i - 1.
   texte(1, 7, "DE 9 A 0");
-  uint8_t tours = 0;
-  for (uint8_t i = 10; i &gt; 0; i--) {
-    nombre((10 - i) * 2, 9, i - 1, 1);
-    tours++;
+  uint8_t tours = 0;                  // Combien de tours la boucle a faits.
+  for (uint8_t i = 10; i &gt; 0; i--) {  // i = 10, 9, ... 1 : dix tours.
+    nombre((10 - i) * 2, 9, i - 1, 1);  // On affiche i - 1 : 9, 8, ... 0.
+    tours++;                          // Un tour de plus.
   }
 
   texte(1, 13, "TOURS:");
-  nombre(8, 13, tours);
+  nombre(8, 13, tours);               // Affiche 010 : la boucle a bien fini.
 
-  ecran(1);
+  ecran(1);                           // On rallume l'écran : tout apparaît d'un coup.
 
-  while (true) {
+  while (true) {                      // La boucle du jeu.
     image();
   }
 }</code></pre>

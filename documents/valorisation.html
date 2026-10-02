@@ -75,10 +75,10 @@
 <p class="sous-titre">Un atelier maison pour écrire, dessiner et faire tourner de vraies cartouches Game Boy — langage, compilateur, émulateur et éditeur, sans dépendance externe.</p>
 
 <div class="chiffres">
-  <div class="chiffre"><b>79</b><span>leçons vérifiées automatiquement</span></div>
-  <div class="chiffre"><b>10</b><span>niveaux, du premier programme au jeu complet</span></div>
-  <div class="chiffre"><b>30</b><span>exemples fournis, tous compilés</span></div>
-  <div class="chiffre"><b>~8 900</b><span>lignes pour le compilateur et l'émulateur</span></div>
+  <div class="chiffre"><b>587</b><span>étapes vérifiées automatiquement (1 629 contrôles)</span></div>
+  <div class="chiffre"><b>25</b><span>chapitres, du programme vide au jeu complet</span></div>
+  <div class="chiffre"><b>31</b><span>exemples fournis, tous compilés</span></div>
+  <div class="chiffre"><b>~11 000</b><span>lignes pour le compilateur et l'émulateur</span></div>
 </div>
 
 <h2>Ce que c'est</h2>
@@ -88,7 +88,10 @@
 <h2>Ce qui le rend rare</h2>
 
 <h3>Un langage qui refuse, et qui dit pourquoi</h3>
-<p>Le compilateur ne traduit jamais en douce ce qu'il ne peut pas garantir : un <code>float</code>, une classe, un mauvais nombre d'index sur une grille sont refusés avec le numéro de ligne exact et la correction à faire. La leçon 78 en fait un sujet à part entière — un compilateur qui aide n'est pas seulement celui qui compile, c'est celui qui dit non correctement.</p>
+<p>Le compilateur ne traduit jamais en douce ce qu'il ne peut pas garantir : un <code>float</code>, une classe, un mauvais nombre d'index sur une grille sont refusés avec le numéro de ligne exact et la correction à faire. La leçon 141 du parcours en fait un sujet à part entière — un compilateur qui aide n'est pas seulement celui qui compile, c'est celui qui dit non correctement.</p>
+
+<h3>Un parcours, une fonction à la fois</h3>
+<p>Les leçons, les tutoriels et le cours ne forment qu'<strong>une seule suite de 587 étapes en 25 chapitres</strong>, du programme qui ne fait rien jusqu'à un vrai jeu. Aucune fonction de la console n'est là d'office : chacune s'inclut par son nom (<code>#include &lt;texte&gt;</code>), comme en C, parce qu'elle prend de la place dans la cartouche. Chacune a son tuto, placé juste avant la première étape qui l'emploie — et <code>verifier-tuto.mjs</code> contrôle qu'aucune étape n'en apporte deux d'un coup. Sans la ligne, le compilateur dit laquelle écrire, et un bouton l'écrit.</p>
 
 <h3>La couleur de la Game Boy Color, sans écrire une ligne</h3>
 <p>Huit palettes de quatre couleurs, onze variétés et huit thèmes toutes prêtes : on peint une tuile, un personnage ou une carte, et l'atelier écrit lui-même les <code>couleurFond</code> et les <code>teindre</code> — dans les limites exactes de la console (quatre couleurs par carré de 8 × 8). Changer une couleur ne touche que le dessin ouvert : une palette partagée est copiée, jamais changée en cachette pour tout l'écran.</p>
@@ -100,7 +103,7 @@
 <p>Le <strong>MODE MACHINE</strong> désassemble n'importe quelle cartouche compilée ici et retrouve les noms de variables et de fonctions — parce que le compilateur vient de les y ranger. Une cartouche venue d'ailleurs ne montre que des nombres, et l'outil le dit franchement plutôt que de prétendre deviner.</p>
 
 <h3>Un tutoriel qui ne peut pas mentir</h3>
-<p>Rien n'est rédigé à côté du code : chaque leçon est compilée pour de vrai, jouée dans l'émulateur du projet, et les contrôles qu'elle affiche sont ceux que <code>verifier-tuto.mjs</code> exige — mesurés, pas racontés. Le PDF (<code>tutoriel.pdf</code>, 79 pages) et les 79 livrets détaillés sont fabriqués depuis les mêmes leçons, jamais recopiés à la main.</p>
+<p>Rien n'est rédigé à côté du code : chaque leçon est compilée pour de vrai, jouée dans l'émulateur du projet, et les contrôles qu'elle affiche sont ceux que <code>verifier-tuto.mjs</code> exige — mesurés, pas racontés. Le PDF (<code>tutoriel.pdf</code>) et les 587 livrets détaillés sont fabriqués depuis les mêmes leçons, jamais recopiés à la main.</p>
 
 <div class="encadre">
 En pratique : modifier une leçon et oublier de relancer la vérification est <em>détecté</em>, pas seulement possible — <code>verifier-tutoriels.mjs</code> régénère la documentation en mémoire et refuse si elle diffère de ce qui est commité.
@@ -119,20 +122,20 @@ En pratique : modifier une leçon et oublier de relancer la vérification est <e
   <tr><td>Export en HTML autonome</td><td>oui</td><td><strong>oui</strong> — une page qui embarque l'émulateur et la cartouche, jouable en double-cliquant, sans atelier ni serveur ; vérifié automatiquement (<code>verifier-export.mjs</code>)</td></tr>
   <tr><td>Carte pilotée par indicateurs de sprite</td><td>oui (<code>fget</code>/<code>fset</code>)</td><td>pas encore — identifié dans <code>PARCOURS.md</code></td></tr>
 </table>
-<p style="font-size:8.8pt;color:var(--gris)">Vérifié en pilotant l'atelier réel (et non relu dans le seul code) : 4 modes (Création, Code, Leçons, Machine), 4 onglets dans Création (tuiles, airs, couleurs, modèles), 28 exemples dans le sélecteur, 53 réglages en 7 groupes.</p>
+<p style="font-size:8.8pt;color:var(--gris)">Vérifié en pilotant l'atelier réel (et non relu dans le seul code) : 4 modes (Création, Code, Apprendre, Machine), 4 onglets dans Création (tuiles, airs, couleurs, modèles), 31 exemples dans le sélecteur, 62 réglages.</p>
 
 <h2>Coût de reconstruction : une hypothèse, pas la réalité de ce projet</h2>
 <div class="encadre" style="margin-bottom:10pt">
-<strong>Ce projet-ci a été construit en moins d'un mois</strong>, à deux, avec une IA. Le calcul ci-dessous répond à une question différente et purement hypothétique : <strong>combien de temps faudrait-il à UNE SEULE personne, seule, sans aide, tapant et déboguant chaque ligne à la main</strong>, pour produire le même volume ? Les deux chiffres ne se comparent pas — le second sert seulement à donner une idée de l'ampleur du volume produit, pas du temps réellement passé.
+<strong>Ce projet-ci a été construit en quelques semaines</strong>, à deux, avec une IA. Le calcul ci-dessous répond à une question différente et purement hypothétique : <strong>combien de temps faudrait-il à UNE SEULE personne, seule, sans aide, tapant et déboguant chaque ligne à la main</strong>, pour produire le même volume ? Les deux chiffres ne se comparent pas — le second sert seulement à donner une idée de l'ampleur du volume produit, pas du temps réellement passé.
 </div>
-<p>Aucune heure n'a été pointée : ce n'est <strong>pas une facture</strong>. La méthode : le volume réel de chaque partie du dépôt, divisé par une vitesse de production prudente <em>pour un humain seul et non assisté</em> selon sa nature (le code d'un compilateur se teste et se corrige bien plus lentement qu'une leçon qui suit un modèle déjà établi). <code>TUTORIELS.md</code> n'est pas compté : c'est un fichier engendré depuis <code>tuto/lecons.js</code>, déjà comptabilisé — le compter aussi aurait été un double emploi.</p>
+<p>Aucune heure n'a été pointée : ce n'est <strong>pas une facture</strong>. La méthode : le volume réel de chaque partie du dépôt, divisé par une vitesse de production prudente <em>pour un humain seul et non assisté</em> selon sa nature (le code d'un compilateur se teste et se corrige bien plus lentement qu'une leçon qui suit un modèle déjà établi). Ne sont pas comptés les fichiers engendrés (<code>TUTORIELS.md</code>, <code>COURS.md</code>, <code>livret.html</code>, les pages <code>cours/</code> et <code>livrets/</code>) : ils sortent de <code>tuto/*.js</code>, déjà comptabilisé — les compter aussi aurait été un double emploi. Les leçons comptent leurs variantes (« de base, ailleurs », « doublé »), plus rapides à écrire : d'où la vitesse la plus haute.</p>
 
 <table>
   <tr><th>Nature du travail</th><th>Volume réel</th><th>Vitesse retenue</th><th>Jours estimés</th></tr>
-  <tr><td>Compilateur + émulateur (le cœur technique)</td><td>8 888 lignes</td><td>15 à 25 lignes/jour</td><td>355 à 593</td></tr>
-  <tr><td>Interface, éditeurs, outils PDF</td><td>10 100 lignes</td><td>30 à 45 lignes/jour</td><td>224 à 337</td></tr>
-  <tr><td>Leçons, tests automatisés, exemples, documentation écrite</td><td>20 971 lignes</td><td>70 à 140 lignes/jour</td><td>149 à 300</td></tr>
-  <tr><td><strong>Total</strong></td><td><strong>39 959 lignes</strong></td><td>—</td><td><strong>728 à 1 230 jours</strong></td></tr>
+  <tr><td>Compilateur + émulateur (le cœur technique)</td><td>10 993 lignes</td><td>15 à 25 lignes/jour</td><td>440 à 733</td></tr>
+  <tr><td>Interface, éditeurs, outils PDF</td><td>26 380 lignes</td><td>30 à 45 lignes/jour</td><td>586 à 879</td></tr>
+  <tr><td>Leçons, tests automatisés, exemples, documentation écrite</td><td>53 653 lignes</td><td>70 à 140 lignes/jour</td><td>383 à 767</td></tr>
+  <tr><td><strong>Total</strong></td><td><strong>91 026 lignes</strong></td><td>—</td><td><strong>1 409 à 2 379 jours</strong></td></tr>
 </table>
 
 <div class="calc-taux">
@@ -142,17 +145,17 @@ En pratique : modifier une leçon et oublier de relancer la vérification est <e
 </div>
 
 <div class="encadre">
-  <strong>Hypothèse solo, non assisté : entre <span id="cout-bas">291&nbsp;200</span>&nbsp;€ et <span id="cout-haut">492&nbsp;000</span>&nbsp;€</strong>
-  (728 à 1 230 jours × <span id="taux-affiche">400</span>&nbsp;€/j), soit l'équivalent d'environ
-  <strong><span id="annees-bas">2,9</span> à <span id="annees-haut">4,9</span> années</strong> de travail à temps plein d'une seule personne (220 jours ouvrés/an) —
-  <strong>contre moins d'un mois, dans les faits, à deux avec une IA.</strong>
+  <strong>Hypothèse solo, non assisté : entre <span id="cout-bas">563&nbsp;600</span>&nbsp;€ et <span id="cout-haut">951&nbsp;600</span>&nbsp;€</strong>
+  (1 409 à 2 379 jours × <span id="taux-affiche">400</span>&nbsp;€/j), soit l'équivalent d'environ
+  <strong><span id="annees-bas">6,4</span> à <span id="annees-haut">10,8</span> années</strong> de travail à temps plein d'une seule personne (220 jours ouvrés/an) —
+  <strong>contre quelques semaines, dans les faits, à deux avec une IA.</strong>
 </div>
 
 <p style="font-size:8.8pt;color:var(--gris)">Réserves à garder en tête : le nombre de lignes est un indicateur grossier de l'effort réel — il ne dit rien du temps passé à concevoir le langage, à choisir la pédagogie du tutoriel, ou à corriger un bogue invisible pendant des heures. Les vitesses retenues sont des repères de l'industrie du logiciel, pas une mesure prise sur ce projet précis. Et si tout ou partie de ce code a été écrit avec l'aide d'un outil d'IA plutôt que tapé à la main, le temps humain réellement passé peut être largement inférieur à ce que ce calcul suppose.</p>
 
 <script>
 (function () {
-  var JOURS_BAS = 728, JOURS_HAUT = 1230, JOURS_PAR_AN = 220;
+  var JOURS_BAS = 1409, JOURS_HAUT = 2379, JOURS_PAR_AN = 220;
   var input = document.getElementById('taux');
 
   function formater(n) {

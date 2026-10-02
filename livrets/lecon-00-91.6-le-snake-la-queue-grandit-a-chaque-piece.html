@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 0.91.6 — Le snake — la queue grandit à chaque pièce</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie H — Du titre au snake</span>
+    <span>leçon 0.91.6 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
+    
+    
+    
+  </p>
+<h1>0.91.6. Le snake — la queue grandit à chaque pièce</h1>
+<p class="idee">Le 0.91.5, mais la queue est un tableau de cases O. Au début, le A est tout seul ; chaque pièce ramassée ajoute un O. Le serpent grandit.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>C’est le 0.91.5, avec une chose en plus : la queue grandit.</strong> Au début, le A est <strong>tout seul</strong>. À chaque P ramassé, il gagne <strong>une case O</strong>. Au bout de dix pièces, le A traîne dix O derrière lui.</p>
+<p><strong>Une queue de plusieurs cases, c’est plusieurs places : un tableau.</strong> <code>uint8_t qx[50];</code> réserve <strong>50</strong> colonnes, de <code>qx[0]</code> à <code>qx[49]</code> ; <code>qy[50]</code>, les 50 lignes. La case <code>i</code> de la queue est en (<code>qx[i]</code>, <code>qy[i]</code>). <strong><code>qx[0]</code></strong> est la case collée au A ; la dernière est le <strong>bout</strong> de la queue.</p>
+<p><strong><code>longueur</code> compte les cases utilisées :</strong> <strong>0</strong> au départ, le A est tout seul ; <code>nouvellePartie()</code> la remet à 0 et ne pose aucun O. Les cases utilisées vont de <code>0</code> à <code>longueur - 1</code> : avec <code>longueur</code> = 3, ce sont <code>qx[0]</code>, <code>qx[1]</code> et <code>qx[2]</code>. Le bout est donc toujours <code>qx[longueur - 1]</code>.</p>
+<p><strong>Un piège : <code>longueur - 1</code> quand <code>longueur</code> vaut 0.</strong> On attendrait -1. Mais un <code>uint8_t</code> ne connaît que 0 à 255 : sous 0, il repart de l’autre côté, et 0 - 1 donne <strong>255</strong>. <code>qx[255]</code> n’existe pas (le tableau s’arrête à <code>qx[49]</code>), et la boucle ferait 255 tours. D’où la condition <code>longueur &gt; 0 &amp;&amp; (x != ax || y != ay)</code> : <strong><code>&amp;&amp;</code></strong> veut dire « et » (le 0.75) ; <strong>les deux</strong> doivent être vraies. Sans queue, on ne la déplace pas.</p>
+<p><strong>Les parenthèses</strong> autour de <code>x != ax || y != ay</code> : elles se calculent d’abord, comme en maths. « Il y a une queue » ET « le A a bougé (en x ou en y) ».</p>
+<p><strong>Ce qui est nouveau ici : faire avancer toute la queue.</strong> Chaque case prend la place de <strong>celle de devant</strong> : <code>qx[2]</code> prend la place de <code>qx[1]</code>, puis <code>qx[1]</code> celle de <code>qx[0]</code>, puis <code>qx[0]</code> celle que le A vient de quitter (<code>ax</code>, <code>ay</code>). Comme les wagons d’un train.</p>
+<p><strong>Pourquoi en partant du bout ?</strong> Si l’on commençait par <code>qx[1] = qx[0];</code>, l’ancienne place de <code>qx[1]</code> serait perdue avant que <code>qx[2]</code> ne la prenne. En partant du bout, chaque case est lue <strong>avant</strong> d’être écrasée.</p>
+<p><strong>La boucle qui recule :</strong> <code>for (uint8_t i = longueur - 1; i &gt; 0; i--)</code>. <strong><code>i--</code></strong> retire 1 à <code>i</code> à chaque tour (le contraire de <code>i++</code>). Avec <code>longueur</code> = 3 : <code>i</code> vaut 2, puis 1, et s’arrête avant 0 (<code>i &gt; 0</code> est faux). Tour <code>i</code> = 2 : <code>qx[2] = qx[1]</code>. Tour <code>i</code> = 1 : <code>qx[1] = qx[0]</code>. Avec <code>longueur</code> = 1, <code>i</code> part de 0 : <code>0 &gt; 0</code> est faux, la boucle ne tourne pas du tout.</p>
+<p><strong>Le bout est effacé avant, toute la queue est redessinée après :</strong> <code>effacer(qx[longueur - 1], qy[longueur - 1], 1)</code> gomme l’ancien bout, puis une boucle <code>for</code> pose un O sur chaque case, de <code>0</code> à <code>longueur - 1</code>. Et le A par-dessus, comme au 0.91.5.</p>
+<p><strong>Grandir, quand on ramasse le P :</strong> la nouvelle case naît <strong>sur le bout de la queue</strong> : <code>qx[longueur] = qx[longueur - 1];</code>, puis <code>longueur = longueur + 1;</code>. Au pas suivant, toute la queue avance d’un cran, sauf la nouvelle case, qui prend la place de l’ancien bout : <strong>elle reste derrière</strong>, et la queue a une case de plus.</p>
+<p><strong>La toute première case, elle, n’a pas de bout sur lequel naître</strong> (et <code>qx[longueur - 1]</code> serait encore <code>qx[255]</code>). Elle naît donc <strong>sous le A</strong> : <code>qx[0] = x;</code> et <code>qy[0] = y;</code>. Au pas suivant, le A s’en va, et le O apparaît sur la case qu’il a quittée. <code>else</code> (le 0.83.1) : « sinon », quand la queue a déjà au moins une case.</p>
+<p><strong>Pourquoi redessiner toute la queue ?</strong> Juste après la pièce, le bout et la nouvelle case sont sur la même place. Au pas suivant, on efface le bout… donc aussi la nouvelle case, qui doit y rester. Redessiner toutes les cases la fait réapparaître.</p>
+<p><strong><code>if (longueur &lt; 50)</code> :</strong> le tableau n’a que 50 cases. Au-delà, <code>qx[50]</code> écrirait en dehors, sur d’autres variables. Après 49 pièces, la queue ne grandit plus.</p>
+<p><strong>Pour plus tard :</strong> le A traverse sa propre queue sans rien dire, et le P peut tomber sur la queue. Dans un vrai serpent, toucher sa queue fait perdre.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;reste&gt;</code> → <a href="lecon-00-8.4-include-reste-a-b.html">0.8.4. #include &lt;reste&gt; — a % b</a></li>
+  <li><code>#include &lt;effacer&gt;</code> → <a href="lecon-00-16.3-la-fonction-effacer-effacer-des-cases.html">0.16.3. La fonction effacer() — effacer des cases</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;couleurTexte&gt;</code> → <a href="lecon-00-87.7-la-fonction-couleurtexte-la-couleur-des-.html">0.87.7. La fonction couleurTexte() — la couleur des lettres</a></li>
+  <li><code>#include &lt;texteGrand&gt;</code> → <a href="lecon-00-86.3-la-fonction-textegrand-un-texte-agrandi.html">0.86.3. La fonction texteGrand() — un texte agrandi</a></li>
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+  <li><code>#include &lt;deplace_croix&gt;</code> → <a href="lecon-00-66.3-la-fonction-deplace-croix-suivre-la-croi.html">0.66.3. La fonction deplace_croix() — suivre la croix, case par case</a></li>
+  <li><code>#include &lt;hasard&gt;</code> → <a href="lecon-00-81.2-la-fonction-hasard-un-nombre-au-hasard.html">0.81.2. La fonction hasard() — un nombre au hasard</a></li>
+  <li><code>#include &lt;nombre&gt;</code> → <a href="lecon-00-8.3-la-fonction-nombre-ecrire-un-nombre.html">0.8.3. La fonction nombre() — écrire un nombre</a></li>
+  <li><code>#include &lt;chaque&gt;</code> → <a href="lecon-00-29.3-la-fonction-chaque-toutes-les-n-millisec.html">0.29.3. La fonction chaque() — toutes les n millisecondes</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>2646 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage           117 o  ← la console, à l’allumage  — la mise en route de la console
+  texte_grand_0()     195 o  ← main()  — ta fonction
+  chaque_minuteur()   124 o  ← main()  — une fonction fournie par le langage
+  deplace_croix()     217 o  ← main()  — une fonction fournie par le langage
+  viderEcran()         33 o  ← nouvellePartie(), main()  — ta fonction
+  nouvellePartie()    163 o  ← main()  — ta fonction
+  main()              619 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EffacerCases, EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase          10 o  ← poser(), effacer()  — trouve l’adresse d’une case de l’écran
+  EffacerCases         12 o  ← effacer()  — efface des cases
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre         33 o  ← nombre()  — écrit un nombre en chiffres
+  Reste                10 o  ← main()  — le reste d’une division
+  CopierTuiles         18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Hasard               25 o  ← hasard()  — tire un nombre au hasard
+  LireManette          37 o  ← bouton()  — lit les huit boutons
+  Tuiles              848 o  ← CopierTuiles  — la police entière, et 9 tuiles dessinées
+  "SCORE"               5 o  ← texte()  — un texte gravé
+  "TEMPS"               5 o  ← texte()  — un texte gravé
+  "APPUIE SUR START"   16 o  ← texte()  — un texte gravé
+  "FIN"                 3 o  ← texte()  — un texte gravé
+  "SCORE"               5 o  ← texte()  — un texte gravé
+  "START : REJOUER"    15 o  ← texte()  — un texte gravé
+  GRAND_TABLE_0_0_0    12 o  ← poser()  — une table gravée
+  GRAND_TABLE_0_1_1    12 o  ← poser()  — une table gravée
+  GRAND_TABLE_0_2_2    12 o  ← poser()  — une table gravée
+  GRAND_TABLE_0_3_3    12 o  ← poser()  — une table gravée
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, Diviser, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser()           × 15   278 o sur place, dans texte_grand_0(), deplace_croix(), nouvellePartie(), main()  + AdresseCase (10 o), GRAND_TABLE_0_0_0 (12 o), GRAND_TABLE_0_1_1 (12 o), GRAND_TABLE_0_2_2 (12 o), GRAND_TABLE_0_3_3 (12 o)
+  texte()           ×  6    66 o sur place, dans nouvellePartie(), main()  + EcrireTexte (10 o)
+  effacer()         ×  3    64 o sur place, dans deplace_croix(), viderEcran(), main()  + AdresseCase (10 o), EffacerCases (12 o)
+  bouton()          ×  6    30 o sur place, dans deplace_croix(), main()  + LireManette (37 o)
+  nombre()          ×  3    30 o sur place, dans main()  + EcrireNombre (33 o)
+  couleurFond()     ×  1    12 o sur place, dans main()
+  hasard()          ×  2     6 o sur place, dans main()  + Hasard (25 o)
+  images()          ×  2     4 o sur place, dans chaque_minuteur(), deplace_croix()
+  image()           ×  1     3 o sur place, dans main()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  deplace_croix()   ×  1    19 o sur place, dans main()
+  chaque_minuteur() ×  1    10 o sur place, dans main()
+  viderEcran()      ×  2     6 o sur place, dans nouvellePartie(), main()
+  nouvellePartie()  ×  2     6 o sur place, dans main()
+  texte_grand_0()   ×  1     3 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>#include &lt;reste&gt;   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include &lt;effacer&gt;         // efface des cases, ou tout le fond
+#include &lt;poser&gt;           // pose une tuile sur une case du fond
+#include &lt;ALPHABET&gt;        // les lettres de la police : ALPHABET[0] est le A
+#include &lt;texte&gt;           // écrit un texte à l’écran
+#include &lt;couleurTexte&gt;    // choisit la couleur des lettres
+#include &lt;texteGrand&gt;      // écrit un texte agrandi, de 1 à 20 fois
+#include &lt;bouton&gt;          // lit un bouton de la manette
+#include &lt;deplace_croix&gt;   // une tuile qui suit la croix, case par case
+#include &lt;hasard&gt;          // tire un nombre au hasard
+#include &lt;nombre&gt;          // écrit un nombre en chiffres
+#include &lt;chaque&gt;          // répond 1 toutes les n millisecondes</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une variable — ecran</p>
+    <pre><code>uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une variable — x</p>
+    <pre><code>uint8_t x = 5;            // le A : sa colonne…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une variable — y</p>
+    <pre><code>uint8_t y = 8;            // …et sa ligne (le 0.81)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une variable — px</p>
+    <pre><code>uint8_t px = 15;          // la pièce, le P : sa colonne…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">6. une variable — py</p>
+    <pre><code>uint8_t py = 8;           // …et sa ligne</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">7. une variable — score</p>
+    <pre><code>uint8_t score = 0;        // les pièces ramassées</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">8. une variable — temps</p>
+    <pre><code>uint8_t temps = 30;       // les secondes qui restent</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">9. une variable — ax</p>
+    <pre><code>uint8_t ax = 5;           // la place du A AVANT son pas… (le 0.91.3)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">10. une variable — ay</p>
+    <pre><code>uint8_t ay = 8;           // …pour l'y remettre s'il entre dans un mur</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">11. un tableau — qx</p>
+    <pre><code>uint8_t qx[50];           // NOUVEAU : la queue, un TABLEAU de 50 cases O : les colonnes…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">12. un tableau — qy</p>
+    <pre><code>uint8_t qy[50];           // …et les lignes. qx[0] : la case collée au A.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">13. une variable — longueur</p>
+    <pre><code>uint8_t longueur = 0;     // NOUVEAU : combien de cases la queue utilise (0 : le A seul)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">14. une fonction — viderEcran()</p>
+    <pre><code>void viderEcran() {
+  for (uint8_t l = 0; l &lt; 18; l++) {
+    effacer(0, l, 20);
+  }
+}
+
+// ---- Une partie qui commence, TOUT au départ (le 0.91.2) ----
+// Depuis le titre, ET depuis la fin (START : rejouer).</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">15. une fonction — nouvellePartie()</p>
+    <pre><code>void nouvellePartie() {
+  x = 5;                          // le A revient à sa place
+  y = 8;
+  px = 15;                        // le P revient en (15, 8), d'où qu'il soit
+  py = 8;
+  ax = 5;                         // et sa place d'avant, la même
+  ay = 8;
+  longueur = 0;                   // NOUVEAU : pas de queue, le A est tout seul
+  score = 0;                      // pas encore de pièce
+  temps = 30;                     // 30 secondes de nouveau
+  ecran = 1;                      // on est sur le JEU
+  viderEcran();
+  poser(px, py, ALPHABET[15]);
+
+  // ---- Le cadre de murs, des X tout autour du terrain (le 0.91.3) ----
+  //
+  //   colonne : 0 1 2 …           19
+  //   ligne 0 : X X X X X X … X X X     le haut : ligne 0, colonnes 0 à 19
+  //   ligne 1 : X                 X
+  //   …         X   A        P    X     les côtés : colonnes 0 et 19
+  //   ligne 15: X                 X
+  //   ligne 16: X X X X X X … X X X     le bas : ligne 16
+  //   ligne 17: SCORE 000  TEMPS 030    la ligne 17 reste aux nombres
+  //
+  // ALPHABET[23] : la 24e lettre (on compte depuis 0), le X.
+  for (uint8_t c = 0; c &lt; 20; c++) {
+    poser(c, 0, ALPHABET[23]);        // le haut
+    poser(c, 16, ALPHABET[23]);       // le bas
+  }
+  for (uint8_t l = 1; l &lt; 16; l++) {
+    poser(0, l, ALPHABET[23]);        // le côté gauche
+    poser(19, l, ALPHABET[23]);       // le côté droit
+  }
+
+  texte(0, 17, "SCORE");
+  texte(11, 17, "TEMPS");
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">16. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  couleurTexte(31, 16, 0);
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    if (ecran == 0 &amp;&amp; bouton(START)) {
+      nouvellePartie();               // la première partie
+    }
+
+    if (ecran == 1) {
+      ax = x;                                  // on retient où est le A… (le 0.91.3)
+      ay = y;
+      deplace_croix(x, y, ALPHABET[0], 250);   // …il fait peut-être un pas…
+
+      // …et s'il est arrivé SUR le cadre (colonne 0 ou 19, ligne 0 ou 16) :
+      //   1. on remet le X, que le A venait de recouvrir ;
+      //   2. le A revient à sa place d'avant, et s'y pose.
+      // || veut dire « OU » : une seule des quatre suffit.
+      if (x == 0 || x == 19 || y == 0 || y &gt;= 16) {
+        poser(x, y, ALPHABET[23]);             // le mur revient
+        x = ax;                                // le A recule
+        y = ay;
+        poser(x, y, ALPHABET[0]);
+      }
+
+      // ---- La queue suit le A (le 0.91.5) ----
+      // Le A a-t-il bougé ? Sa place n'est plus celle d'avant (ax, ay).
+      // NOUVEAU : longueur &gt; 0 d'abord. Sans queue, rien à déplacer, et
+      // longueur - 1 vaudrait 255 (un uint8_t ne descend pas sous 0).
+      // &amp;&amp; veut dire « ET » : il faut une queue ET que le A ait bougé.
+      if (longueur &gt; 0 &amp;&amp; (x != ax || y != ay)) {
+        // 1. le BOUT de la queue disparaît : la dernière case, longueur - 1
+        effacer(qx[longueur - 1], qy[longueur - 1], 1);
+
+        // ---- NOUVEAU : 2. chaque case prend la place de celle de devant ----
+        // En partant du BOUT, et en reculant (i-- : i = i - 1).
+        // Avec longueur = 3 :  i = 2 : qx[2] = qx[1]
+        //                      i = 1 : qx[1] = qx[0]
+        //                      i = 0 : 0 &gt; 0 est faux, la boucle s'arrête.
+        for (uint8_t i = longueur - 1; i &gt; 0; i--) {
+          qx[i] = qx[i - 1];
+          qy[i] = qy[i - 1];
+        }
+
+        // 3. la première case prend la case que le A vient de quitter
+        qx[0] = ax;
+        qy[0] = ay;
+
+        // 4. toute la queue redessinée, de la case 0 à la case longueur - 1
+        //    (après une pièce, la nouvelle case venait d'être effacée avec le bout)
+        for (uint8_t i = 0; i &lt; longueur; i++) {
+          poser(qx[i], qy[i], ALPHABET[14]);
+        }
+        poser(x, y, ALPHABET[0]);              // 5. le A par-dessus (le 0.91.5)
+      }
+      if (x == px &amp;&amp; y == py) {                // le A sur le P : ramassée (le 0.81)
+        score = score + 1;
+
+        // ---- La pièce réapparaît AU HASARD, mais DANS le cadre (le 0.91.4) ----
+        //
+        //   px = 1 + hasard() % 18;
+        //        |   |        |
+        //        |   |        +-- % 18 : le reste de la division par 18, de 0 à 17.
+        //        |   |            Exemple : hasard() rend 137 ; 137 = 7 × 18 + 11 ;
+        //        |   |            le reste est 11.
+        //        |   +----------- un nombre imprévisible, de 0 à 255 (le 0.81.2)
+        //        +--------------- + 1 : on décale de 0…17 à 1…18 → 11 + 1 = 12.
+        //
+        // Pourquoi pas % 20 comme au 0.81.2 ? Les colonnes 0 et 19 sont des murs X :
+        // la pièce doit rester de 1 à 18. Les lignes 0 et 16 aussi sont des murs :
+        // la pièce doit rester de 1 à 15, d'où 1 + hasard() % 15.
+        px = 1 + hasard() % 18;                // une colonne : 1 à 18
+        py = 1 + hasard() % 15;                // une ligne : 1 à 15
+        poser(px, py, ALPHABET[15]);           // le nouveau P apparaît là
+
+        // ---- NOUVEAU : la queue grandit d'une case ----
+        // La nouvelle case naît SUR le bout de la queue. Au prochain pas, toutes
+        // les autres avancent, elle non : elle reste derrière.
+        // La toute première n'a pas de bout : elle naît SOUS le A.
+        // &lt; 50 : le tableau n'a que 50 cases, qx[0] à qx[49].
+        if (longueur &lt; 50) {
+          if (longueur == 0) {
+            qx[0] = x;                         // la première case : sous le A
+            qy[0] = y;
+          } else {
+            qx[longueur] = qx[longueur - 1];   // la case d'après le bout…
+            qy[longueur] = qy[longueur - 1];   // …à la même place que le bout
+          }
+          longueur = longueur + 1;             // une case de plus
+        }
+      }
+      nombre(6, 17, score);
+      nombre(17, 17, temps);
+    }
+
+    if (ecran == 1 &amp;&amp; chaque(1000)) {
+      temps = temps - 1;
+      if (temps == 0) {
+        ecran = 2;
+        viderEcran();
+        texte(8, 6, "FIN");
+        texte(5, 9, "SCORE");         // le score de la partie (le 0.91.2)
+        nombre(11, 9, score);
+        texte(2, 13, "START : REJOUER");
+      }
+    }
+
+    // ---- Sur la fin, START relance une partie (le 0.91.2).
+    if (ecran == 2 &amp;&amp; bouton(START)) {
+      nouvellePartie();               // la même fonction : tout au départ
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACQElEQVR4nO3bMW7bQBBAUZc+Qsrc/zQ+Qo6R0kVKmtSSXIrSzwN+IQjycDUPkg0D/Pjz90vhPm4/gS4NcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8V4C+PPX74fNmjNr/hWvBwwYMGDAgF8F+5k/e8V8wJOXAngZ4AvnA568FMDLAF84H/DkpQBeBvjC+YAnLwXwsizwrH9uAAYMGDBgwIDvXyjgG5b4zIUCvmGJz1wo4BuW+MyFAp7whgHPDfCF8wFPXgrgZYAvnP/fAa+9+VmLWJs50hXXumu3gAEDBgwYsO4PcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHOwj84/1Va/ddbTz/4+OR+Wduwd54vPe+sbX5D1exd2+Hb2U7Ajy4rMOPx58ZP+eZ8++dP3L+M3sADPg08MOvprXXj7zhjWcOf4UOLnrK/JHzj1/3RT/BI0e8+hO898z/Hh+7yt7zj18X8GTgYxc6D7x23TcG3viKm/JX5caLD/zK2DX/vX8H640CHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMf7BsM6fvMalOCPAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC60lEQVR4nO2YQW7CMBAAc+QJPfL/1/AEnsGxBySIQuzYxDHO7Eijyl0oib3sZqfT/XG7/F3vj9sT17D1NMJNuD42wa/f5+8wzohPq/n//BvjJ41bwfC4z2D42gTD1+9nsCDJVbCci+oWLeci16JTU5mci/Upev6anJ1FHq1gFHUeLOfCIQuOHhwRK5iDLRqOHsxHD+ajB5PRg8k4ZMHRgyNiBXOwRcPRg/nowXz0YDJ6MBmHLDh6cESsYA62aDh6MB89mI8eTEYPJuOQBUcPjogVzMEWDUcP5qMH89GDyejBZByy4OjBEbGCOdii4ejBfPRgPnowGT2YjEMWHD04IlYwB1s0HD2Yjx7MRw8moweTcciCowdH5McVfPm7Pvn5QfTc7EH7Ha5FR3s0HL3f4TzYBB90iVE8eN6ygiS4w2YH8uDIFXzoJUbxYBPc4TxNcD9+lmAB43+yOAzXoqUtw3mwNGcsD5YjGMiDpTljebC0xSELjh4cESuYgy0ajh7MRw/moweT0YPJOGTB0YMjYgVzsEXD0YP56MF89GAyejAZhyw4enBErGAOtmg4ejAfPZiPHkxGDybjkAVHD46IFczBFg1HD+ajB/PRg8nowWQcsuDowRGxgjnYouHowXz0YD56MBk9mIxDFhw9OCJWMAdbNBw9mI8ezEcPJqMHk3HIgqMHRyRXwa4BaxMMX29M0cbPHt/2YOOnjlvB8LjPYPjaBMPXejCc9zP4xfzl1WAqvvkhqx+1StV1M/EqUveZiafWm/e55xwy5/kZXLboxbubrwt31e1a+avnP/N1lOWJb3IOqWDRM7hwY30SnDq4wniHBC9+9jmHzfucv3/ZoncmuKp15zeWOrjyeMMEZ85n9X6aPEo291VyP8shq+Qbl/+GlldAZmPzL+PX8YYJ/uIcaq9Sfg6Ze/h8f2mCq9aFnaBk84M/g49O8P719F1L2WzpqZZV3p36T9GZBNdO0flNld/n/nPQg+H8A0cnwCYKqtZTAAAAAElFTkSuQmCC" alt="l’écran après START">
+    <figcaption><strong>START</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">START : le A tout seul ; à chaque P ramassé, un O de plus derrière lui.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>au départ : le A tout seul, aucun O </li>
+
+  <li>le P est ramassé <span class="detail"> (score = 1)</span></li>
+
+  <li>la queue a grandi : une case par pièce <span class="detail"> (longueur = 1)</span></li>
+
+  <li>autant de O à l’écran que de cases <span class="detail"> (1 O)</span></li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>0.91.7. Le snake — le A avance tout seul</strong> — chapitre 0 : Avant tout.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

@@ -18,6 +18,14 @@
 // position, la pesanteur s'ajoute à la vitesse, et le sol renvoie l'objet en
 // lui prenant un quart de sa vitesse à chaque choc.
 
+#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <bouton>   // lit un bouton de la manette
+#include <texte>    // écrit un texte à l’écran
+#include <poser>    // pose une tuile sur une case du fond
+#include <nombre>   // écrit un nombre en chiffres
+#include <ecran>    // éteint ou rallume l’écran
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+
 Tuile BALLE = {
   "00333300",
   "03222230",
@@ -66,6 +74,7 @@ uint8_t aAvant = 0;
 uint8_t hAvant = 0;
 uint8_t bAvant = 0;
 uint8_t tour = 0;       // lequel des quatre nombres on rafraîchit ce tour-ci
+uint8_t pas = 0;        // les images, 0 puis 1 : la physique avance quand il revient à 0
 
 /* ------------------------------------------------------- le déplacement */
 
@@ -211,18 +220,17 @@ void decor() {
 }
 
 /*
- * UN SEUL NOMBRE PAR TOUR — et ce n'est pas de l'avarice.
+ * UN SEUL NOMBRE PAR TOUR.
  *
- * Écrire dans la mémoire vidéo n'est possible qu'entre deux images, pendant le
- * court instant où le balayage se repose. Un `nombre()` de trois chiffres n'y
- * tient déjà plus tout à fait : il coûte une image entière de plus au tour de
- * boucle. Les quatre nombres réunis en coûtaient cinq, et la balle mettait
- * cinq fois trop longtemps à tomber — la physique était juste, c'est l'horloge
- * qui était fausse.
+ * Écrire dans la mémoire vidéo n'est possible que quand le balayage se repose.
+ * Autrefois, `nombre()` attendait pour cela l'image suivante, et chaque tour de
+ * boucle durait deux images : c'est sur ce rythme, trente pas par seconde, que
+ * la pesanteur a été réglée. Aujourd'hui, `nombre()` n'attend plus qu'une
+ * ligne ; la boucle tourne à soixante tours par seconde, et c'est `main()` qui
+ * ne fait avancer la physique qu'une image sur deux — écrit en clair, au lieu
+ * de dépendre d'une attente cachée.
  *
- * En n'en rafraîchissant qu'un par tour, le coût devient CONSTANT : chaque tour
- * dure exactement deux images, la chute est régulière, et chaque nombre est
- * réécrit huit fois par seconde — largement assez pour un œil.
+ * Un nombre par tour suffit : chacun est réécrit quinze fois par seconde.
  */
 void mesures() {
   if (tour == 0) {
@@ -260,10 +268,16 @@ int main() {
 
     lireLesTouches();
 
-    if (!couchee) {
-      avancer();
-      toucherLeSol();
-      toucherLePlafond();
+    /* Un pas de physique toutes les DEUX images : trente par seconde, le
+       rythme pour lequel la pesanteur est réglée (voir mesures()). */
+    pas = pas + 1;
+    if (pas == 2) {
+      pas = 0;
+      if (!couchee) {
+        avancer();
+        toucherLeSol();
+        toucherLePlafond();
+      }
     }
 
     mesures();

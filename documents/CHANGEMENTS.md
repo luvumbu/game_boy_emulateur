@@ -1984,3 +1984,136 @@ Ajoutés ou mis à jour le 29 septembre 2026 (§9 et §10) :
 | `recherche-page.js` | **nouveau** (§11) : la recherche de `sommaire.html` et `cours/index.html` |
 | `projets.js` | `apresLaListe` : la page réapplique sa recherche quand la grille est refaite |
 | `verification/verifier-recherche.mjs` | **nouveau** (§11) : chaque recherche essayée dans un navigateur (`npm run recherche`) |
+
+---
+
+# La passe des #include, et du parcours unique
+
+> 30 septembre – 2 octobre 2026. Deux changements de fond. **Aucune fonction
+> de la console n'est plus là d'office** : chacune s'inclut par son nom,
+> `#include <texte>`, comme en C. Et **les leçons, les tutoriels et le cours ne
+> font plus qu'une seule suite**, le parcours, où chaque fonction est
+> présentée seule, juste avant de servir.
+
+## 1. `#include <nom>` : une fonction de la console s'inclut
+
+Une fonction de la console prend de la place dans la cartouche (son code, ses
+routines, ses tables). La règle est donc celle du C : ce qu'on emploie, on
+l'inclut.
+
+```cpp
+#include <texte>      // texte() existe
+#include <ALPHABET>   // ALPHABET existe
+#include <Tuile>      // on peut dessiner une Tuile
+```
+
+- **71 noms** possibles, rangés dans `BIBLIOTHEQUES` (`compilateur/inclusion.js`),
+  chacun avec une phrase qui dit ce qu'il apporte. Ce sont les fonctions, les
+  types `Tuile`, `Perso`, `Mot`, `Carre`, `Air`, les deux alphabets, et quatre
+  calculs que le processeur ne sait pas faire seul : `<multiplier>`,
+  `<diviser>`, `<reste>`, `<decaler>`.
+- **Sans la ligne, le compilateur refuse** et dit laquelle écrire, avec sa
+  ligne (« il faut « #include <texte> » pour employer texte() »). Un nom mal
+  écrit (`<Texte>`) est corrigé dans le message.
+- **Une ligne de trop ne coûte rien** : seul ce qui est employé est gravé.
+- **Restent natives**, parce qu'elles ne coûtent rien : `image()`, `images()`,
+  `retard()`, `ms()`, `secondes()`. Un calcul écrit par le compilateur
+  lui-même (par 1, 2, 4, 8… en clair, ou `x % 20` dans `textS`) ne demande rien.
+- La ligne accepte un commentaire après elle (`#include <poser>   // …`).
+
+**Écrire les lignes à sa place.** `compilateur/inclusions-auto.js` (nouveau)
+compile le programme en lui demandant de **relever** au lieu de refuser, et
+écrit les lignes qui manquent en tête, dans l'ordre d'emploi, chacune
+commentée. Il sert :
+- au bouton **« ✚ Écrire les #include qui manquent »** de l'atelier et de
+  `tuto.html`, qui apparaît sous l'erreur ;
+- aux éditeurs (tuiles, couleurs, airs, carte, scènes, modèles de jeux), qui
+  écrivent eux-mêmes les lignes dont leur code a besoin ;
+- à `retour-cpp.js` (la traduction d'une cartouche en C++).
+
+Les 31 exemples (`exemples/*.cpp`), `projets/mon_mario` et les modèles de jeux
+ont reçu leurs lignes.
+
+## 2. Le parcours : une seule suite
+
+`tuto/parcours.js` (nouveau) range les leçons (`tuto/lecons.js`, par niveau)
+et le cours (`tuto/programmation.js`, par notion) en **25 chapitres**, de
+« Avant tout » à « Aller au bout ». Rien n'est retiré : chaque étape garde son
+texte, son programme et ses contrôles ; seuls changent sa place et son numéro.
+
+- Les deux séries sont **entremêlées par sujet**, chacune dans son ordre :
+  aucune notion n'arrive avant ce dont elle a besoin (`CHAPITRES_DU_PARCOURS`).
+- **Un `#include` nouveau à la fois.** Chaque fonction a son tuto (sa ligne
+  `#include`, ses arguments, ce qu'elle coûte), placé **juste avant** la
+  première étape qui l'emploie. Les tutos qu'aucune étape n'emploie restent
+  ensemble, dans la partie L du chapitre 0, « Les fonctions de la console, une
+  par une ». `verifier-tuto.mjs` contrôle qu'aucune étape n'en apporte deux.
+- Une étape d'ouverture, **« Pourquoi écrire « #include » ? »**, explique la
+  règle une fois, en détail.
+- **Une entrée par chapitre** : d'où l'on vient, ce qui vient, les fonctions
+  qui arrivent — calculée sur le parcours lui-même.
+- Dans chaque étape, l'encadré **« Les fonctions de cette leçon »** mène au
+  tuto de chacune, et un tuto dit où l'on retrouve sa fonction
+  (`tuto/fonctions.js`, nouveau : tout est lu dans le code, rien n'est écrit
+  à la main).
+
+En chiffres : **587 étapes** (dont 143 principales), **383** au chapitre 0,
+**71** tutos de fonctions, **61** cours.
+
+Dans l'atelier, le mode APPRENDRE montre le parcours ; le bouton « Cours » et
+`cours.html` restent pour les anciens liens et y mènent.
+
+## 3. Le cours : les chapitres 9 à 14
+
+Six chapitres de plus au cours : le mouvement au pixel près, les collisions,
+le hasard et le temps, les états du jeu, le son, le défilement. Les pages
+`cours/*.html` et `documents/COURS.md` sont régénérées.
+
+## 4. Les livrets, les images et les documents régénérés
+
+La numérotation a changé : les anciens livrets (`livrets/lecon-09…` à
+`lecon-82…`, et ceux du chapitre 0 dont le numéro a bougé) sont **supprimés** et
+remplacés par les nouveaux (634 fichiers). Les captures `tutoriels/*.png`
+sont refaites, avec une image par nouvelle étape. `documents/TUTORIELS.md`,
+`documents/COURS.md`, `documents/livret.html` et `documents/tutoriel.pdf` sont
+régénérés. Le projet d'essai `projets/mon_jeu/` est supprimé.
+
+## 5. Ce qui a été vérifié
+
+- `verification/verifier-tuto.mjs` : 587 leçons, 1629 contrôles, et « un
+  #include nouveau à la fois, sur tout le parcours » — tout est vert.
+- `verification/verifier-tuto-page.mjs` : les 587 étapes s'ouvrent et
+  compilent dans `tuto.html`, dans un vrai navigateur — tout est vert.
+- L'atelier (`index.html`, mode APPRENDRE), piloté étape par étape dans un
+  navigateur neuf en relevant toute erreur JavaScript : aucune.
+- `verifier-inclusion.mjs`, `verifier-refus.mjs`, `verifier-retour.mjs` et les
+  autres vérificateurs ont été adaptés aux `#include`.
+
+## 6. Ce qui reste
+
+- **Des plantages signalés** (la leçon 0.6, entre autres) **ne se reproduisent
+  pas** dans un navigateur neuf. Piste : un programme gardé par le navigateur
+  (`gameboy3-programme`) écrit avant les `#include`, ou d'anciens fichiers en
+  cache (Ctrl + F5). À reprendre avec le message d'erreur exact.
+- `documents/PARCOURS.md` (les chemins vers Tetris et Mario) cite encore les
+  numéros des 77 leçons d'avant : à refaire sur le parcours.
+
+## Les fichiers ajoutés ou mis à jour
+
+| Fichier | Rôle |
+|---|---|
+| `compilateur/inclusion.js` | `BIBLIOTHEQUES` : les 71 noms et ce qu'ils apportent ; un commentaire permis après la ligne |
+| `compilateur/analyseur.js` | la ligne `#include <nom>` devient un nœud `inclusion` ; le nom mal écrit est corrigé dans le message |
+| `compilateur/emetteur.js` | le refus quand une ligne manque ; `releverInclusions` ; seules les routines employées sont gravées |
+| `compilateur/inclusions-auto.js` | **nouveau** : écrire les `#include` qui manquent |
+| `tuto/parcours.js` | **nouveau** : le parcours en 25 chapitres, un `#include` à la fois |
+| `tuto/fonctions.js` | **nouveau** : les fonctions d'une leçon, et le tuto de chacune |
+| `tuto/lecons.js`, `tuto/programmation.js`, `tuto/tutoriels.js` | les `#include` dans chaque programme ; les tutos des fonctions ; les chapitres 9 à 14 du cours |
+| `index.html`, `tuto.html`, `cours.html`, `sommaire.html` | le parcours ; « Les fonctions de cette leçon » ; le bouton « ✚ Écrire les #include qui manquent » |
+| `retour-cpp.js`, `convertir.js`, `modeles-jeux.js`, `projets-serveur.mjs` | les `#include` dans ce qu'ils écrivent |
+| `analyse-rom.js` | le panneau ROM : chaque `#include`, s'il sert et ce qu'il coûte ; l'en-tête que toute cartouche paie |
+| `exemples/*.cpp`, `projets/mon_mario/principal.cpp` | leurs lignes `#include` |
+| `outils/cours.mjs`, `outils/livret.mjs`, `outils/tutoriels.mjs` | le parcours et ses numéros |
+| `verification/verifier-*.mjs` | adaptés aux `#include` et au parcours |
+| `LISEZMOI.md` | « Apprendre : un seul parcours » ; « Les fonctions fournies — et leur `#include` » |
+| `documents/TUTORIELS.md`, `documents/COURS.md`, `documents/livret.html`, `documents/tutoriel.pdf`, `cours/`, `livrets/`, `tutoriels/` | régénérés |

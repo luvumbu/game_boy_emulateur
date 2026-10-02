@@ -5,6 +5,20 @@
 // mieux méritent de redevenir des arguments, et les portées de reprendre
 // leur place — c'est là tout l'intérêt d'être passé au C++.
 
+#include <Tuile>      // un dessin de 8 × 8 pixels
+#include <Perso>      // un dessin de 16 × 16 pixels, pour un lutin
+#include <poser>      // pose une tuile sur une case du fond
+#include <sprite16>   // place un lutin de 16 × 16 au pixel près
+#include <cacher16>   // cache un lutin de 16 × 16
+#include <sprite>     // place un lutin de 8 × 8 au pixel près
+#include <cacher>     // cache un lutin
+#include <ecran>      // éteint ou rallume l’écran
+#include <defiler>    // fait glisser tout le fond
+#include <texte>      // écrit un texte à l’écran
+#include <bouton>     // lit un bouton de la manette
+#include <diviser>    // a / b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <reste>      // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
 Tuile SOL = {
   "33333333",
   "32222223",

@@ -16,8 +16,15 @@ import { bulletin } from '../outils/controle.mjs'
 
 const b = bulletin('les refus du compilateur')
 
-/** Compile un texte, et lève si le programme n'est pas compris. */
-const batir = (source) => compiler(analyser(source))
+/**
+ * Compile un texte, et lève si le programme n'est pas compris.
+ *
+ * « libre » : ces petits programmes éprouvent d'AUTRES refus que celui des
+ * « #include » — on ne les encombre pas de leurs lignes. La règle des
+ * « #include » a ses propres cas, à la fin, compilés sans « libre ».
+ */
+const batir = (source) => compiler(analyser(source), { libre: true })
+const batirStrict = (source) => compiler(analyser(source))
 
 const NL = String.fromCharCode(10)
 
@@ -321,5 +328,48 @@ for (const [quoi, source] of acceptes) {
   try { batir(source) } catch (e) { erreur = e.message }
   b.verifier(quoi + ' est accepté', erreur === null, erreur ? ` — refusé : « ${erreur} »` : '')
 }
+
+/* ------------------------------------------- la règle des « #include » */
+
+/*
+ * Aucune fonction de la console n'est là d'office : on l'inclut par son nom,
+ * ou elle est refusée, et le message dit quelle ligne écrire.
+ */
+const sansInclude = [
+  ['texte() sans son #include', AVEC_MAIN('  texte(1, 1, "A");'), '#include <texte>'],
+  ['ALPHABET sans son #include', '#include <poser>' + NL + AVEC_MAIN('  poser(1, 1, ALPHABET[0]);'), '#include <ALPHABET>'],
+  ['une Tuile sans son #include', 'Tuile T = { "########", "#......#", "#......#", "#......#", "#......#", "#......#", "#......#", "########" };' + NL + AVEC_MAIN(''), '#include <Tuile>'],
+  ['un dessin écrit sur place sans <Tuile>', '#include <poser>' + NL + AVEC_MAIN('  poser(1, 1, { "########", "#......#", "#......#", "#......#", "#......#", "#......#", "#......#", "########" });'), '#include <Tuile>'],
+  ['chaque() sans son #include (même réécrite ensuite)', AVEC_MAIN('  uint8_t v = 0;' + NL + '  if (chaque(250)) { v = 1; }'), '#include <chaque>'],
+  ['couleurTexte() sans son #include', AVEC_MAIN('  couleurTexte(31, 0, 0);'), '#include <couleurTexte>'],
+  ['une multiplication de deux valeurs calculées', AVEC_MAIN('  uint8_t a = images();' + NL + '  a = a * images();'), '#include <multiplier>'],
+  ['une division par un nombre qui n’est pas une puissance de deux', AVEC_MAIN('  uint8_t a = images();' + NL + '  a = a / 3;'), '#include <diviser>'],
+  ['le message dit TOUTES les lignes qui manquent', AVEC_MAIN('  poser(1, 1, ALPHABET[0]);' + NL + '  texte(2, 2, "B");'), '#include <poser>   #include <ALPHABET>   #include <texte>'],
+  ['un nom qui n’existe pas', '#include <rien>' + NL + AVEC_MAIN(''), 'existe pas'],
+  ['le nom s’écrit comme dans le programme', '#include <alphabet>' + NL + AVEC_MAIN(''), '#include <ALPHABET>'],
+]
+for (const [quoi, source, motif] of sansInclude) {
+  b.refuse(quoi, () => batirStrict(source), motif)
+}
+
+const avecInclude = [
+  ['texte() avec son #include', '#include <texte>' + NL + AVEC_MAIN('  texte(1, 1, "A");')],
+  ['un commentaire au bout de la ligne #include', '#include <texte>   // écrit un texte' + NL + AVEC_MAIN('  texte(1, 1, "A");')],
+  ['image(), images(), ms(), secondes(), retard() restent natives', AVEC_MAIN('  uint8_t t = images() + ms(100) + secondes(1) + retard();' + NL + '  image();')],
+  ['sa propre fonction carre(), à la place de celle de la console', 'void carre() { }' + NL + AVEC_MAIN('  carre();')],
+  ['une multiplication par un nombre écrit en clair', AVEC_MAIN('  uint8_t a = images();' + NL + '  a = a * 3 + a / 4 + a % 8 + (a << 2);')],
+]
+for (const [quoi, source] of avecInclude) {
+  let erreur = null
+  try { batirStrict(source) } catch (e) { erreur = e.message }
+  b.verifier(quoi + ' est accepté', erreur === null, erreur ? ` — refusé : « ${erreur} »` : '')
+}
+
+/* Une ligne de trop ne coûte rien : le programme pèse exactement pareil. */
+const seul = batirStrict('#include <texte>' + NL + AVEC_MAIN('  texte(1, 1, "A");'))
+const enTrop = batirStrict('#include <texte>' + NL + '#include <sprite>' + NL + '#include <jouer>' + NL + AVEC_MAIN('  texte(1, 1, "A");'))
+b.verifier('un #include qui ne sert pas ne grave rien', seul.octets.length === enTrop.octets.length,
+  ` (${seul.octets.length} octets, et ${enTrop.octets.length} avec deux lignes de trop)`)
+b.verifier('et l’analyse le dit « inutile »', enTrop.grave.bibliotheques.sprite?.etat === 'inutile' && enTrop.grave.bibliotheques.texte?.etat === 'emploi')
 
 b.fin()

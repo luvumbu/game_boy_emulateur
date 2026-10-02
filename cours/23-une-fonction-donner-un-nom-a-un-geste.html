@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 5 — Les fonctions : nommer un geste</span>
   <span>leçon 1 sur 4 dans ce chapitre</span>
-  <span>23 sur 42 dans le cours</span>
+  <span>23 sur 61 dans le cours</span>
 </p>
 <h1>23. Une fonction : donner un nom à un geste</h1>
 <p class="idee">Quand un bloc de code fait UNE chose, on lui donne un nom, et main() se lit comme une histoire.</p>
@@ -109,30 +109,95 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1597 octets</strong> de cartouche.</p>
+<strong>777 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            52 o  ← la console, à l’allumage  — la mise en route de la console
+  cadre()             112 o  ← main()  — ta fonction
+  toutEffacer()        36 o  ← main()  — ta fonction
+  main()               58 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase          10 o  ← texte()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre         33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles         85 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              272 o  ← CopierTuiles  — 17 lettres sur 43
+  "#"                   1 o  ← texte()  — un texte gravé
+  "#"                   1 o  ← texte()  — un texte gravé
+  "#"                   1 o  ← texte()  — un texte gravé
+  "#"                   1 o  ← texte()  — un texte gravé
+  "               …"   20 o  ← texte()  — un texte gravé
+  "APPELS:"             7 o  ← texte()  — un texte gravé
+Lettres gravées : AELPS0123456789:#
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()       × 6    97 o sur place, dans cadre(), toutEffacer(), main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  ecran()       × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  nombre()      × 1    10 o sur place, dans main()  + EcrireNombre (33 o)
+  image()       × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  cadre()       × 2     6 o sur place, dans main()
+  toutEffacer() × 1     3 o sur place, dans main()</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. une variable — appels</p>
-    <pre><code>uint8_t appels = 0;</code></pre>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : dessine un cadre, efface l'écran, redessine le cadre,
+// et affiche combien de fois on a dessiné le cadre.
+//
+// Ce qui est nouveau : la FONCTION. On donne un nom à un groupe d'instructions,
+// puis on l'« appelle » par son nom, autant de fois qu'on veut.
+//   void cadre() ...   = on DÉFINIT la fonction cadre.
+//                        void = « rien » : elle ne rend pas de résultat.
+//                        () vides = on ne lui donne rien.
+//   cadre();           = on l'APPELLE : ses instructions s'exécutent.
+
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;ecran&gt;    // éteint ou rallume l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. une fonction — cadre()</p>
-    <pre><code>void cadre() {
-  for (uint8_t i = 0; i &lt; 20; i++) {
-    texte(i, 0, "#");
-    texte(i, 17, "#");
+    <p class="quoi">2. une variable — appels</p>
+    <pre><code>uint8_t appels = 0;               // Combien de fois cadre() a été appelée.
+                                  // Déclarée hors des fonctions : toutes la voient.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une fonction — cadre()</p>
+    <pre><code>void cadre() {                    // DÉFINITION de cadre : dessine un bord de # tout autour.
+  for (uint8_t i = 0; i &lt; 20; i++) {  // Les 20 colonnes :
+    texte(i, 0, "#");             //   en haut (ligne 0)
+    texte(i, 17, "#");            //   et en bas (ligne 17).
   }
-  for (uint8_t l = 1; l &lt; 17; l++) {
-    texte(0, l, "#");
-    texte(19, l, "#");
+  for (uint8_t l = 1; l &lt; 17; l++) {  // Les lignes 1 à 16 :
+    texte(0, l, "#");             //   à gauche (colonne 0)
+    texte(19, l, "#");            //   et à droite (colonne 19).
   }
-  appels++;
+  appels++;                       // Un appel de plus.
+}                                 // Fin de cadre : on retourne là où on l'a appelée.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une fonction — toutEffacer()</p>
+    <pre><code>void toutEffacer() {              // DÉFINITION de toutEffacer : vide tout l'écran.
+  for (uint8_t l = 0; l &lt; 18; l++) {    // Chaque ligne 0 à 17...
+    texte(0, l, "                    ");  // ... est recouverte de 20 espaces.
+  }
 }</code></pre>
   </div>
   <div></div>
@@ -140,31 +205,19 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">3. une fonction — toutEffacer()</p>
-    <pre><code>void toutEffacer() {
-  for (uint8_t l = 0; l &lt; 18; l++) {
-    texte(0, l, "                    ");
-  }
-}</code></pre>
-  </div>
-  <div></div>
-</div>
-
-<div class="morceau">
-  <div>
-    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  ecran(0);
-  cadre();
-  toutEffacer();
-  cadre();
+    <p class="quoi">5. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                      // Le jeu commence ici (pas dans cadre !).
+  ecran(0);                       // Dessin écran éteint.
+  cadre();                        // 1er appel : le cadre est dessiné. appels = 1.
+  toutEffacer();                  // Tout est effacé.
+  cadre();                        // 2e appel : le cadre revient. appels = 2.
 
   texte(4, 8, "APPELS:");
-  nombre(12, 8, appels);
+  nombre(12, 8, appels);          // Affiche 002.
 
-  ecran(1);
+  ecran(1);                       // On rallume.
 
-  while (true) {
+  while (true) {                  // La boucle du jeu.
     image();
   }
 }</code></pre>

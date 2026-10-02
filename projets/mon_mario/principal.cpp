@@ -7,6 +7,20 @@
  * au rythme des pas, plus un troisième pour le saut.
  */
 
+#include <Perso>      // un dessin de 16 × 16 pixels, pour un lutin
+#include <Tuile>      // un dessin de 8 × 8 pixels
+#include <poser>      // pose une tuile sur une case du fond
+#include <cacher16>   // cache un lutin de 16 × 16
+#include <sprite16>   // place un lutin de 16 × 16 au pixel près
+#include <sprite>     // place un lutin de 8 × 8 au pixel près
+#include <cacher>     // cache un lutin
+#include <ecran>      // éteint ou rallume l’écran
+#include <defiler>    // fait glisser tout le fond
+#include <texte>      // écrit un texte à l’écran
+#include <bouton>     // lit un bouton de la manette
+#include <diviser>    // a / b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <reste>      // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
 Perso HEROS_DEBOUT = {
   "0000011111000000",
   "0000111111100000",

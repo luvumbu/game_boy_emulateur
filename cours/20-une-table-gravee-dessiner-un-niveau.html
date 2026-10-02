@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 4 — Les tableaux : ranger beaucoup de valeurs</span>
   <span>leçon 3 sur 5 dans ce chapitre</span>
-  <span>20 sur 42 dans le cours</span>
+  <span>20 sur 61 dans le cours</span>
 </p>
 <h1>20. Une table gravée : dessiner un niveau</h1>
 <p class="idee">Le niveau est une liste de nombres ; deux boucles en font un paysage.</p>
@@ -109,15 +109,57 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1484 octets</strong> de cartouche.</p>
+<strong>755 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          150 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← texte()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles     85 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          304 o  ← CopierTuiles  — 19 lettres sur 43
+  "#"               1 o  ← texte()  — un texte gravé
+  "COLONNES:"       9 o  ← texte()  — un texte gravé
+  "BLOCS:"          6 o  ← texte()  — un texte gravé
+  HAUTEURS_0       20 o  ← main()  — une table gravée
+Lettres gravées : BCELNOS0123456789:#
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 3    48 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  ecran()  × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  nombre() × 2    20 o sur place, dans main()  + EcrireNombre (33 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. une table gravée dans la cartouche — HAUTEURS</p>
-    <pre><code>const uint8_t HAUTEURS[] = {
-  2, 2, 3, 5, 5, 4, 2, 1, 1, 3,
-  6, 6, 3, 2, 2, 4, 4, 2, 1, 1,
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : dessine un paysage de collines à partir d'une liste de hauteurs.
+//
+// Ce qui est nouveau : const devant un tableau.
+//   const = « constant » : le tableau ne changera jamais. Il est gravé dans
+//   la cartouche et ne prend pas de place dans la petite mémoire de travail.
+//   [] vide : le compilateur compte lui-même les valeurs (ici 20).
+
+#include &lt;ecran&gt;    // éteint ou rallume l’écran
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une table gravée dans la cartouche — HAUTEURS</p>
+    <pre><code>const uint8_t HAUTEURS[] = {      // La hauteur de chaque colonne, de gauche à droite :
+  2, 2, 3, 5, 5, 4, 2, 1, 1, 3,   // colonnes 0 à 9
+  6, 6, 3, 2, 2, 4, 4, 2, 1, 1,   // colonnes 10 à 19
 };</code></pre>
   </div>
   <div></div>
@@ -125,24 +167,26 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  ecran(0);
-  uint8_t blocs = 0;
+    <p class="quoi">3. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                      // Le jeu commence ici.
+  ecran(0);                       // Dessin écran éteint.
+  uint8_t blocs = 0;              // Combien de # posés en tout.
 
-  for (uint8_t colonne = 0; colonne &lt; sizeof(HAUTEURS); colonne++) {
-    for (uint8_t h = 0; h &lt; HAUTEURS[colonne]; h++) {
-      texte(colonne, 17 - h, "#");
-      blocs++;
+  for (uint8_t colonne = 0; colonne &lt; sizeof(HAUTEURS); colonne++) {  // colonne = 0 à 19
+    for (uint8_t h = 0; h &lt; HAUTEURS[colonne]; h++) {  // h = 0 jusqu'à la hauteur - 1
+      texte(colonne, 17 - h, "#");  // On empile depuis le BAS : la ligne 17 est la
+                                    // dernière de l'écran. h = 0 → ligne 17, h = 1 → 16...
+                                    // Colonne 3 (hauteur 5) : lignes 17, 16, 15, 14, 13.
+      blocs++;                      // un # de plus.
     }
   }
 
-  texte(1, 1, "COLONNES:"); nombre(12, 1, sizeof(HAUTEURS));
-  texte(1, 2, "BLOCS:");    nombre(12, 2, blocs);
+  texte(1, 1, "COLONNES:"); nombre(12, 1, sizeof(HAUTEURS));  // 020
+  texte(1, 2, "BLOCS:");    nombre(12, 2, blocs);             // la somme des hauteurs : 59
 
-  ecran(1);
+  ecran(1);                       // On rallume : le paysage apparaît.
 
-  while (true) {
+  while (true) {                  // La boucle du jeu.
     image();
   }
 }</code></pre>

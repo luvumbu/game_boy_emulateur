@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 5 — Les fonctions : nommer un geste</span>
   <span>leçon 4 sur 4 dans ce chapitre</span>
-  <span>26 sur 42 dans le cours</span>
+  <span>26 sur 61 dans le cours</span>
 </p>
 <h1>26. Découper la boucle du jeu en fonctions</h1>
 <p class="idee">lire, faire évoluer, dessiner : la boucle du jeu tient en trois appels.</p>
@@ -103,55 +103,107 @@
 <p>Un vrai jeu a des centaines de lignes dans sa boucle. Les ranger dans des fonctions aux noms clairs rend <code>main</code> <strong>lisible d’un coup d’œil</strong> : <code>lireTouches(); evoluer(); dessiner();</code> — la boucle du chapitre 3, écrite en français.</p>
 <p>Les fonctions partagent l’<strong>état du jeu</strong> : <code>energie</code> est <strong>globale</strong>, elle survit d’une image à l’autre et toutes les fonctions la voient. Chaque fonction a <strong>un seul rôle</strong> : <code>lireTouches</code> ne dessine pas, <code>dessiner</code> ne change pas l’énergie.</p>
 <p><code>jauge(ligne, valeur)</code> est une fonction <strong>avec une boucle</strong>, appelée <strong>dans la boucle</strong> du jeu : elle écrit <code>valeur</code> # puis complète avec des espaces jusqu’à 10 — sinon, quand l’énergie baisse, les anciens # resteraient à l’écran.</p>
-<p><code>dessiner</code> ne fait rien si l’énergie n’a pas changé depuis le dernier dessin : <code>affichee</code> retient la valeur montrée. Sans ce test, la jauge serait réécrite à chaque image — onze écritures, onze VBlank, et le jeu tournerait dix fois trop lentement.</p>
+<p><code>dessiner</code> ne fait rien si l’énergie n’a pas changé depuis le dernier dessin : <code>affichee</code> retient la valeur montrée. Sans ce test, la jauge serait réécrite à chaque image — onze écritures pour rien, chacune attendant sa pause (chapitre 3) : du temps que le jeu passerait à attendre au lieu de jouer.</p>
 <p><code>evoluer</code> fait baisser l’énergie d’un point tous les 20 tours : un compteur, une remise à zéro — la montre du chapitre 3. Et la garde <code>energie &gt; 0</code> évite le 255 du chapitre 1. Tous les chapitres se retrouvent ici.</p>
 <p><strong>À toi :</strong> ajoute une seconde jauge, pour la magie, qui remonte toute seule.</p>
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1555 octets</strong> de cartouche.</p>
+<strong>790 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        60 o  ← la console, à l’allumage  — la mise en route de la console
+  jauge()          71 o  ← dessiner()  — ta fonction
+  lireTouches()    13 o  ← main()  — ta fonction
+  evoluer()        28 o  ← main()  — ta fonction
+  dessiner()       36 o  ← main()  — ta fonction
+  main()           27 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← texte()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles     85 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette      37 o  ← bouton()  — lit les huit boutons
+  Tuiles          288 o  ← CopierTuiles  — 18 lettres sur 43
+  "#"               1 o  ← texte()  — un texte gravé
+  " "               1 o  ← texte()  — un texte gravé
+  "A: RECHARGER"   12 o  ← texte()  — un texte gravé
+Lettres gravées : ACEGHR0123456789:#
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()       × 3    51 o sur place, dans jauge(), main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  nombre()      × 1    10 o sur place, dans dessiner()  + EcrireNombre (33 o)
+  bouton()      × 1     5 o sur place, dans lireTouches()  + LireManette (37 o)
+  image()       × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  jauge()       × 1    11 o sur place, dans dessiner()
+  lireTouches() × 1     3 o sur place, dans main()
+  evoluer()     × 1     3 o sur place, dans main()
+  dessiner()    × 1     3 o sur place, dans main()</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. une variable — energie</p>
-    <pre><code>uint8_t energie = 10;</code></pre>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : une jauge d'énergie qui se vide toute seule ; A la recharge.
+//
+// Ce qui est nouveau : découper la boucle du jeu en fonctions.
+// Chaque image, un jeu fait toujours les trois mêmes choses, dans cet ordre :
+//   1. lireTouches() : ce que le joueur demande
+//   2. evoluer()     : le monde avance (temps, règles)
+//   3. dessiner()    : l'écran montre le nouvel état
+
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;bouton&gt;   // lit un bouton de la manette
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. une variable — affichee</p>
-    <pre><code>uint8_t affichee = 255;      // rien n'est encore dessine</code></pre>
+    <p class="quoi">2. une variable — energie</p>
+    <pre><code>uint8_t energie = 10;        // L'énergie, de 0 à 10.</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">3. une variable — minuteur</p>
-    <pre><code>uint8_t minuteur = 0;</code></pre>
+    <p class="quoi">3. une variable — affichee</p>
+    <pre><code>uint8_t affichee = 255;      // rien n'est encore dessiné (255 : aucune énergie ne vaut ça)</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">4. une fonction — jauge()</p>
-    <pre><code>void jauge(uint8_t ligne, uint8_t valeur) {
-  for (uint8_t i = 0; i &lt; 10; i++) {
-    if (i &lt; valeur) texte(8 + i, ligne, "#");
-    else texte(8 + i, ligne, " ");
+    <p class="quoi">4. une variable — minuteur</p>
+    <pre><code>uint8_t minuteur = 0;        // Compte les images jusqu'à 20.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une fonction — jauge()</p>
+    <pre><code>void jauge(uint8_t ligne, uint8_t valeur) {   // Dessine « valeur » # sur 10 cases.
+  for (uint8_t i = 0; i &lt; 10; i++) {          // les 10 cases, colonnes 8 à 17
+    if (i &lt; valeur) texte(8 + i, ligne, "#"); // avant la valeur : plein
+    else texte(8 + i, ligne, " ");            // après : vide
   }
-}</code></pre>
+}                                             // jauge(5, 3) → ###       (3 pleins, 7 vides)</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">5. une fonction — lireTouches()</p>
+    <p class="quoi">6. une fonction — lireTouches()</p>
     <pre><code>void lireTouches() {
   if (bouton(A)) energie = 10;       // on recharge
 }</code></pre>
@@ -161,12 +213,12 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">6. une fonction — evoluer()</p>
+    <p class="quoi">7. une fonction — evoluer()</p>
     <pre><code>void evoluer() {
-  minuteur++;
-  if (minuteur == 20) {
-    minuteur = 0;
-    if (energie &gt; 0) energie--;
+  minuteur++;                        // Une image de plus.
+  if (minuteur == 20) {              // Toutes les 20 images (1/3 de seconde) :
+    minuteur = 0;                    //   on recommence à compter,
+    if (energie &gt; 0) energie--;      //   et l'énergie perd 1, sans passer sous 0.
   }
 }</code></pre>
   </div>
@@ -175,12 +227,13 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">7. une fonction — dessiner()</p>
+    <p class="quoi">8. une fonction — dessiner()</p>
     <pre><code>void dessiner() {
-  if (energie == affichee) return;   // rien n'a change
-  jauge(5, energie);
-  nombre(1, 5, energie);
-  affichee = energie;
+  if (energie == affichee) return;   // rien n'a changé : on sort tout de suite.
+                                     // (return dans une fonction void = « c'est fini ».)
+  jauge(5, energie);                 // Redessine la jauge sur la ligne 5,
+  nombre(1, 5, energie);             // et le nombre à gauche.
+  affichee = energie;                // On retient ce qui est à l'écran.
 }</code></pre>
   </div>
   <div></div>
@@ -188,15 +241,15 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">8. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  texte(1, 2, "A: RECHARGER");
+    <p class="quoi">9. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                         // Le jeu commence ici.
+  texte(1, 2, "A: RECHARGER");       // La consigne.
 
-  while (true) {
-    image();
-    lireTouches();
-    evoluer();
-    dessiner();
+  while (true) {                     // La boucle du jeu, maintenant très courte :
+    image();                         //   attendre l'image,
+    lireTouches();                   //   1. les touches,
+    evoluer();                       //   2. le monde,
+    dessiner();                      //   3. l'écran.
   }
 }</code></pre>
   </div>
@@ -220,12 +273,12 @@ instants qui comptent. Une image identique à la précédente n’est pas montr�
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACSUlEQVR4nO3awY2bQABA0T2mhBxTRGpJDSk3JaSMHHOwtFp5DR5swPD3Sf/AziJAPDFgad7+/vujcG8vvwJtGuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOPdAf72/celZ87xfpCr43wcn/rX1eDN7Zn9p65/0fXMHOf4zQHP3NCbI0uPM3WEkf233h6/DwfvceDxnrmhS4+zFuRXAV5ldhqZogdv9N0pdGRqvfy5aP+vOEUvAl40ya/7BM+fd/zJPqPu3u/g8Sd13e3Bj7W713NG4xe/g1f5in7gvbt0ql/lPhwOWIEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEeXBe9dHy7rpZhZNoDeIulqVsAT6mfenxX4Kk1SkdYu3Q50c/fv977eGHnHd8P+POi0anxlywhPhrMyYBvrhidGv983wEfHXjR9v66gJ8CfvgrejddH1nPAh+/l/+e2SjAGgpwPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMf7DzHwoeCZmebgAAAAAElFTkSuQmCC" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACR0lEQVR4nO3awW2cQABAUR9dgo8pwrWkBpebElKGjz6sZFmbhYU1hOH7Sf+AxwgQTwysNE9/3/8o3NPhV6BdAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcLw7wM8vvy595xyfB7k6ztfxqX9dDd7cntl/6vpXXc/MccZvDnjmht4cWXucqSMs2X/v7eX3YfAeB17ed27o2uNsBflTgDeZnZZM0Qtv9N0pdMnUevlz1f4/cYpeBbxqkt/2CZ4/7/In+4y6//sdvPxJ3XZ74cfa3es5o/HB7+BNvqIfeO+uneo3uQ/DASsQ4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzjeg+ui147v19UyjNN1JPAeS1P3AJ5SP8X4EMBTa5RGWLt0OdHr2+/Pvl7Y+OPHA/+7aHRq/KgpeiiwkwHfXDE6M35zG/C4wJtsAx4U+Cxf0VOXfYrxg4HH7/DfOSf+maRAgOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc43gdKMPvQb+YM0AAAAABJRU5ErkJggg==" alt="l’écran">
     <figcaption>au bout d’une seconde — image 60</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACUUlEQVR4nO3bQW6bQABA0Sx7hC57iJ6lZ+hxe4Qeo8suLEWRY/DgDAH/POkvyAQNiBcPWCIvf//9UbiXw89AuwY4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4d4C/ff9x6SPHeJ3kap6340u/uhq8ub2y/9L5bzqflXnO3xrwygW9ObJ1nqUZRvbfe3v8Opy8x4HH+8gF3TrPLMivAjxldRpZogcv9N0ldGRpvfy4af+vuERvAt60yM/9BK8fd/yT/Yy6n30PHv+kzt0efFi7ez7PaHzwPXjKU/QD992tS/2U63A6YAUCHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMd78L3ore8579fVQT+tw+UmAM96HXVv4CX1XccPlxtsCHjpHaUz/AfA5Vg/f/967e2J7Td+uNw04PcvjS6N3/zjAHxq4JtvjC6NAz5he92DAZ+kmU/RK+N7A988jV3HD5cb7Om/B/uaFAfWeoDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HON5/6gQYLuQouekAAAAASUVORK5CYII=" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACUUlEQVR4nO3aQW6bQABA0Sx7hC5ziJ6lZ+hxe4QeI8suIkWRAwPYGOyfJ72FM7EAzRcDlubl39tfwl5OvwLuSuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMWAv/4+frulnN8HOTiOJ/H5/51MTj5efD9uevfdD2D4zy+UeDBhE6ObD3O3BHWfP/en9fPw4O7PvB6t0zo1uPsFfK7BN5ldVqzRK+c6MUldM3S+v7npu9/xyV6U+BNi/y+d/D4vOvv7Gese/QzeP2duu/nlS9ri9fzjI1Pfgbv8hZ9xXN361K/yzw8XGACBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjrtwXvXX8fi62YSw6fcYPds2WnVu2pu5u8kRzLQWeno65PUqDe+LgwL/+/P7w+cK+jp8+4wdbDvx10+jc+PF1Bb418OSO0bnxuZG7Enhsz2fwKTMo8Nieb9GnvK96yRp7+t/BfiaNPX1gxgSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4Lj/1KY7tbKD/fMAAAAASUVORK5CYII=" alt="l’écran">
     <figcaption>au bout de trois secondes — image 180</figcaption>
   </figure>
 

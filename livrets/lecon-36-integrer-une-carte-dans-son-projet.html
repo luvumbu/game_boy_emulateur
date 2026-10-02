@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 36 — Intégrer une carte dans son projet</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 6 — Dessiner</span>
+    
+    
+    <span>leçon 36 sur 143</span>
+    <span class="jauge" style="--part: 30%">difficulté 3 / 10</span>
+    
+    
+    
+  </p>
+<h1>36. Intégrer une carte dans son projet</h1>
+<p class="idee">Une carte dessinée à la souris est une fonction du programme : on l’appelle, et le décor apparaît.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>Ce programme a les trois sortes de dessins du jeu :</strong> une <strong>tuile de 8 × 8</strong> (<code>Tuile ARBRE</code>), un <strong>personnage de 16 × 16</strong> (<code>Perso HEROS</code> — quatre tuiles d’un coup), et une <strong>carte</strong> (<code>VILLAGE</code>, tout un écran). Les deux premiers se peignent dans ▦ <strong>Les tuiles</strong> ; la carte, dans 🗺 <strong>La carte</strong>. Essaie sur chacun les palettes, la sélection et le déplacement.</p>
+<p>Une <strong>carte</strong>, c’est un décor entier dessiné à la souris, dans l’onglet 🗺 La carte. L’atelier ne la garde pas de son côté : il l’<strong>écrit dans ton programme</strong>, sous la forme d’une <strong>fonction</strong> — ici <code>void VILLAGE()</code>, entre deux commentaires <code>/* --- carte "VILLAGE" --- */</code> qui la marquent. C’est grâce à eux qu’il la retrouve et la réécrit quand tu dessines.</p>
+<p><strong>La créer :</strong> onglet 🗺 La carte, « + carte », et un nom en majuscules — VILLAGE, MAISON, NIVEAU1… Puis dessine : chaque carré de 8 × 8 que tu remplis devient une ligne <code>poser(colonne, ligne, {…})</code>, avec ses huit rangées. Un carré laissé vide n’est pas écrit : il ne coûte rien.</p>
+<p><strong>Lire le code de la carte :</strong> dans <code>poser(9, 10, {…})</code>, <strong>9 est la colonne</strong> (0 tout à gauche, 19 tout à droite) et <strong>10 la ligne</strong> (0 tout en haut, 17 tout en bas). Une case fait 8 × 8 pixels : la case (9, 10) commence donc au pixel x = 72, y = 80. Les <strong>huit textes entre accolades</strong> sont les huit rangées de pixels du carré, de haut en bas, et <strong>chaque chiffre est un pixel</strong> : 0 le plus clair, 1, 2, puis 3 le plus sombre. Regarde le toit, case (9, 9) : ses « 3 » dessinent la pente, rangée après rangée. En couleur, une ligne <code>teindre(colonne, ligne, palette)</code> dit en plus quelle palette prend la case.</p>
+<p><strong>Lire la carte pendant le jeu :</strong> <code>lire(colonne, ligne)</code> rend le <strong>numéro de la tuile</strong> affichée à cet endroit — 0 si la case est vide. C’est ainsi qu’un jeu sait si le joueur arrive sur un mur, sur le sol ou dans le vide. Le programme le montre en bas de l’écran : il relit la case (9, 11), du sol, et l’écrit avec <code>nombre()</code> ; la case (5, 11), vide, donne 0.</p>
+<p><strong>Une fonction ne fait rien tant qu’on ne l’appelle pas.</strong> C’est l’oubli le plus fréquent : la carte est dessinée, le programme compile, et l’écran reste vide. Il manque <code>VILLAGE();</code> dans <code>main</code>, <strong>avant</strong> la boucle du jeu — une seule fois : un décor reste à l’écran tant qu’on ne l’efface pas.</p>
+<p><strong>Essaie :</strong> mets <code>//</code> devant <code>VILLAGE();</code>. Le titre reste, la maison disparaît. Enlève-le : elle revient. Tout le décor tient dans cette seule ligne.</p>
+<p><strong>Plusieurs cartes :</strong> chacune a sa fonction. Pour passer de l’une à l’autre, on efface puis on appelle l’autre : <code>effacer();</code> puis <code>MAISON();</code>. Les huit carrés du sol, identiques, ne prennent <strong>qu’une tuile</strong> : le compilateur reconnaît un dessin qu’il a déjà.</p>
+<p><strong>Copier, déplacer :</strong> dans l’atelier de la carte, l’outil <strong>⬚ Sélection</strong> choisit une zone — un rectangle <strong>libre</strong> tracé à la souris, ou d’un clic <strong>un carré de 8 × 8</strong> ou <strong>un bloc de 16 × 16</strong>, calés sur la grille. <strong>Attrape</strong> la zone et <strong>glisse-la</strong> : elle se déplace, et retombe sur la case la plus proche ; sa place redevient le fond. <strong>Ctrl+C</strong>, <strong>Ctrl+X</strong> et <strong>Ctrl+V</strong> la copient, la coupent et la collent. Dans l’atelier des tuiles, <strong>⬚ Sélectionner et déplacer</strong> fait de même à l’intérieur d’une tuile de 8 × 8 ou d’un personnage de 16 × 16, et <strong>📋 Copier le dessin</strong>, <strong>📌 Coller ici</strong> et <strong>⧉ Dupliquer</strong> copient un dessin entier. Chaque geste s’annule avec <strong>Ctrl+Z</strong>.</p>
+<p><strong>Un jeu, sans écrire la boucle :</strong> dans 🗺 La carte, « ▶ Jouer la scène » écrit <code>main</code> pour toi — la carte, les murs, le joueur qui bouge, les acteurs et les événements. Tes propres lignes de <code>main</code> sont alors remplacées ; l’atelier demande avant de le faire.</p>
+<p><strong>Poser une tuile, poser un personnage :</strong> <code>poser(6, 10, ARBRE);</code> met l’arbre dans la case (6, 10), et <code>teindre(6, 10, 1);</code> lui donne la palette 1 — celle de la forêt. <code>sprite16(0, 60, 72, HEROS);</code> pose le personnage <strong>au pixel près</strong>, en x = 60, y = 72 : un personnage n’est pas sur la grille, il se déplace librement par-dessus le décor.</p>
+<p><strong>À toi :</strong> descends à l’atelier de la carte, dessine un arbre à côté de la maison, et regarde un nouveau <code>poser(…)</code> apparaître dans <code>VILLAGE()</code>.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;Tuile&gt;</code> → <a href="lecon-00-107.2-tuile-dessiner-une-case.html">0.107.2. Tuile — dessiner une case</a></li>
+  <li><code>#include &lt;Perso&gt;</code> → <a href="lecon-35-1-perso-dessiner-un-personnage-de-16-16.html">35.1. Perso — dessiner un personnage de 16 × 16</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;couleurFond&gt;</code> → <a href="lecon-00-88.3-la-fonction-couleurfond-une-couleur-du-d.html">0.88.3. La fonction couleurFond() — une couleur du décor</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;teindre&gt;</code> → <a href="lecon-00-89.1-la-fonction-teindre-une-case-dans-une-pa.html">0.89.1. La fonction teindre() — une case dans une palette</a></li>
+  <li><code>#include &lt;sprite16&gt;</code> → <a href="lecon-35-2-la-fonction-sprite16-un-personnage-de-16.html">35.2. La fonction sprite16() — un personnage de 16 × 16</a></li>
+  <li><code>#include &lt;nombre&gt;</code> → <a href="lecon-00-8.3-la-fonction-nombre-ecrire-un-nombre.html">0.8.3. La fonction nombre() — écrire un nombre</a></li>
+  <li><code>#include &lt;lire&gt;</code> → <a href="lecon-00-68.4-la-fonction-lire-lire-une-case.html">0.68.4. La fonction lire() — lire une case</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1165 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            57 o  ← la console, à l’allumage  — la mise en route de la console
+  VILLAGE()            73 o  ← main()  — ta fonction
+  main()              261 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre         33 o  ← nombre()  — écrit un nombre en chiffres
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles        103 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              496 o  ← CopierTuiles  — 21 lettres sur 43, et 10 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+  "MON VILLAGE"        11 o  ← texte()  — un texte gravé
+  "SOL"                 3 o  ← texte()  — un texte gravé
+  "VIDE"                4 o  ← texte()  — un texte gravé
+Lettres gravées : ADEGILMNOSV0123456789
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+Fonctions du langage appelées :
+  sprite()      ×  4    96 o sur place, dans main()
+  poser()       × 14    84 o sur place, dans VILLAGE(), main()
+  couleurFond() ×  4    48 o sur place, dans main()
+  teindre()     ×  2    34 o sur place, dans main()
+  texte()       ×  3    33 o sur place, dans main()  + EcrireTexte (10 o)
+  nombre()      ×  2    16 o sur place, dans main()  + EcrireNombre (33 o)
+  lire()        ×  2     8 o sur place, dans main()
+  image()       ×  1     6 o sur place, dans main()  + AttendreImage (28 o)
+  sprite16()    ×  1     0 o sur place, dans main()
+Tes fonctions appelées :
+  VILLAGE()     ×  1     3 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>/* Une TUILE de 8 × 8 : un arbre. Elle se peint dans ▦ Les tuiles. */
+
+#include &lt;Tuile&gt;         // un dessin de 8 × 8 pixels
+#include &lt;Perso&gt;         // un dessin de 16 × 16 pixels, pour un lutin
+#include &lt;poser&gt;         // pose une tuile sur une case du fond
+#include &lt;couleurFond&gt;   // choisit une couleur d’une palette du fond
+#include &lt;texte&gt;         // écrit un texte à l’écran
+#include &lt;teindre&gt;       // met une case du fond dans une palette
+#include &lt;sprite16&gt;      // place un lutin de 16 × 16 au pixel près
+#include &lt;nombre&gt;        // écrit un nombre en chiffres
+#include &lt;lire&gt;          // lit la tuile posée sur une case</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — ARBRE</p>
+    <pre><code>Tuile ARBRE = {
+  "00111100",
+  "01122110",
+  "11222211",
+  "12222221",
+  "11222211",
+  "01133110",
+  "00033000",
+  "00333300",
+};
+
+/* Un PERSONNAGE de 16 × 16 : quatre tuiles de 8 × 8 d'un coup. */</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAfklEQVR4nO3WsQ2AQAxD0SsZgZIhmIUZKBmDsRiBERiDkhFiRS64y5dc26+JlPa8d5jzOixRthogQAVASvW6b2FyRECAxgO55l1EQIAqgFzzOSIgQBVAvzt7QIA6B+Ve2Glewig9tp8aEKCuQEoUUK4ZEKCaIGXeRQQEaDjQB+lbc9NW4ML5AAAAAElFTkSuQmCC" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un dessin — HEROS</p>
+    <pre><code>Perso HEROS = {
+  "0000033333300000",
+  "0000322222230000",
+  "0003222222223000",
+  "0003211221123000",
+  "0003211221123000",
+  "0003222222223000",
+  "0000322332230000",
+  "0000033333300000",
+  "0003333333333000",
+  "0032222222222300",
+  "0321222222221230",
+  "0321222222221230",
+  "0003222222223000",
+  "0003322003223000",
+  "0003220000223000",
+  "0033330000333300",
+};
+
+/* --- carte "VILLAGE" --- */</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAIAAABt+uBvAAABEElEQVR4nO3asQ3CMBBA0ZSMQMkQzMIMlIzBWIzACIxByQApOFm+cxI/6bexfS9FFMnL5/tO6nS+lJU3xQIIECBAgCYAWh/6er+VlUcGCBAgQICOBzSWo5IMECBAgADNCfR8Pf4WGbVtHUCAAAECBAgQIECAAAGaE2hsgAABAgQIUDbZ+qle6/SaCxAgQIAAzQAUIcsrbwpAgAABAnQ8oMrhxyICAgQIEKC9A603i/xAbq02MkCAAAECtC+gCEfbRZbKel2RAQQIECBAgAABAgQIEKAaoEgRxLFFho8ECBAgQIBmAGojy3sZgAABAgQIUN9Dt+21DhAgQIAAAYoDRT7qkXoBVZ4HECBAgABtGOgH27QuekJCqxMAAAAASUVORK5CYII=" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une fonction — VILLAGE()</p>
+    <pre><code>void VILLAGE() {
+  poser(9, 9, {
+    "00000033",
+    "00003322",
+    "00332222",
+    "33222222",
+    "32222222",
+    "33333333",
+    "31111113",
+    "31111113",
+  });
+  poser(10, 9, {
+    "33000000",
+    "22330000",
+    "22223300",
+    "22222233",
+    "22222223",
+    "33333333",
+    "31111113",
+    "31111113",
+  });
+  poser(9, 10, {
+    "31111113",
+    "31133113",
+    "31133113",
+    "31111113",
+    "31111333",
+    "31111311",
+    "31111311",
+    "33333311",
+  });
+  poser(10, 10, {
+    "31111113",
+    "31111113",
+    "33311113",
+    "11311113",
+    "11311113",
+    "11311113",
+    "11311113",
+    "11333333",
+  });
+  poser(6, 11, {
+    "33333333",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+  });
+  poser(7, 11, {
+    "33333333",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+  });
+  poser(8, 11, {
+    "33333333",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+  });
+  poser(9, 11, {
+    "33333333",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+  });
+  poser(10, 11, {
+    "33333333",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+  });
+  poser(11, 11, {
+    "33333333",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+  });
+  poser(12, 11, {
+    "33333333",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+  });
+  poser(13, 11, {
+    "33333333",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+    "12121212",
+    "21212121",
+  });
+}
+/* --- fin de la carte "VILLAGE" --- */</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  /* Les couleurs : la palette 1 pour l'arbre (une forêt). */
+  couleurFond(1, 0, 22, 31, 14);
+  couleurFond(1, 1, 10, 24, 6);
+  couleurFond(1, 2, 4, 14, 2);
+  couleurFond(1, 3, 12, 6, 2);
+
+  texte(4, 3, "MON VILLAGE");
+
+  VILLAGE();   // la carte : SANS CET APPEL, RIEN NE S'AFFICHE
+
+  /* La tuile ARBRE, posée à côté de la maison, dans la palette 1. */
+  poser(6, 10, ARBRE);
+  teindre(6, 10, 1);
+  poser(13, 10, ARBRE);
+  teindre(13, 10, 1);
+
+  /* Le personnage HEROS, au pixel près : un lutin de 16 × 16. */
+  sprite16(0, 60, 72, HEROS);
+
+  /* Relire la carte : le numéro de la tuile à une case, 0 si elle est vide. */
+  texte(1, 15, "SOL");
+  nombre(6, 15, lire(9, 11));
+  texte(1, 16, "VIDE");
+  nombre(6, 16, lire(3, 11));
+
+  while (true) {
+    image();
+  }
+
+  return 0;
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADXElEQVR4nO3cwW2kMBhA4RxTQo4pIrVsDXtMGSkrJaSElLHHPSCNLIPNz2CweTzpaUQsNMvwyQZG2nn5/fdj4F66H4EdmsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHhnAL++vS9uT39OBfdv/v6R8dL7VN4/7RbA0+fMPnBl+/HnTuDgSHx863b3zpvB6WvkBM33Hxk48j4C59vBJe4E4MUlN12W5ivQCOtz52twq+VuhBnsEn3syaqs5wJ3A251F13Zc9Ndbn0prh9/5H2wwNYxgeEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDwCcPbLcpHfFO1+zKd1eeDXt/ePv3+yFn9wMNvhJszXBl7UTY3ntHdjJgB/fX9+fX9OZo/tOu19mMnAEd3FJZ0UAbgyL+N1/ywHdW3g1Dhdk6ftaTanVca7f5CDujxw6TFJ4KlBgdOzv4k27QTg4HEKvHDW0pumku7qrVOG2hY4eJwCF89a5dw97p9LuunDUgY8Z34COHic3RsReFHraeAMMtvYAxw5zu6NCByfGfXHpPnVty2wM3iXcepR2jN9NMrIS3O3FfCm4xS4iLe6T6o7dRpw/Dg7Nihw5Dum0j6Rp6ZW32SN/13YcMBbv2Icre4ncHTgxw3wRV+7n8DRgbsL7XztfgJHB+4u5Aw+tu5CzuBj6y7kDD627kLO4GPrLuQMtislMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwVoBX/5N1NtjqsCL/s3t13FaAK7+svbq9p6ffX915QwNXZmr8aG9edIkuncrjgNPX0j6RwZsXvcmKoDYETifx6vFExm/boMBNtm39Gly65m26y32iTf9uZdx8DoYXvYsOPge3mtnO4M7AqyN7rotegxs2NPD8OXjTuJ0HvHV9XnwO3jpu487gxefgreMW+iYr/rWR1+ABW39MKul6F32JfA6GJzA8geEJDE9geALDExiewPAEhvcfl47QONWwqg0AAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Le titre « MON VILLAGE », la maison sur huit carrés de sol, un arbre de chaque côté (dans la palette de la forêt), le personnage devant la maison, et en bas « SOL 053 » et « VIDE 000 ».</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>le titre est écrit </li>
+
+  <li>la carte : la maison et ses quatre carrés </li>
+
+  <li>le sol, sur huit cases, ne prend qu’une tuile </li>
+
+  <li>la tuile ARBRE (8 × 8) est posée deux fois, la même </li>
+
+  <li>dans la palette 1, par teindre() </li>
+
+  <li>le personnage HEROS (16 × 16) est à l’écran, au pixel près <span class="detail"> (x = 60, y = 72)</span></li>
+
+  <li>lire(9, 11) relit la tuile du sol <span class="detail"> (053)</span></li>
+
+  <li>lire(3, 11), une case vide, donne 000 </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>37. Les couleurs : palettes, variétés et thèmes</strong> — chapitre 6 : Dessiner.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

@@ -23,6 +23,18 @@
 
 /* La mélodie : quatre phrases de deux mesures. Elle monte, redescend, monte
    plus haut, puis rentre à la maison. */
+
+#include <Air>       // un air de musique, note par note
+#include <Tuile>     // un dessin de 8 × 8 pixels
+#include <bruit>     // joue un bruit
+#include <poser>     // pose une tuile sur une case du fond
+#include <jouer>     // joue un air tout seul
+#include <texte>     // écrit un texte à l’écran
+#include <bouton>    // lit un bouton de la manette
+#include <silence>   // fait taire une voix
+#include <nombre>    // écrit un nombre en chiffres
+#include <airFini>   // dit si un air est fini
+
 Air MELODIE = {
   "SOL4 12", "==",      "DO5 12",  "==",      "MI5 12",  "==",      "SOL5 13", "==",
   "MI5 12",  "==",      "DO5 12",  "==",      "RE5 12",  "==",      "==",      "==",

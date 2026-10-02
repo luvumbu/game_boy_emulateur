@@ -79,9 +79,11 @@
 
 
   <p class="reperes">
-    <span class="niveau">Niveau 0 — Avant tout</span>
-    <span>leçon 0.11 sur 82</span>
-    <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie A — Écrire des lettres</span>
+    <span>leçon 0.11 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
@@ -94,19 +96,59 @@
 <p>Le calcul du 0.9 (<code>i % 20</code>, <code>i / 20</code>) est fait <strong>à notre place</strong>. <code>texte()</code>, lui, refuserait ce mot trop long.</p>
 <p>Après la ligne 17, <code>textS</code> repart <strong>en haut</strong>, à la ligne 0.</p>
 
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;textS&gt;</code> → <a href="lecon-00-10.3-la-fonction-texts-un-texte-qui-passe-a-l.html">0.10.3. La fonction textS() — un texte qui passe à la ligne</a></li>
+</ul>
+</div>
+
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1321 octets</strong> de cartouche.</p>
+<strong>639 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()               29 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles         31 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              416 o  ← CopierTuiles  — 26 lettres sur 43
+  "ABCDEFGHIJKLMNO…"   20 o  ← texte()  — un texte gravé
+  "UVWXYZ"              6 o  ← texte()  — un texte gravé
+Lettres gravées : ABCDEFGHIJKLMNOPQRSTUVWXYZ
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte() × 2    22 o sur place, dans main()  + EcrireTexte (10 o)
+  image() × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+  textS() × 1     0 o sur place, dans main()</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  textS(0, 0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");   // passe à la ligne après T
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>#include &lt;textS&gt;   // écrit un texte qui passe à la ligne tout seul</code></pre>
+  </div>
+  <div></div>
+</div>
 
-  while (true) {
-    image();
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                                   // Le programme commence ici.
+  textS(0, 0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");   // passe à la ligne après T
+                                               // textS(colonne, ligne, "TEXTE") : comme
+                                               // texte(), mais quand le texte arrive au
+                                               // bord droit (colonne 19), il continue
+                                               // tout seul au début de la ligne suivante.
+                                               // A à T sur la ligne 0, U à Z sur la ligne 1.
+
+  while (true) {                               // La boucle de jeu : pour toujours...
+    image();                                   // ... attendre l'image suivante.
   }
 }</code></pre>
   </div>
@@ -152,7 +194,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 
 <p class="pied">
-  Ensuite : <strong>0.11.1. Tout l’alphabet, avec textS — de base, ailleurs</strong> — niveau 0 sur 10.
+  Ensuite : <strong>0.11.1. Tout l’alphabet, avec textS — de base, ailleurs</strong> — chapitre 0 : Avant tout.
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 

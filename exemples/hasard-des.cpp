@@ -13,6 +13,14 @@
  * du matériel n'ayant pas encore tourné au moment où le jeu commence.
  */
 
+#include <hasard>    // tire un nombre au hasard
+#include <effacer>   // efface des cases, ou tout le fond
+#include <nombre>    // écrit un nombre en chiffres
+#include <semer>     // choisit le départ du hasard
+#include <texte>     // écrit un texte à l’écran
+#include <bouton>    // lit un bouton de la manette
+#include <reste>     // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
 uint8_t de = 1;
 uint8_t avantA = 0;
 uint8_t lances = 0;

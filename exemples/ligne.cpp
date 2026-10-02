@@ -1,5 +1,8 @@
 /* Une ligne entière de tuiles : une boucle, un appel. */
 
+#include <Tuile>   // un dessin de 8 × 8 pixels
+#include <poser>   // pose une tuile sur une case du fond
+
 Tuile BRIQUE = { "########", "#--#---#", "#--#---#", "########", "---#----", "---#----", "########", "#--#---#" };
 
 int main() {

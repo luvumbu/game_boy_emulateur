@@ -7,6 +7,9 @@
 //
 //   node gb3.mjs exemples/bonjour.cpp
 
+#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+
 int main() {
   texte(6, 4, "BONJOUR");
   texte(3, 8, "APPUIE SUR A");

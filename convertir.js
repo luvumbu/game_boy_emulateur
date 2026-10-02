@@ -268,6 +268,15 @@ export function fichierDeLaCartouche(gb, { titre = 'la cartouche' } = {}) {
     '',
   ]
 
+  /* Les fonctions de la console que ce fichier emploie : chacune s'inclut. */
+  const inclure = [
+    tuiles.length && '#include <Tuile>      // un dessin de 8 × 8 pixels',
+    palettes && '#include <couleurFond> // choisit une couleur d’une palette du fond',
+    textes.length && '#include <texte>      // écrit un texte à l’écran',
+    cases.length && '#include <poser>      // pose une tuile sur une case du fond',
+  ].filter(Boolean)
+  if (inclure.length) lignes.push(...inclure, '')
+
   for (const { numero, rangees } of tuiles) {
     lignes.push(
       '/* tuile n° ' + numero + ' de la cartouche */',

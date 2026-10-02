@@ -19,6 +19,17 @@
  */
 
 /* Trente-deux couleurs de fond, toutes différentes. */
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurLutin>   // choisit une couleur d’une palette des lutins
+#include <poser>          // pose une tuile sur une case du fond
+#include <teindre>        // met une case du fond dans une palette
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <teindreLutin>   // met un lutin dans une palette
+#include <diviser>        // a / b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <reste>          // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
 const uint8_t FOND_R[] = {
   31, 24, 16,  8,   31, 26, 18, 10,   31, 28, 20, 12,   28, 21, 14,  7,
    4,  3,  2,  1,    2,  6, 10, 14,   20, 15, 11,  6,   31, 23, 15,  9,

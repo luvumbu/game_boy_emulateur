@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 28 — L’écran ne s’écrit que pendant le VBlank</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 5 — Les boucles : répéter</span>
+    <span class="outil">du cours</span>
+    
+    <span>leçon 28 sur 143</span>
+    <span class="jauge" style="--part: 20%">difficulté 2 / 10</span>
+    
+    
+    
+  </p>
+<h1>28. L’écran ne s’écrit que pendant le VBlank</h1>
+<p class="idee">La console dessine l’écran ligne par ligne, soixante fois par seconde ; on ne peut lui écrire que pendant ses pauses : le VBlank, et la toute petite pause au bout de chaque ligne.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>L’écran de la Game Boy est dessiné <strong>ligne par ligne</strong>, de haut en bas : 144 lignes, puis une pause de 10 lignes avant de recommencer. Cette pause s’appelle le <strong>VBlank</strong> (« vertical blank »). Elle dure à peine plus d’<strong>une milliseconde</strong>, soixante fois par seconde. Et au bout de <strong>chaque ligne</strong>, il y a aussi une toute petite pause, le temps de revenir à gauche.</p>
+<p>Pendant que la console dessine une ligne, la puce graphique <strong>occupe la mémoire vidéo</strong> : le processeur n’a pas le droit d’y écrire. <code>texte()</code>, <code>effacer()</code> et <code>nombre()</code> attendent donc, <strong>avant chaque lettre</strong>, une pause : celle du bout de la ligne, ou le VBlank. Au pire, ils attendent <strong>une ligne</strong> d’écran : un dixième de milliseconde. Une lettre ne coûte presque rien.</p>
+<p>Presque rien, mais pas rien. Le programme le <strong>mesure</strong> avec <code>images()</code>, l’horloge de la console, qui avance à chaque VBlank. Il remplit <strong>16 lignes</strong> de « # », écran allumé, et recommence <strong>trois fois</strong> : 48 tours, 48 × 20 = <strong>960 lettres</strong>. <code>i % 16</code> (le reste, leçon 2) ramène la ligne à 0 après la 15 : 0, 1 … 15, puis 0, 1 … 15 encore. Pendant le VBlank, plusieurs lettres passent d’un coup ; entre deux lignes, une ou deux. La mesure donne <strong>3 images</strong> : environ 320 lettres par image. Pour vingt lettres, on ne verrait rien ; pour redessiner tout un décor, ça compte.</p>
+<p><strong>Première solution : éteindre l’écran.</strong> <code>ecran(0)</code> l’éteint ; la mémoire vidéo est alors libre <strong>tout le temps</strong>, et les 960 écritures se font d’un trait, sans attendre. <code>ecran(1)</code> le rallume. La mesure donne <strong>1 image</strong> : c’est <code>ecran(0)</code> qui l’a prise, car il attend lui-même un VBlank (éteindre l’écran pendant qu’il se dessine peut abîmer une vraie console). L’écran clignote en blanc un instant : on le fait donc aux moments où ça ne gêne pas — au début d’un niveau, entre deux écrans. <strong>À partir d’ici, les leçons dessinent leur décor écran éteint.</strong></p>
+<p><strong>Seconde solution, dans la boucle du jeu : n’écrire que ce qui change.</strong> Déplacer un personnage, c’est effacer <strong>une</strong> case et en écrire <strong>une</strong> — pas redessiner toute la ligne. Un jeu qui redessinerait tout l’écran à chaque image passerait une image entière par tour à attendre, et tournerait deux fois moins vite. C’est pourquoi les programmes du chapitre 2 gardaient <code>ancien</code>.</p>
+<p>Les vrais jeux Game Boy vivent avec cette règle : le décor est posé écran éteint, et chaque image ne change que quelques cases. Ce qui bouge beaucoup est confié aux <strong>lutins</strong>, que le tutoriel présente dans ses leçons sur les sprites.</p>
+<p><strong>À toi :</strong> remplace le 48 par 16 dans la boucle écran allumé (l’écran rempli une seule fois) : combien d’images, maintenant ? Et avec 1 ?</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;ecran&gt;</code> → <a href="lecon-27-1-la-fonction-ecran-eteindre-et-rallumer-l.html">27.1. La fonction ecran() — éteindre et rallumer l’écran</a></li>
+  <li><code>#include &lt;nombre&gt;</code> → <a href="lecon-00-8.3-la-fonction-nombre-ecrire-un-nombre.html">0.8.3. La fonction nombre() — écrire un nombre</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>894 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              202 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase          10 o  ← texte()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre         33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles         94 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              352 o  ← CopierTuiles  — 22 lettres sur 43
+  "###############…"   20 o  ← texte()  — un texte gravé
+  ":::::::::::::::…"   20 o  ← texte()  — un texte gravé
+  "ALLUME:"             7 o  ← texte()  — un texte gravé
+  "IMAGES"              6 o  ← texte()  — un texte gravé
+  "ETEINT:"             7 o  ← texte()  — un texte gravé
+  "IMAGES"              6 o  ← texte()  — un texte gravé
+Lettres gravées : AEGILMNSTU0123456789:#
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 6    90 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  ecran()  × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  nombre() × 2    20 o sur place, dans main()  + EcrireNombre (33 o)
+  images() × 4     8 o sur place, dans main()
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : mesure combien de temps il faut pour remplir l'écran,
+// d'abord écran ALLUMÉ, puis écran ÉTEINT. Éteint, c'est beaucoup plus rapide.
+//
+// Pourquoi : écran allumé, la console ne peut écrire dans l'image que pendant
+// une courte pause entre deux images (le « VBlank »). texte() attend cette pause.
+// Écran éteint, rien n'est affiché : on peut écrire à tout moment.
+
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;ecran&gt;    // éteint ou rallume l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                          // Le jeu commence ici.
+  // Écran allumé : avant chaque lettre, texte() attend une pause.
+  uint8_t debut = images();           // images() = combien d'images depuis le démarrage.
+                                      // On note l'heure de départ.
+  for (uint8_t i = 0; i &lt; 48; i++) {  // 48 tours...
+    texte(0, i % 16, "####################");   // 20 lettres ; 3 fois l'écran
+                                      // i % 16 = le reste par 16 : 0 à 15, puis encore
+                                      // 0 à 15, 3 fois : 3 fois les 16 premières lignes.
+  }
+  uint8_t allume = images() - debut;  // Heure d'arrivée moins heure de départ :
+                                      // le nombre d'images que ça a pris.
+
+  // Écran éteint : la mémoire vidéo est libre.
+  debut = images();                   // Nouvelle heure de départ.
+  ecran(0);                           // ecran(0) ÉTEINT l'écran.
+  for (uint8_t i = 0; i &lt; 48; i++) {  // Le même travail...
+    texte(0, i % 16, "::::::::::::::::::::");  // ... avec des « : » pour voir le changement.
+  }
+  ecran(1);                           // ecran(1) le RALLUME.
+  uint8_t eteint = images() - debut;  // Le temps que ça a pris cette fois.
+
+  texte(0, 16, "ALLUME:");  nombre(8, 16, allume);   // Les deux mesures, en bas.
+  texte(12, 16, "IMAGES");
+  texte(0, 17, "ETEINT:");  nombre(8, 17, eteint);   // Beaucoup plus petit.
+  texte(12, 17, "IMAGES");
+
+  while (true) {                      // La boucle du jeu.
+    image();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACyElEQVR4nO3XQW7bMBQGYS9zhCxz/9PkCD1Gl12kCIxEkkVKbuzpBwwC+49giRw9PvLy6/c7wlw+P728vi1eIX/q/LJ4ETIQHIfgOHpwPFfBcQiOQ3AcPTieq+A4BMchOI4eHM9VcByC4xAcRw+O5yo4DsFxCI6jB8dzFRyH4DgEx9GD47kKjkNwHILj6MHxXAXHITgOwXH04HiuguMQHIfgOHpwPFfBcQiOQ3AcPTieq+A4BMchOI4eHM9VcByC4xAcRw+O5yo4DsFxCI6jB8dzFRyH4DgEx9GD47kKjkNwHILj6MHxXAXHITgOwXH04HiuguMQHIfgOHpwPFfBcQiOQ3AcPTieq+A4BMchOI4eHM9VcByC4xAcRw+O5yo4DsFxCI6jB8dzFRyH4DgEx9GD47kKjkNwHILj6MHxXAXHITgOwXH04HiuguMQHIfgOHpwPFfBcQiOQ3AcPTieq+A4BMchOI4eHM9VcByC4xAcRw+O5yo4DsFxCI6jB8dzFRyH4DgEx9GD47kKjkNwHILj6MHxXAXHITjOX8Evr28fXP/vyOKw8/M1R4ax9iNr4xq97835WbvFwec5Pj+XnTIOCv74+uVBtx96/5BGX6yJWyxevGdc0882+ng/LPjL3xMHcP07axO9Vkxzdxka11nzeVTw4lLwDwSftT5vTPT3fG4GhwRvzOdiPrSkzwg+/Y078kZPCL4u1pv5nOPtNeAeS/Tccz6N4Pv14LmXrCl4bam5uevbORE/soueWPpGx7UmZmg+T5kc5+A4NzZZ1Qqe2GFFzsF7JmLi+o3Nzrnbn6GlcvQdWhvXM52D7yR447hyfBjXb8/ixDkHb60DG+vM/utPnOi1O65N9Fkv1pDgxz0HDwmbuP5OghdbwFxrOD6uhz4mPY7gu/bg/07w9irxPTllF33w0W/ed253vf/3pzd3zsE4jT86j52VYrSSMgAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Seize lignes de « : » ; en bas, la mesure : 3 images écran allumé pour 960 lettres, 1 écran éteint.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>les seize lignes sont dessinées </li>
+
+  <li>écran allumé : plusieurs images pour 960 lettres <span class="detail"> (3 images)</span></li>
+
+  <li>écran éteint : presque rien <span class="detail"> (1)</span></li>
+
+  <li>l’écran affiche la mesure </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>29. Compter à l’envers, et le piège du zéro</strong> — chapitre 5 : Les boucles : répéter.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

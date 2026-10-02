@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 2 — Les conditions : choisir</span>
   <span>leçon 3 sur 4 dans ce chapitre</span>
-  <span>7 sur 42 dans le cours</span>
+  <span>7 sur 61 dans le cours</span>
 </p>
 <h1>7. Et, ou, non : &amp;&amp; || !</h1>
 <p class="idee">Une vraie question de jeu se pose rarement en une seule comparaison.</p>
@@ -110,39 +110,91 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1702 octets</strong> de cartouche.</p>
+<strong>846 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage         49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()           231 o  ← démarrage  — ta fonction
+  VBlank             8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage     28 o  ← image()  — attend l’image suivante
+  AttendreVBlank    16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces     12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase       10 o  ← texte()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte       10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles      85 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte      14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette       37 o  ← bouton()  — lit les huit boutons
+  Tuiles           288 o  ← CopierTuiles  — 18 lettres sur 43
+  "GAUCHE DROITE"   13 o  ← texte()  — un texte gravé
+  "|   |"            5 o  ← texte()  — un texte gravé
+  " "                1 o  ← texte()  — un texte gravé
+  "#"                1 o  ← texte()  — un texte gravé
+  "DANS LA ZONE"    12 o  ← texte()  — un texte gravé
+  "HORS ZONE   "    12 o  ← texte()  — un texte gravé
+  "AU BORD"          7 o  ← texte()  — un texte gravé
+  "       "          7 o  ← texte()  — un texte gravé
+Lettres gravées : ABCDEGHILNORSTUZ#|
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 8   102 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  bouton() × 2    10 o sur place, dans main()  + LireManette (37 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  uint8_t x = 2;
-  uint8_t ancien = 0;         // different de x : force le premier dessin
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : un # se déplace avec GAUCHE et DROITE sur la ligne 10.
+// L'écran dit s'il est DANS la zone (colonnes 8 à 12) et s'il est AU BORD.
+//
+// Ce qui est nouveau : combiner des conditions.
+//   &amp;&amp;  = ET   : vrai seulement si les DEUX côtés sont vrais
+//   ||  = OU   : vrai si AU MOINS UN des deux côtés est vrai
+//   !   = NON  : retourne la réponse (vrai devient faux, faux devient vrai)
 
-  texte(1, 1, "GAUCHE DROITE");
-  texte(8, 12, "|   |");        // la zone : de 8 a 12
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;bouton&gt;   // lit un bouton de la manette</code></pre>
+  </div>
+  <div></div>
+</div>
 
-  while (true) {
-    image();
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                    // Le jeu commence ici.
+  uint8_t x = 2;                // La colonne du #, de 0 à 19. Il part de la colonne 2.
+  uint8_t ancien = 0;           // La colonne où le # était dessiné avant.
+                                // Elle est différente de x : cela force le premier dessin.
 
-    if (bouton(DROITE) &amp;&amp; x &lt; 19) x++;
-    if (bouton(GAUCHE) &amp;&amp; x &gt; 0) x--;
+  texte(1, 1, "GAUCHE DROITE"); // La consigne.
+  texte(8, 12, "|   |");       // Dessine la zone : les barres sont en colonnes 8 et 12.
 
-    if (x != ancien) {
-      uint8_t dans = x &gt;= 8 &amp;&amp; x &lt;= 12;
-      uint8_t bord = x == 0 || x == 19;
+  while (true) {                // Répète pour toujours :
+    image();                    // attend l'image suivante.
 
-      texte(ancien, 10, " ");
-      texte(x, 10, "#");
+    // Bouger, sans sortir de l'écran :
+    if (bouton(DROITE) &amp;&amp; x &lt; 19) x++;   // DROITE tenue ET pas déjà au bord droit (19) :
+                                          // x gagne 1. Si x vaut 19, rien ne se passe.
+    if (bouton(GAUCHE) &amp;&amp; x &gt; 0) x--;    // GAUCHE tenue ET pas déjà au bord gauche (0) :
+                                          // x perd 1 (« -- » retire 1).
 
-      if (dans) texte(1, 4, "DANS LA ZONE");
-      if (!dans) texte(1, 4, "HORS ZONE   ");
+    if (x != ancien) {          // On ne redessine QUE si le # a bougé (x différent d'avant).
+      uint8_t dans = x &gt;= 8 &amp;&amp; x &lt;= 12;  // 1 si x est entre 8 et 12, sinon 0.
+                                          // Exemple : x = 10 → 10 &gt;= 8 (vrai) ET 10 &lt;= 12 (vrai) → 1.
+                                          //           x = 14 → 14 &lt;= 12 est faux → 0.
+      uint8_t bord = x == 0 || x == 19;  // 1 si x vaut 0 OU vaut 19, sinon 0.
 
-      if (bord) texte(1, 6, "AU BORD");
-      else texte(1, 6, "       ");
+      texte(ancien, 10, " ");   // Efface le # à son ancienne place (un espace).
+      texte(x, 10, "#");        // Le dessine à sa nouvelle place.
 
-      ancien = x;
+      if (dans) texte(1, 4, "DANS LA ZONE");   // Si dans vaut 1.
+      if (!dans) texte(1, 4, "HORS ZONE   ");  // Si dans vaut 0 : « !dans » vaut 1.
+                                               // Les espaces effacent la fin de l'ancien texte.
+
+      if (bord) texte(1, 6, "AU BORD");        // Au bord : on l'écrit...
+      else texte(1, 6, "       ");             // ... sinon : 7 espaces pour effacer AU BORD.
+
+      ancien = x;               // On retient où le # est maintenant, pour le prochain tour.
     }
   }
 }</code></pre>
@@ -175,7 +227,7 @@ relâché. Voici l’écran juste après.</p>
 <div class="etapes">
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACdklEQVR4nO3cQW4aMQBA0Sx7hC57iJ6lZ+hxe4Qeo8suKqUoIYMHxph8nvQWhCCPwxeOQU5efv/5RdjL8hkwlcBxAscJHCdwnMBxAsddCPzl67d/Ru4//fL9t8Yf//rgs5femORHFx2c/8Y8zw61d54PF3gjwN1ujzj2Wh9dffyRD2U08FFP6N5xBJ4eeHxpuiLwxaXvxsB7f5XsDfzg6/OCJXrv+DcGvpjQK3jx7dsDn93xCfz/Zxhfio/adR+4iz5knhuBH3+V9j44TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM47pojOyPnh98Pdd0JjXuer05aeehuxOD4Z49fPW3UUw8dePyVevYMpcCXA+89/3zFYbbBuoOnJ285X510/Ct4+9m84iz7jfN5clOW6I1ndnCTdex8ntnBu+iPbu/9UxS76HsEJkDgOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOG5Z4Df/hu7J/x/dPCsDD97JLRYH/v7zxyuBZxA4TuA4geNssuK8TYrzQUecwHECxwkcJ3CcwHECxwkc9+kDn37Y+eaDz08x/mwCLx5/NoEXjz+bwIvHn03gxePPJvDi8WcTePH4swm8ePzZPn1gtgkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHF/AWDo2r+qnudFAAAAAElFTkSuQmCC" alt="l’écran après DROITE">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACdklEQVR4nO3dQVIaQQBAUZc5QpY5RM6SM+S4HiHHcOnCKkMpDD0wQ8PnVb0FKtXT8ou2oVp9+ff2StjL9BmwK4HjBI4TOE7gOIHjBI47E/jHz18fRj5/+OH3L43f//PORy+9MMlTFx2c/8I8jw61dp53F3ghwM1uj9j2WqeuPn7PuzIaeKsHdO04Au8eeHxpuiDw2aXvysBrf5SsDXzn6/OEJXrt+FcGPpvQM3jy7esDH93xCfz/exhfirfadW+4i95knguB73+V9jo4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM47pIjOyPnh78PddkJjVuer06aeehuxOD4R49fPW3UQ3cdePyZevQMpcDnA689/3zBYbbBuoOnJ685X520/TN4+dG84Cz7lfN5crss0QuP7OAma9v5PLONd9Gnbq/9VRS76FsEJkDgOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gjX3583rT/86ewBsb/PfwNyPwxj5a/v7755PAKQLHCRwncJxNVpyXSdyUwHECxwkcJ3CcwHECxwkc9/CBD98U/PIG4UOMvzeBJ4+/N4Enj783gSePvzeBJ4+/N4Enj783gSePvzeBJ4+/t4cPzDKB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzjuHVeY2r8dzUO9AAAAAElFTkSuQmCC" alt="l’écran après DROITE">
     <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
   </figure>
 

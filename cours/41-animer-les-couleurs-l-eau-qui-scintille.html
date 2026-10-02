@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 8 — La couleur : la Game Boy Color</span>
   <span>leçon 5 sur 6 dans ce chapitre</span>
-  <span>41 sur 42 dans le cours</span>
+  <span>41 sur 61 dans le cours</span>
 </p>
 <h1>41. Animer les couleurs : l’eau qui scintille</h1>
 <p class="idee">Faire tourner trois couleurs d’une palette, et toute une mer ondule — sans redessiner une tuile.</p>
@@ -102,31 +102,80 @@
 <h2>1. Ce qu’il faut comprendre</h2>
 <p>Toutes les cases teintes en palette 1 changent <strong>ensemble</strong> quand on change la palette 1. C’est la ruse de l’<strong>animation de palette</strong> : une mer de 60 cases ondule, et l’on n’a écrit que <strong>trois couleurs</strong>.</p>
 <p>Les trois bleus sont rangés dans trois tables, <code>ROUGES</code>, <code>VERTS</code> et <code>BLEUS</code> — pas <code>R</code>, <code>V</code>, <code>B</code> : <code>B</code> est déjà le nom du bouton B, et le compilateur le refuse. Tous les 10 tours, <code>decalage</code> avance d’un cran, et chaque indice prend la couleur <strong>suivante</strong> : <code>(i + decalage) % 3</code>. Le modulo fait tourner la liste en rond — le bleu clair passe à l’indice 2, le moyen à l’indice 3, le sombre revient à l’indice 1.</p>
-<p>Redessiner 60 tuiles demanderait 60 écritures, donc 60 VBlank : une seconde de jeu gelé (chapitre 3). Changer trois couleurs n’en coûte presque rien. C’est ainsi que les jeux font scintiller l’eau, luire la lave, clignoter un néon ou tomber la nuit.</p>
+<p>Redessiner 60 tuiles demanderait 60 écritures, chacune attendant sa pause (chapitre 3), et cela à chaque image de l’animation. Changer trois couleurs n’en coûte presque rien. C’est ainsi que les jeux font scintiller l’eau, luire la lave, clignoter un néon ou tomber la nuit.</p>
 <p>Même idée qu’au fondu du chapitre 7 : <strong>on ne touche pas au dessin, on change sa lecture.</strong></p>
 <p><strong>À toi :</strong> fais un coucher de soleil — le ciel qui passe lentement du bleu à l’orange, puis au violet.</p>
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1669 octets</strong> de cartouche.</p>
+<strong>720 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          288 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← poser(), teindre()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  Reste            10 o  ← main()  — le reste d’une division
+  CopierTuiles     94 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          160 o  ← CopierTuiles  — 9 lettres sur 43, et 1 tuile dessinée
+  "LA MER BOUGE"   12 o  ← texte()  — un texte gravé
+  ROUGES_0          3 o  ← couleurFond()  — une table gravée
+  VERTS_1           3 o  ← couleurFond()  — une table gravée
+  BLEUS_2           3 o  ← couleurFond()  — une table gravée
+Lettres gravées : ABEGLMORU
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  couleurFond() × 2   106 o sur place, dans main()  + ROUGES_0 (3 o), VERTS_1 (3 o), BLEUS_2 (3 o)
+  teindre()     × 1    24 o sur place, dans main()  + AdresseCase (10 o)
+  ecran()       × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  poser()       × 1    13 o sur place, dans main()  + AdresseCase (10 o)
+  texte()       × 1    11 o sur place, dans main()  + EcrireTexte (10 o)
+  image()       × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. un dessin — VAGUE</p>
-    <pre><code>Tuile VAGUE = {
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME (Game Boy Color) : une mer de vagues qui scintille.
+//
+// L'astuce (« animation de palette ») : on ne redessine AUCUNE tuile.
+// On fait tourner trois bleus entre les indices 1, 2 et 3 de la palette 1 :
+// toutes les cases teintes en palette 1 changent ensemble.
+
+#include &lt;reste&gt;   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
+#include &lt;Tuile&gt;         // un dessin de 8 × 8 pixels
+#include &lt;couleurFond&gt;   // choisit une couleur d’une palette du fond
+#include &lt;ecran&gt;         // éteint ou rallume l’écran
+#include &lt;texte&gt;         // écrit un texte à l’écran
+#include &lt;poser&gt;         // pose une tuile sur une case du fond
+#include &lt;teindre&gt;       // met une case du fond dans une palette</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — VAGUE</p>
+    <pre><code>Tuile VAGUE = {                   // Des bandes en diagonale d'indices 1, 2, 3.
   "11112222", "11222233", "12223333", "22233331",
   "22333311", "23333111", "33331112", "33311122",
 };
 
-/* Trois bleus, du clair au sombre. */</code></pre>
+// Trois bleus, du clair au sombre. Chaque table donne une lumière :
+//                          bleu 0  bleu 1  bleu 2</code></pre>
   </div>
   <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAZElEQVR4nO3QMRGAMBREwZRIoEQEWtBAiQxkIQ0BKWh+SHE7c/3buXY/V8n28yhZAwKKBFXFlnX7HBBQAmhcDAgoEzQ3398BBJQJGpcHAsoE/ZkHAkoAzc33dwABAdXmgYACQC/v2iG5ESpdagAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. une table gravée dans la cartouche — ROUGES</p>
+    <p class="quoi">3. une table gravée dans la cartouche — ROUGES</p>
     <pre><code>const uint8_t ROUGES[] = {  8,  2,  0 };</code></pre>
   </div>
   <div></div>
@@ -134,7 +183,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">3. une table gravée dans la cartouche — VERTS</p>
+    <p class="quoi">4. une table gravée dans la cartouche — VERTS</p>
     <pre><code>const uint8_t VERTS[]  = { 24, 14,  6 };</code></pre>
   </div>
   <div></div>
@@ -142,45 +191,47 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">4. une table gravée dans la cartouche — BLEUS</p>
-    <pre><code>const uint8_t BLEUS[]  = { 31, 28, 18 };</code></pre>
+    <p class="quoi">5. une table gravée dans la cartouche — BLEUS</p>
+    <pre><code>const uint8_t BLEUS[]  = { 31, 28, 18 };
+// (Pas R, V, B : B est déjà le nom du bouton B, le compilateur refuserait.)</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">5. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  couleurFond(1, 0, 31, 31, 31);
+    <p class="quoi">6. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                          // Le jeu commence ici.
+  couleurFond(1, 0, 31, 31, 31);      // Palette 1, indice 0 : blanc.
 
-  ecran(0);
+  ecran(0);                           // Dessin écran éteint.
   texte(3, 2, "LA MER BOUGE");
-  for (uint8_t l = 6; l &lt; 12; l++) {
-    for (uint8_t c = 0; c &lt; 20; c++) {
-      poser(c, l, VAGUE);
-      teindre(c, l, 1);
+  for (uint8_t l = 6; l &lt; 12; l++) {  // Lignes 6 à 11,
+    for (uint8_t c = 0; c &lt; 20; c++) {  // toute la largeur :
+      poser(c, l, VAGUE);             //   une vague,
+      teindre(c, l, 1);               //   en palette 1. 6 × 20 = 120 cases.
     }
   }
-  ecran(1);
+  ecran(1);                           // On rallume.
 
-  uint8_t decalage = 0;
-  uint8_t attente = 0;
+  uint8_t decalage = 0;               // De combien on fait tourner les bleus : 0, 1 ou 2.
+  uint8_t attente = 0;                // Compte les images jusqu'à 10.
 
-  while (true) {
+  while (true) {                      // La boucle du jeu :
     image();
 
     attente++;
-    if (attente == 10) {
+    if (attente == 10) {              // Toutes les 10 images :
       attente = 0;
-      decalage = (decalage + 1) % 3;
+      decalage = (decalage + 1) % 3;  // 0 → 1 → 2 → 0 → 1 ... (le reste par 3 tourne en rond)
     }
 
-    /* Les teintes 1, 2, 3 prennent les trois bleus, decales. */
-    for (uint8_t i = 0; i &lt; 3; i++) {
-      uint8_t k = (i + decalage) % 3;
-      couleurFond(1, i + 1, ROUGES[k], VERTS[k], BLEUS[k]);
-    }
+    // Les teintes 1, 2, 3 prennent les trois bleus, décalés.
+    for (uint8_t i = 0; i &lt; 3; i++) {       // i = 0, 1, 2
+      uint8_t k = (i + decalage) % 3;       // quel bleu pour cet indice.
+                                            // decalage = 1 : i = 0 → k = 1 ; i = 1 → 2 ; i = 2 → 0.
+      couleurFond(1, i + 1, ROUGES[k], VERTS[k], BLEUS[k]);  // l'indice i + 1 (1, 2, 3)
+    }                                                         // reçoit le bleu numéro k.
   }
 }</code></pre>
   </div>

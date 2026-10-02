@@ -73,6 +73,26 @@ et le livret — est raconté dans [`CHANGEMENTS.md`](documents/CHANGEMENTS.md).
 
 ---
 
+## Apprendre : un seul parcours
+
+Les leçons, les tutoriels et le cours ne forment plus qu'**une seule suite** :
+**Apprendre — le parcours** (`tuto.html`, et le mode APPRENDRE de l'atelier ;
+`cours.html` y mène). Rien n'a été retiré : chaque leçon et chaque cours garde
+son texte, son programme et ses contrôles. `tuto/parcours.js` les range :
+
+- **25 chapitres**, de « Avant tout » à « Aller au bout ». Les niveaux des
+  leçons et les chapitres du cours y sont entremêlés **par sujet**, chaque
+  série gardant son ordre : aucune notion n'arrive avant ce dont elle a besoin.
+- **Un `#include` nouveau à la fois.** Chaque fonction de la console a son
+  tuto (sa ligne `#include`, ses arguments, ce qu'elle coûte), placé juste
+  avant la première étape qui l'emploie. Une étape d'ouverture explique, en
+  détail, pourquoi on écrit des `#include`. `verifier-tuto.mjs` contrôle
+  qu'aucune étape n'en apporte deux d'un coup.
+- **Une entrée par chapitre** : d'où l'on vient, ce qui vient, les fonctions
+  qui arrivent — calculée sur le parcours lui-même.
+- Dans chaque étape, l'encadré **« Les fonctions de cette leçon »** mène au
+  tuto de chacune ; un tuto dit, lui, où l'on retrouve sa fonction.
+
 ## Ce que c'est, et ce que ce n'est pas
 
 **C'est un vrai compilateur.** Le fichier `.cpp` est lu, analysé, et traduit en
@@ -223,6 +243,7 @@ int main() {                     // par où la console commence
 | `Air THEME = { "DO4 12", "==", … };` | **une mélodie**, un pas par élément ; `jouer()` la lance et elle avance toute seule |
 | `'A'`, `0x2A`, `0b1010` | un caractère est un nombre ; les bases s'écrivent comme en C++ |
 | `#include "autre.cpp"` | **verse un autre fichier ici**, avant toute compilation — en ligne de commande comme dans la page, où les fichiers sont des onglets |
+| `#include <texte>` | **inclut une fonction de la console**, par son nom : aucune n'est là d'office (voir « Les fonctions fournies ») |
 | `// …` et `/* … */` | commentaires |
 | `int main()` | **le point d'entrée** : rien ne s'exécute en dehors |
 
@@ -283,7 +304,33 @@ Recompiler montre le prix des trois — c'est ce que fait le tutoriel 39.
 `exemples/methodes.cpp` les éprouve toutes, et `node verification/verifier-methodes.mjs` les
 fait tourner dans l'émulateur.
 
-### Les fonctions fournies
+### Les fonctions fournies — et leur `#include`
+
+**Aucune fonction de la console n'est là d'office.** Chacune prend de la place
+dans la cartouche (son code, ses routines, ses tables) : elle ne s'emploie que
+si on l'**inclut**, par son nom, écrit exactement comme dans le programme.
+
+```cpp
+#include <texte>      // texte() existe
+#include <poser>      // poser() existe
+#include <ALPHABET>   // ALPHABET existe
+#include <Tuile>      // on peut dessiner une Tuile
+```
+
+- Sans la ligne, le compilateur **refuse** et dit lesquelles écrire ; dans
+  l'atelier, un bouton « ✚ Écrire les #include qui manquent » les écrit.
+- Une ligne **de trop ne coûte rien** : seul ce que le programme emploie est
+  gravé. Le panneau ROM dit, pour chaque `#include`, s'il sert et ce qu'il coûte.
+- Les éditeurs de l'atelier (tuiles, couleurs, airs, carte, scènes, modèles)
+  écrivent eux-mêmes les lignes dont leur code a besoin.
+- Les noms : chaque fonction ci-dessous (`<texte>`, `<chaque>`, `<deplace_x>`…),
+  `<ALPHABET>`, `<ALPHABET_GRAS>`, les types `<Tuile>`, `<Perso>`, `<Mot>`,
+  `<Carre>`, `<Air>`, et quatre calculs que le processeur ne sait pas faire
+  seul : `<multiplier>` (`a * b`, les deux calculés), `<diviser>` et `<reste>`
+  (`a / b`, `a % b`, sauf par 1, 2, 4, 8… écrits en clair), `<decaler>`
+  (`a << b`, `a >> b`, b calculé).
+- Restent **natives**, parce qu'elles ne coûtent rien : `image()`, `images()`,
+  `retard()`, `ms()` et `secondes()`.
 
 | Fonction | Ce qu'elle fait |
 |---|---|

@@ -79,37 +79,83 @@
 
 
   <p class="reperes">
-    <span class="niveau">Niveau 0 — Avant tout</span>
-    <span>leçon 0.9.1 sur 82</span>
-    <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie A — Écrire des lettres</span>
+    <span>leçon 0.9.1 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
   </p>
 <h1>0.9.1. Tout l’alphabet, avec une seule boucle — de base, ailleurs</h1>
-<p class="idee">Le 0.9 trois lignes plus bas : tout l’alphabet sur les lignes 5 et 6.</p>
+<p class="idee">Le 0.9 trois lignes plus bas : tout l’alphabet sur les lignes 3 et 4.</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
-<p><strong>C’est le 0.9</strong>, avec un seul changement : la <strong>ligne de départ</strong> : <code>5 + i / 20</code> au lieu de <code>i / 20</code>. <code>i / 20</code> vaut 0 puis 1 ; en ajoutant 5, on obtient les lignes 5 puis 6.</p>
+<p><strong>C’est le 0.9</strong>, avec un seul changement : la <strong>ligne de départ</strong> : <code>3 + i / 20</code> au lieu de <code>i / 20</code>. <code>i / 20</code> vaut 0 puis 1 ; en ajoutant 3, on obtient les lignes 3 puis 4.</p>
 <p><strong>Le reste ne bouge pas :</strong> A à T sur une ligne, U à Z sur la suivante.</p>
 <p><strong>C’est la version de base</strong> : une seule chose, à la deuxième place. Le 0.9.2 met les deux ensemble.</p>
 
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;reste&gt;</code> → <a href="lecon-00-8.4-include-reste-a-b.html">0.8.4. #include &lt;reste&gt; — a % b</a></li>
+  <li><code>#include &lt;diviser&gt;</code> → <a href="lecon-00-8.5-include-diviser-a-b.html">0.8.5. #include &lt;diviser&gt; — a / b</a></li>
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+</ul>
+</div>
+
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1354 octets</strong> de cartouche.</p>
+<strong>940 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()           66 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AdresseCase      10 o  ← poser()  — trouve l’adresse d’une case de l’écran
+  Diviser          17 o  ← poser()  — divise — le processeur ne sait pas le faire
+  Reste            10 o  ← poser()  — le reste d’une division
+  CopierTuiles     18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          704 o  ← CopierTuiles  — la police entière
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser() × 1    41 o sur place, dans main()  + AdresseCase (10 o), Diviser (17 o), Reste (10 o)
+  image() × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  // Le changement : les lignes 0 et 1 → 5 et 6.
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>#include &lt;reste&gt;     // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include &lt;diviser&gt;   // a / b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include &lt;ALPHABET&gt;   // les lettres de la police : ALPHABET[0] est le A
+#include &lt;poser&gt;      // pose une tuile sur une case du fond</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                                  // Le programme commence ici.
+  // Le changement : les lignes 0 et 1 → 3 et 4.
+  // for : i part de 0, et gagne 1 à chaque tour tant que i &lt; 26 (la taille de ALPHABET).
   for (uint8_t i = 0; i &lt; sizeof(ALPHABET); i++) {
-    poser(i % 20, 5 + i / 20, ALPHABET[i]);   // 5 + i / 20 : la ligne 5, puis 6
+    poser(i % 20, 3 + i / 20, ALPHABET[i]);   // 3 + i / 20 : la ligne 3, puis 4
+                                              // i % 20 = le reste par 20 : la colonne
+                                              //   (0 à 19, puis de nouveau 0 à 5).
+                                              // i / 20 = 0 pour A à T, 1 pour U à Z.
+                                              // Ex. : i = 22 (le W) → colonne 2, ligne 4.
   }
 
-  while (true) {
-    image();
+  while (true) {                              // La boucle de jeu : pour toujours...
+    image();                                  // ... attendre l'image suivante.
   }
 }</code></pre>
   </div>
@@ -130,7 +176,7 @@ programme.</p>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACYUlEQVR4nO3ZTW6bQACAUS97hC57/9P0CD1Gl120ilDCz2AGJ/30pG+BBkTwPDNg5fHr90+Fe3z6FejWAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHO8f8LfvP/623Pc2+G787PHL8eWurfGd869ubx2/tWtke+Tvnr2eWfO5tWt1Ph9PfIAr21sTd3FCd862Ovv746uzudx4N/7iOdz5pB/3XgU+C3MWeOT8zwGPn2F5/Mdr2Br/WsCHt/wVgJGle3VCx5f0s8Bbi/kTwKt39tl5OHX84SNpBXjKN+j/WqLP3sFzt8e/QKfu1/nAX/kZfPisvb4yzZ2HweucCXz3W/TOdY+//e4sWYeL+cgj4Am8U4+25XVeWeo3gRXu1Uv0+EuTpvSZwMsA39RM4MMXVLqv73ngKz82RsY1pcnAO3fq+KAmtge8o/g2PuV3qu5r779JIzAXgb1F353fwfEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPH+ALfsabaVf/ZQAAAAAElFTkSuQmCC" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACYUlEQVR4nO3ZTW6bQACAUS97hC57/9P0CD1Gl120ilDCz2AGJ/30pG+BBkTwPDNg5fHr90+Fe3z6FejWAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHO8f8LfvP/623Pc2+G787PHL8eWurfGd869ubx2/tWtke+Tvnr2eWfO5tWt1Ph9PfIAr21sTd3FCd862Ovv746uzudx4N/7iOdz5pB/3XgU+C3MWeOT8zwGPn2F5/Mdr2Br/WsCHt/wVgJGle3VCx5f0s8Bbi/kTwKt39tl5OHX84SNpBXjKN+j/WqLP3sFzt8e/QKfu1/nAX/kZfPisvb4yzZ2HweucCXz3W/TOdY+//e4sWYeL+cgj4Am8U4+25XVeWeo3gRXu1Uv0+EuTpvSZwMsA39RM4MMXVLqv73ngKz82RsY1pcnAO3fq+KAmtge8o/g2PuV3qu5r779JIzAXgb1F353fwfEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPH+ABCXabaAc/TnAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
   </figure>
 </div>
@@ -138,7 +184,7 @@ programme.</p>
 
 
 <h2>4. Ce qu’on doit voir</h2>
-<p class="avoir">Tout l’alphabet sur les lignes 5 et 6.</p>
+<p class="avoir">Tout l’alphabet sur les lignes 3 et 4.</p>
 
 <h2>5. Ce que la console répond</h2>
 <p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
@@ -147,15 +193,15 @@ et voici ce qu’ils ont mesuré.</p>
 
 <ul class="controles">
 
-  <li>ligne 5 : A à T </li>
+  <li>ligne 3 : A à T </li>
 
-  <li>ligne 6 : U à Z </li>
+  <li>ligne 4 : U à Z </li>
 </ul>
 
 
 
 <p class="pied">
-  Ensuite : <strong>0.9.2. Tout l’alphabet, avec une seule boucle — doublé, deux positions</strong> — niveau 0 sur 10.
+  Ensuite : <strong>0.9.2. Tout l’alphabet, avec une seule boucle — doublé, deux positions</strong> — chapitre 0 : Avant tout.
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 

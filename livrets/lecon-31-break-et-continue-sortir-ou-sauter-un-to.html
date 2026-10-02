@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 31 — break et continue : sortir, ou sauter un tour</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 5 — Les boucles : répéter</span>
+    <span class="outil">du cours</span>
+    
+    <span>leçon 31 sur 143</span>
+    <span class="jauge" style="--part: 20%">difficulté 2 / 10</span>
+    
+    
+    
+  </p>
+<h1>31. break et continue : sortir, ou sauter un tour</h1>
+<p class="idee">On n’est pas obligé de finir tous les tours : on sort dès qu’on a trouvé.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><code>break;</code> <strong>sort</strong> de la boucle immédiatement, sans finir le tour ni faire les suivants. C’est l’outil de la <strong>recherche</strong> : on parcourt jusqu’à trouver, puis on s’arrête.</p>
+<p>Ici, on cherche la <strong>première case vide</strong> d’une rangée — là où un jeu poserait une nouvelle pièce, un nouvel ennemi. <code>lire(colonne, ligne)</code> rend le numéro de la tuile affichée ; l’espace est la tuile <strong>0</strong>. Dès qu’on la trouve : on retient la colonne, et <code>break</code>.</p>
+<p><code>tours</code> le prouve : la boucle prévoyait 20 tours, elle n’en a fait que <strong>5</strong>. Sur une grande grille, s’arrêter tôt, c’est du temps de gagné — et sur une console à 4 MHz, le temps est compté.</p>
+<p><code>continue;</code> fait l’inverse : il <strong>abandonne ce tour-ci</strong> et passe <strong>au suivant</strong>. Ici, il saute les multiples de 3 (<code>i % 3 == 0</code>) : 0, 3, 6 et 9 ne sont pas écrits.</p>
+<p>Le <code>libre = 255</code> de départ est une <strong>valeur témoin</strong> : si la rangée était pleine, la boucle finirait sans rien trouver, et 255 le dirait (aucune colonne ne porte ce numéro).</p>
+<p><strong>À toi :</strong> remplis toute la rangée de # et vérifie que l’écran affiche 255.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;ecran&gt;</code> → <a href="lecon-27-1-la-fonction-ecran-eteindre-et-rallumer-l.html">27.1. La fonction ecran() — éteindre et rallumer l’écran</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;lire&gt;</code> → <a href="lecon-00-68.4-la-fonction-lire-lire-une-case.html">0.68.4. La fonction lire() — lire une case</a></li>
+  <li><code>#include &lt;nombre&gt;</code> → <a href="lecon-00-8.3-la-fonction-nombre-ecrire-un-nombre.html">0.8.3. La fonction nombre() — écrire un nombre</a></li>
+  <li><code>#include &lt;reste&gt;</code> → <a href="lecon-00-8.4-include-reste-a-b.html">0.8.4. #include &lt;reste&gt; — a % b</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>901 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              190 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase          10 o  ← lire(), nombre()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre         33 o  ← nombre()  — écrit un nombre en chiffres
+  Reste                10 o  ← main()  — le reste d’une division
+  CopierTuiles         94 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              384 o  ← CopierTuiles  — 24 lettres sur 43
+  "####  ##  #####…"   20 o  ← texte()  — un texte gravé
+  "CASE LIBRE:"        11 o  ← texte()  — un texte gravé
+  "TOURS FAITS:"       12 o  ← texte()  — un texte gravé
+Lettres gravées : ABCEFILORSTU0123456789:#
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  nombre() × 3    42 o sur place, dans main()  + AdresseCase (10 o), EcrireNombre (33 o)
+  texte()  × 3    33 o sur place, dans main()  + EcrireTexte (10 o)
+  ecran()  × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  lire()   × 1    11 o sur place, dans main()  + AdresseCase (10 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : cherche la première case vide d'une ligne (avec break),
+// puis écrit des chiffres en sautant les multiples de 3 (avec continue).
+//
+// Ce qui est nouveau :
+//   break    = sortir de la boucle TOUT DE SUITE, sans finir les tours.
+//   continue = sauter la FIN de ce tour, et passer au tour suivant.
+
+#include &lt;ecran&gt;    // éteint ou rallume l’écran
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;lire&gt;     // lit la tuile posée sur une case
+#include &lt;nombre&gt;   // écrit un nombre en chiffres
+#include &lt;reste&gt;    // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                              // Le jeu commence ici.
+  ecran(0);                               // Dessin écran éteint.
+  texte(0, 3, "####  ##  ##########");    // Une ligne avec des trous :
+                                          // colonnes 0 à 3 = #, 4 et 5 = vides, ...
+
+  uint8_t libre = 255;        // 255 : pas encore trouvé (une valeur « impossible »)
+  uint8_t tours = 0;          // Combien de cases on a regardées.
+
+  for (uint8_t colonne = 0; colonne &lt; 20; colonne++) {  // colonne = 0 à 19
+    tours++;                                            // une case de plus regardée
+    if (lire(colonne, 3) == 0) {    // lire(colonne, ligne) rend ce qui est écrit
+                                    // dans la case ; 0 veut dire « vide ».
+      libre = colonne;              // On note la colonne vide...
+      break;                  // trouvé : inutile de continuer
+    }
+  }
+  // Déroulé : colonnes 0, 1, 2, 3 : un # ; colonne 4 : vide → libre = 4, break.
+  // tours vaut 5 : on a regardé 5 cases au lieu de 20.
+
+  texte(0, 5, "CASE LIBRE:");  nombre(14, 5, libre);   // affiche 004
+  texte(0, 6, "TOURS FAITS:"); nombre(14, 6, tours);   // affiche 005
+
+  // continue : on saute les multiples de 3.
+  for (uint8_t i = 0; i &lt; 10; i++) {      // i = 0 à 9
+    if (i % 3 == 0) continue;             // reste de i par 3 égal à 0 ? (0, 3, 6, 9)
+                                          // alors on saute la ligne suivante.
+    nombre(i * 2, 10, i, 1);              // Écrit : 1 2 . 4 5 . 7 8 (pas de 0, 3, 6, 9).
+  }
+  ecran(1);                               // On rallume.
+
+  while (true) {                          // La boucle du jeu.
+    image();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADA0lEQVR4nO3czXHbMBQAYR5TQo4pIrWkhpTrElKGjz5Eo9FIAsgH4IHgemf2INM0DeMT/zRhtn+fHwZuO30ElprA8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B424+fv1KLDmi17V+97e0cleauYXkDwFLbv/ryG/Dvv3/uPf5A//I2gHW2f/XlAi8KI7DAAgvsRdbwv3e15d4mwfODDngCwxMYnsDwBIYnMDyB4QkM7wZc+txgd/njt6IfQVTWebuR0saPLG/4SKSn6HzuTkgX8BNS6HXP+Orrv52dIePMm82esSW9C5+BowO9LnBe99/7eoQrWf7/8gTg3aNfaf0k4CGH7jnAr2b15ecA72L07DFj9+D6+pOB35rVlye9F1vOwWsCv/7Itc7BiXtw5ZBbej3kqnXUKeDIOL/1VbSB29r2pNLr0H1zqeh4juzxk6+/Ro1zDPAr1S5k8+uDs7O7/PglVfTiq3+Kl7qdE3h80fvg1MPJYOC2i4vSyqFDWejKJfv4HLoPPvJXrAI85ACYvQenTmjDffDFgOujXB/43HPwVOCGq8HS6yEfYVYmorL9zkv6ZuPQqWrGOdiQCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhtQOH/hn+nMfsGx5uy3s2qe15u+GDaQQOjWbOs7D9j8Ykjerc+Zm0B2dP7pEHGx9XXu2Ikjc/U4FTdZca0jqnsHnAEx7la5ij7PdcdOWr7sFzTnsrHBI7J2cV4Ob/kiFVOnTdl/18cN58hvI+GJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExjeF5rdrl2/jq66AAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">La case libre est la 004, trouvée en 005 tours ; puis 1 2 4 5 7 8, sans 0, 3, 6 ni 9.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>la première case vide est la colonne 4 </li>
+
+  <li>break a arrêté la boucle après 5 tours </li>
+
+  <li>continue a sauté 0, 3, 6 et 9 </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>32. do … while : au moins une fois</strong> — chapitre 5 : Les boucles : répéter.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 2 — Les conditions : choisir</span>
   <span>leçon 2 sur 4 dans ce chapitre</span>
-  <span>6 sur 42 dans le cours</span>
+  <span>6 sur 61 dans le cours</span>
 </p>
 <h1>6. Une comparaison est un nombre</h1>
 <p class="idee">« x == 7 » n’est pas une question posée dans le vide : c’est un calcul qui donne 1 ou 0.</p>
@@ -108,30 +108,77 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1668 octets</strong> de cartouche.</p>
+<strong>1057 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              266 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre         33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles         85 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              432 o  ← CopierTuiles  — 27 lettres sur 43
+  "X VAUT 7"            8 o  ← texte()  — un texte gravé
+  "X EGAL 7"            8 o  ← texte()  — un texte gravé
+  "X DIFFERENT DE 7"   16 o  ← texte()  — un texte gravé
+  "X PLUS PETIT 10"    15 o  ← texte()  — un texte gravé
+  "X PLUS GRAND 10"    15 o  ← texte()  — un texte gravé
+  "X AU PLUS 7"        11 o  ← texte()  — un texte gravé
+  "X AU MOINS 8"       12 o  ← texte()  — un texte gravé
+  "VRAIES ADDITION…"   19 o  ← texte()  — un texte gravé
+Lettres gravées : ADEFGILMNOPRSTUVX0123456789
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  nombre() × 7   124 o sur place, dans main()  + EcrireNombre (33 o)
+  texte()  × 8    88 o sur place, dans main()  + EcrireTexte (10 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  uint8_t x = 7;
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : pose des questions sur x (x vaut 7) et affiche les réponses.
+// Une comparaison donne un NOMBRE : 1 si c'est vrai, 0 si c'est faux.
+//
+//   ==  égal à            (DEUX signes « = » : un seul « = » veut dire « ranger dans »)
+//   !=  différent de
+//   &lt;   plus petit que        &gt;   plus grand que
+//   &lt;=  plus petit ou égal    &gt;=  plus grand ou égal
 
-  texte(1, 1, "X VAUT 7");
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
 
-  texte(1, 4, "X EGAL 7");        nombre(18, 4, x == 7, 1);
-  texte(1, 5, "X DIFFERENT DE 7"); nombre(18, 5, x != 7, 1);
-  texte(1, 6, "X PLUS PETIT 10");  nombre(18, 6, x &lt; 10, 1);
-  texte(1, 7, "X PLUS GRAND 10");  nombre(18, 7, x &gt; 10, 1);
-  texte(1, 8, "X AU PLUS 7");      nombre(18, 8, x &lt;= 7, 1);
-  texte(1, 9, "X AU MOINS 8");     nombre(18, 9, x &gt;= 8, 1);
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                        // Le jeu commence ici.
+  uint8_t x = 7;                    // On range 7 dans x.
 
+  texte(1, 1, "X VAUT 7");          // Rappel à l'écran.
+
+  // nombre(colonne, ligne, valeur, 1) : le dernier 1 veut dire « écris 1 seul chiffre ».
+  texte(1, 4, "X EGAL 7");        nombre(18, 4, x == 7, 1);   // 7 égal à 7 ?        oui : 1
+  texte(1, 5, "X DIFFERENT DE 7"); nombre(18, 5, x != 7, 1);  // 7 différent de 7 ?  non : 0
+  texte(1, 6, "X PLUS PETIT 10");  nombre(18, 6, x &lt; 10, 1);  // 7 plus petit que 10 ? 1
+  texte(1, 7, "X PLUS GRAND 10");  nombre(18, 7, x &gt; 10, 1);  // 7 plus grand que 10 ? 0
+  texte(1, 8, "X AU PLUS 7");      nombre(18, 8, x &lt;= 7, 1);  // 7 au plus 7 ?       oui : 1
+  texte(1, 9, "X AU MOINS 8");     nombre(18, 9, x &gt;= 8, 1);  // 7 au moins 8 ?      non : 0
+
+  // Puisqu'une réponse est un nombre, on peut les additionner :
+  // (x == 7) vaut 1, (x &lt; 10) vaut 1, (x &lt;= 7) vaut 1  →  1 + 1 + 1 = 3.
   uint8_t vraies = (x == 7) + (x &lt; 10) + (x &lt;= 7);
   texte(1, 12, "VRAIES ADDITIONNEES");
-  nombre(18, 13, vraies, 1);
+  nombre(18, 13, vraies, 1);        // affiche 3
 
-  while (true) {
-    image();
+  while (true) {                    // Répète pour toujours :
+    image();                        // attend l'image suivante.
   }
 }</code></pre>
   </div>

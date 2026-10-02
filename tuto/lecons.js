@@ -17,7 +17,7 @@
  * elles sont écrites ici.
  *
  * `partie: 'Le temps'`, sur la leçon qui l'ouvre, coupe un niveau en parties
- * (A, B, C… comptées toutes seules, voir `partieDe`). Le chapitre 0 en a dix ;
+ * (A, B, C… comptées toutes seules, voir `partieDe`). Le chapitre 0 en a onze ;
  * les numéros des leçons n'en dépendent pas.
  *
  * `controle` est exécuté avec un objet qui sait lire la console :
@@ -37,7 +37,7 @@
  * lui-même. Le nom du niveau, lui, annonce ce qu'on va y faire, et c'est ce
  * qui permet de choisir par où revenir.
  */
-export const NIVEAUX = {
+const NIVEAUX_DES_LECONS = {
   0: 'Avant tout',
   1: 'Les tout premiers pas',
   2: 'Retenir, et réagir',
@@ -52,6 +52,15 @@ export const NIVEAUX = {
 }
 
 import { TUTORIELS } from './tutoriels.js'
+import { construireLeParcours, CHAPITRES } from './parcours.js'
+
+/*
+ * Les chapitres du PARCOURS — leçons et cours réunis (voir tuto/parcours.js).
+ * Le nom « NIVEAUX » est gardé : toutes les pages le lisent. Les dix niveaux
+ * d'origine des leçons restent ci-dessus, dans NIVEAUX_DES_LECONS.
+ */
+export const NIVEAUX = CHAPITRES
+export { NIVEAUX_DES_LECONS }
 
 /*
  * Pour les contrôles des leçons de déplacement : suivre des lettres.
@@ -92,11 +101,18 @@ const ECRITES = [
       '**`image()`** attend la prochaine image de l’écran. Il y en a **60 par seconde** : la boucle fait donc un tour tous les soixantièmes de seconde.',
       'Ce programme ne montre rien, mais il tourne. Tous les suivants partent de lui : on ajoutera des choses **avant** la boucle (ce qui se fait une fois) et **dedans** (ce qui se fait à chaque image).',
     ],
-    code: `int main() {
-  while (true) {
-    image();
-  }
-}
+    code: `// Tout ce qui suit deux barres « // » est un COMMENTAIRE :
+// la console ne le lit pas, il est là seulement pour toi.
+
+int main() {        // main = « principal » : quand la console s'allume, elle arrive ICI.
+                    // Tout le programme s'écrit entre cette accolade ouvrante
+                    // et la dernière accolade fermante.
+  while (true) {    // while (true) = « tant que vrai » : ce qui est entre les
+                    // accolades recommence pour TOUJOURS. C'est la boucle de jeu.
+    image();        // Attend la prochaine image de l'écran (60 par seconde).
+                    // Le « ; » termine l'instruction, comme un point en fin de phrase.
+  }                 // Fin de la boucle : on repart à image().
+}                   // Fin de main. Ce programme ne montre rien, mais il tourne.
 `,
     aVoir: 'Rien : l’écran reste vide, mais la console tourne.',
     controle: (c) => {
@@ -116,12 +132,24 @@ const ECRITES = [
       'Les lettres sont **déjà dessinées** dans le programme : c’est la police, chargée au démarrage. Il suffit de dire laquelle afficher, et où.',
       '`texte(0, 0, "A")` écrit **A** dans la case de la colonne **0**, ligne **0** : celle en haut à gauche. L’écran fait 20 colonnes (0 à 19) sur 18 lignes (0 à 17).',
       'La ligne est écrite **avant** la boucle : on n’écrit le A qu’une fois, et il reste affiché.',
+      '**La première ligne, `#include <texte>`**, dit à la console : « ce programme se sert de `texte()` ». Aucune fonction de la console n’est là d’office : chacune prend de la **place dans la cartouche** (son code, ses lettres), et ne s’emploie que si on l’**inclut**, par son nom. Sans cette ligne, le compilateur refuse `texte()`, et dit quelle ligne écrire.',
+      '**Au 0.0, il n’y avait aucun `#include`** : `image()` ne coûte rien, elle est toujours là. À partir d’ici, chaque programme commence par la liste de ce qu’il emploie — une ligne par fonction, avec en commentaire ce qu’elle fait.',
     ],
-    code: `int main() {
-  texte(0, 0, "A");   // colonne 0, ligne 0 : la case en haut à gauche
+    code: `// #include <texte> : « ce programme se sert de texte() ».
+// Une fonction de la console prend de la place dans la cartouche :
+// elle ne s'emploie que si on l'inclut, par son nom. Sans cette ligne,
+// le compilateur refuse texte() — et dit quelle ligne écrire.
+#include <texte>   // écrit un texte à l’écran
 
-  while (true) {
-    image();
+int main() {          // Le programme commence ici.
+  texte(0, 0, "A");   // colonne 0, ligne 0 : la case en haut à gauche
+                      // texte(colonne, ligne, "LETTRES") écrit des lettres à l'écran.
+                      // L'écran fait 20 colonnes (0 à 19) sur 18 lignes (0 à 17).
+                      // Les lettres à écrire se mettent entre guillemets.
+                      // Écrit AVANT la boucle : une seule fois, et le A reste affiché.
+
+  while (true) {      // La boucle de jeu : recommence pour toujours...
+    image();          // ... attendre l'image suivante (60 par seconde).
   }
 }
 `,
@@ -145,7 +173,9 @@ const ECRITES = [
       '**Les deux premiers nombres de `texte`** sont la colonne (de 0 à 19, de gauche à droite) et la ligne (de 0 à 17, de haut en bas). Le milieu de l’écran est vers la colonne 10 et la ligne 8.',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.1.2 met les deux ensemble.',
     ],
-    code: `int main() {
+    code: `#include <texte>   // écrit un texte à l’écran
+
+int main() {
   // Le changement : la place. (0, 0) → (10, 8).
   //
   //   texte(10, 8, "A");
@@ -178,7 +208,9 @@ const ECRITES = [
       '**C’est le 0.1 et le 0.1.1 réunis** : deux lignes `texte`, une par place.',
       '**Chaque appel écrit sa lettre à sa place**, et les deux restent à l’écran : elles ne sont pas au même endroit, donc aucune n’écrase l’autre (le 0.3 montre ce qui arrive quand elles le sont).',
     ],
-    code: `int main() {
+    code: `#include <texte>   // écrit un texte à l’écran
+
+int main() {
   texte(0, 0, "A");     // 1. en haut à gauche (le 0.1)
   texte(10, 8, "A");    // 2. au milieu (le 0.1.1)
 
@@ -207,7 +239,10 @@ const ECRITES = [
       '`poser(0, 0, ALPHABET[0])` pose cette lettre dans la case (0, 0).',
       '**Pourquoi `poser()` et pas `texte()` ?** `ALPHABET[0]` n’est pas un texte : c’est un **nombre**, le numéro de la tuile du A (1). `texte()` n’accepte que des lettres entre guillemets ; pour mettre une tuile à partir de son numéro, c’est `poser()`. Écrire `texte(0, 0, ALPHABET[0])` est une erreur : le compilateur la refuse.',
     ],
-    code: `int main() {
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   poser(0, 0, ALPHABET[0]);   // l'indice 0 : la première lettre, A
   // (ne pas faire cette erreur : texte(0, 0, ALPHABET[0]) est refusé,
   //  car ALPHABET[0] est un numéro de tuile, pas un texte)
@@ -237,7 +272,10 @@ const ECRITES = [
       '**`poser` prend la même place que `texte`** : la colonne d’abord (0 à 19), puis la ligne (0 à 17).',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.2.2 met les deux ensemble.',
     ],
-    code: `int main() {
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le changement : la place. (0, 0) → (10, 8).
   poser(10, 8, ALPHABET[0]);   // l'indice 0 : A, au milieu de l'écran
 
@@ -263,7 +301,10 @@ const ECRITES = [
     texte: [
       '**C’est le 0.2 et le 0.2.1 réunis** : deux lignes `poser`, une par place.',
     ],
-    code: `int main() {
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   poser(0, 0, ALPHABET[0]);    // 1. en haut à gauche (le 0.2)
   poser(10, 8, ALPHABET[0]);   // 2. au milieu (le 0.2.1)
 
@@ -291,7 +332,9 @@ const ECRITES = [
       'Les lignes s’exécutent **de haut en bas** : le A d’abord, puis le B. C’est donc le B qui reste.',
       'Le A a bien été écrit, mais il est remplacé avant même la première image : on ne le voit jamais.',
     ],
-    code: `int main() {
+    code: `#include <texte>   // écrit un texte à l’écran
+
+int main() {
   texte(0, 0, "A");   // colonne 0, ligne 0 : la case en haut à gauche
   texte(0, 0, "B");   // même case : le B écrase le A
 
@@ -320,7 +363,9 @@ const ECRITES = [
       '**La règle ne dépend pas de la place :** deux écritures dans la **même** case, la seconde efface la première. Ici, les deux sont en (10, 8) : on ne voit que le B.',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.3.2 met les deux ensemble.',
     ],
-    code: `int main() {
+    code: `#include <texte>   // écrit un texte à l’écran
+
+int main() {
   texte(10, 8, "A");   // au milieu…
   texte(10, 8, "B");   // …même case : le B écrase le A
 
@@ -348,7 +393,9 @@ const ECRITES = [
       '**C’est le 0.3 et le 0.3.1 réunis** : les deux écrasements, chacun à sa place.',
       '**Chaque case est indépendante :** ce qui s’écrit en (0, 0) ne touche pas (10, 8). Aux deux endroits, le B écrase le A.',
     ],
-    code: `int main() {
+    code: `#include <texte>   // écrit un texte à l’écran
+
+int main() {
   texte(0, 0, "A");    // en haut à gauche (le 0.3)…
   texte(0, 0, "B");    // …écrasé par le B
   texte(10, 8, "A");   // au milieu (le 0.3.1)…
@@ -378,9 +425,13 @@ const ECRITES = [
       'On s’arrête à **T**, la 20e lettre. Il n’y a **pas de colonne 20** : `texte(20, 0, "U")` est refusé par le compilateur, qui répond que l’écran fait 20 colonnes.',
       'Vingt lignes presque identiques : c’est long à écrire, et c’est exactement ce qu’une boucle saura faire à notre place.',
     ],
-    code: `int main() {
-  texte(0, 0, "A");
-  texte(1, 0, "B");
+    code: `#include <texte>   // écrit un texte à l’écran
+
+int main() {            // Le programme commence ici.
+  // Une lettre par case, de gauche à droite, sur la ligne 0.
+  // texte(colonne, ligne, "LETTRE") : seule la colonne change, de 1 en 1.
+  texte(0, 0, "A");     // colonne 0 : la première à gauche
+  texte(1, 0, "B");     // colonne 1 : juste à droite du A
   texte(2, 0, "C");
   texte(3, 0, "D");
   texte(4, 0, "E");
@@ -389,7 +440,7 @@ const ECRITES = [
   texte(7, 0, "H");
   texte(8, 0, "I");
   texte(9, 0, "J");
-  texte(10, 0, "K");
+  texte(10, 0, "K");    // colonne 10 : le milieu de la ligne
   texte(11, 0, "L");
   texte(12, 0, "M");
   texte(13, 0, "N");
@@ -404,8 +455,8 @@ const ECRITES = [
   // (si on dépasse : texte(20, 0, "U") est refusé par le compilateur,
   //  qui répond « l'écran fait 20 colonnes et 18 lignes ; 20,0 est dehors »)
 
-  while (true) {
-    image();
+  while (true) {        // La boucle de jeu : recommence pour toujours...
+    image();            // ... attendre l'image suivante.
   }
 }
 `,
@@ -429,10 +480,14 @@ const ECRITES = [
       '**Seul le deuxième nombre change**, dans chaque `texte` : c’est la ligne. Les colonnes restent 0 à 19 : la même ligne de lettres, plus bas.',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.4.2 met les deux ensemble.',
     ],
-    code: `int main() {
+    code: `#include <texte>   // écrit un texte à l’écran
+
+int main() {            // Le programme commence ici.
   // Le changement : la ligne, 0 → 5, dans chaque texte.
-  texte(0, 5, "A");
-  texte(1, 5, "B");
+  // texte(colonne, ligne, "LETTRE") : le 2e nombre (la ligne) vaut 5 partout ;
+  // la colonne va toujours de 0 à 19, une lettre par case.
+  texte(0, 5, "A");     // colonne 0, ligne 5
+  texte(1, 5, "B");     // colonne 1, ligne 5
   texte(2, 5, "C");
   texte(3, 5, "D");
   texte(4, 5, "E");
@@ -450,10 +505,10 @@ const ECRITES = [
   texte(16, 5, "Q");
   texte(17, 5, "R");
   texte(18, 5, "S");
-  texte(19, 5, "T");
+  texte(19, 5, "T");    // colonne 19 : la dernière de la ligne
 
-  while (true) {
-    image();
+  while (true) {        // La boucle de jeu : recommence pour toujours...
+    image();            // ... attendre l'image suivante.
   }
 }
 `,
@@ -475,20 +530,25 @@ const ECRITES = [
       '**C’est le 0.4 et le 0.4.1 réunis** : les vingt lettres en ligne 0, puis les vingt en ligne 5.',
       '**Quarante lignes presque pareilles :** c’est long, et facile de se tromper. C’est exactement ce que la boucle `for` du 0.5 va raccourcir.',
     ],
-    code: `int main() {
-  // 1. La ligne 0 (le 0.4)
+    code: `#include <texte>   // écrit un texte à l’écran
+
+int main() {            // Le programme commence ici.
+  // Deux lignes d'alphabet : la ligne 0, puis la même sur la ligne 5.
+  // Plusieurs instructions peuvent tenir sur une même ligne :
+  // chacune se termine par son « ; ».
+  // 1. La ligne 0 (le 0.4) : texte(colonne, 0, "LETTRE"), colonnes 0 à 19.
   texte(0, 0, "A"); texte(1, 0, "B"); texte(2, 0, "C"); texte(3, 0, "D"); texte(4, 0, "E");
   texte(5, 0, "F"); texte(6, 0, "G"); texte(7, 0, "H"); texte(8, 0, "I"); texte(9, 0, "J");
   texte(10, 0, "K"); texte(11, 0, "L"); texte(12, 0, "M"); texte(13, 0, "N"); texte(14, 0, "O");
   texte(15, 0, "P"); texte(16, 0, "Q"); texte(17, 0, "R"); texte(18, 0, "S"); texte(19, 0, "T");
-  // 2. La ligne 5 (le 0.4.1)
+  // 2. La ligne 5 (le 0.4.1) : les mêmes lettres, le 2e nombre vaut 5.
   texte(0, 5, "A"); texte(1, 5, "B"); texte(2, 5, "C"); texte(3, 5, "D"); texte(4, 5, "E");
   texte(5, 5, "F"); texte(6, 5, "G"); texte(7, 5, "H"); texte(8, 5, "I"); texte(9, 5, "J");
   texte(10, 5, "K"); texte(11, 5, "L"); texte(12, 5, "M"); texte(13, 5, "N"); texte(14, 5, "O");
   texte(15, 5, "P"); texte(16, 5, "Q"); texte(17, 5, "R"); texte(18, 5, "S"); texte(19, 5, "T");
 
-  while (true) {
-    image();
+  while (true) {        // La boucle de jeu : recommence pour toujours...
+    image();            // ... attendre l'image suivante.
   }
 }
 `,
@@ -511,7 +571,10 @@ const ECRITES = [
       '`i` sert **deux fois** : comme **colonne**, pour avancer de gauche à droite, et comme **indice** dans `ALPHABET`, pour passer de A à T.',
       '**`i < 20`** : on s’arrête avant la colonne 20, qui n’existe pas, exactement comme au 0.4. Le résultat est le même, en 3 lignes au lieu de 20, et le programme est plus léger.',
     ],
-    code: `int main() {
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   for (uint8_t i = 0; i < 20; i++) {   // 20 tours : les colonnes 0 à 19
     poser(i, 0, ALPHABET[i]);          // la lettre n° i, dans la colonne i
   }
@@ -541,7 +604,10 @@ const ECRITES = [
       '**Un seul nombre à changer**, au lieu de vingt au 0.4.1 : la boucle écrit la ligne entière, et la ligne n’est dite qu’une fois.',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.5.2 met les deux ensemble.',
     ],
-    code: `int main() {
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le changement : la ligne, 0 → 5.
   for (uint8_t i = 0; i < 20; i++) {   // 20 tours : les colonnes 0 à 19
     poser(i, 5, ALPHABET[i]);          // la lettre n° i, colonne i, ligne 5
@@ -570,7 +636,10 @@ const ECRITES = [
       '**C’est le 0.5 et le 0.5.1 réunis** : la boucle du 0.5 (ligne 0), puis celle du 0.5.1 (ligne 5).',
       '**Deux boucles l’une après l’autre :** la première finit ses vingt tours, puis la seconde commence. Chaque `for` déclare son propre `i` : il n’existe que dans sa boucle.',
     ],
-    code: `int main() {
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. La ligne 0 (le 0.5)
   for (uint8_t i = 0; i < 20; i++) {   // 20 tours : les colonnes 0 à 19
     poser(i, 0, ALPHABET[i]);          // la lettre n° i, colonne i, ligne 0
@@ -604,7 +673,10 @@ const ECRITES = [
       'Les trois morceaux que `for` réunit sur une ligne sont ici écrits **séparément** : le départ `uint8_t i = 0;` avant la boucle, la condition `i < 20` dans le `while`, et `i++;` à la fin de chaque tour.',
       '**Le piège :** sans `i++`, `i` reste à 0, la condition reste vraie, et la boucle **ne s’arrête jamais**. Le programme reste bloqué dedans.',
     ],
-    code: `int main() {
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   uint8_t i = 0;                // 1. on part de la colonne 0
 
   while (i < 20) {              // 2. tant qu'on est dans l'écran
@@ -637,7 +709,10 @@ const ECRITES = [
       '**Un seul nombre à changer**, au lieu de vingt au 0.4.1 : la boucle écrit la ligne entière, et la ligne n’est dite qu’une fois.',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.6.2 met les deux ensemble.',
     ],
-    code: `int main() {
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le changement : la ligne, 0 → 5.
   uint8_t i = 0;                // on part de la colonne 0
   while (i < 20) {              // tant qu'on est dans l'écran
@@ -668,7 +743,10 @@ const ECRITES = [
       '**C’est le 0.6 et le 0.6.1 réunis** : la boucle du 0.6 (ligne 0), puis celle du 0.6.1 (ligne 5).',
       '**Deux boucles l’une après l’autre**, avec la **même** variable `i` : déclarée une fois, elle est remise à 0 (`i = 0;`) avant la seconde boucle, sans `uint8_t` — on ne déclare pas deux fois le même nom.',
     ],
-    code: `int main() {
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. La ligne 0 (le 0.6)
   uint8_t i = 0;                // on part de la colonne 0
   while (i < 20) {              // tant qu'on est dans l'écran
@@ -706,16 +784,23 @@ const ECRITES = [
       'Ici, le résultat est le même qu’avec `for` et `while` : les trois boucles savent faire la même chose. On choisit celle qui se lit le mieux.',
       'Attention au **point-virgule** après `while (i < 20)` : il est obligatoire avec `do`, et seulement avec lui.',
     ],
-    code: `int main() {
-  uint8_t i = 0;
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 
-  do {
+int main() {                    // Le programme commence ici.
+  uint8_t i = 0;                // Une variable i : le numéro de la lettre ET de la colonne.
+                                // uint8_t = un nombre entier de 0 à 255. On part de 0.
+
+  do {                          // do = « fais » : le bloc est fait AU MOINS une fois...
     poser(i, 0, ALPHABET[i]);   // la lettre n° i, dans la colonne i
-    i++;
-  } while (i < 20);             // la condition est vérifiée À LA FIN
+                                // (ALPHABET[0] = A, ALPHABET[1] = B, ...)
+    i++;                        // i gagne 1 : la colonne et la lettre suivantes.
+  } while (i < 20);             // la condition est vérifiée À LA FIN :
+                                // ... puis recommencé tant que i < 20.
+                                // Quand i vaut 20 (après le T), on sort.
 
-  while (true) {
-    image();
+  while (true) {                // La boucle de jeu : recommence pour toujours...
+    image();                    // ... attendre l'image suivante.
   }
 }
 `,
@@ -739,7 +824,10 @@ const ECRITES = [
       '**Un seul nombre à changer**, au lieu de vingt au 0.4.1 : la boucle écrit la ligne entière, et la ligne n’est dite qu’une fois.',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.7.2 met les deux ensemble.',
     ],
-    code: `int main() {
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le changement : la ligne, 0 → 5.
   uint8_t i = 0;
   do {
@@ -770,7 +858,10 @@ const ECRITES = [
       '**C’est le 0.7 et le 0.7.1 réunis** : la boucle du 0.7 (ligne 0), puis celle du 0.7.1 (ligne 5).',
       '**Deux boucles l’une après l’autre**, avec la **même** variable `i` : déclarée une fois, elle est remise à 0 (`i = 0;`) avant la seconde boucle, sans `uint8_t` — on ne déclare pas deux fois le même nom.',
     ],
-    code: `int main() {
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. La ligne 0 (le 0.7)
   uint8_t i = 0;
   do {
@@ -807,7 +898,10 @@ const ECRITES = [
       'Il y a **26 lettres** et seulement **20 colonnes**. La première boucle écrit A à T sur la ligne 0 ; la seconde écrit les 6 dernières, U à Z, sur la ligne **1**.',
       'Dans la seconde boucle, `i` va de 20 à 25 : c’est le bon **indice** dans `ALPHABET` (U est à l’indice 20). Mais la **colonne** doit repartir à 0 : on écrit donc `i - 20`.',
     ],
-    code: `int main() {
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   for (uint8_t i = 0; i < 20; i++) {    // A à T : ligne 0, colonnes 0 à 19
     poser(i, 0, ALPHABET[i]);
   }
@@ -835,19 +929,22 @@ const ECRITES = [
     titre: 'Tout l’alphabet, avec deux boucles — de base, ailleurs',
     difficulte: 0,
     suite: true,
-    idee: 'Le 0.8 trois lignes plus bas : tout l’alphabet sur les lignes 5 et 6.',
+    idee: 'Le 0.8 trois lignes plus bas : tout l’alphabet sur les lignes 3 et 4.',
     texte: [
-      '**C’est le 0.8**, avec un seul changement : les **lignes** : 5 et 6 au lieu de 0 et 1, dans les deux `poser`.',
+      '**C’est le 0.8**, avec un seul changement : les **lignes** : 3 et 4 au lieu de 0 et 1, dans les deux `poser`.',
       '**Le reste ne bouge pas :** A à T sur une ligne, U à Z sur la suivante.',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.8.2 met les deux ensemble.',
     ],
-    code: `int main() {
-  // Le changement : les lignes 0 et 1 → 5 et 6.
-  for (uint8_t i = 0; i < 20; i++) {    // A à T : ligne 5
-    poser(i, 5, ALPHABET[i]);
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
+  // Le changement : les lignes 0 et 1 → 3 et 4.
+  for (uint8_t i = 0; i < 20; i++) {    // A à T : ligne 3
+    poser(i, 3, ALPHABET[i]);
   }
-  for (uint8_t i = 20; i < 26; i++) {   // U à Z : ligne 6
-    poser(i - 20, 6, ALPHABET[i]);
+  for (uint8_t i = 20; i < 26; i++) {   // U à Z : ligne 4
+    poser(i - 20, 4, ALPHABET[i]);
   }
 
   while (true) {
@@ -855,12 +952,12 @@ const ECRITES = [
   }
 }
 `,
-    aVoir: 'Tout l’alphabet sur les lignes 5 et 6.',
+    aVoir: 'Tout l’alphabet sur les lignes 3 et 4.',
     controle: (c) => {
       c.avancer(20)
       return [
-        ['ligne 5 : A à T', c.mot(0, 5, 20) === 'ABCDEFGHIJKLMNOPQRST'],
-        ['ligne 6 : U à Z', c.mot(0, 6, 6) === 'UVWXYZ'],
+        ['ligne 3 : A à T', c.mot(0, 3, 20) === 'ABCDEFGHIJKLMNOPQRST'],
+        ['ligne 4 : U à Z', c.mot(0, 4, 6) === 'UVWXYZ'],
       ]
     },
   },
@@ -869,11 +966,14 @@ const ECRITES = [
     titre: 'Tout l’alphabet, avec deux boucles — doublé, deux positions',
     difficulte: 0,
     suite: true,
-    idee: 'Tout l’alphabet deux fois : lignes 0 et 1, puis lignes 5 et 6.',
+    idee: 'Tout l’alphabet deux fois : lignes 0 et 1, puis lignes 3 et 4.',
     texte: [
-      '**C’est le 0.8 et le 0.8.1 réunis** : l’alphabet du 0.8 (lignes 0 et 1), puis celui du 0.8.1 (lignes 5 et 6).',
+      '**C’est le 0.8 et le 0.8.1 réunis** : l’alphabet du 0.8 (lignes 0 et 1), puis celui du 0.8.1 (lignes 3 et 4).',
     ],
-    code: `int main() {
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Lignes 0 et 1 (le 0.8)
   for (uint8_t i = 0; i < 20; i++) {    // A à T : ligne 0
     poser(i, 0, ALPHABET[i]);
@@ -881,12 +981,12 @@ const ECRITES = [
   for (uint8_t i = 20; i < 26; i++) {   // U à Z : ligne 1
     poser(i - 20, 1, ALPHABET[i]);
   }
-  // 2. Lignes 5 et 6 (le 0.8.1)
-  for (uint8_t i = 0; i < 20; i++) {    // A à T : ligne 5
-    poser(i, 5, ALPHABET[i]);
+  // 2. Lignes 3 et 4 (le 0.8.1)
+  for (uint8_t i = 0; i < 20; i++) {    // A à T : ligne 3
+    poser(i, 3, ALPHABET[i]);
   }
-  for (uint8_t i = 20; i < 26; i++) {   // U à Z : ligne 6
-    poser(i - 20, 6, ALPHABET[i]);
+  for (uint8_t i = 20; i < 26; i++) {   // U à Z : ligne 4
+    poser(i - 20, 4, ALPHABET[i]);
   }
 
   while (true) {
@@ -899,7 +999,7 @@ const ECRITES = [
       c.avancer(20)
       return [
         ['lignes 0 et 1', c.mot(0, 0, 20) === 'ABCDEFGHIJKLMNOPQRST' && c.mot(0, 1, 6) === 'UVWXYZ'],
-        ['lignes 5 et 6', c.mot(0, 5, 20) === 'ABCDEFGHIJKLMNOPQRST' && c.mot(0, 6, 6) === 'UVWXYZ'],
+        ['lignes 3 et 4', c.mot(0, 3, 20) === 'ABCDEFGHIJKLMNOPQRST' && c.mot(0, 4, 6) === 'UVWXYZ'],
       ]
     },
   },
@@ -917,7 +1017,12 @@ const ECRITES = [
       'Tour par tour : **i = 0** → colonne 0, ligne 0, **A** · **i = 19** → colonne 19, ligne 0, **T** (la ligne est pleine) · **i = 20** → colonne **0**, ligne **1**, **U** (le reste repart à 0, le quotient passe à 1) · **i = 25** → colonne 5, ligne 1, **Z**.',
       'C’est compliqué à lire : le chapitre suivant montre `poserS`, qui fait ce calcul à notre place.',
     ],
-    code: `int main() {
+    code: `#include <reste>     // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <diviser>   // a / b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+
+int main() {
   // for : répète le bloc entre { } ; i part de 0 et augmente de 1 à chaque tour.
   // sizeof(ALPHABET) = 26, la taille du tableau : 26 tours, i va de 0 à 25.
   for (uint8_t i = 0; i < sizeof(ALPHABET); i++) {
@@ -950,29 +1055,39 @@ const ECRITES = [
     titre: 'Tout l’alphabet, avec une seule boucle — de base, ailleurs',
     difficulte: 0,
     suite: true,
-    idee: 'Le 0.9 trois lignes plus bas : tout l’alphabet sur les lignes 5 et 6.',
+    idee: 'Le 0.9 trois lignes plus bas : tout l’alphabet sur les lignes 3 et 4.',
     texte: [
-      '**C’est le 0.9**, avec un seul changement : la **ligne de départ** : `5 + i / 20` au lieu de `i / 20`. `i / 20` vaut 0 puis 1 ; en ajoutant 5, on obtient les lignes 5 puis 6.',
+      '**C’est le 0.9**, avec un seul changement : la **ligne de départ** : `3 + i / 20` au lieu de `i / 20`. `i / 20` vaut 0 puis 1 ; en ajoutant 3, on obtient les lignes 3 puis 4.',
       '**Le reste ne bouge pas :** A à T sur une ligne, U à Z sur la suivante.',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.9.2 met les deux ensemble.',
     ],
-    code: `int main() {
-  // Le changement : les lignes 0 et 1 → 5 et 6.
+    code: `#include <reste>     // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <diviser>   // a / b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+
+int main() {                                  // Le programme commence ici.
+  // Le changement : les lignes 0 et 1 → 3 et 4.
+  // for : i part de 0, et gagne 1 à chaque tour tant que i < 26 (la taille de ALPHABET).
   for (uint8_t i = 0; i < sizeof(ALPHABET); i++) {
-    poser(i % 20, 5 + i / 20, ALPHABET[i]);   // 5 + i / 20 : la ligne 5, puis 6
+    poser(i % 20, 3 + i / 20, ALPHABET[i]);   // 3 + i / 20 : la ligne 3, puis 4
+                                              // i % 20 = le reste par 20 : la colonne
+                                              //   (0 à 19, puis de nouveau 0 à 5).
+                                              // i / 20 = 0 pour A à T, 1 pour U à Z.
+                                              // Ex. : i = 22 (le W) → colonne 2, ligne 4.
   }
 
-  while (true) {
-    image();
+  while (true) {                              // La boucle de jeu : pour toujours...
+    image();                                  // ... attendre l'image suivante.
   }
 }
 `,
-    aVoir: 'Tout l’alphabet sur les lignes 5 et 6.',
+    aVoir: 'Tout l’alphabet sur les lignes 3 et 4.',
     controle: (c) => {
       c.avancer(20)
       return [
-        ['ligne 5 : A à T', c.mot(0, 5, 20) === 'ABCDEFGHIJKLMNOPQRST'],
-        ['ligne 6 : U à Z', c.mot(0, 6, 6) === 'UVWXYZ'],
+        ['ligne 3 : A à T', c.mot(0, 3, 20) === 'ABCDEFGHIJKLMNOPQRST'],
+        ['ligne 4 : U à Z', c.mot(0, 4, 6) === 'UVWXYZ'],
       ]
     },
   },
@@ -981,18 +1096,23 @@ const ECRITES = [
     titre: 'Tout l’alphabet, avec une seule boucle — doublé, deux positions',
     difficulte: 0,
     suite: true,
-    idee: 'Tout l’alphabet deux fois : lignes 0 et 1, puis lignes 5 et 6.',
+    idee: 'Tout l’alphabet deux fois : lignes 0 et 1, puis lignes 3 et 4.',
     texte: [
-      '**C’est le 0.9 et le 0.9.1 réunis** : l’alphabet du 0.9 (lignes 0 et 1), puis celui du 0.9.1 (lignes 5 et 6).',
+      '**C’est le 0.9 et le 0.9.1 réunis** : l’alphabet du 0.9 (lignes 0 et 1), puis celui du 0.9.1 (lignes 3 et 4).',
     ],
-    code: `int main() {
+    code: `#include <reste>     // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <diviser>   // a / b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+
+int main() {
   // 1. Lignes 0 et 1 (le 0.9)
   for (uint8_t i = 0; i < sizeof(ALPHABET); i++) {
     poser(i % 20, 0 + i / 20, ALPHABET[i]);   // 0 + i / 20 : la ligne 0, puis 1
   }
-  // 2. Lignes 5 et 6 (le 0.9.1)
+  // 2. Lignes 3 et 4 (le 0.9.1)
   for (uint8_t i = 0; i < sizeof(ALPHABET); i++) {
-    poser(i % 20, 5 + i / 20, ALPHABET[i]);   // 5 + i / 20 : la ligne 5, puis 6
+    poser(i % 20, 3 + i / 20, ALPHABET[i]);   // 3 + i / 20 : la ligne 3, puis 4
   }
 
   while (true) {
@@ -1005,7 +1125,7 @@ const ECRITES = [
       c.avancer(20)
       return [
         ['lignes 0 et 1', c.mot(0, 0, 20) === 'ABCDEFGHIJKLMNOPQRST' && c.mot(0, 1, 6) === 'UVWXYZ'],
-        ['lignes 5 et 6', c.mot(0, 5, 20) === 'ABCDEFGHIJKLMNOPQRST' && c.mot(0, 6, 6) === 'UVWXYZ'],
+        ['lignes 3 et 4', c.mot(0, 3, 20) === 'ABCDEFGHIJKLMNOPQRST' && c.mot(0, 4, 6) === 'UVWXYZ'],
       ]
     },
   },
@@ -1022,7 +1142,10 @@ const ECRITES = [
       '**Comment `poserS` trouve la place**, pour les curieux : la ligne est le nombre de rangées de 20 déjà pleines (20 / 20 = 1), et la colonne ce qui reste une fois ces rangées retirées (25 − 20 = 5). En C++ : `i / 20` et `i % 20`. `poserS` fait ce calcul à notre place.',
       'Le calcul du 0.9 a disparu du programme : `poserS` le fait à notre place.',
     ],
-    code: `int main() {
+    code: `#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poserS>     // pose une tuile, et passe à la ligne au bord
+
+int main() {
   // for : répète le bloc entre { } ; i part de 0 et augmente de 1 à chaque tour.
   // sizeof(ALPHABET) = 26, la taille du tableau : 26 tours, i va de 0 à 25.
   for (uint8_t i = 0; i < sizeof(ALPHABET); i++) {
@@ -1055,29 +1178,36 @@ const ECRITES = [
     titre: 'Tout l’alphabet, avec poserS — de base, ailleurs',
     difficulte: 0,
     suite: true,
-    idee: 'Le 0.10 trois lignes plus bas : tout l’alphabet sur les lignes 5 et 6.',
+    idee: 'Le 0.10 trois lignes plus bas : tout l’alphabet sur les lignes 3 et 4.',
     texte: [
-      '**C’est le 0.10**, avec un seul changement : la **ligne** : 5 au lieu de 0. `poserS` passe tout seul à la ligne suivante, la 6.',
+      '**C’est le 0.10**, avec un seul changement : la **ligne** : 3 au lieu de 0. `poserS` passe tout seul à la ligne suivante, la 4.',
       '**Le reste ne bouge pas :** A à T sur une ligne, U à Z sur la suivante.',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.10.2 met les deux ensemble.',
     ],
-    code: `int main() {
-  // Le changement : les lignes 0 et 1 → 5 et 6.
+    code: `#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poserS>     // pose une tuile, et passe à la ligne au bord
+
+int main() {                                  // Le programme commence ici.
+  // Le changement : les lignes 0 et 1 → 3 et 4.
+  // for : i part de 0, et gagne 1 à chaque tour tant que i < 26 (la taille de ALPHABET).
   for (uint8_t i = 0; i < sizeof(ALPHABET); i++) {
-    poserS(i, 5, ALPHABET[i]);   // poserS passe tout seul à la ligne 6
+    poserS(i, 3, ALPHABET[i]);   // poserS passe tout seul à la ligne 4
+                                 // i = la colonne ; à partir de 20, poserS repart à
+                                 // gauche une ligne plus bas (i = 20 → U en (0, 4)).
+                                 // ALPHABET[i] = la lettre n° i (A pour 0, Z pour 25).
   }
 
-  while (true) {
-    image();
+  while (true) {                 // La boucle de jeu : pour toujours...
+    image();                     // ... attendre l'image suivante.
   }
 }
 `,
-    aVoir: 'Tout l’alphabet sur les lignes 5 et 6.',
+    aVoir: 'Tout l’alphabet sur les lignes 3 et 4.',
     controle: (c) => {
       c.avancer(20)
       return [
-        ['ligne 5 : A à T', c.mot(0, 5, 20) === 'ABCDEFGHIJKLMNOPQRST'],
-        ['ligne 6 : U à Z', c.mot(0, 6, 6) === 'UVWXYZ'],
+        ['ligne 3 : A à T', c.mot(0, 3, 20) === 'ABCDEFGHIJKLMNOPQRST'],
+        ['ligne 4 : U à Z', c.mot(0, 4, 6) === 'UVWXYZ'],
       ]
     },
   },
@@ -1086,18 +1216,21 @@ const ECRITES = [
     titre: 'Tout l’alphabet, avec poserS — doublé, deux positions',
     difficulte: 0,
     suite: true,
-    idee: 'Tout l’alphabet deux fois : lignes 0 et 1, puis lignes 5 et 6.',
+    idee: 'Tout l’alphabet deux fois : lignes 0 et 1, puis lignes 3 et 4.',
     texte: [
-      '**C’est le 0.10 et le 0.10.1 réunis** : l’alphabet du 0.10 (lignes 0 et 1), puis celui du 0.10.1 (lignes 5 et 6).',
+      '**C’est le 0.10 et le 0.10.1 réunis** : l’alphabet du 0.10 (lignes 0 et 1), puis celui du 0.10.1 (lignes 3 et 4).',
     ],
-    code: `int main() {
+    code: `#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poserS>     // pose une tuile, et passe à la ligne au bord
+
+int main() {
   // 1. Lignes 0 et 1 (le 0.10)
   for (uint8_t i = 0; i < sizeof(ALPHABET); i++) {
     poserS(i, 0, ALPHABET[i]);   // poserS passe tout seul à la ligne 1
   }
-  // 2. Lignes 5 et 6 (le 0.10.1)
+  // 2. Lignes 3 et 4 (le 0.10.1)
   for (uint8_t i = 0; i < sizeof(ALPHABET); i++) {
-    poserS(i, 5, ALPHABET[i]);   // poserS passe tout seul à la ligne 6
+    poserS(i, 3, ALPHABET[i]);   // poserS passe tout seul à la ligne 4
   }
 
   while (true) {
@@ -1110,7 +1243,7 @@ const ECRITES = [
       c.avancer(20)
       return [
         ['lignes 0 et 1', c.mot(0, 0, 20) === 'ABCDEFGHIJKLMNOPQRST' && c.mot(0, 1, 6) === 'UVWXYZ'],
-        ['lignes 5 et 6', c.mot(0, 5, 20) === 'ABCDEFGHIJKLMNOPQRST' && c.mot(0, 6, 6) === 'UVWXYZ'],
+        ['lignes 3 et 4', c.mot(0, 3, 20) === 'ABCDEFGHIJKLMNOPQRST' && c.mot(0, 4, 6) === 'UVWXYZ'],
       ]
     },
   },
@@ -1124,11 +1257,18 @@ const ECRITES = [
       'Le calcul du 0.9 (`i % 20`, `i / 20`) est fait **à notre place**. `texte()`, lui, refuserait ce mot trop long.',
       'Après la ligne 17, `textS` repart **en haut**, à la ligne 0.',
     ],
-    code: `int main() {
-  textS(0, 0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");   // passe à la ligne après T
+    code: `#include <textS>   // écrit un texte qui passe à la ligne tout seul
 
-  while (true) {
-    image();
+int main() {                                   // Le programme commence ici.
+  textS(0, 0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");   // passe à la ligne après T
+                                               // textS(colonne, ligne, "TEXTE") : comme
+                                               // texte(), mais quand le texte arrive au
+                                               // bord droit (colonne 19), il continue
+                                               // tout seul au début de la ligne suivante.
+                                               // A à T sur la ligne 0, U à Z sur la ligne 1.
+
+  while (true) {                               // La boucle de jeu : pour toujours...
+    image();                                   // ... attendre l'image suivante.
   }
 }
 `,
@@ -1146,27 +1286,29 @@ const ECRITES = [
     titre: 'Tout l’alphabet, avec textS — de base, ailleurs',
     difficulte: 0,
     suite: true,
-    idee: 'Le 0.11 trois lignes plus bas : tout l’alphabet sur les lignes 5 et 6.',
+    idee: 'Le 0.11 trois lignes plus bas : tout l’alphabet sur les lignes 3 et 4.',
     texte: [
-      '**C’est le 0.11**, avec un seul changement : la **ligne** : 5 au lieu de 0. `textS` passe tout seul à la ligne 6 après le T.',
+      '**C’est le 0.11**, avec un seul changement : la **ligne** : 3 au lieu de 0. `textS` passe tout seul à la ligne 4 après le T.',
       '**Le reste ne bouge pas :** A à T sur une ligne, U à Z sur la suivante.',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.11.2 met les deux ensemble.',
     ],
-    code: `int main() {
-  // Le changement : les lignes 0 et 1 → 5 et 6.
-  textS(0, 5, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");   // passe à la ligne 6 après T
+    code: `#include <textS>   // écrit un texte qui passe à la ligne tout seul
+
+int main() {
+  // Le changement : les lignes 0 et 1 → 3 et 4.
+  textS(0, 3, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");   // passe à la ligne 4 après T
 
   while (true) {
     image();
   }
 }
 `,
-    aVoir: 'Tout l’alphabet sur les lignes 5 et 6.',
+    aVoir: 'Tout l’alphabet sur les lignes 3 et 4.',
     controle: (c) => {
       c.avancer(20)
       return [
-        ['ligne 5 : A à T', c.mot(0, 5, 20) === 'ABCDEFGHIJKLMNOPQRST'],
-        ['ligne 6 : U à Z', c.mot(0, 6, 6) === 'UVWXYZ'],
+        ['ligne 3 : A à T', c.mot(0, 3, 20) === 'ABCDEFGHIJKLMNOPQRST'],
+        ['ligne 4 : U à Z', c.mot(0, 4, 6) === 'UVWXYZ'],
       ]
     },
   },
@@ -1175,15 +1317,17 @@ const ECRITES = [
     titre: 'Tout l’alphabet, avec textS — doublé, deux positions',
     difficulte: 0,
     suite: true,
-    idee: 'Tout l’alphabet deux fois : lignes 0 et 1, puis lignes 5 et 6.',
+    idee: 'Tout l’alphabet deux fois : lignes 0 et 1, puis lignes 3 et 4.',
     texte: [
-      '**C’est le 0.11 et le 0.11.1 réunis** : l’alphabet du 0.11 (lignes 0 et 1), puis celui du 0.11.1 (lignes 5 et 6).',
+      '**C’est le 0.11 et le 0.11.1 réunis** : l’alphabet du 0.11 (lignes 0 et 1), puis celui du 0.11.1 (lignes 3 et 4).',
     ],
-    code: `int main() {
+    code: `#include <textS>   // écrit un texte qui passe à la ligne tout seul
+
+int main() {
   // 1. Lignes 0 et 1 (le 0.11)
   textS(0, 0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");   // passe à la ligne 1 après T
-  // 2. Lignes 5 et 6 (le 0.11.1)
-  textS(0, 5, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");   // passe à la ligne 6 après T
+  // 2. Lignes 3 et 4 (le 0.11.1)
+  textS(0, 3, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");   // passe à la ligne 4 après T
 
   while (true) {
     image();
@@ -1195,7 +1339,7 @@ const ECRITES = [
       c.avancer(20)
       return [
         ['lignes 0 et 1', c.mot(0, 0, 20) === 'ABCDEFGHIJKLMNOPQRST' && c.mot(0, 1, 6) === 'UVWXYZ'],
-        ['lignes 5 et 6', c.mot(0, 5, 20) === 'ABCDEFGHIJKLMNOPQRST' && c.mot(0, 6, 6) === 'UVWXYZ'],
+        ['lignes 3 et 4', c.mot(0, 3, 20) === 'ABCDEFGHIJKLMNOPQRST' && c.mot(0, 4, 6) === 'UVWXYZ'],
       ]
     },
   },
@@ -1212,7 +1356,10 @@ const ECRITES = [
       '**Limite :** `images` est un `uint8_t`, qui ne dépasse pas 255. On compte donc au plus 255 images, environ **4 secondes** : `SECONDES = 5` donnerait 300, trop grand. Le chapitre suivant montre `attendre()`, qui n’a pas cette limite.',
       'Chaque nouvelle lettre **écrase** la précédente, comme au 0.3. Après Z, `lettre` revient à 0 : on repart de A.',
     ],
-    code: `const uint8_t IMAGES_PAR_SECONDE = 60;   // la console affiche 60 images par seconde
+    code: `#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+
+const uint8_t IMAGES_PAR_SECONDE = 60;   // la console affiche 60 images par seconde
 const uint8_t SECONDES = 1;              // le temps entre deux lettres, en secondes
 
 uint8_t lettre = 0;   // l'indice de la lettre affichée
@@ -1258,22 +1405,26 @@ int main() {
       '**Le chronomètre ne change pas :** seule la case où l’on affiche la lettre a bougé.',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.12.2 met les deux ensemble.',
     ],
-    code: `const uint8_t IMAGES_PAR_SECONDE = 60;
-const uint8_t SECONDES = 1;
-uint8_t lettre = 0;
-uint8_t images = 0;
+    code: `#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
 
-int main() {
-  while (true) {
-    image();
-    images++;
-    if (images == SECONDES * IMAGES_PAR_SECONDE) {
-      images = 0;
-      lettre++;
-      if (lettre == sizeof(ALPHABET)) lettre = 0;
+const uint8_t IMAGES_PAR_SECONDE = 60;   // la console affiche 60 images par seconde
+const uint8_t SECONDES = 1;              // le temps entre deux lettres, en secondes
+uint8_t lettre = 0;                      // l'indice de la lettre affichée (0 = A)
+uint8_t images = 0;                      // les images comptées depuis la dernière lettre
+
+int main() {                             // Le programme commence ici.
+  while (true) {                         // La boucle de jeu, pour toujours :
+    image();                             //   attend l'image suivante (1/60 de seconde)
+    images++;                            //   une image de plus
+    if (images == SECONDES * IMAGES_PAR_SECONDE) {  // 1 × 60 = 60 images = 1 seconde ?
+      images = 0;                        //     on recommence à compter
+      lettre++;                          //     la lettre suivante
+      if (lettre == sizeof(ALPHABET)) lettre = 0;   // après Z (26 lettres), retour à A
     }
     // Le changement : la colonne, 0 → 10.
-    poser(10, 0, ALPHABET[lettre]);
+    poser(10, 0, ALPHABET[lettre]);      //   la lettre actuelle en colonne 10, ligne 0 ;
+                                         //   elle écrase la précédente dans la même case.
   }
 }
 `,
@@ -1298,22 +1449,26 @@ int main() {
       '**C’est le 0.12 et le 0.12.1 réunis** : deux `poser` de la même lettre, en colonne 0 et en colonne 10.',
       '**Les deux changent ensemble :** c’est la **même** variable `lettre`, affichée à deux endroits. Pour deux rythmes différents, il faut deux variables : c’est le 0.14.',
     ],
-    code: `const uint8_t IMAGES_PAR_SECONDE = 60;
-const uint8_t SECONDES = 1;
-uint8_t lettre = 0;
-uint8_t images = 0;
+    code: `#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
 
-int main() {
-  while (true) {
-    image();
-    images++;
-    if (images == SECONDES * IMAGES_PAR_SECONDE) {
-      images = 0;
-      lettre++;
-      if (lettre == sizeof(ALPHABET)) lettre = 0;
+const uint8_t IMAGES_PAR_SECONDE = 60;   // la console affiche 60 images par seconde
+const uint8_t SECONDES = 1;              // le temps entre deux lettres, en secondes
+uint8_t lettre = 0;                      // l'indice de la lettre affichée (0 = A)
+uint8_t images = 0;                      // les images comptées depuis la dernière lettre
+
+int main() {                             // Le programme commence ici.
+  while (true) {                         // La boucle de jeu, pour toujours :
+    image();                             //   attend l'image suivante (1/60 de seconde)
+    images++;                            //   une image de plus
+    if (images == SECONDES * IMAGES_PAR_SECONDE) {  // 60 images = 1 seconde ?
+      images = 0;                        //     on recommence à compter
+      lettre++;                          //     la lettre suivante
+      if (lettre == sizeof(ALPHABET)) lettre = 0;   // après Z, retour à A
     }
     poser(0, 0, ALPHABET[lettre]);    // colonne 0 (le 0.12)
     poser(10, 0, ALPHABET[lettre]);   // colonne 10 (le 0.12.1) : la même lettre
+                                      // Deux cases, une seule variable : elles changent ensemble.
   }
 }
 `,
@@ -1337,7 +1492,11 @@ int main() {
       '**La différence avec le 0.12 :** pendant `attendre()`, le programme est **arrêté**. Rien d’autre ne se passe : la manette n’est pas lue. En comptant les images soi-même (0.12), la boucle de jeu continue de tourner pendant l’attente. Pour un jeu, c’est souvent ce qu’il faut ; pour faire patienter, `attendre` est plus simple.',
       '**La limite :** `attendre` ne sait pas **ce qui** doit attendre : il fige **tout** le programme. Avec `attendre(10)`, aucune autre chose ne peut bouger pendant 10 secondes. Pour que plusieurs choses aient chacune leur rythme, voir le chapitre suivant.',
     ],
-    code: `uint8_t lettre = 0;   // l'indice de la lettre affichée
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <attendre>   // attend des secondes entières
+
+uint8_t lettre = 0;   // l'indice de la lettre affichée
 
 int main() {
   while (true) {
@@ -1375,14 +1534,20 @@ int main() {
       '**`attendre(1)` ne change pas** : une seconde entre deux lettres.',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.13.2 met les deux ensemble.',
     ],
-    code: `uint8_t lettre = 0;
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <attendre>   // attend des secondes entières
 
-int main() {
-  while (true) {
+uint8_t lettre = 0;                   // l'indice de la lettre affichée (0 = A)
+
+int main() {                          // Le programme commence ici.
+  while (true) {                      // Pour toujours :
     poser(10, 0, ALPHABET[lettre]);   // le changement : colonne 0 → 10
-    attendre(1);
-    lettre++;
-    if (lettre == sizeof(ALPHABET)) lettre = 0;
+                                      // 1. affiche la lettre en colonne 10, ligne 0
+    attendre(1);                      // 2. attend 1 seconde (le nombre est en SECONDES ;
+                                      //    tout le programme s'arrête pendant ce temps)
+    lettre++;                         // 3. la lettre suivante
+    if (lettre == sizeof(ALPHABET)) lettre = 0;   // après Z (26 lettres), retour à A
   }
 }
 `,
@@ -1407,15 +1572,19 @@ int main() {
       '**C’est le 0.13 et le 0.13.1 réunis** : deux `poser`, avant le même `attendre(1)`.',
       '**`attendre` arrête tout :** les deux lettres sont posées, puis le programme attend une seconde, et recommence.',
     ],
-    code: `uint8_t lettre = 0;
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <attendre>   // attend des secondes entières
 
-int main() {
-  while (true) {
+uint8_t lettre = 0;                   // l'indice de la lettre affichée (0 = A)
+
+int main() {                          // Le programme commence ici.
+  while (true) {                      // Pour toujours :
     poser(0, 0, ALPHABET[lettre]);    // colonne 0 (le 0.13)
-    poser(10, 0, ALPHABET[lettre]);   // colonne 10 (le 0.13.1)
-    attendre(1);
-    lettre++;
-    if (lettre == sizeof(ALPHABET)) lettre = 0;
+    poser(10, 0, ALPHABET[lettre]);   // colonne 10 (le 0.13.1) : la même lettre
+    attendre(1);                      // attend 1 seconde (tout s'arrête pendant ce temps)
+    lettre++;                         // la lettre suivante
+    if (lettre == sizeof(ALPHABET)) lettre = 0;   // après Z (26 lettres), retour à A
   }
 }
 `,
@@ -1444,6 +1613,9 @@ int main() {
 // tout le programme et gardent leur valeur d'un tour à l'autre.
 // uint8_t = un nombre entier de 0 à 255.
 // ─────────────────────────────────────────────────────────────
+
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
 
 uint8_t lente = 0;          // QUELLE lettre montre la lente : 0 = A, 1 = B … 25 = Z
 uint8_t rapide = 0;         // QUELLE lettre montre la rapide : 0 = A, 1 = B … 25 = Z
@@ -1521,6 +1693,9 @@ int main() {
 // uint8_t = un nombre entier de 0 à 255.
 // ─────────────────────────────────────────────────────────────
 
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+
 uint8_t lente = 0;          // QUELLE lettre montre la lente : 0 = A, 1 = B … 25 = Z
 uint8_t rapide = 0;         // QUELLE lettre montre la rapide : 0 = A, 1 = B … 25 = Z
 
@@ -1593,6 +1768,9 @@ int main() {
 // tout le programme et gardent leur valeur d'un tour à l'autre.
 // uint8_t = un nombre entier de 0 à 255.
 // ─────────────────────────────────────────────────────────────
+
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
 
 uint8_t lente = 0;          // QUELLE lettre montre la lente : 0 = A, 1 = B … 25 = Z
 uint8_t rapide = 0;         // QUELLE lettre montre la rapide : 0 = A, 1 = B … 25 = Z
@@ -1667,7 +1845,11 @@ int main() {
       '**Le retour à A sans `if` :** `(rapide + 1) % sizeof(ALPHABET)` ajoute 1, puis garde le reste de la division par 26. Tant qu’on est sous 26, le reste est le nombre lui-même (7 % 26 = 7) ; à 26, il retombe à **0** (26 % 26 = 0) : après Z, A.',
       '**Ce qu’on gagne :** 3 variables au lieu de 4, deux `if` d’une ligne au lieu de deux blocs, et un programme plus léger. **Ce qu’on perd :** les deux rythmes sont liés au même chronomètre ; au 0.14, on pouvait choisir n’importe quelle durée pour chacun, sans rapport entre eux.',
     ],
-    code: `uint8_t lente = 0;    // QUELLE lettre montre la lente : 0 = A … 25 = Z
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+
+uint8_t lente = 0;    // QUELLE lettre montre la lente : 0 = A … 25 = Z
 uint8_t rapide = 0;   // QUELLE lettre montre la rapide : 0 = A … 25 = Z
 uint8_t images = 0;   // UN SEUL chronomètre : il compte de 0 à 59, soit 1 seconde
 
@@ -1721,7 +1903,11 @@ int main() {
       '**Les chronomètres ne changent pas :** seules les cases où l’on affiche les deux lettres ont bougé.',
       '**C’est la version de base** : une seule chose, à la deuxième place. Le 0.15.2 met les deux ensemble.',
     ],
-    code: `uint8_t lente = 0;    // QUELLE lettre montre la lente : 0 = A … 25 = Z
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+
+uint8_t lente = 0;    // QUELLE lettre montre la lente : 0 = A … 25 = Z
 uint8_t rapide = 0;   // QUELLE lettre montre la rapide : 0 = A … 25 = Z
 uint8_t images = 0;   // UN SEUL chronomètre : il compte de 0 à 59, soit 1 seconde
 
@@ -1769,7 +1955,11 @@ int main() {
       '**C’est le 0.15 et le 0.15.1 réunis** : les deux `poser` du 0.15, et les deux du 0.15.1.',
       '**Quatre `poser`, deux variables :** la lente est la même en colonne 0 et en colonne 10, la rapide aussi.',
     ],
-    code: `uint8_t lente = 0;    // QUELLE lettre montre la lente : 0 = A … 25 = Z
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+
+uint8_t lente = 0;    // QUELLE lettre montre la lente : 0 = A … 25 = Z
 uint8_t rapide = 0;   // QUELLE lettre montre la rapide : 0 = A … 25 = Z
 uint8_t images = 0;   // UN SEUL chronomètre : il compte de 0 à 59, soit 1 seconde
 
@@ -1828,6 +2018,9 @@ int main() {
 // ms() les traduit en images (60 images = 1000 ms) :
 // ms(1000) = 60 images, ms(250) = 15 images.
 // ─────────────────────────────────────────────────────────────
+
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
 
 const uint8_t DUREE_LENTE  = ms(1000);   // la lente change toutes les 1000 ms (1 seconde)
 const uint8_t DUREE_RAPIDE = ms(250);    // la rapide change toutes les 250 ms (4 fois par seconde)
@@ -1893,6 +2086,9 @@ int main() {
 // ms(1000) = 60 images, ms(250) = 15 images.
 // ─────────────────────────────────────────────────────────────
 
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+
 const uint8_t DUREE_LENTE  = ms(1000);   // la lente change toutes les 1000 ms (1 seconde)
 const uint8_t DUREE_RAPIDE = ms(250);    // la rapide change toutes les 250 ms (4 fois par seconde)
 
@@ -1954,6 +2150,9 @@ int main() {
 // ms(1000) = 60 images, ms(250) = 15 images.
 // ─────────────────────────────────────────────────────────────
 
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+
 const uint8_t DUREE_LENTE  = ms(1000);   // la lente change toutes les 1000 ms (1 seconde)
 const uint8_t DUREE_RAPIDE = ms(250);    // la rapide change toutes les 250 ms (4 fois par seconde)
 
@@ -2014,7 +2213,11 @@ int main() {
       '**L’arrêt :** la condition `if (x < pas)` compare la colonne de la lettre au nombre de pas. Au départ `x` vaut 0 : 0 < 5 est vrai, le chronomètre tourne et la lettre avance. Après le cinquième pas, `x` vaut 5 : 5 < 5 est **faux**, on ne rentre plus dans le bloc, `x` ne change plus… et la lettre reste en colonne 5.',
       'La boucle `while (true)` continue pourtant de tourner : la lettre est simplement réécrite, à chaque image, à la même place.',
     ],
-    code: `uint8_t pas = 5;      // le NOMBRE DE CASES à parcourir : change-le pour aller plus ou moins loin
+    code: `#include <effacer>    // efface des cases, ou tout le fond
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t pas = 5;      // le NOMBRE DE CASES à parcourir : change-le pour aller plus ou moins loin
 uint8_t x = 0;        // la colonne de la lettre : elle part de 0 (tout à gauche)
 uint8_t images = 0;   // le chronomètre, en images
 
@@ -2060,7 +2263,11 @@ int main() {
       '**C’est le 0.17**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : la **ligne 8** au lieu de la ligne 0, dans `effacer` et dans `poser`.',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.17.2 met les deux ensemble.',
     ],
-    code: `uint8_t pas = 5;      // le nombre de cases à parcourir
+    code: `#include <effacer>    // efface des cases, ou tout le fond
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t pas = 5;      // le nombre de cases à parcourir
 uint8_t x = 0;        // la colonne de la lettre
 uint8_t images = 0;   // le chronomètre, en images
 
@@ -2098,7 +2305,11 @@ int main() {
       '**C’est le 0.17 et le 0.17.1 réunis** : deux `effacer` et deux `poser`, un par ligne.',
       '**Une seule variable `x` pour les deux lettres :** elles sont toujours à la même colonne, donc elles avancent **ensemble**, au même pas.',
     ],
-    code: `uint8_t pas = 5;      // le nombre de cases à parcourir
+    code: `#include <effacer>    // efface des cases, ou tout le fond
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t pas = 5;      // le nombre de cases à parcourir
 uint8_t x = 0;        // la colonne des deux lettres
 uint8_t images = 0;   // le chronomètre, en images
 
@@ -2141,7 +2352,10 @@ int main() {
       '**Sans le `x =`**, en C ordinaire, la lettre bougerait bien à l’écran, mais `x` vaudrait encore 0 : le programme croirait la lettre toujours au départ. Le cours suivant montre quand cela pose problème.',
       '**Elle bloque**, comme `attendre()` : pendant le voyage, rien d’autre ne tourne. Au bord de l’écran (colonne 19), elle s’arrête au lieu de sortir.',
     ],
-    code: `uint8_t pas = 5;      // le nombre de cases à parcourir
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t pas = 5;      // le nombre de cases à parcourir
 uint8_t x = 0;        // la colonne de la lettre : elle part de 0 (tout à gauche)
 
 int main() {
@@ -2187,7 +2401,10 @@ int main() {
       '**C’est le 0.18**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : la **ligne 8** au lieu de 0 (2e réglage de `deplace_x`).',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.18.2 met les deux ensemble.',
     ],
-    code: `uint8_t pas = 5;
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t pas = 5;
 uint8_t x = 0;        // la colonne du B
 
 int main() {
@@ -2219,7 +2436,10 @@ int main() {
       '**Chaque lettre a SA variable :** `x` pour le A, `xb` pour le B. Une seule variable ne suffirait pas : chaque `deplace_x` rend la colonne de SA lettre.',
       '**L’un après l’autre :** `deplace_x` bloque ; le B part quand le A est arrivé.',
     ],
-    code: `uint8_t pas = 5;
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t pas = 5;
 uint8_t x = 0;        // la colonne du A
 uint8_t xb = 0;       // la colonne du B : sa propre variable
 
@@ -2253,7 +2473,10 @@ int main() {
       '**Un octet ne connaît pourtant pas les nombres négatifs :** `-5` y est rangé comme 256 − 5 = **251**. `deplace_x` sait donc qu’au-delà de 127, c’est un recul.',
       '**Le retour part de `x`.** Grâce au `x =` du 0.18, `x` vaut 5 : le retour part bien de la colonne 5, et rend 0. Sans le `x =`, en C ordinaire, `x` vaudrait encore 0 : le retour partirait du bord gauche, buterait dessus, et **ne ferait rien**. Le `x =` sert à **garder en mémoire où est la lettre**.',
     ],
-    code: `uint8_t pas = 5;      // +5 : avance de 5 cases ; -5 : recule de 5 cases
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t pas = 5;      // +5 : avance de 5 cases ; -5 : recule de 5 cases
 uint8_t x = 0;        // la colonne de la lettre : elle part de 0 (tout à gauche)
 
 int main() {
@@ -2303,15 +2526,22 @@ int main() {
       '**C’est le 0.19**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : la **ligne 8**, dans les deux `deplace_x`.',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.19.2 met les deux ensemble.',
     ],
-    code: `uint8_t pas = 5;
-uint8_t x = 0;
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
 
-int main() {
+uint8_t pas = 5;      // +5 : avance de 5 cases ; -5 : recule de 5 cases
+uint8_t x = 0;        // la colonne de la lettre : elle part de 0 (tout à gauche)
+
+int main() {          // Le programme commence ici.
+  // deplace_x(colonne, ligne, tuile, pas) fait avancer la tuile case par case,
+  // puis REND la colonne d'arrivée ; « x = » la range dans x.
+  // Le changement : la ligne 8 (au lieu de 0) et la lettre B (ALPHABET[1]).
   x = deplace_x(x, 8, ALPHABET[1], pas);     // l'aller, ligne 8 : x vaut 5
   x = deplace_x(x, 8, ALPHABET[1], -pas);    // le retour : x vaut 0
+                                             // -pas = -5 : un pas négatif, vers la gauche.
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante. Le B reste en colonne 0.
   }
 }
 `,
@@ -2333,7 +2563,10 @@ int main() {
     texte: [
       '**C’est le 0.19 et le 0.19.1 réunis** : les deux allers-retours, chacun avec sa variable (`x`, `xb`).',
     ],
-    code: `uint8_t pas = 5;
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t pas = 5;
 uint8_t x = 0;        // le A
 uint8_t xb = 0;       // le B
 
@@ -2370,7 +2603,11 @@ int main() {
       '**À quoi ça sert :** une variable ne se voit pas. `x` change dans la mémoire de la console, mais rien ne le montre. En l’écrivant à l’écran, on **voit** ce que vaut `x` : `005` après l’aller, `000` après le retour.',
       '**Pourquoi la ligne 2 :** la lettre bouge sur la ligne 0 ; le nombre, deux lignes plus bas, ne la gêne pas.',
     ],
-    code: `uint8_t pas = 5;      // +5 : avance ; -5 : recule
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>      // écrit un nombre en chiffres
+
+uint8_t pas = 5;      // +5 : avance ; -5 : recule
 uint8_t x = 0;        // la colonne de la lettre
 
 int main() {
@@ -2419,7 +2656,11 @@ int main() {
       '**C’est le 0.20**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : la **ligne 8** pour la lettre, et la **ligne 10** pour le nombre, juste en dessous.',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.20.2 met les deux ensemble.',
     ],
-    code: `uint8_t pas = 5;
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>      // écrit un nombre en chiffres
+
+uint8_t pas = 5;
 uint8_t x = 0;
 
 int main() {
@@ -2450,7 +2691,11 @@ int main() {
       '**C’est le 0.20 et le 0.20.1 réunis** : les deux lettres et leurs deux nombres.',
       '**Deux variables, deux nombres :** `x` s’affiche sous le A (ligne 2), `xb` sous le B (ligne 10).',
     ],
-    code: `uint8_t pas = 5;
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>      // écrit un nombre en chiffres
+
+uint8_t pas = 5;
 uint8_t x = 0;        // le A
 uint8_t xb = 0;       // le B
 
@@ -2487,7 +2732,10 @@ int main() {
       '**Elle rend la nouvelle ligne**, d’où `y = deplace_y(…)`, pour la même raison qu’au 0.18 : la fonction n’a qu’une **copie** de `y`.',
       '**Au bord** (ligne 17), elle s’arrête au lieu de sortir de l’écran.',
     ],
-    code: `uint8_t pas = 5;      // le nombre de lignes à parcourir
+    code: `#include <deplace_y>   // fait avancer une tuile sur sa colonne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t pas = 5;      // le nombre de lignes à parcourir
 uint8_t y = 0;        // la LIGNE de la lettre : elle part de 0 (tout en haut)
 
 int main() {
@@ -2528,14 +2776,20 @@ int main() {
       '**C’est le 0.21**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : la **colonne 10** au lieu de 0 (1er réglage de `deplace_y`).',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.21.2 met les deux ensemble.',
     ],
-    code: `uint8_t pas = 5;
-uint8_t y = 0;
+    code: `#include <deplace_y>   // fait avancer une tuile sur sa colonne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
 
-int main() {
+uint8_t pas = 5;      // le nombre de lignes à parcourir (vers le bas)
+uint8_t y = 0;        // la LIGNE de la lettre : elle part de 0 (tout en haut)
+
+int main() {          // Le programme commence ici.
+  // deplace_y(colonne, ligne, tuile, pas) fait descendre la tuile ligne par ligne,
+  // puis REND la ligne d'arrivée ; « y = » la range dans y.
+  // Le changement : la colonne 10 (au lieu de 0) et la lettre B (ALPHABET[1]).
   y = deplace_y(10, y, ALPHABET[1], pas);    // le B descend en colonne 10 : y vaut 5
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante. Le B reste en ligne 5.
   }
 }
 `,
@@ -2556,7 +2810,10 @@ int main() {
     texte: [
       '**C’est le 0.21 et le 0.21.1 réunis** : deux `deplace_y`, chacun avec sa variable (`y`, `yb`).',
     ],
-    code: `uint8_t pas = 5;
+    code: `#include <deplace_y>   // fait avancer une tuile sur sa colonne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t pas = 5;
 uint8_t y = 0;        // le A
 uint8_t yb = 0;       // le B
 
@@ -2589,7 +2846,10 @@ int main() {
       '**La montée part de `y`**, qui vaut 5 grâce au `y =`. Elle rend 0, et `y =` le range.',
       '**Pourquoi deux fonctions, et pas une seule pour X et Y ?** Une fonction ne peut rendre qu’**une seule valeur**. `deplace_x` rend la colonne, `deplace_y` rend la ligne : chacune dit exactement où la lettre s’est arrêtée.',
     ],
-    code: `uint8_t pas = 5;      // +5 : descend ; -5 : monte
+    code: `#include <deplace_y>   // fait avancer une tuile sur sa colonne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t pas = 5;      // +5 : descend ; -5 : monte
 uint8_t y = 0;        // la LIGNE de la lettre
 
 int main() {
@@ -2631,15 +2891,21 @@ int main() {
       '**C’est le 0.22**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : la **colonne 10**, dans les deux `deplace_y`.',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.22.2 met les deux ensemble.',
     ],
-    code: `uint8_t pas = 5;
-uint8_t y = 0;
+    code: `#include <deplace_y>   // fait avancer une tuile sur sa colonne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
 
-int main() {
+uint8_t pas = 5;      // +5 : descend ; -5 : monte
+uint8_t y = 0;        // la LIGNE de la lettre : elle part de 0 (tout en haut)
+
+int main() {          // Le programme commence ici.
+  // deplace_y(colonne, ligne, tuile, pas) : la tuile descend (pas positif) ou
+  // monte (pas négatif), puis la fonction REND la ligne d'arrivée.
+  // Le changement : la colonne 10 et la lettre B (ALPHABET[1]).
   y = deplace_y(10, y, ALPHABET[1], pas);     // descente : y vaut 5
   y = deplace_y(10, y, ALPHABET[1], -pas);    // montée : y vaut 0
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante. Le B est revenu en haut.
   }
 }
 `,
@@ -2661,7 +2927,10 @@ int main() {
     texte: [
       '**C’est le 0.22 et le 0.22.1 réunis** : les deux descentes-montées, chacune avec sa variable.',
     ],
-    code: `uint8_t pas = 5;
+    code: `#include <deplace_y>   // fait avancer une tuile sur sa colonne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t pas = 5;
 uint8_t y = 0;        // le A
 uint8_t yb = 0;       // le B
 
@@ -2699,7 +2968,11 @@ int main() {
       '**C’est une exception, réservée à la console.** La règle du C ne change pas : une fonction reçoit une copie. Seules les fonctions de la console (`deplace_x`, `deplace_y`, et celles qui viendront) ont droit à ce rangement. Pour **tes** fonctions, il faut toujours `x =` (le 0.33 le montre).',
       '**Une condition :** la position doit être une **variable**. `deplace_x(3, 0, ALPHABET[0], 5);` fait bouger la lettre, mais il n’y a nulle part où ranger la colonne.',
     ],
-    code: `uint8_t pas = 5;      // +5 : avance ; -5 : recule
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>      // écrit un nombre en chiffres
+
+uint8_t pas = 5;      // +5 : avance ; -5 : recule
 uint8_t x = 0;        // la colonne de la lettre
 
 int main() {
@@ -2746,7 +3019,11 @@ int main() {
       '**C’est le 0.23**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : la **ligne 8** pour la lettre, la **ligne 10** pour le nombre.',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.23.2 met les deux ensemble.',
     ],
-    code: `uint8_t pas = 5;
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>      // écrit un nombre en chiffres
+
+uint8_t pas = 5;
 uint8_t x = 0;
 
 int main() {
@@ -2777,7 +3054,11 @@ int main() {
       '**C’est le 0.23 et le 0.23.1 réunis** : les deux lettres, sans aucun `=`.',
       '**La console range chaque position dans SA variable** : celle qu’on donne en premier à `deplace_x`, `x` pour le A, `xb` pour le B.',
     ],
-    code: `uint8_t pas = 5;
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>      // écrit un nombre en chiffres
+
+uint8_t pas = 5;
 uint8_t x = 0;        // le A
 uint8_t xb = 0;       // le B
 
@@ -2813,7 +3094,12 @@ int main() {
       '**C’est pour cela qu’il faut garder `x` à jour :** `deplace_y` part de la colonne `x`, celle où `deplace_x` a laissé la lettre (5). Si `x` était resté à 0, la descente partirait de la colonne 0, et la lettre sauterait d’un coup.',
       '**Les nombres**, en bas de l’écran (ligne 17) : `x` en colonne 0, `y` en colonne 4.',
     ],
-    code: `uint8_t pas = 5;      // 5 cases, sur chaque axe
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>      // écrit un nombre en chiffres
+#include <deplace_y>   // fait avancer une tuile sur sa colonne
+
+uint8_t pas = 5;      // 5 cases, sur chaque axe
 uint8_t x = 0;        // la COLONNE de la lettre (axe X)
 uint8_t y = 0;        // la LIGNE de la lettre (axe Y)
 
@@ -2858,16 +3144,23 @@ int main() {
       '**La lettre va à droite jusqu’en (15, 0), puis descend jusqu’en (15, 5).**',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.24.2 met les deux ensemble.',
     ],
-    code: `uint8_t pas = 5;
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <deplace_y>   // fait avancer une tuile sur sa colonne
+
+uint8_t pas = 5;      // 5 cases, sur chaque axe
 uint8_t x = 10;       // la colonne du B
 uint8_t y = 0;       // sa ligne
 
-int main() {
-  deplace_x(x, y, ALPHABET[1], pas);
-  deplace_y(x, y, ALPHABET[1], pas);
+int main() {          // Le programme commence ici.
+  // Le changement : le B (ALPHABET[1]) part de la colonne 10.
+  deplace_x(x, y, ALPHABET[1], pas);   // 1. à droite, sur la ligne y (0) :
+                                       //    la console range l'arrivée dans x → 15.
+  deplace_y(x, y, ALPHABET[1], pas);   // 2. en bas, depuis la colonne x (15) :
+                                       //    la console range l'arrivée dans y → 5.
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante. Le B est en (15, 5).
   }
 }
 `,
@@ -2890,7 +3183,11 @@ int main() {
       '**C’est le 0.24 et le 0.24.1 réunis** : le A (x, y) puis le B (xb, yb).',
       '**Deux lettres, quatre variables :** chaque lettre a sa colonne et sa ligne.',
     ],
-    code: `uint8_t pas = 5;
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <deplace_y>   // fait avancer une tuile sur sa colonne
+
+uint8_t pas = 5;
 uint8_t x = 0;       // la colonne du A
 uint8_t y = 0;       // sa ligne
 uint8_t xb = 10;       // la colonne du B
@@ -2926,7 +3223,12 @@ int main() {
       '**Ce qui est nouveau ici :** rien de plus que des pas **négatifs** sur les deux axes : `-pas` sur X ramène à gauche, `-pas` sur Y ramène en haut. Quatre côtés : **un carré**.',
       '**Chaque côté part de là où le précédent s’est arrêté**, parce que `x` et `y` sont tenus à jour par la console.',
     ],
-    code: `uint8_t pas = 5;      // 5 cases, sur chaque axe
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>      // écrit un nombre en chiffres
+#include <deplace_y>   // fait avancer une tuile sur sa colonne
+
+uint8_t pas = 5;      // 5 cases, sur chaque axe
 uint8_t x = 0;        // la COLONNE de la lettre
 uint8_t y = 0;        // la LIGNE de la lettre
 
@@ -2973,18 +3275,28 @@ int main() {
       '**C’est le 0.25**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : le **départ (10, 0)** : le carré va de la colonne 10 à 15.',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.25.2 met les deux ensemble.',
     ],
-    code: `uint8_t pas = 5;
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <deplace_y>   // fait avancer une tuile sur sa colonne
+
+uint8_t pas = 5;      // 5 cases, sur chaque axe
 uint8_t x = 10;       // la colonne du B
 uint8_t y = 0;       // sa ligne
 
-int main() {
-  deplace_x(x, y, ALPHABET[1], pas);
-  deplace_y(x, y, ALPHABET[1], pas);
-  deplace_x(x, y, ALPHABET[1], -pas);
-  deplace_y(x, y, ALPHABET[1], -pas);
+int main() {          // Le programme commence ici.
+  // Le changement : le B (ALPHABET[1]) part de la colonne 10.
+  // Le carré, côté par côté ; la console range chaque arrivée dans x ou y.
+  deplace_x(x, y, ALPHABET[1], pas);    // 1. à droite : x vaut 15
+  deplace_y(x, y, ALPHABET[1], pas);    // 2. en bas   : y vaut 5
+  deplace_x(x, y, ALPHABET[1], -pas);   // 3. à gauche : x revient à 10
+  deplace_y(x, y, ALPHABET[1], -pas);   // 4. en haut  : y revient à 0
 
-  while (true) {
-    image();
+  //   (10,0) → → → → → (15,0)
+  //     ↑                ↓
+  //   (10,5) ← ← ← ← ← (15,5)
+
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante. Le B est revenu en (10, 0).
   }
 }
 `,
@@ -3006,24 +3318,31 @@ int main() {
     texte: [
       '**C’est le 0.25 et le 0.25.1 réunis** : le carré du A, puis celui du B.',
     ],
-    code: `uint8_t pas = 5;
+    code: `#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <deplace_y>   // fait avancer une tuile sur sa colonne
+
+uint8_t pas = 5;      // 5 cases, sur chaque axe
 uint8_t x = 0;       // la colonne du A
 uint8_t y = 0;       // sa ligne
 uint8_t xb = 10;       // la colonne du B
 uint8_t yb = 0;       // sa ligne
+                      // Deux lettres : chacune a SES deux variables.
 
-int main() {
-  deplace_x(x, y, ALPHABET[0], pas);
-  deplace_y(x, y, ALPHABET[0], pas);
-  deplace_x(x, y, ALPHABET[0], -pas);
-  deplace_y(x, y, ALPHABET[0], -pas);
-  deplace_x(xb, yb, ALPHABET[1], pas);
-  deplace_y(xb, yb, ALPHABET[1], pas);
-  deplace_x(xb, yb, ALPHABET[1], -pas);
-  deplace_y(xb, yb, ALPHABET[1], -pas);
+int main() {          // Le programme commence ici.
+  // 1. Le carré du A (ALPHABET[0]), depuis (0, 0) :
+  deplace_x(x, y, ALPHABET[0], pas);      // à droite : x vaut 5
+  deplace_y(x, y, ALPHABET[0], pas);      // en bas   : y vaut 5
+  deplace_x(x, y, ALPHABET[0], -pas);     // à gauche : x revient à 0
+  deplace_y(x, y, ALPHABET[0], -pas);     // en haut  : y revient à 0
+  // 2. Puis le carré du B (ALPHABET[1]), depuis (10, 0), avec xb et yb :
+  deplace_x(xb, yb, ALPHABET[1], pas);    // à droite : xb vaut 15
+  deplace_y(xb, yb, ALPHABET[1], pas);    // en bas   : yb vaut 5
+  deplace_x(xb, yb, ALPHABET[1], -pas);   // à gauche : xb revient à 10
+  deplace_y(xb, yb, ALPHABET[1], -pas);   // en haut  : yb revient à 0
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -3049,7 +3368,11 @@ int main() {
       '**La diagonale :** avec `5` et `5`, la lettre fait à chaque quart de seconde un pas sur X **et** un pas sur Y **en même temps** : elle descend en biais, (1, 1), (2, 2)… jusqu’à (5, 5). C’est impossible avec `deplace_x` puis `deplace_y`, qui font un axe après l’autre.',
       '**Deux positions à ranger :** une fonction ne rend qu’une valeur. `deplace` rend la colonne, et dépose la ligne dans une variable de la console. **Seule sur sa ligne**, la console range les deux : `x` **et** `y`. Écris-la toujours ainsi : `x = deplace(…)` ne rangerait que `x`.',
     ],
-    code: `uint8_t x = 0;        // la COLONNE de la lettre
+    code: `#include <deplace>    // fait avancer une tuile sur les deux axes
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>     // écrit un nombre en chiffres
+
+uint8_t x = 0;        // la COLONNE de la lettre
 uint8_t y = 0;        // la LIGNE de la lettre
 
 int main() {
@@ -3099,7 +3422,10 @@ int main() {
       '**C’est le 0.26**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : le **départ (10, 0)** : la diagonale finit en (15, 5).',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.26.2 met les deux ensemble.',
     ],
-    code: `uint8_t x = 10;       // la colonne du B
+    code: `#include <deplace>    // fait avancer une tuile sur les deux axes
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 10;       // la colonne du B
 uint8_t y = 0;       // sa ligne
 
 int main() {
@@ -3128,7 +3454,10 @@ int main() {
     texte: [
       '**C’est le 0.26 et le 0.26.1 réunis** : deux `deplace`, chacun avec ses variables.',
     ],
-    code: `uint8_t x = 0;       // la colonne du A
+    code: `#include <deplace>    // fait avancer une tuile sur les deux axes
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;       // la colonne du A
 uint8_t y = 0;       // sa ligne
 uint8_t xb = 10;       // la colonne du B
 uint8_t yb = 0;       // sa ligne
@@ -3161,7 +3490,11 @@ int main() {
       '**Ce qui est nouveau ici :** un **0** comme pas. `deplace(x, y, …, 5, 0)` : 5 sur X, **rien** sur Y, donc tout droit vers la droite. `0, 5` : tout droit vers le bas. Avec un zéro, `deplace` fait ce que faisaient `deplace_x` ou `deplace_y`.',
       '**Le carré** part de (5, 5) : à droite jusqu’en (10, 5), en bas jusqu’en (10, 10), à gauche jusqu’en (5, 10), en haut jusqu’en (5, 5).',
     ],
-    code: `uint8_t x = 0;        // la COLONNE de la lettre
+    code: `#include <deplace>    // fait avancer une tuile sur les deux axes
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>     // écrit un nombre en chiffres
+
+uint8_t x = 0;        // la COLONNE de la lettre
 uint8_t y = 0;        // la LIGNE de la lettre
 
 int main() {
@@ -3203,18 +3536,25 @@ int main() {
       '**C’est le 0.27**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : le **départ (9, 0)** : la diagonale finit en (14, 5), le carré va jusqu’en (19, 10), le bord droit.',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.27.2 met les deux ensemble.',
     ],
-    code: `uint8_t x = 9;       // la colonne du B
+    code: `#include <deplace>    // fait avancer une tuile sur les deux axes
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 9;       // la colonne du B
 uint8_t y = 0;       // sa ligne
 
-int main() {
-  deplace(x, y, ALPHABET[1], 5, 5);
-  deplace(x, y, ALPHABET[1], 5, 0);
-  deplace(x, y, ALPHABET[1], 0, 5);
-  deplace(x, y, ALPHABET[1], -5, 0);
-  deplace(x, y, ALPHABET[1], 0, -5);
+int main() {          // Le programme commence ici.
+  // deplace(colonne, ligne, tuile, pasX, pasY) : bouge sur les DEUX axes à la fois.
+  // Un 0 : cet axe ne bouge pas. La console range l'arrivée dans x et y.
+  // Le changement : le B (ALPHABET[1]) part de (9, 0).
+  //                             pasX  pasY
+  deplace(x, y, ALPHABET[1], 5, 5);     // la diagonale : (14, 5)
+  deplace(x, y, ALPHABET[1], 5, 0);     // à droite     : (19, 5)
+  deplace(x, y, ALPHABET[1], 0, 5);     // en bas       : (19, 10)
+  deplace(x, y, ALPHABET[1], -5, 0);    // à gauche     : (14, 10)
+  deplace(x, y, ALPHABET[1], 0, -5);    // en haut      : (14, 5)
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante. Le B est en (14, 5).
   }
 }
 `,
@@ -3237,25 +3577,31 @@ int main() {
       '**C’est le 0.27 et le 0.27.1 réunis** : les dix lignes du A, puis les dix du B.',
       '**Les deux trajets ne se touchent pas :** le A reste dans les colonnes 0 à 10, le B dans les colonnes 9 à 19, sur d’autres cases.',
     ],
-    code: `uint8_t x = 0;       // la colonne du A
+    code: `#include <deplace>    // fait avancer une tuile sur les deux axes
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;       // la colonne du A
 uint8_t y = 0;       // sa ligne
 uint8_t xb = 9;       // la colonne du B
 uint8_t yb = 0;       // sa ligne
 
-int main() {
-  deplace(x, y, ALPHABET[0], 5, 5);
-  deplace(x, y, ALPHABET[0], 5, 0);
-  deplace(x, y, ALPHABET[0], 0, 5);
-  deplace(x, y, ALPHABET[0], -5, 0);
-  deplace(x, y, ALPHABET[0], 0, -5);
-  deplace(xb, yb, ALPHABET[1], 5, 5);
-  deplace(xb, yb, ALPHABET[1], 5, 0);
-  deplace(xb, yb, ALPHABET[1], 0, 5);
-  deplace(xb, yb, ALPHABET[1], -5, 0);
-  deplace(xb, yb, ALPHABET[1], 0, -5);
+int main() {          // Le programme commence ici.
+  // deplace(colonne, ligne, tuile, pasX, pasY) : les deux axes à la fois.
+  // 1. Le A (ALPHABET[0]), depuis (0, 0) :      pasX  pasY
+  deplace(x, y, ALPHABET[0], 5, 5);       // la diagonale : (5, 5)
+  deplace(x, y, ALPHABET[0], 5, 0);       // à droite     : (10, 5)
+  deplace(x, y, ALPHABET[0], 0, 5);       // en bas       : (10, 10)
+  deplace(x, y, ALPHABET[0], -5, 0);      // à gauche     : (5, 10)
+  deplace(x, y, ALPHABET[0], 0, -5);      // en haut      : (5, 5)
+  // 2. Le B (ALPHABET[1]), depuis (9, 0), avec ses variables xb et yb :
+  deplace(xb, yb, ALPHABET[1], 5, 5);     // (14, 5)
+  deplace(xb, yb, ALPHABET[1], 5, 0);     // (19, 5)
+  deplace(xb, yb, ALPHABET[1], 0, 5);     // (19, 10)
+  deplace(xb, yb, ALPHABET[1], -5, 0);    // (14, 10)
+  deplace(xb, yb, ALPHABET[1], 0, -5);    // (14, 5)
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -3279,7 +3625,11 @@ int main() {
       '**Le chemin :** à chaque quart de seconde, un pas vers la colonne voulue (si elle n’y est pas) **et** un pas vers la ligne voulue (si elle n’y est pas). De (0, 0) à (10, 5) : en **diagonale** jusqu’en (5, 5), où la ligne est bonne, puis **tout droit** jusqu’en (10, 5).',
       '**Les positions sont rangées toutes seules**, comme avec `deplace` : écris-la seule sur sa ligne.',
     ],
-    code: `uint8_t x = 0;        // la COLONNE de la lettre
+    code: `#include <va_a>       // mène une tuile jusqu’à une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>     // écrit un nombre en chiffres
+
+uint8_t x = 0;        // la COLONNE de la lettre
 uint8_t y = 0;        // la LIGNE de la lettre
 
 int main() {
@@ -3328,7 +3678,10 @@ int main() {
       '**C’est le 0.28**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : le **départ (0, 10)** et l’**arrivée (10, 15)** : tout descend de 10 lignes.',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.28.2 met les deux ensemble.',
     ],
-    code: `uint8_t x = 0;       // la colonne du B
+    code: `#include <va_a>       // mène une tuile jusqu’à une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;       // la colonne du B
 uint8_t y = 10;       // sa ligne
 
 int main() {
@@ -3357,7 +3710,10 @@ int main() {
     texte: [
       '**C’est le 0.28 et le 0.28.1 réunis** : deux `va_a`, chacun avec ses variables.',
     ],
-    code: `uint8_t x = 0;       // la colonne du A
+    code: `#include <va_a>       // mène une tuile jusqu’à une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;       // la colonne du A
 uint8_t y = 0;       // sa ligne
 uint8_t xb = 0;       // la colonne du B
 uint8_t yb = 10;       // sa ligne
@@ -3390,7 +3746,11 @@ int main() {
       '**Ce qui est nouveau ici :** rien qu’une autre arrivée. Pour revenir, on ne calcule pas « -10 et -5 » : on dit simplement **où** : `0, 0`.',
       '**Le chemin du retour** suit la même règle : en diagonale tant que les deux axes avancent, de (10, 5) à (5, 0), puis tout droit jusqu’en (0, 0).',
     ],
-    code: `uint8_t x = 0;        // la COLONNE de la lettre
+    code: `#include <va_a>       // mène une tuile jusqu’à une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>     // écrit un nombre en chiffres
+
+uint8_t x = 0;        // la COLONNE de la lettre
 uint8_t y = 0;        // la LIGNE de la lettre
 
 int main() {
@@ -3428,15 +3788,22 @@ int main() {
       '**C’est le 0.29**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : le **départ (0, 10)**, l’arrivée (10, 15), et le retour en **(0, 10)**.',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.29.2 met les deux ensemble.',
     ],
-    code: `uint8_t x = 0;       // la colonne du B
+    code: `#include <va_a>       // mène une tuile jusqu’à une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;       // la colonne du B
 uint8_t y = 10;       // sa ligne
 
-int main() {
-  va_a(x, y, ALPHABET[1], 10, 15);
-  va_a(x, y, ALPHABET[1], 0, 10);
+int main() {          // Le programme commence ici.
+  // va_a(colonne, ligne, tuile, arrivéeX, arrivéeY) : la tuile va jusqu'à la
+  // case d'arrivée (en diagonale d'abord, puis tout droit), et la console range
+  // l'arrivée dans x et y.
+  // Le changement : le B (ALPHABET[1]) part de (0, 10).
+  va_a(x, y, ALPHABET[1], 10, 15);   // l'aller : jusqu'en (10, 15)
+  va_a(x, y, ALPHABET[1], 0, 10);    // le retour : jusqu'en (0, 10), le départ
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -3458,7 +3825,10 @@ int main() {
     texte: [
       '**C’est le 0.29 et le 0.29.1 réunis** : les deux allers-retours.',
     ],
-    code: `uint8_t x = 0;       // la colonne du A
+    code: `#include <va_a>       // mène une tuile jusqu’à une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;       // la colonne du A
 uint8_t y = 0;       // sa ligne
 uint8_t xb = 0;       // la colonne du B
 uint8_t yb = 10;       // sa ligne
@@ -3496,7 +3866,11 @@ int main() {
       '**C’est la boucle qui donne le rythme**, avec le chronomètre du 0.17 : `images` compte les images, et tous les 15 (quatre fois par seconde), on fait un pas.',
       '**Au bord de l’écran** (colonne 19), un pas vers l’extérieur ne fait plus bouger la lettre.',
     ],
-    code: `uint8_t x = 0;        // la colonne de la lettre
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <un_pas>     // fait faire un seul pas à une tuile
+
+uint8_t x = 0;        // la colonne de la lettre
 uint8_t y = 0;        // sa ligne
 uint8_t images = 0;   // le chronomètre, en images (comme au 0.17)
 
@@ -3549,18 +3923,26 @@ int main() {
       '**C’est le 0.30**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : la **ligne 8** : y part de 8.',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.30.2 met les deux ensemble.',
     ],
-    code: `uint8_t x = 0;       // la colonne du B
-uint8_t y = 8;       // sa ligne
-uint8_t images = 0;   // le chronomètre
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <un_pas>     // fait faire un seul pas à une tuile
 
-int main() {
-  poser(x, y, ALPHABET[1]);
-  while (true) {
-    image();
-    images++;
-    if (images == 15) {
-      images = 0;
-      un_pas(x, y, ALPHABET[1], 1, 0);
+uint8_t x = 0;       // la colonne du B
+uint8_t y = 8;       // sa ligne
+uint8_t images = 0;   // le chronomètre, en images
+
+int main() {                    // Le programme commence ici.
+  // Le changement : le B (ALPHABET[1]) sur la ligne 8.
+  poser(x, y, ALPHABET[1]);     // le B à sa place de départ, (0, 8)
+  while (true) {                // La boucle de jeu, pour toujours :
+    image();                    //   attend l'image suivante (60 par seconde)
+    images++;                   //   le chronomètre avance d'une image
+    if (images == 15) {         //   15 images : un quart de seconde
+      images = 0;               //     le chronomètre repart de zéro
+      un_pas(x, y, ALPHABET[1], 1, 0);   // un pas : sensX = 1 (à droite), sensY = 0.
+                                         // un_pas N'ATTEND PAS : elle fait le pas et
+                                         // rend la main ; la console range la nouvelle
+                                         // place dans x et y.
     }
   }
 }
@@ -3584,7 +3966,11 @@ int main() {
       '**C’est le 0.30 et le 0.30.1 réunis** : deux `un_pas` dans la même boucle.',
       '**Ensemble, cette fois :** `un_pas` n’attend pas, les deux pas se font dans la même image. Les deux lettres avancent côte à côte.',
     ],
-    code: `uint8_t x = 0;       // la colonne du A
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <un_pas>     // fait faire un seul pas à une tuile
+
+uint8_t x = 0;       // la colonne du A
 uint8_t y = 0;       // sa ligne
 uint8_t xb = 0;       // la colonne du B
 uint8_t yb = 8;       // sa ligne
@@ -3621,7 +4007,12 @@ int main() {
       '**Chaque lettre a ses deux variables :** `xa`, `ya` pour le A ; `xb`, `yb` pour le B.',
       '**Le B s’arrête en ligne 16** : le `if (yb < 16)` ne le laisse plus avancer après, pour qu’il ne touche pas les nombres de la ligne 17.',
     ],
-    code: `uint8_t xa = 0;       // le A : sa colonne…
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <un_pas>     // fait faire un seul pas à une tuile
+#include <nombre>     // écrit un nombre en chiffres
+
+uint8_t xa = 0;       // le A : sa colonne…
 uint8_t ya = 0;       //       …et sa ligne. Il file vers la DROITE.
 uint8_t xb = 0;       // le B : sa colonne…
 uint8_t yb = 2;       //       …et sa ligne. Il file vers le BAS.
@@ -3674,7 +4065,11 @@ int main() {
       '**Leurs chemins ne se croisent pas :** le A reste sur la ligne 0, le B commence à la ligne 2.',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.31.2 met les deux ensemble.',
     ],
-    code: `uint8_t xa = 10;       // la colonne du A
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <un_pas>     // fait faire un seul pas à une tuile
+
+uint8_t xa = 10;       // la colonne du A
 uint8_t ya = 0;       // sa ligne
 uint8_t xb = 10;       // la colonne du B
 uint8_t yb = 2;       // sa ligne
@@ -3714,7 +4109,11 @@ int main() {
       '**Quatre `un_pas` dans la même image :** les quatre lettres avancent ensemble. `ALPHABET[2]` est le C, `ALPHABET[3]` le D.',
       '**Le A s’arrête en colonne 9** (`if (xa < 9)`) : sans cela, il rattraperait la place du C.',
     ],
-    code: `uint8_t xa = 0;       // la colonne du A
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <un_pas>     // fait faire un seul pas à une tuile
+
+uint8_t xa = 0;       // la colonne du A
 uint8_t ya = 0;       // sa ligne
 uint8_t xb = 0;       // la colonne du B
 uint8_t yb = 2;       // sa ligne
@@ -3769,6 +4168,10 @@ int main() {
     code: `// Le trajet : un côté par case. PAS_X[i] et PAS_Y[i] vont ensemble.
 //                         côté 0   côté 1   côté 2   côté 3
 //                         droite   bas      gauche   haut
+
+#include <deplace>    // fait avancer une tuile sur les deux axes
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
 const uint8_t PAS_X[] = {  5,       0,      -5,       0 };
 const uint8_t PAS_Y[] = {  0,       5,       0,      -5 };
 
@@ -3821,16 +4224,27 @@ int main() {
       '**C’est le 0.32**, avec une autre lettre, le **B** (`ALPHABET[1]`, la 2e lettre), et une autre place : le **départ (10, 0)** : les mêmes tableaux, le carré à droite.',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.32.2 met les deux ensemble.',
     ],
-    code: `const uint8_t PAS_X[] = {  5,  0, -5,  0 };
+    code: `// Le trajet : un côté par case. PAS_X[i] et PAS_Y[i] vont ensemble.
+//                         côté 0   côté 1   côté 2   côté 3
+//                         droite   bas      gauche   haut
+
+#include <deplace>    // fait avancer une tuile sur les deux axes
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+const uint8_t PAS_X[] = {  5,  0, -5,  0 };
 const uint8_t PAS_Y[] = {  0,  5,  0, -5 };
 
 uint8_t x = 10;       // la colonne du B
 uint8_t y = 0;       // sa ligne
 
-int main() {
-  while (true) {
-    for (uint8_t i = 0; i < sizeof(PAS_X); i++) {
+int main() {                                        // Le programme commence ici.
+  // Le changement : le B (ALPHABET[1]) part de (10, 0).
+  while (true) {                                    // le trajet, sans fin
+    for (uint8_t i = 0; i < sizeof(PAS_X); i++) {   // i = 0, 1, 2, 3 : un tour par côté
       deplace(x, y, ALPHABET[1], PAS_X[i], PAS_Y[i]);
+                                                    // le côté i : ses deux pas lus dans
+                                                    // les tableaux. i = 0 : (5, 0), à droite ;
+                                                    // i = 1 : (0, 5), en bas ; etc.
     }
   }
 }
@@ -3855,7 +4269,10 @@ int main() {
       '**C’est le 0.32 et le 0.32.1 réunis** : deux `deplace` dans la boucle, chacun avec ses variables.',
       '**Un seul trajet pour deux lettres :** les tableaux disent les pas ; chaque lettre les suit avec ses variables. Le A fait un côté, puis le B le même côté, et ainsi de suite.',
     ],
-    code: `const uint8_t PAS_X[] = {  5,  0, -5,  0 };
+    code: `#include <deplace>    // fait avancer une tuile sur les deux axes
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+const uint8_t PAS_X[] = {  5,  0, -5,  0 };
 const uint8_t PAS_Y[] = {  0,  5,  0, -5 };
 
 uint8_t x = 0;       // la colonne du A
@@ -3893,7 +4310,11 @@ int main() {
       '**Ici, `x =` est obligatoire.** Le rangement automatique du 0.23 ne vaut que pour les fonctions de la console. `mon_deplace_x(x, …);` seule ferait bouger la lettre, mais `x` resterait à 0 : c’est la règle normale du C.',
       '**`break`** sort de la boucle `while` tout de suite : au bord de l’écran, il n’y a plus de pas possible.',
     ],
-    code: `uint8_t x = 0;        // la colonne de la lettre
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <effacer>    // efface des cases, ou tout le fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;        // la colonne de la lettre
 
 // NOTRE fonction : c'est le 0.17, rangé sous un nom.
 //
@@ -3958,32 +4379,42 @@ int main() {
       '**La fonction ne change pas :** c’est tout l’intérêt d’une fonction. On lui donne d’autres renseignements (la ligne, la tuile), elle fait le même travail ailleurs.',
       '**C’est la version de base** : une seule lettre, à la deuxième place. Le 0.33.2 met les deux ensemble.',
     ],
-    code: `uint8_t x = 0;
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <effacer>    // efface des cases, ou tout le fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 
-// Notre fonction, la même qu'au 0.33 (voir ses commentaires là-bas).
+uint8_t x = 0;        // la colonne de la lettre
+
+// Notre fonction, la même qu'au 0.33 : elle fait avancer (ou reculer) une tuile
+// de « pas » cases sur une ligne, un quart de seconde par case, puis REND la
+// colonne d'arrivée.
+//   uint8_t (devant le nom) = ce qu'elle REND : un octet, la colonne d'arrivée.
+//   (colonne, ligne, tuile, pas) = ce qu'elle reçoit : des COPIES des valeurs.
 uint8_t mon_deplace_x(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t pas) {
-  uint8_t recule = pas > 127;
-  if (recule) pas = 0 - pas;
-  poser(colonne, ligne, tuile);
-  while (pas > 0) {
-    for (uint8_t i = 0; i < 15; i++) image();
-    if (recule && colonne == 0) break;
-    if (!recule && colonne == 19) break;
-    effacer(colonne, ligne, 1);
-    if (recule) colonne--;
-    else colonne++;
-    poser(colonne, ligne, tuile);
-    pas--;
+  uint8_t recule = pas > 127;          // -5 est rangé 251 : au-delà de 127, on recule
+  if (recule) pas = 0 - pas;           // 251 redevient 5 : le nombre de cases
+  poser(colonne, ligne, tuile);        // la lettre à sa place de départ
+  while (pas > 0) {                    // tant qu'il reste des pas
+    for (uint8_t i = 0; i < 15; i++) image();   // un quart de seconde (15 images)
+    if (recule && colonne == 0) break;          // bord gauche : on sort de la boucle
+    if (!recule && colonne == 19) break;        // bord droit  : on sort de la boucle
+    effacer(colonne, ligne, 1);        // 1. efface l'ancienne place (1 case)
+    if (recule) colonne--;             // 2. une colonne plus à gauche…
+    else colonne++;                    //    …ou plus à droite
+    poser(colonne, ligne, tuile);      // 3. la lettre à sa nouvelle place
+    pas--;                             // un pas de moins à faire
   }
-  return colonne;
+  return colonne;                      // REND la colonne d'arrivée, et termine
 }
 
-int main() {
+int main() {                           // Le programme commence ici.
+  // Le changement : le B (ALPHABET[1]), sur la ligne 8.
+  // « x = » range la colonne rendue par la fonction.
   x = mon_deplace_x(x, 8, ALPHABET[1], 5);    // le B, ligne 8 : x vaut 5
   x = mon_deplace_x(x, 8, ALPHABET[1], -5);   // retour : x vaut 0
 
-  while (true) {
-    image();
+  while (true) {                       // La boucle de jeu, pour toujours :
+    image();                           //   attendre l'image suivante.
   }
 }
 `,
@@ -4006,35 +4437,45 @@ int main() {
       '**C’est le 0.33 et le 0.33.1 réunis** : quatre appels à la même fonction.',
       '**Écrite une fois, servie autant qu’on veut :** la fonction ne sait rien du A ni du B ; elle bouge ce qu’on lui donne, et rend la colonne. `x =` et `xb =` rangent chaque résultat dans la bonne variable.',
     ],
-    code: `uint8_t x = 0;        // le A
-uint8_t xb = 0;       // le B
+    code: `#include <poser>      // pose une tuile sur une case du fond
+#include <effacer>    // efface des cases, ou tout le fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 
-// Notre fonction, la même qu'au 0.33.
+uint8_t x = 0;        // le A : sa colonne
+uint8_t xb = 0;       // le B : sa colonne
+
+// Notre fonction, la même qu'au 0.33 : elle fait avancer (ou reculer) une tuile
+// de « pas » cases sur une ligne, un quart de seconde par case, puis REND la
+// colonne d'arrivée.
+//   uint8_t (devant le nom) = ce qu'elle REND : un octet, la colonne d'arrivée.
+//   (colonne, ligne, tuile, pas) = ce qu'elle reçoit : des COPIES des valeurs.
 uint8_t mon_deplace_x(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t pas) {
-  uint8_t recule = pas > 127;
-  if (recule) pas = 0 - pas;
-  poser(colonne, ligne, tuile);
-  while (pas > 0) {
-    for (uint8_t i = 0; i < 15; i++) image();
-    if (recule && colonne == 0) break;
-    if (!recule && colonne == 19) break;
-    effacer(colonne, ligne, 1);
-    if (recule) colonne--;
-    else colonne++;
-    poser(colonne, ligne, tuile);
-    pas--;
+  uint8_t recule = pas > 127;          // -5 est rangé 251 : au-delà de 127, on recule
+  if (recule) pas = 0 - pas;           // 251 redevient 5 : le nombre de cases
+  poser(colonne, ligne, tuile);        // la lettre à sa place de départ
+  while (pas > 0) {                    // tant qu'il reste des pas
+    for (uint8_t i = 0; i < 15; i++) image();   // un quart de seconde (15 images)
+    if (recule && colonne == 0) break;          // bord gauche : on sort de la boucle
+    if (!recule && colonne == 19) break;        // bord droit  : on sort de la boucle
+    effacer(colonne, ligne, 1);        // 1. efface l'ancienne place (1 case)
+    if (recule) colonne--;             // 2. une colonne plus à gauche…
+    else colonne++;                    //    …ou plus à droite
+    poser(colonne, ligne, tuile);      // 3. la lettre à sa nouvelle place
+    pas--;                             // un pas de moins à faire
   }
-  return colonne;
+  return colonne;                      // REND la colonne d'arrivée, et termine
 }
 
-int main() {
-  x = mon_deplace_x(x, 0, ALPHABET[0], 5);
-  x = mon_deplace_x(x, 0, ALPHABET[0], -5);      // le A (le 0.33)
-  xb = mon_deplace_x(xb, 8, ALPHABET[1], 5);
-  xb = mon_deplace_x(xb, 8, ALPHABET[1], -5);    // le B (le 0.33.1)
+int main() {                           // Le programme commence ici.
+  // Le A sur la ligne 0 (le 0.33), avec sa variable x :
+  x = mon_deplace_x(x, 0, ALPHABET[0], 5);       // aller : x vaut 5
+  x = mon_deplace_x(x, 0, ALPHABET[0], -5);      // le A (le 0.33) : retour, x vaut 0
+  // Puis le B sur la ligne 8 (le 0.33.1), avec SA variable xb :
+  xb = mon_deplace_x(xb, 8, ALPHABET[1], 5);     // aller : xb vaut 5
+  xb = mon_deplace_x(xb, 8, ALPHABET[1], -5);    // le B (le 0.33.1) : retour, xb vaut 0
 
-  while (true) {
-    image();
+  while (true) {                       // La boucle de jeu, pour toujours :
+    image();                           //   attendre l'image suivante.
   }
 }
 `,
@@ -4064,6 +4505,10 @@ int main() {
     ],
     code: `// main : le programme commence ici. Les lignes entre { et } s'exécutent
 // dans l'ordre, de haut en bas.
+
+#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
 int main() {
   // Une seule ligne fait tout le carré. Ses sept réglages, dans l'ordre :
   //
@@ -4135,7 +4580,10 @@ int main() {
       '**La position : (4, 4)** au lieu de (10, 8). Un carré de taille 1 tient entier si son centre est à au moins 1 cases de chaque bord : la colonne entre 1 et 19 − 1 = 18, la ligne entre 1 et 17 − 1 = 16. (4, 4) respecte ces limites : le carré de 3 × 3 tient entier, des colonnes 3 à 5 et des lignes 3 à 5.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.34.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.34, ailleurs et avec le B :
   //
   //   carre(4, 4, ALPHABET[1], 1, 1, 250, 1);
@@ -4173,7 +4621,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés ne se touchent pas** : chacun a son coin de l’écran. À la fin, on voit les deux lettres, chacune à son centre.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.34.
   carre(10, 8, ALPHABET[0], 1, 1, 250, 1);
 
@@ -4207,7 +4658,10 @@ int main() {
       '**Où il tombe dans l’écran :** autour de (10, 8), de la colonne 10 − 2 = **8** à 10 + 2 = **12**, et de la ligne 8 − 2 = **6** à 8 + 2 = **10**. L’écran va de la colonne 0 à 19 et de la ligne 0 à 17 : le carré tient entier.',
       '**Pourquoi le centre (10, 8) :** l’écran fait 20 colonnes et 18 lignes ; son milieu est vers la colonne 10 et la ligne 8. C’est le seul genre d’endroit où **toutes** les tailles, de 1 jusqu’à 8, tiennent entières. Toutes les leçons de carré qui suivent tournent donc autour de (10, 8), et l’on voit chaque carré grandir autour du même point.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Un seul changement par rapport au 0.34 : la taille, 1 → 2.
   //
   //   carre(10, 8, ALPHABET[0], 2, 1, 250, 1);
@@ -4252,7 +4706,10 @@ int main() {
       '**La position : (4, 4)** au lieu de (10, 8). Un carré de taille 2 tient entier si son centre est à au moins 2 cases de chaque bord : la colonne entre 2 et 19 − 2 = 17, la ligne entre 2 et 17 − 2 = 15. (4, 4) respecte ces limites : le carré de 5 × 5 tient entier, des colonnes 2 à 6 et des lignes 2 à 6.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.35.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.35, ailleurs et avec le B :
   //
   //   carre(4, 4, ALPHABET[1], 2, 1, 250, 1);
@@ -4290,7 +4747,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés ne se touchent pas** : chacun a son coin de l’écran. À la fin, on voit les deux lettres, chacune à son centre.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.35.
   carre(10, 8, ALPHABET[0], 2, 1, 250, 1);
 
@@ -4323,7 +4783,10 @@ int main() {
       '**Ce qui est nouveau ici : la taille 3.** La lettre tourne à **3 cases** du centre. La règle 2 × n + 1 donne 2 × 3 + 1 = **7** cases de côté : un carré de **7 × 7**.',
       '**Où il tombe dans l’écran :** autour de (10, 8), de la colonne 10 − 3 = **7** à 10 + 3 = **13**, et de la ligne 8 − 3 = **5** à 8 + 3 = **11**. L’écran va de la colonne 0 à 19 et de la ligne 0 à 17 : le carré tient entier.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Un seul changement par rapport au 0.35 : la taille, 2 → 3.
   //
   //   carre(10, 8, ALPHABET[0], 3, 1, 250, 1);
@@ -4370,7 +4833,10 @@ int main() {
       '**La position : (4, 4)** au lieu de (10, 8). Un carré de taille 3 tient entier si son centre est à au moins 3 cases de chaque bord : la colonne entre 3 et 19 − 3 = 16, la ligne entre 3 et 17 − 3 = 14. (4, 4) respecte ces limites : le carré de 7 × 7 tient entier, des colonnes 1 à 7 et des lignes 1 à 7.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.36.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.36, ailleurs et avec le B :
   //
   //   carre(4, 4, ALPHABET[1], 3, 1, 250, 1);
@@ -4408,7 +4874,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés ne se touchent pas** : chacun a son coin de l’écran. À la fin, on voit les deux lettres, chacune à son centre.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.36.
   carre(10, 8, ALPHABET[0], 3, 1, 250, 1);
 
@@ -4441,7 +4910,10 @@ int main() {
       '**Ce qui est nouveau ici : la taille 4.** La lettre tourne à **4 cases** du centre. La règle 2 × n + 1 donne 2 × 4 + 1 = **9** cases de côté : un carré de **9 × 9**.',
       '**Où il tombe dans l’écran :** autour de (10, 8), de la colonne 10 − 4 = **6** à 10 + 4 = **14**, et de la ligne 8 − 4 = **4** à 8 + 4 = **12**. L’écran va de la colonne 0 à 19 et de la ligne 0 à 17 : le carré tient entier.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Un seul changement par rapport au 0.36 : la taille, 3 → 4.
   //
   //   carre(10, 8, ALPHABET[0], 4, 1, 250, 1);
@@ -4490,7 +4962,10 @@ int main() {
       '**La position : (4, 4)** au lieu de (10, 8). Un carré de taille 4 tient entier si son centre est à au moins 4 cases de chaque bord : la colonne entre 4 et 19 − 4 = 15, la ligne entre 4 et 17 − 4 = 13. (4, 4) respecte ces limites : le carré de 9 × 9 tient entier, des colonnes 0 à 8 et des lignes 0 à 8.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.37.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.37, ailleurs et avec le B :
   //
   //   carre(4, 4, ALPHABET[1], 4, 1, 250, 1);
@@ -4528,7 +5003,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés ne se touchent pas** : chacun a son coin de l’écran. À la fin, on voit les deux lettres, chacune à son centre.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.37.
   carre(10, 8, ALPHABET[0], 4, 1, 250, 1);
 
@@ -4561,7 +5039,10 @@ int main() {
       '**Ce qui est nouveau ici : la taille 5.** La lettre tourne à **5 cases** du centre. La règle 2 × n + 1 donne 2 × 5 + 1 = **11** cases de côté : un carré de **11 × 11**.',
       '**Où il tombe dans l’écran :** autour de (10, 8), de la colonne 10 − 5 = **5** à 10 + 5 = **15**, et de la ligne 8 − 5 = **3** à 8 + 5 = **13**. L’écran va de la colonne 0 à 19 et de la ligne 0 à 17 : le carré tient entier.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Un seul changement par rapport au 0.37 : la taille, 4 → 5.
   //
   //   carre(10, 8, ALPHABET[0], 5, 1, 250, 1);
@@ -4612,7 +5093,10 @@ int main() {
       '**La position : (5, 5)** au lieu de (10, 8). Un carré de taille 5 tient entier si son centre est à au moins 5 cases de chaque bord : la colonne entre 5 et 19 − 5 = 14, la ligne entre 5 et 17 − 5 = 12. (5, 5) respecte ces limites : le carré de 11 × 11 tient entier, des colonnes 0 à 10 et des lignes 0 à 10.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.38.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.38, ailleurs et avec le B :
   //
   //   carre(5, 5, ALPHABET[1], 5, 1, 250, 1);
@@ -4650,7 +5134,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés se croisent** (taille 5 : 11 × 11 chacun). En passant sur une case, `carre` l’**efface** en la quittant : si le chemin du B passe sur le A arrêté, il l’efface. C’est normal : chaque lettre ne s’occupe que d’elle-même.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.38.
   carre(10, 8, ALPHABET[0], 5, 1, 250, 1);
 
@@ -4683,7 +5170,10 @@ int main() {
       '**Ce qui est nouveau ici : la taille 6.** La lettre tourne à **6 cases** du centre. La règle 2 × n + 1 donne 2 × 6 + 1 = **13** cases de côté : un carré de **13 × 13**.',
       '**Où il tombe dans l’écran :** autour de (10, 8), de la colonne 10 − 6 = **4** à 10 + 6 = **16**, et de la ligne 8 − 6 = **2** à 8 + 6 = **14**. L’écran va de la colonne 0 à 19 et de la ligne 0 à 17 : le carré tient entier.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Un seul changement par rapport au 0.38 : la taille, 5 → 6.
   //
   //   carre(10, 8, ALPHABET[0], 6, 1, 250, 1);
@@ -4736,7 +5226,10 @@ int main() {
       '**La position : (6, 6)** au lieu de (10, 8). Un carré de taille 6 tient entier si son centre est à au moins 6 cases de chaque bord : la colonne entre 6 et 19 − 6 = 13, la ligne entre 6 et 17 − 6 = 11. (6, 6) respecte ces limites : le carré de 13 × 13 tient entier, des colonnes 0 à 12 et des lignes 0 à 12.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.39.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.39, ailleurs et avec le B :
   //
   //   carre(6, 6, ALPHABET[1], 6, 1, 250, 1);
@@ -4774,7 +5267,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés se croisent** (taille 6 : 13 × 13 chacun). En passant sur une case, `carre` l’**efface** en la quittant : si le chemin du B passe sur le A arrêté, il l’efface. C’est normal : chaque lettre ne s’occupe que d’elle-même.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.39.
   carre(10, 8, ALPHABET[0], 6, 1, 250, 1);
 
@@ -4807,7 +5303,10 @@ int main() {
       '**Ce qui est nouveau ici : la taille 7.** La lettre tourne à **7 cases** du centre. La règle 2 × n + 1 donne 2 × 7 + 1 = **15** cases de côté : un carré de **15 × 15**.',
       '**Où il tombe dans l’écran :** autour de (10, 8), de la colonne 10 − 7 = **3** à 10 + 7 = **17**, et de la ligne 8 − 7 = **1** à 8 + 7 = **15**. L’écran va de la colonne 0 à 19 et de la ligne 0 à 17 : le carré tient entier.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Un seul changement par rapport au 0.39 : la taille, 6 → 7.
   //
   //   carre(10, 8, ALPHABET[0], 7, 1, 250, 1);
@@ -4862,7 +5361,10 @@ int main() {
       '**La position : (7, 7)** au lieu de (10, 8). Un carré de taille 7 tient entier si son centre est à au moins 7 cases de chaque bord : la colonne entre 7 et 19 − 7 = 12, la ligne entre 7 et 17 − 7 = 10. (7, 7) respecte ces limites : le carré de 15 × 15 tient entier, des colonnes 0 à 14 et des lignes 0 à 14.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.40.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.40, ailleurs et avec le B :
   //
   //   carre(7, 7, ALPHABET[1], 7, 1, 250, 1);
@@ -4900,7 +5402,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés se croisent** (taille 7 : 15 × 15 chacun). En passant sur une case, `carre` l’**efface** en la quittant : si le chemin du B passe sur le A arrêté, il l’efface. C’est normal : chaque lettre ne s’occupe que d’elle-même.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.40.
   carre(10, 8, ALPHABET[0], 7, 1, 250, 1);
 
@@ -4934,7 +5439,10 @@ int main() {
       '**Où il tombe dans l’écran :** autour de (10, 8), de la colonne 10 − 8 = **2** à 10 + 8 = **18**, et de la ligne 8 − 8 = **0** à 8 + 8 = **16**. L’écran va de la colonne 0 à 19 et de la ligne 0 à 17 : le carré tient entier.',
       '**C’est le plus grand possible.** Avec la taille 9, le haut du carré serait à la ligne 8 − 9, au-dessus de l’écran : il n’existe pas de ligne -1. La taille 8 touche la ligne 0 en haut, la colonne 2 à gauche et la colonne 18 à droite.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Un seul changement par rapport au 0.40 : la taille, 7 → 8.
   //
   //   carre(10, 8, ALPHABET[0], 8, 1, 250, 1);
@@ -4991,7 +5499,10 @@ int main() {
       '**La position : (8, 8)** au lieu de (10, 8). Un carré de taille 8 tient entier si son centre est à au moins 8 cases de chaque bord : la colonne entre 8 et 19 − 8 = 11, la ligne entre 8 et 17 − 8 = 9. (8, 8) respecte ces limites : le carré de 17 × 17 tient entier, des colonnes 0 à 16 et des lignes 0 à 16.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.41.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.41, ailleurs et avec le B :
   //
   //   carre(8, 8, ALPHABET[1], 8, 1, 250, 1);
@@ -5029,7 +5540,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés se croisent** (taille 8 : 17 × 17 chacun). En passant sur une case, `carre` l’**efface** en la quittant : si le chemin du B passe sur le A arrêté, il l’efface. C’est normal : chaque lettre ne s’occupe que d’elle-même.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.41.
   carre(10, 8, ALPHABET[0], 8, 1, 250, 1);
 
@@ -5063,7 +5577,10 @@ int main() {
       '**Le coin de départ ne change pas :** en haut à gauche. Seule la première direction change : avec `1`, la lettre part vers la **droite** ; avec `-1`, vers le **bas**.',
       '**-1 dans un octet** est rangé 255 : `carre` lit tout ce qui dépasse 127 comme « l’autre sens ».',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré de taille 2 (le 0.35), avec un seul changement : le sens, 1 → -1.
   //
   //   carre(10, 8, ALPHABET[0], 2, -1, 250, 1);
@@ -5107,7 +5624,10 @@ int main() {
       '**La position : (4, 4)** au lieu de (10, 8). Un carré de taille 2 tient entier si son centre est à au moins 2 cases de chaque bord : la colonne entre 2 et 19 − 2 = 17, la ligne entre 2 et 17 − 2 = 15. (4, 4) respecte ces limites : le carré de 5 × 5 tient entier, des colonnes 2 à 6 et des lignes 2 à 6.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.42.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.42, ailleurs et avec le B :
   //
   //   carre(4, 4, ALPHABET[1], 2, -1, 250, 1);
@@ -5145,7 +5665,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés ne se touchent pas** : chacun a son coin de l’écran. À la fin, on voit les deux lettres, chacune à son centre.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.42.
   carre(10, 8, ALPHABET[0], 2, -1, 250, 1);
 
@@ -5179,7 +5702,10 @@ int main() {
       '**Plus le nombre est petit, plus ça va vite**, puisque c’est le temps d’attente entre deux pas. 500 ms, c’est 30 images de la console (elle en montre 60 par seconde).',
       '**Elle s’écrit en clair** (`500`, pas une variable) : le compilateur la traduit en images avant le jeu, comme `ms(500)`.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré de taille 2 (le 0.35), avec un seul changement : la vitesse, 250 → 500.
   //
   //   carre(10, 8, ALPHABET[0], 2, 1, 500, 1);
@@ -5222,7 +5748,10 @@ int main() {
       '**La position : (4, 4)** au lieu de (10, 8). Un carré de taille 2 tient entier si son centre est à au moins 2 cases de chaque bord : la colonne entre 2 et 19 − 2 = 17, la ligne entre 2 et 17 − 2 = 15. (4, 4) respecte ces limites : le carré de 5 × 5 tient entier, des colonnes 2 à 6 et des lignes 2 à 6.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.43.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.43, ailleurs et avec le B :
   //
   //   carre(4, 4, ALPHABET[1], 2, 1, 500, 1);
@@ -5260,7 +5789,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés ne se touchent pas** : chacun a son coin de l’écran. À la fin, on voit les deux lettres, chacune à son centre.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.43.
   carre(10, 8, ALPHABET[0], 2, 1, 500, 1);
 
@@ -5294,7 +5826,10 @@ int main() {
       '**Plus le nombre est petit, plus ça va vite**, puisque c’est le temps d’attente entre deux pas. 100 ms, c’est 6 images de la console (elle en montre 60 par seconde).',
       '**Elle s’écrit en clair** (`100`, pas une variable) : le compilateur la traduit en images avant le jeu, comme `ms(100)`.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré de taille 2 (le 0.35), avec un seul changement : la vitesse, 250 → 100.
   //
   //   carre(10, 8, ALPHABET[0], 2, 1, 100, 1);
@@ -5337,7 +5872,10 @@ int main() {
       '**La position : (4, 4)** au lieu de (10, 8). Un carré de taille 2 tient entier si son centre est à au moins 2 cases de chaque bord : la colonne entre 2 et 19 − 2 = 17, la ligne entre 2 et 17 − 2 = 15. (4, 4) respecte ces limites : le carré de 5 × 5 tient entier, des colonnes 2 à 6 et des lignes 2 à 6.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.44.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.44, ailleurs et avec le B :
   //
   //   carre(4, 4, ALPHABET[1], 2, 1, 100, 1);
@@ -5375,7 +5913,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés ne se touchent pas** : chacun a son coin de l’écran. À la fin, on voit les deux lettres, chacune à son centre.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.44.
   carre(10, 8, ALPHABET[0], 2, 1, 100, 1);
 
@@ -5409,7 +5950,10 @@ int main() {
       '**Plus le nombre est petit, plus ça va vite**, puisque c’est le temps d’attente entre deux pas. 50 ms, c’est 3 images de la console (elle en montre 60 par seconde).',
       '**Elle s’écrit en clair** (`50`, pas une variable) : le compilateur la traduit en images avant le jeu, comme `ms(50)`.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré de taille 2 (le 0.35), avec un seul changement : la vitesse, 250 → 50.
   //
   //   carre(10, 8, ALPHABET[0], 2, 1, 50, 1);
@@ -5452,7 +5996,10 @@ int main() {
       '**La position : (4, 4)** au lieu de (10, 8). Un carré de taille 2 tient entier si son centre est à au moins 2 cases de chaque bord : la colonne entre 2 et 19 − 2 = 17, la ligne entre 2 et 17 − 2 = 15. (4, 4) respecte ces limites : le carré de 5 × 5 tient entier, des colonnes 2 à 6 et des lignes 2 à 6.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.45.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.45, ailleurs et avec le B :
   //
   //   carre(4, 4, ALPHABET[1], 2, 1, 50, 1);
@@ -5490,7 +6037,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés ne se touchent pas** : chacun a son coin de l’écran. À la fin, on voit les deux lettres, chacune à son centre.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.45.
   carre(10, 8, ALPHABET[0], 2, 1, 50, 1);
 
@@ -5523,7 +6073,10 @@ int main() {
       '**Ce qui est nouveau ici : 2 tours.** La lettre va au coin, fait **2 fois** le tour du carré d’affilée, puis revient au centre.',
       '**On le voit au coin en bas à droite** (12, 10) : la lettre y passe 2 fois.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré de taille 2 (le 0.35), avec un seul changement : les tours, 1 → 2.
   //
   //   carre(10, 8, ALPHABET[0], 2, 1, 250, 2);
@@ -5561,7 +6114,10 @@ int main() {
       '**La position : (4, 4)** au lieu de (10, 8). Un carré de taille 2 tient entier si son centre est à au moins 2 cases de chaque bord : la colonne entre 2 et 19 − 2 = 17, la ligne entre 2 et 17 − 2 = 15. (4, 4) respecte ces limites : le carré de 5 × 5 tient entier, des colonnes 2 à 6 et des lignes 2 à 6.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.46.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.46, ailleurs et avec le B :
   //
   //   carre(4, 4, ALPHABET[1], 2, 1, 250, 2);
@@ -5599,7 +6155,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés ne se touchent pas** : chacun a son coin de l’écran. À la fin, on voit les deux lettres, chacune à son centre.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.46.
   carre(10, 8, ALPHABET[0], 2, 1, 250, 2);
 
@@ -5632,7 +6191,10 @@ int main() {
       '**Ce qui est nouveau ici : 3 tours.** La lettre va au coin, fait **3 fois** le tour du carré d’affilée, puis revient au centre.',
       '**On le voit au coin en bas à droite** (12, 10) : la lettre y passe 3 fois.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré de taille 2 (le 0.35), avec un seul changement : les tours, 1 → 3.
   //
   //   carre(10, 8, ALPHABET[0], 2, 1, 250, 3);
@@ -5670,7 +6232,10 @@ int main() {
       '**La position : (4, 4)** au lieu de (10, 8). Un carré de taille 2 tient entier si son centre est à au moins 2 cases de chaque bord : la colonne entre 2 et 19 − 2 = 17, la ligne entre 2 et 17 − 2 = 15. (4, 4) respecte ces limites : le carré de 5 × 5 tient entier, des colonnes 2 à 6 et des lignes 2 à 6.',
       '**C’est la version de base** : une seule lettre, un seul carré. Le 0.47.2 mettra les deux carrés ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Le carré du 0.47, ailleurs et avec le B :
   //
   //   carre(4, 4, ALPHABET[1], 2, 1, 250, 3);
@@ -5708,7 +6273,10 @@ int main() {
       '**L’un après l’autre :** `carre` attend la fin de son carré avant de rendre la main. Le B ne commence que quand le A est revenu à son centre.',
       '**Les deux carrés ne se touchent pas** : chacun a son coin de l’écran. À la fin, on voit les deux lettres, chacune à son centre.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le A, autour de (10, 8) : le 0.47.
   carre(10, 8, ALPHABET[0], 2, 1, 250, 3);
 
@@ -5754,6 +6322,11 @@ int main() {
 //   +-------------------- le type : Carre (avec une majuscule)
 //
 //               x   y  tuile        taille  sens  vitesse  tours
+
+#include <Carre>      // les sept réglages d’un carré sous un seul nom
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <carre>      // une tuile qui tourne en carré
+
 Carre ronde = { 10,  8, ALPHABET[0], 2,      1,    250,     2 };
 // autour de (10, 8), la lettre A, 5 × 5, sens des aiguilles, 250 ms par pas, 2 tours
 
@@ -5798,6 +6371,11 @@ int main() {
       '**C’est la version de base** : la deuxième place, seule. Le 0.48.2 met les deux ensemble.',
     ],
     code: `//              x  y  tuile        taille  sens  vitesse  tours
+
+#include <Carre>      // les sept réglages d’un carré sous un seul nom
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <carre>      // une tuile qui tourne en carré
+
 Carre coin = {  4, 4, ALPHABET[1], 2,      1,    250,     2 };
 
 int main() {
@@ -5828,6 +6406,11 @@ int main() {
       '**Chaque nom range ses sept réglages :** `carre(ronde)` et `carre(coin)` ne se mélangent pas.',
     ],
     code: `//               x   y  tuile        taille  sens  vitesse  tours
+
+#include <Carre>      // les sept réglages d’un carré sous un seul nom
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <carre>      // une tuile qui tourne en carré
+
 Carre ronde = { 10,  8, ALPHABET[0], 2,      1,    250,     2 };
 Carre coin  = {  4,  4, ALPHABET[1], 2,      1,    250,     2 };
 
@@ -5859,7 +6442,10 @@ int main() {
       '**Pourquoi (10, 8) est le meilleur endroit :** le plus grand carré possible a la taille **8** (17 × 17). Autour de (10, 8), il va de la colonne 10 − 8 = **2** à 10 + 8 = **18**, et de la ligne 8 − 8 = **0** à 8 + 8 = **16** : il tient **entier**. Tous les carrés, de la taille 1 à la taille 8, peuvent donc tourner autour du **même** centre, emboîtés comme des cadres.',
       '**Chaque carré revient au centre** avant que le suivant commence : le second repart donc bien de (10, 8).',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // LE CENTRE, pour tous les carrés : (10, 8), le milieu de l'écran.
   //
   //   l'écran : 20 colonnes (0 à 19), 18 lignes (0 à 17)
@@ -5905,13 +6491,22 @@ int main() {
       '**C’est le 0.49**, avec le **B**, autour de **(4, 4)** au lieu de (10, 8).',
       '**C’est la version de base** : la deuxième place, seule. Le 0.49.2 met les deux ensemble.',
     ],
-    code: `int main() {
-  // Le B, autour de (4, 4) :
-  carre(4, 4, ALPHABET[1], 1, 1, 250, 1);
-  carre(4, 4, ALPHABET[1], 2, 1, 250, 1);
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 
-  while (true) {
-    image();
+int main() {          // Le programme commence ici.
+  // carre(x, y, tuile, taille, sens, vitesse, tours) fait tourner une tuile
+  // autour du centre (x, y) :
+  //   taille  : 1 → un carré de 3 × 3, 2 → 5 × 5 (2 cases de plus à chaque cran)
+  //   sens    : 1 = le sens des aiguilles d'une montre
+  //   vitesse : le temps d'un pas, en millisecondes (250 = un quart de seconde)
+  //   tours   : combien de tours (1)
+  // Le changement : le B (ALPHABET[1]), autour de (4, 4) :
+  carre(4, 4, ALPHABET[1], 1, 1, 250, 1);   // taille 1 : 3 × 3, colonnes 3 à 5
+  carre(4, 4, ALPHABET[1], 2, 1, 250, 1);   // taille 2 : 5 × 5, colonnes 2 à 6
+
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -5932,16 +6527,22 @@ int main() {
     texte: [
       '**C’est le 0.49 et le 0.49.1 réunis** : les carrés du A, puis ceux du B.',
     ],
-    code: `int main() {
-  // 1. Le A, autour de (10, 8)
-  carre(10, 8, ALPHABET[0], 1, 1, 250, 1);
-  carre(10, 8, ALPHABET[0], 2, 1, 250, 1);
-  // 2. Le B, autour de (4, 4)
-  carre(4, 4, ALPHABET[1], 1, 1, 250, 1);
-  carre(4, 4, ALPHABET[1], 2, 1, 250, 1);
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 
-  while (true) {
-    image();
+int main() {          // Le programme commence ici.
+  // carre(x, y, tuile, taille, sens, vitesse, tours) : la tuile tourne autour
+  // du centre (x, y). taille 1 = 3 × 3, taille 2 = 5 × 5 ; sens 1 = sens des
+  // aiguilles d'une montre ; vitesse = ms par pas ; tours = combien de tours.
+  // 1. Le A, autour de (10, 8)
+  carre(10, 8, ALPHABET[0], 1, 1, 250, 1);   // taille 1 : 3 × 3
+  carre(10, 8, ALPHABET[0], 2, 1, 250, 1);   // taille 2 : 5 × 5
+  // 2. Le B, autour de (4, 4) — seulement quand le A a fini.
+  carre(4, 4, ALPHABET[1], 1, 1, 250, 1);    // taille 1
+  carre(4, 4, ALPHABET[1], 2, 1, 250, 1);    // taille 2
+
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -5964,7 +6565,10 @@ int main() {
       '**Ce qui est nouveau ici :** rien qu’une taille de plus. On voit la règle se répéter : chaque carré a **2 cases de plus** de côté que le précédent (3, 5, 7), puisqu’il gagne une case de chaque côté.',
       '**On pourrait continuer ainsi jusqu’à 8**, en écrivant huit lignes presque pareilles. Le cours suivant montre comment l’écrire une seule fois.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Toujours le même centre, (10, 8) : les tailles 1 à 8 y tiennent toutes.
   //
   //      colonne :  7  8  9 10 11 12 13
@@ -6006,14 +6610,19 @@ int main() {
       '**C’est le 0.50**, avec le **B**, autour de **(4, 4)** au lieu de (10, 8).',
       '**C’est la version de base** : la deuxième place, seule. Le 0.50.2 met les deux ensemble.',
     ],
-    code: `int main() {
-  // Le B, autour de (4, 4) :
-  carre(4, 4, ALPHABET[1], 1, 1, 250, 1);
-  carre(4, 4, ALPHABET[1], 2, 1, 250, 1);
-  carre(4, 4, ALPHABET[1], 3, 1, 250, 1);
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 
-  while (true) {
-    image();
+int main() {          // Le programme commence ici.
+  // carre(x, y, tuile, taille, sens, vitesse, tours) : la tuile tourne autour
+  // du centre (x, y). Chaque taille a 2 cases de plus de côté que la précédente.
+  // Le changement : le B (ALPHABET[1]), autour de (4, 4) :
+  carre(4, 4, ALPHABET[1], 1, 1, 250, 1);   // taille 1 : 3 × 3 (colonnes 3 à 5)
+  carre(4, 4, ALPHABET[1], 2, 1, 250, 1);   // taille 2 : 5 × 5 (colonnes 2 à 6)
+  carre(4, 4, ALPHABET[1], 3, 1, 250, 1);   // taille 3 : 7 × 7 (colonnes 1 à 7)
+
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -6034,18 +6643,23 @@ int main() {
     texte: [
       '**C’est le 0.50 et le 0.50.1 réunis** : les carrés du A, puis ceux du B.',
     ],
-    code: `int main() {
-  // 1. Le A, autour de (10, 8)
-  carre(10, 8, ALPHABET[0], 1, 1, 250, 1);
-  carre(10, 8, ALPHABET[0], 2, 1, 250, 1);
-  carre(10, 8, ALPHABET[0], 3, 1, 250, 1);
-  // 2. Le B, autour de (4, 4)
-  carre(4, 4, ALPHABET[1], 1, 1, 250, 1);
-  carre(4, 4, ALPHABET[1], 2, 1, 250, 1);
-  carre(4, 4, ALPHABET[1], 3, 1, 250, 1);
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 
-  while (true) {
-    image();
+int main() {          // Le programme commence ici.
+  // carre(x, y, tuile, taille, sens, vitesse, tours) : la tuile tourne autour
+  // du centre (x, y). taille 1 = 3 × 3, 2 = 5 × 5, 3 = 7 × 7.
+  // 1. Le A, autour de (10, 8)
+  carre(10, 8, ALPHABET[0], 1, 1, 250, 1);   // 3 × 3
+  carre(10, 8, ALPHABET[0], 2, 1, 250, 1);   // 5 × 5
+  carre(10, 8, ALPHABET[0], 3, 1, 250, 1);   // 7 × 7
+  // 2. Le B, autour de (4, 4)
+  carre(4, 4, ALPHABET[1], 1, 1, 250, 1);    // 3 × 3
+  carre(4, 4, ALPHABET[1], 2, 1, 250, 1);    // 5 × 5
+  carre(4, 4, ALPHABET[1], 3, 1, 250, 1);    // 7 × 7
+
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -6070,7 +6684,10 @@ int main() {
       '**Pourquoi 8 :** c’est le plus grand carré que l’écran tienne. Autour de (10, 8), il va de la colonne 2 à 18 et de la ligne 0 à 16. Le centre a été choisi pour ça (voir le 0.49).',
       '**La vitesse, 50 ms par pas**, est plus rapide : huit carrés à 250 ms dureraient plus d’une minute. Elle s’écrit toujours en clair ; la taille, elle, peut être une variable.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // La boucle, morceau par morceau :
   //
   //   for (uint8_t taille = 1; taille <= 8; taille++)
@@ -6120,14 +6737,21 @@ int main() {
       '**Pourquoi (9, 9) :** la taille 8 ne tient que si le centre est entre les colonnes 8 et 11 et les lignes 8 et 9. (9, 9) est l’un des rares autres centres possibles.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.51.2 met les deux ensemble.',
     ],
-    code: `int main() {
-  // Le B, autour de (9, 9) :
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {          // Le programme commence ici.
+  // Le changement : le B (ALPHABET[1]), autour de (9, 9).
+  // for : taille part de 1 ; on continue tant que taille <= 8 ; taille++ ajoute 1.
+  //   tour 1 : taille 1 (3 × 3) ... tour 8 : taille 8 (17 × 17).
+  // Le plus grand autour de (9, 9) : colonnes 1 à 17, lignes 1 à 17 : il tient.
   for (uint8_t taille = 1; taille <= 8; taille++) {
-    carre(9, 9, ALPHABET[1], taille, 1, 50, 1);
+    carre(9, 9, ALPHABET[1], taille, 1, 50, 1);   // la taille de ce tour ;
+                                                  // 50 ms par pas : plus vite.
   }
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -6149,18 +6773,23 @@ int main() {
       '**C’est le 0.51 et le 0.51.1 réunis** : les carrés du A, puis ceux du B.',
       '**Ils se croisent :** en passant, les carrés du B effacent le A resté au centre. Chaque lettre ne s’occupe que d’elle-même.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {          // Le programme commence ici.
+  // for : taille part de 1 ; on continue tant que taille <= 8 ; taille++ ajoute 1.
+  // carre(x, y, tuile, taille, sens, vitesse, tours) : un carré de plus à chaque tour.
   // 1. Le A, autour de (10, 8)
   for (uint8_t taille = 1; taille <= 8; taille++) {
-    carre(10, 8, ALPHABET[0], taille, 1, 50, 1);
+    carre(10, 8, ALPHABET[0], taille, 1, 50, 1);   // 3 × 3, 5 × 5 ... 17 × 17
   }
-  // 2. Le B, autour de (9, 9)
+  // 2. Le B, autour de (9, 9) — après les huit carrés du A.
   for (uint8_t taille = 1; taille <= 8; taille++) {
     carre(9, 9, ALPHABET[1], taille, 1, 50, 1);
   }
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -6183,7 +6812,10 @@ int main() {
       '**Ce qui est nouveau ici : deux `carre` l’un après l’autre.** `carre` **bloque** : elle attend la fin de son carré avant de rendre la main. La deuxième ligne ne commence donc que quand la lettre est revenue au centre.',
       '**Le premier** est celui du 0.34 (taille 1). **Le second** change quatre réglages, chacun vu dans sa leçon : taille 3 (le 0.36), sens -1 (le 0.42), vitesse 100 (le 0.44), 3 tours (le 0.47).',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // 1. Le petit carré (le 0.34) : taille 1, sens 1, 250 ms, 1 tour.
   carre(10, 8, ALPHABET[0], 1, 1, 250, 1);
 
@@ -6217,13 +6849,20 @@ int main() {
       '**C’est le 0.52**, avec le **B**, autour de **(4, 4)** au lieu de (10, 8).',
       '**C’est la version de base** : la deuxième place, seule. Le 0.52.2 met les deux ensemble.',
     ],
-    code: `int main() {
-  // Le B, autour de (4, 4) :
-  carre(4, 4, ALPHABET[1], 1, 1, 250, 1);
-  carre(4, 4, ALPHABET[1], 3, -1, 100, 3);
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 
-  while (true) {
-    image();
+int main() {          // Le programme commence ici.
+  // carre(x, y, tuile, taille, sens, vitesse, tours) : la tuile tourne autour de (x, y).
+  // Le changement : le B (ALPHABET[1]), autour de (4, 4) :
+  carre(4, 4, ALPHABET[1], 1, 1, 250, 1);    // 1. le petit : taille 1 (3 × 3), sens 1
+                                             //    (aiguilles d'une montre), 250 ms, 1 tour
+  carre(4, 4, ALPHABET[1], 3, -1, 100, 3);   // 2. le grand, quand le petit est FINI :
+                                             //    taille 3 (7 × 7), sens -1 (l'autre
+                                             //    sens), 100 ms par pas, 3 tours
+
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -6244,16 +6883,21 @@ int main() {
     texte: [
       '**C’est le 0.52 et le 0.52.1 réunis** : les carrés du A, puis ceux du B.',
     ],
-    code: `int main() {
-  // 1. Le A, autour de (10, 8)
-  carre(10, 8, ALPHABET[0], 1, 1, 250, 1);
-  carre(10, 8, ALPHABET[0], 3, -1, 100, 3);
-  // 2. Le B, autour de (4, 4)
-  carre(4, 4, ALPHABET[1], 1, 1, 250, 1);
-  carre(4, 4, ALPHABET[1], 3, -1, 100, 3);
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 
-  while (true) {
-    image();
+int main() {          // Le programme commence ici.
+  // carre(x, y, tuile, taille, sens, vitesse, tours) ; chaque carre attend la fin
+  // de ses tours avant de passer à la ligne suivante.
+  // 1. Le A, autour de (10, 8)
+  carre(10, 8, ALPHABET[0], 1, 1, 250, 1);    // petit : 3 × 3, sens 1, 250 ms, 1 tour
+  carre(10, 8, ALPHABET[0], 3, -1, 100, 3);   // grand : 7 × 7, sens -1, 100 ms, 3 tours
+  // 2. Le B, autour de (4, 4)
+  carre(4, 4, ALPHABET[1], 1, 1, 250, 1);     // petit
+  carre(4, 4, ALPHABET[1], 3, -1, 100, 3);    // grand
+
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -6276,7 +6920,10 @@ int main() {
       '**Ce qui est nouveau ici :** une **deuxième lettre**, `ALPHABET[1]`, le **B**. Chaque appel à `carre` a sa propre tuile et son propre centre : les deux carrés ne se touchent pas.',
       '**Ils se font l’un après l’autre**, comme au 0.52 : le B commence quand le A est revenu à son centre. À la fin, on voit les deux lettres, chacune à sa place.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // ALPHABET[0] est le A, ALPHABET[1] le B : on compte à partir de 0.
 
   // 1. Le A : autour de (4, 4), taille 1 (3 × 3), sens 1, 250 ms, 1 tour.
@@ -6316,7 +6963,10 @@ int main() {
       '**C’est le 0.53**, avec deux **autres** lettres, le C et le D, à deux places libres de l’écran : (15, 4) et (14, 12).',
       '**C’est la version de base** : la deuxième place, seule. Le 0.53.2 met les deux ensemble.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   carre(15, 4, ALPHABET[2], 1, 1, 250, 1);     // le C, en haut à droite
   carre(14, 12, ALPHABET[3], 3, -1, 100, 1);   // le D, en bas à droite
 
@@ -6343,7 +6993,10 @@ int main() {
     texte: [
       '**C’est le 0.53 et le 0.53.1 réunis** : les quatre carrés, l’un après l’autre.',
     ],
-    code: `int main() {
+    code: `#include <carre>      // une tuile qui tourne en carré
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   carre(4, 4, ALPHABET[0], 1, 1, 250, 1);      // le A
   carre(9, 9, ALPHABET[1], 3, -1, 100, 1);     // le B
   carre(15, 4, ALPHABET[2], 1, 1, 250, 1);     // le C
@@ -6376,6 +7029,11 @@ int main() {
     ],
     code: `// Les réglages du C, rangés sous un nom (le 0.48) :
 //               x   y   tuile        taille  sens  vitesse  tours
+
+#include <Carre>      // les sept réglages d’un carré sous un seul nom
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <carre>      // une tuile qui tourne en carré
+
 Carre ronde = { 15,  8,  ALPHABET[2], 2,      1,    250,     2 };
 // autour de (15, 8), la lettre C, 5 × 5, sens des aiguilles, 250 ms par pas, 2 tours
 
@@ -6416,13 +7074,23 @@ int main() {
       '**C’est le 0.54**, avec une **quatrième** lettre, le D, rangée dans un `Carre` nommé `bas`, autour de (15, 14).',
       '**C’est la version de base** : la deuxième place, seule. Le 0.54.2 met les deux ensemble.',
     ],
-    code: `Carre bas = { 15, 14, ALPHABET[3], 2, 1, 250, 1 };   // le D, en bas à droite
+    code: `// Les réglages d'un carré, rangés sous un nom :
+//                x   y   tuile        taille  sens  vitesse  tours
 
-int main() {
-  carre(bas);
+#include <Carre>      // les sept réglages d’un carré sous un seul nom
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <carre>      // une tuile qui tourne en carré
 
-  while (true) {
-    image();
+Carre bas = { 15, 14, ALPHABET[3], 2, 1, 250, 1 };   // le D, en bas à droite
+// autour de (15, 14), la lettre D (ALPHABET[3]), 5 × 5, sens des aiguilles,
+// 250 ms par pas, 1 tour
+
+int main() {          // Le programme commence ici.
+  carre(bas);         // Le compilateur la remplace par
+                      // carre(15, 14, ALPHABET[3], 2, 1, 250, 1).
+
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -6444,7 +7112,11 @@ int main() {
     texte: [
       '**C’est le 0.54 et le 0.54.1 réunis** : les trois carrés, puis le quatrième.',
     ],
-    code: `Carre ronde = { 15,  8, ALPHABET[2], 2, 1, 250, 2 };   // le C
+    code: `#include <Carre>      // les sept réglages d’un carré sous un seul nom
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <carre>      // une tuile qui tourne en carré
+
+Carre ronde = { 15,  8, ALPHABET[2], 2, 1, 250, 2 };   // le C
 Carre bas   = { 15, 14, ALPHABET[3], 2, 1, 250, 1 };   // le D
 
 int main() {
@@ -6479,7 +7151,11 @@ int main() {
       '**Comme pour `carre` : plus le nombre est petit, plus ça va vite.** `vitesse(100)` : 10 pas par seconde. Le nombre s’écrit en clair.',
       '**Le reste est le 0.18 :** `deplace_x` fait avancer la lettre de 5 cases. Mais cette fois, deux fois et demie plus vite.',
     ],
-    code: `uint8_t x = 0;        // la colonne de la lettre : 0, tout à gauche
+    code: `#include <vitesse>     // règle la vitesse des déplacements
+#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;        // la colonne de la lettre : 0, tout à gauche
 
 int main() {
   // La ligne nouvelle :
@@ -6530,7 +7206,11 @@ int main() {
       '**C’est le 0.55**, avec le **B**, sur la **ligne 8**.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.55.2 met les deux ensemble.',
     ],
-    code: `uint8_t x = 0;
+    code: `#include <vitesse>     // règle la vitesse des déplacements
+#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;
 
 int main() {
   vitesse(100);                       // 10 pas par seconde
@@ -6559,7 +7239,11 @@ int main() {
       '**C’est le 0.55 et le 0.55.1 réunis** : le A puis le B, avec le même `vitesse(100)`.',
       '**Un seul réglage suffit :** `vitesse` reste réglée jusqu’au suivant, pour toutes les lettres.',
     ],
-    code: `uint8_t x = 0;        // le A
+    code: `#include <vitesse>     // règle la vitesse des déplacements
+#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;        // le A
 uint8_t xb = 0;       // le B
 
 int main() {
@@ -6591,7 +7275,11 @@ int main() {
       '**Ce qui est nouveau ici :** un **deuxième** `vitesse(…)`. La vitesse reste réglée **jusqu’au prochain `vitesse`** : l’aller se fait à 100, et après `vitesse(500)`, le retour se fait à 500 millisecondes par pas, 2 pas par seconde.',
       '**On peut changer de vitesse autant de fois qu’on veut**, entre deux déplacements.',
     ],
-    code: `uint8_t x = 0;        // la colonne de la lettre
+    code: `#include <vitesse>     // règle la vitesse des déplacements
+#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;        // la colonne de la lettre
 
 int main() {
   vitesse(100);                       // 10 pas par seconde…
@@ -6635,16 +7323,23 @@ int main() {
       '**C’est le 0.56**, avec le **B**, sur la **ligne 8**.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.56.2 met les deux ensemble.',
     ],
-    code: `uint8_t x = 0;
+    code: `#include <vitesse>     // règle la vitesse des déplacements
+#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
 
-int main() {
+uint8_t x = 0;        // la colonne de la lettre
+
+int main() {          // Le programme commence ici.
+  // vitesse(ms) règle le temps d'UN pas, en millisecondes, pour tous les
+  // déplacements qui suivent : 100 ms = 10 pas par seconde, 500 ms = 2.
+  // Le changement : le B (ALPHABET[1]), sur la ligne 8.
   vitesse(100);
-  deplace_x(x, 8, ALPHABET[1], 5);    // vite
+  deplace_x(x, 8, ALPHABET[1], 5);    // vite : l'aller, 5 cases à droite
   vitesse(500);
-  deplace_x(x, 8, ALPHABET[1], -5);   // lentement
+  deplace_x(x, 8, ALPHABET[1], -5);   // lentement : le retour, 5 cases à gauche
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -6666,7 +7361,11 @@ int main() {
     texte: [
       '**C’est le 0.56 et le 0.56.1 réunis** : les deux lettres, chacune avec ses deux vitesses.',
     ],
-    code: `uint8_t x = 0;        // le A
+    code: `#include <vitesse>     // règle la vitesse des déplacements
+#include <deplace_x>   // fait avancer une tuile sur sa ligne
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;        // le A
 uint8_t xb = 0;       // le B
 
 int main() {
@@ -6705,7 +7404,10 @@ int main() {
       '**Le trajet :** du centre, la lettre monte **tout droit** jusqu’à la pointe du haut ; elle fait le tour en diagonale ; puis elle redescend tout droit au centre.',
       '**Un Carre marche aussi :** puisque les réglages sont les mêmes, `losange(ronde);` accepte un `Carre ronde = { … };`, comme `carre(ronde);`.',
     ],
-    code: `int main() {
+    code: `#include <losange>    // une tuile qui tourne en losange
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Un losange autour de la case (10, 8). Mêmes réglages que carre :
   //
   //   losange(10, 8, ALPHABET[0], 2, 1, 250, 1);
@@ -6768,12 +7470,18 @@ int main() {
       '**La forme tient entière** autour de (4, 4) : elle ne s’approche jamais à moins d’une case du bord.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.57.2 met les deux ensemble.',
     ],
-    code: `int main() {
-  // Le B, en haut à gauche :
-  losange(4, 4, ALPHABET[1], 2, 1, 250, 1);
+    code: `#include <losange>    // une tuile qui tourne en losange
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 
-  while (true) {
-    image();
+int main() {          // Le programme commence ici.
+  // losange(x, y, tuile, taille, sens, vitesse, tours) : mêmes réglages que carre,
+  // mais la tuile fait le tour d'un losange (des pas en diagonale).
+  //   taille 2 : les pointes à 2 cases du centre ; sens 1 ; 250 ms par pas ; 1 tour.
+  // Le changement : le B (ALPHABET[1]), autour de (4, 4), en haut à gauche :
+  losange(4, 4, ALPHABET[1], 2, 1, 250, 1);   // pointes en (4, 2), (6, 4), (4, 6), (2, 4)
+
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -6795,14 +7503,19 @@ int main() {
     texte: [
       '**C’est le 0.57 et le 0.57.1 réunis** : la même forme à deux places, l’une après l’autre.',
     ],
-    code: `int main() {
+    code: `#include <losange>    // une tuile qui tourne en losange
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {          // Le programme commence ici.
+  // losange(x, y, tuile, taille, sens, vitesse, tours) : la tuile fait le tour
+  // d'un losange autour de (x, y) ; taille 2 = pointes à 2 cases du centre.
   // 1. Le A, au milieu
   losange(10, 8, ALPHABET[0], 2, 1, 250, 1);
-  // 2. Le B, en haut à gauche
+  // 2. Le B, en haut à gauche — quand le A a fini son tour.
   losange(4, 4, ALPHABET[1], 2, 1, 250, 1);
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -6827,7 +7540,10 @@ int main() {
       '**Le trajet :** du centre, en diagonale, puis tout droit jusqu’au coin en haut à gauche ; le tour ; puis le même chemin à l’envers.',
       '**Les plus grandes tailles :** largeur 9 (19 colonnes) et hauteur 8 (17 lignes).',
     ],
-    code: `int main() {
+    code: `#include <rectangle>   // une tuile qui tourne en rectangle
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Un rectangle autour de la case (10, 8) :
   //
   //   rectangle(10, 8, ALPHABET[0], 4, 2, 1, 250, 1);
@@ -6884,12 +7600,20 @@ int main() {
       '**La forme tient entière** autour de (4, 4) : elle ne s’approche jamais à moins d’une case du bord.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.58.2 met les deux ensemble.',
     ],
-    code: `int main() {
-  // Le B, en haut à gauche :
+    code: `#include <rectangle>   // une tuile qui tourne en rectangle
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+int main() {          // Le programme commence ici.
+  // rectangle(x, y, tuile, largeur, hauteur, sens, vitesse, tours) : la tuile fait
+  // le tour d'un rectangle autour du centre (x, y).
+  //   largeur 4 → 2 × 4 + 1 = 9 cases de large ; hauteur 2 → 5 cases de haut
+  //   sens 1 = comme les aiguilles ; 250 ms par pas ; 1 tour.
+  // Le changement : le B (ALPHABET[1]), autour de (4, 4), en haut à gauche :
+  //   colonnes 0 à 8, lignes 2 à 6.
   rectangle(4, 4, ALPHABET[1], 4, 2, 1, 250, 1);
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -6911,14 +7635,19 @@ int main() {
     texte: [
       '**C’est le 0.58 et le 0.58.1 réunis** : la même forme à deux places, l’une après l’autre.',
     ],
-    code: `int main() {
-  // 1. Le A, au milieu
+    code: `#include <rectangle>   // une tuile qui tourne en rectangle
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+
+int main() {          // Le programme commence ici.
+  // rectangle(x, y, tuile, largeur, hauteur, sens, vitesse, tours) : 9 cases de
+  // large (2 × 4 + 1), 5 de haut (2 × 2 + 1), sens 1, 250 ms par pas, 1 tour.
+  // 1. Le A, au milieu : autour de (10, 8)
   rectangle(10, 8, ALPHABET[0], 4, 2, 1, 250, 1);
-  // 2. Le B, en haut à gauche
+  // 2. Le B, en haut à gauche : autour de (4, 4) — quand le A a fini.
   rectangle(4, 4, ALPHABET[1], 4, 2, 1, 250, 1);
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -6942,7 +7671,10 @@ int main() {
       '**Le sens :** `1` tourne comme les aiguilles d’une montre (droite, bas, gauche, haut, et on recommence) ; `-1` dans l’autre sens (bas, droite, haut, gauche).',
       '**À la fin**, la lettre revient au centre en diagonale.',
     ],
-    code: `int main() {
+    code: `#include <spirale>    // une tuile qui tourne en spirale
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // Une spirale autour de la case (10, 8) :
   //
   //   spirale(10, 8, ALPHABET[0], 3, 1, 250);
@@ -7005,12 +7737,19 @@ int main() {
       '**La forme tient entière** autour de (4, 4) : elle ne s’approche jamais à moins d’une case du bord.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.59.2 met les deux ensemble.',
     ],
-    code: `int main() {
-  // Le B, en haut à gauche :
+    code: `#include <spirale>    // une tuile qui tourne en spirale
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {          // Le programme commence ici.
+  // spirale(x, y, tuile, taille, sens, vitesse) : la tuile tourne en s'éloignant
+  // du centre (x, y) : 1 pas, 1 pas, 2, 2, 3, 3 ... jusqu'au bord d'un carré.
+  //   taille 3 : jusqu'au bord d'un carré 7 × 7 ; sens 1 : droite, bas, gauche,
+  //   haut... ; 250 ms par pas.
+  // Le changement : le B (ALPHABET[1]), autour de (4, 4), en haut à gauche :
   spirale(4, 4, ALPHABET[1], 3, 1, 250);
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -7032,14 +7771,19 @@ int main() {
     texte: [
       '**C’est le 0.59 et le 0.59.1 réunis** : la même forme à deux places, l’une après l’autre.',
     ],
-    code: `int main() {
-  // 1. Le A, au milieu
+    code: `#include <spirale>    // une tuile qui tourne en spirale
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {          // Le programme commence ici.
+  // spirale(x, y, tuile, taille, sens, vitesse) : la tuile tourne en s'éloignant
+  // du centre ; taille 3 = jusqu'au bord d'un carré 7 × 7 ; sens 1 ; 250 ms par pas.
+  // 1. Le A, au milieu : autour de (10, 8)
   spirale(10, 8, ALPHABET[0], 3, 1, 250);
-  // 2. Le B, en haut à gauche
+  // 2. Le B, en haut à gauche : autour de (4, 4) — quand le A a fini.
   spirale(4, 4, ALPHABET[1], 3, 1, 250);
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -7064,7 +7808,10 @@ int main() {
       '• **`vitesse`** : en millisecondes par pas, comme pour `carre`. **`fois`** : combien d’allers-retours.',
       '**Au bord de l’écran**, l’autre bout est ramené dans l’écran.',
     ],
-    code: `int main() {
+    code: `#include <aller_retour>   // une tuile qui va et revient
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   // La ligne, morceau par morceau :
   //
   //   aller_retour(10, 8, ALPHABET[0], 5, 0, 250, 2);
@@ -7109,12 +7856,19 @@ int main() {
       '**La forme tient entière** autour de (4, 4) : elle ne s’approche jamais à moins d’une case du bord.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.60.2 met les deux ensemble.',
     ],
-    code: `int main() {
-  // Le B, en haut à gauche :
+    code: `#include <aller_retour>   // une tuile qui va et revient
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+
+int main() {          // Le programme commence ici.
+  // aller_retour(x, y, tuile, pasX, pasY, vitesse, fois) : la tuile va de (x, y)
+  // jusqu'à (x + pasX, y + pasY), puis revient ; « fois » allers-retours.
+  //   pasX 5 : l'autre bout est 5 cases à droite ; pasY 0 : pas de mouvement en Y ;
+  //   250 ms par pas ; 2 allers-retours.
+  // Le changement : le B (ALPHABET[1]), depuis (4, 4) : de (4, 4) à (9, 4), et retour.
   aller_retour(4, 4, ALPHABET[1], 5, 0, 250, 2);
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante. Le B est revenu en (4, 4).
   }
 }
 `,
@@ -7136,14 +7890,19 @@ int main() {
     texte: [
       '**C’est le 0.60 et le 0.60.1 réunis** : la même forme à deux places, l’une après l’autre.',
     ],
-    code: `int main() {
-  // 1. Le A, au milieu
+    code: `#include <aller_retour>   // une tuile qui va et revient
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+
+int main() {          // Le programme commence ici.
+  // aller_retour(x, y, tuile, pasX, pasY, vitesse, fois) : de (x, y) à
+  // (x + pasX, y + pasY) et retour ; ici 5 cases à droite, 250 ms, 2 fois.
+  // 1. Le A, au milieu : de (10, 8) à (15, 8)
   aller_retour(10, 8, ALPHABET[0], 5, 0, 250, 2);
-  // 2. Le B, en haut à gauche
+  // 2. Le B, en haut à gauche : de (4, 4) à (9, 4) — quand le A a fini.
   aller_retour(4, 4, ALPHABET[1], 5, 0, 250, 2);
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -7166,7 +7925,10 @@ int main() {
       '**Ce qui est nouveau ici :** `pasX` **et** `pasY` à la fois : `4, 4`. L’autre bout est 4 cases à droite **et** 4 cases en bas, en (14, 12). À chaque pas, la lettre avance d’une case sur X et d’une case sur Y : elle va **en biais**, comme `deplace` au 0.26.',
       '**Plus vite, et une seule fois :** vitesse `100`, fois `1`.',
     ],
-    code: `int main() {
+    code: `#include <aller_retour>   // une tuile qui va et revient
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   aller_retour(10, 8, ALPHABET[0], 5, 0, 250, 2);   // tout droit (le 0.60)
 
   // La ligne ajoutée : 4 à droite ET 4 en bas → en diagonale.
@@ -7204,13 +7966,21 @@ int main() {
       '**La forme tient entière** autour de (4, 4) : elle ne s’approche jamais à moins d’une case du bord.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.61.2 met les deux ensemble.',
     ],
-    code: `int main() {
-  // Le B, en haut à gauche :
-  aller_retour(4, 4, ALPHABET[1], 5, 0, 250, 2);
-  aller_retour(4, 4, ALPHABET[1], 4, 4, 100, 1);
+    code: `#include <aller_retour>   // une tuile qui va et revient
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
 
-  while (true) {
-    image();
+int main() {          // Le programme commence ici.
+  // aller_retour(x, y, tuile, pasX, pasY, vitesse, fois) : de (x, y) à
+  // (x + pasX, y + pasY), puis retour par le même chemin.
+  // Le changement : le B (ALPHABET[1]), depuis (4, 4), en haut à gauche :
+  aller_retour(4, 4, ALPHABET[1], 5, 0, 250, 2);   // tout droit : jusqu'à (9, 4),
+                                                   // 250 ms par pas, 2 fois
+  aller_retour(4, 4, ALPHABET[1], 4, 4, 100, 1);   // en diagonale : 4 à droite ET
+                                                   // 4 en bas → jusqu'à (8, 8),
+                                                   // 100 ms par pas, 1 fois
+
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante. Le B est revenu en (4, 4).
   }
 }
 `,
@@ -7232,16 +8002,21 @@ int main() {
     texte: [
       '**C’est le 0.61 et le 0.61.1 réunis** : la même forme à deux places, l’une après l’autre.',
     ],
-    code: `int main() {
-  // 1. Le A, au milieu
-  aller_retour(10, 8, ALPHABET[0], 5, 0, 250, 2);
-  aller_retour(10, 8, ALPHABET[0], 4, 4, 100, 1);
-  // 2. Le B, en haut à gauche
-  aller_retour(4, 4, ALPHABET[1], 5, 0, 250, 2);
-  aller_retour(4, 4, ALPHABET[1], 4, 4, 100, 1);
+    code: `#include <aller_retour>   // une tuile qui va et revient
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
 
-  while (true) {
-    image();
+int main() {          // Le programme commence ici.
+  // aller_retour(x, y, tuile, pasX, pasY, vitesse, fois) : de (x, y) à
+  // (x + pasX, y + pasY), puis retour. pasX et pasY non nuls → en diagonale.
+  // 1. Le A, au milieu
+  aller_retour(10, 8, ALPHABET[0], 5, 0, 250, 2);   // tout droit, jusqu'à (15, 8)
+  aller_retour(10, 8, ALPHABET[0], 4, 4, 100, 1);   // en diagonale, jusqu'à (14, 12)
+  // 2. Le B, en haut à gauche
+  aller_retour(4, 4, ALPHABET[1], 5, 0, 250, 2);    // tout droit, jusqu'à (9, 4)
+  aller_retour(4, 4, ALPHABET[1], 4, 4, 100, 1);    // en diagonale, jusqu'à (8, 8)
+
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }
 `,
@@ -7264,7 +8039,11 @@ int main() {
       '**Ce qui est nouveau ici :** deux formes **différentes** dans le même programme, avec des centres choisis pour qu’elles ne se touchent pas : le A en haut à gauche, le B en haut à droite.',
       '**Elles se font l’une après l’autre** : le B commence quand le A est revenu à son centre. Toutes deux à `100` ms par pas, pour que le tout ne dure pas trop.',
     ],
-    code: `int main() {
+    code: `#include <losange>     // une tuile qui tourne en losange
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <rectangle>   // une tuile qui tourne en rectangle
+
+int main() {
   //   colonnes 2 à 6            colonnes 10 à 18
   //   +----------------+        +---------------------+
   //   |   A : losange  |        |   B : rectangle     |   lignes 2 à 6
@@ -7303,7 +8082,11 @@ int main() {
       '**C’est le 0.62**, avec les deux mêmes formes **en bas** de l’écran, par le C et le D.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.62.2 met les deux ensemble.',
     ],
-    code: `int main() {
+    code: `#include <losange>     // une tuile qui tourne en losange
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <rectangle>   // une tuile qui tourne en rectangle
+
+int main() {
   losange(4, 12, ALPHABET[2], 2, 1, 100, 1);           // le C, en bas à gauche
   rectangle(14, 12, ALPHABET[3], 4, 2, -1, 100, 1);   // le D, en bas à droite
 
@@ -7330,7 +8113,11 @@ int main() {
     texte: [
       '**C’est le 0.62 et le 0.62.1 réunis** : les formes du haut, puis celles du bas.',
     ],
-    code: `int main() {
+    code: `#include <losange>     // une tuile qui tourne en losange
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <rectangle>   // une tuile qui tourne en rectangle
+
+int main() {
   losange(4, 4, ALPHABET[0], 2, 1, 100, 1);            // le A, en haut à gauche
   rectangle(14, 4, ALPHABET[1], 4, 2, -1, 100, 1);    // le B, en haut à droite
   losange(4, 12, ALPHABET[2], 2, 1, 100, 1);           // le C, en bas à gauche
@@ -7361,7 +8148,12 @@ int main() {
       '**C’est le 0.62, plus une ligne :** une spirale (le 0.59) pour le C, en bas à gauche de l’écran.',
       '**Ce qui est nouveau ici :** une troisième forme, sous les deux autres. `ALPHABET[2]` est la 3e lettre, le **C**.',
     ],
-    code: `int main() {
+    code: `#include <losange>     // une tuile qui tourne en losange
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <rectangle>   // une tuile qui tourne en rectangle
+#include <spirale>     // une tuile qui tourne en spirale
+
+int main() {
   //   +----------------+        +---------------------+
   //   |   A : losange  |        |   B : rectangle     |   lignes 2 à 6
   //   +----------------+        +---------------------+
@@ -7402,7 +8194,10 @@ int main() {
       '**C’est le 0.63**, avec une spirale **en bas à droite**, par le D.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.63.2 met les deux ensemble.',
     ],
-    code: `int main() {
+    code: `#include <spirale>    // une tuile qui tourne en spirale
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   spirale(14, 12, ALPHABET[3], 2, 1, 100);            // le D, en bas à droite
 
   while (true) {
@@ -7428,7 +8223,12 @@ int main() {
     texte: [
       '**C’est le 0.63 et le 0.63.1 réunis** : quatre formes, dont deux spirales.',
     ],
-    code: `int main() {
+    code: `#include <losange>     // une tuile qui tourne en losange
+#include <ALPHABET>    // les lettres de la police : ALPHABET[0] est le A
+#include <rectangle>   // une tuile qui tourne en rectangle
+#include <spirale>     // une tuile qui tourne en spirale
+
+int main() {
   losange(4, 4, ALPHABET[0], 2, 1, 100, 1);            // le A, en haut à gauche
   rectangle(14, 4, ALPHABET[1], 4, 2, -1, 100, 1);    // le B, en haut à droite
   spirale(4, 12, ALPHABET[2], 2, 1, 100);             // le C, en bas à gauche
@@ -7458,7 +8258,13 @@ int main() {
       '**Ce qui est nouveau ici :** la quatrième forme. `ALPHABET[3]` est la 4e lettre, le **D** : on compte à partir de 0 (A = 0, B = 1, C = 2, D = 3).',
       '**Change un nombre et relance :** chaque forme a sa taille, son sens et sa vitesse. Tout ce qu’on a vu depuis le 0.34 est là.',
     ],
-    code: `int main() {
+    code: `#include <losange>        // une tuile qui tourne en losange
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+#include <rectangle>      // une tuile qui tourne en rectangle
+#include <spirale>        // une tuile qui tourne en spirale
+#include <aller_retour>   // une tuile qui va et revient
+
+int main() {
   //   colonnes 2 à 6            colonnes 10 à 18
   //   +----------------+        +---------------------+
   //   |   A : losange  |        |   B : rectangle     |   lignes 2 à 6
@@ -7501,7 +8307,10 @@ int main() {
       '**C’est le 0.64**, avec un aller-retour **sur la ligne 8**, entre les formes du haut et celles du bas, par le E (`ALPHABET[4]`).',
       '**C’est la version de base** : la deuxième place, seule. Le 0.64.2 met les deux ensemble.',
     ],
-    code: `int main() {
+    code: `#include <aller_retour>   // une tuile qui va et revient
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   aller_retour(3, 8, ALPHABET[4], 14, 0, 100, 1);     // le E, ligne 8
 
   while (true) {
@@ -7527,7 +8336,13 @@ int main() {
     texte: [
       '**C’est le 0.64 et le 0.64.1 réunis** : les quatre formes, puis le E au milieu.',
     ],
-    code: `int main() {
+    code: `#include <losange>        // une tuile qui tourne en losange
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+#include <rectangle>      // une tuile qui tourne en rectangle
+#include <spirale>        // une tuile qui tourne en spirale
+#include <aller_retour>   // une tuile qui va et revient
+
+int main() {
   losange(4, 4, ALPHABET[0], 2, 1, 100, 1);            // le A, en haut à gauche
   rectangle(14, 4, ALPHABET[1], 4, 2, -1, 100, 1);    // le B, en haut à droite
   spirale(4, 12, ALPHABET[2], 2, 1, 100);             // le C, en bas à gauche
@@ -7560,7 +8375,11 @@ int main() {
       'Pour bouger, on **efface** d’abord l’ancienne place avec `effacer(x, 0, 1)`, une case ; puis on change `x`, et la lettre est réécrite à sa nouvelle place. Sans l’effacement, elle laisserait une traînée de A derrière elle.',
       'Au bout de la ligne, `x` revient à 0 : la lettre repart de la gauche.',
     ],
-    code: `uint8_t x = 0;        // la colonne de la lettre
+    code: `#include <effacer>    // efface des cases, ou tout le fond
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;        // la colonne de la lettre
 uint8_t images = 0;
 
 int main() {
@@ -7603,7 +8422,11 @@ int main() {
       '**C’est le 0.65**, avec le **B**, sur la **ligne 8**.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.65.2 met les deux ensemble.',
     ],
-    code: `uint8_t x = 0;        // la colonne de la lettre
+    code: `#include <effacer>    // efface des cases, ou tout le fond
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;        // la colonne de la lettre
 uint8_t images = 0;
 
 int main() {
@@ -7632,7 +8455,11 @@ int main() {
     texte: [
       '**C’est le 0.65 et le 0.65.1 réunis** : deux `effacer`, deux `poser`, la même `x`.',
     ],
-    code: `uint8_t x = 0;        // la colonne des deux lettres
+    code: `#include <effacer>    // efface des cases, ou tout le fond
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;        // la colonne des deux lettres
 uint8_t images = 0;
 
 int main() {
@@ -7665,7 +8492,10 @@ int main() {
       '**`defile(numero, x, y, tuile, sens, vitesse)`**, une fonction de la console (voir le 0.76.12) : au premier appel, la lettre apparaît en (`x`, `y`) ; ensuite, un pas toutes les `vitesse` ms, à droite (`sens` 1) ou à gauche (-1). Au bord, elle repart de l’autre côté : exactement le `if (x == 20) x = 0;` du 0.65.',
       '**Plus de variables à déclarer :** la console retient elle-même où en est la lettre, grâce au numéro 0.',
     ],
-    code: `int main() {
+    code: `#include <defile>     // une tuile qui file sur sa ligne sans arrêter le jeu
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+int main() {
   while (true) {
     image();
     // Tout le 0.65 en une ligne :
@@ -7692,7 +8522,12 @@ int main() {
       'Les conditions `x < 19`, `x > 0`, `y < 17` et `y > 0` empêchent de sortir de l’écran.',
       'Voilà les trois ingrédients d’un jeu : la **boucle**, le **joueur qui agit**, et l’**écran qui répond**.',
     ],
-    code: `uint8_t x = 9;        // la lettre part du milieu de l'écran
+    code: `#include <effacer>    // efface des cases, ou tout le fond
+#include <bouton>     // lit un bouton de la manette
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 9;        // la lettre part du milieu de l'écran
 uint8_t y = 8;
 uint8_t attente = 0;  // les images à attendre avant le prochain pas
 
@@ -7742,7 +8577,12 @@ int main() {
       '**C’est le 0.66**, avec le **B**, qui part de **(4, 4)** au lieu du milieu.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.66.2 met les deux ensemble.',
     ],
-    code: `uint8_t x = 4;        // la colonne du B
+    code: `#include <effacer>    // efface des cases, ou tout le fond
+#include <bouton>     // lit un bouton de la manette
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 4;        // la colonne du B
 uint8_t y = 4;        // sa ligne
 uint8_t attente = 0;
 
@@ -7783,7 +8623,12 @@ int main() {
       '**C’est le 0.66 et le 0.66.1 réunis** : les deux lettres, commandées par la même croix.',
       '**Une flèche, deux pas :** chaque bouton fait avancer les deux lettres ; chacune garde sa place et s’arrête à SON bord.',
     ],
-    code: `uint8_t x = 9;        // la colonne du A
+    code: `#include <effacer>    // efface des cases, ou tout le fond
+#include <bouton>     // lit un bouton de la manette
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 9;        // la colonne du A
 uint8_t y = 8;        // sa ligne
 uint8_t xb = 4;        // la colonne du B
 uint8_t yb = 4;        // sa ligne
@@ -7829,7 +8674,10 @@ int main() {
       '**La vitesse, 133 ms :** c’est 8 images, exactement l’`attente = 8` du 0.66. La lettre va donc à la même vitesse.',
       '**Et elle ne clignote plus :** `deplace_croix` n’efface l’ancienne case que si la lettre a bougé. Le 0.66 effaçait et reposait à chaque pas possible.',
     ],
-    code: `uint8_t x = 9;        // la lettre part du milieu de l'écran
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 9;        // la lettre part du milieu de l'écran
 uint8_t y = 8;
 
 int main() {
@@ -7879,6 +8727,11 @@ uint8_t attente = 0;  // les images à attendre avant le prochain pas (0 : tout 
 //   +------------ « verse ici » : avant la compilation, cette ligne est
 //                 remplacée par tout le contenu de variables.h. Tout se passe
 //                 comme si x, y et attente étaient écrits ici, comme au 0.66.
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <bouton>     // lit un bouton de la manette
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 #include "variables.h"
 
 int main() {
@@ -7937,6 +8790,11 @@ uint8_t attente = 0;
 `,
     },
     code: `// voir l'onglet variables.h
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <bouton>     // lit un bouton de la manette
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 #include "variables.h"
 
 int main() {
@@ -7985,6 +8843,11 @@ uint8_t attente = 0;
 `,
     },
     code: `// voir l'onglet variables.h
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <bouton>     // lit un bouton de la manette
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 #include "variables.h"
 
 int main() {
@@ -8032,6 +8895,9 @@ uint8_t y = 8;
 `,
     },
     code: `// x et y : voir l'onglet variables.h
+
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include "variables.h"
 
 int main() {
@@ -8070,6 +8936,12 @@ uint8_t attente = 0;  // les images à attendre avant le prochain pas
 `,
     },
     code: `// x, y, attente : voir l'onglet variables.h. (#include veut être seul sur sa ligne.)
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <bouton>     // lit un bouton de la manette
+#include <nombre>     // écrit un nombre en chiffres
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 #include "variables.h"
 
 int main() {
@@ -8138,6 +9010,12 @@ uint8_t attente = 0;
 `,
     },
     code: `// voir l'onglet variables.h
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <bouton>     // lit un bouton de la manette
+#include <nombre>     // écrit un nombre en chiffres
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 #include "variables.h"
 
 int main() {
@@ -8188,6 +9066,12 @@ uint8_t attente = 0;
 `,
     },
     code: `// voir l'onglet variables.h
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <bouton>     // lit un bouton de la manette
+#include <nombre>     // écrit un nombre en chiffres
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 #include "variables.h"
 
 int main() {
@@ -8239,6 +9123,10 @@ uint8_t y = 8;
 `,
     },
     code: `// x et y : voir l'onglet variables.h
+
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
 #include "variables.h"
 
 int main() {
@@ -8283,6 +9171,13 @@ uint8_t trouveY = 0;  // la ligne où lire() a trouvé le A (nouveau)
 `,
     },
     code: `// x, y, attente, trouveX, trouveY : voir l'onglet variables.h
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <bouton>     // lit un bouton de la manette
+#include <nombre>     // écrit un nombre en chiffres
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <lire>       // lit la tuile posée sur une case
 #include "variables.h"
 
 int main() {
@@ -8365,6 +9260,13 @@ uint8_t trouveY = 0;
 `,
     },
     code: `// voir l'onglet variables.h
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <bouton>     // lit un bouton de la manette
+#include <nombre>     // écrit un nombre en chiffres
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <lire>       // lit la tuile posée sur une case
 #include "variables.h"
 
 int main() {
@@ -8418,6 +9320,13 @@ uint8_t trouveY = 0;
 `,
     },
     code: `// voir l'onglet variables.h
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <bouton>     // lit un bouton de la manette
+#include <nombre>     // écrit un nombre en chiffres
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <lire>       // lit la tuile posée sur une case
 #include "variables.h"
 
 int main() {
@@ -8469,6 +9378,12 @@ uint8_t trouveY = 0;  // sa ligne
 `,
     },
     code: `// x, y, trouveX, trouveY : voir l'onglet variables.h
+
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+#include <bouton>          // lit un bouton de la manette
+#include <lire>            // lit la tuile posée sur une case
 #include "variables.h"
 
 int main() {
@@ -8524,6 +9439,10 @@ uint8_t py = 68;      // la ligne en pixels   : 68 = le milieu ((144 - 8) / 2)
 `,
     },
     code: `// px, py : voir l'onglet variables.h
+
+#include <bouton>     // lit un bouton de la manette
+#include <sprite>     // place un lutin de 8 × 8 au pixel près
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
 #include "variables.h"
 
 int main() {
@@ -8579,7 +9498,11 @@ int main() {
       '**C’est le 0.70**, avec le **B**, parti de **(20, 20)** pixels, en haut à gauche.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.70.2 met les deux ensemble.',
     ],
-    code: `uint8_t px = 20;      // le B, en pixels
+    code: `#include <bouton>     // lit un bouton de la manette
+#include <sprite>     // place un lutin de 8 × 8 au pixel près
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t px = 20;      // le B, en pixels
 uint8_t py = 20;
 
 int main() {
@@ -8606,7 +9529,11 @@ int main() {
       '**C’est le 0.70 et le 0.70.1 réunis** : deux lutins, chacun avec son numéro (0 et 1).',
       '**Chaque lutin a son numéro :** le même numéro ferait bouger le même lutin. Ici, 0 pour le A, 1 pour le B.',
     ],
-    code: `uint8_t px = 76;      // le A, en pixels
+    code: `#include <bouton>     // lit un bouton de la manette
+#include <sprite>     // place un lutin de 8 × 8 au pixel près
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t px = 76;      // le A, en pixels
 uint8_t py = 68;
 uint8_t pxb = 20;      // le B, en pixels
 uint8_t pyb = 20;
@@ -8640,7 +9567,10 @@ int main() {
       '**C’est le 0.70, en plus simple :** les quatre `if` des flèches et le `sprite` sont remplacés par une ligne, `glisse_croix` (le 0.73).',
       '**La vitesse, 1 :** un pixel par image, comme au 0.70.',
     ],
-    code: `uint8_t px = 76;      // en pixels : le milieu
+    code: `#include <glisse_croix>   // un lutin qui suit la croix, au pixel près
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t px = 76;      // en pixels : le milieu
 uint8_t py = 68;
 
 int main() {
@@ -8672,7 +9602,10 @@ int main() {
       '**Pas de `x =` :** comme `deplace` au 0.26, elle est seule sur sa ligne, et la console range la nouvelle colonne dans `x` et la nouvelle ligne dans `y`.',
       '**Elle ne clignote pas :** elle n’efface l’ancienne case **que si la lettre a bougé**. Immobile, la lettre est simplement reposée à la même place.',
     ],
-    code: `uint8_t x = 9;        // la COLONNE de la lettre : elle part du milieu
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 9;        // la COLONNE de la lettre : elle part du milieu
 uint8_t y = 8;        // la LIGNE de la lettre
 
 int main() {
@@ -8727,7 +9660,10 @@ int main() {
       '**C’est le 0.71**, avec le **B**, parti de **(4, 4)**.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.71.2 met les deux ensemble.',
     ],
-    code: `uint8_t x = 4;        // le B
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 4;        // le B
 uint8_t y = 4;
 
 int main() {
@@ -8750,7 +9686,10 @@ int main() {
       '**C’est le 0.71 et le 0.71.1 réunis** : deux appels, un par lettre.',
       '**Les deux bougent dans la même image :** la console ne fait passer le temps d’attente qu’une fois par image ; chaque appel de cette image a le droit de faire son pas.',
     ],
-    code: `uint8_t x = 9;        // le A
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 9;        // le A
 uint8_t y = 8;
 uint8_t xb = 4;        // le B
 uint8_t yb = 4;
@@ -8777,7 +9716,10 @@ int main() {
       '**Plus le nombre est petit, plus ça va vite**, puisque c’est le temps d’attente entre deux pas.',
       '**Trop vite, c’est difficile à diriger :** à `50` (20 cases par seconde), la lettre traverse l’écran en une seconde, et il devient dur de s’arrêter sur la bonne case. Essaie, et choisis ce qui convient à ton jeu.',
     ],
-    code: `uint8_t x = 9;        // la COLONNE de la lettre
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 9;        // la COLONNE de la lettre
 uint8_t y = 8;        // la LIGNE de la lettre
 
 int main() {
@@ -8818,7 +9760,10 @@ int main() {
       '**C’est le 0.72**, avec le **B**, parti de **(4, 4)**.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.72.2 met les deux ensemble.',
     ],
-    code: `uint8_t x = 4;        // le B
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 4;        // le B
 uint8_t y = 4;
 
 int main() {
@@ -8841,7 +9786,10 @@ int main() {
       '**C’est le 0.72 et le 0.72.1 réunis** : deux appels, un par lettre.',
       '**Les deux bougent dans la même image :** la console ne fait passer le temps d’attente qu’une fois par image ; chaque appel de cette image a le droit de faire son pas.',
     ],
-    code: `uint8_t x = 9;        // le A
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 9;        // le A
 uint8_t y = 8;
 uint8_t xb = 4;        // le B
 uint8_t yb = 4;
@@ -8870,7 +9818,10 @@ int main() {
       '**Elle reste dans l’écran :** `px` de 0 à 152, `py` de 0 à 136, pour que la lettre de 8 pixels reste entière dans l’écran de 160 × 144.',
       '**Laquelle choisir ?** `deplace_croix` pour un jeu **sur la grille** (un labyrinthe, un plateau), où l’on avance case par case. `glisse_croix` pour un personnage **qui glisse** librement.',
     ],
-    code: `uint8_t px = 76;      // la colonne en PIXELS : le milieu
+    code: `#include <glisse_croix>   // un lutin qui suit la croix, au pixel près
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t px = 76;      // la colonne en PIXELS : le milieu
 uint8_t py = 68;      // la ligne en PIXELS   : le milieu
 
 int main() {
@@ -8917,7 +9868,10 @@ int main() {
       '**C’est le 0.73**, avec le **B**, parti de **(20, 20)** pixels.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.73.2 met les deux ensemble.',
     ],
-    code: `uint8_t px = 20;      // le B, en pixels
+    code: `#include <glisse_croix>   // un lutin qui suit la croix, au pixel près
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t px = 20;      // le B, en pixels
 uint8_t py = 20;
 
 int main() {
@@ -8940,7 +9894,10 @@ int main() {
       '**C’est le 0.73 et le 0.73.1 réunis** : deux appels, un par lettre.',
       '**Deux lutins, deux numéros** (0 et 1) : ils glissent ensemble.',
     ],
-    code: `uint8_t px = 76;      // le A, en pixels
+    code: `#include <glisse_croix>   // un lutin qui suit la croix, au pixel près
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t px = 76;      // le A, en pixels
 uint8_t py = 68;
 uint8_t pxb = 20;      // le B, en pixels
 uint8_t pyb = 20;
@@ -8968,7 +9925,10 @@ int main() {
       '**Au bord,** un pas qui dépasserait s’arrête pile au bord : la lettre ne sort jamais de l’écran.',
       '**Elle peut être une variable :** contrairement à la vitesse de `deplace_croix`, celle-ci n’est pas une durée. On pourra la changer en plein jeu, par exemple aller plus vite tant qu’on tient **B**.',
     ],
-    code: `uint8_t px = 76;      // la colonne en PIXELS
+    code: `#include <glisse_croix>   // un lutin qui suit la croix, au pixel près
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t px = 76;      // la colonne en PIXELS
 uint8_t py = 68;      // la ligne en PIXELS
 
 int main() {
@@ -9010,7 +9970,10 @@ int main() {
       '**C’est le 0.74**, avec le **B**, parti de **(20, 20)** pixels.',
       '**C’est la version de base** : la deuxième place, seule. Le 0.74.2 met les deux ensemble.',
     ],
-    code: `uint8_t px = 20;      // le B, en pixels
+    code: `#include <glisse_croix>   // un lutin qui suit la croix, au pixel près
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t px = 20;      // le B, en pixels
 uint8_t py = 20;
 
 int main() {
@@ -9033,7 +9996,10 @@ int main() {
       '**C’est le 0.74 et le 0.74.1 réunis** : deux appels, un par lettre.',
       '**Deux lutins, deux numéros** (0 et 1) : ils glissent ensemble.',
     ],
-    code: `uint8_t px = 76;      // le A, en pixels
+    code: `#include <glisse_croix>   // un lutin qui suit la croix, au pixel près
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t px = 76;      // le A, en pixels
 uint8_t py = 68;
 uint8_t pxb = 20;      // le B, en pixels
 uint8_t pyb = 20;
@@ -9062,7 +10028,11 @@ int main() {
       '**Deux façons d’écrire le `if` :** sur une ligne, `if (x == 0 && y == 0) lettre = 1;`, ou **avec des accolades** : `if (x == 0 && y == 0) { lettre = 1; }`. Les deux font exactement la même chose. Sans accolades, le `if` ne commande **qu’une seule** instruction, celle qui le suit. Avec des accolades, il commande **tout ce qui est entre elles** : on peut y mettre plusieurs lignes (changer la lettre ET jouer un son, par exemple). Le programme l’écrit avec des accolades, et montre l’autre forme en commentaire juste au-dessus.',
       '**Pour y arriver :** la flèche **gauche**, dix pas. Les nombres en bas montrent `x` qui descend : 010, 009… jusqu’à 000. Et la lettre change.',
     ],
-    code: `uint8_t x = 10;       // la COLONNE : le A part de la colonne 10…
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+
+uint8_t x = 10;       // la COLONNE : le A part de la colonne 10…
 uint8_t y = 0;        // …et de la ligne 0, en haut de l'écran
 uint8_t lettre = 0;   // QUELLE lettre : 0 = A, 1 = B
 
@@ -9130,7 +10100,11 @@ int main() {
       '**C’est ce que montre `&&` :** arriver dans la bonne colonne ne suffit pas, il faut aussi la bonne ligne. Regarde les nombres en bas : `000 008` au bord gauche, encore un A ; `000 000` au coin, un B.',
       '**C’est la version de base** : une seule lettre, un autre départ. Le 0.75.2 met les deux ensemble.',
     ],
-    code: `uint8_t x = 10;       // le changement : le départ, (10, 8), au milieu
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+
+uint8_t x = 10;       // le changement : le départ, (10, 8), au milieu
 uint8_t y = 8;
 uint8_t lettre = 0;   // 0 = A, 1 = B
 
@@ -9181,7 +10155,11 @@ int main() {
       '**Ils n’y arrivent pas en même temps.** Avec la flèche gauche, le premier arrive en (0, 0) et devient B ; le second, en (0, 8), reste un A. Avec la flèche haut, le premier ne peut plus monter (il est déjà en haut) ; le second monte, arrive en (0, 0), et devient B à son tour.',
       '**À la fin, les deux B sont sur la même case**, (0, 0) : on n’en voit qu’un. Chaque lettre ne connaît que sa propre position ; rien ne les empêche de se retrouver au même endroit.',
     ],
-    code: `uint8_t x = 10;        // le premier A : départ (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+
+uint8_t x = 10;        // le premier A : départ (10, 0)
 uint8_t y = 0;
 uint8_t lettre = 0;
 uint8_t xb = 10;       // le second A : départ (10, 8)
@@ -9241,7 +10219,11 @@ int main() {
       '**Une condition à trois morceaux :** `if (x == 0 && y == 0 && actif == 0)`. Le A est en (0, 0) **et** le drapeau vaut encore 0. La troisième partie fait que le bloc ne s’exécute **qu’une seule fois** : dès qu’`actif` vaut 1, elle devient fausse, même si le A reste sur la case.',
       '**Pourquoi un drapeau :** les leçons suivantes font apparaître des lettres et les mettent en mouvement **à partir de ce moment-là**. Le drapeau retient que le moment est passé.',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 
@@ -9284,7 +10266,12 @@ int main() {
       '**Ce qui est nouveau ici : une action déclenchée.** `poser(10, 8, ALPHABET[1]);` pose un B au milieu de l’écran. Comme le bloc ne s’exécute **qu’une fois** (grâce à `actif == 0`), le B n’est posé qu’une fois, au moment où le A arrive en (0, 0).',
       '**Avant, le milieu est vide ;** après, le B y reste. Le A, lui, continue de suivre la croix.',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+#include <poser>           // pose une tuile sur une case du fond
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 
@@ -9328,7 +10315,13 @@ int main() {
       '**`else if`** enchaîne les cas : on ne teste le suivant que si le précédent était faux. Un seul des quatre `un_pas` est fait à chaque pas.',
       '**Le rythme :** `bimages` compte les images ; à 15 (un quart de seconde), un pas, et on recompte. Le B part du milieu (10, 8) et tourne : (14, 8), (14, 12), (10, 12), puis retour au milieu.',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+#include <poser>           // pose une tuile sur une case du fond
+#include <un_pas>          // fait faire un seul pas à une tuile
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 uint8_t bx = 10;      // le B : sa colonne…
@@ -9387,7 +10380,13 @@ int main() {
       '**Ce qui est nouveau ici : la vitesse du chronomètre.** Un pas toutes les **5 images**, c’est 12 pas par seconde, **trois fois plus vite**. Le tour de 16 pas dure alors moins d’une seconde et demie.',
       '**Plus le nombre est petit, plus ça va vite**, comme pour toutes les vitesses vues jusqu’ici : c’est le temps d’attente entre deux pas.',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+#include <poser>           // pose une tuile sur une case du fond
+#include <un_pas>          // fait faire un seul pas à une tuile
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 uint8_t bx = 10;      // le B : sa colonne…
@@ -9445,7 +10444,13 @@ int main() {
       '**Ce qui est nouveau ici : deux lettres sur le même carré.** Le second B a **ses** variables (`bx2`, `by2`, `bpas2`). Il apparaît au coin opposé, (14, 12), avec `bpas2 = 8` : il est déjà à mi-tour, donc il commence par aller **à gauche**.',
       '**Le même chronomètre** fait avancer les deux : à chaque tic, un pas pour chacun. Toujours à 8 pas l’un de l’autre, ils se poursuivent sans jamais se rattraper.',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+#include <poser>           // pose une tuile sur une case du fond
+#include <un_pas>          // fait faire un seul pas à une tuile
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 uint8_t bx = 10;      // le B : sa colonne…
@@ -9516,7 +10521,14 @@ int main() {
       '**Ce qui est nouveau ici : un mouvement vers la GAUCHE, qui recommence.** À chaque tic du chronomètre, le C efface sa case, recule d’une colonne (`cx--`), et se repose. Arrivé à la colonne 0, il **repart de la colonne 19** : `if (cx == 0) { cx = 19; } else { cx--; }`.',
       '**`if … else` avec accolades :** si `cx` vaut 0, on fait le premier bloc (repartir à droite) ; sinon, le second (reculer d’une case). Jamais les deux.',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+#include <poser>           // pose une tuile sur une case du fond
+#include <un_pas>          // fait faire un seul pas à une tuile
+#include <effacer>         // efface des cases, ou tout le fond
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 uint8_t bx = 10;      // le B : sa colonne…
@@ -9595,7 +10607,14 @@ int main() {
       '**Ce qui est nouveau ici : le mouvement inverse du C.** Le D avance d’une colonne (`dx++`) à chaque tic, et arrivé à la colonne 19, il **repart de la colonne 0** : `if (dx == 19) { dx = 0; } else { dx++; }`.',
       '**Tout part du même déclencheur :** en (0, 0), le A fait apparaître quatre lettres, et chacune a son mouvement. Le A, lui, suit toujours la croix.',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+#include <poser>           // pose une tuile sur une case du fond
+#include <un_pas>          // fait faire un seul pas à une tuile
+#include <effacer>         // efface des cases, ou tout le fond
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 uint8_t bx = 10;      // le B : sa colonne…
@@ -9680,7 +10699,11 @@ int main() {
       '**Pourquoi on peut l’enlever :** au 0.76, `&& actif == 0` servait à ne faire le bloc **qu’une fois**. Mais ici, le bloc ne fait que mettre `actif` à 1 : le refaire à chaque image ne change rien, puisqu’il vaut déjà 1. Le troisième morceau n’est utile que si le bloc fait quelque chose qu’on ne veut **pas** répéter.',
       '**La règle pour simplifier :** une condition qui ne change rien au résultat peut disparaître. Moins de code, moins d’erreurs.',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 
@@ -9718,7 +10741,12 @@ int main() {
       '**C’est le 0.76.1, écrit plus simplement.** Au lieu de poser le B **une fois**, au moment exact du déclencheur, on le pose **à chaque image** tant qu’`actif` vaut 1 : `if (actif == 1) { poser(10, 8, ALPHABET[1]); }`.',
       '**Pourquoi ça marche :** poser la même lettre à la même place ne se voit pas, et ne clignote pas (rien ne l’efface). Le résultat à l’écran est le même, et il n’y a plus besoin de penser au « une seule fois ».',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+#include <poser>           // pose une tuile sur une case du fond
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 
@@ -9765,7 +10793,12 @@ int main() {
       '**Elle ne bloque pas :** comme `un_pas`, elle fait au plus un pas et rend la main. Le A suit toujours la croix.',
       '**Elle remplace aussi le `poser` du 0.76.1 :** c’est son premier appel qui fait apparaître le B.',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+#include <tourne_carre>    // une tuile qui tourne en carré sans arrêter le jeu
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 
@@ -9807,7 +10840,12 @@ int main() {
       '**C’est le 0.76.3, en simple :** la vitesse, 6e réglage de `tourne_carre`, passe de `250` à `80` millisecondes.',
       '**80 ms, c’est 5 images :** exactement la vitesse du 0.76.3 (`bimages == 5`). Mais ici, on la dit en millisecondes, comme partout ailleurs.',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+#include <tourne_carre>    // une tuile qui tourne en carré sans arrêter le jeu
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 
@@ -9849,7 +10887,12 @@ int main() {
       '**C’est le 0.76.4, en simple :** une ligne de plus, pour le second B.',
       '**Ce qui est nouveau ici : le numéro 1, et un côté négatif.** Le **numéro 1** : la console retient cette lettre à part de celle du numéro 0. Le **côté `-4`** : le même carré de 4, mais la lettre part vers la **gauche** puis vers le haut, comme le second B du 0.76.4, qui partait du coin opposé (14, 12).',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+#include <tourne_carre>    // une tuile qui tourne en carré sans arrêter le jeu
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 
@@ -9896,7 +10939,13 @@ int main() {
       '**Ce qui est nouveau ici : `defile(numero, x, y, tuile, sens, vitesse)`.** Au premier appel, la lettre apparaît en (`x`, `y`) ; ensuite, toutes les `vitesse` ms, elle fait un pas sur sa ligne : **`sens` -1 vers la gauche**, 1 vers la droite. Au bord, elle repart de l’autre côté, comme au 0.76.5.',
       '**Son numéro, 0, est à elle :** les numéros de `defile` et ceux de `tourne_carre` sont séparés. Le C est le numéro 0 de `defile`, le B le numéro 0 de `tourne_carre`.',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+#include <tourne_carre>    // une tuile qui tourne en carré sans arrêter le jeu
+#include <defile>          // une tuile qui file sur sa ligne sans arrêter le jeu
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 
@@ -9942,7 +10991,13 @@ int main() {
       '**Compare avec le 0.76.6 :** là-bas, plus de cinquante lignes, onze variables, trois chronomètres cachés dans les `if`. Ici, quatre lignes dans le bloc `if (actif == 1)`, une par lettre. C’est le même jeu, à l’écran.',
       '**Pourquoi avoir appris la version longue :** pour savoir ce que ces fonctions font **pour nous**. `tourne_carre` et `defile` contiennent exactement ce qu’on a écrit à la main : un chronomètre, un compteur, des pas.',
     ],
-    code: `uint8_t x = 10;       // le A part de (10, 0)
+    code: `#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+#include <tourne_carre>    // une tuile qui tourne en carré sans arrêter le jeu
+#include <defile>          // une tuile qui file sur sa ligne sans arrêter le jeu
+
+uint8_t x = 10;       // le A part de (10, 0)
 uint8_t y = 0;
 uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)
 
@@ -9990,7 +11045,12 @@ int main() {
       '**Chaque `chaque` a son propre chronomètre :** la console les distingue toute seule, par leur place dans le programme. Les deux lignes ci-dessous ne se gênent pas. On peut en écrire jusqu’à huit.',
       '**`(lente + 1) % sizeof(ALPHABET)`** passe à la lettre suivante, et revient à 0 après la 26e (le Z) : le `%` du 0.9.',
     ],
-    code: `uint8_t lente = 0;    // la lettre de la lente : 0 = A … 25 = Z
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+
+uint8_t lente = 0;    // la lettre de la lente : 0 = A … 25 = Z
 uint8_t rapide = 0;   // la lettre de la rapide
 
 int main() {
@@ -10041,7 +11101,12 @@ int main() {
       '**Le rythme, avec `chaque(50)`** (le 0.77) : un pas toutes les 50 ms, 20 cases par seconde.',
       '**C’est la base des jeux de balle** : Pong, casse-briques. Le 0.78.1 fait rebondir sur les deux axes.',
     ],
-    code: `uint8_t x = 0;        // la colonne de la balle
+    code: `#include <chaque>     // répond 1 toutes les n millisecondes
+#include <effacer>    // efface des cases, ou tout le fond
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;        // la colonne de la balle
 uint8_t vx = 1;       // sa VITESSE : 1 = vers la droite, -1 = vers la gauche
 
 int main() {
@@ -10090,7 +11155,12 @@ int main() {
       '**Ce qui est nouveau ici : deux vitesses.** À chaque pas, `x = x + vx;` et `y = y + vy;` : la balle va **en diagonale**. Chaque axe rebondit **à part** : aux bords gauche et droit, `vx` change de signe ; en haut et en bas, `vy`.',
       '**La balle part de (0, 0)** et ne s’arrête jamais : elle rebondit dans tout l’écran (lignes 0 à 16, pour laisser la ligne 17 libre).',
     ],
-    code: `uint8_t x = 0;        // la colonne de la balle
+    code: `#include <chaque>     // répond 1 toutes les n millisecondes
+#include <effacer>    // efface des cases, ou tout le fond
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t x = 0;        // la colonne de la balle
 uint8_t y = 0;        // sa ligne
 uint8_t vx = 1;       // vitesse en colonne : 1 à droite, -1 à gauche
 uint8_t vy = 1;       // vitesse en ligne   : 1 en bas,   -1 en haut
@@ -10135,7 +11205,13 @@ int main() {
       '**Pourquoi 600 ms :** le A fait un pas tous les 250 ms, plus de **deux fois plus vite** que le B. On peut donc lui échapper. Mais le B avance aussi en diagonale : dans un coin, il finit par nous coincer. Plus rapide (300 ms), il serait presque impossible à fuir. Le 0.79.1 le fait accélérer peu à peu.',
       '**L’ordre compte :** le B bouge **avant** que la croix ne repose le A. Ainsi le A est dessiné par-dessus, et reste visible même quand le B le touche.',
     ],
-    code: `uint8_t x = 10;       // le A (la croix)
+    code: `#include <chaque>          // répond 1 toutes les n millisecondes
+#include <un_pas>          // fait faire un seul pas à une tuile
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <texte>           // écrit un texte à l’écran
+
+uint8_t x = 10;       // le A (la croix)
 uint8_t y = 8;
 uint8_t bx = 0;       // le B (le poursuivant) : il part du coin (0, 0)
 uint8_t by = 0;
@@ -10193,7 +11269,14 @@ int main() {
       '**`compte >= lenteur`** (plus grand **ou égal**) : si `lenteur` diminue juste quand `compte` était déjà plus grand, le pas se fait quand même, au lieu d’attendre que `compte` fasse le tour des 255.',
       '**En bas à droite,** `lenteur` s’affiche : on la voit descendre, 036, 030, 024…',
     ],
-    code: `uint8_t x = 10;       // le A (la croix)
+    code: `#include <chaque>          // répond 1 toutes les n millisecondes
+#include <un_pas>          // fait faire un seul pas à une tuile
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <nombre>          // écrit un nombre en chiffres
+#include <texte>           // écrit un texte à l’écran
+
+uint8_t x = 10;       // le A (la croix)
 uint8_t y = 8;
 uint8_t bx = 0;       // le B (le poursuivant)
 uint8_t by = 0;
@@ -10271,6 +11354,11 @@ int main() {
 //   |      |           +-- ses parties : deux octets, x et y
 //   |      +-------------- son nom : Position
 //   +--------------------- « struct » : on crée un type à nous
+
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+
 struct Position { uint8_t x, y; };
 
 Position joueur;      // une variable de type Position : joueur.x et joueur.y
@@ -10325,6 +11413,11 @@ nombre(4, 17, joueur.y);
 `,
     },
     code: `// Le nouveau type : la colonne et la ligne sous un seul nom (le 0.80).
+
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+
 struct Position { uint8_t x, y; };
 
 Position joueur;      // joueur.x et joueur.y
@@ -10386,6 +11479,11 @@ void tour_de_jeu() {
 `,
     },
     code: `// Le nouveau type : la colonne et la ligne sous un seul nom (le 0.80).
+
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <nombre>          // écrit un nombre en chiffres
+
 struct Position { uint8_t x, y; };
 
 Position joueur;      // joueur.x et joueur.y
@@ -10432,6 +11530,12 @@ int main() {
       '**Le score** s’affiche en bas, après le mot SCORE.',
     ],
     code: `// ---- LES VARIABLES : tout ce que le jeu doit retenir ----
+
+#include <poser>           // pose une tuile sur une case du fond
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <texte>           // écrit un texte à l’écran
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <nombre>          // écrit un nombre en chiffres
 
 uint8_t x = 5;        // la COLONNE du A (0 à gauche … 19 à droite) : il part de la colonne 5
 uint8_t y = 8;        // la LIGNE du A (0 en haut … 17 en bas) : il part de la ligne 8
@@ -10510,6 +11614,13 @@ int main() {
     ],
     code: `// ---- LES VARIABLES : tout ce que le jeu doit retenir ----
 
+#include <poser>           // pose une tuile sur une case du fond
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <texte>           // écrit un texte à l’écran
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <nombre>          // écrit un nombre en chiffres
+#include <reste>           // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
 uint8_t x = 5;        // la COLONNE du A (0 à gauche … 19 à droite) : il part de la colonne 5
 uint8_t y = 8;        // la LIGNE du A (0 en haut … 17 en bas) : il part de la ligne 8
 
@@ -10584,6 +11695,14 @@ int main() {
     ],
     code: `// ---- LES VARIABLES : tout ce que le jeu doit retenir ----
 
+#include <poser>           // pose une tuile sur une case du fond
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <texte>           // écrit un texte à l’écran
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <hasard>          // tire un nombre au hasard
+#include <nombre>          // écrit un nombre en chiffres
+#include <reste>           // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
 uint8_t x = 5;        // la COLONNE du A (0 à gauche … 19 à droite) : il part de la colonne 5
 uint8_t y = 8;        // la LIGNE du A (0 en haut … 17 en bas) : il part de la ligne 8
 
@@ -10647,6 +11766,14 @@ int main() {
       '**Pour passer, il faut contourner :** le mur s’arrête à la ligne 12. En descendant jusqu’à la ligne 13, on peut passer de l’autre côté.',
     ],
     code: `// ---- LES VARIABLES ----
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
+
 uint8_t x = 3;        // la colonne du A : il part de (3, 8), à GAUCHE du mur
 uint8_t y = 8;        // sa ligne
 uint8_t nx = 0;       // la colonne d'ARRIVÉE : où le A irait s'il bougeait
@@ -10738,6 +11865,16 @@ int main() {
       '**Le chemin :** descendre sous le mur (lignes 11 à 13), passer à droite, remonter jusqu’au P.',
     ],
     code: `// ---- LES VARIABLES ----
+
+#include <texte>      // écrit un texte à l’écran
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
+#include <nombre>     // écrit un nombre en chiffres
+
 uint8_t x = 3;        // le A : il part de (3, 5), à gauche du mur du milieu
 uint8_t y = 5;
 uint8_t nx = 0;       // la case d'arrivée, calculée avant chaque pas (le 0.82)
@@ -10852,6 +11989,14 @@ int main() {
     ],
     code: `// ---- LES VARIABLES : tout ce que le jeu doit retenir ----
 
+#include <poser>           // pose une tuile sur une case du fond
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <texte>           // écrit un texte à l’écran
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <note>            // joue une note
+#include <nombre>          // écrit un nombre en chiffres
+#include <reste>           // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
 uint8_t x = 5;        // la COLONNE du A (0 à gauche … 19 à droite) : il part de la colonne 5
 uint8_t y = 8;        // la LIGNE du A (0 en haut … 17 en bas) : il part de la ligne 8
 
@@ -10929,6 +12074,18 @@ int main() {
       '**Et une note** quand on ramasse la pièce, comme au 0.83.',
     ],
     code: `// ---- LES VARIABLES : les mêmes qu'au 0.82.1 ----
+
+#include <texte>      // écrit un texte à l’écran
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
+#include <bruit>      // joue un bruit
+#include <note>       // joue une note
+#include <nombre>     // écrit un nombre en chiffres
+
 uint8_t x = 3;
 uint8_t y = 5;
 uint8_t nx = 0;
@@ -11045,6 +12202,16 @@ int main() {
       '**Repartir du départ** après une prise : on efface la case (le A et le B y sont tous les deux), puis on remet `x`, `y`, `bx`, `by` à leurs valeurs de départ.',
     ],
     code: `// ---- LES VARIABLES ----
+
+#include <texte>           // écrit un texte à l’écran
+#include <chaque>          // répond 1 toutes les n millisecondes
+#include <un_pas>          // fait faire un seul pas à une tuile
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <effacer>         // efface des cases, ou tout le fond
+#include <nombre>          // écrit un nombre en chiffres
+#include <bouton>          // lit un bouton de la manette
+
 uint8_t x = 10;       // le A : il part du milieu, (10, 8)
 uint8_t y = 8;
 uint8_t bx = 0;       // le B, le poursuivant : il part du coin, (0, 0)
@@ -11136,6 +12303,15 @@ int main() {
       '**Ils finissent par se rejoindre** sur le A : ils visent tous la même case.',
     ],
     code: `// ---- LE TYPE Position (le 0.80) : une colonne et une ligne ----
+
+#include <hasard>          // tire un nombre au hasard
+#include <poser>           // pose une tuile sur une case du fond
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>          // répond 1 toutes les n millisecondes
+#include <un_pas>          // fait faire un seul pas à une tuile
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <reste>           // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
 struct Position { uint8_t x, y; };
 
 // ---- UN TABLEAU DE Position : trois ennemis ----
@@ -11220,7 +12396,10 @@ int main() {
       '**`poserS`** passe tout seul à la ligne suivante (le 0.10) : A à T sur la ligne 0, puis U à Z sur la ligne 1.',
       '**Gratuit si on ne s’en sert pas :** les 26 lettres grasses ne sont ajoutées à la cartouche que si le programme écrit `ALPHABET_GRAS`.',
     ],
-    code: `int main() {
+    code: `#include <ALPHABET_GRAS>   // l’alphabet en gras : ALPHABET_GRAS[0] est le A gras
+#include <poserS>          // pose une tuile, et passe à la ligne au bord
+
+int main() {
   // La boucle, morceau par morceau :
   //
   //   poserS(i, 0, ALPHABET_GRAS[i]);
@@ -11266,7 +12445,10 @@ int main() {
       '**Un seul nombre change**, dans `poserS` : c’est la ligne.',
       '**C’est la version de base.** Le 0.86.2 met l’ancien et le nouvel alphabet l’un au-dessus de l’autre.',
     ],
-    code: `int main() {
+    code: `#include <ALPHABET_GRAS>   // l’alphabet en gras : ALPHABET_GRAS[0] est le A gras
+#include <poserS>          // pose une tuile, et passe à la ligne au bord
+
+int main() {
   // Le changement : la ligne, 0 → 5. U à Z iront sur la ligne 6.
   for (uint8_t i = 0; i < sizeof(ALPHABET_GRAS); i++) {
     poserS(i, 5, ALPHABET_GRAS[i]);
@@ -11301,7 +12483,11 @@ int main() {
       '**Deux boucles, deux tableaux :** la première lit `ALPHABET[i]`, la seconde `ALPHABET_GRAS[i]`. Chaque `for` a son propre `i`.',
       '**Regarde le M, le N et le W :** leurs traits étaient trop serrés pour être simplement épaissis. Ils ont été redessinés un peu plus larges, pour garder leurs creux.',
     ],
-    code: `int main() {
+    code: `#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <poserS>          // pose une tuile, et passe à la ligne au bord
+#include <ALPHABET_GRAS>   // l’alphabet en gras : ALPHABET_GRAS[0] est le A gras
+
+int main() {
   // 1. L'alphabet de toujours, sur les lignes 0 et 1.
   for (uint8_t i = 0; i < sizeof(ALPHABET); i++) {
     poserS(i, 0, ALPHABET[i]);
@@ -11338,7 +12524,9 @@ int main() {
       '**Le texte et la taille s’écrivent en clair** (`"A"`, `3`), comme pour `ms()` : le compilateur fabrique les tuiles agrandies **avant le jeu**, et seulement celles dont le programme a besoin.',
       '**Ce qu’elle coûte :** quelques tuiles de plus dans la cartouche. Deux tuiles identiques (souvent toutes pleines aux grandes tailles) ne sont fabriquées qu’une fois.',
     ],
-    code: `int main() {
+    code: `#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+
+int main() {
   // La ligne, morceau par morceau :
   //
   //   texteGrand(2, 2, "A", 3);
@@ -11382,7 +12570,9 @@ int main() {
       '**Tu choisis la taille, la console s’adapte :** aucune taille n’est dessinée à l’avance. Chaque `texteGrand` fait calculer les tuiles de SA taille.',
       '**La place :** taille 1, 1 case ; taille 2, 2 × 2 ; taille 3, 3 × 3 ; taille 4, 4 × 4. Les colonnes de départ (0, 2, 5, 9) laissent juste la place à chacun.',
     ],
-    code: `int main() {
+    code: `#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+
+int main() {
   texteGrand(0, 0, "A", 1);     // taille 1 : 1 case, comme une lettre normale
   texteGrand(2, 0, "A", 2);     // taille 2 : 2 × 2 cases
   texteGrand(5, 0, "A", 3);     // taille 3 : 3 × 3 cases
@@ -11414,7 +12604,9 @@ int main() {
       '**La moitié de l’écran :** l’écran fait 20 × 18 cases ; à la taille 10, une lettre en prend 10 × 10. La plus grande taille, 20, remplit l’écran entier : c’est le 0.87.4.',
       '**Ça ne coûte presque rien de plus :** aux grandes tailles, beaucoup de tuiles sont **toutes pleines** ou **toutes vides**. Les tuiles identiques ne sont fabriquées qu’une fois.',
     ],
-    code: `int main() {
+    code: `#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+
+int main() {
   // Le A dix fois plus grand : 10 × 10 cases, de (5, 4) à (14, 13).
   texteGrand(5, 4, "A", 10);
 
@@ -11443,7 +12635,9 @@ int main() {
       '**La largeur du mot :** 3 lettres × 4 cases = **12 cases**. Il faut qu’elle tienne dans les 20 colonnes de l’écran : `"BONJOUR"` (7 lettres) tient à la taille 2 (14 cases), pas à la taille 3 (21 cases).',
       '**Un titre de jeu,** c’est exactement ça : un mot en grand, au milieu de l’écran.',
     ],
-    code: `int main() {
+    code: `#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+
+int main() {
   // 3 lettres × 4 cases = 12 cases de large, 4 de haut : de (3, 7) à (14, 10).
   texteGrand(3, 7, "JEU", 4);
 
@@ -11473,7 +12667,9 @@ int main() {
       '**En largeur aussi, tout juste :** une case de lettre fait 8 pixels ; 8 × 20 = 160, la largeur exacte de l’écran. Pour tenir, le A géant commence en (0, 0).',
       '**Ça ne coûte presque rien en dessins :** à cette taille, presque toutes les tuiles sont toutes pleines ou toutes vides. Le A géant n’en demande que 9 différentes.',
     ],
-    code: `int main() {
+    code: `#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+
+int main() {
   // La plus grande taille : 20. Le A fait 20 × 20 cases, tout l'écran.
   //   8 pixels × 20 = 160 : toute la largeur
   //   7 pixels × 20 = 140 : presque toute la hauteur (144)
@@ -11505,7 +12701,9 @@ int main() {
       '**Trop haut, c’est une erreur :** l’écran a 18 cases de haut. Si le texte en demande plus (« BONJOUR » en taille 7 : 4 lignes de 7 cases, 28), le compilateur refuse, et dit combien il en faudrait.',
       '**Tout s’écrit en clair,** même la place : le découpage en lignes se fait avant le jeu.',
     ],
-    code: `int main() {
+    code: `#include <texteGrandS>   // écrit un texte agrandi qui passe à la ligne
+
+int main() {
   // Comme texteGrand, mais qui VA À LA LIGNE :
   //
   //   texteGrandS(0, 0, "BONJOUR", 3);
@@ -11542,7 +12740,10 @@ int main() {
       '**Toutes les lettres changent ensemble**, même celles écrites avant ou après : `couleurTexte` règle la couleur **de l’encre**, pas d’un mot.',
       '**Sur la Game Boy Color seulement :** la Game Boy d’origine n’a que 4 gris-verts. Le programme passe tout seul en mode couleur ; choisis « En couleur » en haut de la page.',
     ],
-    code: `int main() {
+    code: `#include <couleurTexte>   // choisit la couleur des lettres
+#include <texte>          // écrit un texte à l’écran
+
+int main() {
   // La couleur, morceau par morceau :
   //
   //   couleurTexte(31, 0, 0);
@@ -11583,7 +12784,10 @@ int main() {
       '**C’est le 0.88, avec un mot et du bleu :** `couleurTexte(0, 0, 31)` (seulement du bleu), puis `texte(6, 8, "BONJOUR")`.',
       '**Toutes les lettres du mot** prennent la couleur : c’est la même encre pour tout le texte.',
     ],
-    code: `int main() {
+    code: `#include <couleurTexte>   // choisit la couleur des lettres
+#include <texte>          // écrit un texte à l’écran
+
+int main() {
   couleurTexte(0, 0, 31);   // rouge 0, vert 0, bleu 31 : du bleu
   texte(6, 8, "BONJOUR");   // tout le mot, en bleu
 
@@ -11611,7 +12815,12 @@ int main() {
       '**Toutes les demi-secondes** (`chaque(500)`, le 0.77), `etape` avance : 0, 1, 2, puis 0. Selon l’étape, une couleur : rouge, vert, bleu.',
       '**Le mot n’est écrit qu’une fois**, avant la boucle : seule l’encre change.',
     ],
-    code: `uint8_t etape = 0;        // 0 = rouge, 1 = vert, 2 = bleu
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <texte>          // écrit un texte à l’écran
+#include <chaque>         // répond 1 toutes les n millisecondes
+#include <couleurTexte>   // choisit la couleur des lettres
+
+uint8_t etape = 0;        // 0 = rouge, 1 = vert, 2 = bleu
 
 int main() {
   texte(6, 8, "BONJOUR");   // écrit UNE fois : ensuite, seule l'encre change
@@ -11648,7 +12857,10 @@ int main() {
       '**La palette 0** est celle de toutes les cases qu’on n’a pas teintes : c’est elle que `couleurTexte` règle.',
       '**Sur la Game Boy Color seulement :** la Game Boy d’origine n’a que 4 gris-verts. Le programme passe tout seul en mode couleur ; choisis « En couleur » en haut de la page.',
     ],
-    code: `int main() {
+    code: `#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <texteCouleur>   // écrit un mot dans une palette de couleur
+
+int main() {
   // Trois palettes, trois couleurs pour la teinte 3 (celle des lettres) :
   //
   //   couleurFond(1, 3, 31, 0, 0);
@@ -11699,7 +12911,12 @@ int main() {
       '**Six couleurs d’arc-en-ciel,** dans les palettes 1 à 6 : rouge, orange, jaune, vert, bleu, violet.',
       '**`1 + i % 6`** : pour la lettre n° i, la palette 1, 2 … 6, puis de nouveau 1 (le `%` du 0.9). BONJOUR a 7 lettres : la 7e (le R) reprend le rouge.',
     ],
-    code: `int main() {
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <couleurFond>   // choisit une couleur d’une palette du fond
+#include <texte>         // écrit un texte à l’écran
+#include <teindre>       // met une case du fond dans une palette
+
+int main() {
   // Six couleurs, dans les palettes 1 à 6 (teinte 3, celle des lettres) :
   couleurFond(1, 3, 31, 0, 0);    // 1 : rouge
   couleurFond(2, 3, 31, 16, 0);   // 2 : orange (rouge + un peu de vert)
@@ -11746,7 +12963,11 @@ int main() {
       '**L’orange,** c’est `31, 16, 0` : tout le rouge, la moitié du vert, pas de bleu.',
       '**C’est un écran titre :** un mot en grand et en couleur, au milieu. Il ne reste qu’à écrire en dessous « APPUIE SUR START ».',
     ],
-    code: `int main() {
+    code: `#include <couleurTexte>   // choisit la couleur des lettres
+#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texte>          // écrit un texte à l’écran
+
+int main() {
   couleurTexte(31, 16, 0);          // de l'orange : tout le rouge, la moitié du vert
   texteGrand(4, 5, "JEU", 4);       // le titre, 4 fois plus grand (le 0.87)
   texte(2, 12, "APPUIE SUR START"); // en dessous, en petit : orange aussi
@@ -11784,7 +13005,13 @@ int main() {
       '**Vider l’écran :** il n’y a pas de fonction qui efface tout d’un coup. On le fait ligne par ligne : une boucle `for` sur les **18 lignes** (0 à 17), et sur chacune `effacer(0, y, 20)` efface **20 cases** à partir de la colonne 0, toute la largeur.',
       '**La couleur reste :** `couleurTexte` a réglé l’encre de toutes les lettres ; le nouvel écran est orange aussi.',
     ],
-    code: `uint8_t ecranTitre = 1;   // sur quel écran on est : 1 = le titre, 0 = l'écran d'après
+    code: `#include <couleurTexte>   // choisit la couleur des lettres
+#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texte>          // écrit un texte à l’écran
+#include <bouton>         // lit un bouton de la manette
+#include <effacer>        // efface des cases, ou tout le fond
+
+uint8_t ecranTitre = 1;   // sur quel écran on est : 1 = le titre, 0 = l'écran d'après
 
 int main() {
   // Le titre du 0.90 :
@@ -11850,7 +13077,15 @@ int main() {
       '**Seulement après START :** `if (ecranTitre == 0)`. Sur le titre, `ecranTitre` vaut 1 : le B ne vient pas encore.',
       '**Le B, pas un A :** « C EST PARTI » contient déjà un A ; un B se distingue mieux.',
     ],
-    code: `uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
+    code: `#include <couleurTexte>   // choisit la couleur des lettres
+#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texte>          // écrit un texte à l’écran
+#include <bouton>         // lit un bouton de la manette
+#include <effacer>        // efface des cases, ou tout le fond
+#include <defile>         // une tuile qui file sur sa ligne sans arrêter le jeu
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+
+uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
 
 int main() {
   couleurTexte(31, 16, 0);          // le titre du 0.90, en orange
@@ -11911,7 +13146,14 @@ int main() {
       '**`d` passe sous 0 ?** C’est un `uint8_t` : après 0 vient **255**, puis 254… (l’octet qui boucle, la leçon 35). Et le décor fait justement **256 pixels** de large : il revient tout seul, sans fin. Ce qui sort par la droite réapparaît à gauche.',
       '**60 images par seconde, un pixel chaque fois :** le texte traverse l’écran (160 pixels) en moins de 3 secondes, tout en douceur.',
     ],
-    code: `uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
+    code: `#include <couleurTexte>   // choisit la couleur des lettres
+#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texte>          // écrit un texte à l’écran
+#include <bouton>         // lit un bouton de la manette
+#include <effacer>        // efface des cases, ou tout le fond
+#include <defiler>        // fait glisser tout le fond
+
+uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
 uint8_t d = 0;            // la caméra : 0 = elle regarde le début du décor
 
 int main() {
@@ -11976,7 +13218,15 @@ int main() {
       '**`p = (p + 1) % 20`** : p va de 0 à 19, puis revient à 0 (le `%` du 0.9). À droite, les dernières lettres passent **hors de l’écran** : la carte du décor fait 32 cases de large, l’écran n’en montre que 20. Elles existent, mais on ne les voit pas.',
       '**Le mot n’est écrit qu’après START :** p commence à 0 ; au premier coup après START, on efface en 0 (rien à effacer), p passe à 1, et BONJOUR s’écrit en (1, 16).',
     ],
-    code: `uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <couleurTexte>   // choisit la couleur des lettres
+#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texte>          // écrit un texte à l’écran
+#include <bouton>         // lit un bouton de la manette
+#include <effacer>        // efface des cases, ou tout le fond
+#include <chaque>         // répond 1 toutes les n millisecondes
+
+uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
 uint8_t p = 0;            // la colonne du bandeau
 
 int main() {
@@ -12041,7 +13291,14 @@ int main() {
       '**`visible = 1 - visible`** : une astuce pour basculer. 1 - 1 = **0**, et 1 - 0 = **1**. À chaque fois, la valeur passe de l’une à l’autre.',
       '**Seulement sur le titre :** `ecranTitre == 1 && chaque(500)`. Après START, la consigne ne revient plus.',
     ],
-    code: `uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
+    code: `#include <couleurTexte>   // choisit la couleur des lettres
+#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texte>          // écrit un texte à l’écran
+#include <chaque>         // répond 1 toutes les n millisecondes
+#include <effacer>        // efface des cases, ou tout le fond
+#include <bouton>         // lit un bouton de la manette
+
+uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
 uint8_t visible = 1;      // 1 = la consigne est à l'écran, 0 = elle est effacée
 
 int main() {
@@ -12104,7 +13361,14 @@ int main() {
       '**`void`** veut dire que la fonction ne rend rien : elle **fait** quelque chose (elle dessine, elle efface), c’est tout.',
       '**Au retour, `visible` repasse à 1 :** dessinerTitre() vient d’écrire la consigne, elle est donc à l’écran.',
     ],
-    code: `uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
+    code: `#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texte>          // écrit un texte à l’écran
+#include <effacer>        // efface des cases, ou tout le fond
+#include <couleurTexte>   // choisit la couleur des lettres
+#include <chaque>         // répond 1 toutes les n millisecondes
+#include <bouton>         // lit un bouton de la manette
+
+uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
 uint8_t visible = 1;      // la consigne : 1 = à l'écran, 0 = effacée
 
 // ---- NOUVEAU : des lignes rangées sous un nom, pour s'en servir plusieurs fois ----
@@ -12189,6 +13453,14 @@ int main() {
     ],
     code: `// ---- NOUVEAU : une variable pour TROIS écrans ----
 //   ecran = 0 : le TITRE    ecran = 1 : le JEU    ecran = 2 : la FIN
+
+#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texte>          // écrit un texte à l’écran
+#include <effacer>        // efface des cases, ou tout le fond
+#include <couleurTexte>   // choisit la couleur des lettres
+#include <chaque>         // répond 1 toutes les n millisecondes
+#include <bouton>         // lit un bouton de la manette
+
 uint8_t ecran = 0;
 uint8_t visible = 1;      // la consigne du titre : 1 = à l'écran, 0 = effacée
 
@@ -12286,7 +13558,17 @@ int main() {
       '**Ce que le 0.81 faisait avant la boucle** (poser le P, écrire SCORE) se fait maintenant **au moment de START** : c’est là que l’écran du jeu commence.',
       '**Deux fois `if`, pas `if … else`,** pour rester comme au 0.90.1 : le premier regarde START sur le titre, le second fait tourner le jeu.',
     ],
-    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU
+    code: `#include <effacer>         // efface des cases, ou tout le fond
+#include <couleurTexte>    // choisit la couleur des lettres
+#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texte>           // écrit un texte à l’écran
+#include <bouton>          // lit un bouton de la manette
+#include <poser>           // pose une tuile sur une case du fond
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <nombre>          // écrit un nombre en chiffres
+
+uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU
 
 // Les variables du jeu du 0.81 :
 uint8_t x = 5;            // le A : sa colonne…
@@ -12356,7 +13638,18 @@ int main() {
       '**Seulement pendant le jeu :** `ecran == 1 && chaque(1000)`. Sur le titre, le temps ne bouge pas.',
       '**Sur l’écran de fin, plus rien ne bouge :** la boucle du jeu est dans `if (ecran == 1)`. Avec `ecran == 2`, le A ne suit plus la croix.',
     ],
-    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+    code: `#include <effacer>         // efface des cases, ou tout le fond
+#include <couleurTexte>    // choisit la couleur des lettres
+#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texte>           // écrit un texte à l’écran
+#include <bouton>          // lit un bouton de la manette
+#include <poser>           // pose une tuile sur une case du fond
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <nombre>          // écrit un nombre en chiffres
+#include <chaque>          // répond 1 toutes les n millisecondes
+
+uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
 
 uint8_t x = 5;            // le A : sa colonne…
 uint8_t y = 8;            // …et sa ligne (le 0.81)
@@ -12436,7 +13729,18 @@ int main() {
       '**La fin mène au jeu, pas au titre** (le 0.90.7) : START encore enfoncé ferait sauter le titre aussitôt.',
       '**La première seconde de la nouvelle partie est un peu courte :** le chronomètre de `chaque(1000)` a continué de tourner pendant l’écran de fin. Au retour dans le jeu, il est déjà « à l’heure » : 30 devient 29 tout de suite.',
     ],
-    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+    code: `#include <effacer>         // efface des cases, ou tout le fond
+#include <poser>           // pose une tuile sur une case du fond
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <texte>           // écrit un texte à l’écran
+#include <couleurTexte>    // choisit la couleur des lettres
+#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <bouton>          // lit un bouton de la manette
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <nombre>          // écrit un nombre en chiffres
+#include <chaque>          // répond 1 toutes les n millisecondes
+
+uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
 
 uint8_t x = 5;            // le A : sa colonne…
 uint8_t y = 8;            // …et sa ligne (le 0.81)
@@ -12538,7 +13842,18 @@ int main() {
       '**`||` veut dire « ou » :** `x == 0 || x == 19 || y == 0 || y >= 16` est vrai dès qu’**une** des quatre l’est. `y >= 16` (plus grand ou égal) compte aussi la ligne 17 : le A ne descend jamais sur les nombres.',
       '**Le cadre est redessiné à chaque partie,** dans `nouvellePartie()` : après le titre et après la fin, l’écran a été vidé.',
     ],
-    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+    code: `#include <effacer>         // efface des cases, ou tout le fond
+#include <poser>           // pose une tuile sur une case du fond
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <texte>           // écrit un texte à l’écran
+#include <couleurTexte>    // choisit la couleur des lettres
+#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <bouton>          // lit un bouton de la manette
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <nombre>          // écrit un nombre en chiffres
+#include <chaque>          // répond 1 toutes les n millisecondes
+
+uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
 
 uint8_t x = 5;            // le A : sa colonne…
 uint8_t y = 8;            // …et sa ligne (le 0.81)
@@ -12684,7 +13999,20 @@ int main() {
       '**Puis `poser(px, py, ALPHABET[15])`** dessine le nouveau P à sa place. L’ancien n’a pas besoin d’être effacé : le A est dessus.',
       '**Dans `nouvellePartie()`,** rien ne change : le P revient en (15, 8), d’où qu’il soit.',
     ],
-    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <effacer>         // efface des cases, ou tout le fond
+#include <poser>           // pose une tuile sur une case du fond
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <texte>           // écrit un texte à l’écran
+#include <couleurTexte>    // choisit la couleur des lettres
+#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <bouton>          // lit un bouton de la manette
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <hasard>          // tire un nombre au hasard
+#include <nombre>          // écrit un nombre en chiffres
+#include <chaque>          // répond 1 toutes les n millisecondes
+
+uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
 
 uint8_t x = 5;            // le A : sa colonne…
 uint8_t y = 8;            // …et sa ligne (le 0.81)
@@ -12845,7 +14173,20 @@ int main() {
       '**Déroulons un pas à droite :** A en (5, 8), O en (4, 8). `deplace_croix` : A en (6, 8), et (5, 8) est effacée. `x` vaut 6, `ax` vaut 5 : il a bougé. 1. (4, 8) est effacée. 2. `qx` = 5, `qy` = 8. 3. O en (5, 8). 4. A en (6, 8). Résultat : **O A**, un cran plus loin.',
       '**Encore un défaut, pour plus tard :** si le P réapparaît juste sur la queue, le O l’efface au pas suivant ; on ne le voit plus, mais il est toujours là, dans `px` et `py`.',
     ],
-    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <effacer>         // efface des cases, ou tout le fond
+#include <poser>           // pose une tuile sur une case du fond
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <texte>           // écrit un texte à l’écran
+#include <couleurTexte>    // choisit la couleur des lettres
+#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <bouton>          // lit un bouton de la manette
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <hasard>          // tire un nombre au hasard
+#include <nombre>          // écrit un nombre en chiffres
+#include <chaque>          // répond 1 toutes les n millisecondes
+
+uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
 
 uint8_t x = 5;            // le A : sa colonne…
 uint8_t y = 8;            // …et sa ligne (le 0.81)
@@ -13036,7 +14377,20 @@ int main() {
       '**`if (longueur < 50)` :** le tableau n’a que 50 cases. Au-delà, `qx[50]` écrirait en dehors, sur d’autres variables. Après 49 pièces, la queue ne grandit plus.',
       '**Pour plus tard :** le A traverse sa propre queue sans rien dire, et le P peut tomber sur la queue. Dans un vrai serpent, toucher sa queue fait perdre.',
     ],
-    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <effacer>         // efface des cases, ou tout le fond
+#include <poser>           // pose une tuile sur une case du fond
+#include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
+#include <texte>           // écrit un texte à l’écran
+#include <couleurTexte>    // choisit la couleur des lettres
+#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <bouton>          // lit un bouton de la manette
+#include <deplace_croix>   // une tuile qui suit la croix, case par case
+#include <hasard>          // tire un nombre au hasard
+#include <nombre>          // écrit un nombre en chiffres
+#include <chaque>          // répond 1 toutes les n millisecondes
+
+uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
 
 uint8_t x = 5;            // le A : sa colonne…
 uint8_t y = 8;            // …et sa ligne (le 0.81)
@@ -13255,7 +14609,19 @@ int main() {
       '**Le reste ne change pas :** le mur fait reculer le A (le 0.91.3) ; il reste donc collé au mur tant qu’on ne choisit pas une autre direction. La queue le suit, le P le fait grandir (le 0.91.6). Le A doit maintenant être **posé** dans `nouvellePartie()` : `deplace_croix` le faisait à sa place.',
       '**Pour plus tard :** en snake, on ne peut pas faire demi-tour d’un coup, sur sa propre queue ; et toucher un mur ou sa queue fait perdre.',
     ],
-    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <effacer>        // efface des cases, ou tout le fond
+#include <poser>          // pose une tuile sur une case du fond
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+#include <texte>          // écrit un texte à l’écran
+#include <couleurTexte>   // choisit la couleur des lettres
+#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <bouton>         // lit un bouton de la manette
+#include <chaque>         // répond 1 toutes les n millisecondes
+#include <hasard>         // tire un nombre au hasard
+#include <nombre>         // écrit un nombre en chiffres
+
+uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
 
 uint8_t x = 5;            // le A : sa colonne…
 uint8_t y = 8;            // …et sa ligne (le 0.81)
@@ -13493,7 +14859,19 @@ int main() {
       '**Déroulons, sans rien toucher :** le A part de (5, 8) vers la droite. Il passe sur le P en (15, 8) : score 1, une case de queue. Il continue… (18, 8)… puis (19, 8) : colonne 19, le mur. `finPartie()` : FIN, SCORE 001. `continue;` : on repart à `image()`.',
       '**Pour plus tard :** le A peut encore faire demi-tour sur sa queue, et la traverser sans perdre.',
     ],
-    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <effacer>        // efface des cases, ou tout le fond
+#include <poser>          // pose une tuile sur une case du fond
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+#include <texte>          // écrit un texte à l’écran
+#include <nombre>         // écrit un nombre en chiffres
+#include <couleurTexte>   // choisit la couleur des lettres
+#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <bouton>         // lit un bouton de la manette
+#include <chaque>         // répond 1 toutes les n millisecondes
+#include <hasard>         // tire un nombre au hasard
+
+uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
 
 uint8_t x = 5;            // le A : sa colonne…
 uint8_t y = 8;            // …et sa ligne (le 0.81)
@@ -13736,7 +15114,19 @@ int main() {
       '**`chaque(250)`, lui, reste :** c’est lui qui fait avancer le A (le 0.91.7). Il n’avait rien à voir avec le chronomètre ; chaque `chaque()` a son propre chronomètre.',
       '**Pour plus tard :** le A peut encore faire demi-tour sur sa queue, et la traverser sans perdre. Sans limite de temps, c’est maintenant le seul vrai défaut du jeu.',
     ],
-    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <effacer>        // efface des cases, ou tout le fond
+#include <poser>          // pose une tuile sur une case du fond
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+#include <texte>          // écrit un texte à l’écran
+#include <nombre>         // écrit un nombre en chiffres
+#include <couleurTexte>   // choisit la couleur des lettres
+#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <bouton>         // lit un bouton de la manette
+#include <chaque>         // répond 1 toutes les n millisecondes
+#include <hasard>         // tire un nombre au hasard
+
+uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN
 
 uint8_t x = 5;            // le A : sa colonne…
 uint8_t y = 8;            // …et sa ligne (le 0.81)
@@ -13973,7 +15363,21 @@ int main() {
       '**Le petit serpent du menu :** trois O et un A, en (8, 9) à (11, 9), dans la palette 1. En changeant de couleur, on le voit changer tout de suite.',
       '**Deux précautions, parce qu’une case garde sa palette :** `effacer()` enlève la **lettre**, pas la **palette** de la case. 1. `viderEcran()` remet toutes les cases dans la palette 0 (une boucle de plus, sur les 20 colonnes) : sinon, FIN ou MENU seraient à moitié de la couleur du serpent. 2. Quand le P réapparaît au hasard, `teindre(px, py, 0)` : la case a pu être celle du serpent.',
     ],
-    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN, 3 = le MENU (NOUVEAU)
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <effacer>        // efface des cases, ou tout le fond
+#include <teindre>        // met une case du fond dans une palette
+#include <poser>          // pose une tuile sur une case du fond
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+#include <texte>          // écrit un texte à l’écran
+#include <nombre>         // écrit un nombre en chiffres
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurTexte>   // choisit la couleur des lettres
+#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <bouton>         // lit un bouton de la manette
+#include <chaque>         // répond 1 toutes les n millisecondes
+#include <hasard>         // tire un nombre au hasard
+
+uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN, 3 = le MENU (NOUVEAU)
 
 uint8_t x = 5;            // le A : sa colonne…
 uint8_t y = 8;            // …et sa ligne (le 0.81)
@@ -14304,7 +15708,21 @@ int main() {
       '**`nouvellePartie()` remet `compte` à 0 :** chaque partie commence par une attente complète.',
       '**Pour la suite :** `attente` est une **variable**. Si elle passe à 14, le A fait un pas toutes les 14 images : un peu plus vite. C’est le 0.92.2.',
     ],
-    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN, 3 = le MENU (le 0.92)
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <effacer>        // efface des cases, ou tout le fond
+#include <teindre>        // met une case du fond dans une palette
+#include <poser>          // pose une tuile sur une case du fond
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+#include <texte>          // écrit un texte à l’écran
+#include <nombre>         // écrit un nombre en chiffres
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurTexte>   // choisit la couleur des lettres
+#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <bouton>         // lit un bouton de la manette
+#include <chaque>         // répond 1 toutes les n millisecondes
+#include <hasard>         // tire un nombre au hasard
+
+uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN, 3 = le MENU (le 0.92)
 
 uint8_t x = 5;            // le A : sa colonne…
 uint8_t y = 8;            // …et sa ligne (le 0.81)
@@ -14625,7 +16043,21 @@ int main() {
       '**Les chiffres :** 15 images, 4 pas par seconde (60 / 15). Après 5 P : 10 images, **6** pas par seconde. Après 10 P : 5 images, **12** pas par seconde. La vitesse a triplé.',
       '**`nouvellePartie()` remet `attente` à 15 :** chaque partie repart lentement, même après une partie très rapide. `monte`, lui, n’est **pas** remis à 0 : c’est un réglage du menu, il reste choisi d’une partie à l’autre, comme la couleur.',
     ],
-    code: `uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN, 3 = le MENU (le 0.92)
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <effacer>        // efface des cases, ou tout le fond
+#include <teindre>        // met une case du fond dans une palette
+#include <poser>          // pose une tuile sur une case du fond
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+#include <texte>          // écrit un texte à l’écran
+#include <nombre>         // écrit un nombre en chiffres
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurTexte>   // choisit la couleur des lettres
+#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <bouton>         // lit un bouton de la manette
+#include <chaque>         // répond 1 toutes les n millisecondes
+#include <hasard>         // tire un nombre au hasard
+
+uint8_t ecran = 0;        // 0 = le TITRE, 1 = le JEU, 2 = la FIN, 3 = le MENU (le 0.92)
 
 uint8_t x = 5;            // le A : sa colonne…
 uint8_t y = 8;            // …et sa ligne (le 0.81)
@@ -14998,6 +16430,9 @@ int main() {
 // ALPHABET[23] : le X (la 24e lettre, on compte depuis 0).
 // ALPHABET[14] : le O (la 15e lettre).
 
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
 int main() {
   // Deux boucles, l'une dans l'autre : chaque LIGNE, et dans chaque ligne,
   // chaque COLONNE. 17 lignes × 19 colonnes = 323 cases.
@@ -15062,6 +16497,13 @@ int main() {
 // Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
 // ALPHABET[23] : le X    ALPHABET[14] : le O
 // ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
 
 uint8_t ox = 1;           // NOUVEAU : le O, le joueur : sa colonne…
 uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
@@ -15150,6 +16592,13 @@ int main() {
 // Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
 // ALPHABET[23] : le X    ALPHABET[14] : le O
 // ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
 
 uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
 uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
@@ -15257,6 +16706,14 @@ int main() {
 // Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
 // ALPHABET[23] : le X    ALPHABET[14] : le O
 // ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <texte>      // écrit un texte à l’écran
+#include <lire>       // lit la tuile posée sur une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
 
 uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
 uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
@@ -15433,6 +16890,14 @@ int main() {
 // ALPHABET[23] : le X    ALPHABET[14] : le O
 // ALPHABET[1]  : le B    ALPHABET[22] : le W
 
+#include <effacer>    // efface des cases, ou tout le fond
+#include <texte>      // écrit un texte à l’écran
+#include <lire>       // lit la tuile posée sur une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+
 uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
 uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
 uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
@@ -15608,6 +17073,15 @@ int main() {
 // Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
 // ALPHABET[23] : le X    ALPHABET[14] : le O
 // ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <texte>      // écrit un texte à l’écran
+#include <lire>       // lit la tuile posée sur une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <hasard>     // tire un nombre au hasard
 
 uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
 uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
@@ -15805,6 +17279,15 @@ int main() {
 // Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
 // ALPHABET[23] : le X    ALPHABET[14] : le O
 // ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <texte>      // écrit un texte à l’écran
+#include <lire>       // lit la tuile posée sur une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <poser>      // pose une tuile sur une case du fond
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <hasard>     // tire un nombre au hasard
 
 uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
 uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
@@ -16021,6 +17504,16 @@ int main() {
 // ALPHABET[23] : le X    ALPHABET[14] : le O
 // ALPHABET[1]  : le B    ALPHABET[22] : le W
 
+#include <effacer>    // efface des cases, ou tout le fond
+#include <lire>       // lit la tuile posée sur une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <texte>      // écrit un texte à l’écran
+#include <poser>      // pose une tuile sur une case du fond
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <hasard>     // tire un nombre au hasard
+#include <nombre>     // écrit un nombre en chiffres
+
 uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
 uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
 uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
@@ -16233,7 +17726,9 @@ int main() {
       const fini = () => false
       tenir('right', () => v('ox') === 9)
       tenir('down', () => v('oy') === 7)
-      for (let tour = 0; tour < 40 && !v('score') >= 1 && !fini(); tour++) {
+      // Les W vont au hasard : le robot recommence jusqu'à ce que l'un d'eux passe dans
+      // les flammes (300 tours au plus — en pratique, quelques dizaines).
+      for (let tour = 0; tour < 300 && v('score') < 1 && !fini(); tour++) {
         c.presser('a', 3)
         tenir('right', () => v('ox') === 11 || fini(), 60)
         tenir('down', () => v('oy') === 8 || fini(), 60)
@@ -16269,6 +17764,16 @@ int main() {
 // Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
 // ALPHABET[23] : le X    ALPHABET[14] : le O
 // ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <lire>       // lit la tuile posée sur une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <texte>      // écrit un texte à l’écran
+#include <poser>      // pose une tuile sur une case du fond
+#include <nombre>     // écrit un nombre en chiffres
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <hasard>     // tire un nombre au hasard
 
 uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
 uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
@@ -16560,6 +18065,16 @@ int main() {
 // ALPHABET[23] : le X    ALPHABET[14] : le O
 // ALPHABET[1]  : le B    ALPHABET[22] : le W
 
+#include <effacer>    // efface des cases, ou tout le fond
+#include <lire>       // lit la tuile posée sur une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <texte>      // écrit un texte à l’écran
+#include <poser>      // pose une tuile sur une case du fond
+#include <nombre>     // écrit un nombre en chiffres
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <hasard>     // tire un nombre au hasard
+
 uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
 uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
 uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
@@ -16823,22 +18338,29 @@ int main() {
     aVoir: 'Détruis les trois W sans te faire toucher : BRAVO ! au-dessus de FIN et du score.',
     controle: (c) => {
       const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(1) }
-      c.avancer(69)                     // ce départ-là mène le robot à la victoire
+      c.avancer(80)
       // le robot : il pose une bombe en (9, 7), s'abrite en (11, 8), attend la fin des flammes, et revient
       const v = (n) => c.variable(n)
       const fini = () => v('ecran') !== 0
-      tenir('right', () => v('ox') === 9)
-      tenir('down', () => v('oy') === 7)
-      for (let tour = 0; tour < 60 && !false && !fini(); tour++) {
-        c.presser('a', 3)
-        tenir('right', () => v('ox') === 11 || fini(), 60)
-        tenir('down', () => v('oy') === 8 || fini(), 60)
-        tenir('b', () => v('feu') === 1 || fini(), 200)
-        tenir('b', () => v('feu') === 0 || fini(), 100)
-        tenir('up', () => v('oy') === 7 || fini(), 60)
-        tenir('left', () => v('ox') === 9 || fini(), 60)
+      // Les W vont au hasard : un W peut toucher le O, et la partie est perdue.
+      // Le robot fait alors comme un joueur : START, et il rejoue — 20 parties au plus.
+      for (let partie = 0; partie < 20; partie++) {
+        tenir('right', () => v('ox') === 9)
+        tenir('down', () => v('oy') === 7)
+        for (let tour = 0; tour < 1000 && !fini(); tour++) {
+          c.presser('a', 3)
+          tenir('right', () => v('ox') === 11 || fini(), 60)
+          tenir('down', () => v('oy') === 8 || fini(), 60)
+          tenir('b', () => v('feu') === 1 || fini(), 200)
+          tenir('b', () => v('feu') === 0 || fini(), 100)
+          tenir('up', () => v('oy') === 7 || fini(), 60)
+          tenir('left', () => v('ox') === 9 || fini(), 60)
+        }
+        c.avancer(30)
+        if (c.mot(6, 3, 7) === 'BRAVO !') break   // gagné : on regarde l'écran de fin
+        c.presser('start', 3)                      // perdu : une nouvelle partie
+        c.avancer(20)
       }
-      c.avancer(30)
       return [
         ['le robot détruit les trois W : BRAVO !, FIN, SCORE 003', v('ecran') === 1 && c.mot(6, 3, 7) === 'BRAVO !' && c.mot(8, 6, 3) === 'FIN' && c.mot(11, 9, 3) === '003', ` (score = ${v('score')})`],
       ]
@@ -16866,6 +18388,17 @@ int main() {
 // ALPHABET[23] : le X    ALPHABET[14] : le O
 // ALPHABET[1]  : le B    ALPHABET[22] : le W
 // ALPHABET[12] : le M
+
+#include <effacer>    // efface des cases, ou tout le fond
+#include <lire>       // lit la tuile posée sur une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <texte>      // écrit un texte à l’écran
+#include <poser>      // pose une tuile sur une case du fond
+#include <hasard>     // tire un nombre au hasard
+#include <nombre>     // écrit un nombre en chiffres
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <reste>      // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
 
 uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
 uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
@@ -17186,6 +18719,17 @@ int main() {
 // ALPHABET[1]  : le B    ALPHABET[22] : le W
 // ALPHABET[12] : le M
 
+#include <effacer>    // efface des cases, ou tout le fond
+#include <lire>       // lit la tuile posée sur une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <texte>      // écrit un texte à l’écran
+#include <poser>      // pose une tuile sur une case du fond
+#include <hasard>     // tire un nombre au hasard
+#include <nombre>     // écrit un nombre en chiffres
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <reste>      // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
 uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)
 uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).
 uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
@@ -17493,23 +19037,45 @@ int main() {
     controle: (c) => {
       const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(1) }
       const lesM = () => { let m = 0; for (let l = 0; l < 17; l++) m += [...c.mot(0, l, 20)].filter((ch) => ch === 'M').length; return m }
-      c.avancer(40)                     // le terrain du démarrage a un M en (6, 1)
+      c.avancer(40)
       const v = (n) => c.variable(n)
       const avant = lesM()
-      const brique = c.mot(6, 1, 1) === 'M'
-      tenir('right', () => v('ox') === 4)
-      c.presser('a', 3)                 // la bombe en (4, 1)
-      tenir('left', () => v('ox') === 3, 60)
-      tenir('down', () => v('oy') === 2, 60)   // à l'abri en (3, 2)
+      // Le terrain est tiré au hasard : on le LIT. Pour une bombe en (bx, 1), chaque bras
+      // avance de 2 cases au plus, s'arrête sur un X, et s'arrête SUR le premier M — qu'il casse.
+      const casses = (bx) => {
+        const touchees = []
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          for (let k = 1; k <= 2; k++) {
+            const x = bx + dx * k
+            const y = 1 + dy * k
+            const ch = c.mot(x, y, 1)
+            if (ch === 'X') break
+            if (ch === 'M') { touchees.push([x, y]); break }
+          }
+        }
+        return touchees
+      }
+      // La bombe : la colonne la plus à droite, de 4 à 9, qu'on atteint sur la ligne 1
+      // sans obstacle, et d'où une flamme touche une brique. Les cases où colonne + ligne
+      // ne dépasse pas 5 restent toujours libres : le chemin (2 à 4, 1) et l'abri (3, 2).
+      let bx = -1
+      for (let x = 2; x <= 9 && c.mot(x, 1, 1) === ' '; x++) if (x >= 4 && casses(x).length) bx = x
+      const attendues = bx < 0 ? [] : casses(bx)
+      const sontDes = (ch) => attendues.every(([x, y]) => c.mot(x, y, 1) === ch)
+      tenir('right', () => v('ox') === bx)
+      c.presser('a', 3)                 // la bombe en (bx, 1)
+      tenir('left', () => v('ox') === 3, 120)
+      tenir('down', () => v('oy') === 2, 60)   // à l'abri en (3, 2), hors des bras
       tenir('b', () => v('feu') === 1, 200)
       c.avancer(2)
-      const pendant = c.mot(3, 1, 4) === '---M'
+      const pendant = v('feu') === 1 && sontDes('M')
       tenir('b', () => v('feu') === 0, 100)
       c.avancer(2)
+      const ou = attendues.map(([x, y]) => `(${x}, ${y})`).join(' ')
       return [
-        ['un M en (6, 1), à 2 cases de la bombe posée en (4, 1)', brique],
-        ['pendant les flammes, le bras s’arrête sur le M : - - - M', pendant],
-        ['les flammes éteintes, le M a disparu', c.mot(6, 1, 1) === ' ' && lesM() === avant - 1, ` (${avant} M, puis ${lesM()})`],
+        ['une bombe posée sur la ligne 1 a une brique M à portée', bx >= 0, ` (bombe en (${bx}, 1), brique${attendues.length > 1 ? 's' : ''} en ${ou})`],
+        ['pendant les flammes, le bras s’arrête sur sa brique, encore là', pendant],
+        ['les flammes éteintes, ces briques ont disparu, et elles seules', sontDes(' ') && lesM() === avant - attendues.length, ` (${avant} M, puis ${lesM()})`],
         ['le O, à l’abri en (3, 2), n’a rien', v('ecran') === 0 && c.mot(3, 2, 1) === 'O'],
       ]
     },
@@ -17574,6 +19140,16 @@ int main() {
 //   jamais en dessous de 0, jamais au-dessus de 255.
 // « = 9 » : le nombre qu'elle a au départ.
 // Elles sont écrites ICI, hors de toute fonction : tout le programme les voit.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <effacer>    // efface des cases, ou tout le fond
+#include <texte>      // écrit un texte à l’écran
+#include <nombre>     // écrit un nombre en chiffres
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+
 uint8_t ax = 9;           // le A, le héros : sa colonne…
 uint8_t ay = 8;           // …et sa ligne, DANS la salle où il est. Il part de (9, 8).
 uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82) :
@@ -17902,6 +19478,15 @@ int main() {
 
 // ---- Les variables ----
 // uint8_t : une boîte qui garde un nombre de 0 à 255, jamais en dessous de 0.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <lire>       // lit la tuile posée sur une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <effacer>    // efface des cases, ou tout le fond
+#include <defiler>    // fait glisser tout le fond
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+
 uint8_t ax = 9;           // le A, le héros : sa colonne DANS LA SALLE (0 à 19)…
 uint8_t ay = 8;           // …et sa ligne (0 à 16). Il part de (9, 8).
 uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)
@@ -18264,6 +19849,6173 @@ int main() {
   },
 
   /*
+   * Partie K — Une lettre qui tire. On part du plus petit programme possible
+   * (un A, et un « . » qui part de lui et disparaît au bord), et chaque leçon
+   * n'ajoute qu'une chose : le bouton, les variables du A, le déplacement, le
+   * sens, le mur, la cible, trois tirs, la riposte ; puis un petit jeu qui
+   * réunit tout. Le A est à l'écran dans toutes les leçons, et tous les tirs
+   * sont des « . ». Chaque leçon à un tir est suivie de sa jumelle (X.1), qui
+   * fait la même chose avec plusieurs tirs en même temps. Après le petit jeu,
+   * on casse les murs (0.105), puis vient la boule de feu et son explosion.
+   */
+  {
+    titre: 'Une lettre qui tire — un tir, tout seul',
+    difficulte: 0,
+    partie: 'Une lettre qui tire',
+    idee: 'Le plus petit tir possible : une lettre A en (2, 8), et un « . » qui part juste à sa droite, avance tout seul d’une case toutes les 100 ms, et disparaît au bord de l’écran. Une seule variable, la colonne du tir.',
+    texte: [
+      '**Une nouvelle série : une lettre qui tire.** Dans beaucoup de jeux, le héros **tire** : une petite chose part de lui, file tout droit, et touche ce qu’elle rencontre. On va le construire pas à pas. Ici, le plus petit morceau : **la lettre A, et un tir qui part d’elle**. Pas de bouton, pas de cible.',
+      '**La lettre qui tire :** un A, posé une fois en (2, 8) avec `poser(2, 8, ALPHABET[0])`. Il ne bouge pas.',
+      '**Un tir, c’est quoi ?** C’est un signe qui bouge, comme la lettre du 0.65 : on l’efface, on change sa colonne, on le redessine. Avec **deux différences** : il va **vite**, et au bord de l’écran, il **disparaît** au lieu de revenir à gauche.',
+      '**Une seule variable :** `tx`, la colonne du tir. Elle part de **3** : le A est en colonne 2, le tir commence **juste à sa droite**. Pas sur le A : il le cacherait, puis l’effacerait en avançant. Sa ligne ne change jamais : c’est la ligne 8, celle du A, écrite directement dans le code.',
+      '**Le signe du tir :** `texte(tx, 8, ".")` écrit un mot d’un seul signe, le **point**. C’est le dessin de **tous** les tirs de cette série : ceux du A, dans tous les sens, et plus tard ceux du B.',
+      '**Vite :** `chaque(100)` (le 0.77) : un pas toutes les 100 ms, **10 cases par seconde**. Le A du 0.66 n’en faisait que 7 : un tir va plus vite que celui qui le lance.',
+      '**Disparaître :** l’écran a les colonnes 0 à 19. Tant que `tx < 20`, le tir avance : on efface sa case, `tx = tx + 1`, et **s’il est encore dans l’écran**, on le redessine. Quand `tx` arrive à **20**, on ne le redessine pas : il a disparu. Et comme `tx < 20` est faux pour toujours, le bloc ne fait plus rien.',
+      '**Déroulons :** le A en (2, 8), `tx` = 3, le « . » en (3, 8). 100 ms plus tard : on efface (3, 8), `tx` = 4, on dessine en (4, 8). … `tx` = 19 : on efface (19, 8), `tx` = 20 : 20 < 20 est faux, on ne dessine rien. Sur la ligne 8, il ne reste que le A.',
+      '**Essaie :** rends le tir plus lent avec `chaque(300)`. Ou pose le A en (6, 8) : change aussi `tx` en 7, pour que le tir parte toujours juste à côté de lui.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : le tir, tout seul ----
+// La lettre A est posée en (2, 8). Juste à sa droite part un TIR :
+// un point « . » qui avance tout seul, case par case, et qui
+// DISPARAÎT quand il arrive au bord de l'écran.
+// Pas encore de bouton : le tir part dès le début, une seule fois.
+// ALPHABET[0] : le A (on compte les lettres à partir de 0 : A = 0, B = 1…).
+
+// Une variable, c'est une boîte qui garde un nombre.
+// uint8_t : elle garde un nombre de 0 à 255.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <texte>      // écrit un texte à l’écran
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <effacer>    // efface des cases, ou tout le fond
+
+uint8_t tx = 3;              // la colonne du tir : il part de la colonne 3,
+                             // juste à droite du A (colonne 2)
+
+int main() {
+  poser(2, 8, ALPHABET[0]);  // la lettre A, celle qui tire : colonne 2, ligne 8.
+                             // Elle ne bougera pas : on la pose une fois.
+
+  // texte(colonne, ligne, "…") écrit un mot ; ici, un mot d'un seul signe.
+  texte(tx, 8, ".");         // le tir, à sa place de départ : (3, 8)
+
+  while (true) {             // la boucle du jeu : elle tourne sans fin
+    image();                 // attendre l'image suivante (60 par seconde)
+
+    // chaque(100) répond 1 toutes les 100 ms (le 0.77) :
+    // le bloc se fait 10 fois par seconde. Un tir va VITE.
+    if (chaque(100)) {
+      if (tx < 20) {         // le tir est encore dans l'écran (colonnes 0 à 19) :
+        effacer(tx, 8, 1);   //   1. il quitte sa case (1 case effacée)…
+        tx = tx + 1;         //   2. …avance d'une colonne…
+        if (tx < 20) {       //   3. …et s'il est encore dans l'écran,
+          texte(tx, 8, "."); //      on le dessine à sa nouvelle place.
+        }
+      }
+      // tx vaut 20 : le tir est sorti par la droite. On ne dessine plus rien :
+      // il a disparu, et « tx < 20 » est faux pour toujours : plus rien ne bouge.
+      // Le A, lui, est toujours là.
+    }
+  }
+}
+`,
+    aVoir: 'Un A en (2, 8). Juste à sa droite, un « . » file vers le bord, une case toutes les 100 ms, puis disparaît ; le A reste.',
+    controle: (c) => {
+      const tireur = c.mot(2, 8, 1) === 'A'
+      const vus = []
+      for (let k = 0; k < 200; k++) {
+        c.avancer(1)
+        const i = c.mot(0, 8, 20).indexOf('.')
+        if (i >= 0 && vus.at(-1) !== i) vus.push(i)
+      }
+      const pasAPas = vus.every((v, k) => k === 0 || v === vus[k - 1] + 1)
+      return [
+        ['la lettre A est en (2, 8)', tireur],
+        ['le tir avance d’une colonne à la fois, vers la droite, sur la ligne 8', vus.length >= 13 && vus[0] >= 3 && pasAPas, ` (colonnes ${vus[0]} à ${vus.at(-1)})`],
+        ['il va jusqu’à la colonne 19', vus.at(-1) === 19],
+        ['puis il disparaît : sur la ligne 8, il ne reste que le A', c.mot(0, 8, 20).trim() === 'A' && c.variable('tx') === 20],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — un tir, tout seul, puis plusieurs',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.96, mais le A tire tout seul, sans fin : un tir toutes les 600 ms. Trois tirs volent en même temps : leurs colonnes sont rangées dans un tableau, tx[3], et vole[3] dit lesquels sont en vol.',
+    texte: [
+      '**C’est le 0.96, avec plusieurs tirs.** Le A tire **tout seul**, toutes les 600 ms, sans jamais s’arrêter. Un tir met 1,7 seconde à traverser l’écran : pendant ce temps, d’autres sont partis. On en voit **trois** en même temps sur la ligne.',
+      '**Le problème :** au 0.96, une seule variable `tx` gardait LA colonne du tir. Trois tirs, ce sont trois colonnes. On pourrait écrire `tx1`, `tx2`, `tx3`… et recopier trois fois le même code. Non : on les range dans un **tableau**, comme la queue du serpent (le 0.91.6).',
+      '**Ce qui est nouveau ici (1) : deux tableaux.** `uint8_t tx[3];` réserve **trois** colonnes : `tx[0]`, `tx[1]` et `tx[2]` (on compte depuis 0). `uint8_t vole[3];` dit, pour chacune, si le tir est en vol (1) ou libre (0). Au départ, tout vaut 0 : aucun tir ne vole.',
+      '**Ce qui est nouveau ici (2) : lancer dans une case libre.** Toutes les 600 ms (`chaque(600)`), une boucle `for` passe sur les trois tirs et lance le **premier** qui ne vole pas : `vole[i] = 1`, `tx[i] = 3`. La variable `lance` passe à 1 dès qu’un tir est parti : les suivants, même libres, ne partent pas à ce tour-ci. Un seul tir à la fois sort du A.',
+      '**Ce qui est nouveau ici (3) : faire avancer chaque tir.** Toutes les 100 ms, une autre boucle passe sur les trois : si `vole[i]` vaut 1, c’est **le pas du 0.96**, avec `tx[i]` au lieu de `tx`. Quand un tir sort de l’écran, `vole[i] = 0` : sa case du tableau est **libre**, elle servira au prochain tir.',
+      '**Déroulons :** au départ, `vole` = {0, 0, 0}. 600 ms : le tir 0 part (`tx[0]` = 3). 1,2 s : le tir 0 est déjà en colonne 9 ; le 1 part. 1,8 s : le 0 est sorti, `vole[0]` revient à 0 ; le 2 part. 2,4 s : la case 0 est libre, c’est elle qui repart. Les trois cases tournent sans fin.',
+      '**Essaie :** `chaque(300)` : plus de tirs voudraient partir, mais les trois cases sont souvent pleines, et il y a des trous dans la rafale. Passe alors à `tx[5]` et `vole[5]`, et `i < 5` dans les deux boucles.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : un tir, tout seul — plusieurs tirs ----
+// Le 0.96, mais le A tire TOUT SEUL, sans fin : un nouveau tir toutes les
+// 600 ms. Plusieurs tirs volent en même temps : leurs colonnes sont rangées
+// dans un TABLEAU (comme la queue du serpent, le 0.91.6).
+
+// ---- NOUVEAU : trois tirs, rangés dans deux tableaux ----
+// uint8_t tx[3] : TROIS cases, tx[0], tx[1] et tx[2] (on compte depuis 0).
+// tx[i] : la colonne du tir numéro i ; vole[i] : 1 s'il est en vol.
+// Au départ, toutes les cases valent 0 : aucun tir ne vole.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <texte>      // écrit un texte à l’écran
+#include <effacer>    // efface des cases, ou tout le fond
+
+uint8_t tx[3];
+uint8_t vole[3];
+uint8_t lance = 0;           // 1 = un tir vient de partir, à ce tour-ci
+
+int main() {
+  poser(2, 8, ALPHABET[0]);  // la lettre A, celle qui tire : (2, 8)
+
+  while (true) {
+    image();
+
+    // ---- NOUVEAU : un tir part toutes les 600 ms, dans une case LIBRE ----
+    // La boucle regarde les trois tirs ; le premier qui ne vole pas part.
+    // lance passe à 1 : les suivants, même libres, attendent le prochain tour.
+    if (chaque(600)) {
+      lance = 0;
+      for (uint8_t i = 0; i < 3; i++) {    // i vaut 0, puis 1, puis 2
+        if (lance == 0 && vole[i] == 0) {
+          vole[i] = 1;                     // le tir n° i est en vol…
+          tx[i] = 3;                       // …il part juste à droite du A…
+          texte(tx[i], 8, ".");            // …et on le dessine
+          lance = 1;
+        }
+      }
+    }
+
+    // ---- CHAQUE tir avance : le pas du 0.96, dans une boucle ----
+    // Le même code, avec tx[i] au lieu de tx, et vole[i] pour savoir
+    // s'il faut s'en occuper.
+    if (chaque(100)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        if (vole[i] == 1) {
+          effacer(tx[i], 8, 1);            // 1. il quitte sa case
+          tx[i] = tx[i] + 1;               // 2. une colonne plus loin
+          if (tx[i] < 20) {                // 3. encore dans l'écran : on le dessine
+            texte(tx[i], 8, ".");
+          } else {                         //    sorti : sa case du tableau est libre,
+            vole[i] = 0;                   //    elle servira au prochain tir
+          }
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Le A en (2, 8) tire tout seul, un « . » toutes les 600 ms ; trois tirs volent en même temps sur la ligne 8, et chacun disparaît au bord.',
+    controle: (c) => {
+      let max = 0
+      let toujours = true
+      for (let k = 0; k < 300; k++) {
+        c.avancer(1)
+        const r = c.mot(0, 8, 20)
+        max = Math.max(max, (r.match(/\./g) || []).length)
+        if (r[2] !== 'A') toujours = false
+      }
+      return [
+        ['le A reste en (2, 8)', toujours],
+        ['plusieurs tirs volent en même temps sur la ligne 8, jamais plus de trois', max >= 2 && max <= 3, ` (au plus ${max})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — A lance le tir',
+    difficulte: 0,
+    idee: 'Le 0.96, mais le tir ne part que quand on appuie sur le bouton A, juste à droite de la lettre A. Une variable vole dit s’il est en vol : un seul tir à la fois.',
+    texte: [
+      '**C’est le 0.96, avec une chose en plus : le bouton A.** Au départ, on ne voit que la lettre A, en (2, 8). Appuie sur le bouton **A** : le tir part juste à côté d’elle, en (3, 8), et file vers la droite. Quand il a disparu, on peut en relancer un.',
+      '**Ce qui est nouveau ici : `vole`.** Une variable qui vaut **1** quand un tir est en vol, **0** sinon. Au 0.96, on savait que le tir volait parce que `tx < 20`. Mais maintenant, au départ, il n’y a **pas** de tir : il faut le dire avec une variable à part.',
+      '**Lancer :** `if (bouton(A) && vole == 0)`. `&&` veut dire « et » : A est enfoncé **et** aucun tir ne vole. Alors `vole = 1`, `tx = 3` (à côté de la lettre), et on dessine le tir.',
+      '**Pourquoi `vole == 0` ?** Sans lui, appuyer sur A pendant le vol remettrait `tx` à 3 **sans effacer** l’ancien « . » : il resterait collé sur l’écran, et le vrai tir repartirait de la lettre. Avec lui, c’est simple : **un seul tir à la fois**. Tant qu’il vole, A ne fait rien.',
+      '**Avancer :** le même bloc qu’au 0.96, mais dans `if (vole == 1)`. Et quand le tir sort (`tx` arrive à 20), `vole = 0` : A peut relancer.',
+      '**`else` :** `if (tx < 20) { … } else { … }` : si le tir est encore dans l’écran, on le dessine ; **sinon**, on dit qu’il ne vole plus.',
+      '**Deux « A » différents :** la **lettre** A, à l’écran, c’est celle qui tire ; le **bouton** A, sur la console, c’est celui qu’on appuie. `ALPHABET[0]` est la lettre, `bouton(A)` le bouton.',
+      '**Essaie :** garde le bouton A enfoncé tout le temps. Un nouveau tir part dès que le précédent a disparu : une rafale, un tir à la fois.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : A lance le tir ----
+// Le 0.96, et le tir ne part plus tout seul : il part du A
+// quand on appuie sur le bouton A.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <bouton>     // lit un bouton de la manette
+#include <texte>      // écrit un texte à l’écran
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <effacer>    // efface des cases, ou tout le fond
+
+uint8_t tx = 3;              // la colonne du tir : juste à droite du A
+uint8_t vole = 0;            // NOUVEAU : 1 = le tir est en vol ; 0 = pas de tir
+
+int main() {
+  poser(2, 8, ALPHABET[0]);  // la lettre A, celle qui tire : (2, 8), comme au 0.96
+
+  while (true) {
+    image();
+
+    // ---- NOUVEAU : le bouton A lance le tir ----
+    // bouton(A) : vrai tant que A est enfoncé.
+    // && : « et ». Il faut A enfoncé ET aucun tir en vol.
+    // Ainsi, UN SEUL TIR À LA FOIS : tant qu'il vole, A ne fait rien.
+    if (bouton(A) && vole == 0) {
+      vole = 1;              // le tir est en vol…
+      tx = 3;                // …il repart de la colonne 3, à côté du A…
+      texte(tx, 8, ".");     // …et on le dessine
+    }
+
+    // ---- le tir avance (le 0.96), mais seulement s'il est en vol ----
+    if (chaque(100)) {
+      if (vole == 1) {
+        effacer(tx, 8, 1);   // 1. il quitte sa case
+        tx = tx + 1;         // 2. une colonne plus loin
+        if (tx < 20) {       // 3. encore dans l'écran : on le dessine
+          texte(tx, 8, ".");
+        } else {             //    sorti par la droite :
+          vole = 0;          //    plus de tir en vol, A peut en relancer un
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'La lettre A seule en (2, 8). Le bouton A lance un « . » juste à sa droite, qui file jusqu’au bord ; tant qu’il vole, A ne fait rien ; quand il a disparu, A en relance un.',
+    controle: (c) => {
+      const points = () => (c.mot(0, 8, 20).match(/\./g) || []).length
+      c.avancer(30)
+      const rien = c.mot(0, 8, 20).trim() === 'A' && c.mot(2, 8, 1) === 'A' && c.variable('vole') === 0
+      c.gb.setButton('a', true)
+      c.avancer(1)
+      c.gb.setButton('a', false)
+      const colle = c.mot(2, 8, 2) === 'A.' && c.variable('vole') === 1
+      c.avancer(3)
+      c.avancer(20)
+      const avant = c.variable('tx')
+      c.presser('a', 3)
+      const un = points() === 1 && c.variable('tx') >= avant
+      c.avancer(160)
+      const fini = c.variable('vole') === 0 && c.mot(0, 8, 20).trim() === 'A'
+      c.presser('a', 3)
+      const encore = c.variable('vole') === 1 && points() === 1
+      return [
+        ['au départ : la lettre A en (2, 8), pas de tir', rien],
+        ['bouton A : un « . » part juste à droite de la lettre, en (3, 8)', colle],
+        ['A pendant le vol : rien ne change, toujours un seul tir', un],
+        ['sorti par la droite : vole revient à 0, il ne reste que le A', fini],
+        ['A : un nouveau tir part', encore],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — A lance plusieurs tirs',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.97, avec les trois tirs du 0.96.1 : garde le bouton A enfoncé, une rafale part, un tir toutes les 250 ms au plus, jamais plus de trois en vol.',
+    texte: [
+      '**C’est le 0.97, avec plusieurs tirs.** Au 0.97, un seul tir à la fois : tant qu’il volait, le bouton A ne faisait rien. Ici, garde A enfoncé : une **rafale** part, jusqu’à **trois** tirs en vol.',
+      '**Ce qui vient du 0.96.1 :** les deux tableaux `tx[3]` et `vole[3]`, la boucle qui lance le premier tir libre (avec `lance`), et la boucle qui fait avancer chaque tir.',
+      '**Ce qui est nouveau ici : un rythme pour tirer, `chaque(250)`.** Au 0.97, `vole == 0` empêchait un deuxième tir. Maintenant, un deuxième tir est permis… et A enfoncé en lancerait un à **chaque image** : trois tirs collés les uns aux autres. On lance donc dans `if (chaque(250)) { if (bouton(A)) { … } }` : au plus **4 tirs par seconde**, bien espacés.',
+      '**Les trois volent déjà ?** La boucle ne trouve aucun `vole[i]` à 0 : rien ne part. Il faut attendre qu’un tir sorte de l’écran.',
+      '**Déroulons, A tenu :** 0 ms, le tir 0 part de (3, 8). 250 ms : il est en (5, 8), le tir 1 part. 500 ms : le tir 2 part. 750 ms : les trois volent, rien ne part. Vers 1,7 s, le tir 0 sort : sa case est libre, le suivant part.',
+      '**Essaie :** `chaque(100)` : les tirs partent collés, à une case d’écart. Puis `chaque(500)` : une rafale lente.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : A lance le tir — plusieurs tirs ----
+// Le 0.97, mais avec trois tirs (le 0.96.1) : garde le bouton A enfoncé,
+// une rafale part, un tir toutes les 250 ms.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <texte>      // écrit un texte à l’écran
+#include <effacer>    // efface des cases, ou tout le fond
+
+uint8_t tx[3];               // les colonnes des trois tirs (le 0.96.1)
+uint8_t vole[3];             // vole[i] = 1 : le tir n° i est en vol
+uint8_t lance = 0;           // 1 = un tir vient de partir, à ce tour-ci
+
+int main() {
+  poser(2, 8, ALPHABET[0]);  // la lettre A, celle qui tire : (2, 8)
+
+  while (true) {
+    image();
+
+    // ---- NOUVEAU : le bouton A lance un tir, au plus toutes les 250 ms ----
+    // Sans ce rythme, garder A enfoncé lancerait les trois tirs en trois
+    // images, collés les uns aux autres.
+    if (chaque(250)) {
+      if (bouton(A)) {
+        lance = 0;
+        for (uint8_t i = 0; i < 3; i++) {
+          if (lance == 0 && vole[i] == 0) {  // le premier tir LIBRE part
+            vole[i] = 1;
+            tx[i] = 3;
+            texte(tx[i], 8, ".");
+            lance = 1;
+          }
+        }
+        // Les trois volent déjà ? Rien ne part : il faut qu'un sorte.
+      }
+    }
+
+    // ---- chaque tir avance (le 0.96.1) ----
+    if (chaque(100)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        if (vole[i] == 1) {
+          effacer(tx[i], 8, 1);
+          tx[i] = tx[i] + 1;
+          if (tx[i] < 20) {
+            texte(tx[i], 8, ".");
+          } else {
+            vole[i] = 0;
+          }
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'La lettre A en (2, 8). Bouton A tenu : une rafale de « . », espacés, jusqu’à trois en vol en même temps ; relâché, les tirs finissent leur course et disparaissent.',
+    controle: (c) => {
+      c.avancer(10)
+      const rien = c.mot(0, 8, 20).trim() === 'A'
+      let max = 0
+      let colles = false
+      c.gb.setButton('a', true)
+      for (let k = 0; k < 150; k++) {
+        c.avancer(1)
+        const r = c.mot(0, 8, 20)
+        max = Math.max(max, (r.match(/\./g) || []).length)
+        if (r.includes('..')) colles = true
+      }
+      c.gb.setButton('a', false)
+      c.avancer(130)
+      return [
+        ['au départ, la lettre A seule', rien],
+        ['A tenu : trois tirs en vol en même temps, pas plus', max === 3, ` (au plus ${max})`],
+        ['les tirs partent espacés, jamais collés', !colles],
+        ['relâché : tous disparaissent, il ne reste que le A', c.mot(0, 8, 20).trim() === 'A'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — la place du A dans deux variables',
+    difficulte: 0,
+    idee: 'Le 0.97, et les nombres 2 et 8, la place du A, sont rangés dans ax et ay. Le tir part de ax + 1, sur la ligne ay : change ax ou ay, et le A et son tir bougent ensemble.',
+    texte: [
+      '**C’est le 0.97, avec une chose en plus : la place du A dans deux variables.** À l’écran, rien ne change : le A en (2, 8), le tir qui part à sa droite. Mais le programme est prêt pour le 0.99, où le A va bouger.',
+      '**Le problème :** au 0.97, la place du A est écrite **cinq fois** : `2` dans `poser()`, `3` pour le départ du tir (2 + 1), et `8` dans `poser()`, `texte()` et `effacer()`. Pour déplacer le A, il faudrait changer tous ces nombres, sans en oublier un.',
+      '**Ce qui est nouveau ici : `ax` et `ay`.** La colonne et la ligne du A, rangées **une fois**, en haut du programme. Partout où il y avait `2`, il y a `ax` ; partout où il y avait `8`, il y a `ay`.',
+      '**Le départ du tir est CALCULÉ :** `tx = ax + 1`. Avec `ax` = 2, ça donne 2 + 1 = **3**, comme avant. Mais si le A est ailleurs, le tir part toujours **juste à côté de lui**.',
+      '**Déroulons :** `ax` = 2, `ay` = 8 : le A en (2, 8). Bouton A : `vole` = 1, `tx` = 2 + 1 = 3, le « . » en (3, 8). Puis (4, 8), (5, 8)… (19, 8), et il disparaît. Le A, lui, n’a pas bougé.',
+      '**Essaie :** écris `uint8_t ax = 0;` et `uint8_t ay = 3;` : le A est en (0, 3), et le tir part de (1, 3). Tu n’as changé que deux nombres.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : la place du A dans deux variables ----
+// Le 0.97, et les nombres 2 et 8 (la place du A) sont rangés dans deux
+// variables, ax et ay. Le tir part de ax + 1, sur la ligne ay.
+// Change ax ou ay : le A ET le tir changent de place ensemble.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <bouton>     // lit un bouton de la manette
+#include <texte>      // écrit un texte à l’écran
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <effacer>    // efface des cases, ou tout le fond
+
+uint8_t ax = 2;              // NOUVEAU : le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne. Il est en (2, 8), comme avant.
+uint8_t tx = 0;              // la colonne du tir
+uint8_t vole = 0;            // 1 = le tir est en vol ; 0 = pas de tir
+
+int main() {
+  poser(ax, ay, ALPHABET[0]);          // le A, à sa place : (ax, ay)
+
+  while (true) {
+    image();
+
+    // ---- A lance le tir (le 0.97) ----
+    if (bouton(A) && vole == 0) {
+      vole = 1;
+      tx = ax + 1;           // NOUVEAU : JUSTE À DROITE du A, calculé :
+                             //   ax vaut 2, donc tx vaut 2 + 1 = 3
+      texte(tx, ay, ".");    // sur la ligne du A
+    }
+
+    // ---- le tir avance, sur la ligne du A ----
+    if (chaque(100)) {
+      if (vole == 1) {
+        effacer(tx, ay, 1);
+        tx = tx + 1;
+        if (tx < 20) {
+          texte(tx, ay, ".");
+        } else {
+          vole = 0;
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Comme au 0.97 : un A en (2, 8), et le bouton A lance un « . » juste à sa droite, qui file jusqu’au bord ; le A reste à sa place.',
+    controle: (c) => {
+      c.avancer(10)
+      const tireur = c.mot(2, 8, 1) === 'A' && c.variable('ax') === 2 && c.variable('ay') === 8
+      c.gb.setButton('a', true)
+      c.avancer(1)
+      c.gb.setButton('a', false)
+      const colle = c.mot(2, 8, 2) === 'A.' && c.variable('tx') === 3
+      c.avancer(160)
+      return [
+        ['le A est en (ax, ay) = (2, 8)', tireur],
+        ['A : le tir part en ax + 1 = 3, juste à sa droite', colle],
+        ['le tir a disparu au bord, le A est toujours là', c.variable('vole') === 0 && c.mot(0, 8, 20).trim() === 'A'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — plusieurs tirs, depuis ax et ay',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.98 (la place du A dans ax et ay), avec les trois tirs du 0.97.1 : chaque tir part de ax + 1, sur la ligne ay.',
+    texte: [
+      '**C’est le 0.98, avec plusieurs tirs.** À l’écran, c’est le 0.97.1 : le bouton A tenu lance une rafale, trois tirs au plus. Dans le programme, la place du A est dans `ax` et `ay` (le 0.98).',
+      '**Ce qui change par rapport au 0.97.1 :** partout où il y avait `2`, il y a `ax` ; partout où il y avait `8`, `ay`. Et le départ d’un tir est calculé : `tx[i] = ax + 1`.',
+      '**Pourquoi c’est utile :** au 0.99.1, le A va bouger. Chaque tir partira alors de là où est le A **au moment du tir**.',
+      '**Essaie :** `uint8_t ax = 0;` et `uint8_t ay = 3;` : le A et sa rafale descendent sur la ligne 3.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : la place du A dans deux variables — plusieurs tirs ----
+// Le 0.98 (ax et ay), avec trois tirs (le 0.97.1).
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <texte>      // écrit un texte à l’écran
+#include <effacer>    // efface des cases, ou tout le fond
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t tx[3];               // les colonnes des trois tirs
+uint8_t vole[3];             // vole[i] = 1 : le tir n° i est en vol
+uint8_t lance = 0;
+
+int main() {
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le bouton A lance un tir, au plus toutes les 250 ms (le 0.97.1) ----
+    if (chaque(250)) {
+      if (bouton(A)) {
+        lance = 0;
+        for (uint8_t i = 0; i < 3; i++) {
+          if (lance == 0 && vole[i] == 0) {
+            vole[i] = 1;
+            tx[i] = ax + 1;          // NOUVEAU : juste à droite du A, calculé (le 0.98)
+            texte(tx[i], ay, ".");   // sur la ligne du A
+            lance = 1;
+          }
+        }
+      }
+    }
+
+    // ---- chaque tir avance, sur la ligne du A ----
+    if (chaque(100)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        if (vole[i] == 1) {
+          effacer(tx[i], ay, 1);
+          tx[i] = tx[i] + 1;
+          if (tx[i] < 20) {
+            texte(tx[i], ay, ".");
+          } else {
+            vole[i] = 0;
+          }
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Comme au 0.97.1 : le A en (2, 8), et le bouton A tenu lance une rafale de « . », jusqu’à trois en vol, qui partent juste à sa droite.',
+    controle: (c) => {
+      c.avancer(10)
+      const place = c.variable('ax') === 2 && c.variable('ay') === 8 && c.mot(2, 8, 1) === 'A'
+      let max = 0
+      let premier = -1
+      c.gb.setButton('a', true)
+      for (let k = 0; k < 150; k++) {
+        c.avancer(1)
+        const r = c.mot(0, 8, 20)
+        if (premier < 0 && r.indexOf('.') >= 0) premier = r.indexOf('.')
+        max = Math.max(max, (r.match(/\./g) || []).length)
+      }
+      c.gb.setButton('a', false)
+      c.avancer(130)
+      return [
+        ['le A est en (ax, ay) = (2, 8)', place],
+        ['le premier tir part juste à droite du A', premier === 3 || premier === 4, ` (colonne ${premier})`],
+        ['A tenu : trois tirs en vol en même temps, pas plus', max === 3, ` (au plus ${max})`],
+        ['relâché : il ne reste que le A', c.mot(0, 8, 20).trim() === 'A'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — le A bouge, le tir garde sa ligne',
+    difficulte: 0,
+    idee: 'Le 0.98, et le A bouge avec la croix. Le tir part de là où est le A ; sa ligne, ty, est recopiée une fois au départ : si le A s’en va, le tir continue tout droit.',
+    texte: [
+      '**C’est le 0.98, avec une chose en plus : le A bouge.** La croix le déplace, un pas toutes les 150 ms, exactement comme le O du 0.93.1 : on calcule la case d’arrivée `nx`, `ny`, on regarde si elle est dans l’écran et vide, puis on y va.',
+      '**Dans l’écran :** `nx < 20 && ny < 17`. Et à gauche ? En colonne 0, `ax - 1` ne donne pas -1 : un `uint8_t` fait le tour et donne **255** (le 0.95). 255 n’est pas plus petit que 20 : sortir à gauche est refusé par le même test. Pareil en haut.',
+      '**Ce qui est nouveau ici : le tir a SA ligne, `ty`.** Au 0.98, le tir avançait sur la ligne `ay`, celle du A. Mais si le A monte pendant que le tir vole, le tir monterait avec lui ! Un tir ne fait pas ça : une fois parti, il va **tout droit**.',
+      '**La solution : recopier.** Au départ du tir, `ty = ay` : `ty` prend la valeur que `ay` a **à ce moment-là**. Ensuite, le tir n’utilise plus que `ty`. Le A peut bouger, `ay` peut changer : `ty`, lui, ne change pas.',
+      '**`ax < 19` :** en colonne 19, il n’y a plus de case à droite du A. On ne lance pas.',
+      '**Le A ne marche pas sur son tir :** il ne va que sur une case **vide** (`lire(nx, ny) == 0`), et le « . » n’est pas vide.',
+      '**Déroulons :** A en (2, 8). BAS, BAS, BAS : A en (2, 11). Bouton A : `tx` = 3, `ty` = 11. HAUT : le A remonte en (2, 10), `ay` = 10 ; mais `ty` vaut toujours 11 : le tir continue sur la ligne 11.',
+      '**Essaie :** remplace `ty` par `ay` dans le bloc qui fait avancer le tir, et bouge pendant qu’il vole : le tir suit le A comme une ombre.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : le A bouge, le tir garde sa ligne ----
+// Le 0.98, et le A bouge avec la croix (comme le O du 0.93.1).
+// Le tir part de là où est le A… puis il garde SA ligne, même si le A s'en va.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
+#include <texte>      // écrit un texte à l’écran
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t nx = 0;              // la case d'ARRIVÉE du A, calculée AVANT de bouger (le 0.82)
+uint8_t ny = 0;
+uint8_t tx = 0;              // le tir : sa colonne…
+uint8_t ty = 0;              // NOUVEAU : …et SA ligne, à lui
+uint8_t vole = 0;            // 1 = le tir est en vol ; 0 = pas de tir
+
+int main() {
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+    if (chaque(150)) {
+      nx = ax;               // 1. l'arrivée : on part de la case actuelle…
+      ny = ay;
+      if (bouton(DROITE)) {  //    …et la flèche la change d'une case.
+        nx = ax + 1;         //    else if : une seule flèche à la fois.
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;         //    en colonne 0, 0 - 1 donne 255 (le uint8_t fait le tour)
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+      }
+      // 2. l'arrivée est dans l'écran : colonnes 0 à 19, lignes 0 à 16.
+      //    255 n'est pas plus petit que 20 : sortir à gauche ou en haut est refusé aussi.
+      if (nx < 20 && ny < 17) {
+        // 3. …et c'est une case VIDE (la tuile 0) : le A y va.
+        //    Le tir n'est pas vide : le A ne marche pas dessus.
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- A lance le tir, depuis la case du A ----
+    // ax < 19 : en colonne 19, il n'y a plus de place à droite pour le tir.
+    if (bouton(A) && vole == 0 && ax < 19) {
+      vole = 1;
+      tx = ax + 1;           // juste à droite du A…
+      ty = ay;               // NOUVEAU : …sur la ligne où est le A MAINTENANT.
+      texte(tx, ty, ".");    // ty est recopiée UNE fois, au départ du tir.
+    }
+
+    // ---- le tir avance sur SA ligne, ty ----
+    // Si le A monte ou descend pendant le vol, ay change, mais pas ty :
+    // le tir continue tout droit, là où il a été lancé.
+    if (chaque(100)) {
+      if (vole == 1) {
+        effacer(tx, ty, 1);
+        tx = tx + 1;
+        if (tx < 20) {
+          texte(tx, ty, ".");
+        } else {
+          vole = 0;
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Le A bouge avec la croix. Le bouton A lance un « . » à sa droite ; si le A monte ou descend ensuite, le tir continue sur la ligne où il est parti.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(2) }
+      const v = (n) => c.variable(n)
+      c.avancer(10)
+      tenir('down', () => v('ay') === 11)
+      const descendu = v('ay') === 11 && c.mot(2, 11, 1) === 'A'
+      c.gb.setButton('a', true)
+      c.avancer(1)
+      c.gb.setButton('a', false)
+      const part = v('vole') === 1 && v('tx') <= 4 && v('ty') === 11
+      tenir('up', () => v('ay') === 9)
+      const garde = v('ay') === 9 && v('ty') === 11 && c.mot(0, 11, 20).includes('.') && !c.mot(0, 9, 20).includes('.')
+      c.avancer(160)
+      return [
+        ['BAS : le A descend en (2, 11)', descendu],
+        ['A : le tir part à sa droite, ty = 11', part],
+        ['le A remonte en ligne 9 : le tir reste sur la ligne 11', garde, ` (ay = ${v('ay')}, ty = ${v('ty')})`],
+        ['le tir finit par disparaître au bord', v('vole') === 0 && !c.mot(0, 11, 20).includes('.')],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — le A bouge, chaque tir garde sa ligne',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.99, avec trois tirs : chaque tir recopie la ligne du A au moment où il part, dans son propre ty[i]. Tire, bouge, tire encore : les tirs volent sur des lignes différentes.',
+    texte: [
+      '**C’est le 0.99, avec plusieurs tirs.** Le A bouge avec la croix, et le bouton A lance une rafale. Tire, descends de deux lignes, tire encore : les premiers tirs continuent sur leur ligne, les nouveaux partent sur la nouvelle.',
+      '**Ce qui est nouveau ici : `ty[3]`, un tableau de lignes.** Au 0.99, **un** tir avait **sa** ligne, `ty`. Maintenant, chaque tir a la sienne : `ty[i]`. Au départ du tir n° i, `ty[i] = ay` recopie la ligne du A **à ce moment-là**. Ensuite, le tir n’utilise que `ty[i]`.',
+      '**Le reste ne change pas :** `tx[3]` et `vole[3]` (le 0.96.1), la rafale avec `chaque(250)` (le 0.97.1), le A qui bouge et ne marche que sur une case vide (le 0.99).',
+      '**Déroulons :** A en (2, 8). Bouton A : le tir 0 part, `tx[0]` = 3, `ty[0]` = 8. BAS, BAS : le A est en (2, 10). Bouton A : le tir 1 part, `tx[1]` = 3, `ty[1]` = 10. Le tir 0, lui, est toujours sur la ligne 8 : deux tirs, deux lignes.',
+      '**Essaie :** garde A enfoncé et monte ou descends en même temps : une rafale en escalier.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : le A bouge — plusieurs tirs ----
+// Le 0.99 (le A bouge, chaque tir garde sa ligne), avec trois tirs.
+// Chaque tir a SA ligne : un troisième tableau, ty.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
+#include <texte>      // écrit un texte à l’écran
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t nx = 0;              // la case d'ARRIVÉE du A (le 0.82)
+uint8_t ny = 0;
+uint8_t tx[3];               // les colonnes des trois tirs…
+uint8_t ty[3];               // NOUVEAU : …et LEURS lignes. Chacun a la sienne.
+uint8_t vole[3];             // vole[i] = 1 : le tir n° i est en vol
+uint8_t lance = 0;
+
+int main() {
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge avec la croix, un pas toutes les 150 ms (le 0.99) ----
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+      }
+      if (nx < 20 && ny < 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- le bouton A lance un tir, au plus toutes les 250 ms ----
+    if (chaque(250)) {
+      if (bouton(A) && ax < 19) {
+        lance = 0;
+        for (uint8_t i = 0; i < 3; i++) {
+          if (lance == 0 && vole[i] == 0) {
+            vole[i] = 1;
+            tx[i] = ax + 1;
+            ty[i] = ay;              // NOUVEAU : la ligne du A, recopiée pour CE tir
+            texte(tx[i], ty[i], ".");
+            lance = 1;
+          }
+        }
+      }
+    }
+
+    // ---- chaque tir avance sur SA ligne, ty[i] ----
+    // Tire, monte, tire encore : les tirs volent sur des lignes différentes.
+    if (chaque(100)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        if (vole[i] == 1) {
+          effacer(tx[i], ty[i], 1);
+          tx[i] = tx[i] + 1;
+          if (tx[i] < 20) {
+            texte(tx[i], ty[i], ".");
+          } else {
+            vole[i] = 0;
+          }
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Le A bouge avec la croix et tire des rafales ; chaque « . » continue sur la ligne où il est parti, même quand le A change de ligne.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(2) }
+      const v = (n) => c.variable(n)
+      c.avancer(10)
+      tenir('a', () => c.mot(3, 8, 17).includes('.'), 30)
+      tenir('down', () => v('ay') === 10)
+      tenir('a', () => c.mot(3, 10, 17).includes('.'), 30)
+      const deux = c.mot(3, 8, 17).includes('.') && c.mot(3, 10, 17).includes('.')
+      c.avancer(160)
+      return [
+        ['un tir sur la ligne 8, puis le A descend en ligne 10 et tire encore', v('ay') === 10],
+        ['les deux tirs volent en même temps, chacun sur SA ligne (8 et 10)', deux],
+        ['ils finissent par disparaître au bord', !c.mot(3, 8, 17).includes('.') && !c.mot(3, 10, 17).includes('.')],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — dans le sens où le A regarde',
+    difficulte: 0,
+    idee: 'Le 0.99, et le A tire dans le sens de la dernière flèche : dx, dy retiennent où il regarde, et le tir recopie ce sens au départ (tdx, tdy). Le tir reste un « . », dans tous les sens.',
+    texte: [
+      '**C’est le 0.99, avec une chose en plus : le sens du tir.** Le A ne tire plus seulement à droite : il tire **là où il regarde**, c’est-à-dire dans le sens de la **dernière flèche** appuyée. Même s’il ne peut pas bouger (au bord), la flèche le fait se tourner.',
+      '**Ce qui est nouveau ici (1) : `dx` et `dy`, le regard du A.** Deux nombres : de combien la colonne et la ligne changent quand on fait un pas dans ce sens. À droite : `dx = 1`, `dy = 0`. En bas : `dx = 0`, `dy = 1`. À gauche : `dx = -1`. En haut : `dy = -1`. Au départ, il regarde à droite.',
+      '**-1 dans un `uint8_t` ?** Il ne peut pas garder de nombre négatif : -1 devient **255** (le 0.84 le faisait déjà avec `sx = -1`). Et ça marche quand même ! Ajouter 255 à un `uint8_t`, c’est **retirer 1** : 5 + 255 = 260, qui ne tient pas dans un octet, et fait le tour : 260 - 256 = **4**.',
+      '**Ce qui est nouveau ici (2) : le tir a SON sens, `tdx` et `tdy`.** Comme la ligne au 0.99 : au départ, le tir **recopie** le sens du A (`tdx = dx`, `tdy = dy`). Ensuite, si le A se retourne, le tir continue dans son sens à lui.',
+      '**Le départ :** la case d’à côté, dans le sens du regard : `nx = ax + dx`, `ny = ay + dy`. Si elle est hors de l’écran, rien ne part.',
+      '**Avancer :** `nx = tx + tdx`, `ny = ty + tdy`. On efface la case du tir. Si l’arrivée est hors de l’écran (`nx >= 20 || ny >= 17` : 20, 17, ou 255), le tir disparaît ; sinon, il y va. `||` veut dire « ou ».',
+      '**Le dessin ne change pas :** dans tous les sens, le tir reste un « . ». Un point ne penche ni d’un côté ni de l’autre : il n’y a rien à changer selon `tdx` et `tdy`, `texte(tx, ty, ".")` suffit partout.',
+      '**Déroulons :** A en (2, 8). HAUT : le A monte en (2, 7), et regarde en haut : `dx` = 0, `dy` = 255. Bouton A : départ en (2 + 0, 7 + 255) = (2, 6), un « . ». Puis (2, 5), (2, 4)… (2, 0). Ensuite, 0 + 255 = 255 : hors de l’écran, il disparaît.',
+      '**Essaie :** va à gauche, tout contre le bord (colonne 0), et appuie sur A : la case de départ serait la colonne 255, rien ne part.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : le tir part dans le sens où le A regarde ----
+// Le 0.99, et le A ne tire plus seulement à droite : il tire dans le sens
+// de la DERNIÈRE flèche appuyée : à droite, à gauche, en haut ou en bas.
+// Le tir est toujours un « . », quel que soit son sens.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
+#include <texte>      // écrit un texte à l’écran
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t dx = 1;              // NOUVEAU : le sens où REGARDE le A.
+uint8_t dy = 0;              //   dx = 1 : à droite, dx = -1 : à gauche, dy = 1 : en bas…
+                             //   Au départ, il regarde à droite : (1, 0).
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t tx = 0;              // le tir : sa colonne…
+uint8_t ty = 0;              // …sa ligne…
+uint8_t tdx = 0;             // NOUVEAU : …et SON sens, à lui, recopié au départ
+uint8_t tdy = 0;
+uint8_t vole = 0;            // 1 = le tir est en vol ; 0 = pas de tir
+
+int main() {
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge avec la croix (le 0.99)… et RETIENT où il regarde ----
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;              // NOUVEAU : il regarde à droite
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;             // à gauche. -1 dans un uint8_t devient 255 :
+        dy = 0;              //   ajouter 255, c'est retirer 1 (le nombre fait le tour)
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;              // en bas
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;              // en haut
+        dy = -1;
+      }
+      if (nx < 20 && ny < 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- A lance le tir, dans le sens où regarde le A ----
+    if (bouton(A) && vole == 0) {
+      nx = ax + dx;          // la case d'à côté, DANS CE SENS :
+      ny = ay + dy;          //   à gauche, ax + 255 = ax - 1
+      if (nx < 20 && ny < 17) {   // elle est dans l'écran : le tir part
+        vole = 1;
+        tx = nx;
+        ty = ny;
+        tdx = dx;            // NOUVEAU : le tir recopie le sens du A, UNE fois.
+        tdy = dy;            //   Si le A se retourne ensuite, le tir, lui, continue.
+        texte(tx, ty, ".");
+      }
+    }
+
+    // ---- le tir avance dans SON sens ----
+    if (chaque(100)) {
+      if (vole == 1) {
+        nx = tx + tdx;       // sa case d'arrivée
+        ny = ty + tdy;
+        effacer(tx, ty, 1);  // il quitte sa case, dans tous les cas
+        if (nx >= 20 || ny >= 17) {
+          vole = 0;          // hors de l'écran (20, 17, ou 255) : il a disparu
+        } else {
+          tx = nx;           // sinon, il y va
+          ty = ny;
+          texte(tx, ty, ".");
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Le A tire dans le sens de la dernière flèche : à gauche, à droite, en haut ou en bas. S’il se retourne, le tir continue dans son sens.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(2) }
+      const tirer = () => { c.gb.setButton('a', true); c.avancer(1); c.gb.setButton('a', false) }
+      const v = (n) => c.variable(n)
+      c.avancer(10)
+      tenir('up', () => v('ay') === 7)
+      tirer()
+      const haut = [0, 1, 2, 3, 4, 5, 6].some((l) => c.mot(2, l, 1) === '.') && v('tdy') === 255
+      tenir('right', () => v('ax') === 3)
+      const garde = v('dx') === 1 && v('tdy') === 255 && v('tdx') === 0
+      c.avancer(80)
+      const sorti = v('vole') === 0
+      tenir('left', () => v('ax') === 0)
+      tirer()
+      const bord = v('vole') === 0
+      tenir('down', () => v('ay') === 8)
+      tenir('right', () => v('ax') === 1)
+      tenir('left', () => v('dx') === 255, 3)
+      c.avancer(10)
+      tenir('right', () => v('dx') === 1, 3)
+      c.avancer(10)
+      tirer()
+      const droite = v('vole') === 1 && v('tdx') === 1 && c.mot(0, v('ay'), 20).includes('.')
+      return [
+        ['HAUT puis A : un « . » part au-dessus du A', haut],
+        ['le A se tourne à droite : le tir garde son sens, vers le haut', garde],
+        ['le tir sort par le haut et disparaît', sorti],
+        ['collé au bord gauche, regard à gauche : rien ne part', bord],
+        ['regard à droite : un « . » part vers la droite', droite],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — chaque tir dans son sens',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.100, avec trois tirs : chacun recopie le sens du A au moment où il part, dans tdx[i] et tdy[i]. Tire à droite, tourne-toi, tire en haut : deux tirs, deux sens, en même temps.',
+    texte: [
+      '**C’est le 0.100, avec plusieurs tirs.** Le A tire dans le sens où il regarde, et le bouton A lance une rafale. Chaque tir garde **son** sens : tire à droite, tourne-toi vers le haut, tire encore, et les deux tirs s’éloignent chacun de leur côté.',
+      '**Ce qui est nouveau ici : `tdx[3]` et `tdy[3]`.** Au 0.100, **le** tir avait son sens, `tdx` et `tdy`. Maintenant, chaque tir a le sien : au départ du tir n° i, `tdx[i] = dx` et `tdy[i] = dy` recopient le regard du A. Ensuite, son arrivée est `tx[i] + tdx[i]`, `ty[i] + tdy[i]`.',
+      '**Cinq tableaux pour trois tirs :** `tx`, `ty`, `tdx`, `tdy`, `vole`. Tout ce qui décrit **un** tir est à la même place `i` dans les cinq. Au 0.102.1, on les rangera ensemble, dans une `struct`.',
+      '**Déroulons :** A en (2, 8), regard à droite. Bouton A : le tir 0 part en (3, 8), `tdx[0]` = 1, `tdy[0]` = 0. HAUT : le A monte en (2, 7) et regarde en haut. Bouton A : le tir 1 part en (2, 6), `tdx[1]` = 0, `tdy[1]` = 255. Le tir 0 continue vers la droite, le tir 1 vers le haut.',
+      '**Essaie :** tourne sur toi-même en gardant A enfoncé : les tirs partent dans quatre sens.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : dans le sens où le A regarde — plusieurs tirs ----
+// Le 0.100 (le tir part dans le sens du regard), avec trois tirs.
+// Chaque tir a SON sens : deux tableaux de plus, tdx et tdy.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
+#include <texte>      // écrit un texte à l’écran
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t dx = 1;              // le sens où regarde le A (le 0.100)
+uint8_t dy = 0;
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t tx[3];               // les trois tirs : leurs colonnes…
+uint8_t ty[3];               // …leurs lignes…
+uint8_t tdx[3];              // NOUVEAU : …et leurs sens. Chacun garde le sien.
+uint8_t tdy[3];
+uint8_t vole[3];             // vole[i] = 1 : le tir n° i est en vol
+uint8_t lance = 0;
+
+int main() {
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge et retient où il regarde (le 0.100) ----
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;
+        dy = 0;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;
+        dy = -1;
+      }
+      if (nx < 20 && ny < 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- le bouton A lance un tir dans le sens du regard, toutes les 250 ms au plus ----
+    if (chaque(250)) {
+      if (bouton(A)) {
+        nx = ax + dx;
+        ny = ay + dy;
+        if (nx < 20 && ny < 17) {
+          lance = 0;
+          for (uint8_t i = 0; i < 3; i++) {
+            if (lance == 0 && vole[i] == 0) {
+              vole[i] = 1;
+              tx[i] = nx;
+              ty[i] = ny;
+              tdx[i] = dx;           // NOUVEAU : CE tir recopie le sens du A
+              tdy[i] = dy;
+              texte(tx[i], ty[i], ".");
+              lance = 1;
+            }
+          }
+        }
+      }
+    }
+
+    // ---- chaque tir avance dans SON sens ----
+    // Tire à droite, tourne-toi, tire en haut : deux tirs, deux sens.
+    if (chaque(100)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        if (vole[i] == 1) {
+          nx = tx[i] + tdx[i];
+          ny = ty[i] + tdy[i];
+          effacer(tx[i], ty[i], 1);
+          if (nx >= 20 || ny >= 17) {
+            vole[i] = 0;             // hors de l'écran : il disparaît
+          } else {
+            tx[i] = nx;
+            ty[i] = ny;
+            texte(tx[i], ty[i], ".");
+          }
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Le A tire des rafales dans le sens où il regarde ; un tir lancé à droite continue à droite même après que le A s’est tourné pour tirer vers le haut.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(2) }
+      const v = (n) => c.variable(n)
+      const auDessus = () => { for (let l = 0; l < v('ay'); l++) if (c.mot(v('ax'), l, 1) === '.') return true; return false }
+      c.avancer(10)
+      tenir('a', () => c.mot(3, 8, 17).includes('.'), 30)
+      tenir('up', () => v('ay') === 7)
+      tenir('a', () => auDessus(), 30)
+      const deux = c.mot(3, 8, 17).includes('.') && auDessus()
+      c.avancer(160)
+      return [
+        ['un tir à droite, puis le A se tourne vers le haut et tire encore', v('dy') === 255],
+        ['deux tirs en même temps : un à droite sur la ligne 8, un au-dessus du A', deux],
+        ['ils finissent par disparaître au bord', !c.mot(3, 8, 17).includes('.') && !auDessus()],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — un mur arrête le tir',
+    difficulte: 0,
+    idee: 'Le 0.100, et un mur de X en colonne 12. Avant chaque pas, le tir regarde sa case d’arrivée avec lire() : si elle n’est pas vide, il s’écrase et disparaît ; le X reste.',
+    texte: [
+      '**C’est le 0.100, avec une chose en plus : un mur.** Neuf X, debout, en colonne 12, des lignes 4 à 12. Le tir s’y écrase : il disparaît, et le mur, lui, reste.',
+      '**Le mur :** une boucle `for` (le 0.5) pose un X sur chaque ligne de 4 à 12 : `l < 13` s’arrête **avant** 13. Le A s’y arrête déjà tout seul : depuis le 0.99, il ne va que sur une case **vide**.',
+      '**Ce qui est nouveau ici : le tir regarde où il va.** Comme le A (le 0.82) : on calcule l’arrivée, on la **regarde**, et seulement après on décide. Trois cas, dans cet ordre :',
+      '**1. Hors de l’écran** (`nx >= 20 || ny >= 17`) : il disparaît, comme avant. **2. L’arrivée n’est pas vide** (`lire(nx, ny) != 0`) : il **s’écrase** : `vole = 0`, et on ne le redessine pas. Sa case a déjà été effacée ; le X, sur la case d’arrivée, n’est pas touché. **3. Sinon**, la case est vide : il y va.',
+      '**Pourquoi cet ordre ?** `lire(20, 8)` n’a pas de sens : la colonne 20 n’existe pas. On vérifie donc d’abord qu’on est dans l’écran, **puis** on regarde la case. `else if` garantit qu’un seul des trois cas se fait.',
+      '**Le départ aussi :** collé au mur, le A n’a pas de place pour lancer le tir. `lire(nx, ny) == 0` s’ajoute au test du départ : si la case d’à côté est un X, rien ne part.',
+      '**Déroulons :** A en (2, 8), regard à droite. Bouton A : départ en (3, 8). Puis (4, 8)… (11, 8). Pas suivant : l’arrivée est (12, 8), `lire(12, 8)` rend le X, pas 0 : le tir s’écrase. (11, 8) est vide, le X est toujours en (12, 8).',
+      '**Essaie :** ajoute un deuxième mur, couché cette fois : `poser(c, 14, ALPHABET[23])` dans une boucle sur `c`.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : un mur arrête le tir ----
+// Le 0.100, et un mur de X au milieu de l'écran. Le tir s'y arrête.
+// ALPHABET[23] : le X.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
+#include <texte>      // écrit un texte à l’écran
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t dx = 1;              // le sens où regarde le A (le 0.100)
+uint8_t dy = 0;
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t tx = 0;              // le tir : sa place…
+uint8_t ty = 0;
+uint8_t tdx = 0;             // …et son sens
+uint8_t tdy = 0;
+uint8_t vole = 0;            // 1 = le tir est en vol ; 0 = pas de tir
+
+int main() {
+  // ---- NOUVEAU : un mur de X, debout, en colonne 12, des lignes 4 à 12 ----
+  for (uint8_t l = 4; l < 13; l++) {   // l vaut 4, 5, 6… jusqu'à 12 : 9 X
+    poser(12, l, ALPHABET[23]);
+  }
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge et retient où il regarde (le 0.100) ----
+    // Il ne va que sur une case vide : le mur l'arrête déjà.
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;
+        dy = 0;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;
+        dy = -1;
+      }
+      if (nx < 20 && ny < 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- A lance le tir ----
+    if (bouton(A) && vole == 0) {
+      nx = ax + dx;
+      ny = ay + dy;
+      // NOUVEAU : la case de départ doit aussi être VIDE.
+      // Collé au mur, le A ne tire pas : le tir n'a pas de place.
+      if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+        vole = 1;
+        tx = nx;
+        ty = ny;
+        tdx = dx;
+        tdy = dy;
+        texte(tx, ty, ".");
+      }
+    }
+
+    // ---- le tir avance ; il regarde sa case d'arrivée AVANT d'y aller ----
+    if (chaque(100)) {
+      if (vole == 1) {
+        nx = tx + tdx;
+        ny = ty + tdy;
+        effacer(tx, ty, 1);
+        if (nx >= 20 || ny >= 17) {
+          vole = 0;                  // 1. hors de l'écran : il disparaît
+        } else if (lire(nx, ny) != 0) {
+          vole = 0;                  // 2. NOUVEAU : l'arrivée n'est pas vide
+                                     //    (un X) : il s'écrase, et disparaît.
+                                     //    Le X, lui, reste : on ne l'efface pas.
+        } else {
+          tx = nx;                   // 3. l'arrivée est vide : il y va
+          ty = ny;
+          texte(tx, ty, ".");
+        }
+        // L'ordre compte : d'abord « hors de l'écran ? », car lire(20, 8)
+        // n'a pas de sens : la case n'existe pas.
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Un mur de X en colonne 12. Le tir s’y écrase et disparaît, le mur reste. Collé au mur, le A ne peut pas tirer vers lui.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(2) }
+      const tirer = () => { c.gb.setButton('a', true); c.avancer(1); c.gb.setButton('a', false) }
+      const v = (n) => c.variable(n)
+      c.avancer(10)
+      const mur = [4, 5, 6, 7, 8, 9, 10, 11, 12].every((l) => c.mot(12, l, 1) === 'X')
+      tirer()
+      let loin = 0
+      for (let k = 0; k < 120; k++) { c.avancer(1); if (v('vole') === 1) loin = Math.max(loin, v('tx')) }
+      const ecrase = v('vole') === 0 && loin === 11 && c.mot(12, 8, 1) === 'X' && c.mot(3, 8, 9).trim() === ''
+      tenir('right', () => false, 200)
+      const arrete = v('ax') === 11
+      tirer()
+      const colle = v('vole') === 0
+      return [
+        ['un mur de 9 X en colonne 12, lignes 4 à 12', mur],
+        ['le tir va jusqu’en colonne 11, puis s’écrase ; le X reste', ecrase, ` (le plus loin : colonne ${loin})`],
+        ['le A s’arrête contre le mur, en colonne 11', arrete],
+        ['collé au mur, le A ne peut pas tirer', colle],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — un mur arrête les tirs',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.101, avec les trois tirs du 0.100.1 : chaque tir regarde sa case d’arrivée avec lire() ; sur le mur de X, il s’écrase et sa case du tableau redevient libre.',
+    texte: [
+      '**C’est le 0.101, avec plusieurs tirs.** Le mur de X est en colonne 12. Garde A enfoncé face au mur : la rafale s’y écrase, tir après tir.',
+      '**Ce qui change par rapport au 0.101 :** le pas du tir (hors de l’écran, pas vide, vide) est le même, dans la boucle sur `i`, avec `tx[i]`, `ty[i]`, `tdx[i]`, `tdy[i]` et `vole[i]`. Quand un tir s’écrase, `vole[i] = 0` : sa case du tableau est libre pour le tir suivant.',
+      '**Un tir sur un autre tir ?** Pour `lire()`, un « . » n’est pas une case vide : un tir qui en trouve un autre sur sa route s’y écrase, comme sur un X. Ça n’arrive presque jamais ici : ils vont tous à la même vitesse.',
+      '**Déroulons, A tenu, regard à droite :** le tir 0 part de (3, 8), va jusqu’en (11, 8), et s’écrase : l’arrivée (12, 8) est un X. Pendant ce temps, les tirs 1 et 2 sont partis ; ils s’écrasent à leur tour, et leurs cases servent aux suivants.',
+      '**Essaie :** ajoute un deuxième mur, couché, sur la ligne 14 : tourne-toi vers le bas et tire.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : un mur arrête le tir — plusieurs tirs ----
+// Le 0.101 (le mur de X), avec trois tirs (le 0.100.1).
+// ALPHABET[23] : le X.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
+#include <texte>      // écrit un texte à l’écran
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t dx = 1;              // le sens où regarde le A
+uint8_t dy = 0;
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t tx[3];               // les trois tirs : leurs colonnes…
+uint8_t ty[3];               // …leurs lignes…
+uint8_t tdx[3];              // …et leurs sens
+uint8_t tdy[3];
+uint8_t vole[3];             // vole[i] = 1 : le tir n° i est en vol
+uint8_t lance = 0;
+
+int main() {
+  for (uint8_t l = 4; l < 13; l++) {   // le mur : 9 X en colonne 12 (le 0.101)
+    poser(12, l, ALPHABET[23]);
+  }
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge et retient où il regarde ----
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;
+        dy = 0;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;
+        dy = -1;
+      }
+      if (nx < 20 && ny < 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- le bouton A lance un tir, au plus toutes les 250 ms ----
+    if (chaque(250)) {
+      if (bouton(A)) {
+        nx = ax + dx;
+        ny = ay + dy;
+        // la case de départ doit être dans l'écran ET vide (le 0.101)
+        if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+          lance = 0;
+          for (uint8_t i = 0; i < 3; i++) {
+            if (lance == 0 && vole[i] == 0) {
+              vole[i] = 1;
+              tx[i] = nx;
+              ty[i] = ny;
+              tdx[i] = dx;
+              tdy[i] = dy;
+              texte(tx[i], ty[i], ".");
+              lance = 1;
+            }
+          }
+        }
+      }
+    }
+
+    // ---- chaque tir avance, et regarde sa case d'arrivée (le 0.101) ----
+    if (chaque(100)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        if (vole[i] == 1) {
+          nx = tx[i] + tdx[i];
+          ny = ty[i] + tdy[i];
+          effacer(tx[i], ty[i], 1);
+          if (nx >= 20 || ny >= 17) {
+            vole[i] = 0;             // 1. hors de l'écran
+          } else if (lire(nx, ny) != 0) {
+            vole[i] = 0;             // 2. un X (ou un autre tir) : il s'écrase
+          } else {
+            tx[i] = nx;              // 3. une case vide : il y va
+            ty[i] = ny;
+            texte(tx[i], ty[i], ".");
+          }
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Face au mur de X, le bouton A tenu lance une rafale de « . » qui s’écrasent tous en colonne 11 ; le mur reste entier.',
+    controle: (c) => {
+      c.avancer(10)
+      let max = 0
+      let derriere = false
+      let loin = 0
+      c.gb.setButton('a', true)
+      for (let k = 0; k < 200; k++) {
+        c.avancer(1)
+        const r = c.mot(0, 8, 20)
+        max = Math.max(max, (r.match(/\./g) || []).length)
+        if (r.slice(12).includes('.')) derriere = true
+        loin = Math.max(loin, r.lastIndexOf('.'))
+      }
+      c.gb.setButton('a', false)
+      c.avancer(100)
+      const mur = [4, 5, 6, 7, 8, 9, 10, 11, 12].every((l) => c.mot(12, l, 1) === 'X')
+      return [
+        ['A tenu : plusieurs tirs en vol en même temps, trois au plus', max >= 2 && max <= 3, ` (au plus ${max})`],
+        ['aucun ne passe le mur : le plus loin est la colonne 11', !derriere && loin === 11, ` (le plus loin : colonne ${loin})`],
+        ['le mur est entier, et plus aucun tir ne vole', mur && c.mot(3, 8, 9).trim() === ''],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — une cible B',
+    difficulte: 0,
+    idee: 'Le 0.101, et une cible : un B en (16, 2). Touché, il disparaît, une note joue, le score monte, et un nouveau B apparaît au hasard, sur une case vide.',
+    texte: [
+      '**C’est le 0.101, avec une chose en plus : une cible.** Un **B**, d’abord en (16, 2). Quand le tir arrive sur lui : **touché !** Le B disparaît, une note joue, le score monte d’un point, et un nouveau B apparaît **ailleurs**.',
+      '**Deux variables pour la cible, `bx` et `by`**, et une pour le **score**, écrit en bas avec `texte()` et `nombre()`.',
+      '**Ce qui est nouveau ici (1) : un quatrième cas dans le pas du tir.** Avant « l’arrivée n’est pas vide », on regarde : `nx == bx && ny == by`, « l’arrivée, c’est la cible ». Il faut le tester **avant** : le B n’est pas vide, et sinon le tir s’y écraserait comme sur un X, sans rien faire.',
+      '**Touché :** `vole = 0` (le tir disparaît), `effacer(bx, by, 1)` (le B aussi), `score = score + 1` et `nombre()` pour l’afficher, `note(1, DO5, 10, 12)` (le 0.83), puis `placerB()`.',
+      '**Ce qui est nouveau ici (2) : `placerB()`, une place au hasard, mais sur une case vide.** `hasard() % 20` donne une colonne de 0 à 19, `hasard() % 17` une ligne de 0 à 16 (le 0.81.2). Mais la place tirée peut tomber sur un X, ou sur le A ! On recommence alors, avec `do { … } while (…)` (le 0.7) : le bloc se fait **une fois**, puis **encore**, tant que `lire(bx, by) != 0`. À la sortie, la case est vide : on y pose le B.',
+      '**Pourquoi `do … while` et pas `while` ?** Il faut tirer une place **avant** de pouvoir la regarder. `do` fait le bloc d’abord, et ne teste qu’après.',
+      '**Déroulons :** A en (2, 8). HAUT jusqu’en (2, 2), puis DROITE : le A va en (3, 2) et regarde à droite. Bouton A : départ en (4, 2), puis (5, 2)… (15, 2). Pas suivant : l’arrivée est (16, 2), c’est `bx`, `by`. Touché : le score passe à 1, et un B apparaît au hasard.',
+      '**Essaie :** donne 5 points par B (`score = score + 5`), ou change la note (`MI5`, `SOL5`).',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : une cible B ----
+// Le 0.101, et une cible : un B. Touché, il disparaît, un son joue,
+// le score monte, et un nouveau B apparaît ailleurs, au hasard.
+// ALPHABET[0] : le A    ALPHABET[1] : le B    ALPHABET[23] : le X
+
+#include <hasard>     // tire un nombre au hasard
+#include <lire>       // lit la tuile posée sur une case
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <texte>      // écrit un texte à l’écran
+#include <nombre>     // écrit un nombre en chiffres
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <effacer>    // efface des cases, ou tout le fond
+#include <note>       // joue une note
+#include <reste>      // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t dx = 1;              // le sens où regarde le A
+uint8_t dy = 0;
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t tx = 0;              // le tir : sa place…
+uint8_t ty = 0;
+uint8_t tdx = 0;             // …et son sens
+uint8_t tdy = 0;
+uint8_t vole = 0;            // 1 = le tir est en vol ; 0 = pas de tir
+uint8_t bx = 16;             // NOUVEAU : la cible B : sa colonne…
+uint8_t by = 2;              // …et sa ligne. La première est en (16, 2).
+uint8_t score = 0;           // NOUVEAU : les B touchés
+
+// ---- NOUVEAU : un B à une place au hasard, sur une case vide ----
+// hasard() % 20 : un nombre de 0 à 19 (le reste de la division par 20).
+// do { … } while (…) : on tire une place, et on RECOMMENCE tant qu'elle
+// n'est pas vide (un X, le A, le tir…). Le bloc se fait au moins une fois.
+void placerB() {
+  do {
+    bx = hasard() % 20;      // colonne 0 à 19
+    by = hasard() % 17;      // ligne 0 à 16
+  } while (lire(bx, by) != 0);
+  poser(bx, by, ALPHABET[1]);
+}
+
+int main() {
+  for (uint8_t l = 4; l < 13; l++) {   // le mur de X (le 0.101)
+    poser(12, l, ALPHABET[23]);
+  }
+  poser(ax, ay, ALPHABET[0]);
+  poser(bx, by, ALPHABET[1]);          // NOUVEAU : la cible, à sa première place
+  texte(0, 17, "SCORE");               // NOUVEAU : le score, tout en bas
+  nombre(6, 17, score);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge et retient où il regarde (le 0.100) ----
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;
+        dy = 0;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;
+        dy = -1;
+      }
+      if (nx < 20 && ny < 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- A lance le tir (le 0.101) ----
+    if (bouton(A) && vole == 0) {
+      nx = ax + dx;
+      ny = ay + dy;
+      if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+        vole = 1;
+        tx = nx;
+        ty = ny;
+        tdx = dx;
+        tdy = dy;
+        texte(tx, ty, ".");
+      }
+    }
+
+    // ---- le tir avance ----
+    if (chaque(100)) {
+      if (vole == 1) {
+        nx = tx + tdx;
+        ny = ty + tdy;
+        effacer(tx, ty, 1);
+        if (nx >= 20 || ny >= 17) {
+          vole = 0;                  // 1. hors de l'écran
+        } else if (nx == bx && ny == by) {
+          // 2. NOUVEAU : l'arrivée, c'est la cible. TOUCHÉ !
+          vole = 0;                  //    le tir disparaît…
+          effacer(bx, by, 1);        //    …le B aussi…
+          score = score + 1;         //    …un point de plus…
+          nombre(6, 17, score);
+          note(1, DO5, 10, 12);      //    …un son (le 0.83)…
+          placerB();                 //    …et un nouveau B, ailleurs.
+        } else if (lire(nx, ny) != 0) {
+          vole = 0;                  // 3. un X : il s'écrase
+        } else {
+          tx = nx;                   // 4. une case vide : il y va
+          ty = ny;
+          texte(tx, ty, ".");
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Un B en (16, 2). Le tir qui l’atteint le fait disparaître avec une note ; le score passe à 1, et un nouveau B apparaît ailleurs, au hasard.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(2) }
+      const v = (n) => c.variable(n)
+      const lesB = () => { let n = 0; for (let l = 0; l < 17; l++) n += (c.mot(0, l, 20).match(/B/g) || []).length; return n }
+      c.avancer(10)
+      const depart = c.mot(16, 2, 1) === 'B' && c.mot(0, 17, 9) === 'SCORE 000'
+      tenir('up', () => v('ay') === 2)
+      tenir('right', () => v('ax') === 3)
+      c.gb.setButton('a', true); c.avancer(1); c.gb.setButton('a', false)
+      let t = 0
+      while (t < 200 && v('score') === 0) { c.avancer(1); t++ }
+      c.avancer(2)
+      return [
+        ['au départ : le B en (16, 2), SCORE 000', depart],
+        ['le tir atteint le B : le score passe à 001', v('score') === 1 && c.mot(6, 17, 3) === '001'],
+        ['le tir a disparu', v('vole') === 0 && !c.mot(0, 2, 20).includes('.')],
+        ['un seul B à l’écran : le nouveau, posé sur une case vide', lesB() === 1 && c.mot(v('bx'), v('by'), 1) === 'B', ` (en ${v('bx')}, ${v('by')})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — une cible B, et trois tirs rangés dans une struct',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.102 (la cible B), avec trois tirs comme au 0.101.1. Mais les cinq tableaux d’un tir (tx, ty, tdx, tdy, vole) sont rangés ensemble : un type Tir, et un seul tableau Tir tirs[3].',
+    texte: [
+      '**C’est le 0.102, avec plusieurs tirs.** Garde A enfoncé : une **rafale** part vers le B, jusqu’à **trois** tirs en vol en même temps, comme au 0.101.1.',
+      '**Le problème :** au 0.101.1, un tir était éparpillé dans **cinq tableaux** : `tx[i]`, `ty[i]`, `tdx[i]`, `tdy[i]`, `vole[i]`. Ça marche, mais rien ne dit que ces cinq cases parlent du même tir. On fait comme pour les ennemis du 0.85 : on range ensemble ce qui va ensemble.',
+      '**Ce qui est nouveau ici (1) : le type `Tir`.** `struct Tir { … };` (le 0.80) range les cinq parties d’un tir sous un seul nom : `x`, `y`, `dx`, `dy`, `vole`. Puis **`Tir tirs[3];`** : un tableau de trois tirs, numérotés 0, 1 et 2. `tirs[1].x` est la colonne du 2e tir ; `tirs[2].vole` dit si le 3e vole. Au départ, tout vaut 0 : aucun ne vole.',
+      '**Ce qui vient d’avant :** chercher un tir libre avec `lance` (le 0.96.1), la rafale avec `chaque(250)` (le 0.97.1), la cible touchée et `placerB()` (le 0.102). Seule l’écriture change : `tirs[i].vole` au lieu de `vole[i]`, `tirs[i].x` au lieu de `tx[i]`…',
+      '**Et un tir qui touche le B ?** Le cas « touché » du 0.102 est dans la boucle : `vole` redevient 0 pour **ce** tir-là, `tirs[i].vole = 0`, et sa place sert au tir suivant.',
+      '**Avancer :** le **même** code qu’au 0.102, dans une boucle `for`, avec `tirs[i].x` au lieu de `tx`, `tirs[i].vole` au lieu de `vole`… et le tir se dessine avec `texte(tirs[i].x, tirs[i].y, ".")`.',
+      '**Un tir qui en rattrape un autre ?** Ils vont à la même vitesse : ça n’arrive pas. Mais si un tir trouve une case pas vide, même un autre tir, il s’y écrase : c’est le cas 3, rien à ajouter.',
+      '**Essaie :** passe à cinq tirs : `Tir tirs[5];`, et `i < 5` dans les deux boucles. Et `chaque(150)` pour une rafale plus serrée.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : trois tirs à la fois ----
+// Le 0.102, et le A peut avoir TROIS tirs en vol en même temps.
+// Chaque tir a sa place, son sens, et son « vole » : on les range
+// dans un tableau de struct (le 0.85).
+
+// ---- NOUVEAU : le type Tir, tout ce qu'il faut savoir d'UN tir ----
+
+#include <hasard>     // tire un nombre au hasard
+#include <lire>       // lit la tuile posée sur une case
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <texte>      // écrit un texte à l’écran
+#include <nombre>     // écrit un nombre en chiffres
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <effacer>    // efface des cases, ou tout le fond
+#include <note>       // joue une note
+#include <reste>      // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
+struct Tir {
+  uint8_t x, y;              // sa place
+  uint8_t dx, dy;            // son sens
+  uint8_t vole;              // 1 = en vol ; 0 = libre, prêt à partir
+};
+
+// ---- NOUVEAU : trois tirs, numérotés 0, 1 et 2 ----
+// tirs[0].x : la colonne du 1er tir ; tirs[2].vole : le 3e vole-t-il ?
+// Au départ, toutes leurs parties valent 0 : aucun ne vole.
+Tir tirs[3];
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t dx = 1;              // le sens où regarde le A
+uint8_t dy = 0;
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t bx = 16;             // la cible B
+uint8_t by = 2;
+uint8_t score = 0;
+uint8_t lance = 0;           // NOUVEAU : 1 = un tir vient de partir, à ce tour-ci
+
+void placerB() {             // un B au hasard, sur une case vide (le 0.102)
+  do {
+    bx = hasard() % 20;
+    by = hasard() % 17;
+  } while (lire(bx, by) != 0);
+  poser(bx, by, ALPHABET[1]);
+}
+
+int main() {
+  for (uint8_t l = 4; l < 13; l++) {
+    poser(12, l, ALPHABET[23]);
+  }
+  poser(ax, ay, ALPHABET[0]);
+  poser(bx, by, ALPHABET[1]);
+  texte(0, 17, "SCORE");
+  nombre(6, 17, score);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge et retient où il regarde (le 0.100) ----
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;
+        dy = 0;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;
+        dy = -1;
+      }
+      if (nx < 20 && ny < 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- NOUVEAU : A lance un tir, au plus toutes les 250 ms ----
+    // Sans ce rythme, garder A enfoncé lancerait les trois tirs en trois
+    // images, collés les uns aux autres. Avec chaque(250) : une rafale.
+    if (chaque(250)) {
+      if (bouton(A)) {
+        nx = ax + dx;
+        ny = ay + dy;
+        if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+          // On cherche un tir LIBRE (vole == 0), et on lance le premier trouvé.
+          // lance passe à 1 dès qu'un tir est parti : les suivants, même
+          // libres, ne partent pas à ce tour-ci. Un seul tir par appui.
+          lance = 0;
+          for (uint8_t i = 0; i < 3; i++) {
+            if (lance == 0 && tirs[i].vole == 0) {
+              tirs[i].vole = 1;
+              tirs[i].x = nx;
+              tirs[i].y = ny;
+              tirs[i].dx = dx;
+              tirs[i].dy = dy;
+              texte(tirs[i].x, tirs[i].y, ".");
+              lance = 1;
+            }
+          }
+          // Les trois volent déjà ? lance reste à 0 : rien ne part.
+        }
+      }
+    }
+
+    // ---- NOUVEAU : CHAQUE tir avance : le 0.102, dans une boucle ----
+    // Le même code qu'avant, avec tirs[i].x au lieu de tx, tirs[i].vole
+    // au lieu de vole… i vaut 0, puis 1, puis 2.
+    if (chaque(100)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        if (tirs[i].vole == 1) {
+          nx = tirs[i].x + tirs[i].dx;
+          ny = tirs[i].y + tirs[i].dy;
+          effacer(tirs[i].x, tirs[i].y, 1);
+          if (nx >= 20 || ny >= 17) {
+            tirs[i].vole = 0;            // 1. hors de l'écran
+          } else if (nx == bx && ny == by) {
+            tirs[i].vole = 0;            // 2. la cible : touché !
+            effacer(bx, by, 1);
+            score = score + 1;
+            nombre(6, 17, score);
+            note(1, DO5, 10, 12);
+            placerB();
+          } else if (lire(nx, ny) != 0) {
+            tirs[i].vole = 0;            // 3. un X, ou un autre tir : il s'écrase
+          } else {
+            tirs[i].x = nx;              // 4. une case vide : il y va
+            tirs[i].y = ny;
+            texte(tirs[i].x, tirs[i].y, ".");
+          }
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'A enfoncé : une rafale de « . », espacés, jusqu’à trois en vol en même temps ; chacun s’écrase sur le mur ou touche le B.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(2) }
+      const v = (n) => c.variable(n)
+      c.avancer(10)
+      let max = 0
+      let colles = false
+      c.gb.setButton('a', true)
+      for (let k = 0; k < 150; k++) {
+        c.avancer(1)
+        const rangee = c.mot(0, 8, 20)
+        max = Math.max(max, (rangee.match(/\./g) || []).length)
+        if (rangee.includes('..')) colles = true
+      }
+      c.gb.setButton('a', false)
+      c.avancer(80)
+      const finis = !c.mot(0, 8, 20).includes('.') && c.mot(12, 8, 1) === 'X'
+      tenir('up', () => v('ay') === 2)
+      tenir('right', () => v('ax') === 3)
+      c.gb.setButton('a', true)
+      let t = 0
+      while (t < 400 && v('score') < 2) { c.avancer(1); t++ }
+      c.gb.setButton('a', false)
+      return [
+        ['A tenu : trois tirs en vol en même temps, pas plus', max === 3, ` (au plus ${max})`],
+        ['les tirs partent espacés, jamais collés', !colles],
+        ['ils s’écrasent tous sur le mur', finis],
+        ['la rafale touche le B : le score monte', v('score') >= 1, ` (score ${v('score')})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — le B tire aussi',
+    difficulte: 0,
+    idee: 'Le 0.102.1, et le B riposte : toutes les 1,2 seconde, un « . » part vers la gauche, sur sa ligne. S’il touche le A, une vie de moins ; à 0 : PERDU, et START pour recommencer (le 0.84).',
+    texte: [
+      '**C’est le 0.102.1, avec une chose en plus : le B tire aussi.** Toutes les 1,2 seconde, le B lance un **point** « . » vers la gauche, sur sa ligne. S’il touche le A, le A perd une **vie**. Au bout de trois : **PERDU**.',
+      '**Ce qui est nouveau ici : le tir du B.** Trois variables : `ex`, `ey`, sa place, et `evole`, 1 s’il est en vol. Il va **toujours à gauche** : pas besoin de sens, l’arrivée est simplement `ex - 1`.',
+      '**Le lancer :** `chaque(1200)`, et seulement si aucun tir du B ne vole, si le B n’est pas en colonne 0 (il n’y aurait pas de place à sa gauche), et si la case à sa gauche est vide.',
+      '**Le pas, toutes les 150 ms :** le même plan que pour le tir du A. On efface sa case, puis : **1.** l’arrivée est hors de l’écran (`nx >= 20` : 0 - 1 donne 255) : il disparaît. **2.** L’arrivée est **le A** (`nx == ax && ey == ay`) : touché ! Une vie de moins, un `bruit()` (le 0.83.1), et s’il n’en reste plus, PERDU. **3.** L’arrivée n’est pas vide (un X, ou un tir du A) : il s’écrase. **4.** Sinon, il y va.',
+      '**Le tir du B ressemble à ceux du A :** un « . », lui aussi. **Les tirs se bloquent :** un tir qui trouve un autre tir sur sa route s’y écrase (le cas « pas vide »), qu’il soit du A ou du B. On peut donc **se défendre** en tirant sur les tirs du B.',
+      '**Les vies et l’état du jeu, comme au 0.84 :** `vies` part de 3. `etat` vaut 0 quand on joue, 1 quand on a perdu. Toute la partie est dans `if (etat == 0) { … }` ; dans le `else`, plus rien ne bouge, on attend **START** : il efface PERDU, remet le A et le B (PERDU les a peut-être recouverts), 3 vies, score 0, et on rejoue.',
+      '**Déroulons :** A en (2, 8). HAUT jusqu’en (2, 2), sur la ligne du B. Le B, en (16, 2), lance un « . » en (15, 2). Il avance : (14, 2), (13, 2)… L’arrivée devient (2, 2) : c’est le A. `vies` passe à 2, et ainsi de suite, jusqu’à 0 : PERDU.',
+      '**Essaie :** fais tirer le B plus souvent (`chaque(600)`), ou donne 5 vies au A.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : le B tire aussi ----
+// Le 0.102.1, et la cible B RIPOSTE : toutes les 1,2 seconde, elle lance
+// un « . » vers la gauche, sur sa ligne : un tir pareil à ceux du A.
+// S'il touche le A : une vie de moins.
+// À 0 vie : PERDU, et START pour recommencer (le 0.84).
+
+#include <hasard>     // tire un nombre au hasard
+#include <lire>       // lit la tuile posée sur une case
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <texte>      // écrit un texte à l’écran
+#include <nombre>     // écrit un nombre en chiffres
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <effacer>    // efface des cases, ou tout le fond
+#include <note>       // joue une note
+#include <bruit>      // joue un bruit
+#include <reste>      // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
+struct Tir {
+  uint8_t x, y;              // sa place
+  uint8_t dx, dy;            // son sens
+  uint8_t vole;              // 1 = en vol ; 0 = libre
+};
+Tir tirs[3];                 // les trois tirs du A (le 0.102.1)
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t dx = 1;              // le sens où regarde le A
+uint8_t dy = 0;
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t bx = 16;             // la cible B
+uint8_t by = 2;
+uint8_t score = 0;
+uint8_t lance = 0;           // 1 = un tir vient de partir, à ce tour-ci
+uint8_t ex = 0;              // NOUVEAU : le tir du B, le « . » : sa colonne…
+uint8_t ey = 0;              // …sa ligne…
+uint8_t evole = 0;           // …et 1 s'il est en vol. Il va toujours à gauche.
+uint8_t vies = 3;            // NOUVEAU : les vies du A (le 0.84)
+uint8_t etat = 0;            // L'ÉTAT DU JEU (le 0.84) : 0 = on joue, 1 = perdu
+
+void placerB() {
+  do {
+    bx = hasard() % 20;
+    by = hasard() % 17;
+  } while (lire(bx, by) != 0);
+  poser(bx, by, ALPHABET[1]);
+}
+
+int main() {
+  for (uint8_t l = 4; l < 13; l++) {
+    poser(12, l, ALPHABET[23]);
+  }
+  poser(ax, ay, ALPHABET[0]);
+  poser(bx, by, ALPHABET[1]);
+  texte(0, 17, "SCORE");
+  nombre(6, 17, score);
+  texte(10, 17, "VIES");               // NOUVEAU : les vies, à côté du score
+  nombre(15, 17, vies);
+
+  while (true) {
+    image();
+
+    if (etat == 0) {                   // ================ ON JOUE
+
+      // ---- le A bouge et retient où il regarde (le 0.100) ----
+      if (chaque(150)) {
+        nx = ax;
+        ny = ay;
+        if (bouton(DROITE)) {
+          nx = ax + 1;
+          dx = 1;
+          dy = 0;
+        } else if (bouton(GAUCHE)) {
+          nx = ax - 1;
+          dx = -1;
+          dy = 0;
+        } else if (bouton(BAS)) {
+          ny = ay + 1;
+          dx = 0;
+          dy = 1;
+        } else if (bouton(HAUT)) {
+          ny = ay - 1;
+          dx = 0;
+          dy = -1;
+        }
+        if (nx < 20 && ny < 17) {
+          if (lire(nx, ny) == 0) {
+            effacer(ax, ay, 1);
+            ax = nx;
+            ay = ny;
+            poser(ax, ay, ALPHABET[0]);
+          }
+        }
+      }
+
+      // ---- A lance un tir, au plus toutes les 250 ms (le 0.102.1) ----
+      if (chaque(250)) {
+        if (bouton(A)) {
+          nx = ax + dx;
+          ny = ay + dy;
+          if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+            lance = 0;
+            for (uint8_t i = 0; i < 3; i++) {
+              if (lance == 0 && tirs[i].vole == 0) {
+                tirs[i].vole = 1;
+                tirs[i].x = nx;
+                tirs[i].y = ny;
+                tirs[i].dx = dx;
+                tirs[i].dy = dy;
+                texte(tirs[i].x, tirs[i].y, ".");
+                lance = 1;
+              }
+            }
+          }
+        }
+      }
+
+      // ---- chaque tir du A avance (le 0.102.1) ----
+      if (chaque(100)) {
+        for (uint8_t i = 0; i < 3; i++) {
+          if (tirs[i].vole == 1) {
+            nx = tirs[i].x + tirs[i].dx;
+            ny = tirs[i].y + tirs[i].dy;
+            effacer(tirs[i].x, tirs[i].y, 1);
+            if (nx >= 20 || ny >= 17) {
+              tirs[i].vole = 0;
+            } else if (nx == bx && ny == by) {
+              tirs[i].vole = 0;
+              effacer(bx, by, 1);
+              score = score + 1;
+              nombre(6, 17, score);
+              note(1, DO5, 10, 12);
+              placerB();
+            } else if (lire(nx, ny) != 0) {
+              tirs[i].vole = 0;          // un X, ou un tir (même celui du B)
+            } else {
+              tirs[i].x = nx;
+              tirs[i].y = ny;
+              texte(tirs[i].x, tirs[i].y, ".");
+            }
+          }
+        }
+      }
+
+      // ---- NOUVEAU : le B lance son tir, toutes les 1200 ms ----
+      // Un seul à la fois (evole == 0), juste à GAUCHE du B, si la case est vide.
+      if (chaque(1200)) {
+        if (evole == 0 && bx > 0) {
+          if (lire(bx - 1, by) == 0) {
+            evole = 1;
+            ex = bx - 1;
+            ey = by;
+            texte(ex, ey, ".");
+          }
+        }
+      }
+
+      // ---- NOUVEAU : le tir du B avance vers la gauche, toutes les 150 ms ----
+      // Le même plan que pour le tir du A : l'arrivée d'abord, puis on décide.
+      if (chaque(150)) {
+        if (evole == 1) {
+          nx = ex - 1;                   // toujours à gauche (en colonne 0 : 255)
+          effacer(ex, ey, 1);
+          if (nx >= 20) {
+            evole = 0;                   // 1. sorti par la gauche
+          } else if (nx == ax && ey == ay) {
+            evole = 0;                   // 2. le A est touché !
+            vies = vies - 1;             //    une vie de moins…
+            nombre(15, 17, vies);
+            bruit(8, 12);                //    …un bruit : 8 images, volume 12 (le 0.83.1)…
+            if (vies == 0) {             //    …et plus de vie : PERDU
+              etat = 1;
+              texte(7, 8, "PERDU");      //    écrit au milieu de l'écran
+            }
+          } else if (lire(nx, ey) != 0) {
+            evole = 0;                   // 3. un X, ou un tir du A : il s'écrase
+          } else {
+            ex = nx;                     // 4. une case vide : il y va
+            texte(ex, ey, ".");
+          }
+        }
+      }
+
+    } else {                           // ================ PERDU
+      // Plus rien ne bouge : on attend START (le 0.84).
+      if (bouton(START)) {
+        effacer(7, 8, 5);                // efface les 5 lettres de PERDU…
+        poser(ax, ay, ALPHABET[0]);      // …et remet le A et le B : PERDU
+        poser(bx, by, ALPHABET[1]);      //    les a peut-être recouverts
+        vies = 3;
+        score = 0;
+        texte(0, 17, "SCORE");           // la ligne du bas, comme au départ
+        nombre(6, 17, score);
+        texte(10, 17, "VIES");
+        nombre(15, 17, vies);
+        etat = 0;                        // et on rejoue
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Le B lance des « . » vers la gauche. Sur sa ligne, le A est touché : les vies baissent, et à 0, PERDU s’affiche. START relance la partie.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(2) }
+      const v = (n) => c.variable(n)
+      c.avancer(10)
+      const depart = c.mot(10, 17, 8) === 'VIES 003'
+      let point = false
+      for (let k = 0; k < 120 && !point; k++) { c.avancer(1); if (c.mot(0, 2, 16).includes('.')) point = true }
+      tenir('up', () => v('ay') === 2)
+      let t = 0
+      while (t < 600 && v('vies') === 3) { c.avancer(1); t++ }
+      const une = v('vies') === 2 && c.mot(15, 17, 3) === '002'
+      t = 0
+      while (t < 900 && v('etat') === 0) { c.avancer(1); t++ }
+      const perdu = v('vies') === 0 && v('etat') === 1 && c.mot(7, 8, 5) === 'PERDU'
+      const x = v('ax')
+      tenir('down', () => false, 30)
+      const fige = v('ax') === x && v('ay') === 2
+      c.presser('start', 4)
+      c.avancer(5)
+      return [
+        ['au départ : VIES 003', depart],
+        ['le B lance un « . » vers la gauche, sur sa ligne', point],
+        ['le A sur la ligne du B est touché : VIES 002', une],
+        ['à 0 vie : PERDU, au milieu de l’écran', perdu],
+        ['perdu : le A ne bouge plus', fige],
+        ['START : PERDU effacé, 3 vies, on rejoue', v('etat') === 0 && v('vies') === 3 && c.mot(7, 8, 5).trim() === '' && c.mot(10, 17, 8) === 'VIES 003'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — un petit jeu : les W tombent',
+    difficulte: 0,
+    idee: 'Tout ensemble, dans un petit jeu : le A, en bas, va de côté et tire vers le haut ; trois W tombent. Un W touché : un point, et il repart d’en haut. Un W arrivé en bas : une vie de moins. PERDU, et START.',
+    texte: [
+      '**Un petit jeu complet, avec tout ce qu’on a vu.** Le A est en bas, sur la ligne 15, au-dessus d’un sol de « # ». Il va à gauche et à droite, et tire **vers le haut**. Trois **W** tombent du ciel, une case toutes les 600 ms. Un W touché : un point, et il repart d’en haut. Un W qui arrive en bas : une vie de moins.',
+      '**Ce qui vient d’avant :** le tir qui avance et regarde sa case d’arrivée (le 0.101), la cible touchée (le 0.102), trois tirs dans un tableau de `struct` avec `chaque(250)` (le 0.102.1), les vies, PERDU et START (le 0.103), les ennemis dans un tableau (le 0.85).',
+      '**Plus simple qu’avant, sur deux points.** Le A ne va que de côté : sa ligne est toujours 15, pas besoin de `ay`. Et les tirs vont **toujours vers le haut** : le `struct Tir` perd son sens (`dx`, `dy`), l’arrivée d’un tir est simplement la ligne `y - 1`.',
+      '**Ce qui est nouveau ici (1) : plusieurs cibles.** Au 0.102, une seule cible : `nx == bx && ny == by`. Ici, trois W : une boucle sur `j` compare l’arrivée du tir à **chaque** W. Si l’un est là : il disparaît, `placerW(j)` le renvoie en haut, et `touche = 1`. Après la boucle, `touche` dit si le tir a touché quelque chose.',
+      '**Ce qui est nouveau ici (2) : un W ne tombe pas sur un tir.** Si la case sous un W n’est pas vide (un tir, ou un autre W), le W **attend** : il ne descend pas à ce tour-ci. Au pas suivant du tir, c’est le tir qui monte sur lui : touché. Sans cette attente, le W écraserait le dessin du tir, et le tir, en avançant, effacerait… le W.',
+      '**Arrivé en bas :** quand l’arrivée d’un W est la ligne 15, celle du A, il ne s’y pose pas : il disparaît, repart d’en haut, et le joueur perd une vie.',
+      '**`nouvellePartie()` :** tout ce qu’il faut pour commencer (vider le terrain, arrêter les tirs, placer les W et le A, 3 vies, score 0) est rangé dans une fonction. On l’appelle au début **et** quand on appuie sur START : écrit une seule fois, fait deux fois.',
+      '**Essaie :** fais tomber les W plus vite (`chaque(400)`), ajoute un quatrième W (`Ennemi ennemis[4]`, et `j < 4` partout), ou fais accélérer la chute quand le score monte.',
+    ],
+    code: `// ---- UN PETIT JEU DE TIR : les W tombent ----
+// Tout ce qu'on a vu, dans un vrai petit jeu. Le A, en bas, va à gauche et
+// à droite, et tire vers le HAUT. Trois W tombent du ciel. Un W touché :
+// un point, et il repart d'en haut. Un W qui arrive en bas : une vie de moins.
+// ALPHABET[0] : le A    ALPHABET[22] : le W
+//
+//   ligne 0  :    W        W     W      les W partent d'ici, et tombent
+//   …        :       |                  un tir du A monte
+//   ligne 15 :       A                  le A : il ne va que de côté
+//   ligne 16 : ####################     le sol
+//   ligne 17 : SCORE 0   VIES 3
+
+// ---- un tir : il monte toujours, il n'a donc plus besoin de sens ----
+
+#include <hasard>     // tire un nombre au hasard
+#include <lire>       // lit la tuile posée sur une case
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <effacer>    // efface des cases, ou tout le fond
+#include <nombre>     // écrit un nombre en chiffres
+#include <texte>      // écrit un texte à l’écran
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <note>       // joue une note
+#include <bruit>      // joue un bruit
+#include <reste>      // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
+struct Tir {
+  uint8_t x, y;              // sa place
+  uint8_t vole;              // 1 = en vol ; 0 = libre
+};
+// ---- un ennemi W : sa place ----
+struct Ennemi {
+  uint8_t x, y;
+};
+
+Tir tirs[3];                 // trois tirs à la fois (le 0.102.1)
+Ennemi ennemis[3];           // trois W (le 0.85)
+
+uint8_t ax = 9;              // le A : sa colonne. Sa ligne est toujours 15.
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t score = 0;
+uint8_t vies = 3;
+uint8_t etat = 0;            // 0 = on joue, 1 = perdu (le 0.84)
+uint8_t lance = 0;           // 1 = un tir vient de partir, à ce tour-ci
+uint8_t touche = 0;          // 1 = le tir qu'on regarde vient de toucher un W
+
+// ---- le W numéro j repart d'en haut : ligne 0, colonne au hasard ----
+void placerW(uint8_t j) {
+  do {
+    ennemis[j].x = hasard() % 20;      // colonne 0 à 19…
+    ennemis[j].y = 0;                  // …sur la ligne 0…
+  } while (lire(ennemis[j].x, 0) != 0);  // …sur une case vide
+  poser(ennemis[j].x, 0, ALPHABET[22]);
+}
+
+// ---- une nouvelle partie : le terrain vidé, tout à sa place ----
+void nouvellePartie() {
+  for (uint8_t l = 0; l < 16; l++) {   // les lignes 0 à 15 : le terrain
+    effacer(0, l, 20);
+  }
+  for (uint8_t i = 0; i < 3; i++) {
+    tirs[i].vole = 0;                  // aucun tir en vol…
+    placerW(i);                        // …et les trois W en haut
+  }
+  ax = 9;
+  poser(ax, 15, ALPHABET[0]);          // le A, en bas au milieu
+  score = 0;
+  vies = 3;
+  nombre(6, 17, score);
+  nombre(15, 17, vies);
+  etat = 0;
+}
+
+int main() {
+  texte(0, 16, "####################");  // le sol : 20 « # »
+  texte(0, 17, "SCORE");
+  texte(10, 17, "VIES");
+  nouvellePartie();
+
+  while (true) {
+    image();
+
+    if (etat == 0) {                   // ================ ON JOUE
+
+      // ---- le A va à gauche et à droite, sur la ligne 15 ----
+      if (chaque(120)) {
+        nx = ax;
+        if (bouton(DROITE)) {
+          nx = ax + 1;
+        } else if (bouton(GAUCHE)) {
+          nx = ax - 1;                 // en colonne 0 : 255, refusé juste après
+        }
+        if (nx < 20 && nx != ax) {
+          effacer(ax, 15, 1);
+          ax = nx;
+          poser(ax, 15, ALPHABET[0]);
+        }
+      }
+
+      // ---- A tire vers le haut, au plus toutes les 250 ms (le 0.102.1) ----
+      if (chaque(250)) {
+        if (bouton(A) && lire(ax, 14) == 0) {    // la case au-dessus du A est vide
+          lance = 0;
+          for (uint8_t i = 0; i < 3; i++) {
+            if (lance == 0 && tirs[i].vole == 0) {
+              tirs[i].vole = 1;
+              tirs[i].x = ax;
+              tirs[i].y = 14;
+              texte(ax, 14, ".");
+              lance = 1;
+            }
+          }
+        }
+      }
+
+      // ---- chaque tir monte d'une case ----
+      if (chaque(80)) {
+        for (uint8_t i = 0; i < 3; i++) {
+          if (tirs[i].vole == 1) {
+            nx = tirs[i].x;
+            ny = tirs[i].y - 1;        // monter, c'est retirer 1 à la ligne
+            effacer(tirs[i].x, tirs[i].y, 1);
+            // Un W sur l'arrivée ? On les regarde tous les trois.
+            touche = 0;
+            for (uint8_t j = 0; j < 3; j++) {
+              if (ny < 17 && ennemis[j].x == nx && ennemis[j].y == ny) {
+                effacer(nx, ny, 1);    // le W disparaît…
+                placerW(j);            // …et repart d'en haut
+                touche = 1;
+              }
+            }
+            if (touche == 1) {
+              tirs[i].vole = 0;        // 1. un W : touché !
+              score = score + 1;
+              nombre(6, 17, score);
+              note(1, DO5, 10, 12);
+            } else if (ny >= 17) {
+              tirs[i].vole = 0;        // 2. sorti par le haut (0 - 1 = 255)
+            } else if (lire(nx, ny) != 0) {
+              tirs[i].vole = 0;        // 3. autre chose : il s'arrête
+            } else {
+              tirs[i].y = ny;          // 4. une case vide : il y monte
+              texte(nx, ny, ".");
+            }
+          }
+        }
+      }
+
+      // ---- les W descendent d'une case, toutes les 600 ms ----
+      if (chaque(600)) {
+        for (uint8_t j = 0; j < 3; j++) {
+          nx = ennemis[j].x;
+          ny = ennemis[j].y + 1;
+          if (ny == 15) {
+            // Arrivé en bas, sur la ligne du A : une vie de moins.
+            effacer(nx, ennemis[j].y, 1);
+            placerW(j);
+            vies = vies - 1;
+            nombre(15, 17, vies);
+            bruit(8, 12);
+            if (vies == 0) {
+              etat = 1;
+              texte(7, 8, "PERDU");
+            }
+          } else if (lire(nx, ny) == 0) {
+            effacer(nx, ennemis[j].y, 1);   // la case en dessous est vide : il y va
+            ennemis[j].y = ny;
+            poser(nx, ny, ALPHABET[22]);
+          }
+          // Sinon, un tir (ou un autre W) est juste dessous : le W attend.
+          // Au prochain pas du tir, c'est le tir qui monte sur lui : touché.
+        }
+      }
+
+    } else {                           // ================ PERDU
+      if (bouton(START)) {
+        nouvellePartie();              // tout recommence
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Trois W tombent. Le A, en bas, va de côté et tire vers le haut : un W touché rapporte un point et repart d’en haut ; un W arrivé en bas coûte une vie. À 0 : PERDU ; START relance.',
+    controle: (c) => {
+      const v = (n) => c.variable(n)
+      const lesW = () => { const w = []; for (let l = 0; l < 15; l++) { const r = c.mot(0, l, 20); for (let i = 0; i < 20; i++) if (r[i] === 'W') w.push([i, l]) } return w }
+      c.avancer(10)
+      const depart = lesW().length === 3 && c.mot(9, 15, 1) === 'A' && c.mot(0, 16, 20) === '####################' && c.mot(0, 17, 9) === 'SCORE 000'
+      // On joue : le A se place sous le W le plus bas, et tire.
+      for (let k = 0; k < 1500 && v('score') < 5; k++) {
+        const w = lesW().sort((a, b) => b[1] - a[1])[0]
+        c.gb.setButton('right', !!w && w[0] > v('ax'))
+        c.gb.setButton('left', !!w && w[0] < v('ax'))
+        c.gb.setButton('a', true)
+        c.avancer(1)
+      }
+      for (const b of ['right', 'left', 'a']) c.gb.setButton(b, false)
+      const score = v('score')
+      const trois = lesW().length === 3
+      let t = 0
+      while (t < 3000 && v('etat') === 0) { c.avancer(1); t++ }
+      const perdu = v('etat') === 1 && v('vies') === 0 && c.mot(7, 8, 5) === 'PERDU'
+      c.presser('start', 4)
+      c.avancer(5)
+      return [
+        ['au départ : trois W en haut, le A en (9, 15), le sol, SCORE 000', depart],
+        ['en visant, le A touche des W : le score monte', score >= 5, ` (score ${score})`],
+        ['un W touché repart d’en haut : toujours trois W', trois],
+        ['sans tirer, les W arrivent en bas : les vies tombent à 0, PERDU', perdu],
+        ['START : une nouvelle partie, 3 vies, score 0', v('etat') === 0 && v('vies') === 3 && v('score') === 0 && lesW().length === 3 && c.mot(7, 8, 5).trim() === ''],
+      ]
+    },
+  },
+
+
+  {
+    titre: 'Une lettre qui tire — le tir casse le X',
+    difficulte: 0,
+    idee: 'On reprend le 0.101 (le mur de X, un seul tir) : le tir qui arrive sur un X le casse. Le X disparaît, le tir aussi ; le tir suivant passe par le trou, et le A aussi.',
+    texte: [
+      '**On revient au mur du 0.101, pour le casser.** Au 0.101, le X arrêtait le tir, et restait. Ici, le tir qui arrive sur un X le **casse** : le X disparaît, le tir aussi. Le mur a un **trou** : le tir suivant passe, et le A peut y marcher.',
+      '**Ce qui vient d’avant :** tout le 0.101. Le A bouge et regarde (le 0.100), le tir part dans son sens, et avant chaque pas il regarde sa case d’arrivée avec `lire()`.',
+      '**Ce qui est nouveau ici : un cas de plus, « c’est un X ».** Le pas du tir avait trois cas : hors de l’écran, pas vide, vide. On en ajoute un, **avant** « pas vide » : `lire(nx, ny) == ALPHABET[23]`, l’arrivée est un X. Alors `effacer(nx, ny, 1)` efface le X, et `vole = 0` : le tir s’est usé dessus, il disparaît.',
+      '**Pourquoi avant « pas vide » ?** Un X n’est pas vide : si « pas vide » venait d’abord, le tir s’y écraserait comme au 0.101, et le cas du X ne serait jamais regardé. Dans une suite de `else if`, **le premier cas vrai gagne**.',
+      '**Déroulons :** A en (2, 8), regard à droite. Bouton A : le tir va de (3, 8) à (11, 8). Pas suivant : l’arrivée (12, 8) est un X. On efface (12, 8), le tir disparaît. Bouton A encore : le tir passe (12, 8), qui est vide, et file jusqu’au bord. DROITE : le A passe aussi par le trou.',
+      '**Essaie :** fais que le tir traverse le X sans disparaître : dans le cas du X, remplace `vole = 0;` par ce que fait le cas « vide » (`tx = nx; ty = ny;` et le dessin). Un tir perçant !',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : le tir casse le X ----
+// Le 0.101 (le mur de X), mais le mur ne tient plus : le tir qui arrive
+// sur un X le CASSE. Le X disparaît, le tir aussi, et le mur a un trou.
+// ALPHABET[23] : le X.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
+#include <texte>      // écrit un texte à l’écran
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t dx = 1;              // le sens où regarde le A (le 0.100)
+uint8_t dy = 0;
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t tx = 0;              // le tir : sa place…
+uint8_t ty = 0;
+uint8_t tdx = 0;             // …et son sens
+uint8_t tdy = 0;
+uint8_t vole = 0;            // 1 = le tir est en vol ; 0 = pas de tir
+
+int main() {
+  // ---- NOUVEAU : un mur de X, debout, en colonne 12, des lignes 4 à 12 ----
+  for (uint8_t l = 4; l < 13; l++) {   // l vaut 4, 5, 6… jusqu'à 12 : 9 X
+    poser(12, l, ALPHABET[23]);
+  }
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge et retient où il regarde (le 0.100) ----
+    // Il ne va que sur une case vide : le mur l'arrête déjà.
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;
+        dy = 0;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;
+        dy = -1;
+      }
+      if (nx < 20 && ny < 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- A lance le tir ----
+    if (bouton(A) && vole == 0) {
+      nx = ax + dx;
+      ny = ay + dy;
+      // NOUVEAU : la case de départ doit aussi être VIDE.
+      // Collé au mur, le A ne tire pas : le tir n'a pas de place.
+      if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+        vole = 1;
+        tx = nx;
+        ty = ny;
+        tdx = dx;
+        tdy = dy;
+        texte(tx, ty, ".");
+      }
+    }
+
+    // ---- le tir avance ; il regarde sa case d'arrivée AVANT d'y aller ----
+    if (chaque(100)) {
+      if (vole == 1) {
+        nx = tx + tdx;
+        ny = ty + tdy;
+        effacer(tx, ty, 1);
+        if (nx >= 20 || ny >= 17) {
+          vole = 0;                  // 1. hors de l'écran : il disparaît
+        } else if (lire(nx, ny) == ALPHABET[23]) {
+          // 2. NOUVEAU : l'arrivée est un X : le tir le CASSE.
+          effacer(nx, ny, 1);        //    le X disparaît (sa case devient vide)…
+          vole = 0;                  //    …et le tir aussi : il s'est usé dessus.
+        } else if (lire(nx, ny) != 0) {
+          vole = 0;                  // 3. autre chose, pas vide : il s'écrase.
+        } else {
+          tx = nx;                   // 4. l'arrivée est vide : il y va
+          ty = ny;
+          texte(tx, ty, ".");
+        }
+        // L'ordre compte : d'abord « hors de l'écran ? », car lire(20, 8)
+        // n'a pas de sens : la case n'existe pas.
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Le tir casse le X de la ligne 8 et disparaît ; le tir suivant passe par le trou jusqu’au bord, et le A peut y marcher. Les autres X restent.',
+    controle: (c) => {
+      const tenir = (b, cond, max = 300) => { let t = 0; while (t < max && !cond()) { c.gb.setButton(b, true); c.avancer(1); t++ } c.gb.setButton(b, false); c.avancer(2) }
+      const v = (n) => c.variable(n)
+      c.avancer(10)
+      const mur = c.mot(12, 8, 1) === 'X'
+      c.presser('a', 3)
+      let t = 0
+      while (t < 120 && v('vole') === 1) { c.avancer(1); t++ }
+      const casse = c.mot(12, 8, 1) === ' ' && c.mot(12, 7, 1) === 'X' && c.mot(12, 9, 1) === 'X'
+      c.presser('a', 3)
+      let loin = 0
+      for (let k = 0; k < 150; k++) { c.avancer(1); if (v('vole') === 1) loin = Math.max(loin, v('tx')) }
+      tenir('right', () => v('ax') === 13)
+      return [
+        ['au départ, un X en (12, 8)', mur],
+        ['le premier tir le casse : (12, 8) est vide, les X au-dessus et au-dessous restent', casse],
+        ['le tir suivant passe par le trou, jusqu’en colonne 19', loin === 19, ` (le plus loin : colonne ${loin})`],
+        ['le A passe par le trou, lui aussi', v('ax') === 13],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — la rafale perce le mur',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.105 avec les trois tirs du 0.101.1 : le premier tir de la rafale casse le X, les suivants passent par le trou.',
+    texte: [
+      '**C’est le 0.105, avec plusieurs tirs.** Garde A enfoncé face au mur : le premier tir casse le X, et **les suivants passent** par le trou, jusqu’au bord de l’écran.',
+      '**Ce qui change par rapport au 0.101.1 :** le même cas en plus qu’au 0.105, dans la boucle sur `i` : `lire(nx, ny) == ALPHABET[23]`, on efface le X, et `vole[i] = 0`.',
+      '**Un seul X par tir :** chaque tir casse **un** X et disparaît. Pour ouvrir un grand passage, il faut tirer depuis plusieurs lignes : monte d’une case, tire, monte encore…',
+      '**Déroulons, A tenu :** le tir 0 casse (12, 8). Les tirs 1 et 2, partis 250 et 500 ms plus tard, trouvent (12, 8) vide : ils passent, jusqu’en colonne 19.',
+      '**Essaie :** ouvre dans le mur une porte de trois cases de haut (lignes 7, 8 et 9), puis traverse avec le A.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : la rafale perce le mur ----
+// Le 0.105 (le tir casse le X), avec les trois tirs du 0.101.1.
+// Le premier tir casse le X ; les suivants passent par le trou.
+// ALPHABET[23] : le X.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
+#include <texte>      // écrit un texte à l’écran
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t dx = 1;              // le sens où regarde le A
+uint8_t dy = 0;
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t tx[3];               // les trois tirs : leurs colonnes…
+uint8_t ty[3];               // …leurs lignes…
+uint8_t tdx[3];              // …et leurs sens
+uint8_t tdy[3];
+uint8_t vole[3];             // vole[i] = 1 : le tir n° i est en vol
+uint8_t lance = 0;
+
+int main() {
+  for (uint8_t l = 4; l < 13; l++) {   // le mur : 9 X en colonne 12 (le 0.101)
+    poser(12, l, ALPHABET[23]);
+  }
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge et retient où il regarde ----
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;
+        dy = 0;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;
+        dy = -1;
+      }
+      if (nx < 20 && ny < 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- le bouton A lance un tir, au plus toutes les 250 ms ----
+    if (chaque(250)) {
+      if (bouton(A)) {
+        nx = ax + dx;
+        ny = ay + dy;
+        // la case de départ doit être dans l'écran ET vide (le 0.101)
+        if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+          lance = 0;
+          for (uint8_t i = 0; i < 3; i++) {
+            if (lance == 0 && vole[i] == 0) {
+              vole[i] = 1;
+              tx[i] = nx;
+              ty[i] = ny;
+              tdx[i] = dx;
+              tdy[i] = dy;
+              texte(tx[i], ty[i], ".");
+              lance = 1;
+            }
+          }
+        }
+      }
+    }
+
+    // ---- chaque tir avance, et regarde sa case d'arrivée (le 0.105) ----
+    if (chaque(100)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        if (vole[i] == 1) {
+          nx = tx[i] + tdx[i];
+          ny = ty[i] + tdy[i];
+          effacer(tx[i], ty[i], 1);
+          if (nx >= 20 || ny >= 17) {
+            vole[i] = 0;             // 1. hors de l'écran
+          } else if (lire(nx, ny) == ALPHABET[23]) {
+            effacer(nx, ny, 1);      // 2. un X : le tir le casse (le 0.105)…
+            vole[i] = 0;             //    …et disparaît
+          } else if (lire(nx, ny) != 0) {
+            vole[i] = 0;             // 3. un autre tir : il s'écrase
+          } else {
+            tx[i] = nx;              // 4. une case vide : il y va
+            ty[i] = ny;
+            texte(tx[i], ty[i], ".");
+          }
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'A tenu face au mur : le premier tir casse le X de la ligne 8, les suivants passent par le trou jusqu’au bord ; les autres X restent.',
+    controle: (c) => {
+      c.avancer(10)
+      let derriere = false
+      c.gb.setButton('a', true)
+      for (let k = 0; k < 200; k++) { c.avancer(1); if (c.mot(13, 8, 7).includes('.')) derriere = true }
+      c.gb.setButton('a', false)
+      c.avancer(120)
+      return [
+        ['le X de la ligne 8 est cassé, ceux d’au-dessus et d’au-dessous restent', c.mot(12, 8, 1) === ' ' && c.mot(12, 7, 1) === 'X' && c.mot(12, 9, 1) === 'X'],
+        ['les tirs suivants passent par le trou, derrière le mur', derriere],
+        ['relâché : plus aucun tir, il ne reste que le A sur la ligne', c.mot(0, 8, 20).trim() === 'A'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — la boule de feu',
+    difficulte: 0,
+    idee: 'Le 0.105.1, et une deuxième arme : le bouton B lance une boule de feu. Plus lente qu’un tir, elle clignote « O », « # », « O »… comme une flamme, et casse le X qu’elle touche.',
+    texte: [
+      '**Une deuxième arme : la boule de feu.** Le bouton **A** tire toujours ses rafales de « . » (le 0.105.1). Le bouton **B** lance une **boule de feu** : plus grosse, plus lente, et elle **clignote**, comme une flamme qui danse.',
+      '**Ses variables :** comme un tir, une place (`fx`, `fy`), un sens (`fdx`, `fdy`), et `feu`, 1 quand elle vole. **Une seule à la fois** : `bouton(B) && feu == 0`.',
+      '**Ce qui est nouveau ici (1) : l’effet de flamme.** La variable `flamme` dit quel dessin montrer : 0, un « O » ; 1, un « # ». La fonction `dessinerFeu()` dessine la boule, **puis change** `flamme` : `flamme = 1 - flamme`. 1 - 0 = **1**, et 1 - 1 = **0** : elle passe de l’un à l’autre à chaque appel. À chaque pas, la boule a donc l’autre dessin : O, #, O, #…',
+      '**Ce qui est nouveau ici (2) : une autre vitesse.** Elle avance avec son propre `chaque(200)` : un pas toutes les 200 ms, **deux fois moins vite** que les tirs (100 ms). Deux rythmes dans le même programme, sans se gêner (le 0.77).',
+      '**Le pas de la boule :** le même plan que pour un tir (le 0.105). Hors de l’écran, elle disparaît ; sur un X, elle le casse et s’éteint ; sur autre chose, elle s’éteint ; sur une case vide, elle y va, avec l’autre dessin.',
+      '**Déroulons :** A en (2, 8), regard à droite. Bouton B : la boule part en (3, 8), dessin « O », `flamme` passe à 1. 200 ms : (4, 8), « # », `flamme` = 0. 200 ms : (5, 8), « O »… Arrivée (12, 8) : un X, cassé.',
+      '**Essaie :** fais-la plus lente encore, `chaque(400)`, pour bien voir le clignotement. Ou change ses dessins : « ! » et « : ».',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : la boule de feu ----
+// Le 0.105.1, et une deuxième arme : le bouton B lance une BOULE DE FEU.
+// Elle est plus lente qu'un tir, elle CLIGNOTE (« O », puis « # », puis « O »…)
+// comme une flamme, et elle casse le X qu'elle touche.
+// ALPHABET[23] : le X.
+// ALPHABET[23] : le X.
+
+#include <texte>      // écrit un texte à l’écran
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+#include <lire>       // lit la tuile posée sur une case
+#include <effacer>    // efface des cases, ou tout le fond
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t dx = 1;              // le sens où regarde le A
+uint8_t dy = 0;
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t tx[3];               // les trois tirs : leurs colonnes…
+uint8_t ty[3];               // …leurs lignes…
+uint8_t tdx[3];              // …et leurs sens
+uint8_t tdy[3];
+uint8_t vole[3];             // vole[i] = 1 : le tir n° i est en vol
+uint8_t lance = 0;
+uint8_t fx = 0;              // NOUVEAU : la boule de feu : sa colonne…
+uint8_t fy = 0;              // …sa ligne…
+uint8_t fdx = 0;             // …son sens…
+uint8_t fdy = 0;
+uint8_t feu = 0;             // …1 si elle vole, 0 sinon (une seule à la fois)…
+uint8_t flamme = 0;          // …et son dessin : 0 = « O », 1 = « # »
+
+// ---- NOUVEAU : dessiner la boule de feu, et changer son dessin ----
+// Une fois « O », la fois suivante « # », puis « O »… : elle clignote.
+// flamme = 1 - flamme : 1 - 0 = 1, et 1 - 1 = 0. Elle passe de l'un à l'autre.
+void dessinerFeu() {
+  if (flamme == 0) {
+    texte(fx, fy, "O");
+  } else {
+    texte(fx, fy, "#");
+  }
+  flamme = 1 - flamme;
+}
+
+int main() {
+  for (uint8_t l = 4; l < 13; l++) {   // le mur : 9 X en colonne 12 (le 0.101)
+    poser(12, l, ALPHABET[23]);
+  }
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge et retient où il regarde ----
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;
+        dy = 0;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;
+        dy = -1;
+      }
+      if (nx < 20 && ny < 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- le bouton A lance un tir, au plus toutes les 250 ms ----
+    if (chaque(250)) {
+      if (bouton(A)) {
+        nx = ax + dx;
+        ny = ay + dy;
+        // la case de départ doit être dans l'écran ET vide (le 0.101)
+        if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+          lance = 0;
+          for (uint8_t i = 0; i < 3; i++) {
+            if (lance == 0 && vole[i] == 0) {
+              vole[i] = 1;
+              tx[i] = nx;
+              ty[i] = ny;
+              tdx[i] = dx;
+              tdy[i] = dy;
+              texte(tx[i], ty[i], ".");
+              lance = 1;
+            }
+          }
+        }
+      }
+    }
+
+    // ---- chaque tir avance, et regarde sa case d'arrivée (le 0.105) ----
+    if (chaque(100)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        if (vole[i] == 1) {
+          nx = tx[i] + tdx[i];
+          ny = ty[i] + tdy[i];
+          effacer(tx[i], ty[i], 1);
+          if (nx >= 20 || ny >= 17) {
+            vole[i] = 0;             // 1. hors de l'écran
+          } else if (lire(nx, ny) == ALPHABET[23]) {
+            effacer(nx, ny, 1);      // 2. un X : le tir le casse (le 0.105)…
+            vole[i] = 0;             //    …et disparaît
+          } else if (lire(nx, ny) != 0) {
+            vole[i] = 0;             // 3. un autre tir : il s'écrase
+          } else {
+            tx[i] = nx;              // 4. une case vide : il y va
+            ty[i] = ny;
+            texte(tx[i], ty[i], ".");
+          }
+        }
+      }
+    }
+    // ---- NOUVEAU : le bouton B lance la boule de feu, dans le sens du regard ----
+    // Une seule à la fois (feu == 0), sur une case vide à côté du A.
+    if (bouton(B) && feu == 0) {
+      nx = ax + dx;
+      ny = ay + dy;
+      if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+        feu = 1;
+        fx = nx;
+        fy = ny;
+        fdx = dx;                    // elle recopie le sens du A, comme un tir
+        fdy = dy;
+        dessinerFeu();
+      }
+    }
+
+    // ---- NOUVEAU : la boule avance toutes les 200 ms : deux fois moins vite qu'un tir ----
+    if (chaque(200)) {
+      if (feu == 1) {
+        nx = fx + fdx;
+        ny = fy + fdy;
+        effacer(fx, fy, 1);          // elle quitte sa case
+        if (nx >= 20 || ny >= 17) {
+          feu = 0;                   // 1. hors de l'écran : elle disparaît
+        } else if (lire(nx, ny) == ALPHABET[23]) {
+          effacer(nx, ny, 1);        // 2. un X : elle le casse…
+          feu = 0;                   //    …et s'éteint
+        } else if (lire(nx, ny) != 0) {
+          feu = 0;                   // 3. autre chose : elle s'éteint
+        } else {
+          fx = nx;                   // 4. une case vide : elle y va…
+          fy = ny;
+          dessinerFeu();             //    …avec l'autre dessin : elle clignote
+        }
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Le bouton B lance une boule de feu qui avance deux fois moins vite qu’un tir en clignotant « O » / « # », et casse le X qu’elle touche ; A tire toujours des rafales.',
+    controle: (c) => {
+      const v = (n) => c.variable(n)
+      c.avancer(5)
+      c.presser('b', 3)
+      const vus = new Set()
+      const places = []
+      for (let k = 0; k < 150; k++) {
+        c.avancer(1)
+        const r = c.mot(0, 8, 20)
+        for (const s of 'O#') if (r.slice(3).includes(s)) vus.add(s)
+        if (v('feu') === 1 && places.at(-1) !== v('fx')) places.push(v('fx'))
+      }
+      c.avancer(5)
+      return [
+        ['la boule clignote : on voit « O » et « # » sur sa route', vus.has('O') && vus.has('#')],
+        ['elle avance d’une case à la fois, jusqu’au mur', places.length >= 7 && places.at(-1) === 11, ` (colonnes ${places[0]} à ${places.at(-1)})`],
+        ['elle casse le X de la ligne 8, et s’éteint', v('feu') === 0 && c.mot(12, 8, 1) === ' ' && c.mot(12, 7, 1) === 'X' && c.mot(3, 8, 9).trim() === ''],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — la boule de feu explose',
+    difficulte: 0,
+    idee: 'Le 0.106, et la boule explose : une croix de « # » s’allume sur la case touchée et ses quatre voisines, casse les X qui s’y trouvent, et s’éteint un tiers de seconde plus tard.',
+    texte: [
+      '**C’est le 0.106, avec une chose en plus : l’explosion.** La boule de feu ne casse plus un seul X : quand elle touche quelque chose, **BOUM**. Une **croix de feu** s’allume : la case touchée, et ses quatre voisines. Les X de la croix sont cassés. Un tiers de seconde plus tard, la croix s’éteint : il reste un trou de trois cases dans le mur.',
+      '**Ce qui est nouveau ici (1) : `allumer(c, l)`.** Elle allume **une** case de l’explosion : un « # ». Mais seulement si la case est dans l’écran (`c < 20 && l < 17`), et si c’est une case vide ou un X. Le A, un tir… ne sont pas touchés : pas question que l’explosion efface le A.',
+      '**Ce qui est nouveau ici (2) : `exploser()`.** Elle appelle `allumer()` sur les cinq cases de la croix : le centre (`ex`, `ey`), puis à droite, à gauche, en bas, en haut. Au bord de l’écran, `ex - 1` peut donner 255 : `allumer()` le refuse, rien à écrire de plus.',
+      '**Ce qui est nouveau ici (3) : éteindre, mais seulement les « # ».** Pour savoir ce qu’il y a sur une case, `lire()` rend le **numéro de sa tuile**. Chaque signe de la police a le sien : espace 0, A à Z de 1 à 26, 0 à 9 de 27 à 36, puis ! 37, ? 38, . 39, - 40, : 41, et **# 42**. `eteindre(c, l)` n’efface la case que si `lire(c, l) == 42` : si le A est venu se placer à côté, il n’est pas effacé.',
+      '**Ce qui est nouveau ici (4) : une durée.** `boum` vaut 1 pendant l’explosion, et `duree` compte les images : 20 au début. À chaque image, `duree = duree - 1` ; à 0, `eteindreTout()` éteint la croix. 20 images, c’est un tiers de seconde (60 images par seconde).',
+      '**Une seule explosion à la fois :** B ne lance pas de nouvelle boule tant que `boum` vaut 1. Sinon, une deuxième explosion changerait `ex` et `ey`, et la première ne serait jamais éteinte.',
+      '**Déroulons :** A en (2, 8). Bouton B : la boule avance jusqu’en (11, 8). Pas suivant : l’arrivée (12, 8) est un X, pas vide. `ex` = 12, `ey` = 8, `exploser()` : (12, 8) X → #, (13, 8) vide → #, (11, 8) vide → #, (12, 9) X → #, (12, 7) X → #. 20 images plus tard, les cinq « # » s’effacent. Les X des lignes 7, 8 et 9 ont disparu.',
+      '**Essaie :** fais durer l’explosion une seconde entière (`duree = 60`). Ou tire la boule vers le haut, dans le vide : elle sort de l’écran sans exploser.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : la boule de feu explose ----
+// Le 0.106, mais la boule ne casse plus un seul X : elle EXPLOSE.
+// Une croix de « # » s'allume sur la case touchée et ses quatre voisines ;
+// les X qui s'y trouvent sont cassés. Un tiers de seconde plus tard, la croix
+// s'éteint, et il reste un trou dans le mur.
+// ALPHABET[23] : le X. Le « # » est la tuile 42 de la police :
+//   espace = 0, A = 1 … Z = 26, 0 = 27 … 9 = 36, ! = 37, ? = 38,
+//   . = 39, - = 40, : = 41, # = 42.
+// ALPHABET[23] : le X.
+
+#include <texte>      // écrit un texte à l’écran
+#include <lire>       // lit la tuile posée sur une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <effacer>    // efface des cases, ou tout le fond
+#include <poser>      // pose une tuile sur une case du fond
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t dx = 1;              // le sens où regarde le A
+uint8_t dy = 0;
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t tx[3];               // les trois tirs : leurs colonnes…
+uint8_t ty[3];               // …leurs lignes…
+uint8_t tdx[3];              // …et leurs sens
+uint8_t tdy[3];
+uint8_t vole[3];             // vole[i] = 1 : le tir n° i est en vol
+uint8_t lance = 0;
+uint8_t fx = 0;              // NOUVEAU : la boule de feu : sa colonne…
+uint8_t fy = 0;              // …sa ligne…
+uint8_t fdx = 0;             // …son sens…
+uint8_t fdy = 0;
+uint8_t feu = 0;             // …1 si elle vole, 0 sinon (une seule à la fois)…
+uint8_t flamme = 0;          // …et son dessin : 0 = « O », 1 = « # »
+uint8_t boum = 0;            // NOUVEAU : 1 pendant l'explosion
+uint8_t ex = 0;              // le centre de l'explosion : sa colonne…
+uint8_t ey = 0;              // …et sa ligne
+uint8_t duree = 0;           // les images qu'il reste avant de l'éteindre
+
+// ---- NOUVEAU : dessiner la boule de feu, et changer son dessin ----
+// Une fois « O », la fois suivante « # », puis « O »… : elle clignote.
+// flamme = 1 - flamme : 1 - 0 = 1, et 1 - 1 = 0. Elle passe de l'un à l'autre.
+void dessinerFeu() {
+  if (flamme == 0) {
+    texte(fx, fy, "O");
+  } else {
+    texte(fx, fy, "#");
+  }
+  flamme = 1 - flamme;
+}
+
+// ---- NOUVEAU : allumer UNE case de l'explosion ----
+// Dans l'écran (colonne 255 = sortie à gauche : refusée aussi), et seulement
+// sur une case vide ou un X : le X est cassé, remplacé par le « # ».
+// Le A, un tir… ne sont pas touchés.
+void allumer(uint8_t c, uint8_t l) {
+  if (c < 20 && l < 17) {
+    if (lire(c, l) == 0 || lire(c, l) == ALPHABET[23]) {
+      texte(c, l, "#");
+    }
+  }
+}
+
+// ---- NOUVEAU : éteindre UNE case : seulement si c'est encore un « # » ----
+void eteindre(uint8_t c, uint8_t l) {
+  if (c < 20 && l < 17) {
+    if (lire(c, l) == 42) {          // 42 : la tuile du « # »
+      effacer(c, l, 1);
+    }
+  }
+}
+
+// ---- NOUVEAU : l'explosion, en croix, autour de (ex, ey) ----
+//          #            (ex, ey - 1)
+//        # # #          (ex - 1, ey)  (ex, ey)  (ex + 1, ey)
+//          #            (ex, ey + 1)
+void exploser() {
+  allumer(ex, ey);
+  allumer(ex + 1, ey);
+  allumer(ex - 1, ey);               // en colonne 0 : 255, refusé par allumer()
+  allumer(ex, ey + 1);
+  allumer(ex, ey - 1);
+  boum = 1;
+  duree = 20;                        // 20 images : un tiers de seconde
+}
+
+// ---- NOUVEAU : éteindre la croix, les mêmes cinq cases ----
+void eteindreTout() {
+  eteindre(ex, ey);
+  eteindre(ex + 1, ey);
+  eteindre(ex - 1, ey);
+  eteindre(ex, ey + 1);
+  eteindre(ex, ey - 1);
+  boum = 0;
+}
+
+int main() {
+  for (uint8_t l = 4; l < 13; l++) {   // le mur : 9 X en colonne 12 (le 0.101)
+    poser(12, l, ALPHABET[23]);
+  }
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge et retient où il regarde ----
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;
+        dy = 0;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;
+        dy = -1;
+      }
+      if (nx < 20 && ny < 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- le bouton A lance un tir, au plus toutes les 250 ms ----
+    if (chaque(250)) {
+      if (bouton(A)) {
+        nx = ax + dx;
+        ny = ay + dy;
+        // la case de départ doit être dans l'écran ET vide (le 0.101)
+        if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+          lance = 0;
+          for (uint8_t i = 0; i < 3; i++) {
+            if (lance == 0 && vole[i] == 0) {
+              vole[i] = 1;
+              tx[i] = nx;
+              ty[i] = ny;
+              tdx[i] = dx;
+              tdy[i] = dy;
+              texte(tx[i], ty[i], ".");
+              lance = 1;
+            }
+          }
+        }
+      }
+    }
+
+    // ---- chaque tir avance, et regarde sa case d'arrivée (le 0.105) ----
+    if (chaque(100)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        if (vole[i] == 1) {
+          nx = tx[i] + tdx[i];
+          ny = ty[i] + tdy[i];
+          effacer(tx[i], ty[i], 1);
+          if (nx >= 20 || ny >= 17) {
+            vole[i] = 0;             // 1. hors de l'écran
+          } else if (lire(nx, ny) == ALPHABET[23]) {
+            effacer(nx, ny, 1);      // 2. un X : le tir le casse (le 0.105)…
+            vole[i] = 0;             //    …et disparaît
+          } else if (lire(nx, ny) != 0) {
+            vole[i] = 0;             // 3. un autre tir : il s'écrase
+          } else {
+            tx[i] = nx;              // 4. une case vide : il y va
+            ty[i] = ny;
+            texte(tx[i], ty[i], ".");
+          }
+        }
+      }
+    }
+    // ---- le bouton B lance la boule de feu (le 0.106) ----
+    // boum == 0 : pas de nouvelle boule tant que l'explosion brûle encore.
+    if (bouton(B) && feu == 0 && boum == 0) {
+      nx = ax + dx;
+      ny = ay + dy;
+      if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+        feu = 1;
+        fx = nx;
+        fy = ny;
+        fdx = dx;                    // elle recopie le sens du A, comme un tir
+        fdy = dy;
+        dessinerFeu();
+      }
+    }
+
+    // ---- la boule avance toutes les 200 ms (le 0.106) ----
+    if (chaque(200)) {
+      if (feu == 1) {
+        nx = fx + fdx;
+        ny = fy + fdy;
+        effacer(fx, fy, 1);          // elle quitte sa case
+        if (nx >= 20 || ny >= 17) {
+          feu = 0;                   // 1. hors de l'écran : elle disparaît
+        } else if (lire(nx, ny) != 0) {
+          // 2. NOUVEAU : l'arrivée n'est pas vide (un X…) : BOUM !
+          //    L'explosion se centre sur la case touchée.
+          feu = 0;
+          ex = nx;
+          ey = ny;
+          exploser();
+        } else {
+          fx = nx;                   // 3. une case vide : elle y va…
+          fy = ny;
+          dessinerFeu();             //    …avec l'autre dessin : elle clignote
+        }
+      }
+    }
+
+    // ---- NOUVEAU : l'explosion brûle 20 images, puis s'éteint ----
+    if (boum == 1) {
+      duree = duree - 1;
+      if (duree == 0) {
+        eteindreTout();              // les « # » disparaissent : un trou reste
+      }
+    }
+  }
+}
+`,
+    aVoir: 'La boule de feu touche le mur et explose : une croix de « # » s’allume, casse les X des lignes 7, 8 et 9, puis s’éteint ; il reste un trou de trois cases.',
+    controle: (c) => {
+      const v = (n) => c.variable(n)
+      c.avancer(5)
+      c.presser('b', 3)
+      let t = 0
+      while (t < 200 && v('boum') === 0) { c.avancer(1); t++ }
+      c.avancer(2)
+      const croix = c.mot(11, 8, 3) === '###' && c.mot(12, 7, 1) === '#' && c.mot(12, 9, 1) === '#'
+      t = 0
+      while (t < 100 && v('boum') === 1) { c.avancer(1); t++ }
+      c.avancer(2)
+      const trou = [7, 8, 9].every((l) => c.mot(12, l, 1) === ' ') && c.mot(11, 8, 3) === '   '
+      const reste = c.mot(12, 6, 1) === 'X' && c.mot(12, 10, 1) === 'X'
+      return [
+        ['BOUM : une croix de « # » autour de (12, 8)', croix],
+        ['elle s’éteint : un trou de trois cases, lignes 7, 8 et 9', trou],
+        ['les X plus loin (lignes 6 et 10) restent', reste],
+        ['le A n’a rien', c.mot(2, 8, 1) === 'A'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — une explosion plus grande',
+    difficulte: 0,
+    suite: true,
+    idee: 'Le 0.107, mais les bras de la croix ont une longueur, PORTEE = 2 : une boucle for les allume case après case. Cinq X cassés au lieu de trois.',
+    texte: [
+      '**C’est le 0.107, avec une explosion plus grande.** Chaque bras de la croix a maintenant **deux** cases : l’explosion casse cinq X dans le mur, des lignes 6 à 10.',
+      '**Le problème :** au 0.107, `exploser()` écrivait les cinq cases une par une. Avec des bras de deux cases, il en faudrait neuf ; de trois, treize… Et autant dans `eteindreTout()`.',
+      '**Ce qui est nouveau ici : une boucle pour les bras.** `PORTEE` dit la longueur d’un bras. Après le centre, `for (uint8_t k = 1; k <= PORTEE; k++)` : `k` vaut 1, puis 2. À chaque tour, les **quatre** bras gagnent une case : `(ex + k, ey)`, `(ex - k, ey)`, `(ex, ey + k)`, `(ex, ey - k)`. `<=` veut dire « plus petit ou égal » : avec `PORTEE` = 2, le tour `k` = 2 se fait aussi.',
+      '**`eteindreTout()` fait la même boucle**, avec `eteindre()` à la place d’`allumer()`. Les deux passent sur les mêmes cases.',
+      '**Au bord de l’écran :** `ex - 2` peut donner 254 ou 255 ; `allumer()` et `eteindre()` le refusent déjà (le 0.107).',
+      '**Déroulons :** la boule touche (12, 8). Le centre, puis `k` = 1 : (13, 8), (11, 8), (12, 9), (12, 7). `k` = 2 : (14, 8), (10, 8), (12, 10), (12, 6). Neuf « # », cinq X cassés.',
+      '**Essaie :** `PORTEE = 4`, et regarde la croix traverser presque tout le mur. Et `PORTEE = 0` ? La boucle ne fait aucun tour : il ne reste que le centre.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : une explosion plus grande ----
+// Le 0.107, mais les bras de la croix ont une LONGUEUR : 2 cases de chaque
+// côté au lieu d'une. Une boucle for allume les bras, case après case.
+// Change PORTEE, et l'explosion grandit toute seule.
+// ALPHABET[23] : le X. Le « # » est la tuile 42 de la police :
+//   espace = 0, A = 1 … Z = 26, 0 = 27 … 9 = 36, ! = 37, ? = 38,
+//   . = 39, - = 40, : = 41, # = 42.
+// ALPHABET[23] : le X.
+
+#include <texte>      // écrit un texte à l’écran
+#include <lire>       // lit la tuile posée sur une case
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+#include <effacer>    // efface des cases, ou tout le fond
+#include <poser>      // pose une tuile sur une case du fond
+#include <chaque>     // répond 1 toutes les n millisecondes
+#include <bouton>     // lit un bouton de la manette
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t dx = 1;              // le sens où regarde le A
+uint8_t dy = 0;
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t tx[3];               // les trois tirs : leurs colonnes…
+uint8_t ty[3];               // …leurs lignes…
+uint8_t tdx[3];              // …et leurs sens
+uint8_t tdy[3];
+uint8_t vole[3];             // vole[i] = 1 : le tir n° i est en vol
+uint8_t lance = 0;
+uint8_t fx = 0;              // NOUVEAU : la boule de feu : sa colonne…
+uint8_t fy = 0;              // …sa ligne…
+uint8_t fdx = 0;             // …son sens…
+uint8_t fdy = 0;
+uint8_t feu = 0;             // …1 si elle vole, 0 sinon (une seule à la fois)…
+uint8_t flamme = 0;          // …et son dessin : 0 = « O », 1 = « # »
+uint8_t boum = 0;            // NOUVEAU : 1 pendant l'explosion
+uint8_t ex = 0;              // le centre de l'explosion : sa colonne…
+uint8_t ey = 0;              // …et sa ligne
+uint8_t duree = 0;           // les images qu'il reste avant de l'éteindre
+uint8_t PORTEE = 2;          // NOUVEAU : la longueur des bras de la croix
+
+// ---- NOUVEAU : dessiner la boule de feu, et changer son dessin ----
+// Une fois « O », la fois suivante « # », puis « O »… : elle clignote.
+// flamme = 1 - flamme : 1 - 0 = 1, et 1 - 1 = 0. Elle passe de l'un à l'autre.
+void dessinerFeu() {
+  if (flamme == 0) {
+    texte(fx, fy, "O");
+  } else {
+    texte(fx, fy, "#");
+  }
+  flamme = 1 - flamme;
+}
+
+// ---- NOUVEAU : allumer UNE case de l'explosion ----
+// Dans l'écran (colonne 255 = sortie à gauche : refusée aussi), et seulement
+// sur une case vide ou un X : le X est cassé, remplacé par le « # ».
+// Le A, un tir… ne sont pas touchés.
+void allumer(uint8_t c, uint8_t l) {
+  if (c < 20 && l < 17) {
+    if (lire(c, l) == 0 || lire(c, l) == ALPHABET[23]) {
+      texte(c, l, "#");
+    }
+  }
+}
+
+// ---- NOUVEAU : éteindre UNE case : seulement si c'est encore un « # » ----
+void eteindre(uint8_t c, uint8_t l) {
+  if (c < 20 && l < 17) {
+    if (lire(c, l) == 42) {          // 42 : la tuile du « # »
+      effacer(c, l, 1);
+    }
+  }
+}
+
+// ---- l'explosion, en croix, avec des bras de PORTEE cases ----
+//            #              PORTEE = 2 :
+//            #
+//        # # # # #          le centre, et 2 cases dans chaque sens
+//            #
+//            #
+// NOUVEAU : une boucle for. k vaut 1, puis 2 (jusqu'à PORTEE) :
+//   k = 1 allume les quatre voisines, k = 2 les quatre suivantes.
+void exploser() {
+  allumer(ex, ey);                   // le centre
+  for (uint8_t k = 1; k <= PORTEE; k++) {
+    allumer(ex + k, ey);             // à droite
+    allumer(ex - k, ey);             // à gauche (sous 0 : 255, 254… refusés)
+    allumer(ex, ey + k);             // en bas
+    allumer(ex, ey - k);             // en haut
+  }
+  boum = 1;
+  duree = 20;
+}
+
+// ---- éteindre la croix : la même boucle, avec eteindre() ----
+void eteindreTout() {
+  eteindre(ex, ey);
+  for (uint8_t k = 1; k <= PORTEE; k++) {
+    eteindre(ex + k, ey);
+    eteindre(ex - k, ey);
+    eteindre(ex, ey + k);
+    eteindre(ex, ey - k);
+  }
+  boum = 0;
+}
+
+int main() {
+  for (uint8_t l = 4; l < 13; l++) {   // le mur : 9 X en colonne 12 (le 0.101)
+    poser(12, l, ALPHABET[23]);
+  }
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge et retient où il regarde ----
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;
+        dy = 0;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;
+        dy = -1;
+      }
+      if (nx < 20 && ny < 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- le bouton A lance un tir, au plus toutes les 250 ms ----
+    if (chaque(250)) {
+      if (bouton(A)) {
+        nx = ax + dx;
+        ny = ay + dy;
+        // la case de départ doit être dans l'écran ET vide (le 0.101)
+        if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+          lance = 0;
+          for (uint8_t i = 0; i < 3; i++) {
+            if (lance == 0 && vole[i] == 0) {
+              vole[i] = 1;
+              tx[i] = nx;
+              ty[i] = ny;
+              tdx[i] = dx;
+              tdy[i] = dy;
+              texte(tx[i], ty[i], ".");
+              lance = 1;
+            }
+          }
+        }
+      }
+    }
+
+    // ---- chaque tir avance, et regarde sa case d'arrivée (le 0.105) ----
+    if (chaque(100)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        if (vole[i] == 1) {
+          nx = tx[i] + tdx[i];
+          ny = ty[i] + tdy[i];
+          effacer(tx[i], ty[i], 1);
+          if (nx >= 20 || ny >= 17) {
+            vole[i] = 0;             // 1. hors de l'écran
+          } else if (lire(nx, ny) == ALPHABET[23]) {
+            effacer(nx, ny, 1);      // 2. un X : le tir le casse (le 0.105)…
+            vole[i] = 0;             //    …et disparaît
+          } else if (lire(nx, ny) != 0) {
+            vole[i] = 0;             // 3. un autre tir : il s'écrase
+          } else {
+            tx[i] = nx;              // 4. une case vide : il y va
+            ty[i] = ny;
+            texte(tx[i], ty[i], ".");
+          }
+        }
+      }
+    }
+    // ---- le bouton B lance la boule de feu (le 0.106, le 0.107) ----
+    // boum == 0 : pas de nouvelle boule tant que l'explosion brûle encore.
+    if (bouton(B) && feu == 0 && boum == 0) {
+      nx = ax + dx;
+      ny = ay + dy;
+      if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+        feu = 1;
+        fx = nx;
+        fy = ny;
+        fdx = dx;                    // elle recopie le sens du A, comme un tir
+        fdy = dy;
+        dessinerFeu();
+      }
+    }
+
+    // ---- la boule avance toutes les 200 ms (le 0.106) ----
+    if (chaque(200)) {
+      if (feu == 1) {
+        nx = fx + fdx;
+        ny = fy + fdy;
+        effacer(fx, fy, 1);          // elle quitte sa case
+        if (nx >= 20 || ny >= 17) {
+          feu = 0;                   // 1. hors de l'écran : elle disparaît
+        } else if (lire(nx, ny) != 0) {
+          // 2. l'arrivée n'est pas vide (un X…) : BOUM ! (le 0.107)
+          //    L'explosion se centre sur la case touchée.
+          feu = 0;
+          ex = nx;
+          ey = ny;
+          exploser();
+        } else {
+          fx = nx;                   // 3. une case vide : elle y va…
+          fy = ny;
+          dessinerFeu();             //    …avec l'autre dessin : elle clignote
+        }
+      }
+    }
+
+    // ---- l'explosion brûle 20 images, puis s'éteint (le 0.107) ----
+    if (boum == 1) {
+      duree = duree - 1;
+      if (duree == 0) {
+        eteindreTout();              // les « # » disparaissent : un trou reste
+      }
+    }
+  }
+}
+`,
+    aVoir: 'La boule de feu explose en une grande croix de « # », deux cases dans chaque sens : cinq X cassés, des lignes 6 à 10.',
+    controle: (c) => {
+      const v = (n) => c.variable(n)
+      c.avancer(5)
+      c.presser('b', 3)
+      let t = 0
+      while (t < 200 && v('boum') === 0) { c.avancer(1); t++ }
+      c.avancer(2)
+      const croix = c.mot(10, 8, 5) === '#####' && [6, 7, 9, 10].every((l) => c.mot(12, l, 1) === '#')
+      t = 0
+      while (t < 100 && v('boum') === 1) { c.avancer(1); t++ }
+      c.avancer(2)
+      const trou = [6, 7, 8, 9, 10].every((l) => c.mot(12, l, 1) === ' ')
+      return [
+        ['BOUM : une croix de « # » avec des bras de deux cases', croix],
+        ['elle s’éteint : cinq X cassés, lignes 6 à 10', trou],
+        ['les X des lignes 5 et 11 restent', c.mot(12, 5, 1) === 'X' && c.mot(12, 11, 1) === 'X'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Une lettre qui tire — des étincelles',
+    difficulte: 0,
+    idee: 'La rafale du 0.105.1 : chaque tir est un point, et il casse un seul X, celui qu’il touche en face. Au choc, un petit éclat jaillit : six étincelles de 2 × 2 pixels, jaunes et orange, qui scintillent un instant puis disparaissent.',
+    texte: [
+      '**On reprend la rafale du 0.105.1**, et on lui ajoute un effet. Le tir est un **point** « . » ; il casse **un seul X**, celui qu’il touche **en face**, et disparaît. Au moment du choc, un petit **éclat** jaillit du trou : six étincelles jaunes et orange, qui scintillent un instant, puis s’éteignent.',
+      '**Ce qui est nouveau ici (1) : une étincelle est un lutin.** Une lettre ne bouge que case par case : 8 pixels d’un coup. Un **lutin** (le 0.70) se pose **au pixel près**, avec `sprite(numero, x, y, dessin)`. Les six étincelles sont les lutins 0 à 5 ; leur place se compte en **pixels** : `px[i]`, `py[i]`. La case (c, l) commence au pixel (c × 8, l × 8).',
+      '**Ce qui est nouveau ici (2) : un dessin à nous, `Tuile ETINCELLE`.** Huit lignes de huit chiffres : un chiffre par pixel. 0 est **transparent** (on voit le décor derrière) ; 1 et 2 sont deux couleurs. Seuls quatre pixels, au milieu, sont allumés : 2 × 2, une étincelle.',
+      '**Ce qui est nouveau ici (3) : les couleurs.** `couleurLutin(palette, teinte, rouge, vert, bleu)` règle une teinte d’une palette de lutins, avec trois nombres de 0 à 31. La palette 0 met le jaune (31, 31, 6) en 1 et l’orange (31, 16, 0) en 2 ; la palette 1 les échange. `teindreLutin(i, palette)` choisit la palette du lutin i. Le programme s’en sert : la console passe **toute seule** en mode couleur.',
+      '**Ce qui est nouveau ici (4) : `eclat(c, l)`.** Quand un tir casse le X en (`nx`, `ny`), on appelle `eclat(nx, ny)` : les six étincelles sont posées au centre de cette case, et chacune reçoit une **vie** de 6 à 11 images (`6 + hasard() % 6`). Elles ne s’éteignent pas toutes ensemble : c’est ce qui fait « étincelles ».',
+      '**`etinceler()`, à chaque image :** chaque étincelle encore vivante perd une image de vie, avance d’un pixel dans **sa** direction (`PDX[i]`, `PDY[i]`, gravées dans la cartouche : 255 veut dire -1, le 0.100), est redessinée, et **scintille** : `teindreLutin(i, ((images() + i) / 2) % 2)` la fait passer du jaune à l’orange toutes les 2 images. À 0, `cacher(i)` la fait disparaître.',
+      '**Un seul X, celui d’en face :** rien ne change dans le pas du tir du 0.105.1. Son arrivée est un X : `effacer(nx, ny, 1)` efface **cette case-là**, le tir disparaît, et l’éclat part de là. Les X au-dessus et au-dessous ne sont pas touchés.',
+      '**Déroulons :** A en (2, 8), bouton A. Le point va de (3, 8) à (11, 8). Pas suivant : l’arrivée (12, 8) est un X. Il est effacé, le tir disparaît, et `eclat(12, 8)` pose les six étincelles au pixel (96, 64). Une image plus tard, elles s’écartent d’un pixel : deux en haut, deux en bas, deux de chaque côté. Dix images plus tard, il n’en reste plus.',
+      '**Essaie :** change les couleurs (du bleu et du blanc pour de la glace : 10, 20, 31 et 31, 31, 31). Ou un éclat plus long : `12 + hasard() % 8`.',
+    ],
+    code: `// ---- UNE LETTRE QUI TIRE : des étincelles ----
+// La rafale du 0.105.1 : chaque tir est un point « . », et il casse UN X,
+// celui qu'il touche en face. NOUVEAU : au choc, un petit ÉCLAT jaillit de
+// l'endroit touché — six étincelles de 2 × 2 pixels, jaunes et orange, qui
+// scintillent un instant, puis disparaissent.
+// Une étincelle est un LUTIN (le 0.70) : un petit dessin placé au pixel près.
+// ALPHABET[23] : le X.
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <hasard>         // tire un nombre au hasard
+#include <cacher>         // cache un lutin
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <teindreLutin>   // met un lutin dans une palette
+#include <couleurLutin>   // choisit une couleur d’une palette des lutins
+#include <poser>          // pose une tuile sur une case du fond
+#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+#include <chaque>         // répond 1 toutes les n millisecondes
+#include <bouton>         // lit un bouton de la manette
+#include <lire>           // lit la tuile posée sur une case
+#include <effacer>        // efface des cases, ou tout le fond
+#include <texte>          // écrit un texte à l’écran
+#include <reste>          // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
+uint8_t ax = 2;              // le A : sa colonne…
+uint8_t ay = 8;              // …et sa ligne
+uint8_t dx = 1;              // le sens où regarde le A
+uint8_t dy = 0;
+uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger
+uint8_t ny = 0;
+uint8_t tx[3];               // les trois tirs : leurs colonnes…
+uint8_t ty[3];               // …leurs lignes…
+uint8_t tdx[3];              // …et leurs sens
+uint8_t tdy[3];
+uint8_t vole[3];             // vole[i] = 1 : le tir n° i est en vol
+uint8_t lance = 0;
+
+// ---- NOUVEAU : le dessin d'une étincelle, 2 × 2 pixels au milieu ----
+// 0 : transparent (on voit le décor derrière). 1 et 2 : deux couleurs,
+// réglées plus bas avec couleurLutin().
+Tuile ETINCELLE = {
+  "00000000",
+  "00000000",
+  "00000000",
+  "00012000",
+  "00021000",
+  "00000000",
+  "00000000",
+  "00000000",
+};
+
+// ---- NOUVEAU : six étincelles, rangées dans des tableaux ----
+uint8_t px[6];               // leur place, en PIXELS (et non en cases)
+uint8_t py[6];
+uint8_t vie[6];              // les images qu'il leur reste à briller (0 : éteinte)
+
+// ---- NOUVEAU : leurs six directions, gravées dans la cartouche ----
+// De combien de pixels chacune avance à chaque image. 255, c'est -1
+// (un uint8_t fait le tour, le 0.100) :
+//   0 : à droite, un peu en haut     3 : à gauche, un peu en bas
+//   1 : à droite, un peu en bas      4 : tout droit en haut
+//   2 : à gauche, un peu en haut     5 : tout droit en bas
+const uint8_t PDX[] = {   1,   1, 255, 255,   0,   0 };
+const uint8_t PDY[] = { 255,   1, 255,   1, 255,   1 };
+
+// ---- NOUVEAU : un éclat, au centre de la case (c, l) ----
+// Une case fait 8 pixels : la case (c, l) commence au pixel (c × 8, l × 8).
+void eclat(uint8_t c, uint8_t l) {
+  for (uint8_t i = 0; i < 6; i++) {
+    px[i] = c * 8;
+    py[i] = l * 8;
+    vie[i] = 6 + hasard() % 6;       // de 6 à 11 images : un instant
+  }
+}
+
+// ---- NOUVEAU : faire vivre les étincelles, une image de plus ----
+void etinceler() {
+  for (uint8_t i = 0; i < 6; i++) {
+    if (vie[i] > 0) {
+      vie[i] = vie[i] - 1;
+      if (vie[i] == 0) {
+        cacher(i);                   // plus de vie : le lutin i disparaît
+      } else {
+        px[i] = px[i] + PDX[i];      // elle file dans SA direction…
+        py[i] = py[i] + PDY[i];
+        sprite(i, px[i], py[i], ETINCELLE);
+        // …et scintille : toutes les 2 images, elle passe d'une palette à
+        // l'autre (0 : jaune au milieu, 1 : orange). Après sprite(), qui
+        // remet la palette à 0.
+        teindreLutin(i, ((images() + i) / 2) % 2);
+      }
+    }
+  }
+}
+
+int main() {
+  // ---- NOUVEAU : les deux palettes des étincelles (couleurs de 0 à 31) ----
+  couleurLutin(0, 1, 31, 31,  6);    // palette 0 : jaune…
+  couleurLutin(0, 2, 31, 16,  0);    // …et orange
+  couleurLutin(1, 1, 31, 16,  0);    // palette 1 : orange…
+  couleurLutin(1, 2, 31, 31,  6);    // …et jaune : les mêmes, échangées
+
+  for (uint8_t l = 4; l < 13; l++) {   // le mur : 9 X en colonne 12 (le 0.101)
+    poser(12, l, ALPHABET[23]);
+  }
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge et retient où il regarde ----
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;
+        dy = 0;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;
+        dy = -1;
+      }
+      if (nx < 20 && ny < 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- le bouton A lance un tir, au plus toutes les 250 ms ----
+    if (chaque(250)) {
+      if (bouton(A)) {
+        nx = ax + dx;
+        ny = ay + dy;
+        // la case de départ doit être dans l'écran ET vide (le 0.101)
+        if (nx < 20 && ny < 17 && lire(nx, ny) == 0) {
+          lance = 0;
+          for (uint8_t i = 0; i < 3; i++) {
+            if (lance == 0 && vole[i] == 0) {
+              vole[i] = 1;
+              tx[i] = nx;
+              ty[i] = ny;
+              tdx[i] = dx;
+              tdy[i] = dy;
+              texte(tx[i], ty[i], ".");
+              lance = 1;
+            }
+          }
+        }
+      }
+    }
+
+    // ---- chaque tir avance, et regarde sa case d'arrivée (le 0.105) ----
+    if (chaque(100)) {
+      for (uint8_t i = 0; i < 3; i++) {
+        if (vole[i] == 1) {
+          nx = tx[i] + tdx[i];
+          ny = ty[i] + tdy[i];
+          effacer(tx[i], ty[i], 1);
+          if (nx >= 20 || ny >= 17) {
+            vole[i] = 0;             // 1. hors de l'écran
+          } else if (lire(nx, ny) == ALPHABET[23]) {
+            effacer(nx, ny, 1);      // 2. un X : le tir casse CE X-là, et lui seul…
+            vole[i] = 0;             //    …disparaît…
+            eclat(nx, ny);           //    …et NOUVEAU : un éclat jaillit du choc
+          } else if (lire(nx, ny) != 0) {
+            vole[i] = 0;             // 3. un autre tir : il s'écrase
+          } else {
+            tx[i] = nx;              // 4. une case vide : il y va
+            ty[i] = ny;
+            texte(tx[i], ty[i], ".");
+          }
+        }
+      }
+    }
+
+    // ---- NOUVEAU : les étincelles vivent, une image après l'autre ----
+    etinceler();
+  }
+}
+`,
+    aVoir: 'Chaque point de la rafale casse le X qu’il touche en face, et lui seul ; au choc, un petit éclat jaune et orange jaillit du trou, scintille un instant, puis disparaît.',
+    controle: (c) => {
+      const teinte = (x, y) => { const k = c.gb.ppu.couleurs[y * 160 + x]; return `${k & 31}/${k >> 5 & 31}/${k >> 10 & 31}` }
+      const couleurs = () => { const vus = new Set(); for (let y = 0; y < 144; y++) for (let x = 0; x < 160; x++) vus.add(teinte(x, y)); return vus }
+      c.avancer(5)
+      const avant = couleurs()
+      c.gb.setButton('a', true)
+      let t = 0
+      while (t < 40 && !c.mot(3, 8, 9).includes('.')) { c.avancer(1); t++ }
+      c.gb.setButton('a', false)
+      t = 0
+      while (t < 200 && c.mot(12, 8, 1) === 'X') { c.avancer(1); t++ }
+      c.avancer(3)
+      const vus = couleurs()
+      const pres = [0, 1, 2, 3, 4, 5].every((i) => Math.abs(c.lutin(i).x - 96) <= 8 && Math.abs(c.lutin(i).y - 64) <= 8)
+      const seul = c.mot(12, 8, 1) === ' ' && [4, 5, 6, 7, 9, 10, 11, 12].every((l) => c.mot(12, l, 1) === 'X')
+      c.avancer(20)
+      const apres = couleurs()
+      return [
+        ['avant le choc : ni jaune ni orange', !avant.has('31/31/6') && !avant.has('31/16/0')],
+        ['le tir casse un seul X, celui d’en face (12, 8) ; les autres restent', seul],
+        ['au choc, un éclat jaune et orange, tout près du trou', vus.has('31/31/6') && vus.has('31/16/0') && pres],
+        ['un instant plus tard, il a disparu', !apres.has('31/31/6') && !apres.has('31/16/0')],
+      ]
+    },
+  },
+
+  /*
+   * Partie L : les fonctions de la console, une par une.
+   *
+   * Une leçon par « #include ». Chacune montre UNE fonction, seule ou presque,
+   * dans le plus petit programme qui la fait voir à l'écran : la ligne à
+   * inclure, ses arguments un par un, ce qu'elle coûte dans la cartouche, et
+   * un essai à faire. Les octets annoncés sont MESURÉS : la fonction appelée
+   * une fois, dans un programme vide (80 octets de code), compilé par ce
+   * compilateur — l'écran mis en place compris, quand elle écrit à l'écran.
+   */
+  {
+    titre: 'La fonction texte() — écrire un mot',
+    difficulte: 0,
+    partie: 'Les fonctions de la console, une par une',
+    idee: '#include <texte>, puis texte(colonne, ligne, "MOT") : le mot s’écrit à cette place, une lettre par case.',
+    texte: [
+      '**Cette partie est un dictionnaire.** Chaque leçon montre **une** fonction de la console : la ligne `#include` qui la rend disponible, ses arguments, ce qu’elle coûte, et un essai. Aucune fonction de la console n’est là d’office : on l’inclut par son nom, écrit exactement comme dans le programme.',
+      '**Ce qu’elle fait :** `texte(colonne, ligne, "MOT")` écrit des lettres à l’écran, une par case, de gauche à droite. L’écran fait **20 colonnes** (0 à 19) et **18 lignes** (0 à 17).',
+      '**La ligne à écrire : `#include <texte>`.** Sans elle, le compilateur refuse `texte()` et dit quelle ligne écrire.',
+      '**Ses arguments :** la **colonne** de la première lettre, la **ligne**, puis le **texte entre guillemets** : des lettres, des chiffres, des espaces. La colonne et la ligne peuvent être des variables.',
+      '**Ce qu’elle coûte :** environ **150 octets** la première fois (la mise en place de l’écran, la routine qui écrit, les lettres employées), puis une dizaine d’octets par appel.',
+      '**Essaie :** écris ton prénom en (0, 17), tout en bas à gauche.',
+    ],
+    code: `// ---- #include <texte> : écrire un mot ----
+// texte(colonne, ligne, "MOT") écrit le mot à cette place, une lettre par case.
+
+#include <texte>   // texte() : sans cette ligne, le compilateur la refuse
+
+int main() {
+  texte(4, 8, "BONJOUR");   // colonne 4, ligne 8 : B en (4, 8), O en (5, 8)…
+  texte(0, 0, "EN HAUT");   // la case (0, 0) est en haut à gauche
+
+  while (true) {            // la boucle du jeu : rien d'autre à faire
+    image();                // image() est native : elle ne s'inclut pas
+  }
+}
+`,
+    aVoir: 'BONJOUR au milieu de l’écran, EN HAUT dans le coin en haut à gauche.',
+    controle: (c) => [
+      ['BONJOUR est en (4, 8)', c.mot(4, 8, 7) === 'BONJOUR', ` (« ${c.mot(4, 8, 7)} »)`],
+      ['EN HAUT est en (0, 0)', c.mot(0, 0, 7) === 'EN HAUT'],
+    ],
+  },
+
+  {
+    titre: 'La fonction textS() — un texte qui passe à la ligne',
+    difficulte: 0,
+    idee: '#include <textS> : comme texte(), mais arrivé au bord droit, la suite repart en colonne 0 de la ligne d’en dessous.',
+    texte: [
+      '**Ce qu’elle fait :** `textS(colonne, ligne, "TEXTE")` écrit comme `texte()`, mais **ne s’arrête pas au bord** : après la colonne 19, la lettre suivante va en colonne 0 de la ligne d’en dessous. Après la ligne 17, elle remonte en haut.',
+      '**La ligne à écrire : `#include <textS>`.**',
+      '**Ses arguments :** les mêmes que `texte()` : colonne, ligne, texte entre guillemets.',
+      '**Ce qu’elle coûte :** environ **250 octets** la première fois : elle calcule la case de chaque lettre pendant le jeu.',
+      '**Essaie :** `textS(0, 0, "...")` avec un texte de 45 lettres : il remplit deux lignes et demie.',
+    ],
+    code: `// ---- #include <textS> : un texte qui passe à la ligne ----
+// BONJOUR commence en colonne 15 : B O N J O tiennent jusqu'à la colonne 19,
+// puis U et R repartent en colonne 0, une ligne plus bas.
+
+#include <textS>   // textS() : le texte qui va à la ligne tout seul
+
+int main() {
+  textS(15, 8, "BONJOUR");   // BONJO en (15..19, 8), puis UR en (0..1, 9)
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'BONJO tout à droite de la ligne 8, et UR au début de la ligne 9.',
+    controle: (c) => [
+      ['BONJO tient jusqu’au bord droit', c.mot(15, 8, 5) === 'BONJO'],
+      ['UR repart en colonne 0, une ligne plus bas', c.mot(0, 9, 2) === 'UR', ` (« ${c.mot(0, 9, 2)} »)`],
+    ],
+  },
+
+  {
+    titre: 'La fonction texteGrand() — un texte agrandi',
+    difficulte: 0,
+    idee: '#include <texteGrand> : texteGrand(colonne, ligne, "A", 3) écrit un A trois fois plus grand, sans rien dessiner.',
+    texte: [
+      '**Ce qu’elle fait :** `texteGrand(colonne, ligne, "TEXTE", taille)` écrit un texte **agrandi** de 1 à 20 fois. Chaque pixel de la lettre devient un carré de `taille × taille` pixels : une lettre prend `taille × taille` cases.',
+      '**La ligne à écrire : `#include <texteGrand>`.**',
+      '**Ses arguments :** la colonne et la ligne du coin en haut à gauche, le texte entre guillemets, la taille. Le texte et la taille **s’écrivent en clair** : le compilateur fabrique les tuiles agrandies avant le jeu.',
+      '**Ce qu’elle coûte :** environ **950 octets** pour un A en taille 2 : les tuiles agrandies, la petite fonction qui les pose, et la police.',
+      '**Essaie :** `texteGrand(0, 0, "GO", 5);` : deux lettres de 5 × 5 cases.',
+    ],
+    code: `// ---- #include <texteGrand> : un texte agrandi ----
+// Un A trois fois plus grand : 3 × 3 cases, à partir de la case (2, 2).
+
+#include <texteGrand>   // texteGrand() : les lettres agrandies
+
+int main() {
+  texteGrand(2, 2, "A", 3);   // colonne 2, ligne 2, le texte, la taille
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un grand A, trois cases de large et trois de haut, en haut à gauche.',
+    controle: (c) => {
+      let pleines = 0
+      for (let l = 2; l < 5; l++) for (let k = 2; k < 5; k++) if (c.lire(k, l) !== 0) pleines++
+      return [
+        ['des cases sont dessinées dans le carré de 3 × 3', pleines >= 5, ` (${pleines} sur 9)`],
+        ['rien à côté du carré', c.lire(6, 2) === 0 && c.lire(2, 6) === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction texteGrandS() — un grand texte qui va à la ligne',
+    difficulte: 0,
+    idee: '#include <texteGrandS> : comme texteGrand(), mais les lettres qui ne tiennent plus repartent à gauche, une rangée de lettres plus bas.',
+    texte: [
+      '**Ce qu’elle fait :** `texteGrandS(colonne, ligne, "TEXTE", taille)` écrit un texte agrandi qui **va à la ligne** : une lettre qui dépasserait la colonne 19 repart en colonne 0, `taille` cases plus bas.',
+      '**La ligne à écrire : `#include <texteGrandS>`.**',
+      '**Ses arguments :** comme `texteGrand()`, et **tout en clair** — la place aussi : le découpage en lignes se fait avant le jeu. Un texte qui dépasserait le bas de l’écran est refusé.',
+      '**Ce qu’elle coûte :** environ **1 000 octets** pour deux lettres en taille 2.',
+      '**Essaie :** `texteGrandS(0, 0, "BONJOUR", 4);` : combien de lignes ?',
+    ],
+    code: `// ---- #include <texteGrandS> : un grand texte qui va à la ligne ----
+// En taille 3, une lettre prend 3 colonnes : 6 lettres tiennent sur 20 cases.
+// La septième, G, repart en colonne 0, trois cases plus bas.
+
+#include <texteGrandS>   // texteGrandS() : agrandi, et qui va à la ligne
+
+int main() {
+  texteGrandS(0, 0, "ABCDEFG", 3);   // ABCDEF sur les lignes 0 à 2, G en (0, 3)
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'ABCDEF en grand sur toute la largeur, et G dessous, à gauche.',
+    controle: (c) => {
+      let g = 0
+      for (let l = 3; l < 6; l++) for (let k = 0; k < 3; k++) if (c.lire(k, l) !== 0) g++
+      return [
+        ['la première rangée de lettres est dessinée', c.lire(0, 0) !== 0 || c.lire(1, 0) !== 0 || c.lire(1, 1) !== 0],
+        ['G est repartie en colonne 0, trois cases plus bas', g >= 4, ` (${g} cases)`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction texteCouleur() — un mot en couleur',
+    difficulte: 0,
+    idee: '#include <texteCouleur> : texteCouleur(colonne, ligne, "MOT", palette) écrit le mot et le met dans une palette de couleur (Game Boy Color).',
+    texte: [
+      '**Ce qu’elle fait :** `texteCouleur(colonne, ligne, "MOT", palette)` écrit le mot **et** met chacune de ses cases dans la **palette** donnée (0 à 7). Sur une Game Boy Color, le mot prend les couleurs de cette palette.',
+      '**La ligne à écrire : `#include <texteCouleur>`.** Ici il faut aussi `#include <couleurFond>` : c’est elle qui choisit la couleur de la palette 1.',
+      '**Ses arguments :** la colonne, la ligne, le mot entre guillemets, le numéro de palette.',
+      '**Comment c’est fait :** la ligne devient un `texte()`, puis un `teindre()` par lettre. Une lettre de la police est dessinée dans la **teinte 3** : c’est la teinte 3 de la palette 1 qu’on rend rouge.',
+      '**Ce qu’elle coûte :** environ **150 octets** pour un mot de cinq lettres, sur une Game Boy Color.',
+      '**Essaie :** mets un deuxième mot dans la palette 2, en bleu : `couleurFond(2, 3, 0, 0, 31);`.',
+    ],
+    code: `// ---- #include <texteCouleur> : un mot en couleur ----
+// La palette 1 reçoit du rouge dans sa teinte 3 (celle des lettres),
+// puis ROUGE s'écrit dans la palette 1.
+
+#include <couleurFond>     // couleurFond() : choisir une couleur d'une palette
+#include <texteCouleur>    // texteCouleur() : écrire un mot dans une palette
+#include <texte>           // texte() : pour le mot NORMAL
+
+int main() {
+  couleurFond(1, 3, 31, 0, 0);       // palette 1, teinte 3 : rouge 31, vert 0, bleu 0
+  texteCouleur(5, 8, "ROUGE", 1);    // le mot, et ses cases dans la palette 1
+  texte(5, 10, "NORMAL");            // un texte ordinaire : la palette 0
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'ROUGE écrit en rouge, et NORMAL en dessous, dans la couleur des lettres d’origine.',
+    controle: (c) => {
+      const paletteDe = (colonne, ligne) => c.gb.ppu.vram[0x2000 + 0x1800 + ligne * 32 + colonne] & 7
+      return [
+        ['la cartouche tourne en couleur', c.gb.ppu.couleur === true],
+        ['ROUGE est écrit en (5, 8)', c.mot(5, 8, 5) === 'ROUGE'],
+        ['ses cases sont dans la palette 1', [5, 6, 7, 8, 9].every((k) => paletteDe(k, 8) === 1)],
+        ['NORMAL reste dans la palette 0', paletteDe(5, 10) === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction nombre() — écrire un nombre',
+    difficulte: 0,
+    idee: '#include <nombre> : nombre(colonne, ligne, valeur) écrit la valeur d’une variable en chiffres, sur trois chiffres.',
+    texte: [
+      '**Ce qu’elle fait :** `nombre(colonne, ligne, valeur)` écrit un **nombre calculé** en chiffres : la valeur d’une variable, un calcul. Trois chiffres par défaut : 42 s’écrit **042**.',
+      '**La ligne à écrire : `#include <nombre>`.**',
+      '**Ses arguments :** la colonne, la ligne, la valeur ; un **quatrième**, facultatif, dit combien de chiffres (1, 2 ou 3).',
+      '**Ce qu’elle coûte :** environ **320 octets** la première fois : la routine qui découpe un nombre en chiffres, et les dix chiffres de la police.',
+      '**Essaie :** `nombre(4, 10, score, 2);` : deux chiffres seulement.',
+    ],
+    code: `// ---- #include <nombre> : écrire un nombre ----
+
+#include <nombre>   // nombre() : une valeur, en chiffres
+
+uint8_t score = 42;   // une variable : sa valeur se lit pendant le jeu
+
+int main() {
+  nombre(4, 8, score);        // 042 : trois chiffres, des zéros devant
+  nombre(4, 10, score, 2);    // 42 : deux chiffres demandés
+  nombre(4, 12, score + 8);   // un calcul aussi : 050
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: '042, puis 42, puis 050, les uns sous les autres.',
+    controle: (c) => [
+      ['042 en (4, 8)', c.mot(4, 8, 3) === '042', ` (« ${c.mot(4, 8, 3)} »)`],
+      ['42 sur deux chiffres', c.mot(4, 10, 2) === '42'],
+      ['le calcul : 050', c.mot(4, 12, 3) === '050'],
+    ],
+  },
+
+  {
+    titre: 'La fonction effacer() — effacer des cases',
+    difficulte: 0,
+    idee: '#include <effacer> : effacer(colonne, ligne, quoi) vide des cases ; effacer() sans rien vide tout l’écran.',
+    texte: [
+      '**Ce qu’elle fait :** `effacer(colonne, ligne, quoi)` remet des cases **à vide**. « quoi » dit combien : un **nombre de cases**, ou le **texte lui-même** — `effacer(4, 8, "BON")` efface trois cases, le compilateur compte les lettres. Sans argument, `effacer()` vide **tout** l’écran.',
+      '**La ligne à écrire : `#include <effacer>`.**',
+      '**Ses arguments :** la colonne, la ligne, puis le nombre de cases ou le texte.',
+      '**Ce qu’elle coûte :** environ **120 octets** la première fois.',
+      '**Essaie :** remplace `3` par `"BONJ"` : quatre cases partent.',
+    ],
+    code: `// ---- #include <effacer> : effacer des cases ----
+// On écrit BONJOUR, puis on efface ses trois premières cases : il reste JOUR.
+
+#include <texte>     // pour écrire d'abord le mot
+#include <effacer>   // effacer() : remettre des cases à vide
+
+int main() {
+  texte(4, 8, "BONJOUR");
+  effacer(4, 8, 3);         // trois cases à partir de (4, 8) : B, O et N
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Trois cases vides, puis JOUR.',
+    controle: (c) => [
+      ['les trois premières cases sont vides', c.mot(4, 8, 3) === '   '],
+      ['JOUR reste', c.mot(7, 8, 4) === 'JOUR', ` (« ${c.mot(4, 8, 7)} »)`],
+    ],
+  },
+
+  {
+    titre: 'La fonction poser() — poser une tuile',
+    difficulte: 0,
+    idee: '#include <poser> : poser(colonne, ligne, tuile) pose une seule tuile — une lettre, un dessin — dans une case.',
+    texte: [
+      '**Ce qu’elle fait :** `poser(colonne, ligne, tuile)` pose **une tuile** dans une case : une lettre de la police, un dessin à toi, ou un numéro.',
+      '**La ligne à écrire : `#include <poser>`.** Une seule ligne : ici, la tuile se donne par son **numéro**. Les lettres de la police sont rangées dans l’ordre : la tuile **1** est le A, la **2** le B… la **26** le Z. L’étape suivante, `ALPHABET`, donne un nom à ces numéros.',
+      '**Ses arguments :** la colonne, la ligne, la tuile. Les trois peuvent se calculer.',
+      '**Ce qu’elle coûte :** environ **120 octets** la première fois (l’écran mis en place, et la lettre), puis une dizaine par appel.',
+      '**Essaie :** pose un B (la tuile 2) dans chaque coin de l’écran.',
+    ],
+    code: `// ---- #include <poser> : poser une tuile ----
+
+#include <poser>      // poser() : une tuile dans une case
+
+int main() {
+  poser(9, 8, 1);      // la tuile numéro 1 : le A, au milieu
+  poser(0, 0, 26);     // la tuile numéro 26 : le Z, en haut à gauche
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A au milieu, un Z en haut à gauche.',
+    controle: (c) => [
+      ['le A est en (9, 8)', c.mot(9, 8, 1) === 'A'],
+      ['le Z est en (0, 0)', c.mot(0, 0, 1) === 'Z'],
+    ],
+  },
+
+  {
+    titre: 'La fonction poserS() — poser, et passer à la ligne',
+    difficulte: 0,
+    idee: '#include <poserS> : comme poser(), mais la colonne 20 devient la colonne 0 de la ligne suivante.',
+    texte: [
+      '**Ce qu’elle fait :** `poserS(colonne, ligne, tuile)` pose comme `poser()`, mais une colonne **au-delà de 19** repart en colonne 0, une ligne plus bas. Avec une boucle, tout l’alphabet tient sans calcul de `% 20`.',
+      '**La ligne à écrire : `#include <poserS>`.**',
+      '**Ses arguments :** colonne, ligne, tuile, comme `poser()`.',
+      '**Ce qu’elle coûte :** environ **180 octets** la première fois.',
+      '**Essaie :** commence en colonne 10 : où tombe le Z ?',
+    ],
+    code: `// ---- #include <poserS> : poser, et passer à la ligne ----
+// Les 26 lettres, de la colonne 0 à la colonne 25 : les colonnes 20 à 25
+// repartent en (0 à 5) sur la ligne d'en dessous.
+
+#include <poserS>     // poserS() : poser, et aller à la ligne au bord
+#include <ALPHABET>   // ALPHABET[i] : la lettre numéro i
+
+int main() {
+  for (uint8_t i = 0; i < 26; i++) {
+    poserS(i, 4, ALPHABET[i]);   // i va de 0 à 25 : U V W X Y Z vont ligne 5
+  }
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'A à T sur la ligne 4, U à Z au début de la ligne 5.',
+    controle: (c) => [
+      ['A à T sur la ligne 4', c.mot(0, 4, 20) === 'ABCDEFGHIJKLMNOPQRST'],
+      ['U à Z repartent en colonne 0, ligne 5', c.mot(0, 5, 6) === 'UVWXYZ', ` (« ${c.mot(0, 5, 6)} »)`],
+    ],
+  },
+
+  {
+    titre: 'La fonction lire() — lire une case',
+    difficulte: 0,
+    idee: '#include <lire> : lire(colonne, ligne) rend la tuile posée dans cette case — de quoi savoir si elle est libre.',
+    texte: [
+      '**Ce qu’elle fait :** `lire(colonne, ligne)` rend le **numéro de la tuile** affichée dans cette case. Une case vide rend **0**. C’est ainsi qu’un jeu sait s’il y a un mur devant le joueur, sans tenir un tableau à côté.',
+      '**La ligne à écrire : `#include <lire>`.**',
+      '**Ses arguments :** la colonne et la ligne.',
+      '**Ce qu’elle coûte :** environ **90 octets** la première fois.',
+      '**Essaie :** lis la case (4, 3), qui est vide : `t` vaut 0, et le programme écrit NON.',
+    ],
+    code: `// ---- #include <lire> : lire une case ----
+
+#include <poser>
+#include <ALPHABET>
+#include <texte>
+#include <lire>       // lire() : la tuile d'une case
+
+uint8_t t = 0;
+
+int main() {
+  poser(3, 3, ALPHABET[0]);    // un A en (3, 3)
+  t = lire(3, 3);              // t reçoit le numéro de la tuile : 1, celui du A
+
+  if (t == ALPHABET[0]) {      // est-ce un A ?
+    texte(3, 5, "OUI");
+  } else {
+    texte(3, 5, "NON");
+  }
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A, et OUI en dessous : la case lue porte bien un A.',
+    controle: (c) => [
+      ['t vaut 1, le numéro du A', c.variable('t') === 1, ` (${c.variable('t')})`],
+      ['le programme a écrit OUI', c.mot(3, 5, 3) === 'OUI'],
+    ],
+  },
+
+  {
+    titre: 'La fonction changerDessin() — redessiner une tuile partout',
+    difficulte: 0,
+    idee: '#include <changerDessin> : changerDessin(tuile, dessin) change le dessin d’une tuile, et toutes les cases qui la portent changent d’un coup.',
+    texte: [
+      '**Ce qu’elle fait :** `changerDessin(tuile, dessin)` remplace le **dessin** d’une tuile dans la mémoire vidéo. Toutes les cases qui portent cette tuile changent **en même temps**, sans en poser une seule : c’est ainsi qu’on anime l’eau, le feu, l’herbe.',
+      '**La ligne à écrire : `#include <changerDessin>`.** Ici aussi `<Tuile>` : on dessine deux tuiles.',
+      '**Ses arguments :** la tuile à changer, puis le dessin à lui donner.',
+      '**Ce qu’elle coûte :** environ **830 octets** : elle lit les dessins à leur place dans la cartouche, et le compilateur grave la police entière.',
+      '**Essaie :** `changerDessin(EAU, EAU);` rend le dessin d’origine.',
+    ],
+    code: `// ---- #include <changerDessin> : redessiner une tuile partout ----
+// Trois cases d'EAU. Toutes les 30 images, la tuile EAU prend le dessin
+// VAGUE, puis le sien : les trois cases bougent ensemble.
+
+#include <Tuile>          // pour dessiner des tuiles
+#include <poser>
+#include <changerDessin>  // changerDessin() : un autre dessin pour une tuile
+
+Tuile EAU = {
+  "........", "........", "..##....", ".#..#..#",
+  "#....##.", "........", "........", "........",
+};
+Tuile VAGUE = {
+  "........", "........", "....##..", "#..#..#.",
+  ".##....#", "........", "........", "........",
+};
+
+uint8_t vague = 0;   // 1 : la tuile EAU porte le dessin VAGUE
+
+int main() {
+  poser(4, 8, EAU);
+  poser(5, 8, EAU);
+  poser(6, 8, EAU);
+
+  while (true) {
+    image();
+    if (images() == 30 || images() == 90 || images() == 150) {   // de temps en temps
+      if (vague == 0) {
+        changerDessin(EAU, VAGUE);   // les trois cases d'un coup
+        vague = 1;
+      } else {
+        changerDessin(EAU, EAU);     // le dessin d'origine
+        vague = 0;
+      }
+    }
+  }
+}
+`,
+    aVoir: 'Trois vagues qui changent de forme ensemble, de temps en temps.',
+    controle: (c) => {
+      const tuile = c.lire(4, 8)
+      const dessin = () => Array.from({ length: 16 }, (_, i) => c.gb.ppu.vram[tuile * 16 + i]).join(',')
+      const avant = dessin()
+      c.avancer(60)
+      const apres = dessin()
+      return [
+        ['les trois cases portent la même tuile', tuile !== 0 && c.lire(5, 8) === tuile && c.lire(6, 8) === tuile],
+        ['le dessin de la tuile a changé', avant !== apres],
+        ['et les cases n’ont pas été reposées : même tuile', c.lire(4, 8) === tuile],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction defiler() — faire glisser le fond',
+    difficulte: 0,
+    idee: '#include <defiler> : defiler(x, y) décale tout le fond de x pixels vers la gauche et y vers le haut.',
+    texte: [
+      '**Ce qu’elle fait :** `defiler(x, y)` fait **glisser tout le fond** : l’écran montre la carte à partir du pixel (x, y). La carte fait 256 pixels de côté et **revient toute seule** au début.',
+      '**La ligne à écrire : `#include <defiler>`.**',
+      '**Ses arguments :** le décalage en pixels, en x puis en y.',
+      '**Ce qu’elle coûte :** environ **75 octets**, avec la mise en place de l’écran. L’appel seul : quatre octets.',
+      '**Essaie :** fais grandir `y` au lieu de `x` : le mot monte.',
+    ],
+    code: `// ---- #include <defiler> : faire glisser le fond ----
+// À chaque image, x grandit d'un pixel : tout le fond glisse vers la gauche,
+// jusqu'à 60 pixels (7 cases et demie), puis s'arrête.
+
+#include <texte>
+#include <defiler>   // defiler() : décaler tout le fond
+
+uint8_t x = 0;
+
+int main() {
+  texte(8, 8, "GLISSE");
+
+  while (true) {
+    image();
+    if (x < 60) {
+      x = x + 1;      // un pixel de plus
+    }
+    defiler(x, 0);    // le fond se décale de x pixels
+  }
+}
+`,
+    aVoir: 'Le mot GLISSE glisse vers la gauche, puis s’arrête.',
+    controle: (c) => {
+      const avant = c.defilement()
+      c.avancer(10)
+      const apres = c.defilement()
+      return [
+        ['le fond est décalé', avant !== 0 || apres !== 0, ` (${avant} puis ${apres})`],
+        ['et il avance d’un pixel par image', ((apres - avant) & 255) === 10, ` (+${(apres - avant) & 255})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction ecran() — éteindre et rallumer l’écran',
+    difficulte: 0,
+    idee: '#include <ecran> : ecran(0) éteint l’écran, ecran(1) le rallume — le temps de dessiner beaucoup d’un coup.',
+    texte: [
+      '**Ce qu’elle fait :** `ecran(0)` **éteint** l’écran, `ecran(1)` le **rallume**. Écran éteint, on peut écrire dans toutes les cases sans attendre : c’est le moment d’un gros dessin, comme tout un niveau.',
+      '**La ligne à écrire : `#include <ecran>`.**',
+      '**Son argument :** 0 ou 1, écrit en clair.',
+      '**Ce qu’elle coûte :** environ **90 octets** avec la mise en place de l’écran ; un appel seul, quatre octets.',
+      '**Essaie :** enlève `ecran(1)` : l’écran reste blanc, le programme continue pourtant.',
+    ],
+    code: `// ---- #include <ecran> : éteindre et rallumer l'écran ----
+// Écran éteint, on remplit trois lignes d'un coup, puis on le rallume.
+
+#include <ecran>      // ecran() : éteindre (0), rallumer (1)
+#include <poserS>
+#include <ALPHABET>
+
+int main() {
+  ecran(0);                          // éteint : on écrit sans attendre
+  for (uint8_t i = 0; i < 60; i++) {
+    poserS(i, 4, ALPHABET[0]);       // 60 A : trois lignes pleines
+  }
+  ecran(1);                          // rallumé : tout apparaît d'un coup
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Trois lignes pleines de A, apparues d’un seul coup.',
+    controle: (c) => [
+      ['l’écran est rallumé', c.ecranAllume()],
+      ['les trois lignes sont pleines', c.mot(0, 4, 20) === 'A'.repeat(20) && c.mot(0, 6, 20) === 'A'.repeat(20)],
+    ],
+  },
+
+  {
+    titre: 'La fonction panneau() — montrer le panneau',
+    difficulte: 0,
+    idee: '#include <panneau> : panneau(x, y) allume le panneau, une seconde couche qui ne défile pas, et le place en pixels.',
+    texte: [
+      '**Ce qu’elle fait :** le **panneau** est une seconde couche, **par-dessus** le fond, qui ne défile pas avec lui : le bon endroit pour un score, des vies, un dialogue. `panneau(x, y)` l’**allume** et place son coin en haut à gauche en (x, y), en pixels.',
+      '**La ligne à écrire : `#include <panneau>`.** Une seule ligne : on ne l’écrit pas encore (c’est `textePanneau()`, juste après). Vide, il se voit quand même : il **cache** le fond qu’il recouvre.',
+      '**Ses arguments :** x de 0 à 159, y de 0 à 143, en pixels. `panneau(0, 128)` : une bande de deux lignes, tout en bas.',
+      '**Ce qu’elle coûte :** environ **85 octets**, avec la mise en place de l’écran.',
+      '**Essaie :** `panneau(0, 72);` : le panneau couvre la moitié basse de l’écran.',
+    ],
+    code: `// ---- #include <panneau> : montrer le panneau ----
+// Deux textes sur le fond, dont un tout en bas. Le panneau, vide, se pose
+// sur les deux dernières lignes (y = 128 pixels = 144 - 16) : il les cache.
+
+#include <texte>
+#include <panneau>        // panneau() : l'allumer, et le placer
+
+int main() {
+  texte(2, 6, "LE FOND RESTE");
+  texte(2, 16, "CACHE PAR LE PANNEAU");   // la ligne 16 : sous le panneau
+  panneau(0, 128);                       // son coin en haut à gauche : x = 0, y = 128
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'LE FOND RESTE en haut ; en bas, une bande vide : le panneau, qui cache le texte de la ligne 16.',
+    controle: (c) => [
+      ['le panneau est allumé', (c.gb.mmu.read(0xff40) & 0x20) !== 0],
+      ['il est placé à y = 128', c.gb.mmu.read(0xff4a) === 128, ` (${c.gb.mmu.read(0xff4a)})`],
+      ['le texte du fond est toujours là, dessous', c.mot(2, 16, 5) === 'CACHE'],
+    ],
+  },
+
+  {
+    titre: 'La fonction cacherPanneau() — ôter le panneau',
+    difficulte: 0,
+    idee: '#include <cacherPanneau> : cacherPanneau() ôte le panneau de l’écran, sans rien perdre de ce qui y est écrit.',
+    texte: [
+      '**Ce qu’elle fait :** `cacherPanneau()` **éteint** le panneau. Ce qui y est écrit reste en mémoire : un `panneau(x, y)` le remontre tel quel.',
+      '**La ligne à écrire : `#include <cacherPanneau>`.**',
+      '**Pas d’argument.**',
+      '**Ce qu’elle coûte :** environ **75 octets**, avec la mise en place de l’écran.',
+      '**Essaie :** remontre-le à l’image 240 avec `panneau(0, 128);`.',
+    ],
+    code: `// ---- #include <cacherPanneau> : ôter le panneau ----
+// Le panneau se montre au départ ; à l'image 120 (deux secondes), il part.
+
+#include <textePanneau>
+#include <panneau>
+#include <cacherPanneau>   // cacherPanneau() : l'ôter, sans l'effacer
+
+int main() {
+  textePanneau(1, 0, "MESSAGE");
+  panneau(0, 128);
+
+  while (true) {
+    image();
+    if (images() == 120) {   // images() compte les images depuis l'allumage
+      cacherPanneau();
+    }
+  }
+}
+`,
+    aVoir: 'MESSAGE en bas de l’écran, qui disparaît au bout de deux secondes.',
+    controle: (c) => {
+      const avant = (c.gb.mmu.read(0xff40) & 0x20) !== 0
+      c.avancer(120)
+      return [
+        ['au départ, le panneau est là', avant],
+        ['deux secondes plus tard, il est caché', (c.gb.mmu.read(0xff40) & 0x20) === 0],
+        ['son texte n’est pas effacé', c.gb.mmu.read(0x9c01) !== 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction effacerPanneau() — effacer dans le panneau',
+    difficulte: 0,
+    idee: '#include <effacerPanneau> : effacerPanneau(colonne, ligne, quoi) efface un mot du panneau ; sans argument, tout le panneau.',
+    texte: [
+      '**Ce qu’elle fait :** comme `effacer()`, mais **dans le panneau** : `effacerPanneau(1, 0, "VIES")` vide les quatre cases du mot ; `effacerPanneau()` vide tout le panneau.',
+      '**La ligne à écrire : `#include <effacerPanneau>`.**',
+      '**Ses arguments :** rien, ou la colonne, la ligne, et le texte ou un nombre de cases.',
+      '**Ce qu’elle coûte :** environ **90 octets**, avec la mise en place de l’écran.',
+      '**Essaie :** `effacerPanneau();` : tout part.',
+    ],
+    code: `// ---- #include <effacerPanneau> : effacer dans le panneau ----
+// Le panneau porte SCORE et VIES ; on efface VIES, SCORE reste.
+
+#include <textePanneau>
+#include <panneau>
+#include <effacerPanneau>   // effacerPanneau() : vider des cases du panneau
+
+int main() {
+  textePanneau(1, 0, "SCORE");
+  textePanneau(10, 0, "VIES");
+  panneau(0, 128);
+  effacerPanneau(10, 0, "VIES");   // les quatre cases de VIES, comptées par le compilateur
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Le panneau ne montre plus que SCORE.',
+    controle: (c) => [
+      ['SCORE est toujours là', c.gb.mmu.read(0x9c01) !== 0],
+      ['VIES est effacé', [10, 11, 12, 13].every((k) => c.gb.mmu.read(0x9c00 + k) === 0)],
+    ],
+  },
+
+  {
+    titre: 'La fonction textePanneau() — écrire dans le panneau',
+    difficulte: 0,
+    idee: '#include <textePanneau> : textePanneau(colonne, ligne, "MOT") écrit dans le panneau, comme texte() sur le fond.',
+    texte: [
+      '**Ce qu’elle fait :** `textePanneau(colonne, ligne, "MOT")` écrit **dans le panneau**. Les cases se comptent depuis le coin du panneau, pas depuis celui de l’écran.',
+      '**La ligne à écrire : `#include <textePanneau>`.** Il faut `<panneau>` pour le montrer.',
+      '**Ses arguments :** comme `texte()`.',
+      '**Ce qu’elle coûte :** environ **150 octets** la première fois.',
+      '**Essaie :** écris sur la ligne 1 du panneau : elle tombe sur la dernière ligne de l’écran.',
+    ],
+    code: `// ---- #include <textePanneau> : écrire dans le panneau ----
+// Le fond porte un mot ; le panneau, posé par-dessus en bas, en porte un autre.
+
+#include <texte>
+#include <textePanneau>   // textePanneau() : écrire dans le panneau
+#include <panneau>
+
+int main() {
+  texte(4, 4, "LE FOND");
+  textePanneau(1, 0, "LE PANNEAU");   // (1, 0) : depuis le coin du panneau
+  panneau(0, 128);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'LE FOND en haut, LE PANNEAU dans la bande du bas.',
+    controle: (c) => [
+      ['le fond porte son mot', c.mot(4, 4, 7) === 'LE FOND'],
+      ['le panneau porte le sien, depuis sa case (1, 0)', c.gb.mmu.read(0x9c01) !== 0 && c.gb.mmu.read(0x9c00) === 0],
+      ['le panneau est allumé', (c.gb.mmu.read(0xff40) & 0x20) !== 0],
+    ],
+  },
+
+  {
+    titre: 'La fonction nombrePanneau() — un nombre dans le panneau',
+    difficulte: 0,
+    idee: '#include <nombrePanneau> : nombrePanneau(colonne, ligne, valeur) écrit un nombre dans le panneau, comme nombre() sur le fond.',
+    texte: [
+      '**Ce qu’elle fait :** `nombrePanneau(colonne, ligne, valeur)` écrit un nombre calculé **dans le panneau** : le score qui reste en place quand le décor défile.',
+      '**La ligne à écrire : `#include <nombrePanneau>`.**',
+      '**Ses arguments :** comme `nombre()`, avec le nombre de chiffres en quatrième, facultatif.',
+      '**Ce qu’elle coûte :** environ **320 octets** la première fois.',
+      '**Essaie :** fais monter le score toutes les secondes, et réécris-le.',
+    ],
+    code: `// ---- #include <nombrePanneau> : un nombre dans le panneau ----
+
+#include <textePanneau>
+#include <nombrePanneau>   // nombrePanneau() : une valeur, dans le panneau
+#include <panneau>
+
+uint8_t score = 120;
+
+int main() {
+  textePanneau(1, 0, "SCORE");
+  nombrePanneau(7, 0, score);   // 120, juste après SCORE
+  panneau(0, 128);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'SCORE 120 dans la bande du bas.',
+    controle: (c) => [
+      ['trois chiffres sont écrits après SCORE', [7, 8, 9].every((k) => c.gb.mmu.read(0x9c00 + k) !== 0)],
+      ['1, 2 et 0 : trois chiffres différents', new Set([7, 8, 9].map((k) => c.gb.mmu.read(0x9c00 + k))).size === 3],
+    ],
+  },
+
+  {
+    titre: 'La fonction poserPanneau() — une tuile dans le panneau',
+    difficulte: 0,
+    idee: '#include <poserPanneau> : poserPanneau(colonne, ligne, tuile) pose une tuile dans le panneau.',
+    texte: [
+      '**Ce qu’elle fait :** `poserPanneau(colonne, ligne, tuile)` pose une tuile **dans le panneau** : un cœur par vie, une icône.',
+      '**La ligne à écrire : `#include <poserPanneau>`.**',
+      '**Ses arguments :** comme `poser()`.',
+      '**Ce qu’elle coûte :** environ **120 octets** la première fois.',
+      '**Essaie :** pose trois cœurs avec une boucle `for`.',
+    ],
+    code: `// ---- #include <poserPanneau> : une tuile dans le panneau ----
+
+#include <poserPanneau>   // poserPanneau() : une tuile dans le panneau
+#include <ALPHABET>
+#include <panneau>
+
+int main() {
+  poserPanneau(0, 0, ALPHABET[1]);   // un B dans la première case du panneau
+  panneau(0, 128);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un B tout à gauche de la bande du bas.',
+    controle: (c) => [
+      ['le B (tuile 2) est dans la case (0, 0) du panneau', c.gb.mmu.read(0x9c00) === 2, ` (${c.gb.mmu.read(0x9c00)})`],
+    ],
+  },
+
+  {
+    titre: 'La fonction lirePanneau() — lire une case du panneau',
+    difficulte: 0,
+    idee: '#include <lirePanneau> : lirePanneau(colonne, ligne) rend la tuile posée dans cette case du panneau.',
+    texte: [
+      '**Ce qu’elle fait :** comme `lire()`, mais **dans le panneau** : la tuile d’une de ses cases, 0 si elle est vide.',
+      '**La ligne à écrire : `#include <lirePanneau>`.**',
+      '**Ses arguments :** la colonne et la ligne, depuis le coin du panneau.',
+      '**Ce qu’elle coûte :** environ **90 octets** la première fois.',
+      '**Essaie :** lis la case (5, 0), vide : `t` vaut 0.',
+    ],
+    code: `// ---- #include <lirePanneau> : lire une case du panneau ----
+
+#include <poserPanneau>
+#include <ALPHABET>
+#include <panneau>
+#include <lirePanneau>   // lirePanneau() : la tuile d'une case du panneau
+#include <nombre>
+
+uint8_t t = 0;
+
+int main() {
+  poserPanneau(2, 0, ALPHABET[2]);   // un C : la tuile 3
+  panneau(0, 128);
+  t = lirePanneau(2, 0);             // t reçoit 3
+  nombre(2, 4, t);                   // et on l'écrit sur le fond : 003
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un C dans le panneau, et 003 écrit sur le fond : son numéro.',
+    controle: (c) => [
+      ['t vaut 3, le numéro du C', c.variable('t') === 3, ` (${c.variable('t')})`],
+      ['le fond montre 003', c.mot(2, 4, 3) === '003'],
+    ],
+  },
+
+  {
+    titre: 'ALPHABET — les lettres de la police',
+    difficulte: 0,
+    idee: '#include <ALPHABET> : ALPHABET[0] est le A, ALPHABET[25] le Z — le numéro de la lettre, pour poser(), sprite()…',
+    texte: [
+      '**Ce que c’est :** `ALPHABET` range les lettres de la police dans l’ordre : `ALPHABET[0]` est le **A**, `ALPHABET[1]` le **B**… `ALPHABET[25]` le **Z**. Ce n’est pas un tableau en mémoire : `ALPHABET[i]` se calcule « 1 + i », et ne coûte rien de plus.',
+      '**La ligne à écrire : `#include <ALPHABET>`.**',
+      '**Ce qu’il coûte :** une lettre écrite en clair (`ALPHABET[7]`) grave **16 octets** : son dessin, et rien d’autre. Une lettre **calculée** (`ALPHABET[i]`) peut être n’importe laquelle : la police entière part dans la cartouche, **704 octets**.',
+      '**Essaie :** remplace `ALPHABET[7]` par `ALPHABET[i]` dans une boucle : regarde la ROM grossir de 700 octets.',
+    ],
+    code: `// ---- #include <ALPHABET> : les lettres de la police ----
+// ALPHABET[0] = A, ALPHABET[1] = B, … ALPHABET[25] = Z.
+
+#include <ALPHABET>   // ALPHABET : le numéro de chaque lettre
+#include <poser>
+
+int main() {
+  poser(8, 8, ALPHABET[7]);    // la lettre numéro 7 : H (A=0, B=1, … H=7)
+  poser(9, 8, ALPHABET[8]);    // la lettre numéro 8 : I
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'HI au milieu de l’écran.',
+    controle: (c) => [
+      ['ALPHABET[7] est un H, ALPHABET[8] un I', c.mot(8, 8, 2) === 'HI', ` (« ${c.mot(8, 8, 2)} »)`],
+    ],
+  },
+
+  {
+    titre: 'ALPHABET_GRAS — les lettres en gras',
+    difficulte: 0,
+    idee: '#include <ALPHABET_GRAS> : ALPHABET_GRAS[0] est le A en gras, à côté de l’alphabet ordinaire.',
+    texte: [
+      '**Ce que c’est :** `ALPHABET_GRAS[0]` est un **A en gras**, `ALPHABET_GRAS[25]` un Z en gras. Ce sont 26 tuiles dessinées, ajoutées à côté de la police : l’alphabet ordinaire ne change pas.',
+      '**La ligne à écrire : `#include <ALPHABET_GRAS>`.**',
+      '**Ce qu’il coûte :** **beaucoup**, environ **1 200 octets** dès la première lettre : les 26 dessins et le tableau qui les range partent ensemble, même pour un seul A.',
+      '**Essaie :** pose le A normal à côté du A gras, pour comparer.',
+    ],
+    code: `// ---- #include <ALPHABET_GRAS> : les lettres en gras ----
+
+#include <ALPHABET_GRAS>   // ALPHABET_GRAS : 26 lettres grasses
+#include <ALPHABET>
+#include <poser>
+
+int main() {
+  poser(8, 8, ALPHABET_GRAS[0]);   // le A gras
+  poser(10, 8, ALPHABET[0]);       // le A ordinaire, pour comparer
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A en gras, et un A ordinaire à sa droite.',
+    controle: (c) => [
+      ['une tuile est posée en (8, 8)', c.lire(8, 8) !== 0],
+      ['ce n’est pas le A ordinaire', c.lire(8, 8) !== c.lire(10, 8), ` (${c.lire(8, 8)} et ${c.lire(10, 8)})`],
+      ['le A ordinaire est là', c.mot(10, 8, 1) === 'A'],
+    ],
+  },
+
+  {
+    titre: 'Tuile — dessiner une case',
+    difficulte: 0,
+    idee: '#include <Tuile> : Tuile NOM = { huit rangées de huit pixels }; dessine une case à toi, que poser() pose comme une lettre.',
+    texte: [
+      '**Ce que c’est :** une **Tuile** est le dessin d’une case : 8 rangées de 8 pixels. Chaque pixel s’écrit en **chiffre** (0 le plus clair, 3 le plus foncé) ou en **signe** (`.` `-` `+` `#`).',
+      '**La ligne à écrire : `#include <Tuile>`.** Un dessin écrit sur place, dans un `poser(…, { … })`, la demande aussi.',
+      '**Ce qu’elle coûte :** **16 octets** par tuile : deux octets par rangée.',
+      '**Essaie :** change une rangée en `"########"` : une barre apparaît.',
+    ],
+    code: `// ---- #include <Tuile> : dessiner une case ----
+// Un cœur : # le plus foncé, + moyen, . vide.
+
+#include <Tuile>   // Tuile : un dessin de 8 × 8 pixels
+#include <poser>
+
+Tuile COEUR = {
+  ".##..##.",
+  "#++##++#",
+  "#++++++#",
+  "#++++++#",
+  ".#++++#.",
+  "..#++#..",
+  "...##...",
+  "........",
+};
+
+int main() {
+  poser(9, 8, COEUR);    // le nom de la tuile se pose comme une lettre
+  poser(11, 8, COEUR);   // deux fois : la tuile n'est gravée qu'une fois
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Deux cœurs au milieu de l’écran.',
+    controle: (c) => [
+      ['un cœur en (9, 8)', c.lire(9, 8) !== 0],
+      ['le même en (11, 8) : une seule tuile', c.lire(11, 8) === c.lire(9, 8)],
+    ],
+  },
+
+  {
+    titre: 'Perso — dessiner un personnage de 16 × 16',
+    difficulte: 0,
+    idee: '#include <Perso> : Perso NOM = { seize rangées de seize pixels }; un personnage entier, que sprite16() promène au pixel près.',
+    texte: [
+      '**Ce que c’est :** un **Perso** est un dessin de **16 × 16 pixels** : seize rangées de seize signes. Le compilateur le coupe en quatre tuiles.',
+      '**La ligne à écrire : `#include <Perso>`.** Un Perso écrit ne s’affiche pas tout seul : c’est un dessin rangé, prêt à servir. L’étape suivante, `sprite16()`, le montre à l’écran.',
+      '**Ce qu’il coûte :** **64 octets** de dessin (quatre tuiles) — gravés quand on s’en sert.',
+      '**Essaie :** change une rangée, puis passe à l’étape suivante pour le voir.',
+    ],
+    code: `// ---- #include <Perso> : un personnage de 16 × 16 ----
+
+#include <Perso>      // Perso : un dessin de 16 × 16
+#include <texte>
+
+// Le dessin : seize rangées de seize signes. Il est écrit, pas encore montré.
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+
+int main() {
+  texte(2, 8, "UN PERSO ECRIT");
+  texte(2, 10, "SPRITE16 LE MONTRE");
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'UN PERSO ECRIT : le dessin compile ; l’étape suivante le montre.',
+    controle: (c) => [
+      ['le programme compile avec son Perso', c.mot(2, 8, 14) === 'UN PERSO ECRIT'],
+    ],
+  },
+
+  {
+    titre: 'Mot — un texte et sa place, sous un nom',
+    difficulte: 0,
+    idee: '#include <Mot> : Mot SALUT = { colonne, ligne, "SALUT" }; puis texte(SALUT) l’écrit et effacer(SALUT) l’efface.',
+    texte: [
+      '**Ce que c’est :** un **Mot** range la **colonne**, la **ligne** et le **texte** sous un seul nom. `texte(SALUT)` l’écrit à sa place, `effacer(SALUT)` l’efface exactement — jamais une case de trop.',
+      '**La ligne à écrire : `#include <Mot>`.** Il faut aussi `<texte>` et `<effacer>` pour s’en servir.',
+      '**Ce qu’il coûte :** le texte du mot, gravé une fois, et l’appel de `texte()` — rien n’est rangé en mémoire de travail.',
+      '**Essaie :** déplace le Mot en changeant seulement `{ 6, 8, … }`.',
+    ],
+    code: `// ---- #include <Mot> : un texte et sa place, sous un nom ----
+// SALUT s'écrit au départ, et s'efface à l'image 120.
+
+#include <Mot>       // Mot : colonne, ligne et texte sous un seul nom
+#include <texte>
+#include <effacer>
+
+Mot SALUT = { 6, 8, "SALUT" };   // colonne 6, ligne 8, le texte
+
+int main() {
+  texte(SALUT);                // écrit SALUT en (6, 8)
+
+  while (true) {
+    image();
+    if (images() == 120) {
+      effacer(SALUT);          // efface ses 5 cases, à la bonne place
+    }
+  }
+}
+`,
+    aVoir: 'SALUT au milieu de l’écran, qui disparaît au bout de deux secondes.',
+    controle: (c) => {
+      const avant = c.mot(6, 8, 5)
+      c.avancer(120)
+      return [
+        ['SALUT est écrit en (6, 8)', avant === 'SALUT'],
+        ['puis effacé, à la même place', c.mot(6, 8, 5) === '     '],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction sprite() — un lutin au pixel près',
+    difficulte: 0,
+    idee: '#include <sprite> : sprite(numero, x, y, tuile) place un lutin — une tuile qui bouge pixel par pixel, par-dessus le fond.',
+    texte: [
+      '**Ce qu’elle fait :** un **lutin** est une tuile qui n’est pas sur la grille : il se place au **pixel près**, par-dessus le fond. `sprite(numero, x, y, tuile)` place le lutin `numero` (0 à 39) en (x, y).',
+      '**La ligne à écrire : `#include <sprite>`.**',
+      '**Ses arguments :** le numéro du lutin, x de 0 à 159, y de 0 à 143, la tuile ; un cinquième, facultatif, le retourne (`MIROIR_X`, `MIROIR_Y`).',
+      '**Ce qu’elle coûte :** environ **145 octets** la première fois : les 40 lutins rangés, et leur copie à chaque image.',
+      '**Essaie :** fais-le descendre : `y = y + 1;`.',
+    ],
+    code: `// ---- #include <sprite> : un lutin au pixel près ----
+// Le A avance d'un pixel par image, de gauche à droite.
+
+#include <sprite>     // sprite() : un lutin, au pixel près
+#include <ALPHABET>
+
+uint8_t x = 0;
+
+int main() {
+  while (true) {
+    image();
+    x = x + 1;                          // un pixel de plus à chaque image
+    sprite(0, x, 72, ALPHABET[0]);      // le lutin 0, en (x, 72)
+  }
+}
+`,
+    aVoir: 'Un A qui glisse doucement de gauche à droite, au milieu de l’écran.',
+    controle: (c) => {
+      const avant = c.lutin(0).x
+      c.avancer(10)
+      const apres = c.lutin(0)
+      return [
+        ['le lutin 0 porte le A', apres.tuile === 1],
+        ['il est à la hauteur 72', apres.y === 72],
+        ['il avance d’un pixel par image', ((apres.x - avant) & 255) === 10, ` (+${(apres.x - avant) & 255})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction sprite16() — un personnage de 16 × 16',
+    difficulte: 0,
+    idee: '#include <sprite16> : sprite16(numero, x, y, PERSO) place quatre lutins en carré, d’un appel.',
+    texte: [
+      '**Ce qu’elle fait :** `sprite16(numero, x, y, perso)` place un personnage de **16 × 16** : les lutins `numero` à `numero + 3`, en carré. Le dessin est un `Perso`, ou seize rangées écrites sur place.',
+      '**La ligne à écrire : `#include <sprite16>`.**',
+      '**Ses arguments :** comme `sprite()` ; le numéro du premier des quatre lutins.',
+      '**Ce qu’elle coûte :** environ **270 octets** avec son dessin.',
+      '**Essaie :** un deuxième personnage avec le numéro 4 : les lutins 4 à 7.',
+    ],
+    code: `// ---- #include <sprite16> : un personnage de 16 × 16 ----
+// Un bloc 16 × 16, écrit sur place, qui descend d'un pixel par image.
+
+#include <sprite16>   // sprite16() : quatre lutins en carré
+#include <Perso>      // le dessin de 16 × 16
+
+Perso BLOC = {
+  "################", "#..............#", "#.############.#", "#.#..........#.#",
+  "#.#.########.#.#", "#.#.#......#.#.#", "#.#.#.####.#.#.#", "#.#.#.#..#.#.#.#",
+  "#.#.#.#..#.#.#.#", "#.#.#.####.#.#.#", "#.#.#......#.#.#", "#.#.########.#.#",
+  "#.#..........#.#", "#.############.#", "#..............#", "################",
+};
+
+uint8_t y = 0;
+
+int main() {
+  while (true) {
+    image();
+    if (y < 120) y = y + 1;     // il descend, et s'arrête en 120
+    sprite16(0, 72, y, BLOC);   // les lutins 0, 1, 2, 3
+  }
+}
+`,
+    aVoir: 'Un bloc carré qui descend au milieu de l’écran, et s’arrête en bas.',
+    controle: (c) => {
+      c.avancer(150)
+      return [
+        ['le bloc est arrivé en y = 120', c.lutin(0).y === 120, ` (${c.lutin(0).y})`],
+        ['les quatre lutins font un carré de 16', c.lutin(1).x === 80 && c.lutin(2).y === 128 && c.lutin(3).x === 80],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction cacher() — ôter un lutin',
+    difficulte: 0,
+    idee: '#include <cacher> : cacher(numero) ôte le lutin de l’écran.',
+    texte: [
+      '**Ce qu’elle fait :** `cacher(numero)` **ôte** le lutin de l’écran : il est rangé hors de la vue. Un `sprite()` le ramène.',
+      '**La ligne à écrire : `#include <cacher>`.**',
+      '**Son argument :** le numéro du lutin.',
+      '**Ce qu’elle coûte :** environ **95 octets** avec la mise en place des lutins ; l’appel seul, quelques octets.',
+      '**Essaie :** fais-le clignoter : `sprite` les images paires, `cacher` les impaires.',
+    ],
+    code: `// ---- #include <cacher> : ôter un lutin ----
+// Le A est là au départ ; à l'image 120, il part.
+
+#include <sprite>
+#include <cacher>     // cacher() : ôter un lutin
+#include <ALPHABET>
+
+int main() {
+  sprite(0, 76, 68, ALPHABET[0]);
+
+  while (true) {
+    image();
+    if (images() == 120) {
+      cacher(0);              // le lutin 0 quitte l'écran
+    }
+  }
+}
+`,
+    aVoir: 'Un A au milieu, qui disparaît au bout de deux secondes.',
+    controle: (c) => {
+      const avant = c.lutin(0)
+      c.avancer(120)
+      const apres = c.lutin(0)
+      const dehors = apres.y < -8 || apres.y >= 144 || apres.x < -8 || apres.x >= 160
+      return [
+        ['au départ, le A est en (76, 68)', avant.x === 76 && avant.y === 68],
+        ['puis il est hors de l’écran', dehors, ` (${apres.x}, ${apres.y})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction cacher16() — ôter un personnage de 16 × 16',
+    difficulte: 0,
+    idee: '#include <cacher16> : cacher16(numero) ôte les quatre lutins d’un personnage de 16 × 16.',
+    texte: [
+      '**Ce qu’elle fait :** `cacher16(numero)` ôte les quatre lutins `numero` à `numero + 3` : tout le personnage.',
+      '**La ligne à écrire : `#include <cacher16>`.**',
+      '**Son argument :** le numéro du premier lutin, comme pour `sprite16()`.',
+      '**Ce qu’elle coûte :** environ **105 octets** avec la mise en place des lutins.',
+      '**Essaie :** fais-le réapparaître à l’image 240.',
+    ],
+    code: `// ---- #include <cacher16> : ôter un personnage de 16 × 16 ----
+
+#include <sprite16>
+#include <cacher16>   // cacher16() : ôter les quatre lutins
+#include <Perso>
+
+Perso BLOC = {
+  "################", "################", "################", "################",
+  "################", "################", "################", "################",
+  "################", "################", "################", "################",
+  "################", "################", "################", "################",
+};
+
+int main() {
+  sprite16(0, 72, 64, BLOC);
+
+  while (true) {
+    image();
+    if (images() == 120) {
+      cacher16(0);            // les lutins 0, 1, 2 et 3
+    }
+  }
+}
+`,
+    aVoir: 'Un carré plein au milieu, qui disparaît au bout de deux secondes.',
+    controle: (c) => {
+      const avant = c.lutin(3)
+      c.avancer(120)
+      const dehors = [0, 1, 2, 3].every((n) => c.lutin(n).y < -8 || c.lutin(n).y >= 144 || c.lutin(n).x < -8 || c.lutin(n).x >= 160)
+      return [
+        ['au départ, le carré est là', avant.x === 80 && avant.y === 72],
+        ['puis ses quatre lutins sont hors de l’écran', dehors],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction couleurFond() — une couleur du décor',
+    difficulte: 0,
+    idee: '#include <couleurFond> : couleurFond(palette, teinte, rouge, vert, bleu) choisit une couleur des palettes du fond (Game Boy Color).',
+    texte: [
+      '**Ce qu’elle fait :** sur une **Game Boy Color**, le fond a **8 palettes** de **4 teintes**. `couleurFond(palette, teinte, rouge, vert, bleu)` choisit une de ces 32 couleurs. Une case vide est dans la **teinte 0** de la palette 0 : c’est la couleur du fond de l’écran.',
+      '**La ligne à écrire : `#include <couleurFond>`.**',
+      '**Ses arguments :** la palette (0 à 7), la teinte (0 à 3), puis le rouge, le vert et le bleu, de **0 à 31** chacun.',
+      '**Ce qu’elle coûte :** environ **80 octets** la première fois ; une dizaine par appel.',
+      '**Essaie :** `couleurFond(0, 0, 0, 0, 31);` : tout l’écran devient bleu.',
+    ],
+    code: `// ---- #include <couleurFond> : une couleur du décor ----
+// La teinte 0 de la palette 0, c'est le fond de l'écran : on la fait jaune.
+
+#include <couleurFond>   // couleurFond() : une des 32 couleurs du fond
+#include <texte>
+
+int main() {
+  couleurFond(0, 0, 31, 31, 0);   // palette 0, teinte 0 : rouge 31 + vert 31 = jaune
+  texte(6, 8, "JAUNE");
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Tout l’écran jaune, avec JAUNE écrit au milieu.',
+    controle: (c) => {
+      const couleur = (p, n) => c.gb.ppu.bgPalettes[p * 8 + n * 2] | c.gb.ppu.bgPalettes[p * 8 + n * 2 + 1] << 8
+      return [
+        ['la cartouche tourne en couleur', c.gb.ppu.couleur === true],
+        ['la teinte 0 de la palette 0 est jaune', couleur(0, 0) === (31 | 31 << 5), ` (${couleur(0, 0)})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction couleurTexte() — la couleur des lettres',
+    difficulte: 0,
+    idee: '#include <couleurTexte> : couleurTexte(rouge, vert, bleu) colore toutes les lettres d’un coup (Game Boy Color).',
+    texte: [
+      '**Ce qu’elle fait :** `couleurTexte(rouge, vert, bleu)` change la couleur de **toutes les lettres** de l’écran. C’est `couleurFond(0, 3, rouge, vert, bleu)` : les lettres sont dessinées dans la teinte 3, et les cases dans la palette 0.',
+      '**La ligne à écrire : `#include <couleurTexte>`.**',
+      '**Ses arguments :** rouge, vert, bleu, de 0 à 31.',
+      '**Ce qu’elle coûte :** environ **80 octets** la première fois.',
+      '**Essaie :** `couleurTexte(0, 20, 0);` : des lettres vertes.',
+    ],
+    code: `// ---- #include <couleurTexte> : la couleur des lettres ----
+
+#include <couleurTexte>   // couleurTexte() : toutes les lettres d'une couleur
+#include <texte>
+
+int main() {
+  couleurTexte(31, 0, 0);       // rouge 31, vert 0, bleu 0 : du rouge
+  texte(4, 6, "TOUT EST");
+  texte(4, 8, "EN ROUGE");
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Deux lignes de texte en rouge.',
+    controle: (c) => {
+      const couleur = (p, n) => c.gb.ppu.bgPalettes[p * 8 + n * 2] | c.gb.ppu.bgPalettes[p * 8 + n * 2 + 1] << 8
+      return [
+        ['la cartouche tourne en couleur', c.gb.ppu.couleur === true],
+        ['la teinte 3 de la palette 0 est rouge', couleur(0, 3) === 31, ` (${couleur(0, 3)})`],
+        ['le texte est écrit', c.mot(4, 8, 8) === 'EN ROUGE'],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction couleurLutin() — une couleur des personnages',
+    difficulte: 0,
+    idee: '#include <couleurLutin> : couleurLutin(palette, teinte, rouge, vert, bleu) choisit une couleur des palettes des lutins (Game Boy Color).',
+    texte: [
+      '**Ce qu’elle fait :** les lutins ont leurs **propres 8 palettes**. `couleurLutin(palette, teinte, rouge, vert, bleu)` en choisit une couleur. La **teinte 0 est transparente** : on voit le fond à travers.',
+      '**La ligne à écrire : `#include <couleurLutin>`.**',
+      '**Ses arguments :** la palette (0 à 7), la teinte (1 à 3), rouge, vert, bleu de 0 à 31.',
+      '**Ce qu’elle coûte :** environ **130 octets** avec la mise en place des lutins.',
+      '**Essaie :** fais le A vert : `couleurLutin(0, 3, 0, 31, 0);`.',
+    ],
+    code: `// ---- #include <couleurLutin> : une couleur des personnages ----
+// Un lutin est dans la palette 0 des lutins : sa teinte 3 devient bleue.
+
+#include <couleurLutin>   // couleurLutin() : une couleur des lutins
+#include <sprite>
+#include <ALPHABET>
+
+int main() {
+  couleurLutin(0, 3, 0, 0, 31);    // palette 0 des lutins, teinte 3 : bleu
+  sprite(0, 76, 68, ALPHABET[0]);  // le A, dans cette palette
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A bleu au milieu de l’écran.',
+    controle: (c) => {
+      const couleur = (p, n) => c.gb.ppu.objPalettes[p * 8 + n * 2] | c.gb.ppu.objPalettes[p * 8 + n * 2 + 1] << 8
+      return [
+        ['la cartouche tourne en couleur', c.gb.ppu.couleur === true],
+        ['la teinte 3 de la palette 0 des lutins est bleue', couleur(0, 3) === 31 << 10, ` (${couleur(0, 3)})`],
+        ['le lutin est posé', c.lutin(0).x === 76],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction teindre() — une case dans une palette',
+    difficulte: 0,
+    idee: '#include <teindre> : teindre(colonne, ligne, palette) met une case du fond dans une autre palette (Game Boy Color).',
+    texte: [
+      '**Ce qu’elle fait :** toute case est dans la **palette 0**, jusqu’à ce qu’on la **teigne**. `teindre(colonne, ligne, palette)` met cette case dans une autre palette : la même tuile peut avoir des couleurs différentes d’une case à l’autre.',
+      '**La ligne à écrire : `#include <teindre>`.**',
+      '**Ses arguments :** la colonne, la ligne, la palette (0 à 7). `palette | DEVANT` fait passer la case devant les personnages.',
+      '**Ce qu’elle coûte :** environ **100 octets** la première fois.',
+      '**Essaie :** teins aussi la case (7, 8) : deux lettres en bleu.',
+    ],
+    code: `// ---- #include <teindre> : une case dans une palette ----
+// BLEU s'écrit ; seule sa première case passe dans la palette 2, bleue.
+
+#include <couleurFond>
+#include <texte>
+#include <teindre>     // teindre() : la palette d'une case
+
+int main() {
+  couleurFond(2, 3, 0, 0, 31);   // palette 2, teinte 3 (les lettres) : bleu
+  texte(6, 8, "BLEU");
+  teindre(6, 8, 2);              // la case du B dans la palette 2
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'BLEU, dont seul le B est bleu.',
+    controle: (c) => {
+      const paletteDe = (colonne, ligne) => c.gb.ppu.vram[0x2000 + 0x1800 + ligne * 32 + colonne] & 7
+      return [
+        ['la case du B est dans la palette 2', paletteDe(6, 8) === 2, ` (${paletteDe(6, 8)})`],
+        ['la case du L reste dans la palette 0', paletteDe(7, 8) === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction teindrePanneau() — une case du panneau dans une palette',
+    difficulte: 0,
+    idee: '#include <teindrePanneau> : teindrePanneau(colonne, ligne, palette) teint une case du panneau (Game Boy Color).',
+    texte: [
+      '**Ce qu’elle fait :** comme `teindre()`, mais **dans le panneau** : un cœur rouge dans le HUD, un mot important dans un dialogue.',
+      '**La ligne à écrire : `#include <teindrePanneau>`.**',
+      '**Ses arguments :** la colonne et la ligne du panneau, la palette.',
+      '**Ce qu’elle coûte :** environ **100 octets** la première fois.',
+      '**Essaie :** teins les cinq lettres de VIES avec une boucle `for`.',
+    ],
+    code: `// ---- #include <teindrePanneau> : une case du panneau dans une palette ----
+
+#include <couleurFond>
+#include <textePanneau>
+#include <panneau>
+#include <teindrePanneau>   // teindrePanneau() : la palette d'une case du panneau
+
+int main() {
+  couleurFond(1, 3, 31, 0, 0);   // palette 1 : des lettres rouges
+  textePanneau(1, 0, "VIES");
+  panneau(0, 128);
+  teindrePanneau(1, 0, 1);       // le V, en rouge
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'VIES dans la bande du bas, avec le V en rouge.',
+    controle: (c) => {
+      const paletteDe = (colonne, ligne) => c.gb.ppu.vram[0x2000 + 0x1c00 + ligne * 32 + colonne] & 7
+      return [
+        ['la case (1, 0) du panneau est dans la palette 1', paletteDe(1, 0) === 1, ` (${paletteDe(1, 0)})`],
+        ['la case d’à côté reste dans la palette 0', paletteDe(2, 0) === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction teindreLutin() — un lutin dans une palette',
+    difficulte: 0,
+    idee: '#include <teindreLutin> : teindreLutin(numero, palette) met le lutin dans une des 8 palettes des lutins (Game Boy Color).',
+    texte: [
+      '**Ce qu’elle fait :** `teindreLutin(numero, palette)` met le lutin dans une autre **palette des lutins** : deux personnages avec le même dessin, de deux couleurs.',
+      '**La ligne à écrire : `#include <teindreLutin>`.**',
+      '**Ses arguments :** le numéro du lutin, la palette (0 à 7). À écrire **après** son `sprite()`.',
+      '**Ce qu’elle coûte :** environ **130 octets** avec la mise en place des lutins.',
+      '**Essaie :** une palette 2 verte, et un troisième A dedans.',
+    ],
+    code: `// ---- #include <teindreLutin> : un lutin dans une palette ----
+// Deux A : le premier dans la palette 0 (bleue), le second dans la 1 (rouge).
+
+#include <couleurLutin>
+#include <sprite>
+#include <teindreLutin>   // teindreLutin() : la palette d'un lutin
+#include <ALPHABET>
+
+int main() {
+  couleurLutin(0, 3, 0, 0, 31);    // palette 0 : bleu
+  couleurLutin(1, 3, 31, 0, 0);    // palette 1 : rouge
+  sprite(0, 60, 68, ALPHABET[0]);
+  sprite(1, 92, 68, ALPHABET[0]);
+  teindreLutin(1, 1);              // le lutin 1 dans la palette 1
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Deux A côte à côte : un bleu, un rouge.',
+    controle: (c) => {
+      const options = (n) => c.gb.mmu.read(0xfe00 + n * 4 + 3) & 7
+      return [
+        ['le lutin 0 est dans la palette 0', options(0) === 0],
+        ['le lutin 1 est dans la palette 1', options(1) === 1, ` (${options(1)})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction paletteFond() — les quatre nuances du fond',
+    difficulte: 0,
+    idee: '#include <paletteFond> : paletteFond(n0, n1, n2, n3) choisit quelle nuance de gris chaque teinte du fond prend (Game Boy d’origine).',
+    texte: [
+      '**Ce qu’elle fait :** la Game Boy d’origine n’a que **4 nuances**, du plus clair (0) au plus foncé (3). `paletteFond(n0, n1, n2, n3)` dit quelle nuance prend chaque teinte des tuiles du fond. `paletteFond(3, 2, 1, 0)` **inverse** l’écran : le clair devient foncé.',
+      '**La ligne à écrire : `#include <paletteFond>`.**',
+      '**Ses arguments :** quatre nuances, de 0 à 3.',
+      '**Ce qu’elle coûte :** environ **70 octets** avec la mise en place de l’écran ; un appel seul, quelques octets.',
+      '**Essaie :** `paletteFond(0, 0, 0, 0);` : tout devient blanc, et rien n’est effacé.',
+    ],
+    code: `// ---- #include <paletteFond> : les quatre nuances du fond ----
+// Le fond et les lettres échangent leurs nuances : l'écran est inversé.
+
+#include <paletteFond>   // paletteFond() : quelle nuance pour chaque teinte
+#include <texte>
+
+int main() {
+  texte(5, 8, "INVERSE");
+  paletteFond(3, 2, 1, 0);   // teinte 0 (le fond) → nuance 3, la plus foncée…
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un écran foncé, et INVERSE écrit en clair.',
+    controle: (c) => [
+      ['le registre des nuances du fond vaut 3, 2, 1, 0', c.gb.mmu.read(0xff47) === (3 | 2 << 2 | 1 << 4 | 0 << 6), ` (${c.gb.mmu.read(0xff47)})`],
+    ],
+  },
+
+  {
+    titre: 'La fonction paletteLutins() — les nuances des lutins',
+    difficulte: 0,
+    idee: '#include <paletteLutins> : paletteLutins(0 ou 1, n0, n1, n2, n3) choisit les nuances d’une des deux palettes des lutins (Game Boy d’origine).',
+    texte: [
+      '**Ce qu’elle fait :** sur la Game Boy d’origine, les lutins ont **deux** palettes de nuances. `paletteLutins(p, n0, n1, n2, n3)` règle la palette `p` (0 ou 1). La teinte 0 reste transparente.',
+      '**La ligne à écrire : `#include <paletteLutins>`.**',
+      '**Ses arguments :** la palette, 0 ou 1, puis quatre nuances de 0 à 3.',
+      '**Ce qu’elle coûte :** environ **95 octets** avec la mise en place des lutins.',
+      '**Essaie :** `paletteLutins(0, 0, 1, 1, 1);` : le A devient gris clair.',
+    ],
+    code: `// ---- #include <paletteLutins> : les nuances des lutins ----
+
+#include <paletteLutins>   // paletteLutins() : les nuances d'une palette des lutins
+#include <sprite>
+#include <ALPHABET>
+
+int main() {
+  paletteLutins(0, 0, 1, 2, 2);   // palette 0 : la teinte 3 prend la nuance 2, plus claire
+  sprite(0, 76, 68, ALPHABET[0]);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A gris foncé plutôt que noir, au milieu de l’écran.',
+    controle: (c) => [
+      ['le registre de la palette 0 des lutins vaut 0, 1, 2, 2', c.gb.mmu.read(0xff48) === (0 | 1 << 2 | 2 << 4 | 2 << 6), ` (${c.gb.mmu.read(0xff48)})`],
+    ],
+  },
+
+  {
+    titre: 'La fonction deplace_x() — avancer sur une ligne',
+    difficulte: 0,
+    idee: '#include <deplace_x> : deplace_x(x, y, tuile, pas) fait avancer la tuile de « pas » cases vers la droite (ou la gauche si pas est négatif), un pas tous les quarts de seconde.',
+    texte: [
+      '**Ce qu’elle fait :** `deplace_x(x, y, tuile, pas)` pose la tuile en (x, y), puis la fait **avancer** de `pas` cases : vers la droite si `pas` est positif, vers la gauche s’il est négatif. Un pas tous les **250 ms**. Elle **bloque** : le programme attend la fin du trajet.',
+      '**La ligne à écrire : `#include <deplace_x>`.**',
+      '**Ses arguments :** la colonne et la ligne de départ, la tuile, le nombre de pas. Seule sur sa ligne, avec une variable en premier, elle **range l’arrivée** dans cette variable.',
+      '**Ce qu’elle coûte :** environ **220 octets** pour elle-même, et la police entière (**704 octets**) : la tuile arrive par un argument, le compilateur ne sait pas laquelle ce sera.',
+      '**Essaie :** `deplace_x(x, 8, ALPHABET[0], -5);` après le premier : le A revient.',
+    ],
+    code: `// ---- #include <deplace_x> : avancer sur une ligne ----
+// Le A part de la colonne 2 et avance de 10 cases : il finit en colonne 12.
+
+#include <deplace_x>   // deplace_x() : avancer sur la ligne
+#include <ALPHABET>
+
+uint8_t x = 2;
+
+int main() {
+  deplace_x(x, 8, ALPHABET[0], 10);   // 10 pas vers la droite ; x reçoit 12
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A qui avance de dix cases vers la droite, un pas par quart de seconde.',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 200).A
+      return [
+        ['le A finit en (12, 8)', chemin.at(-1) === '12,8', ` (${chemin.at(-1)})`],
+        ['x a reçu l’arrivée : 12', c.variable('x') === 12],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction deplace_y() — avancer sur une colonne',
+    difficulte: 0,
+    idee: '#include <deplace_y> : deplace_y(x, y, tuile, pas) fait descendre la tuile de « pas » lignes (ou monter si pas est négatif).',
+    texte: [
+      '**Ce qu’elle fait :** comme `deplace_x()`, mais **de haut en bas** : `pas` positif descend, négatif monte. Elle s’arrête au bord de l’écran.',
+      '**La ligne à écrire : `#include <deplace_y>`.**',
+      '**Ses arguments :** colonne, ligne, tuile, pas ; seule sur sa ligne, elle range l’arrivée dans la variable de la ligne.',
+      '**Ce qu’elle coûte :** environ **220 octets**, plus la police entière.',
+      '**Essaie :** `deplace_y(10, y, ALPHABET[0], -6);` : le A remonte.',
+    ],
+    code: `// ---- #include <deplace_y> : avancer sur une colonne ----
+// Le A descend de la ligne 2 à la ligne 10.
+
+#include <deplace_y>   // deplace_y() : avancer sur la colonne
+#include <ALPHABET>
+
+uint8_t y = 2;
+
+int main() {
+  deplace_y(10, y, ALPHABET[0], 8);   // 8 pas vers le bas ; y reçoit 10
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A qui descend de huit lignes.',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 180).A
+      return [
+        ['le A finit en (10, 10)', chemin.at(-1) === '10,10', ` (${chemin.at(-1)})`],
+        ['y a reçu l’arrivée : 10', c.variable('y') === 10],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction deplace() — avancer sur les deux axes',
+    difficulte: 0,
+    idee: '#include <deplace> : deplace(x, y, tuile, pasX, pasY) fait avancer la tuile en diagonale, puis tout droit.',
+    texte: [
+      '**Ce qu’elle fait :** `deplace(x, y, tuile, pasX, pasY)` fait avancer la tuile sur **les deux axes** en même temps : `pasX` vers la droite (+) ou la gauche (-), `pasY` vers le bas (+) ou le haut (-). 5 et 5 : en diagonale.',
+      '**La ligne à écrire : `#include <deplace>`.**',
+      '**Ses arguments :** colonne, ligne, tuile, pasX, pasY. Seule sur sa ligne, elle range l’arrivée dans les deux variables.',
+      '**Ce qu’elle coûte :** environ **300 octets**, plus la police entière.',
+      '**Essaie :** `deplace(x, y, ALPHABET[0], 6, 0);` : tout droit.',
+    ],
+    code: `// ---- #include <deplace> : avancer sur les deux axes ----
+// De (2, 2), 6 pas à droite et 6 en bas : en diagonale, jusqu'en (8, 8).
+
+#include <deplace>    // deplace() : les deux axes à la fois
+#include <ALPHABET>
+
+uint8_t x = 2;
+uint8_t y = 2;
+
+int main() {
+  deplace(x, y, ALPHABET[0], 6, 6);   // x et y reçoivent 8 et 8
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A qui descend en diagonale vers le milieu de l’écran.',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 150).A
+      return [
+        ['le A passe par (5, 5) : en diagonale', chemin.includes('5,5')],
+        ['il finit en (8, 8)', chemin.at(-1) === '8,8', ` (${chemin.at(-1)})`],
+        ['x et y ont reçu l’arrivée', c.variable('x') === 8 && c.variable('y') === 8],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction va_a() — aller jusqu’à une case',
+    difficulte: 0,
+    idee: '#include <va_a> : va_a(x, y, tuile, versColonne, versLigne) mène la tuile jusqu’à la case visée.',
+    texte: [
+      '**Ce qu’elle fait :** `va_a(x, y, tuile, versColonne, versLigne)` mène la tuile **jusqu’à une case** : en diagonale tant que c’est possible, puis tout droit. On dit où aller, pas combien de pas.',
+      '**La ligne à écrire : `#include <va_a>`.**',
+      '**Ses arguments :** la place de départ, la tuile, la case d’arrivée.',
+      '**Ce qu’elle coûte :** environ **240 octets**, plus la police entière.',
+      '**Essaie :** enchaîne deux `va_a` : le A fait un aller et retour.',
+    ],
+    code: `// ---- #include <va_a> : aller jusqu'à une case ----
+// Le A part de (1, 1) et va jusqu'en (15, 5).
+
+#include <va_a>       // va_a() : aller à une case
+#include <ALPHABET>
+
+uint8_t x = 1;
+uint8_t y = 1;
+
+int main() {
+  va_a(x, y, ALPHABET[0], 15, 5);   // diagonale jusqu'à la ligne 5, puis tout droit
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A qui descend en diagonale, puis file vers la droite, jusqu’en (15, 5).',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 260).A
+      return [
+        ['le A arrive en (15, 5)', chemin.at(-1) === '15,5', ` (${chemin.at(-1)})`],
+        ['il est passé par (5, 5) : la diagonale d’abord', chemin.includes('5,5')],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction un_pas() — un seul pas, sans attendre',
+    difficulte: 0,
+    idee: '#include <un_pas> : un_pas(x, y, tuile, sensX, sensY) fait faire UN pas à la tuile, tout de suite, sans bloquer le jeu.',
+    texte: [
+      '**Ce qu’elle fait :** `un_pas(x, y, tuile, sensX, sensY)` fait faire **un seul pas**, tout de suite, sans attendre : 1 vers la droite ou le bas, -1 vers la gauche ou le haut, 0 immobile. Elle ne bloque pas : on l’appelle dans la boucle, et d’autres choses bougent en même temps.',
+      '**La ligne à écrire : `#include <un_pas>`.** Ici aussi `<chaque>`, pour rythmer les pas.',
+      '**Ses arguments :** la place, la tuile, le sens en x et en y. Seule sur sa ligne, elle range la nouvelle place dans x et y.',
+      '**Ce qu’elle coûte :** environ **180 octets**, plus la police entière.',
+      '**Essaie :** `un_pas(x, y, ALPHABET[0], 1, 1);` : en diagonale.',
+    ],
+    code: `// ---- #include <un_pas> : un seul pas, sans attendre ----
+// Toutes les 250 ms, le A fait un pas vers la droite, tant qu'il n'est pas au bord.
+
+#include <un_pas>     // un_pas() : un pas, tout de suite
+#include <chaque>
+#include <ALPHABET>
+
+uint8_t x = 0;
+uint8_t y = 8;
+
+int main() {
+  while (true) {
+    image();
+    if (chaque(250) && x < 19) {
+      un_pas(x, y, ALPHABET[0], 1, 0);   // un pas à droite ; x grandit de 1
+    }
+  }
+}
+`,
+    aVoir: 'Un A qui avance d’une case tous les quarts de seconde, jusqu’au bord droit.',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 120).A
+      return [
+        ['le A avance case par case', chemin.length >= 6, ` (${chemin.length} places)`],
+        ['vers la droite, sur la ligne 8', chemin.every((p) => p.endsWith(',8'))],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction vitesse() — régler la vitesse des déplacements',
+    difficulte: 0,
+    idee: '#include <vitesse> : vitesse(ms) règle le temps d’un pas pour deplace_x, deplace_y, deplace et va_a qui viennent après.',
+    texte: [
+      '**Ce qu’elle fait :** `vitesse(ms)` dit combien de **millisecondes** dure un pas des déplacements qui suivent. 250 au départ (4 pas par seconde) ; 100, plus vite ; 500, plus lentement. Elle ne fait rien bouger elle-même.',
+      '**La ligne à écrire : `#include <vitesse>`.**',
+      '**Son argument :** la durée d’un pas, écrite en clair.',
+      '**Ce qu’elle coûte :** une dizaine d’octets : elle range un nombre.',
+      '**Essaie :** `vitesse(500);` : le A traîne.',
+    ],
+    code: `// ---- #include <vitesse> : régler la vitesse des déplacements ----
+// Le même trajet que pour deplace_x, mais à 100 ms par pas : deux fois et demie plus vite.
+
+#include <vitesse>     // vitesse() : la durée d'un pas
+#include <deplace_x>
+#include <ALPHABET>
+
+uint8_t x = 2;
+
+int main() {
+  vitesse(100);                        // 100 ms par pas, au lieu de 250
+  deplace_x(x, 8, ALPHABET[0], 10);    // les 10 pas vont plus vite
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Le A traverse dix cases en une seconde.',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 70).A
+      return [
+        ['en 70 images (un peu plus d’une seconde), le A est arrivé en (12, 8)', chemin.at(-1) === '12,8', ` (${chemin.at(-1)})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction deplace_croix() — suivre la croix, case par case',
+    difficulte: 0,
+    idee: '#include <deplace_croix> : deplace_croix(x, y, tuile, vitesse) fait suivre la croix de la manette à une tuile, case par case.',
+    texte: [
+      '**Ce qu’elle fait :** `deplace_croix(x, y, tuile, vitesse)` lit la **croix** et fait avancer la tuile d’une case dans ce sens, au plus une fois toutes les `vitesse` millisecondes. Elle reste dans l’écran, et n’efface que si elle a bougé : pas de clignotement.',
+      '**La ligne à écrire : `#include <deplace_croix>`.**',
+      '**Ses arguments :** la place, la tuile, la vitesse en ms écrite en clair. Seule sur sa ligne, elle range la place dans x et y. À appeler **dans la boucle**, après `image()`.',
+      '**Ce qu’elle coûte :** environ **330 octets**, plus la police entière.',
+      '**Essaie :** une vitesse de 100 : le A file.',
+    ],
+    code: `// ---- #include <deplace_croix> : suivre la croix, case par case ----
+// La croix fait bouger le A, une case tous les quarts de seconde.
+
+#include <deplace_croix>   // deplace_croix() : la tuile suit la croix
+#include <ALPHABET>
+
+uint8_t x = 9;
+uint8_t y = 8;
+
+int main() {
+  while (true) {
+    image();
+    deplace_croix(x, y, ALPHABET[0], 250);   // x et y suivent la tuile
+  }
+}
+`,
+    aVoir: 'Un A au milieu ; la croix le promène, case par case.',
+    controle: (c) => {
+      c.avancer(10)
+      const depart = c.variable('x')
+      c.gb.setButton('right', true)
+      c.avancer(70)
+      c.gb.setButton('right', false)
+      c.avancer(5)
+      return [
+        ['au départ, le A est en (9, 8)', depart === 9],
+        ['DROITE tenue : il est allé à droite', c.variable('x') > 9, ` (x = ${c.variable('x')})`],
+        ['et la lettre est là où dit x', c.mot(c.variable('x'), 8, 1) === 'A'],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction glisse_croix() — suivre la croix, au pixel près',
+    difficulte: 0,
+    idee: '#include <glisse_croix> : glisse_croix(numero, px, py, tuile, vitesse) fait suivre la croix à un lutin, pixel par pixel.',
+    texte: [
+      '**Ce qu’elle fait :** la même chose que `deplace_croix()`, mais avec un **lutin**, **au pixel près** : un mouvement fluide. `vitesse` est en **pixels par image** : 1 vaut 60 pixels par seconde.',
+      '**La ligne à écrire : `#include <glisse_croix>`.**',
+      '**Ses arguments :** le numéro du lutin, sa place en pixels (px de 0 à 152, py de 0 à 136), la tuile, la vitesse. Seule sur sa ligne, elle range la place dans px et py.',
+      '**Ce qu’elle coûte :** environ **310 octets**, plus la police entière et les lutins.',
+      '**Essaie :** une vitesse de 3.',
+    ],
+    code: `// ---- #include <glisse_croix> : suivre la croix, au pixel près ----
+
+#include <glisse_croix>   // glisse_croix() : un lutin qui suit la croix
+#include <ALPHABET>
+
+uint8_t px = 76;
+uint8_t py = 68;
+
+int main() {
+  while (true) {
+    image();
+    glisse_croix(0, px, py, ALPHABET[0], 1);   // le lutin 0, un pixel par image
+  }
+}
+`,
+    aVoir: 'Un A au milieu ; la croix le fait glisser en douceur.',
+    controle: (c) => {
+      c.avancer(5)
+      c.gb.setButton('down', true)
+      c.avancer(30)
+      c.gb.setButton('down', false)
+      c.avancer(3)
+      return [
+        ['BAS tenu 30 images : py a grandi d’environ 30', c.variable('py') >= 90 && c.variable('py') <= 100, ` (py = ${c.variable('py')})`],
+        ['le lutin est là où dit py', c.lutin(0).y === c.variable('py')],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction carre() — tourner en carré',
+    difficulte: 0,
+    idee: '#include <carre> : carre(x, y, tuile, taille, sens, vitesse, tours) fait tourner la tuile en carré autour de (x, y).',
+    texte: [
+      '**Ce qu’elle fait :** `carre(x, y, tuile, taille, sens, vitesse, tours)` fait faire à la tuile des **tours en carré** autour de la case (x, y). Taille 1 : un carré de 3 × 3 ; taille 2 : 5 × 5. Elle part du centre et y revient.',
+      '**La ligne à écrire : `#include <carre>`.**',
+      '**Ses arguments :** le centre, la tuile, la taille, le sens (1 : aiguilles d’une montre, -1 : l’autre), la vitesse en ms par pas (en clair), le nombre de tours.',
+      '**Ce qu’elle coûte :** environ **500 octets**, plus la police entière.',
+      '**Essaie :** `carre(10, 8, ALPHABET[0], 3, -1, 100, 2);`.',
+    ],
+    code: `// ---- #include <carre> : tourner en carré ----
+
+#include <carre>      // carre() : des tours en carré
+#include <ALPHABET>
+
+int main() {
+  carre(10, 8, ALPHABET[0], 1, 1, 250, 1);   // centre (10, 8), taille 1, un tour
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A qui fait un tour en carré autour du milieu, puis s’y arrête.',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 300).A
+      const coins = chemin.filter((p) => ['9,7', '11,7', '11,9', '9,9'].includes(p))
+      return [
+        ['les quatre coins, dans le sens des aiguilles', coins.slice(0, 4).join(' ') === '9,7 11,7 11,9 9,9', ` (${coins.slice(0, 4).join(' ')})`],
+        ['le A revient au centre', chemin.at(-1) === '10,8'],
+      ]
+    },
+  },
+
+  {
+    titre: 'Carre — les réglages d’un carré sous un nom',
+    difficulte: 0,
+    idee: '#include <Carre> : Carre ronde = { x, y, tuile, taille, sens, vitesse, tours }; puis carre(ronde) ou losange(ronde).',
+    texte: [
+      '**Ce que c’est :** un **Carre** range les **sept réglages** d’un carré sous un seul nom. `carre(ronde);` vaut `carre(10, 8, ALPHABET[0], 2, 1, 250, 1);` — et `losange(ronde);` marche aussi.',
+      '**La ligne à écrire : `#include <Carre>`**, avec un C majuscule, comme on l’écrit. Il faut aussi `<carre>` pour s’en servir.',
+      '**Ce qu’il coûte :** rien de plus que `carre()` : le compilateur recopie les sept réglages à la place du nom.',
+      '**Essaie :** change seulement le sens dans `{ … }` : -1.',
+    ],
+    code: `// ---- #include <Carre> : les réglages d'un carré sous un nom ----
+
+#include <Carre>      // Carre : sept réglages sous un seul nom
+#include <carre>
+#include <ALPHABET>
+
+Carre ronde = { 10, 8, ALPHABET[0], 2, 1, 150, 1 };   // centre, tuile, taille 2, sens, vitesse, tours
+
+int main() {
+  carre(ronde);   // = carre(10, 8, ALPHABET[0], 2, 1, 150, 1);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A qui fait un grand tour en carré (5 × 5) autour du milieu.',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 350).A
+      return [
+        ['le A passe par les coins du carré de taille 2', chemin.includes('8,6') && chemin.includes('12,6') && chemin.includes('12,10') && chemin.includes('8,10')],
+        ['il revient au centre', chemin.at(-1) === '10,8'],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction losange() — tourner en losange',
+    difficulte: 0,
+    idee: '#include <losange> : losange(x, y, tuile, taille, sens, vitesse, tours), le carré posé sur la pointe.',
+    texte: [
+      '**Ce qu’elle fait :** `losange(…)` fait tourner la tuile en **losange** autour de (x, y) : un carré posé sur la pointe, ses côtés en diagonale. Les pointes sont à `taille` cases du centre.',
+      '**La ligne à écrire : `#include <losange>`.**',
+      '**Ses arguments :** les mêmes sept que `carre()`, dans le même ordre.',
+      '**Ce qu’elle coûte :** environ **510 octets**, plus la police entière.',
+      '**Essaie :** une taille de 4.',
+    ],
+    code: `// ---- #include <losange> : tourner en losange ----
+
+#include <losange>    // losange() : des tours en losange
+#include <ALPHABET>
+
+int main() {
+  losange(10, 8, ALPHABET[0], 2, 1, 150, 1);   // pointes à 2 cases du centre
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A qui fait un tour en losange autour du milieu.',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 300).A
+      const pointes = ['10,6', '12,8', '10,10', '8,8'].filter((p) => chemin.includes(p))
+      return [
+        ['le A touche les quatre pointes', pointes.length === 4, ` (${pointes.join(' ')})`],
+        ['il revient au centre', chemin.at(-1) === '10,8'],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction rectangle() — tourner en rectangle',
+    difficulte: 0,
+    idee: '#include <rectangle> : rectangle(x, y, tuile, largeur, hauteur, sens, vitesse, tours), un carré qui a deux tailles.',
+    texte: [
+      '**Ce qu’elle fait :** `rectangle(…)` fait tourner la tuile en **rectangle** : `largeur` pour l’axe x, `hauteur` pour l’axe y. Largeur 4 et hauteur 2 : 9 × 5 cases.',
+      '**La ligne à écrire : `#include <rectangle>`.**',
+      '**Ses arguments :** huit : le centre, la tuile, la largeur, la hauteur, le sens, la vitesse, les tours.',
+      '**Ce qu’elle coûte :** environ **600 octets**, plus la police entière.',
+      '**Essaie :** une largeur de 8 et une hauteur de 1 : une piste.',
+    ],
+    code: `// ---- #include <rectangle> : tourner en rectangle ----
+
+#include <rectangle>  // rectangle() : des tours en rectangle
+#include <ALPHABET>
+
+int main() {
+  rectangle(10, 8, ALPHABET[0], 4, 2, 1, 100, 1);   // 9 × 5 cases autour de (10, 8)
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A qui fait le tour d’un rectangle large et plat.',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 300).A
+      return [
+        ['le A touche les coins du rectangle', chemin.includes('6,6') && chemin.includes('14,6') && chemin.includes('14,10') && chemin.includes('6,10')],
+        ['il revient au centre', chemin.at(-1) === '10,8'],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction spirale() — tourner en spirale',
+    difficulte: 0,
+    idee: '#include <spirale> : spirale(x, y, tuile, taille, sens, vitesse) part du centre et s’en éloigne en tournant.',
+    texte: [
+      '**Ce qu’elle fait :** `spirale(…)` part du centre et **tourne en s’éloignant** — des branches de 1, 1, 2, 2, 3, 3… pas — jusqu’au bord d’un carré de `taille`, puis revient au centre.',
+      '**La ligne à écrire : `#include <spirale>`.**',
+      '**Ses arguments :** le centre, la tuile, la taille, le sens, la vitesse.',
+      '**Ce qu’elle coûte :** environ **500 octets**, plus la police entière.',
+      '**Essaie :** le sens -1.',
+    ],
+    code: `// ---- #include <spirale> : tourner en spirale ----
+
+#include <spirale>    // spirale() : une spirale depuis le centre
+#include <ALPHABET>
+
+int main() {
+  spirale(10, 8, ALPHABET[0], 2, 1, 100);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A qui tourne en s’éloignant du milieu, puis y revient.',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 300).A
+      const loin = chemin.some((p) => { const [x, y] = p.split(',').map(Number); return Math.abs(x - 10) === 2 || Math.abs(y - 8) === 2 })
+      return [
+        ['le A s’éloigne jusqu’à 2 cases du centre', loin],
+        ['il revient au centre', chemin.at(-1) === '10,8', ` (${chemin.at(-1)})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction aller_retour() — aller et revenir',
+    difficulte: 0,
+    idee: '#include <aller_retour> : aller_retour(x, y, tuile, pasX, pasY, vitesse, fois) va et revient, « fois » fois.',
+    texte: [
+      '**Ce qu’elle fait :** `aller_retour(…)` mène la tuile jusqu’en (x + pasX, y + pasY), puis la **ramène**, autant de fois que `fois`. Elle finit à sa place de départ.',
+      '**La ligne à écrire : `#include <aller_retour>`.**',
+      '**Ses arguments :** la place de départ, la tuile, le trajet en x et en y, la vitesse, le nombre d’allers-retours.',
+      '**Ce qu’elle coûte :** environ **460 octets**, plus la police entière.',
+      '**Essaie :** `4, 4` : en diagonale.',
+    ],
+    code: `// ---- #include <aller_retour> : aller et revenir ----
+
+#include <aller_retour>   // aller_retour() : un trajet, et retour
+#include <ALPHABET>
+
+int main() {
+  aller_retour(5, 8, ALPHABET[0], 6, 0, 100, 2);   // de (5, 8) à (11, 8), deux fois
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un A qui va de gauche à droite et revient, deux fois.',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 200).A
+      const allers = chemin.filter((p) => p === '11,8').length
+      return [
+        ['le A va jusqu’en (11, 8), deux fois', allers === 2, ` (${allers} fois)`],
+        ['et finit à sa place de départ', chemin.at(-1) === '5,8'],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction tourne_carre() — un carré sans arrêter le jeu',
+    difficulte: 0,
+    idee: '#include <tourne_carre> : tourne_carre(numero, x, y, tuile, cote, vitesse), appelée à chaque image, fait tourner une tuile sans fin, sans bloquer.',
+    texte: [
+      '**Ce qu’elle fait :** contrairement à `carre()`, `tourne_carre(…)` **ne bloque pas** : on l’appelle à **chaque image**, et elle fait un pas quand c’est l’heure. Le jeu continue autour. La tuile tourne sans fin : `cote` pas à droite, en bas, à gauche, en haut.',
+      '**La ligne à écrire : `#include <tourne_carre>`.**',
+      '**Ses arguments :** un numéro (0 à 3 : la console retient où en est chaque tuile), le départ, la tuile, le côté (négatif : part vers la gauche), la vitesse en ms.',
+      '**Ce qu’elle coûte :** environ **470 octets**, plus la police entière.',
+      '**Essaie :** une deuxième tuile, avec le numéro 1.',
+    ],
+    code: `// ---- #include <tourne_carre> : un carré sans arrêter le jeu ----
+
+#include <tourne_carre>   // tourne_carre() : un pas quand c'est l'heure, sans bloquer
+#include <ALPHABET>
+
+int main() {
+  while (true) {
+    image();
+    tourne_carre(0, 8, 6, ALPHABET[0], 4, 100);   // départ (8, 6), côté 4, 100 ms par pas
+  }
+}
+`,
+    aVoir: 'Un A qui tourne en carré sans jamais s’arrêter.',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 240).A
+      return [
+        ['le A touche les quatre coins', ['8,6', '12,6', '12,10', '8,10'].every((p) => chemin.includes(p))],
+        ['et il continue : plus d’un tour', chemin.filter((p) => p === '12,6').length >= 2],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction defile() — filer sur sa ligne sans arrêter le jeu',
+    difficulte: 0,
+    idee: '#include <defile> : defile(numero, x, y, tuile, sens, vitesse), appelée à chaque image, fait filer une tuile sur sa ligne, d’un bord à l’autre, sans fin.',
+    texte: [
+      '**Ce qu’elle fait :** `defile(…)` fait **filer** une tuile sur sa ligne, sans bloquer : un pas quand c’est l’heure, et au bord elle **repart de l’autre côté**.',
+      '**La ligne à écrire : `#include <defile>`.** À ne pas confondre avec `defiler()`, qui fait glisser tout le fond.',
+      '**Ses arguments :** un numéro (0 à 3), le départ, la tuile, le sens (1 : à droite, -1 : à gauche), la vitesse en ms.',
+      '**Ce qu’elle coûte :** environ **300 octets**, plus la police entière.',
+      '**Essaie :** le sens -1.',
+    ],
+    code: `// ---- #include <defile> : filer sur sa ligne sans arrêter le jeu ----
+
+#include <defile>     // defile() : une tuile qui file, sans bloquer
+#include <ALPHABET>
+
+int main() {
+  while (true) {
+    image();
+    defile(0, 15, 8, ALPHABET[0], 1, 50);   // vers la droite, 50 ms par pas
+  }
+}
+`,
+    aVoir: 'Un A qui file vers la droite, et revient par la gauche.',
+    controle: (c) => {
+      const chemin = suivre(c, 'A', 120).A
+      return [
+        ['le A atteint le bord droit', chemin.includes('19,8')],
+        ['et repart de la colonne 0', chemin.includes('0,8')],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction chaque() — toutes les n millisecondes',
+    difficulte: 0,
+    idee: '#include <chaque> : if (chaque(500)) { … } se fait deux fois par seconde, sans rien arrêter.',
+    texte: [
+      '**Ce qu’elle fait :** `chaque(ms)` répond **1** toutes les `ms` millisecondes, et **0** le reste du temps. Dans un `if`, le bloc se fait à ce rythme, pendant que le reste du jeu continue. Chaque `chaque()` du programme a son propre chronomètre (huit au plus).',
+      '**La ligne à écrire : `#include <chaque>`.**',
+      '**Son argument :** la durée en millisecondes, écrite en clair (elle est traduite en images avant le jeu).',
+      '**Ce qu’elle coûte :** environ **140 octets** la première fois : la petite fonction qui compte, et trois octets de mémoire par chronomètre.',
+      '**Essaie :** `chaque(100)` : le mot clignote vite.',
+    ],
+    code: `// ---- #include <chaque> : toutes les n millisecondes ----
+// Toutes les 500 ms, le mot apparaît ou disparaît : il clignote.
+
+#include <chaque>    // chaque() : 1 toutes les n millisecondes
+#include <texte>
+#include <effacer>
+
+uint8_t allume = 0;
+
+int main() {
+  texte(4, 2, "CHAQUE 500 MS");   // un titre fixe, qui ne clignote pas
+
+  while (true) {
+    image();
+    if (chaque(500)) {            // deux fois par seconde
+      if (allume == 0) {
+        texte(6, 8, "COUCOU");
+        allume = 1;
+      } else {
+        effacer(6, 8, "COUCOU");
+        allume = 0;
+      }
+    }
+  }
+}
+`,
+    aVoir: 'CHAQUE 500 MS en haut, et COUCOU qui clignote en dessous, deux fois par seconde.',
+    controle: (c) => {
+      const vus = new Set()
+      for (let k = 0; k < 150; k++) { c.avancer(1); vus.add(c.mot(6, 8, 6)) }
+      return [
+        ['le mot apparaît', vus.has('COUCOU')],
+        ['et disparaît', vus.has('      ')],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction attendre() — attendre des secondes',
+    difficulte: 0,
+    idee: '#include <attendre> : attendre(2) arrête tout le programme deux secondes, puis il continue.',
+    texte: [
+      '**Ce qu’elle fait :** `attendre(secondes)` **arrête tout** le programme ce nombre de secondes, puis il continue à la ligne suivante. Simple, mais pendant ce temps rien d’autre ne se passe : la manette n’est pas lue. Pour attendre sans tout arrêter, il y a `chaque()`.',
+      '**La ligne à écrire : `#include <attendre>`.**',
+      '**Son argument :** le nombre de secondes, jusqu’à 255.',
+      '**Ce qu’elle coûte :** une vingtaine d’octets.',
+      '**Essaie :** ajoute une troisième ligne, TROIS, après un autre `attendre(1);`.',
+    ],
+    code: `// ---- #include <attendre> : attendre des secondes ----
+
+#include <attendre>   // attendre() : tout s'arrête un moment
+#include <texte>
+
+int main() {
+  texte(4, 6, "UN");
+  attendre(2);              // deux secondes : rien ne bouge
+  texte(4, 8, "DEUX");      // puis la suite
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'UN, puis DEUX deux secondes plus tard.',
+    controle: (c) => {
+      const tot = c.mot(4, 8, 4)
+      c.avancer(130)
+      return [
+        ['UN est là tout de suite', c.mot(4, 6, 2) === 'UN'],
+        ['DEUX n’est pas encore là au départ', tot === '    '],
+        ['deux secondes plus tard, DEUX est là', c.mot(4, 8, 4) === 'DEUX'],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction bouton() — lire la manette',
+    difficulte: 0,
+    idee: '#include <bouton> : bouton(A) vaut 1 tant que le bouton A est enfoncé, 0 sinon.',
+    texte: [
+      '**Ce qu’elle fait :** `bouton(X)` rend **1** tant que le bouton est **enfoncé**, **0** sinon. Les huit : `A`, `B`, `START`, `SELECT`, `HAUT`, `BAS`, `GAUCHE`, `DROITE`.',
+      '**La ligne à écrire : `#include <bouton>`.**',
+      '**Son argument :** le nom du bouton.',
+      '**Ce qu’elle coûte :** environ **50 octets** : la routine qui lit les huit boutons, et un test par appel.',
+      '**Essaie :** un deuxième `if`, avec `bouton(B)`, qui écrit ailleurs.',
+    ],
+    code: `// ---- #include <bouton> : lire la manette ----
+// Tant que A est enfoncé, APPUYE s'affiche ; relâché, il s'efface.
+
+#include <bouton>    // bouton() : 1 si le bouton est enfoncé
+#include <texte>
+#include <effacer>
+
+int main() {
+  texte(4, 2, "APPUIE SUR A");   // la consigne, en haut
+
+  while (true) {
+    image();
+    if (bouton(A)) {
+      texte(6, 8, "APPUYE");
+    } else {
+      effacer(6, 8, "APPUYE");
+    }
+  }
+}
+`,
+    aVoir: 'APPUIE SUR A en haut ; APPUYE apparaît au milieu tant qu’on tient le bouton A.',
+    controle: (c) => {
+      const avant = c.mot(6, 8, 6)
+      c.gb.setButton('a', true)
+      c.avancer(5)
+      const pendant = c.mot(6, 8, 6)
+      c.gb.setButton('a', false)
+      c.avancer(5)
+      return [
+        ['rien au départ', avant === '      '],
+        ['A tenu : APPUYE', pendant === 'APPUYE'],
+        ['relâché : effacé', c.mot(6, 8, 6) === '      '],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction hasard() — un nombre au hasard',
+    difficulte: 0,
+    idee: '#include <hasard> : hasard() rend un nombre imprévisible, de 0 à 255.',
+    texte: [
+      '**Ce qu’elle fait :** `hasard()` rend un **nombre imprévisible**, de 0 à 255. Pour un nombre plus petit, on prend le reste : `hasard() % 6` va de 0 à 5.',
+      '**La ligne à écrire : `#include <hasard>`.**',
+      '**Pas d’argument.**',
+      '**Ce qu’elle coûte :** environ **40 octets** : un petit mélangeur, et une semence prise au matériel au démarrage.',
+      '**Essaie :** `hasard() % 6 + 1` : un dé (il faut alors `#include <reste>`).',
+    ],
+    code: `// ---- #include <hasard> : un nombre au hasard ----
+// Toutes les secondes, un nouveau tirage s'écrit à l'écran.
+
+#include <hasard>    // hasard() : un nombre de 0 à 255
+#include <chaque>
+#include <nombre>
+
+uint8_t tirage = 0;
+
+int main() {
+  tirage = hasard();           // un premier tirage, tout de suite
+  nombre(8, 8, tirage);
+
+  while (true) {
+    image();
+    if (chaque(1000)) {
+      tirage = hasard();       // un nombre imprévisible
+      nombre(8, 8, tirage);
+    }
+  }
+}
+`,
+    aVoir: 'Un nombre au milieu de l’écran, qui change toutes les secondes.',
+    controle: (c) => {
+      const vus = new Set()
+      for (let k = 0; k < 5; k++) { c.avancer(62); vus.add(c.variable('tirage')) }
+      return [
+        ['les tirages changent', vus.size >= 4, ` (${[...vus].join(', ')})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction semer() — le départ du hasard',
+    difficulte: 0,
+    idee: '#include <semer> : semer(n) choisit le point de départ des tirages de hasard().',
+    texte: [
+      '**Ce qu’elle fait :** `semer(n)` donne au tirage un **point de départ** choisi. C’est utile pour mélanger avec un nombre qui vient du joueur : le moment où il appuie sur START, par exemple.',
+      '**La ligne à écrire : `#include <semer>`.**',
+      '**Son argument :** un nombre de 0 à 255.',
+      '**Ce qu’elle coûte :** une dizaine d’octets.',
+      '**Essaie :** `semer(images());` au moment où l’on appuie sur START.',
+    ],
+    code: `// ---- #include <semer> : le départ du hasard ----
+
+#include <semer>     // semer() : le départ des tirages
+#include <hasard>
+#include <nombre>
+
+uint8_t tirage = 0;
+
+int main() {
+  semer(42);              // le point de départ du hasard
+  tirage = hasard();      // le premier tirage, à partir de là
+  nombre(8, 8, tirage);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un nombre tiré au hasard, au milieu de l’écran.',
+    controle: (c) => [
+      ['un tirage est écrit', /^\d\d\d$/.test(c.mot(8, 8, 3)), ` (« ${c.mot(8, 8, 3)} »)`],
+      ['c’est bien la valeur de tirage', Number(c.mot(8, 8, 3)) === c.variable('tirage')],
+    ],
+  },
+
+  {
+    titre: 'La fonction note() — jouer une note',
+    difficulte: 0,
+    idee: '#include <note> : note(voix, hauteur, duree, volume) joue une note sur la voix 1 ou 2.',
+    texte: [
+      '**Ce qu’elle fait :** `note(voix, hauteur, duree, volume)` **joue une note**. Les hauteurs ont des noms, de `DO2` à `SI6` : `DO4`, `RE4`, `LA4` (le LA à 440 Hz)…',
+      '**La ligne à écrire : `#include <note>`.**',
+      '**Ses arguments :** la voix (1 ou 2), la hauteur, la durée en 256ᵉ de seconde (1 à 64 ; **0 : sans fin**), le volume (0 à 15).',
+      '**Ce qu’elle coûte :** environ **190 octets** : la table des hauteurs (120 octets) et le réglage de la voix.',
+      '**Essaie :** une deuxième note sur la voix 2 : un accord.',
+    ],
+    code: `// ---- #include <note> : jouer une note ----
+
+#include <note>      // note() : une note sur la voix 1 ou 2
+#include <texte>
+
+int main() {
+  texte(6, 8, "LA 440");
+  note(1, LA4, 0, 12);    // voix 1, le LA4, sans fin (0), volume 12
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'LA 440 écrit, et un LA qui sonne sans s’arrêter.',
+    controle: (c) => [
+      ['la voix 1 joue', c.voix(1).joue],
+      ['un LA, autour de 440 Hz', Math.abs(c.voix(1).hertz - 440) <= 3, ` (${c.voix(1).hertz} Hz)`],
+      ['au volume 12', c.voix(1).volume === 12],
+    ],
+  },
+
+  {
+    titre: 'La fonction bruit() — un bruit',
+    difficulte: 0,
+    idee: '#include <bruit> : bruit(duree, volume) frappe sur la voix du bruit : un tir, un pas, une explosion.',
+    texte: [
+      '**Ce qu’elle fait :** `bruit(duree, volume)` frappe sur la **voix 4**, celle du bruit : pas une note, un choc. Un troisième argument, le **grain** (0 à 255), le rend plus sourd ou plus sifflant.',
+      '**La ligne à écrire : `#include <bruit>`.**',
+      '**Ses arguments :** la durée (1 à 64, ou 0 : sans fin), le volume (0 à 15), et le grain, facultatif.',
+      '**Ce qu’elle coûte :** environ **50 octets**.',
+      '**Essaie :** `bruit(20, 8, 0x55);` : plus rêche.',
+    ],
+    code: `// ---- #include <bruit> : un bruit ----
+// Chaque fois qu'on appuie sur A, un bruit court.
+
+#include <bruit>     // bruit() : la voix du bruit
+#include <bouton>
+#include <texte>
+
+int main() {
+  texte(4, 8, "APPUIE SUR A");
+
+  while (true) {
+    image();
+    if (bouton(A)) {
+      bruit(10, 12);      // court (10), fort (12)
+    }
+  }
+}
+`,
+    aVoir: 'APPUIE SUR A ; le bouton A fait un bruit sec.',
+    controle: (c) => {
+      const avant = c.voix(4).joue
+      c.gb.setButton('a', true)
+      c.avancer(2)
+      c.gb.setButton('a', false)
+      return [
+        ['silence au départ', !avant],
+        ['A : la voix du bruit joue', c.voix(4).joue],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction silence() — faire taire une voix',
+    difficulte: 0,
+    idee: '#include <silence> : silence(voix) coupe la voix 1, 2 ou 4.',
+    texte: [
+      '**Ce qu’elle fait :** `silence(voix)` **coupe** la voix tout de suite : une note sans fin, un air, un bruit.',
+      '**La ligne à écrire : `#include <silence>`.**',
+      '**Son argument :** la voix : 1, 2, ou 4 pour le bruit.',
+      '**Ce qu’elle coûte :** une vingtaine d’octets.',
+      '**Essaie :** coupe la note quand on appuie sur B.',
+    ],
+    code: `// ---- #include <silence> : faire taire une voix ----
+// Une note sans fin, qui se tait au bout d'une seconde.
+
+#include <note>
+#include <silence>   // silence() : couper une voix
+#include <texte>
+
+int main() {
+  texte(3, 8, "UN DO PUIS RIEN");
+  note(1, DO4, 0, 12);      // DO4, sans fin
+
+  while (true) {
+    image();
+    if (images() == 60) {   // une seconde après l'allumage
+      silence(1);           // la voix 1 se tait
+    }
+  }
+}
+`,
+    aVoir: 'Un DO qui sonne une seconde, puis le silence.',
+    controle: (c) => {
+      const avant = c.voix(1).joue
+      c.avancer(60)
+      return [
+        ['la note joue au départ', avant],
+        ['une seconde plus tard, la voix 1 se tait', !c.voix(1).joue],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction volumeSon() — le volume général',
+    difficulte: 0,
+    idee: '#include <volumeSon> : volumeSon(0 à 7) règle le volume de toute la console.',
+    texte: [
+      '**Ce qu’elle fait :** `volumeSon(n)` règle le **volume général**, de 0 (muet) à 7 (le plus fort), pour toutes les voix ensemble. En le baissant pas à pas, une musique s’éteint en douceur.',
+      '**La ligne à écrire : `#include <volumeSon>`.**',
+      '**Son argument :** de 0 à 7.',
+      '**Ce qu’elle coûte :** une vingtaine d’octets.',
+      '**Essaie :** baisse-le de 7 à 0, d’un cran toutes les 250 ms : un fondu.',
+    ],
+    code: `// ---- #include <volumeSon> : le volume général ----
+
+#include <note>
+#include <volumeSon>   // volumeSon() : le volume de toute la console
+#include <texte>
+
+int main() {
+  texte(5, 8, "DOUCEMENT");
+  volumeSon(3);            // à peu près à moitié : 3 sur 7
+  note(1, MI4, 0, 15);     // une note forte… mais tout est à moitié
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un MI qui sonne doucement.',
+    controle: (c) => [
+      ['le volume général vaut 3, à gauche comme à droite', c.gb.mmu.read(0xff24) === 0x33, ` (${c.gb.mmu.read(0xff24).toString(16)})`],
+      ['la note joue', c.voix(1).joue],
+    ],
+  },
+
+  {
+    titre: 'Air — écrire une musique',
+    difficulte: 0,
+    idee: '#include <Air> : Air THEME = { "DO4 12", "==", "MI4", … }; une mélodie, un pas par élément, que jouer() lance.',
+    texte: [
+      '**Ce que c’est :** un **Air** est une mélodie écrite **pas par pas**. Chaque pas est une hauteur et un volume (`"DO4 12"`) ; `"=="` **tient** la note d’avant ; `"--"` est un **silence**.',
+      '**La ligne à écrire : `#include <Air>`.** Un Air écrit ne joue pas tout seul : c’est la partition, pas le musicien. L’étape suivante, `jouer()`, le fait entendre.',
+      '**Ce qu’il coûte :** deux octets par pas, gravés quand on le joue — un Air que rien ne joue ne grave rien.',
+      '**Essaie :** ajoute `"SOL4"` à la fin : la partition a un pas de plus.',
+    ],
+    code: `// ---- #include <Air> : écrire une musique ----
+
+#include <Air>      // Air : une mélodie, pas par pas
+#include <texte>
+
+// La partition : dix pas. Elle est écrite, mais rien ne la joue encore.
+Air GAMME = {
+  "DO4 12", "RE4 12", "MI4 12", "FA4 12",
+  "SOL4 12", "LA4 12", "SI4 12", "DO5 12",
+  "==", "--",
+};
+
+int main() {
+  texte(3, 8, "UNE GAMME ECRITE");
+  texte(3, 10, "PAS ENCORE JOUEE");
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'UNE GAMME ECRITE, PAS ENCORE JOUEE : la partition existe, la console reste muette.',
+    controle: (c) => {
+      c.avancer(30)
+      return [
+        ['le programme compile avec son Air', c.mot(3, 8, 16) === 'UNE GAMME ECRITE'],
+        ['et rien ne joue : il faut jouer()', !c.voix(1).joue],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction jouer() — jouer un air tout seul',
+    difficulte: 0,
+    idee: '#include <jouer> : jouer(voix, AIR, vitesse) lance l’air, qui avance tout seul pendant que le jeu continue.',
+    texte: [
+      '**Ce qu’elle fait :** `jouer(voix, AIR, vitesse)` **lance** un Air sur la voix 1 ou 2. Il avance **tout seul**, une image après l’autre : le programme continue pendant ce temps.',
+      '**La ligne à écrire : `#include <jouer>`.**',
+      '**Ses arguments :** la voix, le nom de l’Air, la vitesse (le nombre d’images que dure un pas) ; un quatrième, `1`, le fait jouer **en boucle**.',
+      '**Ce qu’elle coûte :** environ **510 octets** avec un petit air : le lecteur, la table des hauteurs, les pas.',
+      '**Essaie :** une vitesse de 4 : l’air file.',
+    ],
+    code: `// ---- #include <jouer> : jouer un air tout seul ----
+// L'air tourne en boucle ; pendant ce temps, le programme compte les secondes.
+
+#include <jouer>    // jouer() : lancer un air
+#include <Air>
+#include <chaque>
+#include <nombre>
+
+Air REFRAIN = { "MI4", "SOL4", "LA4", "==", "SOL4", "MI4", "--", "--" };
+
+uint8_t secondesJouees = 0;
+
+int main() {
+  nombre(8, 8, secondesJouees);   // 000 dès le départ
+  jouer(1, REFRAIN, 8, 1);   // voix 1, 8 images par pas, en boucle (1)
+
+  while (true) {
+    image();
+    if (chaque(1000)) {      // le jeu continue pendant la musique
+      secondesJouees++;
+      nombre(8, 8, secondesJouees);
+    }
+  }
+}
+`,
+    aVoir: 'Un petit refrain qui tourne sans fin, et un compteur de secondes qui avance.',
+    controle: (c) => {
+      let joue = 0
+      for (let k = 0; k < 200; k++) { c.avancer(1); if (c.voix(1).joue) joue++ }
+      return [
+        ['la musique joue', joue > 80, ` (${joue} images sur 200)`],
+        ['et le compteur avance en même temps', c.variable('secondesJouees') >= 3],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction airFini() — l’air est-il fini ?',
+    difficulte: 0,
+    idee: '#include <airFini> : airFini(voix) rend 1 quand l’air de cette voix est arrivé au bout.',
+    texte: [
+      '**Ce qu’elle fait :** `airFini(voix)` rend **1** quand l’air est arrivé au bout — ou que rien ne joue —, **0** tant qu’il joue. De quoi enchaîner : la fin de la musique de victoire lance l’écran suivant.',
+      '**La ligne à écrire : `#include <airFini>`.**',
+      '**Son argument :** la voix, 1 ou 2.',
+      '**Ce qu’elle coûte :** une vingtaine d’octets.',
+      '**Essaie :** relance l’air quand il est fini : il tourne en boucle, sans le 4ᵉ argument.',
+    ],
+    code: `// ---- #include <airFini> : l'air est-il fini ? ----
+
+#include <airFini>   // airFini() : 1 quand l'air est fini
+#include <Air>
+#include <jouer>
+#include <texte>
+
+Air COURT = { "DO5", "SOL4", "DO4", "--" };
+
+uint8_t ecrit = 0;
+
+int main() {
+  texte(5, 4, "ECOUTE");
+  jouer(1, COURT, 10);
+
+  while (true) {
+    image();
+    if (airFini(1) && ecrit == 0) {   // l'air est arrivé au bout
+      texte(7, 8, "FINI");
+      ecrit = 1;
+    }
+  }
+}
+`,
+    aVoir: 'ECOUTE ; trois notes qui descendent, puis FINI s’affiche.',
+    controle: (c) => {
+      const tot = c.mot(7, 8, 4)
+      c.avancer(60)
+      return [
+        ['pendant l’air, rien n’est écrit', tot === '    '],
+        ['l’air fini, FINI s’affiche', c.mot(7, 8, 4) === 'FINI'],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction sauver() — garder un nombre, même éteint',
+    difficulte: 0,
+    idee: '#include <sauver> : sauver(numero, valeur) écrit dans la mémoire de la cartouche, qui garde tout quand on éteint.',
+    texte: [
+      '**Ce qu’elle fait :** la cartouche porte une **pile** et une petite mémoire. `sauver(numero, valeur)` y écrit une valeur dans une de ses **256 cases** : elle y sera encore après avoir éteint la console. C’est ainsi qu’on garde un record.',
+      '**La ligne à écrire : `#include <sauver>`.**',
+      '**Ses arguments :** le numéro de la case (0 à 255), la valeur.',
+      '**Ce qu’elle coûte :** une vingtaine d’octets ; la cartouche s’annonce avec une mémoire à pile.',
+      '**Essaie :** sauve le score à chaque fois qu’il change.',
+    ],
+    code: `// ---- #include <sauver> : garder un nombre, même éteint ----
+
+#include <sauver>    // sauver() : écrire dans la mémoire de la cartouche
+#include <texte>
+
+int main() {
+  sauver(0, 42);           // la case 0 de la cartouche reçoit 42
+  texte(5, 8, "SAUVE");
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'SAUVE écrit ; 42 est rangé dans la cartouche.',
+    controle: (c) => [
+      ['la cartouche annonce une mémoire à pile', c.gb.mmu.mbc === 'mbc1'],
+      ['la case 0 de la cartouche vaut 42', c.gb.mmu.externalRam[0] === 42, ` (${c.gb.mmu.externalRam[0]})`],
+    ],
+  },
+
+  {
+    titre: 'La fonction sauvegarde() — relire un nombre gardé',
+    difficulte: 0,
+    idee: '#include <sauvegarde> : sauvegarde(numero) relit une valeur écrite par sauver(), même d’une partie précédente.',
+    texte: [
+      '**Ce qu’elle fait :** `sauvegarde(numero)` **relit** la case de la cartouche : ce qu’un `sauver()` y a écrit, aujourd’hui ou la veille.',
+      '**La ligne à écrire : `#include <sauvegarde>`.**',
+      '**Son argument :** le numéro de la case.',
+      '**Ce qu’elle coûte :** une vingtaine d’octets.',
+      '**Attention :** une cartouche **neuve** ne contient rien de sûr. On y range d’abord une « marque » : si elle n’y est pas, on remet tout à zéro.',
+    ],
+    code: `// ---- #include <sauvegarde> : relire un nombre gardé ----
+// Le nombre de fois où la console a été allumée : gardé dans la case 1.
+
+#include <sauvegarde>   // sauvegarde() : relire la cartouche
+#include <sauver>
+#include <nombre>
+
+uint8_t allumages = 0;
+
+int main() {
+  if (sauvegarde(0) != 42) {          // pas de marque : une cartouche neuve
+    sauver(0, 42);                    // on pose la marque
+    sauver(1, 0);                     // et le compte à zéro
+  }
+  allumages = sauvegarde(1) + 1;      // relire, et compter cet allumage
+  sauver(1, allumages);
+  nombre(8, 8, allumages);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: '001 au premier allumage — et un de plus à chaque fois qu’on rallume.',
+    controle: (c) => [
+      ['premier allumage : 1', c.variable('allumages') === 1],
+      ['la marque et le compte sont dans la cartouche', c.gb.mmu.externalRam[0] === 42 && c.gb.mmu.externalRam[1] === 1],
+      ['001 s’affiche', c.mot(8, 8, 3) === '001'],
+    ],
+  },
+
+  {
+    titre: '#include <multiplier> — a * b, quand les deux se calculent',
+    difficulte: 0,
+    idee: '#include <multiplier> : le processeur ne sait pas multiplier ; a * b, quand ni a ni b n’est écrit en clair, demande une routine.',
+    texte: [
+      '**Ce que c’est :** le processeur de la Game Boy **ne sait pas multiplier**. Fois un nombre écrit en clair (`a * 3`), le compilateur s’en sort tout seul en additionnant. Mais quand **les deux** se calculent (`a * b`), il faut une petite routine qui multiplie.',
+      '**La ligne à écrire : `#include <multiplier>`.** Sans elle, `a * b` est refusé ; `a * 3` passe toujours.',
+      '**Ce qu’elle coûte :** environ **25 octets**.',
+      '**Essaie :** remplace `b` par `7` et enlève la ligne `#include <multiplier>` : ça compile encore.',
+    ],
+    code: `// ---- #include <multiplier> : a * b, quand les deux se calculent ----
+
+#include <multiplier>   // la routine qui multiplie deux valeurs calculées
+#include <nombre>
+
+uint8_t a = 6;
+uint8_t b = 7;
+uint8_t produit = 0;
+
+int main() {
+  produit = a * b;          // 6 × 7, calculé pendant le jeu
+  nombre(8, 8, produit);    // 042
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: '042 au milieu de l’écran.',
+    controle: (c) => [
+      ['6 × 7 = 42', c.variable('produit') === 42],
+      ['042 s’affiche', c.mot(8, 8, 3) === '042'],
+    ],
+  },
+
+  {
+    titre: '#include <diviser> — a / b',
+    difficulte: 0,
+    idee: '#include <diviser> : a / b demande une routine, sauf par 1, 2, 4, 8, 16… écrits en clair.',
+    texte: [
+      '**Ce que c’est :** le processeur **ne sait pas diviser** non plus. Diviser par 2, 4, 8, 16… écrit en clair, c’est décaler les bits : le compilateur le fait seul. Par **tout autre nombre**, ou par une valeur calculée, il faut une routine.',
+      '**La ligne à écrire : `#include <diviser>`.** Le résultat est **entier** : 100 / 7 vaut 14, le reste se perd.',
+      '**Ce qu’elle coûte :** environ **30 octets**.',
+      '**Essaie :** `a / 4` sans la ligne : ça compile.',
+    ],
+    code: `// ---- #include <diviser> : a / b ----
+
+#include <diviser>   // la routine qui divise
+#include <nombre>
+
+uint8_t a = 100;
+uint8_t b = 7;
+uint8_t quotient = 0;
+
+int main() {
+  quotient = a / b;           // 100 / 7 = 14 (et il reste 2)
+  nombre(8, 8, quotient);     // 014
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: '014 au milieu de l’écran.',
+    controle: (c) => [
+      ['100 / 7 = 14', c.variable('quotient') === 14],
+      ['014 s’affiche', c.mot(8, 8, 3) === '014'],
+    ],
+  },
+
+  {
+    titre: '#include <reste> — a % b',
+    difficulte: 0,
+    idee: '#include <reste> : a % b, le reste d’une division, demande une routine, sauf par 1, 2, 4, 8, 16… écrits en clair.',
+    texte: [
+      '**Ce que c’est :** `a % b` est le **reste** de la division : 100 % 7 vaut 2, parce que 100 = 7 × 14 + 2. Par 2, 4, 8, 16… écrit en clair, c’est garder les bits du bas : gratuit. Sinon, il faut une routine.',
+      '**La ligne à écrire : `#include <reste>`.**',
+      '**Ce qu’elle coûte :** une vingtaine d’octets.',
+      '**Essaie :** `hasard() % 6` : un nombre de 0 à 5, pour un dé.',
+    ],
+    code: `// ---- #include <reste> : a % b ----
+
+#include <reste>     // la routine du reste
+#include <nombre>
+
+uint8_t a = 100;
+uint8_t b = 7;
+uint8_t r = 0;
+
+int main() {
+  r = a % b;            // 100 = 7 × 14 + 2 : le reste est 2
+  nombre(8, 8, r);      // 002
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: '002 au milieu de l’écran.',
+    controle: (c) => [
+      ['100 % 7 = 2', c.variable('r') === 2],
+      ['002 s’affiche', c.mot(8, 8, 3) === '002'],
+    ],
+  },
+
+  {
+    titre: '#include <decaler> — a << b et a >> b',
+    difficulte: 0,
+    idee: '#include <decaler> : décaler les bits d’un nombre calculé de rangs — chaque rang à gauche double, chaque rang à droite divise par deux.',
+    texte: [
+      '**Ce que c’est :** `a << b` décale les bits de `a` de `b` rangs vers la gauche : chaque rang **double** (1 << 3 vaut 8). `a >> b` décale vers la droite : chaque rang **divise par deux** (200 >> 2 vaut 50). Quand `b` est écrit en clair, le compilateur le fait seul ; quand `b` se calcule, il faut une routine.',
+      '**La ligne à écrire : `#include <decaler>`.**',
+      '**Ce qu’elle coûte :** une vingtaine d’octets par sens.',
+      '**Essaie :** `1 << n` pour n de 0 à 7 : 1, 2, 4, 8… 128.',
+    ],
+    code: `// ---- #include <decaler> : a << b et a >> b ----
+
+#include <decaler>   // les routines qui décalent d'un nombre calculé de rangs
+#include <nombre>
+
+uint8_t n = 3;
+uint8_t gauche = 0;
+uint8_t droite = 0;
+
+int main() {
+  gauche = 1 << n;          // 1 décalé de 3 rangs : 8
+  droite = 200 >> (n - 1);  // 200 décalé de 2 rangs : 50
+  nombre(8, 6, gauche);     // 008
+  nombre(8, 8, droite);     // 050
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: '008, puis 050 en dessous.',
+    controle: (c) => [
+      ['1 << 3 = 8', c.variable('gauche') === 8],
+      ['200 >> 2 = 50', c.variable('droite') === 50],
+      ['les deux s’affichent', c.mot(8, 6, 3) === '008' && c.mot(8, 8, 3) === '050'],
+    ],
+  },
+
+  /*
    * Le chapitre 1 va par paires : une leçon AFFICHE le mot, la suivante
    * l'EFFACE. D'une paire à l'autre, une seule chose change — la façon de
    * dire le mot et sa place : en clair, sous un nom, dans x et y, dans un Mot.
@@ -18280,7 +26032,9 @@ int main() {
       '`texte(colonne, ligne, "…")` écrit à partir d’une case : l’écran en fait **20 de large sur 18 de haut**, et la case (0, 0) est en haut à gauche.',
       '`while (true) image();` n’est pas décoratif. Un programme qui se termine laisse le processeur partir n’importe où ; ici, il attend l’image suivante, soixante fois par seconde, et l’écran reste affiché.',
     ],
-    code: `int main() {
+    code: `#include <texte>   // écrit un texte à l’écran
+
+int main() {
   texte(5, 6, "BONJOUR");
 
   while (true) image();
@@ -18302,7 +26056,9 @@ int main() {
       '**L’espace est une case vide.** Écrire des espaces par-dessus un mot, c’est l’effacer.',
       'Il en faut **autant que de lettres** : `BONJOUR` en a sept, donc sept espaces. Un de moins laisse le `R` tout seul.',
     ],
-    code: `int main() {
+    code: `#include <texte>   // écrit un texte à l’écran
+
+int main() {
   texte(5, 6, "BONJOUR");
   texte(5, 6, "       ");
 
@@ -18328,7 +26084,10 @@ int main() {
       '`effacer(5, 6, "BONJOUR")` efface **autant de cases que le mot a de lettres** : sept. Plus d’espaces à compter.',
       'Il faut effacer **à la même place** qu’on a écrit : ici, (5, 6) deux fois.',
     ],
-    code: `int main() {
+    code: `#include <texte>     // écrit un texte à l’écran
+#include <effacer>   // efface des cases, ou tout le fond
+
+int main() {
   texte(5, 6, "BONJOUR");
   effacer(5, 6, "BONJOUR");
 
@@ -18354,7 +26113,9 @@ int main() {
       '`const char MOT[] = "BONJOUR";` range le mot sous le nom `MOT`, au-dessus de `int main()`. C’est la chaîne de caractères de cette console.',
       '`texte(5, 6, MOT)` écrit ce que `MOT` contient.',
     ],
-    code: `const char MOT[] = "BONJOUR";
+    code: `#include <texte>   // écrit un texte à l’écran
+
+const char MOT[] = "BONJOUR";
 
 int main() {
   texte(5, 6, MOT);
@@ -18379,7 +26140,10 @@ int main() {
     texte: [
       '`effacer(5, 6, MOT)` efface les sept cases de `MOT`. Si l’on change le mot, l’effacement suit tout seul.',
     ],
-    code: `const char MOT[] = "BONJOUR";
+    code: `#include <texte>     // écrit un texte à l’écran
+#include <effacer>   // efface des cases, ou tout le fond
+
+const char MOT[] = "BONJOUR";
 
 int main() {
   texte(5, 6, MOT);
@@ -18407,7 +26171,9 @@ int main() {
       '`uint8_t x = 5;` range un nombre sous le nom `x` : la **colonne**. La **ligne** va dans `y`.',
       '`texte(x, y, MOT)` écrit le mot à cette place. Pour le déplacer, on ne change que `x` ou `y`.',
     ],
-    code: `const char MOT[] = "BONJOUR";
+    code: `#include <texte>   // écrit un texte à l’écran
+
+const char MOT[] = "BONJOUR";
 uint8_t x = 5;
 uint8_t y = 6;
 
@@ -18435,7 +26201,10 @@ int main() {
     texte: [
       '`effacer(x, y, MOT)` efface là où `texte(x, y, MOT)` a écrit : les deux lisent les mêmes variables.',
     ],
-    code: `const char MOT[] = "BONJOUR";
+    code: `#include <texte>     // écrit un texte à l’écran
+#include <effacer>   // efface des cases, ou tout le fond
+
+const char MOT[] = "BONJOUR";
 uint8_t x = 5;
 uint8_t y = 6;
 
@@ -18466,7 +26235,10 @@ int main() {
       '`Mot mot_xy = { 5, 6, "BONJOUR" };` range **trois choses sous un seul nom** : la colonne, la ligne, et le texte.',
       '`texte(mot_xy)` l’écrit. Plus rien à répéter : ni la place, ni le mot.',
     ],
-    code: `Mot mot_xy = { 5, 6, "BONJOUR" };
+    code: `#include <Mot>     // un texte et sa place, sous un seul nom
+#include <texte>   // écrit un texte à l’écran
+
+Mot mot_xy = { 5, 6, "BONJOUR" };
 
 int main() {
   texte(mot_xy);
@@ -18491,7 +26263,11 @@ int main() {
     texte: [
       '`effacer(mot_xy)` efface la place et la longueur que `mot_xy` retient : exactement ce que `texte(mot_xy)` a écrit.',
     ],
-    code: `Mot mot_xy = { 5, 6, "BONJOUR" };
+    code: `#include <Mot>       // un texte et sa place, sous un seul nom
+#include <texte>     // écrit un texte à l’écran
+#include <effacer>   // efface des cases, ou tout le fond
+
+Mot mot_xy = { 5, 6, "BONJOUR" };
 
 int main() {
   texte(mot_xy);
@@ -18519,7 +26295,10 @@ int main() {
       'On crée d’abord `x`, `y` et `MOT`, **avant** le `Mot` : il ne peut se servir que de ce qui existe déjà.',
       '`Mot mot_xy = { x, y, MOT };` ne recopie pas 5 et 6 : il **relit** `x` et `y` à chaque `texte()`. Changer `x` déplace donc le mot.',
     ],
-    code: `uint8_t x = 5;
+    code: `#include <Mot>     // un texte et sa place, sous un seul nom
+#include <texte>   // écrit un texte à l’écran
+
+uint8_t x = 5;
 uint8_t y = 6;
 const char MOT[] = "BONJOUR";
 Mot mot_xy = { x, y, MOT };
@@ -18548,7 +26327,11 @@ int main() {
     texte: [
       '`effacer(mot_xy)` relit `x`, `y` et `MOT` : il efface exactement ce que `texte(mot_xy)` a écrit.',
     ],
-    code: `uint8_t x = 5;
+    code: `#include <Mot>       // un texte et sa place, sous un seul nom
+#include <texte>     // écrit un texte à l’écran
+#include <effacer>   // efface des cases, ou tout le fond
+
+uint8_t x = 5;
 uint8_t y = 6;
 const char MOT[] = "BONJOUR";
 Mot mot_xy = { x, y, MOT };
@@ -18588,7 +26371,10 @@ const char MOT[] = "BONJOUR";
 Mot mot_xy = { x, y, MOT };
 `,
     },
-    code: `#include "variables.h"
+    code: `#include <Mot>       // un texte et sa place, sous un seul nom
+#include <texte>     // écrit un texte à l’écran
+#include <effacer>   // efface des cases, ou tout le fond
+#include "variables.h"
 
 int main() {
   texte(mot_xy);
@@ -18617,7 +26403,10 @@ int main() {
       '`if (bouton(A))` exécute ce qui suit **tant que A est enfoncé**. On y recouvre la ligne d’espaces.',
       '« BONJOUR APPUIE SUR A » fait vingt caractères, espaces compris : il faut donc vingt espaces. C’est toute la largeur de l’écran.',
     ],
-    code: `int main() {
+    code: `#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+
+int main() {
   texte(0, 4, "BONJOUR APPUIE SUR A");
   texte(3, 8, "APPUIE SUR A");
 
@@ -18653,7 +26442,10 @@ int main() {
       'B écrit « APPUIE SUR A », A remet « APPUIE SUR B ». Chaque message **recouvre** le précédent, à la même place.',
       'Les deux font **douze** caractères : le nouveau couvre exactement l’ancien, et il ne reste aucune lettre de trop.',
     ],
-    code: `int main() {
+    code: `#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+
+int main() {
 
    texte(1, 8, "APPUIE SUR B");
   while (true) {
@@ -18697,7 +26489,10 @@ int main() {
       'C’est pour cela que **`effacer(6, 4, "BONJOUR")` existe** : il ôte exactement la longueur du texte, comptée par le compilateur. Les deux lignes font la même chose, mais l’une ne peut pas se tromper d’un espace. La leçon « Effacer sans compter les lettres » y revient.',
       'Pour effacer une zone plus large, `poser(colonne, ligne, 0)` fait la même chose case par case, et se met dans une boucle.',
     ],
-    code: `int main() {
+    code: `#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+
+int main() {
   texte(6, 4, "BONJOUR");
   texte(3, 8, "APPUIE SUR A");
 
@@ -18749,7 +26544,11 @@ int main() {
 Mot consigne = { 3, 8, "APPUIE SUR A" };
 `,
     },
-    code: `#include "variables.h"
+    code: `#include <Mot>       // un texte et sa place, sous un seul nom
+#include <texte>     // écrit un texte à l’écran
+#include <bouton>    // lit un bouton de la manette
+#include <effacer>   // efface des cases, ou tout le fond
+#include "variables.h"
 
 int main() {
   texte(bonjour);
@@ -18787,7 +26586,10 @@ int main() {
       '`attente++` est la façon C++ d’écrire `attente = attente + 1`. `+=`, `--`, `%=` existent aussi.',
       'Pour afficher un chiffre calculé, on ne peut pas se servir de `texte()`, qui ne prend que des mots écrits en clair. On pose la **tuile** du chiffre : celle du 0 porte le numéro 27, et les neuf suivantes se suivent. D’où `27 + compte`.',
     ],
-    code: `int main() {
+    code: `#include <texte>   // écrit un texte à l’écran
+#include <poser>   // pose une tuile sur une case du fond
+
+int main() {
   uint8_t compte = 0;
   uint8_t attente = 0;
 
@@ -18834,7 +26636,10 @@ int main() {
       'Ici on lit le **niveau** : tant que A est tenu, le texte change. C’est ce qu’on veut pour courir ou viser — mais pas pour un menu : c’est la leçon « le front » qui règle ce cas.',
       '`&&`, `||` et `!` s’écrivent comme en C++, et **s’arrêtent dès que la réponse est connue** : dans `i < n && t[i] == 0`, la case n’est pas lue si l’index est hors du tableau.',
     ],
-    code: `int main() {
+    code: `#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+
+int main() {
   texte(3, 5, "APPUIE SUR A");
 
   while (true) {
@@ -18875,7 +26680,11 @@ int main() {
       'La réponse tient en une variable : l’état du bouton à l’image **précédente**. On agit quand il vaut 1 maintenant et valait 0 avant — ce qu’on appelle agir **au front**.',
       'Le programme montre les deux compteurs côte à côte. Tiens A : celui du haut s’emballe, celui du bas monte d’un seul cran.',
     ],
-    code: `int main() {
+    code: `#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+#include <poser>    // pose une tuile sur une case du fond
+
+int main() {
   uint8_t aAvant = 0;
   uint8_t niveau = 0;
   uint8_t front = 0;
@@ -18925,7 +26734,12 @@ int main() {
       'Le `switch` aiguille sur la scène. Il fonctionne comme en C++, **`break` compris** : sans lui, l’exécution tombe dans le cas suivant. C’est un piège célèbre, mais c’est le sens du langage, et le trahir en douce serait pire.',
       'On éteint l’écran pour effacer parce que repeindre toute la carte demande bien plus de temps qu’une image n’en contient. `effacer()` sans argument vide les 32 × 32 de la carte d’un coup — cette leçon écrivait autrefois ses deux boucles à la main, et n’effaçait alors que les 20 × 18 visibles : le décor qui défilait ramenait l’écran d’avant.',
     ],
-    code: `enum Scene { TITRE, JEU, FIN };
+    code: `#include <ecran>     // éteint ou rallume l’écran
+#include <effacer>   // efface des cases, ou tout le fond
+#include <texte>     // écrit un texte à l’écran
+#include <bouton>    // lit un bouton de la manette
+
+enum Scene { TITRE, JEU, FIN };
 
 Scene scene = TITRE;
 
@@ -19009,7 +26823,11 @@ int main() {
       '**Les chiffres ne sont pas la seule écriture.** Huit chiffres à la file ne ressemblent pas à un dessin ; les signes `. - + #` disent exactement la même chose — le point est le vide, le dièse est le plein — et se relisent de loin : `"#.++++.#"`. Les deux donnent les mêmes octets. On n’en mélange pas deux dans une même tuile, et l’atelier rend à chacune la sienne quand tu peins.',
       'C’est vrai partout dans ce projet : **le programme reste la seule vérité**. L’atelier ne garde aucun dessin de son côté ; il lit les `Tuile NOM = {…}` du texte, et il les réécrit. Un éditeur graphique qui tiendrait ses propres dessins finirait par ne plus dire la même chose que le code.',
     ],
-    code: `Tuile BLOC = {
+    code: `#include <Tuile>   // un dessin de 8 × 8 pixels
+#include <texte>   // écrit un texte à l’écran
+#include <poser>   // pose une tuile sur une case du fond
+
+Tuile BLOC = {
   "33333333",
   "30000003",
   "30222203",
@@ -19055,7 +26873,11 @@ int main() {
       'Cela marche aux quatre endroits où un numéro de tuile est attendu : `poser`, `poserPanneau`, `sprite`, et `sprite16` — qui veut alors **seize rangées de seize signes**, et les découpe lui-même en quatre tuiles. Ailleurs, des accolades restent une faute, et le compilateur le dit avec sa ligne.',
       'Une chose que le dessin sur place ne fait pas : **il n’apparaît pas dans l’atelier**. Celui-ci lit les `Tuile NOM = {…}` du texte, et il ne saurait pas où réécrire un dessin qui n’a pas de nom. Ce qu’on veut peindre à la souris, on le nomme.',
     ],
-    code: `Tuile SOL = {
+    code: `#include <Tuile>   // un dessin de 8 × 8 pixels
+#include <texte>   // écrit un texte à l’écran
+#include <poser>   // pose une tuile sur une case du fond
+
+Tuile SOL = {
   "22222222",
   "21111112",
   "21111112",
@@ -19137,6 +26959,17 @@ int main() {
       '**À toi :** descends à l’atelier de la carte, dessine un arbre à côté de la maison, et regarde un nouveau `poser(…)` apparaître dans `VILLAGE()`.',
     ],
     code: `/* Une TUILE de 8 × 8 : un arbre. Elle se peint dans ▦ Les tuiles. */
+
+#include <Tuile>         // un dessin de 8 × 8 pixels
+#include <Perso>         // un dessin de 16 × 16 pixels, pour un lutin
+#include <poser>         // pose une tuile sur une case du fond
+#include <couleurFond>   // choisit une couleur d’une palette du fond
+#include <texte>         // écrit un texte à l’écran
+#include <teindre>       // met une case du fond dans une palette
+#include <sprite16>      // place un lutin de 16 × 16 au pixel près
+#include <nombre>        // écrit un nombre en chiffres
+#include <lire>          // lit la tuile posée sur une case
+
 Tuile ARBRE = {
   "00111100",
   "01122110",
@@ -19359,6 +27192,13 @@ int main() {
       '**À toi :** ajoute une quatrième brique en (10, 8) avec `teindre(10, 8, 1);` — elle prend les couleurs du désert. Puis, dans l’atelier, essaie « 🎨 Thèmes » et regarde les trois briques changer ensemble.',
     ],
     code: `/* Une seule tuile : quatre NUMÉROS de couleur, de 0 (clair) à 3 (sombre). */
+
+#include <Tuile>         // un dessin de 8 × 8 pixels
+#include <couleurFond>   // choisit une couleur d’une palette du fond
+#include <texte>         // écrit un texte à l’écran
+#include <poser>         // pose une tuile sur une case du fond
+#include <teindre>       // met une case du fond dans une palette
+
 Tuile BRIQUE = {
   "33333333",
   "21112111",
@@ -19423,7 +27263,12 @@ int main() {
       '`sprite(numero, x, y, tuile)` pose un carré de huit sur huit **où l’on veut**. Le matériel en a quarante, numérotés de 0 à 39.',
       'Il n’y a rien à faire pour l’effacer : on le repose ailleurs à chaque image, et il a bougé.',
     ],
-    code: `Tuile BALLE = {
+    code: `#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+
+Tuile BALLE = {
   "00333300",
   "03222230",
   "32222223",
@@ -19495,7 +27340,11 @@ int main() {
       '`G` vaut 2, et ce nombre est le seul réglage : à 1 la balle flotte comme sur la Lune, à 6 elle tombe comme une enclume. C’est là, et nulle part ailleurs, que se décide ce qu’on ressent.',
       '**Et 9,81 dans tout ça ?** Elle est dans `G`. Le processeur n’a ni virgule ni mètres : `G` se compte en seizièmes de pixel par image, par image, soit 450 pixels par seconde carrée à soixante images par seconde. Décidez qu’un mètre fait 46 pixels, et ces 450 pixels deviennent **9,81 m/s²** — l’écran mesure alors 3,10 m de haut, et la chute de 2,60 m dure les trois quarts de seconde que la vraie physique annonce. La pesanteur est la bonne ; c’est l’unité qui a changé.',
     ],
-    code: `Tuile BALLE = {
+    code: `#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <texte>    // écrit un texte à l’écran
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+
+Tuile BALLE = {
   "00333300",
   "03222230",
   "32222223",
@@ -19590,7 +27439,12 @@ int main() {
       '`const uint8_t ZEROV = 16;` ne coûte rien : la valeur est connue à la compilation, et le compilateur l’écrit directement dans le code. Un `const` n’occupe pas d’octet de mémoire.',
       'La pesanteur ajoute 1 à chaque image. Sauter, c’est poser une vitesse bien en dessous de 16 : elle remonte d’elle-même, le mouvement s’inverse, et la courbe est celle d’un vrai saut.',
     ],
-    code: `Tuile BALLE = {
+    code: `#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+
+Tuile BALLE = {
   "00333300",
   "03222230",
   "32222223",
@@ -19671,7 +27525,11 @@ int main() {
       'Leur envol est la vitesse décalée du saut : `ZEROV - 6` les projette vers le haut, la pesanteur les rattrape. Les deux éclats rapides retombent trois fois plus loin que les lents, sans qu’on ait rien à écrire pour ça — même temps de vol, vitesse triple.',
       '`t` n’avance **que tant qu’ils volent**. Posés, il s’arrête, et les éclats restent exactement où ils sont tombés. C’est cette ligne-là, et aucune autre, qui fait la différence entre du verre brisé et quatre morceaux qui glissent à l’infini.',
     ],
-    code: `Tuile VERRE = {
+    code: `#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <texte>    // écrit un texte à l’écran
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+
+Tuile VERRE = {
   "00333300",
   "03211230",
   "32112223",
@@ -19800,7 +27658,11 @@ int main() {
       'Un tableau **`const`** est différent : il est **gravé dans la cartouche**. Il ne prend pas un octet de mémoire, et ne peut plus changer — le compilateur refuse d’y écrire. C’est ce qu’on veut pour une table de formes, un niveau, une courbe.',
       'Le `for` de C++ tient sur une ligne ce que le `while` demandait en quatre, et **la variable du compteur n’existe que dans la boucle**. Deux boucles voisines peuvent toutes deux nommer leur compteur `i` sans se marcher dessus : c’est la portée du langage, et le compilateur la tient vraiment.',
     ],
-    code: `const uint8_t TABLE[] = { 1, 1, 2, 3, 5, 8, 3, 1, 4, 5 };
+    code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
+#include <texte>   // écrit un texte à l’écran
+#include <poser>   // pose une tuile sur une case du fond
+
+const uint8_t TABLE[] = { 1, 1, 2, 3, 5, 8, 3, 1, 4, 5 };
 
 uint8_t cases[20];
 
@@ -19845,7 +27707,11 @@ int main() {
       'Une fonction qui ne rend rien s’écrit **`void`**. Une fonction qui annonce rendre un `uint8_t` **doit** le faire : si aucun `return` ne rend de valeur, le compilateur refuse le fichier, plutôt que de laisser la fonction rendre ce qui traînait dans le processeur.',
       'Un prix à payer, et il est dit franchement : **une fonction ne peut pas s’appeler elle-même**. Les arguments vivent à une place fixe, réservée une fois pour toutes — faute d’une pile praticable sur cette machine. Un appel imbriqué écraserait les arguments de l’appel en cours ; le compilateur nomme le cycle et s’arrête là.',
     ],
-    code: `Tuile BLOC = {
+    code: `#include <Tuile>   // un dessin de 8 × 8 pixels
+#include <poser>   // pose une tuile sur une case du fond
+#include <texte>   // écrit un texte à l’écran
+
+Tuile BLOC = {
   "33333333",
   "30000003",
   "30222203",
@@ -19910,7 +27776,11 @@ int main() {
       'Une `struct` peut en contenir une autre : `struct Ennemi { Point ou; uint8_t vie; };`, et l’on écrit `troupe[i].ou.x`. Le compilateur additionne les décalages lui-même.',
       'Ce qu’elle ne sait pas faire : s’affecter d’un bloc, se passer en argument, se rendre par une fonction. On nomme le champ qu’on veut lire ou écrire — et le compilateur le dit plutôt que de traduire à peu près.',
     ],
-    code: `Tuile CORPS = {
+    code: `#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+#include <texte>    // écrit un texte à l’écran
+
+Tuile CORPS = {
   "00333300",
   "03222230",
   "32222223",
@@ -19987,7 +27857,13 @@ int main() {
       '`defiler(x, y)` fait glisser la fenêtre. Au-delà de 255, le compte revient tout seul à zéro : le décor est un **ruban sans fin**.',
       'C’est ce qui permet un niveau aussi long qu’on veut : quand la caméra franchit une case, on redessine la colonne qui va entrer par la droite, à la place de celle qui vient de sortir par la gauche.',
     ],
-    code: `Tuile MUR = {
+    code: `#include <Tuile>     // un dessin de 8 × 8 pixels
+#include <texte>     // écrit un texte à l’écran
+#include <poser>     // pose une tuile sur une case du fond
+#include <bouton>    // lit un bouton de la manette
+#include <defiler>   // fait glisser tout le fond
+
+Tuile MUR = {
   "33333333",
   "32222223",
   "32122123",
@@ -20044,7 +27920,14 @@ int main() {
       'Une seule variable suffit pour les deux rôles. `camera` est la fenêtre **et** la position du héros dans le monde : il est en `camera + 76`. Le jour où un ennemi arrive, lui vit dans le monde, et c’est à lui de se convertir — `sprite(1, xEnnemi - camera, 112, ENNEMI)`.',
       'La preuve est à l’écran, et elle est gratuite : **même la consigne s’en va**. Elle est écrite dans le décor, donc elle voyage avec lui. Le bonhomme, lui, ne bouge pas d’un pixel.',
     ],
-    code: `Tuile HEROS = {
+    code: `#include <Tuile>     // un dessin de 8 × 8 pixels
+#include <texte>     // écrit un texte à l’écran
+#include <poser>     // pose une tuile sur une case du fond
+#include <bouton>    // lit un bouton de la manette
+#include <defiler>   // fait glisser tout le fond
+#include <sprite>    // place un lutin de 8 × 8 au pixel près
+
+Tuile HEROS = {
   "00333300",
   "03222230",
   "32122123",
@@ -20141,7 +28024,13 @@ int main() {
       'La **durée** se compte en 256ᵉ de seconde, de 1 à 64. Une durée de `0` veut dire « sans fin » : la note tient jusqu’à `silence(voix)`. Le **volume** va de 0 à 15.',
       'Deux voix, c’est une mélodie et son accompagnement. Ici la voix 2 double la voix 1 une octave plus bas — `MELODIE[pas] - 12`, puisqu’une octave fait douze demi-tons.',
     ],
-    code: `const uint8_t MELODIE[] = { DO4, MI4, SOL4, DO5, SOL4, MI4, RE4, SOL4 };
+    code: `#include <texte>     // écrit un texte à l’écran
+#include <note>      // joue une note
+#include <bouton>    // lit un bouton de la manette
+#include <bruit>     // joue un bruit
+#include <silence>   // fait taire une voix
+
+const uint8_t MELODIE[] = { DO4, MI4, SOL4, DO5, SOL4, MI4, RE4, SOL4 };
 
 uint8_t pas = 0;
 uint8_t attente = 0;
@@ -20214,7 +28103,14 @@ int main() {
       'Il n’y a que **deux cartes de fond** dans la console : le décor prend la première, le panneau la seconde. C’est un choix, et il vaut mieux le savoir que le découvrir.',
       '`paletteFond(n0, n1, n2, n3)` choisit les quatre nuances, de la plus claire à la plus sombre — chaque nombre va de 0 à 3. Elles étaient posées une fois pour toutes à l’allumage ; ici on s’en sert pour assombrir le fond par paliers.',
     ],
-    code: `Tuile SOL = {
+    code: `#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <poser>          // pose une tuile sur une case du fond
+#include <textePanneau>   // écrit un texte sur le panneau
+#include <panneau>        // montre le panneau, à une place choisie
+#include <defiler>        // fait glisser tout le fond
+#include <paletteFond>    // choisit les quatre nuances du fond
+
+Tuile SOL = {
   "33333333",
   "32222223",
   "32122123",
@@ -20305,7 +28201,12 @@ int main() {
       'Cette mémoire n’est pas ouverte en permanence : il faut la **déverrouiller** avant d’y toucher et la refermer aussitôt. Le compilateur pose le verrou lui-même à chaque accès. Ce n’est pas de la prudence excessive : laissée ouverte, une coupure de courant au mauvais moment la corrompt.',
       'À la toute première partie, cette mémoire contient n’importe quoi. Un jeu y écrit donc **une marque à lui** et ne fait confiance au reste que s’il la retrouve. C’est ce que fait la première ligne de `main()`.',
     ],
-    code: `const uint8_t MARQUE = 42;
+    code: `#include <sauvegarde>   // relit un nombre gardé dans la cartouche
+#include <sauver>       // garde un nombre dans la cartouche, même éteinte
+#include <texte>        // écrit un texte à l’écran
+#include <poser>        // pose une tuile sur une case du fond
+
+const uint8_t MARQUE = 42;
 
 uint8_t meilleur = 0;
 uint8_t score = 0;
@@ -20374,7 +28275,11 @@ int main() {
       'Le code écrit porte le **nom** de la tuile, jamais son numéro. C’est ce qui compte : un numéro devient faux le jour où l’on ajoute un dessin avant lui, alors qu’un nom reste juste. C’est le compilateur qui traduit, et c’est son travail.',
       'L’outil ne possède que le bloc entre `// PLAN` et `// FIN DU PLAN`. Tout ce que tu écris ailleurs est à toi, et il n’y touche pas.',
     ],
-    code: `Tuile MUR = {
+    code: `#include <Tuile>   // un dessin de 8 × 8 pixels
+#include <texte>   // écrit un texte à l’écran
+#include <poser>   // pose une tuile sur une case du fond
+
+Tuile MUR = {
   "33333333",
   "32222223",
   "32122123",
@@ -20437,7 +28342,13 @@ int main() {
       'Ensuite, **le programme n’a plus rien à tenir**. L’air avance tout seul, soixante fois par seconde, dans l’interruption de la console — même si le jeu, lui, est en retard. Un tempo qui ralentirait avec la charge du jeu ne serait pas un tempo.',
       'La **partition ci-dessous** écrit ces lignes à la souris, et le bouton « Écouter » la fait entendre sans même compiler. Les deux voix chantantes sont la 1 et la 2 ; la quatrième, celle du bruit, se frappe avec `bruit(6, 10)`.',
     ],
-    code: `Air THEME = {
+    code: `#include <Air>       // un air de musique, note par note
+#include <texte>     // écrit un texte à l’écran
+#include <jouer>     // joue un air tout seul
+#include <bouton>    // lit un bouton de la manette
+#include <silence>   // fait taire une voix
+
+Air THEME = {
   "DO4 12", "==",      "MI4 12",  "==",      "SOL4 12", "==",      "DO5 13",  "==",
   "SI4 11",  "==",     "SOL4 11", "==",      "MI4 11",  "==",      "--",      "--",
 };
@@ -20521,6 +28432,10 @@ int main() {
  * Tout ce qui suit tiendrait dans main(). Ce serait plus court à taper, et
  * illisible trois jours plus tard.
  */
+
+#include <Tuile>   // un dessin de 8 × 8 pixels
+#include <texte>   // écrit un texte à l’écran
+#include <poser>   // pose une tuile sur une case du fond
 
 const uint8_t LIGNE_DU_SOL = 14;
 const uint8_t LIGNE_DU_CIEL = 3;
@@ -20633,6 +28548,15 @@ int main() {
       'La **partition ci-dessous** écrit les deux airs à la souris, et « Écouter » les fait entendre sans compiler. Change une note : le programme se réécrit, la cartouche se refait, et la console joue ta version dans la seconde.',
     ],
     code: `/* La musique tourne pendant que le jeu tourne. */
+
+#include <Air>       // un air de musique, note par note
+#include <Tuile>     // un dessin de 8 × 8 pixels
+#include <texte>     // écrit un texte à l’écran
+#include <jouer>     // joue un air tout seul
+#include <bouton>    // lit un bouton de la manette
+#include <sprite>    // place un lutin de 8 × 8 au pixel près
+#include <poser>     // pose une tuile sur une case du fond
+#include <airFini>   // dit si un air est fini
 
 Air MUSIQUE = {
   "DO4 10",  "==",      "SOL4 10", "==",      "MI4 10",  "==",      "SOL4 10", "==",
@@ -20751,7 +28675,13 @@ int main() {
       '**Sur le fond, il n’y a pas de `poser16()`** — une case du décor fait huit pixels, et le personnage en couvre quatre. On pose donc ses quarts un par un, et l’ordre est celui des numéros : `poser(10, 8, HEROS); poser(11, 8, HEROS + 1); poser(10, 9, HEROS + 2); poser(11, 9, HEROS + 3);`. C’est ce que fait le programme ci-dessous, en plus du lutin.',
       'Dans l’atelier, **« + perso 16 × 16 »** en ajoute un, et la grille passe à seize sur seize. Le reste ne change pas : on peint, et le programme se réécrit.',
     ],
-    code: `Perso HEROS = {
+    code: `#include <Perso>      // un dessin de 16 × 16 pixels, pour un lutin
+#include <texte>      // écrit un texte à l’écran
+#include <poser>      // pose une tuile sur une case du fond
+#include <bouton>     // lit un bouton de la manette
+#include <sprite16>   // place un lutin de 16 × 16 au pixel près
+
+Perso HEROS = {
   "....####........",
   "..##++++##......",
   ".#++++++++#.....",
@@ -20834,7 +28764,12 @@ int main() {
  * a été écrite pour la trouver. Le tri par difficulté les entremêle, ce qui
  * est exactement le but — on avance par niveau, pas par provenance.
  */
-export const LECONS = [...ECRITES, ...TUTORIELS].sort((a, b) => a.difficulte - b.difficulte)
+/*
+ * Le parcours : les leçons, les tutoriels ET le cours, en une seule suite —
+ * chapitres entremêlés par sujet, et chaque tuto de fonction juste avant la
+ * première étape qui l'emploie. Voir tuto/parcours.js.
+ */
+export const LECONS = construireLeParcours(ECRITES, TUTORIELS)
 
 /**
  * Le numéro qu'on AFFICHE, pour chaque leçon d'une liste.

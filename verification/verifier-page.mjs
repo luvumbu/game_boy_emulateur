@@ -145,7 +145,7 @@ console.log('LA PAGE, PILOTÉE DANS UN VRAI NAVIGATEUR\n')
 
 try {
   await envoyer('Runtime.enable')
-  await patienter(1200) // le temps que le module se charge et compile « bonjour »
+  await patienter(3000) // le temps que le module se charge (le parcours entier) et compile « bonjour »
 
   /* --- ce qui s'affiche à l'ouverture --- */
   controle('la page s’ouvre sur un exemple', (await evaluer(`document.getElementById('source').value.length`)) > 50)
@@ -527,6 +527,7 @@ try {
   controle('« + fichier » ouvre un second fichier', onglets.includes('fichier2.cpp'), ` (${onglets})`)
 
   await ecrire([
+    '#include <Tuile>',
     'Tuile CAILLOU = {',
     '  "########", "#......#", "#.++++.#", "#.++++.#",',
     '  "#.++++.#", "#.++++.#", "#......#", "########",',
@@ -539,6 +540,7 @@ try {
     (await evaluer(`document.getElementById('source').value`)).includes('int main'))
 
   await ecrire([
+    '#include <poser>',
     '#include "fichier2.cpp"',
     '',
     'int main() {',

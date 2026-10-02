@@ -79,9 +79,11 @@
 
 
   <p class="reperes">
-    <span class="niveau">Niveau 0 — Avant tout</span>
-    <span>leçon 0.85 sur 82</span>
-    <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie F — Un premier jeu</span>
+    <span>leçon 0.85 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
@@ -96,15 +98,68 @@
 <p><strong>Au départ, au hasard</strong> (le 0.81.2) : chaque ennemi prend une colonne <code>hasard() % 20</code> sur les lignes du haut. Chaque partie commence différemment.</p>
 <p><strong>Ils finissent par se rejoindre</strong> sur le A : ils visent tous la même case.</p>
 
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;hasard&gt;</code> → <a href="lecon-00-81.2-la-fonction-hasard-un-nombre-au-hasard.html">0.81.2. La fonction hasard() — un nombre au hasard</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+  <li><code>#include &lt;chaque&gt;</code> → <a href="lecon-00-29.3-la-fonction-chaque-toutes-les-n-millisec.html">0.29.3. La fonction chaque() — toutes les n millisecondes</a></li>
+  <li><code>#include &lt;un_pas&gt;</code> → <a href="lecon-00-29.4-la-fonction-un-pas-un-seul-pas-sans-atte.html">0.29.4. La fonction un_pas() — un seul pas, sans attendre</a></li>
+  <li><code>#include &lt;deplace_croix&gt;</code> → <a href="lecon-00-66.3-la-fonction-deplace-croix-suivre-la-croi.html">0.66.3. La fonction deplace_croix() — suivre la croix, case par case</a></li>
+  <li><code>#include &lt;reste&gt;</code> → <a href="lecon-00-8.4-include-reste-a-b.html">0.8.4. #include &lt;reste&gt; — a % b</a></li>
+</ul>
+</div>
+
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>2620 octets</strong> de cartouche.</p>
+<strong>1788 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage           88 o  ← la console, à l’allumage  — la mise en route de la console
+  chaque_minuteur()  124 o  ← main()  — une fonction fournie par le langage
+  deplace_croix()    217 o  ← main()  — une fonction fournie par le langage
+  un_pas()           117 o  ← main()  — une fonction fournie par le langage
+  main()             348 o  ← démarrage  — ta fonction
+  VBlank               8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage       28 o  ← image()  — attend l’image suivante
+  AttendreVBlank      16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces       12 o  ← EffacerCases  — attend de pouvoir écrire une case
+  AdresseCase         10 o  ← effacer(), poser()  — trouve l’adresse d’une case de l’écran
+  EffacerCases        12 o  ← effacer()  — efface des cases
+  Reste               10 o  ← main()  — le reste d’une division
+  CopierTuiles        18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte        14 o  ← démarrage  — vide les deux cartes de l’écran
+  Hasard              25 o  ← hasard()  — tire un nombre au hasard
+  LireManette         37 o  ← bouton()  — lit les huit boutons
+  Tuiles             704 o  ← CopierTuiles  — la police entière
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EcrireTexte, EcrireNombre, Diviser, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser()           × 3    61 o sur place, dans deplace_croix(), un_pas(), main()  + AdresseCase (10 o)
+  effacer()         × 2    30 o sur place, dans deplace_croix(), un_pas()  + AdresseCase (10 o), EffacerCases (12 o)
+  bouton()          × 4    20 o sur place, dans deplace_croix()  + LireManette (37 o)
+  hasard()          × 2     6 o sur place, dans main()  + Hasard (25 o)
+  images()          × 2     4 o sur place, dans chaque_minuteur(), deplace_croix()
+  image()           × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  un_pas()          × 1    41 o sur place, dans main()
+  deplace_croix()   × 1    19 o sur place, dans main()
+  chaque_minuteur() × 1    10 o sur place, dans main()</code></pre>
 
 
 <div class="morceau">
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
-    <pre><code>// ---- LE TYPE Position (le 0.80) : une colonne et une ligne ----</code></pre>
+    <pre><code>// ---- LE TYPE Position (le 0.80) : une colonne et une ligne ----
+
+#include &lt;hasard&gt;          // tire un nombre au hasard
+#include &lt;poser&gt;           // pose une tuile sur une case du fond
+#include &lt;ALPHABET&gt;        // les lettres de la police : ALPHABET[0] est le A
+#include &lt;chaque&gt;          // répond 1 toutes les n millisecondes
+#include &lt;un_pas&gt;          // fait faire un seul pas à une tuile
+#include &lt;deplace_croix&gt;   // une tuile qui suit la croix, case par case
+#include &lt;reste&gt;           // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair</code></pre>
   </div>
   <div></div>
 </div>
@@ -227,22 +282,22 @@ programme.</p>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABrklEQVR4nO3XMQrCQABFQcscwdL7n8YjeAxLC0Es0qy4hH0ZmGKr8MkjC7k8nnfCLocvYCqB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSO+yXwdr19zNg0+/mr7xnyY+Dd8x9f6NTnr75niMDr7Rniil5vzxBf8Hp7hgi83p4hruj19gzxHxwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRx30sDb9fZ2+JLZzhj4u2u+scAC53zu5zPc0icNvHtOEljgHIHpEDhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOewFMzGJDot7GOQAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABo0lEQVR4nO3UsQ2DMBBAUUpGoGT/aTJCxkiZIhKioCUW3096xVU24su3vD+vUdZtPzzx/EdYBt59/u93NLj7/EcQOG5wYCv6bl5wnMBxVnTcyMD8QTmwF9wPfDlPReC4eGArOh74cp6KwHHxwFZ0OTAC9wkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHGTBl63/Wf4l9xtxsDnrvnGAgucc+znGbb0pIEv5ySBBc4RmA6B4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LgvHaBiQzy9KCkAAAAASUVORK5CYII=" alt="l’écran">
     <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABoklEQVR4nO3dsQ3CMBBA0ZSMQMn+0zACY1DSRRShS2zx/aRXuDpZ+spJrrK93k/Ctuk34FICxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcd2bg2/2xu+Ku/z5/ipMDH57Nn0jgcfOnsKLHzZ/CFzxu/hQCj5s/hRU9bv4U3sFxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxiwbu/en7lxUDf3fNNxZY4Jx9P6+wpRcNfHhOEljgHIHpEDhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSO+wByPWJD/eCrogAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABpElEQVR4nO3VsQ3CMBBA0ZQZgZL9p2EExqCkQIooUibgfD/pFVdZlr58Xp6vB2HL32/AqQSOEzhO4DiB4wSOEzhuxMDr7b654vlDGTTw7nyV84cisMA/Z0UfaNDAu/NVzh+KwAL/nBV9oBEDc6AZA3vBcf7gOIHjrOg4LzhO4Dgrmg6B4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LhJA6+3+8ffb3K2GQN/d803FljgnG0/z7ClJw28OycJLHCOwHQIHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAse9AUmYYkMDKHmfAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>au bout d’une seconde — image 60</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABk0lEQVR4nO3csQ0CMRAAwQ8pgZD+q6EEyiAkQwQfPs95GWkCRydLKzu87fG8E7b9/AZ8lcBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAsdNDHy53t5WnD/K0MC751XmjyKwwKfzRR9oaODd8yrzRxFY4NP5og80MTAHEjhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSO+9PANt2V2VUZJ3Dc5zJSgYO84DiB4wSmQ+A4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM47gUZ6pJjURH5swAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABiElEQVR4nO3dsQ1AUBRAUaURlPafxgjGUOpESSHiOskpflSSm/d0/rBuC2HD62/AowSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEziuHHic5sOV50nxwLfOSQIL/FlWdD/wrXOSwAJ/lhUdD8xPA5vgON/gOIHjrOg4ExwncJwVTYfAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncNxPA/vje5k7G+IEjjtfyiFwkAmOEzhOYDoEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geN2uetiQ9Qe9ekAAAAASUVORK5CYII=" alt="l’écran">
     <figcaption>au bout de trois secondes — image 180</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABf0lEQVR4nO3WsQmAMBBAUUtHsHT/aRzBMSztxMI2CD8PXpEy8LlLlvM6CFt+vwFDCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncNyMgddtf/x+mdEmDfx5ThJY4BwrOs4ExwkcZ0XTMWlgE1zmDY4TOO79yRI4yATHCRwnMB0CxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHE3ELrCgzWv3+0AAAAASUVORK5CYII=" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABhElEQVR4nO3ZsQmAMBBAUUtHsHT/aRzBMSztxMI2CD8PXmEZ+NwJyXJeB2HL7ydgKIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI6bMfC67Y/fDzPapIE/v5MEFjjHio4zwXECx1nRdMwY2ATH+QfHCRxnRceZ4DiB46xoOgSOEzhO4DiB4wSOEzhO4DiB4yYN7CarzF10nMBx78cGgYNMcJzAcQLTIXCcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcdwP2sJJjj4AaTAAAAABJRU5ErkJggg==" alt="l’écran">
     <figcaption>au bout de sept secondes — image 420</figcaption>
   </figure>
 </div>
@@ -267,7 +322,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 
 <p class="pied">
-  Ensuite : <strong>1. Écrire à l’écran</strong> — niveau 1 sur 10.
+  Ensuite : <strong>0.85.1. ALPHABET_GRAS — les lettres en gras</strong> — chapitre 0 : Avant tout.
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 

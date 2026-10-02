@@ -381,7 +381,11 @@
   .analyse-jauge.chargee i { background: #d9a83f; }
   .analyse-jauge.pleine i { background: var(--rouge); }
   .analyse-liste { font-size: 12.5px; }
+  .analyse-grave { font-size: 11.5px; line-height: 1.45; margin: 6px 0 0; padding: 8px; overflow-x: auto; background: var(--panneau-clair); border: 1px solid var(--bord); border-radius: 6px; white-space: pre; }
   .analyse-liste summary { cursor: pointer; color: var(--gris); }
+  .analyse-inclure { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+  .analyse-inclure > div { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .analyse-inclure button { padding: 2px 10px; font-size: 12px; }
   .analyse-liste ol { margin: 4px 0 0; padding-left: 20px; }
   .inspecteur { margin-top: 10px; font-size: 12.5px; }
   .inspecteur summary { cursor: pointer; font-weight: 600; }
@@ -1024,6 +1028,7 @@
     border-radius: 7px; color: var(--gris); line-height: 1.15;
   }
 
+  .mode[hidden] { display: none; } /* le bouton du cours, gardé pour les anciens liens */
   .mode b { font-size: 11px; letter-spacing: .05em; white-space: nowrap; }
   .mode small { font-size: 10px; opacity: .8; white-space: nowrap; }
   .mode:hover:not(.actif) { background: var(--panneau-clair); color: var(--texte); }
@@ -1299,10 +1304,11 @@
         <small>écrire le programme</small>
       </button>
       <button type="button" class="mode" id="mode-lecons" role="tab" aria-selected="false">
-        <b>📚 MODE LEÇONS</b>
-        <small>apprendre pas à pas</small>
+        <b>📚 APPRENDRE</b>
+        <small>le parcours : leçons et cours</small>
       </button>
-      <button type="button" class="mode" id="mode-cours" role="tab" aria-selected="false">
+      <!-- Le cours a rejoint le parcours : ce bouton reste pour les anciens liens, caché. -->
+      <button type="button" class="mode" id="mode-cours" role="tab" aria-selected="false" hidden>
         <b>🧠 MODE COURS</b>
         <small>apprendre à programmer</small>
       </button>
@@ -1729,6 +1735,7 @@ import { compiler } from './compilateur/emetteur.js'
 import { fabriquer } from './compilateur/cartouche.js'
 import { fabriquerLesCartouches } from './compilateur/cartouches.js'
 import { rassembler, traduire, fichiersDemandes } from './compilateur/inclusion.js'
+import { completerLesInclusions, avecLesInclusions } from './compilateur/inclusions-auto.js'
 import { GameBoy } from './emulateur.js'
 import { installer as installerTuiles } from './editeur-tuiles.js'
 import { installerEditeur } from './editeur-code.js'
@@ -2193,7 +2200,7 @@ const CATALOGUE = [
   {
     cle: 'modeDemarrage', groupe: 'La page', type: 'liste', defaut: 'dernier',
     titre: 'Le mode au chargement', aide: 'Par quoi la page s’ouvre, la prochaine fois.',
-    options: [['dernier', 'Celui que je quitte'], ['creation', 'Création'], ['code', 'Code'], ['lecons', 'Leçons'], ['cours', 'Cours']],
+    options: [['dernier', 'Celui que je quitte'], ['creation', 'Création'], ['code', 'Code'], ['lecons', 'Apprendre']],
     appliquer: () => {},
   },
   {
@@ -2596,7 +2603,40 @@ function refaireLeGeste() {
   revenirA(historique.apres.pop())
 }
 
-function poserLeCode(texte, genre = 'atelier') {
+/*
+ * Les boutons « Retirer » du panneau ROM.
+ *
+ * Ils effacent — ou écrivent — « #include <texte> » en tête du programme
+ * principal, puis recompilent : la demande se lit dans le code, comme si on
+ * l'avait tapée, et « Annuler » la défait.
+ */
+function inclureDansLaCartouche(nom, oui) {
+  const surLePrincipal = fichierCourant === PRINCIPAL
+  const avant = surLePrincipal ? $('source').value : fichiers.get(PRINCIPAL)
+  const deja = new RegExp(`^[ \\t]*#\\s*include\\s*<\\s*${nom}\\s*>[ \\t]*(?:\\/\\/[^\\n]*)?\\r?\\n?`, 'gm')
+  let texte = avant.replace(deja, '')
+  if (oui) texte = `#include <${nom}>\n` + texte
+  if (surLePrincipal) {
+    poserLeCode(texte, 'atelier', { tel: true }) // la ligne retirée ne doit pas revenir d'elle-même
+  } else {
+    fichiers.set(PRINCIPAL, texte)
+    retenirLeProgramme()
+    montrerLaPeremption()
+  }
+  compilerEtLancer()
+}
+
+/*
+ * « tel » : le texte est posé tel quel. Sinon, ce qu'un éditeur de l'atelier
+ * vient d'écrire (un dessin, un air, une scène, un modèle) reçoit les
+ * « #include » qui lui manquent — chaque fonction de la console s'inclut, et
+ * l'on ne demande pas à quelqu'un qui peint une tuile d'écrire « #include <Tuile> ».
+ */
+function poserLeCode(texte, genre = 'atelier', { tel = false } = {}) {
+  if (!tel && fichierCourant === PRINCIPAL) {
+    const autres = Object.fromEntries([...fichiers].filter(([nom]) => nom !== PRINCIPAL))
+    texte = completerLesInclusions(texte, autres)
+  }
   retenirPourAnnuler($('source').value, texte, genre)
   $('source').value = texte
   texteConnu = texte
@@ -2727,7 +2767,7 @@ function compilerEtLancer() {
         `${noms.length} variable${noms.length > 1 ? 's' : ''}` + (noms.length ? ' : ' + noms.join(', ') : '')
     ) + deuxCartouches
     marquerLEtat(true)
-    montrerLAnalyse($('analyse'), analyserLaCartouche(faite))
+    montrerLAnalyse($('analyse'), analyserLaCartouche(faite), { inclure: inclureDansLaCartouche })
     derniereCompilation = faite
     $('sauver-etat').disabled = false
 
@@ -2760,6 +2800,30 @@ function compilerEtLancer() {
     signalerLaFaute()
     allerALaLigneFautive(message)
     biper()
+    /* Un « #include » manque : un bouton les écrit tous, en tête du programme.
+       La ligne reste à lire dans le code — le bouton ne fait que l'écrire. */
+    if (message.includes('il faut « #include <')) {
+      const bouton = document.createElement('button')
+      bouton.type = 'button'
+      bouton.className = 'petit'
+      bouton.textContent = '✚ Écrire les #include qui manquent'
+      bouton.style.marginLeft = '8px'
+      bouton.addEventListener('click', () => {
+        fichiers.set(fichierCourant, $('source').value)
+        const autres = Object.fromEntries([...fichiers].filter(([nom]) => nom !== PRINCIPAL))
+        let texte
+        try {
+          texte = avecLesInclusions(fichiers.get(PRINCIPAL), autres)
+        } catch (autre) {
+          $('etat').textContent = traduire(autre.message, assemble.origine)
+          return
+        }
+        if (fichierCourant === PRINCIPAL) poserLeCode(texte, 'atelier', { tel: true })
+        else { fichiers.set(PRINCIPAL, texte); retenirLeProgramme() }
+        compilerEtLancer()
+      })
+      $('etat').append(bouton)
+    }
   }
 }
 
@@ -3536,6 +3600,8 @@ const PROGRAMME_NEUF = [
   ' * arrive, et nulle part ailleurs.',
   ' */',
   '',
+  '#include <texte>   // chaque fonction de la console s\'inclut : texte() écrit un texte',
+  '',
   'int main() {',
   '  texte(4, 6, "NOM");',
   '',
@@ -4018,7 +4084,7 @@ const DIDACTICIEL = [
     titre: '🧭 Premiers pas : la page',
     dit: 'Où est quoi : les modes, le programme, la console, les projets.',
     etapes: [
-      { selecteur: '.modes', titre: 'Cinq façons de travailler', texte: 'CRÉATION pour dessiner et faire un jeu à la souris, CODE pour écrire le programme, LEÇONS et COURS pour apprendre, MACHINE pour voir ce que la console exécute vraiment.' },
+      { selecteur: '.modes', titre: 'Cinq façons de travailler', texte: 'CRÉATION pour dessiner et faire un jeu à la souris, CODE pour écrire le programme, APPRENDRE pour suivre le parcours, MACHINE pour voir ce que la console exécute vraiment.' },
       { selecteur: '#source', titre: 'Le programme', avant: allerA('code'), texte: 'Tout ton jeu est ici, en C++. Les ateliers l’écrivent pour toi quand tu dessines ; tu peux aussi l’écrire toi-même.' },
       { selecteur: '#lancer', titre: 'Compiler et lancer', texte: 'Transforme le programme en cartouche et la fait tourner dans la console. Raccourci : Ctrl + Entrée.' },
       { selecteur: '#ecran', titre: 'La console', texte: 'Ta Game Boy. Clique dedans, puis joue : flèches pour la croix, X pour A, Z pour B, Entrée pour Start. Une manette USB marche aussi.' },
@@ -4067,7 +4133,7 @@ const DIDACTICIEL = [
       { selecteur: '.couleurs-grille', titre: 'Les huit palettes', avant: allerA('creation', 'couleurs'), texte: 'Clique une pastille pour changer sa couleur. Tes dessins s’affichent dans chaque palette : on voit tout de suite le résultat.' },
       { selecteur: '#grille .barre-paint', titre: 'Peindre avec une palette', avant: allerA('creation', 'tuiles'), texte: 'Dans l’atelier des tuiles (et de la carte), les 8 palettes, de 0 à 7 — la 0 est la normale. Clique une couleur et peins : la tuile, ou le quart du personnage, prend sa palette. 4 couleurs par carré de 8 × 8 : c’est la Game Boy Color.' },
       { selecteur: '#grille .barre-paint', titre: 'Variétés, thèmes, changer une couleur', avant: allerA('creation', 'tuiles'), texte: '« 🎨 Variétés » : 11 palettes toutes prêtes (0 à 10). « 🎨 Thèmes » : les 8 palettes d’un coup, qui vont ensemble. « 🎨 Changer cette couleur » ne change que le dessin ouvert : si d’autres partagent sa palette, il en reçoit une copie.' },
-      { selecteur: '#console-cible', titre: 'Game Boy ou Color', texte: 'L’un ou l’autre : « En couleur » ou « Game Boy » (4 nuances, rien de plus — l’onglet l’explique). Le MODE COURS apprend les nuances puis la couleur ; les leçons 19 et 20 montrent les palettes dans l’atelier.' },
+      { selecteur: '#console-cible', titre: 'Game Boy ou Color', texte: 'L’un ou l’autre : « En couleur » ou « Game Boy » (4 nuances, rien de plus — l’onglet l’explique). Le parcours (APPRENDRE) a deux chapitres pour cela : les quatre nuances, puis la couleur.' },
     ],
   },
   {
@@ -4110,10 +4176,9 @@ const DIDACTICIEL = [
   },
   {
     titre: '📚 Apprendre',
-    dit: 'Le cours de programmation, les leçons, les livrets.',
+    dit: 'Le parcours : les leçons et le cours réunis, les livrets.',
     etapes: [
-      { selecteur: '#mode-cours', titre: 'Le mode Cours', texte: 'Apprendre à programmer, dans l’ordre : variables, conditions, boucles, tableaux, fonctions, struct — puis les quatre nuances et la couleur. 42 leçons.' },
-      { selecteur: '#mode-lecons', titre: 'Le mode Leçons', texte: '82 leçons sur tout ce que la console sait faire : dessiner, bouger, le son, les couleurs, jusqu’à un vrai jeu. Rangées par difficulté.' },
+      { selecteur: '#mode-lecons', titre: 'Apprendre — le parcours', texte: 'Les leçons et le cours réunis en une seule suite, chapitre par chapitre : du programme qui ne fait rien jusqu’à un vrai jeu. Chaque fonction de la console est présentée seule, avec sa ligne #include, juste avant de servir.' },
       { selecteur: '#didacticiel', titre: 'Revenir ici', texte: 'Le didacticiel se rouvre à tout moment par ce bouton. Bon jeu !' },
     ],
   },
@@ -4385,9 +4450,12 @@ function montrerMode(lequel) {
   if (MODES_CONNUS?.includes?.(lequel)) {
     try { localStorage.setItem('gameboy3-mode', lequel) } catch { /* tant pis */ }
   }
-  /* Le mode Cours EST le mode Leçons, avec une autre série : même zone, même
+  /* Le cours a rejoint le parcours : « cours » est le même mode que les leçons — même zone, même
      mise en page. Seuls le bouton allumé et la liste des leçons changent. */
-  if (lequel === 'lecons' || lequel === 'cours') choisirLaSerie(lequel)
+  /* Le cours a rejoint le parcours : « cours » (un ancien lien, un mode
+     retenu) ouvre le même mode que les leçons. */
+  if (lequel === 'cours') lequel = 'lecons'
+  if (lequel === 'lecons') choisirLaSerie(lequel)
   const vue = lequel === 'cours' ? 'lecons' : lequel
   document.body.dataset.mode = vue
   /* L'atelier est là en création ET en leçons : c'est lui qui décide si une
@@ -5302,7 +5370,7 @@ $('annuler').addEventListener('click', annulerLeGeste)
 const versions = installerLesVersions({
   bouton: $('versions'),
   lireSource: () => $('source').value,
-  revenirA: (texte) => { poserLeCode(texte, 'programme'); compilerEtLancer(); atelier.rafraichir(); atelierCarte.rafraichir() },
+  revenirA: (texte) => { poserLeCode(texte, 'programme', { tel: true }); compilerEtLancer(); atelier.rafraichir(); atelierCarte.rafraichir() },
 })
 $('refaire').addEventListener('click', refaireLeGeste)
 addEventListener('keydown', (e) => {
@@ -5389,9 +5457,11 @@ let leconCourante = 0
 let rechercheLecons = null
 
 const SERIES = {
-  lecons: { liste: LECONS, groupes: NIVEAUX, groupe: 'Niveau', page: 'tuto.html', lien: 'le tutoriel en grand ↗' },
-  cours: { liste: COURS, groupes: CHAPITRES, groupe: 'Chapitre', page: 'cours.html', lien: 'le cours en grand ↗' },
+  lecons: { liste: LECONS, groupes: NIVEAUX, groupe: 'Chapitre', page: 'tuto.html', lien: 'le parcours en grand ↗' },
 }
+/* Le cours a rejoint le parcours (tuto/parcours.js) : la série « cours » est
+   la même liste, gardée sous ce nom pour les anciens liens. */
+SERIES.cours = SERIES.lecons
 let serie = 'lecons'
 const liste = () => SERIES[serie].liste
 
@@ -5599,12 +5669,13 @@ function toutesLesFiches() {
   relireLesProjets()   // pour la prochaine fois
   const liste = []
 
-  // 📘 les leçons du tutoriel, et 🎓 celles du cours
-  for (const [laSerie, genre] of [['lecons', '📘 Leçon'], ['cours', '🎓 Cours']]) {
-    const { fiches: textes, numeros: nums } = fichesDe(laSerie)
-    SERIES[laSerie].liste.forEach((lecon, i) => liste.push({
-      genre, libelle: `${nums[i]}. ${lecon.titre}`, detail: lecon.idee,
-      texte: textes[i], numero: nums[i], aller: () => allerALaLeconDe(laSerie, i),
+  // 📘 les étapes du parcours : leçons, 🎓 cours et 📖 tutos des fonctions, une seule liste
+  {
+    const { fiches: textes, numeros: nums } = fichesDe('lecons')
+    SERIES.lecons.liste.forEach((lecon, i) => liste.push({
+      genre: lecon.provenance === 'cours' ? '🎓 Cours' : '📘 Leçon',
+      libelle: `${nums[i]}. ${lecon.titre}`, detail: lecon.idee,
+      texte: textes[i], numero: nums[i], aller: () => allerALaLeconDe('lecons', i),
     }))
   }
 
@@ -5726,9 +5797,7 @@ function allerALaLecon(index, { garderLeCode = false, defiler = true } = {}) {
   $('lecon-apres-bas').textContent = apres ? `${NUMEROS[index + 1]}. ${apres.titre} ▶` : `✓ Tu es au bout des ${principales(LECONS)}`
   $('lecon-ou').textContent = !apres
     ? 'la dernière leçon : tu as tout vu'
-    : serie === 'cours'
-      ? `ensuite — chapitre ${apres.difficulte} : ${CHAPITRES[apres.difficulte]}`
-      : `ensuite — niveau ${apres.difficulte} sur 10`
+    : `ensuite — chapitre ${apres.difficulte} : ${NIVEAUX[apres.difficulte]}`
 
   $('lecon-titre').textContent = `${NUMEROS[index]}. ${lecon.titre}`
   $('lecon-idee').textContent = lecon.idee
@@ -5743,21 +5812,19 @@ function allerALaLecon(index, { garderLeCode = false, defiler = true } = {}) {
     return balise
   }
 
-  if (serie === 'cours') {
-    /* Un chapitre n'est pas une difficulté : une jauge sur 10 mentirait. */
-    const duChapitre = LECONS.filter((l) => l.difficulte === lecon.difficulte)
-    repere(`Chapitre ${lecon.difficulte} — ${CHAPITRES[lecon.difficulte]}`, 'niveau')
-    repere(`leçon ${NUMEROS[index]} sur ${principales(LECONS)}`, '')
-    repere(`${duChapitre.indexOf(lecon) + 1} / ${duChapitre.length} dans ce chapitre`, '')
-  } else {
-    repere(`Niveau ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`, 'niveau')
+  {
+    repere(`Chapitre ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`, 'niveau')
+    /* D'où vient l'étape : une leçon, un cours, ou le tuto d'une fonction. */
+    if (lecon.provenance === 'cours') repere('🎓 du cours', 'outil')
     // La partie, juste après le niveau : « Partie D — Des formes ». Seul le
     // chapitre 0 en a ; ailleurs partieDe rend null, et rien n'est ajouté.
     const partie = partieDe(LECONS, index)
     if (partie) repere(`Partie ${partie.lettre} — ${partie.nom}`, 'niveau')
     repere(`leçon ${NUMEROS[index]} sur ${principales(LECONS)}`, '')
-    repere(`difficulté ${lecon.difficulte} / 10`, 'difficulte')
-      .style.setProperty('--part', `${lecon.difficulte * 10}%`)
+    /* La jauge : la difficulté de 1 à 10, et non le numéro du chapitre. */
+    const niveau = lecon.niveau ?? Math.max(1, Math.min(10, lecon.difficulte))
+    repere(`difficulté ${niveau} / 10`, 'difficulte')
+      .style.setProperty('--part', `${niveau * 10}%`)
   }
 
   /*
@@ -5859,7 +5926,8 @@ const DEMANDES = {
   '#carte': () => { montrerMode('creation'); montrerAtelier('carte') },
   '#code': () => montrerMode('code'),
   '#lecons': () => { montrerMode('lecons'); allerALaLecon(0) },
-  '#cours': () => { montrerMode('cours'); allerALaLecon(0) },
+  /* Le cours a rejoint le parcours : « #cours » ouvre son premier cours. */
+  '#cours': () => { montrerMode('lecons'); allerALaLecon(Math.max(0, LECONS.findIndex((l) => l.provenance === 'cours'))) },
   '#machine': () => montrerMode('machine'),
 }
 

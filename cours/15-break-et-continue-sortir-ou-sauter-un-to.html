@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 3 — Les boucles : répéter</span>
   <span>leçon 7 sur 9 dans ce chapitre</span>
-  <span>15 sur 42 dans le cours</span>
+  <span>15 sur 61 dans le cours</span>
 </p>
 <h1>15. break et continue : sortir, ou sauter un tour</h1>
 <p class="idee">On n’est pas obligé de finir tous les tours : on sort dès qu’on a trouvé.</p>
@@ -109,38 +109,89 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1571 octets</strong> de cartouche.</p>
+<strong>901 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              190 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase          10 o  ← lire(), nombre()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre         33 o  ← nombre()  — écrit un nombre en chiffres
+  Reste                10 o  ← main()  — le reste d’une division
+  CopierTuiles         94 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              384 o  ← CopierTuiles  — 24 lettres sur 43
+  "####  ##  #####…"   20 o  ← texte()  — un texte gravé
+  "CASE LIBRE:"        11 o  ← texte()  — un texte gravé
+  "TOURS FAITS:"       12 o  ← texte()  — un texte gravé
+Lettres gravées : ABCEFILORSTU0123456789:#
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  nombre() × 3    42 o sur place, dans main()  + AdresseCase (10 o), EcrireNombre (33 o)
+  texte()  × 3    33 o sur place, dans main()  + EcrireTexte (10 o)
+  ecran()  × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  lire()   × 1    11 o sur place, dans main()  + AdresseCase (10 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  ecran(0);
-  texte(0, 3, "####  ##  ##########");
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : cherche la première case vide d'une ligne (avec break),
+// puis écrit des chiffres en sautant les multiples de 3 (avec continue).
+//
+// Ce qui est nouveau :
+//   break    = sortir de la boucle TOUT DE SUITE, sans finir les tours.
+//   continue = sauter la FIN de ce tour, et passer au tour suivant.
 
-  uint8_t libre = 255;        // 255 : pas encore trouve
-  uint8_t tours = 0;
+#include &lt;reste&gt;   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
 
-  for (uint8_t colonne = 0; colonne &lt; 20; colonne++) {
-    tours++;
-    if (lire(colonne, 3) == 0) {
-      libre = colonne;
-      break;                  // trouve : inutile de continuer
+#include &lt;ecran&gt;    // éteint ou rallume l’écran
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;lire&gt;     // lit la tuile posée sur une case
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                              // Le jeu commence ici.
+  ecran(0);                               // Dessin écran éteint.
+  texte(0, 3, "####  ##  ##########");    // Une ligne avec des trous :
+                                          // colonnes 0 à 3 = #, 4 et 5 = vides, ...
+
+  uint8_t libre = 255;        // 255 : pas encore trouvé (une valeur « impossible »)
+  uint8_t tours = 0;          // Combien de cases on a regardées.
+
+  for (uint8_t colonne = 0; colonne &lt; 20; colonne++) {  // colonne = 0 à 19
+    tours++;                                            // une case de plus regardée
+    if (lire(colonne, 3) == 0) {    // lire(colonne, ligne) rend ce qui est écrit
+                                    // dans la case ; 0 veut dire « vide ».
+      libre = colonne;              // On note la colonne vide...
+      break;                  // trouvé : inutile de continuer
     }
   }
+  // Déroulé : colonnes 0, 1, 2, 3 : un # ; colonne 4 : vide → libre = 4, break.
+  // tours vaut 5 : on a regardé 5 cases au lieu de 20.
 
-  texte(0, 5, "CASE LIBRE:");  nombre(14, 5, libre);
-  texte(0, 6, "TOURS FAITS:"); nombre(14, 6, tours);
+  texte(0, 5, "CASE LIBRE:");  nombre(14, 5, libre);   // affiche 004
+  texte(0, 6, "TOURS FAITS:"); nombre(14, 6, tours);   // affiche 005
 
-  /* continue : on saute les multiples de 3 */
-  for (uint8_t i = 0; i &lt; 10; i++) {
-    if (i % 3 == 0) continue;
-    nombre(i * 2, 10, i, 1);
+  // continue : on saute les multiples de 3.
+  for (uint8_t i = 0; i &lt; 10; i++) {      // i = 0 à 9
+    if (i % 3 == 0) continue;             // reste de i par 3 égal à 0 ? (0, 3, 6, 9)
+                                          // alors on saute la ligne suivante.
+    nombre(i * 2, 10, i, 1);              // Écrit : 1 2 . 4 5 . 7 8 (pas de 0, 3, 6, 9).
   }
-  ecran(1);
+  ecran(1);                               // On rallume.
 
-  while (true) {
+  while (true) {                          // La boucle du jeu.
     image();
   }
 }</code></pre>

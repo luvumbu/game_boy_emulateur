@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 12 — Où vit une variable : avant la boucle, ou dedans</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 2 — Les variables : la mémoire de la console</span>
+    <span class="outil">du cours</span>
+    
+    <span>leçon 12 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
+    
+    
+    
+  </p>
+<h1>12. Où vit une variable : avant la boucle, ou dedans</h1>
+<p class="idee">Une variable déclarée DANS la boucle renaît à chaque tour — et oublie tout.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>Une variable existe à partir de sa déclaration, et <strong>jusqu’à l’accolade qui ferme son bloc</strong>. C’est sa <strong>portée</strong>. Hors de ses accolades, son nom ne veut plus rien dire.</p>
+<p><code>tours</code> est déclarée <strong>avant</strong> <code>while (true)</code> : elle naît une seule fois, et garde sa valeur d’un tour à l’autre. Elle compte : 1, 2, 3…</p>
+<p><code>neuve</code> est déclarée <strong>dans</strong> la boucle : à chaque tour, la ligne <code>uint8_t neuve = 0;</code> est exécutée de nouveau, et remet la case à zéro. On a beau faire <code>neuve++</code>, elle vaut toujours <strong>1</strong> à l’écran.</p>
+<p>C’est <strong>le bogue le plus fréquent du débutant</strong> : « mon compteur ne compte pas ». Règle simple : <strong>ce qui doit durer d’une image à l’autre</strong> (un score, une position, une vie) se déclare <strong>avant</strong> la boucle du jeu. Ce qui ne sert que le temps d’un calcul se déclare dedans — c’est même plus clair, car on voit qu’elle ne sert qu’ici.</p>
+<p><strong>À toi :</strong> déplace la déclaration de <code>neuve</code> au-dessus de <code>while (true)</code>, et regarde-la compter à son tour.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;nombre&gt;</code> → <a href="lecon-00-8.3-la-fonction-nombre-ecrire-un-nombre.html">0.8.3. La fonction nombre() — écrire un nombre</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>710 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()               65 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre         33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles         76 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              368 o  ← CopierTuiles  — 23 lettres sur 43
+  "AVANT LA BOUCLE:"   16 o  ← texte()  — un texte gravé
+  "DANS LA BOUCLE:"    15 o  ← texte()  — un texte gravé
+Lettres gravées : ABCDELNOSTUV0123456789:
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 2    22 o sur place, dans main()  + EcrireTexte (10 o)
+  nombre() × 2    20 o sur place, dans main()  + EcrireNombre (33 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : compare deux variables.
+//   - « tours » est créée AVANT la boucle : elle garde sa valeur d'un tour à l'autre.
+//   - « neuve » est créée DANS la boucle : elle est recréée à 0 à chaque tour.
+
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                  // Le jeu commence ici.
+  uint8_t tours = 0;          // Créée UNE seule fois, avant la boucle : elle se souvient.
+
+  texte(1, 4, "AVANT LA BOUCLE:");  // Le nom de la première ligne.
+  texte(1, 6, "DANS LA BOUCLE:");   // Le nom de la deuxième ligne.
+
+  while (true) {              // Répète pour toujours ce qui est entre les accolades.
+    image();                  // Attend l'image suivante.
+
+    uint8_t neuve = 0;        // Recréée à CHAQUE tour, et remise à 0 : elle oublie.
+    tours++;                  // tours gagne 1 : 1, 2, 3, 4 ... (elle monte)
+    neuve++;                  // neuve gagne 1 : elle passe de 0 à 1, à chaque tour.
+
+    nombre(17, 4, tours);     // Affiche tours : le nombre grandit sans arrêt.
+    nombre(17, 6, neuve);     // Affiche neuve : toujours 001.
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAClUlEQVR4nO3ZQW7TUBRA0Q5ZAkP2vxqWwDIYdoBUocR2/nPdRByudIWCm5pnn9ou+W+/fv8suLeXT1BfWsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeM9AP72/cefbjZuvp6+/+PN99+yN8xozodvvn//5ce79+9OR105G5v7PwI+gJm+/vjr5lgrh3p84kZ7u/C4RjMcz3Z8ZjZ/sFb29iTgmz894Omco+Pdu9msHOAD4M1byvSWe3rQ9RM3vdVPHyVXAU/vzycujJvtz7uC98bqCj6Yc/pou994Bnjvx+p/Bn7yM/jLgUcDXQg8emSs7GfvS5/ZfjDnVb9FH2wfABdQwHgB4wWMFzBewHgB4wWMFzDe6mLD3pduNm6+nn7OfrxOQq77To93fZ344sWGzQ/HTy+TLc5z4fynX6/MPz0bJ2a4V79+Nel+HUICns75mf6+WjbnWfk4+iTwdN33xDro5nZy3ff4POxdMPfbrwS+/KQsnrjT+/lHr+C9R97m9oBfDD/lPzfDDPiqW9zp336nJ3dl/oNHxqvWfR8ewunt/T8YL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsY7x0NOZhP5HpRdQAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACmklEQVR4nO3ZwW3bMABA0Rw7Qo/df5qO0DF67KFAUNgSTTJyjLx+4CNwGVWm9CIpMd9+/f5ZcG8vn0E9tYDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsZ7APzt+4+/3Qwevl7d/n3j+/9yNpmleT7c+H77y4/37H1Xpzqzn8PxEfAAZvX1+z8Pz+nkD+PgxC3t7cLjWprDeG7jM7N9jJ8EfPPVA16d59LxDq7Uh2/0APjsVnD2erz92V3x48Crt/rVR8lVwKv358GFcfZeNyOfdwVPTmgPeGlvX+gKHjzaDsfvN9sBPvux+p+BX/UMfhbwVRNaBV56ZMzs5+xbHxlf+i13cqrz4wvABRQwXsB4AeMFjBcwXsB4AeMFjDe72HD2rZvBw9ern7MPtlHXfVePd7Dz5y42HH44vr1MNjmfC+e//Xpm/qtnY++z6KevJt2vQ0jAq/P8SP9eLYfzmfk4ehN4dd13Yx30cJxc9x2fh7ML5n78SuDLT8rkidvezxe9gs8eeYfjAb8YfpV/bw5rwFfd4rZ/+109uTPzHzwyXrXu+/AQtsf7OxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxjvDxVQh3fjvR5XAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>au bout d’une seconde — image 60</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAChklEQVR4nO3ZTU7bQACAUZYcocve/zQ9Qo/RZReVEEo8tsc/RLx+0icUJsYZ52EbMm+///wquLeXz6BuLWC8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPE2gN9//PzXw+Di49ntPzZ+/pHRZKbmubnx8/aXH+/odXdOdXFvo/0sjq8Br8DMPv74dnG6hw91E+Du45qaw/rcFp/d/FXYfK0vAn746gHPznN/69etzfEN4NGlYPR4ffvRVfE88OylfvZWchXw7PX5/K/R153Bo2l1Bh846v0vcQR4dL39n4Fvuge/DHhz5CbgqVvGnv2MnjozPvVX7s6p3gJcQAHjBYwXMF7AeAHjBYwXMF7AeHsXG0ZPPQwuPp79nH19/URd95063pWd37vY8HnhaA/YFLD9mfP5+S+u112/mvS8DiEBz87zTJ/PlsX57PmY+iDw7Lrv7KV1NA6v+472PzphnsevBL78Tdn5xh3ezzc9g0e3vMXxgF8MP8t/bA5zwFdd4g7/9Tv75u6Z/8ot41XrvpuHcHi8/4PxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDx/gLR2KuPcIrTyAAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout de trois secondes — image 180</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACf0lEQVR4nO3ZQW6bUBRA0Qy7hA67/9V0CV1GhxlUiiwbMA9wrZ5e6SpyMMEfjvgk+R+/fv8suI+3j6BeWsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeM9Af72/cef7jYuvp7u/7Xz44+sDWY0zqc7P+5/+fmufe7OoT492tP9t4A3YKavv75dvKbnT3V0tAvPazSG7bGtae1R3Nj/LwHfffWAp+Pc3/SKzYAXp5TplHt7+74IeDrVTx8lVwFP5+c14I3jvO0O3hjueeDR0aQ7+On1PAK8Nt/+z8Avega/DXj0wRcCjx4Ze46z9taZ7RvjnM7S58fT38F4AeMFjBcwXsB4AeMFjBcwXsB4excb1t6627j4evp/9o194HXf0fm+bbHhduFoD9gI2P6f8/nx3xG8BHhxHUICno7zTLd3y+J49iy/HgServtOp9a17fC679rx126Yx+1XAl9+UXZeuMPH+Ufv4LVH3uL2gN8MP+U/NoYZ8FVT3OHffqcXd8/4Nx4Z71r3fXoKh7f3dzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzDeJ/R5pFfS/UAwAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>au bout de sept secondes — image 420</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Le compteur du haut monte ; celui du bas reste bloqué sur 001.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>la variable déclarée avant la boucle compte <span class="detail"> (17 puis 47)</span></li>
+
+  <li>celle déclarée dedans vaut toujours 1 </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>12.1. Chapitre 3 — Retenir, et réagir : ce qui vient</strong> — chapitre 3 : Retenir, et réagir.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

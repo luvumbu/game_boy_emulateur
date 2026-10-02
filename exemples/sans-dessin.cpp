@@ -18,6 +18,12 @@
  * celles-ci — c'est tout ce qui les distingue.
  */
 
+#include <poser>    // pose une tuile sur une case du fond
+#include <lire>     // lit la tuile posée sur une case
+#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+#include <nombre>   // écrit un nombre en chiffres
+
 const uint8_t VIDE = 0;
 const uint8_t HEROS = 15;   // la lettre O
 const uint8_t MUR = 42;     // le signe #

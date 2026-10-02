@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 0.65.5 — La fonction bouton() — lire la manette</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie E — La croix : le joueur</span>
+    <span>leçon 0.65.5 sur 143</span>
+    <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
+    
+    
+    
+  </p>
+<h1>0.65.5. La fonction bouton() — lire la manette</h1>
+<p class="idee">#include &lt;bouton&gt; : bouton(A) vaut 1 tant que le bouton A est enfoncé, 0 sinon.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>Ce qu’elle fait :</strong> <code>bouton(X)</code> rend <strong>1</strong> tant que le bouton est <strong>enfoncé</strong>, <strong>0</strong> sinon. Les huit : <code>A</code>, <code>B</code>, <code>START</code>, <code>SELECT</code>, <code>HAUT</code>, <code>BAS</code>, <code>GAUCHE</code>, <code>DROITE</code>.</p>
+<p><strong>La ligne à écrire : <code>#include &lt;bouton&gt;</code>.</strong></p>
+<p><strong>Son argument :</strong> le nom du bouton.</p>
+<p><strong>Ce qu’elle coûte :</strong> environ <strong>50 octets</strong> : la routine qui lit les huit boutons, et un test par appel.</p>
+<p><strong>Essaie :</strong> un deuxième <code>if</code>, avec <code>bouton(B)</code>, qui écrit ailleurs.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">On retrouve bouton dans 137 leçons</p>
+  <p style="margin: 0;"><a href="lecon-00-66-la-lettre-bouge-avec-la-croix.html">0.66</a>, <a href="lecon-00-66.1-la-lettre-bouge-avec-la-croix-de-base-ai.html">0.66.1</a>, <a href="lecon-00-66.2-la-lettre-bouge-avec-la-croix-double-deu.html">0.66.2</a>, <a href="lecon-00-67-les-variables-de-la-lettre-dans-leur-pro.html">0.67</a>, <a href="lecon-00-67.1-les-variables-de-la-lettre-dans-leur-pro.html">0.67.1</a>, <a href="lecon-00-67.2-les-variables-de-la-lettre-dans-leur-pro.html">0.67.2</a>, <a href="lecon-00-68-voir-la-position-du-a-en-direct.html">0.68</a>, <a href="lecon-00-68.1-voir-la-position-du-a-en-direct-de-base-.html">0.68.1</a>, <a href="lecon-00-68.2-voir-la-position-du-a-en-direct-double-d.html">0.68.2</a>, <a href="lecon-00-69-chercher-le-a-sur-l-ecran-lire.html">0.69</a>, <a href="lecon-00-69.1-chercher-le-a-sur-l-ecran-lire-de-base-a.html">0.69.1</a>, <a href="lecon-00-69.2-chercher-le-a-sur-l-ecran-lire-double-de.html">0.69.2</a>, <a href="lecon-00-69.3-chercher-le-a-sur-l-ecran-lire-en-simple.html">0.69.3</a>, <a href="lecon-00-70-plus-fluide-la-lettre-au-pixel-pres.html">0.70</a>, <a href="lecon-00-70.1-plus-fluide-la-lettre-au-pixel-pres-de-b.html">0.70.1</a>, <a href="lecon-00-70.2-plus-fluide-la-lettre-au-pixel-pres-doub.html">0.70.2</a>, <a href="lecon-00-82-un-mur-qu-on-ne-traverse-pas-le-m.html">0.82</a>, <a href="lecon-00-82.1-un-mur-qu-on-ne-traverse-pas-le-m-un-lab.html">0.82.1</a>, <a href="lecon-00-83.2-un-son-quand-on-ramasse-note-et-un-bruit.html">0.83.2</a>, <a href="lecon-00-84-des-vies-et-une-fin-de-partie.html">0.84</a>, <a href="lecon-00-90.1-l-ecran-titre-start-un-autre-ecran.html">0.90.1</a>, <a href="lecon-00-90.2-l-ecran-titre-une-lettre-qui-file.html">0.90.2</a>, <a href="lecon-00-90.4-l-ecran-titre-tout-l-ecran-glisse.html">0.90.4</a>, <a href="lecon-00-90.5-l-ecran-titre-un-bandeau-qui-passe.html">0.90.5</a>, <a href="lecon-00-90.6-l-ecran-titre-la-consigne-qui-clignote.html">0.90.6</a>, <a href="lecon-00-90.7-l-ecran-titre-select-retour-au-titre.html">0.90.7</a>, <a href="lecon-00-90.8-l-ecran-titre-trois-ecrans.html">0.90.8</a>, <a href="lecon-00-91-le-titre-puis-le-jeu.html">0.91</a>, <a href="lecon-00-91.1-le-titre-puis-le-jeu-trente-secondes.html">0.91.1</a>, <a href="lecon-00-91.2-le-titre-puis-le-jeu-le-score-et-rejouer.html">0.91.2</a>, <a href="lecon-00-91.3-le-titre-puis-le-jeu-un-cadre-de-murs-x.html">0.91.3</a>, <a href="lecon-00-91.4-le-titre-puis-le-jeu-la-piece-revient-au.html">0.91.4</a>, <a href="lecon-00-91.5-le-snake-une-queue-qui-suit-le-a.html">0.91.5</a>, <a href="lecon-00-91.6-le-snake-la-queue-grandit-a-chaque-piece.html">0.91.6</a>, <a href="lecon-00-91.7-le-snake-le-a-avance-tout-seul.html">0.91.7</a>, <a href="lecon-00-91.8-le-snake-le-mur-fait-perdre.html">0.91.8</a>, <a href="lecon-00-91.9-le-snake-sans-limite-de-temps.html">0.91.9</a>, <a href="lecon-00-92-le-snake-avec-un-menu-la-couleur-du-serp.html">0.92</a>, <a href="lecon-00-92.1-le-snake-avec-un-menu-le-pas-compte-en-i.html">0.92.1</a>, <a href="lecon-00-92.2-le-snake-avec-un-menu-la-vitesse-qui-mon.html">0.92.2</a>, <a href="lecon-00-93.1-un-jeu-de-bombes-le-o-bouge-les-x-l-arre.html">0.93.1</a>, <a href="lecon-00-93.2-un-jeu-de-bombes-a-pose-une-bombe.html">0.93.2</a>, <a href="lecon-00-93.3-un-jeu-de-bombes-la-bombe-explose.html">0.93.3</a>, <a href="lecon-00-93.4-un-jeu-de-bombes-des-flammes-plus-longue.html">0.93.4</a>, <a href="lecon-00-93.5-un-jeu-de-bombes-un-ennemi-w.html">0.93.5</a>, <a href="lecon-00-93.6-un-jeu-de-bombes-trois-ennemis.html">0.93.6</a>, <a href="lecon-00-93.7-un-jeu-de-bombes-la-flamme-detruit-les-w.html">0.93.7</a>, <a href="lecon-00-93.8-un-jeu-de-bombes-touche-la-partie-s-arre.html">0.93.8</a>, <a href="lecon-00-93.9-un-jeu-de-bombes-les-trois-w-detruits-ga.html">0.93.9</a>, <a href="lecon-00-94-un-jeu-de-bombes-avec-des-briques-des-br.html">0.94</a>, <a href="lecon-00-94.1-un-jeu-de-bombes-avec-des-briques-la-fla.html">0.94.1</a>, <a href="lecon-00-95-un-micro-zelda-des-salles-des-murs-deux-.html">0.95</a>, <a href="lecon-00-95.1-un-micro-zelda-l-ecran-glisse-dans-le-se.html">0.95.1</a>, <a href="lecon-00-97-une-lettre-qui-tire-a-lance-le-tir.html">0.97</a>, <a href="lecon-00-97.1-une-lettre-qui-tire-a-lance-plusieurs-ti.html">0.97.1</a>, <a href="lecon-00-98-une-lettre-qui-tire-la-place-du-a-dans-d.html">0.98</a>, <a href="lecon-00-98.1-une-lettre-qui-tire-plusieurs-tirs-depui.html">0.98.1</a>, <a href="lecon-00-99-une-lettre-qui-tire-le-a-bouge-le-tir-ga.html">0.99</a>, <a href="lecon-00-99.1-une-lettre-qui-tire-le-a-bouge-chaque-ti.html">0.99.1</a>, <a href="lecon-00-100-une-lettre-qui-tire-dans-le-sens-ou-le-a.html">0.100</a>, <a href="lecon-00-100.1-une-lettre-qui-tire-chaque-tir-dans-son-.html">0.100.1</a>, <a href="lecon-00-101-une-lettre-qui-tire-un-mur-arrete-le-tir.html">0.101</a>, <a href="lecon-00-101.1-une-lettre-qui-tire-un-mur-arrete-les-ti.html">0.101.1</a>, <a href="lecon-00-102-une-lettre-qui-tire-une-cible-b.html">0.102</a>, <a href="lecon-00-102.1-une-lettre-qui-tire-une-cible-b-et-trois.html">0.102.1</a>, <a href="lecon-00-103-une-lettre-qui-tire-le-b-tire-aussi.html">0.103</a>, <a href="lecon-00-104-une-lettre-qui-tire-un-petit-jeu-les-w-t.html">0.104</a>, <a href="lecon-00-105-une-lettre-qui-tire-le-tir-casse-le-x.html">0.105</a>, <a href="lecon-00-105.1-une-lettre-qui-tire-la-rafale-perce-le-m.html">0.105.1</a>, <a href="lecon-00-106-une-lettre-qui-tire-la-boule-de-feu.html">0.106</a>, <a href="lecon-00-107-une-lettre-qui-tire-la-boule-de-feu-expl.html">0.107</a>, <a href="lecon-00-107.1-une-lettre-qui-tire-une-explosion-plus-g.html">0.107.1</a>, <a href="lecon-00-108-une-lettre-qui-tire-des-etincelles.html">0.108</a>, <a href="lecon-02-effacer-quand-on-appuie-sur-a.html">2</a>, <a href="lecon-02-1-changer-de-message-avec-a-et-b.html">2.1</a>, <a href="lecon-02-2-effacer-ce-qu-on-a-ecrit.html">2.2</a>, <a href="lecon-02-3-les-messages-dans-leur-propre-fichier.html">2.3</a>, <a href="lecon-14-lire-un-bouton.html">14</a>, <a href="lecon-16-un-de-et-le-hasard-du-materiel.html">16</a>, <a href="lecon-17-deux-mots-de-meme-longueur.html">17</a>, <a href="lecon-18-se-souvenir-de-l-etat-d-avant.html">18</a>, <a href="lecon-19-un-choix-puis-plusieurs.html">19</a>, <a href="lecon-20-deux-touches-deux-effets.html">20</a>, <a href="lecon-21-if-et-else-deux-chemins.html">21</a>, <a href="lecon-23-et-ou-non.html">23</a>, <a href="lecon-44-le-front-ou-pourquoi-un-appui-compte-tro.html">44</a>, <a href="lecon-45-un-lutin-au-pixel-pres.html">45</a>, <a href="lecon-47-un-personnage-de-seize.html">47</a>, <a href="lecon-48-deplacer-un-lutin.html">48</a>, <a href="lecon-49-le-garder-dans-l-ecran.html">49</a>, <a href="lecon-51-sauter-sans-pesanteur.html">51</a>, <a href="lecon-52-defiler-et-l-octet-qui-boucle.html">52</a>, <a href="lecon-53-le-son.html">53</a>, <a href="lecon-54-ecrire-une-musique.html">54</a>, <a href="lecon-55-une-note-au-front.html">55</a>, <a href="lecon-57-un-bruit.html">57</a>, <a href="lecon-70-chercher-et-changer-une-case.html">70</a>, <a href="lecon-81-une-valeur-de-retour-la-fonction-qui-rep.html">81</a>, <a href="lecon-82-decouper-la-boucle-du-jeu-en-fonctions.html">82</a>, <a href="lecon-84-le-decor-qui-defile.html">84</a>, <a href="lecon-85-la-camera-c-est-le-monde-qui-bouge.html">85</a>, <a href="lecon-89-les-trois-facons-de-faire-la-meme-chose.html">89</a>, <a href="lecon-91-une-struct-ce-qui-va-ensemble.html">91</a>, <a href="lecon-94-le-petit-jeu-tout-ensemble.html">94</a>, <a href="lecon-97-la-palette-un-indice-n-est-pas-une-nuanc.html">97</a>, <a href="lecon-98-un-fondu-au-noir-et-retour.html">98</a>, <a href="lecon-100-faire-clignoter-un-personnage-touche.html">100</a>, <a href="lecon-102-melanger-la-lumiere.html">102</a>, <a href="lecon-106-un-jeu-lisible-en-couleur-comme-en-nuanc.html">106</a>, <a href="lecon-107-au-pixel-pres-le-lutin-glisse.html">107</a>, <a href="lecon-108-la-vitesse-un-pas-toutes-les-n-images.html">108</a>, <a href="lecon-109-animer-deux-dessins-pour-marcher.html">109</a>, <a href="lecon-110-regarder-a-gauche-ou-a-droite-le-miroir.html">110</a>, <a href="lecon-111-deux-boites-qui-se-touchent.html">111</a>, <a href="lecon-112-lire-la-case-devant-soi-le-mur.html">112</a>, <a href="lecon-113-glisser-le-long-d-un-mur-un-axe-a-la-foi.html">113</a>, <a href="lecon-114-le-hasard-dans-une-plage-choisie.html">114</a>, <a href="lecon-116-compter-les-secondes-un-chronometre.html">116</a>, <a href="lecon-117-un-compte-a-rebours.html">117</a>, <a href="lecon-118-enum-un-nom-pour-chaque-ecran.html">118</a>, <a href="lecon-119-un-switch-et-une-fonction-par-etat.html">119</a>, <a href="lecon-120-le-record-garde-dans-la-cartouche.html">120</a>, <a href="lecon-121-une-note-sa-hauteur-sa-duree-son-volume.html">121</a>, <a href="lecon-122-un-son-pour-chaque-action.html">122</a>, <a href="lecon-123-un-petit-air-qui-joue-tout-seul.html">123</a>, <a href="lecon-124-faire-glisser-le-decor.html">124</a>, <a href="lecon-125-une-carte-plus-grande-que-l-ecran-la-cam.html">125</a>, <a href="lecon-126-passer-d-un-ecran-a-l-autre.html">126</a>, <a href="lecon-127-la-pesanteur-et-le-saut.html">127</a>, <a href="lecon-129-un-etat-de-jeu.html">129</a>, <a href="lecon-131-des-ennemis-qui-vivent-et-qui-meurent.html">131</a>, <a href="lecon-132-les-collisions.html">132</a>, <a href="lecon-134-passer-a-la-salle-suivante-sans-bouton.html">134</a>, <a href="lecon-136-la-musique-d-un-jeu.html">136</a>, <a href="lecon-137-le-monde-glisse-le-heros-ne-bouge-pas.html">137</a>, <a href="lecon-138-un-record-qui-survit-a-l-extinction.html">138</a>, <a href="lecon-143-sinus-cosinus-une-seule-table.html">143</a></p>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>465 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()           48 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EffacerCases, EcrireTexte  — attend de pouvoir écrire une case
+  EffacerCases     12 o  ← effacer()  — efface des cases
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles     85 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette      37 o  ← bouton()  — lit les huit boutons
+  Tuiles          128 o  ← CopierTuiles  — 8 lettres sur 43
+  "APPUIE SUR A"   12 o  ← texte()  — un texte gravé
+  "APPUYE"          6 o  ← texte()  — un texte gravé
+Lettres gravées : AEIPRSUY
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()   × 2    22 o sur place, dans main()  + EcrireTexte (10 o)
+  effacer() × 1     8 o sur place, dans main()  + EffacerCases (12 o)
+  bouton()  × 1     5 o sur place, dans main()  + LireManette (37 o)
+  image()   × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// ---- #include &lt;bouton&gt; : lire la manette ----
+// Tant que A est enfoncé, APPUYE s'affiche ; relâché, il s'efface.
+
+#include &lt;bouton&gt;    // bouton() : 1 si le bouton est enfoncé
+#include &lt;texte&gt;
+#include &lt;effacer&gt;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  texte(4, 2, "APPUIE SUR A");   // la consigne, en haut
+
+  while (true) {
+    image();
+    if (bouton(A)) {
+      texte(6, 8, "APPUYE");
+    } else {
+      effacer(6, 8, "APPUYE");
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB3UlEQVR4nO3WO27CQBRAUcosIWX2v5osIctISYGUAmEy4wwhvjnSLUYDMk8++HP6+HxXuNPTJ9BDAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcLxfAn55fbt0c3N8/+Z65PhXH30759ZvXa2nDr415+GBB0/W7vX4zvicP5l/9jwABvzngbdufatu0Vs7S26hq27ROx4ZhwEeRBrff8QVPDvzZT3171ky21SA98/8tR6/gpfMNtWRgO+8hS55i77z5R2PjH8ErCcGOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY53BrtSobTgrnbIAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB3UlEQVR4nO3WO27CQBRAUcosIWX2v5osIctISYGUAmEy4wwhvjnSLUYDMk8++HP6+HxXuNPTJ9BDAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcLxfAn55fbt0c3N8/+Z65PhXH30759ZvXa2nDr415+GBB0/W7vX4zvicP5l/9jwABvzngbdufatu0Vs7S26hq27ROx4ZhwEeRBrff8QVPDvzZT3171ky21SA98/8tR6/gpfMNtWRgO+8hS55i77z5R2PjH8ErCcGOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY53BrtSobTgrnbIAAAAAElFTkSuQmCC" alt="l’écran après A">
+    <figcaption><strong>A</strong> — l’écran n’a pas bougé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">APPUIE SUR A en haut ; APPUYE apparaît au milieu tant qu’on tient le bouton A.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>rien au départ </li>
+
+  <li>A tenu : APPUYE </li>
+
+  <li>relâché : effacé </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>0.66. La lettre bouge avec la croix</strong> — chapitre 0 : Avant tout.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

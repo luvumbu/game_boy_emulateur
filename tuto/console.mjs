@@ -113,5 +113,5 @@ export function consoleDuProgramme(code, titre, laisserDemarrer = true, fichiers
 
   if (laisserDemarrer) avancer(IMAGES_DE_DEPART)
 
-  return { laConsole, gb, octets, variables }
+  return { laConsole, gb, octets, variables, grave: rendu.grave }
 }

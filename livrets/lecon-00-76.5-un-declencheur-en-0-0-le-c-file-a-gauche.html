@@ -79,9 +79,11 @@
 
 
   <p class="reperes">
-    <span class="niveau">Niveau 0 — Avant tout</span>
-    <span>leçon 0.76.5 sur 82</span>
-    <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie E — La croix : le joueur</span>
+    <span>leçon 0.76.5 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
@@ -94,14 +96,68 @@
 <p><strong>Ce qui est nouveau ici : un mouvement vers la GAUCHE, qui recommence.</strong> À chaque tic du chronomètre, le C efface sa case, recule d’une colonne (<code>cx--</code>), et se repose. Arrivé à la colonne 0, il <strong>repart de la colonne 19</strong> : <code>if (cx == 0) { cx = 19; } else { cx--; }</code>.</p>
 <p><strong><code>if … else</code> avec accolades :</strong> si <code>cx</code> vaut 0, on fait le premier bloc (repartir à droite) ; sinon, le second (reculer d’une case). Jamais les deux.</p>
 
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;deplace_croix&gt;</code> → <a href="lecon-00-66.3-la-fonction-deplace-croix-suivre-la-croi.html">0.66.3. La fonction deplace_croix() — suivre la croix, case par case</a></li>
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+  <li><code>#include &lt;nombre&gt;</code> → <a href="lecon-00-8.3-la-fonction-nombre-ecrire-un-nombre.html">0.8.3. La fonction nombre() — écrire un nombre</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;un_pas&gt;</code> → <a href="lecon-00-29.4-la-fonction-un-pas-un-seul-pas-sans-atte.html">0.29.4. La fonction un_pas() — un seul pas, sans attendre</a></li>
+  <li><code>#include &lt;effacer&gt;</code> → <a href="lecon-00-16.3-la-fonction-effacer-effacer-des-cases.html">0.16.3. La fonction effacer() — effacer des cases</a></li>
+</ul>
+</div>
+
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>2753 octets</strong> de cartouche.</p>
+<strong>1809 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        109 o  ← la console, à l’allumage  — la mise en route de la console
+  deplace_croix()  217 o  ← main()  — une fonction fournie par le langage
+  un_pas()         117 o  ← main()  — une fonction fournie par le langage
+  main()           474 o  ← démarrage  — ta fonction
+  VBlank             8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage     28 o  ← image()  — attend l’image suivante
+  AttendreVBlank    16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces     12 o  ← EffacerCases, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase       10 o  ← effacer(), poser()  — trouve l’adresse d’une case de l’écran
+  EffacerCases      12 o  ← effacer()  — efface des cases
+  EcrireNombre      33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles      18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte      14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette       37 o  ← bouton()  — lit les huit boutons
+  Tuiles           704 o  ← CopierTuiles  — la police entière
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EcrireTexte, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser()         × 6    57 o sur place, dans deplace_croix(), un_pas(), main()  + AdresseCase (10 o)
+  effacer()       × 3    45 o sur place, dans deplace_croix(), un_pas(), main()  + AdresseCase (10 o), EffacerCases (12 o)
+  bouton()        × 4    20 o sur place, dans deplace_croix()  + LireManette (37 o)
+  nombre()        × 2    20 o sur place, dans main()  + EcrireNombre (33 o)
+  image()         × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+  images()        × 1     2 o sur place, dans deplace_croix()
+Tes fonctions appelées :
+  un_pas()        × 8   176 o sur place, dans main()
+  deplace_croix() × 1    19 o sur place, dans main()</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. une variable — x</p>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>#include &lt;deplace_croix&gt;   // une tuile qui suit la croix, case par case
+#include &lt;ALPHABET&gt;        // les lettres de la police : ALPHABET[0] est le A
+#include &lt;nombre&gt;          // écrit un nombre en chiffres
+#include &lt;poser&gt;           // pose une tuile sur une case du fond
+#include &lt;un_pas&gt;          // fait faire un seul pas à une tuile
+#include &lt;effacer&gt;         // efface des cases, ou tout le fond</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une variable — x</p>
     <pre><code>uint8_t x = 10;       // le A part de (10, 0)</code></pre>
   </div>
   <div></div>
@@ -109,7 +165,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. une variable — y</p>
+    <p class="quoi">3. une variable — y</p>
     <pre><code>uint8_t y = 0;</code></pre>
   </div>
   <div></div>
@@ -117,7 +173,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">3. une variable — actif</p>
+    <p class="quoi">4. une variable — actif</p>
     <pre><code>uint8_t actif = 0;    // 0 : pas encore ; 1 : le A est passé par (0, 0)</code></pre>
   </div>
   <div></div>
@@ -125,7 +181,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">4. une variable — bx</p>
+    <p class="quoi">5. une variable — bx</p>
     <pre><code>uint8_t bx = 10;      // le B : sa colonne…</code></pre>
   </div>
   <div></div>
@@ -133,7 +189,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">5. une variable — by</p>
+    <p class="quoi">6. une variable — by</p>
     <pre><code>uint8_t by = 8;       // …et sa ligne. Il apparaît au milieu, (10, 8).</code></pre>
   </div>
   <div></div>
@@ -141,7 +197,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">6. une variable — bpas</p>
+    <p class="quoi">7. une variable — bpas</p>
     <pre><code>uint8_t bpas = 0;     // où il en est dans son tour : du pas 0 au pas 15</code></pre>
   </div>
   <div></div>
@@ -149,7 +205,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">7. une variable — bimages</p>
+    <p class="quoi">8. une variable — bimages</p>
     <pre><code>uint8_t bimages = 0;  // le chronomètre du B, en images</code></pre>
   </div>
   <div></div>
@@ -157,7 +213,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">8. une variable — bx2</p>
+    <p class="quoi">9. une variable — bx2</p>
     <pre><code>uint8_t bx2 = 14;     // le second B : il part du coin opposé, (14, 12)…</code></pre>
   </div>
   <div></div>
@@ -165,7 +221,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">9. une variable — by2</p>
+    <p class="quoi">10. une variable — by2</p>
     <pre><code>uint8_t by2 = 12;</code></pre>
   </div>
   <div></div>
@@ -173,7 +229,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">10. une variable — bpas2</p>
+    <p class="quoi">11. une variable — bpas2</p>
     <pre><code>uint8_t bpas2 = 8;    // …donc déjà à mi-tour : il commence par aller à gauche</code></pre>
   </div>
   <div></div>
@@ -181,7 +237,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">11. une variable — cx</p>
+    <p class="quoi">12. une variable — cx</p>
     <pre><code>uint8_t cx = 19;      // le C : il apparaît en (19, 3), au bord droit</code></pre>
   </div>
   <div></div>
@@ -189,7 +245,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">12. une variable — cy</p>
+    <p class="quoi">13. une variable — cy</p>
     <pre><code>uint8_t cy = 3;</code></pre>
   </div>
   <div></div>
@@ -197,7 +253,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">13. le point d’entrée : c’est ici que la console arrive</p>
+    <p class="quoi">14. le point d’entrée : c’est ici que la console arrive</p>
     <pre><code>int main() {
   while (true) {
     image();
@@ -274,7 +330,7 @@ et voici ce qu’ils ont mesuré.</p>
 
   <li>le C est apparu </li>
 
-  <li>il va vers la GAUCHE <span class="detail"> (15 → 11)</span></li>
+  <li>il va vers la GAUCHE <span class="detail"> (11 → 3)</span></li>
 
   <li>à sa place, ligne 3 </li>
 </ul>
@@ -282,7 +338,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 
 <p class="pied">
-  Ensuite : <strong>0.76.6. Un déclencheur en (0, 0) : le D file à droite</strong> — niveau 0 sur 10.
+  Ensuite : <strong>0.76.6. Un déclencheur en (0, 0) : le D file à droite</strong> — chapitre 0 : Avant tout.
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 

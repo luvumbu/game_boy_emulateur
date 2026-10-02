@@ -11,7 +11,8 @@
  * lecteur croit avoir mal compris.
  */
 
-import { LECONS } from '../tuto/lecons.js'
+import { LECONS, numeros } from '../tuto/lecons.js'
+import { inclusionsDe } from '../tuto/fonctions.js'
 import { consoleDuProgramme } from '../tuto/console.mjs'
 
 let echecs = 0
@@ -55,6 +56,25 @@ for (const [index, lecon] of LECONS.entries()) {
     if (!bon) echecs++
   }
 }
+
+/*
+ * Le parcours avance un « #include » à la fois : aucune étape n'en apporte
+ * deux nouveaux d'un coup. Chaque fonction de la console a son tuto juste
+ * avant la première étape qui l'emploie (voir tuto/parcours.js).
+ */
+const NUMEROS_DU_PARCOURS = numeros(LECONS)
+const dejaInclus = new Set()
+const tropDunCoup = []
+LECONS.forEach((lecon, i) => {
+  const neufs = inclusionsDe(lecon).filter((nom) => !dejaInclus.has(nom))
+  if (neufs.length > 1) tropDunCoup.push(`${NUMEROS_DU_PARCOURS[i]}. ${lecon.titre} (${neufs.join(', ')})`)
+  for (const nom of inclusionsDe(lecon)) dejaInclus.add(nom)
+})
+console.log()
+console.log(`  ${tropDunCoup.length ? 'NON' : 'OK '} un #include nouveau à la fois, sur tout le parcours` +
+  (tropDunCoup.length ? ` — ${tropDunCoup.join(' ; ')}` : ''))
+controles++
+if (tropDunCoup.length) echecs++
 
 console.log()
 console.log(`  ${LECONS.length} leçons, ${controles} contrôles`)

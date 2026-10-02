@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 123 — Un petit air qui joue tout seul</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 21 — Le son : notes, bruits, airs</span>
+    <span class="outil">du cours</span>
+    
+    <span>leçon 123 sur 143</span>
+    <span class="jauge" style="--part: 90%">difficulté 9 / 10</span>
+    
+    
+    
+  </p>
+<h1>123. Un petit air qui joue tout seul</h1>
+<p class="idee">Un Air s’écrit comme une tuile se dessine : une suite de pas, gravée dans le programme.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>Une mélodie, c’est une suite de notes. On pourrait appeler <code>note()</code> au bon moment, image après image, avec un compteur ; la console sait le faire toute seule.</p>
+<p><strong>Ce qui est nouveau ici : <code>Air</code>, et <code>jouer(voix, AIR, vitesse)</code>.</strong> Un <code>Air</code> est une <strong>liste de pas</strong>, comme une tuile est une liste de rangées. Chaque pas est une note et son volume, <code>"DO4 12"</code>, ou l’un de ces deux signes : <code>"--"</code> fait taire la voix, <code>"=="</code> laisse la note d’avant continuer (c’est ce qui fait les notes longues).</p>
+<p><code>jouer(1, CLAIR, 10)</code> joue l’air sur la voix 1, à raison d’un pas toutes les <strong>10 images</strong>. Ensuite, le programme n’a plus rien à faire : l’air avance tout seul, soixante fois par seconde, même si la boucle du jeu est en retard.</p>
+<p><code>airFini(1)</code> rend 1 quand l’air de la voix 1 est arrivé au bout. On s’en sert ici pour écrire « FIN » <strong>une fois</strong> (la variable <code>fini</code> évite de le réécrire à chaque image), et A relance l’air depuis le début.</p>
+<p>Pour une musique de fond qui ne s’arrête jamais, on ajoute un 4e argument : <code>jouer(1, CLAIR, 10, 1)</code> recommence sans fin. Et une deuxième voix peut jouer un autre <code>Air</code> en même temps : une basse sous la mélodie.</p>
+<p><strong>À toi :</strong> écris la suite de la chanson (« mon ami Pierrot ») à la fin de <code>CLAIR</code>.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;Air&gt;</code> → <a href="lecon-53-1-air-ecrire-une-musique.html">53.1. Air — écrire une musique</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;jouer&gt;</code> → <a href="lecon-53-2-la-fonction-jouer-jouer-un-air-tout-seul.html">53.2. La fonction jouer() — jouer un air tout seul</a></li>
+  <li><code>#include &lt;airFini&gt;</code> → <a href="lecon-58-1-la-fonction-airfini-l-air-est-il-fini.html">58.1. La fonction airFini() — l’air est-il fini ?</a></li>
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1190 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            74 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              191 o  ← démarrage  — ta fonction
+  VBlank               11 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AvancerAirs         308 o  ← VBlank  — fait avancer la musique à chaque image
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles         94 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette          37 o  ← bouton()  — lit les huit boutons
+  Tuiles              208 o  ← CopierTuiles  — 13 lettres sur 43
+  Notes               120 o  ← AvancerAirs  — la table des notes de musique
+  "AU CLAIR DE LA …"   19 o  ← texte()  — un texte gravé
+  "A: REJOUER"         10 o  ← texte()  — un texte gravé
+  "FIN"                 3 o  ← texte()  — un texte gravé
+  "   "                 3 o  ← texte()  — un texte gravé
+  CLAIR_0              32 o  ← jouer()  — une table gravée
+Lettres gravées : ACDEFIJLNORU:
+Pas gravé (jamais appelé) : AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert
+Fonctions du langage appelées :
+  jouer()   × 2   104 o sur place, dans main()  + CLAIR_0 (32 o)
+  texte()   × 4    44 o sur place, dans main()  + EcrireTexte (10 o)
+  airFini() × 1     5 o sur place, dans main()
+  bouton()  × 1     5 o sur place, dans main()  + LireManette (37 o)
+  image()   × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : joue « Au clair de la lune » tout seul, écrit FIN à la fin ;
+// A la rejoue.
+//
+// Ce qui est nouveau : Air, une liste de pas de musique.
+//   Chaque pas est une note et son volume : DO4 12 (do, octave 4, volume 12).
+//   == : la note d'avant continue (une note longue).
+//   -- : silence.
+//   jouer(voix, AIR, vitesse) : joue l'air sur la voix, un pas toutes les « vitesse » images.
+//   airFini(voix) : 1 quand l'air de cette voix est arrivé au bout.
+
+// Au clair de la lune : chaque pas dure 10 images.
+// « Au clair de la lu-ne, mon a-mi Pier-rot » : 16 pas.
+
+#include &lt;Air&gt;       // un air de musique, note par note
+#include &lt;texte&gt;     // écrit un texte à l’écran
+#include &lt;jouer&gt;     // joue un air tout seul
+#include &lt;airFini&gt;   // dit si un air est fini
+#include &lt;bouton&gt;    // lit un bouton de la manette</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une mélodie — CLAIR</p>
+    <pre><code>Air CLAIR = {
+  "DO4 12", "DO4 12", "DO4 12", "RE4 12",
+  "MI4 12", "==",     "RE4 12", "==",
+  "DO4 12", "MI4 12", "RE4 12", "RE4 12",
+  "DO4 12", "==",     "==",     "--",
+};</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une variable — fini</p>
+    <pre><code>uint8_t fini = 0;      // 1 quand FIN est déjà écrit</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                       // Le jeu commence ici.
+  texte(2, 3, "AU CLAIR DE LA LUNE");
+  texte(2, 10, "A: REJOUER");
+
+  jouer(1, CLAIR, 10);       // voix 1, un pas toutes les 10 images.
+                             // L'air avance TOUT SEUL : la boucle n'a rien à faire.
+
+  while (true) {                   // La boucle du jeu :
+    image();
+
+    if (airFini(1) &amp;&amp; !fini) {     // l'air vient de finir : une seule fois
+      texte(8, 6, "FIN");
+      fini = 1;                    // pour ne pas réécrire FIN à chaque image
+    }
+
+    if (bouton(A) &amp;&amp; fini) {       // on ne relance qu'un air fini
+      jouer(1, CLAIR, 10);         // depuis le début
+      texte(8, 6, "   ");          // on efface FIN
+      fini = 0;
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACVElEQVR4nO3dQU7jMABAUZYcgeXc/zRzBI7BkgXSDGKC6yQuzXw96QulVWVCHnbbTfz0+vZb4Z4efga6a4DjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY53EPj55ddHX57cPD4zzszrB+N89/rx4INxZoY6cP67xvnuOm8eHwHe9QtOjjP/DzR+5h7nswpmIfCfh5cDPn+BAH8cf/55HHhzyfoB4MFSOVi3DyyJ/86MJUvrkqX+5jX/PH5/Bs/Pv8YM/nJ8FeC7vgefn8GA/z6cX8pmPv1OXvQln+oXfope9RZ285Ru/r2+B8cDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMdbuW/S4UF23WH95B3Qx3dkX/J3XarFt/T/mU0w5iF3jX9mn4bLth74/DiAF7Zy36Qz48w8vxB4yVZ4/0WPn8EHFvm7zuCS7lXegwdge1+/ZIkuGT9+Bm8ej1fRzaGO7Uq6ajOsy+Z7cDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcLx3pb3dNhXJa18AAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACd0lEQVR4nO3dQW7aQABA0Sx7hC57/9P0CD1Gl1lEaqPUGezxEMzrl74iQ8iE8DKDkQx++fX7Z8G9PPwe1F0LGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvIDxAsYLGC9gvEngb99/vPXhys3tM+Psuf1gnM9uPx58MM6eoSbu/6FxPnucN7dngA/9gpPj7P8HGl9zj/uzCmYh8J+LlwM+/wAF/Lb9/us88OaS9QXAg6VysG5PLIn/zowlS+uSpf7mY/5+fH8G759/xgz+sH0V4Ls+B5+fwQH/vbh/Kduz97vzQV+yV79wL3rVU9jNu3Tz7+11MF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMF7AeAHjBYwXMJ4AvOTIBzUE+NB3N48fVvtPgSeOuXzSEODBEXHjoy0DfoLmZvCenwUKOODLN0BqL1oArkEB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgB4wWMFzBewHgrz5s0PcihT1g//z7gwSeyL/m7LtXij/T/mpNg7Ic8ND75lpb1wOfHCXhhK8+bdGacPdcvBF5yKryn6PEzeGKRv+sMlnSv8hw8ADt6+yVLtGT8+Bm8uT1eRTeHmjsr6ZnzGj1FvQ7GCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGewU7bngmlS0PSQAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout de trois secondes — image 180</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACVElEQVR4nO3dQU7jMABAUZYcgeXc/zRzBI7BkgXSDGKC6yQuzXw96QulVWVCHnbbTfz0+vZb4Z4efga6a4DjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY53EPj55ddHX57cPD4zzszrB+N89/rx4INxZoY6cP67xvnuOm8eHwHe9QtOjjP/DzR+5h7nswpmIfCfh5cDPn+BAH8cf/55HHhzyfoB4MFSOVi3DyyJ/86MJUvrkqX+5jX/PH5/Bs/Pv8YM/nJ8FeC7vgefn8GA/z6cX8pmPv1OXvQln+oXfope9RZ285Ru/r2+B8cDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMdbuW/S4UF23WH95B3Qx3dkX/J3XarFt/T/mU0w5iF3jX9mn4bLth74/DiAF7Zy36Qz48w8vxB4yVZ4/0WPn8EHFvm7zuCS7lXegwdge1+/ZIkuGT9+Bm8ej1fRzaGO7Uq6ajOsy+Z7cDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcLx3pb3dNhXJa18AAAAASUVORK5CYII=" alt="l’écran après A">
+    <figcaption><strong>A</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Au clair de la lune joue une fois, puis « FIN » ; A la rejoue.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>l’air commence par un do (DO4, vers 262) <span class="detail"> (262)</span></li>
+
+  <li>il finit tout seul : FIN </li>
+
+  <li>A le relance </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>123.1. Chapitre 22 — Le défilement : un monde plus grand que l’écran : ce qui vient</strong> — chapitre 22 : Le défilement : un monde plus grand que l’écran.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

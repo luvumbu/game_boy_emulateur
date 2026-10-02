@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 2 — Les conditions : choisir</span>
   <span>leçon 4 sur 4 dans ce chapitre</span>
-  <span>8 sur 42 dans le cours</span>
+  <span>8 sur 61 dans le cours</span>
 </p>
 <h1>8. Plusieurs cas : else if, puis switch</h1>
 <p class="idee">« else if » range des intervalles ; « switch » aiguille sur des valeurs exactes.</p>
@@ -109,40 +109,92 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1552 octets</strong> de cartouche.</p>
+<strong>1016 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          199 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  Diviser          17 o  ← main()  — divise — le processeur ne sait pas le faire
+  CopierTuiles     85 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          480 o  ← CopierTuiles  — 30 lettres sur 43
+  "SCORE:"          6 o  ← texte()  — un texte gravé
+  "MEDAILLE:"       9 o  ← texte()  — un texte gravé
+  "MONDE:"          6 o  ← texte()  — un texte gravé
+  "BRONZE"          6 o  ← texte()  — un texte gravé
+  "ARGENT"          6 o  ← texte()  — un texte gravé
+  "OR    "          6 o  ← texte()  — un texte gravé
+  "PLAINE"          6 o  ← texte()  — un texte gravé
+  "GROTTE"          6 o  ← texte()  — un texte gravé
+  "CHATEAU"         7 o  ← texte()  — un texte gravé
+  "?      "         7 o  ← texte()  — un texte gravé
+Lettres gravées : ABCDEGHILMNOPRSTUZ0123456789?:
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte()  × 10   110 o sur place, dans main()  + EcrireTexte (10 o)
+  nombre() ×  1    10 o sur place, dans main()  + EcrireNombre (33 o)
+  image()  ×  1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  uint8_t score = 0;
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : un score monte tout seul. Selon sa valeur, on affiche
+// une médaille (BRONZE, ARGENT, OR) et un monde (PLAINE, GROTTE, CHATEAU).
+//
+// Ce qui est nouveau :
+//   else if  = « sinon, si ... » : on essaie les cas l'un après l'autre.
+//   switch   = on saute directement au « case » qui a la bonne valeur.
 
-  texte(1, 2, "SCORE:");
+#include &lt;diviser&gt;   // a / b, sauf par 1, 2, 4, 8, 16… écrits en clair
+
+#include &lt;texte&gt;     // écrit un texte à l’écran
+#include &lt;nombre&gt;    // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                          // Le jeu commence ici.
+  uint8_t score = 0;                  // Le score part de 0.
+
+  texte(1, 2, "SCORE:");              // Les trois titres, écrits une fois.
   texte(1, 5, "MEDAILLE:");
   texte(1, 8, "MONDE:");
 
-  while (true) {
-    image();
-    score++;                          // le score monte tout seul
-    nombre(12, 2, score);
+  while (true) {                      // Répète pour toujours :
+    image();                          // attend l'image suivante (60 par seconde).
+    score++;                          // Le score monte tout seul : + 1 à chaque image.
+    nombre(12, 2, score);             // On l'affiche.
 
-    /* des intervalles : else if, dans l'ordre */
-    if (score &lt; 60) {
+    // Des intervalles : else if, dans l'ordre.
+    // On lit de haut en bas ; dès qu'un test est vrai, on fait son bloc et on s'arrête.
+    if (score &lt; 60) {                 // De 0 à 59 :
       texte(12, 5, "BRONZE");
-    } else if (score &lt; 120) {
+    } else if (score &lt; 120) {         // Sinon, de 60 à 119 (on sait déjà qu'il est &gt;= 60) :
       texte(12, 5, "ARGENT");
-    } else {
-      texte(12, 5, "OR    ");
+    } else {                          // Sinon, tout le reste (120 et plus) :
+      texte(12, 5, "OR    ");         // Les espaces effacent la fin de ARGENT.
     }
 
-    /* des valeurs exactes : switch */
+    // Des valeurs exactes : switch.
+    // score / 60 vaut 0 (score 0 à 59), 1 (60 à 119), 2 (120 à 179), 3 (180 à 239) ou 4.
     switch (score / 60) {
-      case 0:  texte(12, 8, "PLAINE"); break;
-      case 1:  texte(12, 8, "GROTTE"); break;
-      case 2:  texte(12, 8, "CHATEAU"); break;
-      default: texte(12, 8, "?      "); break;
+      case 0:  texte(12, 8, "PLAINE"); break;   // si ça vaut 0. « break » = sortir du switch.
+      case 1:  texte(12, 8, "GROTTE"); break;   // si ça vaut 1.
+      case 2:  texte(12, 8, "CHATEAU"); break;  // si ça vaut 2.
+      default: texte(12, 8, "?      "); break;  // default = « aucun des cas au-dessus ».
     }
+    // Après 255, le score repart à 0 (un uint8_t ne va que jusqu'à 255) :
+    // on retombe sur BRONZE et PLAINE.
   }
 }</code></pre>
   </div>
@@ -161,22 +213,22 @@ instants qui comptent. Une image identique à la précédente n’est pas montr�
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC2klEQVR4nO3cPU7DQBBA4ZQcgZL7n4YjcAxKuigK3t3ZP3vy8qRXWA5EXn+O42Lg9vP7beBulx+BbU1geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMLwG8Mfn173D/aWf73qTw7dKVdd6H1+9/MhrwJHjXrWd8+zMrCXJVTsLPHMiMqw/0v04n8xK++8vZVhg9BZdgiztf9ruunVn61Hr/xpL+18DuIkXBC7dxC5ff3Dth2b1/Umu3Vngru3gnSDy6snAXdupltD4Du59emze0tNe6U1j4FO0ARIYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDi05VRiYxdkyABPdvnQwZGBpcMtmyZF3tkZ3KuGj8gqj8bnwYb2wyZp584Rx4c+By+Vhx+xNcGQt9CeD51g76V0amu4YS9wIvHK5bArx1cq/3Fh2ZLg2eh/l1DX4HD/887xNcP/7gedg3dcsHPuE7uPcTPHA+zwbueoquX7nxvzrc+rRZPw+r1jV8Prc8RRsggeEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMLyRiY6ZiYXDN0n+n+4iEx2lX4nsHxtWXAN8nyubmfvtnUWKvHoycNfxD8ygNc/bcLNz0ZG53zHgPJ0A3DxviYB7P/HJ788Dt+jhOfD4nwKtBD5nO3MzY7y9Y8IXfIKvAs7D/3bAb/gUXdpfmmdeft6ci7bjBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDw/gClVgWHTmSIxwAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC3ElEQVR4nO3cS27jMBAAUS9zhCxz/9PkCDlGll4EMAxEpLr5EelyAYWBoWQ8FJ+laNGZ28/vt4G7LV+BTU1geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMLwT4I/Pr0eHx0vfn3qTw7faqsoiK5uww3nVgEuLez4+6nX8X1+iW1rVKeHys+gFjmxEG/A+PdZZumllN/DKorfoyLorkKlb9279Le/5z+xuLCz6kBW58upXauqzv1XPH8HgWexzar3AqdfBO8Fue1T/cL8wcOUWmn2KLr1+obt0dh+Wr/kc2AAJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4UWnKiOTGDMmQILHp06GNAwNDplsGXJe5yM7/8dFR43Nxo+0HY98NQg86nVleC+yV+OBD2ciXwu4v7GD/qUZ0+xQ4lzggcN1Q4CnTu5lb9GR6dLgPvSfV+PP4Obv513B9fUH92He7C0f+IKfwdkruGE/rwZOPUXXP7nx3zqc+rRZ34dR59W8n1Oeog2QwPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGF7LREfPxMLhm2z+P91FJjpKfyVyvG1YcQzwY66sZ+43O4sU+erFwKn1N8ygne5bc71z0ZG53zbgfboA+HTfNgLOXvGb358bbtHNc+DxXwUaCXzN653rGePNjgkvuIJXAe/D/3bAb/gUXTpemmcevm/ORdtxAsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4d/QNImf7bfFPAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC3UlEQVR4nO3cPW6sQBAAYYc+gkPf/zQ+go/h0NkKaZmZnj/orS2pAsTaK5gPeATt9/H792PgPm4/AtuawPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4DeDPr+9Hp/tLP9/1JadflarKQVaOPMNJ1YBLx3fcv2o75+o0j7lyaSa5ameBIwsxBpynx3GWHlqlX8lwgtFHdPOU6pBdj+5sHbUiwMcL4vaDj75kRe68+p0avPYTdrwEg8B5rt1Z4K7t4JMg8unFwHXOzKfQ+De462058kgvPbozrEVkKYL7XwPYAAkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhRacqI5MYOyZAgvu3ToYMDA0umWxZcl7tkZ3ncdFVY7PxPWP7I58GgVdtNwcul48Vt+/g55nI1wKeb+2gf2VkumsocS/wwuG6JcBbJ/d6H9GR6dLe8duNwPXt3p/n3cH14w+uQ+SGFrh9FjuA61pja3I/cNdbdP3Kjf/V4da3zfo6rDqv4fXc8hZtgASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwRiY6ZiYWTr8k+f90F5noKP1KZP/YsOIa4Mdc2czcb+8sUuTTi4G7jn9gBq25bsPNzkVH5n7HgPN0AXBz3RIB997xyZ/PA4/o4Tnw+J8CrQS+ZjtzM2O8vWPCN9zBdwHn4X874Dd8iy7tL80zL18356LtPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwvH/NwBsvCe52iAAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC3klEQVR4nO3cQU7zMBBA4S45AkvufxqOwDFYskCqKkjsGdtJpq9PekJVgf6OvybNYvhvX9+fBu52+Qrs0ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCw+sAv71/3Nt8fu/nUy+y+VKlSq2/1HG1gPcW9+dgljyO/+uX6A6sv8hRzAJnNyK7QRW6r7NxpqY26syil+jIuhuQqUt3tX6X9/g1YlnkoKI3WZEzr32mlt2CyLE/nsTdYy91aLPAqcepXaizRwMfN3UW3/kMTt0tRy7pZe82u8bZfbh8zX1gAyQwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGF52qjExiHDEBEnz+0MmQgaHBJZMtS46rP7KzOS6afUM0fjc+7zI2nTpPvnAOPDW8t+TN2j+D/89EPhfwfGsH/Rvjt0dM7g0CLxyuWwJ86ORe9hIdmS4N7sP8cQ1+Bg//PO8Mbq9/Zsz2pDP42YFP+AzOnsED+3k2cOouuv3Onf+rvQvvorPHNbyfh9xFGyCB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwvJGJjpmJhc0XKf4/3UUmOvZ+JfL82LDiGuD7XNnM3G92Finy3ZOBU+sfmEHr7ttws3PRkbnfMeA6nQDc3bdCwNkzvvj1eeASPTwHHv9ToJXA5zyu3MwYb3ZM+IIz+CrgOvwvB/yCd9F7z+/NMy/fN+eibTuB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMLwfm0YRj3c9DSMAAAAASUVORK5CYII=" alt="l’écran">
     <figcaption>au bout d’une seconde — image 60</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAC1ElEQVR4nO3cMU7DQBBA0ZQcgZL7n4YjcAxKuigi3vXs7tie/HzpF5EDkb3PNi4m3H5+vw3c7fI9sEMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxvB/jj8+ve5vbWzw99yOZHlaq/k6PbqwBH9jvrdc3ViexzC77IWbsKHFmIOeA63fdz8ybUUi9ygNFbdAuytf3f66Fbd7UetTaPsbU+FY4r+pAVufL6V2rrNK/f4ynYOnEj218SeOh18E4Qefdk4P5evfBD1tDTcuSWXvZM78d8ijZAAsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHjRqcrRWaTnj5qbAAluP3QyZGJoMGWyJeW49kd2nsdFs8Zm41vmtkfeDQJnvd4duEwfK96/gjvjoi8BvF7uoH9nZHpoKPFY4MThuhTgQyf3Rm/RkenS4DqsH9fk3+Dpn+ddwf39D67D0DSuwMnLFLkiV9bh0BP3jKfo/pkb/9bhVd8kSDyu6fU85CnaAAkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhzUx0rEwsbH5I8f90F5noaP1KZPvcsGIO8H2ubGXud3QWKfLuycBD+z8xg7a7btOtzkVH5n7ngOt0AvDuuhUCHr3ii9+fJ27R03Pg8a8CZQKf87pyK2O8o2PCF1zBVwHX4X874Dd8im5tb80zp6+bc9G2ncDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMY3h9q/hGP+w41PgAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACnUlEQVR4nO3cPW7jMBQAYZc5Qsrc/zQ5Qo6RMl0Km6T4Kz6OB5hC0Bpa0t9KdoCXffz8fhu4x/YV2NIEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsO7AP74/PoveT73+qaLJC8VrcJmn9Yfal8l4NzinjYz5bj+b9+l27fa7bsYBc6dHweOVmG1YXUbHtGt+8k9spIXj/BGXDbyz31jtV+yau688p2a/Azbvv/6kqsNrjsBuOm48kkQ7T0qrOds4MIjtPVbdO74lKd0Yb8HAxsggeEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMLzaqcqaSYwVEyCV51dPhpw7NHg9svM6FTxrbLb+TN/5mj+t1O3YV5Cu7+DXmcizgMd7R+CJw3VTgFc/ny/3tR2yH7h83Pp63h0cWfctgG/4DI5sfMe36AJw028dbvxtvtZ9xcmfg+EJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4fVMdIz8j3bJiwSfW+uY6JgyqTJlkmR0Lvp1oZevqVxcHPLWvayYQese1x2di85NGR49S7wU4Hjg1jv+iOdz7nzHEGDyTOsjfSbwPceRg9/Bu4Dj8MM/g5MX8lv0XODWR3H9m+bPwfAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPD+AFO0rffTFT0bAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>au bout de trois secondes — image 180</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACy0lEQVR4nO3cQU7DMBBA0S45AkvufxqOwDFYskMVjSczsZ04ny/9RVQKSvxSN4sRj6/vTwP3uPwMbGoCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geHtAL+9f/y2+Xrr/aU/svmnVmvzDOOTX+GiIuDMeY86XnN1/kAm1yH4lfPrBc5c8DHg1QqANzenRS4wu0XHl7oLWdq616wF/Gr5DH/5aWcfsjKfvPiTGm9x6xdvwq0b+vJr7AUuHSd3gsxPFwGOz3aFS9j5Di49LWe29GXv9F3d0jrcA9gACQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geFlpyozkxgzJkCSr8+eDKkODZbmwKdOvOyP7LyOhY4am82/cuz1zE+TusOPN9d5xmji/ic4GAu9BXB/AyFL63wl8MDhuiHA5+zPya+k522vtG7J9RkMHB9X38/7BOfHaavrJnBqCU74Ds7vZLcBPrBltdai9LRZen1UB27c6vlfA2yABIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPCOTHQEkxit47v/v+jZc9HzJlV656JfT2j3Pa2bJri9Ltcdchxf1/BhnRRwa2w2OK6+f/1mDxneDLj6ib/F/ry56x4YMqwC969P79js2O1rzTI71iTg/pNfF3gd/lFz0bcB/s9P0dW56AxkADz3KdoACQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHh/QD2bh//shdURgAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAClElEQVR4nO3cQU7DMBBAUZYcgSX3Pw1H4BgsWSCxaezM2E46/v3SX0QhqpI84rbSwNv3z5eBe3v6GdilCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGdwL8/vH53+H+1vGpFzl8qWq1zrB18kWuqAfcuaTl22Vv0JhinV/ZWeDW/nngah0uVwN37+aiS3Tk1DuQqaW7Zp33o12X6Ahe5Ji/7ewTUK3++Ze9ulng1HZwJSh1g4KEWwJ3lqDsp+jW9i6r9JL7UA7YAAkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhRacqI5MYV0yABPdfPRmy79Dg+cjO45TvqrHZ+J6x/ZGfBnUHrqtI50/w40zkXsDzvSLwwuG6JcBXr8+n1/V0yHHg/nb2eN4TXFn3JYBveA+ubHzHp+gOcOqvDrP7F5a9rjr5PRiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGN7IRMfMf7Q7fJHic2sDEx1LJlWWTJLMzkU/nujpMcGTq0OevZYrZtCGx3Vn56JbU4ZbzxJfCrA9cPaJ32J9bu0fGAI83JNd0lcC37NdOfgT/CzgOvzw9+DDF/JT9Frg7FIcv2l+D4YnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIb3CwOxpr/4RehTAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>au bout de sept secondes — image 420</figcaption>
   </figure>
 </div>

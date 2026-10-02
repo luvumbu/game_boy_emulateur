@@ -5,6 +5,12 @@
 // mieux méritent de redevenir des arguments, et les portées de reprendre
 // leur place — c'est là tout l'intérêt d'être passé au C++.
 
+#include <texte>     // écrit un texte à l’écran
+#include <poser>     // pose une tuile sur une case du fond
+#include <ecran>     // éteint ou rallume l’écran
+#include <effacer>   // efface des cases, ou tout le fond
+#include <bouton>    // lit un bouton de la manette
+
 uint8_t MENU = 0;
 uint8_t JOUER = 1;
 uint8_t REGLAGES = 2;

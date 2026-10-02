@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 8 — La couleur : la Game Boy Color</span>
   <span>leçon 4 sur 6 dans ce chapitre</span>
-  <span>40 sur 42 dans le cours</span>
+  <span>40 sur 61 dans le cours</span>
 </p>
 <h1>40. Les lutins en couleur</h1>
 <p class="idee">Le même personnage en rouge et en vert : deux joueurs pour une seule tuile.</p>
@@ -109,13 +109,60 @@
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1518 octets</strong> de cartouche.</p>
+<strong>583 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            57 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              196 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         67 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              128 o  ← CopierTuiles  — 7 lettres sur 43, et 1 tuile dessinée
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+  "DEUX FRERES"        11 o  ← texte()  — un texte gravé
+Lettres gravées : DEFRSUX
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+Fonctions du langage appelées :
+  couleurLutin() × 6    72 o sur place, dans main()
+  sprite()       × 2    46 o sur place, dans main()
+  teindreLutin() × 2    33 o sur place, dans main()
+  texte()        × 1    11 o sur place, dans main()  + EcrireTexte (10 o)
+  image()        × 1     6 o sur place, dans main()  + AttendreImage (28 o)
+  images()       × 1     2 o sur place, dans main()</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. un dessin — HEROS</p>
-    <pre><code>Tuile HEROS = {
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME (Game Boy Color) : deux héros du même dessin, l'un rouge et
+// immobile, l'autre vert qui avance tout seul vers la droite.
+//
+// Ce qui est nouveau :
+//   couleurLutin(palette, indice, rouge, vert, bleu) : les couleurs des lutins
+//     (8 palettes à eux). L'indice 0 est transparent : on règle 1, 2 et 3.
+//   teindreLutin(numero du lutin, palette) : quelle palette ce lutin emploie.
+//   LE PIÈGE : sprite() remet la palette du lutin à 0. Il faut donc rappeler
+//   teindreLutin() juste APRÈS chaque sprite().
+
+#include &lt;Tuile&gt;          // un dessin de 8 × 8 pixels
+#include &lt;couleurLutin&gt;   // choisit une couleur d’une palette des lutins
+#include &lt;texte&gt;          // écrit un texte à l’écran
+#include &lt;sprite&gt;         // place un lutin de 8 × 8 au pixel près
+#include &lt;teindreLutin&gt;   // met un lutin dans une palette</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — HEROS</p>
+    <pre><code>Tuile HEROS = {                   // 0 = transparent, 1 clair, 2 moyen, 3 contour.
   "00333300",
   "03222230",
   "32122123",
@@ -131,29 +178,29 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  /* Palette 0 des lutins : le rouge. Palette 1 : le vert. */
-  couleurLutin(0, 1, 31, 28, 20);
-  couleurLutin(0, 2, 31,  4,  2);
-  couleurLutin(0, 3, 10,  0,  0);
-  couleurLutin(1, 1, 28, 31, 20);
-  couleurLutin(1, 2,  4, 26,  2);
-  couleurLutin(1, 3,  0,  8,  0);
+    <p class="quoi">3. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                      // Le jeu commence ici.
+  // Palette 0 des lutins : le rouge. Palette 1 : le vert.
+  couleurLutin(0, 1, 31, 28, 20); // palette 0, indice 1 : rose clair
+  couleurLutin(0, 2, 31,  4,  2); // palette 0, indice 2 : rouge
+  couleurLutin(0, 3, 10,  0,  0); // palette 0, indice 3 : rouge très sombre
+  couleurLutin(1, 1, 28, 31, 20); // palette 1, indice 1 : vert pâle
+  couleurLutin(1, 2,  4, 26,  2); // palette 1, indice 2 : vert
+  couleurLutin(1, 3,  0,  8,  0); // palette 1, indice 3 : vert très sombre
 
   texte(1, 1, "DEUX FRERES");
 
-  sprite(0, 40, 70, HEROS);
-  teindreLutin(0, 0);
+  sprite(0, 40, 70, HEROS);       // Lutin 0 au pixel (40, 70)...
+  teindreLutin(0, 0);             // ... en palette 0 : rouge. Il ne bougera plus.
 
-  uint8_t x = 60;
+  uint8_t x = 60;                 // La place du frère vert, en pixels.
 
-  while (true) {
+  while (true) {                  // La boucle du jeu :
     image();
 
-    if (images() % 4 == 0 &amp;&amp; x &lt; 150) x++;
-    sprite(1, x, 70, HEROS);
-    teindreLutin(1, 1);          // apres CHAQUE sprite() : sinon il redevient rouge
+    if (images() % 4 == 0 &amp;&amp; x &lt; 150) x++;   // Une image sur 4, et pas trop loin : + 1 pixel.
+    sprite(1, x, 70, HEROS);      // Lutin 1, reposé à sa place à chaque image...
+    teindreLutin(1, 1);          // après CHAQUE sprite() : sinon il redevient rouge
   }
 }</code></pre>
   </div>

@@ -10,6 +10,11 @@
  * qu'un « switch » aiguille vraiment, et pas seulement qu'il compile.
  */
 
+#include <texte>     // écrit un texte à l’écran
+#include <effacer>   // efface des cases, ou tout le fond
+#include <poser>     // pose une tuile sur une case du fond
+#include <nombre>    // écrit un nombre en chiffres
+
 const uint8_t COMBIEN = 32;
 
 uint8_t resultat[COMBIEN];

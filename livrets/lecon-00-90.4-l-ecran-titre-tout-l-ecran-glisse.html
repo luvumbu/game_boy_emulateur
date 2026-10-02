@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 0.90.4 — L’écran titre — tout l’écran glisse</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie G — Les lettres et l’écran titre</span>
+    <span>leçon 0.90.4 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
+    
+    
+    
+  </p>
+<h1>0.90.4. L’écran titre — tout l’écran glisse</h1>
+<p class="idee">On repart du 0.90.1 : cette fois, c’est TOUT l’écran qui glisse vers la droite. defiler(d, 0), et d qui diminue à chaque image.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>On repart du 0.90.1</strong> (sans le B du 0.90.2), avec une seule chose en plus : <strong>tout l’écran</strong> glisse de gauche à droite, « C EST PARTI » compris.</p>
+<p><strong>Ce qui est nouveau ici : <code>defiler(x, y)</code>.</strong> Il ne bouge pas une lettre : il déplace <strong>la caméra</strong> qui regarde le décor. <code>x</code> dit de combien de <strong>pixels</strong> la caméra est poussée vers la droite.</p>
+<p><strong>Pour que le décor aille à DROITE, la caméra va à GAUCHE :</strong> comme dans un train, quand tu avances, le paysage recule. Alors <code>d</code> <strong>diminue</strong> : <code>d--</code>, un pixel à chaque image.</p>
+<p><strong><code>d</code> passe sous 0 ?</strong> C’est un <code>uint8_t</code> : après 0 vient <strong>255</strong>, puis 254… (l’octet qui boucle, la leçon 35). Et le décor fait justement <strong>256 pixels</strong> de large : il revient tout seul, sans fin. Ce qui sort par la droite réapparaît à gauche.</p>
+<p><strong>60 images par seconde, un pixel chaque fois :</strong> le texte traverse l’écran (160 pixels) en moins de 3 secondes, tout en douceur.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;couleurTexte&gt;</code> → <a href="lecon-00-87.7-la-fonction-couleurtexte-la-couleur-des-.html">0.87.7. La fonction couleurTexte() — la couleur des lettres</a></li>
+  <li><code>#include &lt;texteGrand&gt;</code> → <a href="lecon-00-86.3-la-fonction-textegrand-un-texte-agrandi.html">0.86.3. La fonction texteGrand() — un texte agrandi</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+  <li><code>#include &lt;effacer&gt;</code> → <a href="lecon-00-16.3-la-fonction-effacer-effacer-des-cases.html">0.16.3. La fonction effacer() — effacer des cases</a></li>
+  <li><code>#include &lt;defiler&gt;</code> → <a href="lecon-00-90.3-la-fonction-defiler-faire-glisser-le-fon.html">0.90.3. La fonction defiler() — faire glisser le fond</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1465 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            62 o  ← la console, à l’allumage  — la mise en route de la console
+  texte_grand_0()     195 o  ← main()  — ta fonction
+  main()              120 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EffacerCases, EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase          10 o  ← poser(), effacer()  — trouve l’adresse d’une case de l’écran
+  EffacerCases         12 o  ← effacer()  — efface des cases
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles         18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette          37 o  ← bouton()  — lit les huit boutons
+  Tuiles              848 o  ← CopierTuiles  — la police entière, et 9 tuiles dessinées
+  "APPUIE SUR START"   16 o  ← texte()  — un texte gravé
+  "C EST PARTI"        11 o  ← texte()  — un texte gravé
+  GRAND_TABLE_0_0_0    12 o  ← poser()  — une table gravée
+  GRAND_TABLE_0_1_1    12 o  ← poser()  — une table gravée
+  GRAND_TABLE_0_2_2    12 o  ← poser()  — une table gravée
+  GRAND_TABLE_0_3_3    12 o  ← poser()  — une table gravée
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser()         × 4   122 o sur place, dans texte_grand_0()  + AdresseCase (10 o), GRAND_TABLE_0_0_0 (12 o), GRAND_TABLE_0_1_1 (12 o), GRAND_TABLE_0_2_2 (12 o), GRAND_TABLE_0_3_3 (12 o)
+  texte()         × 2    22 o sur place, dans main()  + EcrireTexte (10 o)
+  effacer()       × 1    14 o sur place, dans main()  + AdresseCase (10 o), EffacerCases (12 o)
+  couleurFond()   × 1    12 o sur place, dans main()
+  defiler()       × 1     7 o sur place, dans main()
+  bouton()        × 1     5 o sur place, dans main()  + LireManette (37 o)
+  image()         × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  texte_grand_0() × 1     3 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>#include &lt;couleurTexte&gt;   // choisit la couleur des lettres
+#include &lt;texteGrand&gt;     // écrit un texte agrandi, de 1 à 20 fois
+#include &lt;texte&gt;          // écrit un texte à l’écran
+#include &lt;bouton&gt;         // lit un bouton de la manette
+#include &lt;effacer&gt;        // efface des cases, ou tout le fond
+#include &lt;defiler&gt;        // fait glisser tout le fond</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une variable — ecranTitre</p>
+    <pre><code>uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une variable — d</p>
+    <pre><code>uint8_t d = 0;            // la caméra : 0 = elle regarde le début du décor</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  couleurTexte(31, 16, 0);          // le titre du 0.90, en orange
+  texteGrand(4, 5, "JEU", 4);
+  texte(2, 12, "APPUIE SUR START");
+
+  while (true) {
+    image();
+
+    // Le changement d'écran du 0.90.1 : une seule fois, au premier appui sur START.
+    if (ecranTitre == 1 &amp;&amp; bouton(START)) {
+      ecranTitre = 0;
+      for (uint8_t y = 0; y &lt; 18; y++) {
+        effacer(0, y, 20);          // on vide les 18 lignes
+      }
+      texte(5, 8, "C EST PARTI");
+    }
+
+    // ---- NOUVEAU : tout l'écran glisse, seulement sur l'écran d'après
+    //
+    //   d--          la caméra recule d'un pixel : 0, 255, 254, 253…
+    //   defiler(d, 0);
+    //           |  |
+    //           |  +-- vers le bas : 0, on ne bouge pas en hauteur
+    //           +----- vers la droite : d pixels
+    //
+    //   la caméra recule → le décor semble avancer vers la DROITE
+    if (ecranTitre == 0) {
+      d--;
+      defiler(d, 0);
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACQElEQVR4nO3bMW7bQBBAUZc+Qsrc/zQ+Qo6R0kVKmtSSXIrSzwN+IQjycDUPkg0D/Pjz90vhPm4/gS4NcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8V4C+PPX74fNmjNr/hWvBwwYMGDAgF8F+5k/e8V8wJOXAngZ4AvnA568FMDLAF84H/DkpQBeBvjC+YAnLwXwsizwrH9uAAYMGDBgwIDvXyjgG5b4zIUCvmGJz1wo4BuW+MyFAp7whgHPDfCF8wFPXgrgZYAvnP/fAa+9+VmLWJs50hXXumu3gAEDBgwYsO4PcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHOwj84/1Va/ddbTz/4+OR+Wduwd54vPe+sbX5D1exd2+Hb2U7Ajy4rMOPx58ZP+eZ8++dP3L+M3sADPg08MOvprXXj7zhjWcOf4UOLnrK/JHzj1/3RT/BI0e8+hO898z/Hh+7yt7zj18X8GTgYxc6D7x23TcG3viKm/JX5caLD/zK2DX/vX8H640CHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMf7BsM6fvMalOCPAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB1ElEQVR4nO3WMW6DQBRAQZc5Qsrc/zQ+Qo6RMkW6OGxYwLL9GOkVCH/wSmPWXD6/rgp3efgKdNcAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMc7/WA394/fpoavr3kz/OD+X/vv2adaxaz9NEpgH9hTM2vOb/+zuP1zB7vWe24FwbeMw/4SdsAPLWFzn7L7JY73v8BH/YEj2e2PcFL52+PZyFPCrznP3g8c2/gpQsBX496i962VR4IvP6Hda63aM0GOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY73DVn65RQzeCCGAAAAAElFTkSuQmCC" alt="l’écran après START">
+    <figcaption><strong>START</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Après START : C EST PARTI glisse vers la droite, sort de l’écran et revient par la gauche, sans fin.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>sur le titre, rien ne glisse </li>
+
+  <li>après START, la caméra recule : d est passé sous 0 (255, 254…) <span class="detail"> (d = 228)</span></li>
+
+  <li>et l’écran glisse vraiment <span class="detail"> (0 vers 228)</span></li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>0.90.5. L’écran titre — un bandeau qui passe</strong> — chapitre 0 : Avant tout.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

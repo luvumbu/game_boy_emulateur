@@ -11,6 +11,11 @@
  * plutôt que d'être recopiée quatre fois comme dans un langage sans elles.
  */
 
+#include <lire>     // lit la tuile posée sur une case
+#include <poser>    // pose une tuile sur une case du fond
+#include <bouton>   // lit un bouton de la manette
+#include <Tuile>    // un dessin de 8 × 8 pixels
+
 const uint8_t LARGEUR = 20;
 const uint8_t HAUTEUR = 18;
 const uint8_t MUR = 42;

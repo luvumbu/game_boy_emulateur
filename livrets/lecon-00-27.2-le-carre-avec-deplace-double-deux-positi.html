@@ -79,9 +79,11 @@
 
 
   <p class="reperes">
-    <span class="niveau">Niveau 0 — Avant tout</span>
-    <span>leçon 0.27.2 sur 82</span>
-    <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie C — Déplacer une lettre</span>
+    <span>leçon 0.27.2 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
@@ -93,14 +95,53 @@
 <p><strong>C’est le 0.27 et le 0.27.1 réunis</strong> : les dix lignes du A, puis les dix du B.</p>
 <p><strong>Les deux trajets ne se touchent pas :</strong> le A reste dans les colonnes 0 à 10, le B dans les colonnes 9 à 19, sur d’autres cases.</p>
 
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;deplace&gt;</code> → <a href="lecon-00-25.3-la-fonction-deplace-avancer-sur-les-deux.html">0.25.3. La fonction deplace() — avancer sur les deux axes</a></li>
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+</ul>
+</div>
+
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>2046 octets</strong> de cartouche.</p>
+<strong>1416 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        69 o  ← la console, à l’allumage  — la mise en route de la console
+  deplace()       236 o  ← main()  — une fonction fournie par le langage
+  main()          289 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EffacerCases  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← poser(), effacer()  — trouve l’adresse d’une case de l’écran
+  EffacerCases     12 o  ← effacer()  — efface des cases
+  CopierTuiles     18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          704 o  ← CopierTuiles  — la police entière
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser()   ×  2    26 o sur place, dans deplace()  + AdresseCase (10 o)
+  effacer() ×  1    15 o sur place, dans deplace()  + AdresseCase (10 o), EffacerCases (12 o)
+  image()   ×  2     6 o sur place, dans deplace(), main()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  deplace() × 10   222 o sur place, dans main()</code></pre>
 
 
 <div class="morceau">
   <div>
-    <p class="quoi">1. une variable — x</p>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>#include &lt;deplace&gt;    // fait avancer une tuile sur les deux axes
+#include &lt;ALPHABET&gt;   // les lettres de la police : ALPHABET[0] est le A</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une variable — x</p>
     <pre><code>uint8_t x = 0;       // la colonne du A</code></pre>
   </div>
   <div></div>
@@ -108,7 +149,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. une variable — y</p>
+    <p class="quoi">3. une variable — y</p>
     <pre><code>uint8_t y = 0;       // sa ligne</code></pre>
   </div>
   <div></div>
@@ -116,7 +157,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">3. une variable — xb</p>
+    <p class="quoi">4. une variable — xb</p>
     <pre><code>uint8_t xb = 9;       // la colonne du B</code></pre>
   </div>
   <div></div>
@@ -124,7 +165,7 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">4. une variable — yb</p>
+    <p class="quoi">5. une variable — yb</p>
     <pre><code>uint8_t yb = 0;       // sa ligne</code></pre>
   </div>
   <div></div>
@@ -132,21 +173,24 @@
 
 <div class="morceau">
   <div>
-    <p class="quoi">5. le point d’entrée : c’est ici que la console arrive</p>
-    <pre><code>int main() {
-  deplace(x, y, ALPHABET[0], 5, 5);
-  deplace(x, y, ALPHABET[0], 5, 0);
-  deplace(x, y, ALPHABET[0], 0, 5);
-  deplace(x, y, ALPHABET[0], -5, 0);
-  deplace(x, y, ALPHABET[0], 0, -5);
-  deplace(xb, yb, ALPHABET[1], 5, 5);
-  deplace(xb, yb, ALPHABET[1], 5, 0);
-  deplace(xb, yb, ALPHABET[1], 0, 5);
-  deplace(xb, yb, ALPHABET[1], -5, 0);
-  deplace(xb, yb, ALPHABET[1], 0, -5);
+    <p class="quoi">6. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {          // Le programme commence ici.
+  // deplace(colonne, ligne, tuile, pasX, pasY) : les deux axes à la fois.
+  // 1. Le A (ALPHABET[0]), depuis (0, 0) :      pasX  pasY
+  deplace(x, y, ALPHABET[0], 5, 5);       // la diagonale : (5, 5)
+  deplace(x, y, ALPHABET[0], 5, 0);       // à droite     : (10, 5)
+  deplace(x, y, ALPHABET[0], 0, 5);       // en bas       : (10, 10)
+  deplace(x, y, ALPHABET[0], -5, 0);      // à gauche     : (5, 10)
+  deplace(x, y, ALPHABET[0], 0, -5);      // en haut      : (5, 5)
+  // 2. Le B (ALPHABET[1]), depuis (9, 0), avec ses variables xb et yb :
+  deplace(xb, yb, ALPHABET[1], 5, 5);     // (14, 5)
+  deplace(xb, yb, ALPHABET[1], 5, 0);     // (19, 5)
+  deplace(xb, yb, ALPHABET[1], 0, 5);     // (19, 10)
+  deplace(xb, yb, ALPHABET[1], -5, 0);    // (14, 10)
+  deplace(xb, yb, ALPHABET[1], 0, -5);    // (14, 5)
 
-  while (true) {
-    image();
+  while (true) {      // La boucle de jeu, pour toujours :
+    image();          //   attendre l'image suivante.
   }
 }</code></pre>
   </div>
@@ -207,7 +251,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 
 <p class="pied">
-  Ensuite : <strong>0.28. Aller à une case : va_a</strong> — niveau 0 sur 10.
+  Ensuite : <strong>0.27.3. La fonction va_a() — aller jusqu’à une case</strong> — chapitre 0 : Avant tout.
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 

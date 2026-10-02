@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<title>Cours 49 — Glisser le long d’un mur : un axe à la fois</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+
+  a { color: var(--vert); }
+  .navigation { display: flex; justify-content: space-between; gap: 12pt; margin-top: 18pt; font-size: 9.5pt; }
+  .sommaire-cours { list-style: none; padding: 0; margin: 0; }
+  .sommaire-cours li { padding: 2pt 0; }
+  .sommaire-cours li.chapitre {
+    color: var(--vert); font-weight: 700; text-transform: uppercase;
+    font-size: 9pt; letter-spacing: .05em; padding-top: 12pt;
+  }
+  .sommaire-cours .numero {
+    display: inline-grid; place-items: center; width: 16pt; height: 16pt; border-radius: 50%;
+    background: var(--vert-clair); color: var(--vert); font-size: 8pt; font-weight: 700; margin-right: 4pt;
+  }
+</style>
+</head>
+<body>
+
+<p class="reperes">
+  <span class="niveau">Chapitre 10 — Les collisions : se toucher, se cogner</span>
+  <span>leçon 3 sur 3 dans ce chapitre</span>
+  <span>49 sur 61 dans le cours</span>
+</p>
+<h1>49. Glisser le long d’un mur : un axe à la fois</h1>
+<p class="idee">Tester la largeur, puis la hauteur, séparément : le héros bloqué d’un côté continue de l’autre.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p>Maintenant le héros va partout, et en diagonale. Il occupe un carré de pixels qui peut chevaucher <strong>deux lignes</strong> de cases, ou <strong>deux colonnes</strong>. Avant d’avancer, on regarde donc <strong>deux coins</strong> : ceux qui vont entrer les premiers dans la case suivante.</p>
+<p>Pour ne pas écrire quatre fois <code>lire(p / 8, q / 8) != MUR</code>, on en fait une fonction, <code>libre(px, py)</code> : « le pixel (px, py) est-il hors d’un mur ? ». Le chapitre 5 dans toute sa force : un nom clair, et chaque test tient en une ligne.</p>
+<p>À droite, les deux coins qui entrent sont <strong>en haut à droite</strong> et <strong>en bas à droite</strong> du prochain pas : <code>(x + 8, y)</code> et <code>(x + 8, y + 7)</code>. À gauche, <code>(x - 1, y)</code> et <code>(x - 1, y + 7)</code>. En bas, <code>(x, y + 8)</code> et <code>(x + 7, y + 8)</code>. En haut, <code>(x, y - 1)</code> et <code>(x + 7, y - 1)</code>.</p>
+<p><strong>Ce qui est nouveau ici : un axe à la fois.</strong> On essaie d’abord le pas en largeur, <strong>puis</strong> le pas en hauteur, chacun avec son test. Pousse DROITE et BAS contre le mur vertical : le pas à droite est refusé, mais le pas vers le bas est accepté. Le héros <strong>glisse</strong> le long du mur au lieu de s’y coller.</p>
+<p>Si l’on testait la diagonale d’un coup (« le coin en bas à droite, en <code>(x + 8, y + 8)</code>, est-il libre ? »), le moindre mur arrêterait <strong>les deux</strong> mouvements : le héros resterait collé dès qu’il frôle quelque chose. C’est la sensation « poisseuse » des jeux mal réglés.</p>
+<p><strong>À toi :</strong> retire le test des deux coins à droite pour n’en garder qu’un (<code>libre(x + 8, y)</code>), et regarde le héros entrer à moitié dans le mur par le bas.</p>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>875 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            65 o  ← la console, à l’allumage  — la mise en route de la console
+  libre()              37 o  ← main()  — ta fonction
+  main()              337 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase          10 o  ← lire(), poser()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         76 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette          37 o  ← bouton()  — lit les huit boutons
+  Tuiles              176 o  ← CopierTuiles  — 9 lettres sur 43, et 2 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+  "DROITE ET BAS"      13 o  ← texte()  — un texte gravé
+Lettres gravées : ABDEIORST
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, Notes
+Fonctions du langage appelées :
+  lire()   × 1    27 o sur place, dans libre()  + AdresseCase (10 o)
+  poser()  × 2    25 o sur place, dans main()  + AdresseCase (10 o)
+  sprite() × 1    23 o sur place, dans main()
+  ecran()  × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  bouton() × 4    20 o sur place, dans main()  + LireManette (37 o)
+  texte()  × 1    11 o sur place, dans main()  + EcrireTexte (10 o)
+  image()  × 1     6 o sur place, dans main()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  libre()  × 8   112 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : un héros se déplace dans les 4 directions, et GLISSE le long
+// des murs : bloqué d'un côté, il peut encore avancer de l'autre.
+//
+// Ce qui est nouveau : tester un axe à la fois.
+//   1. d'abord la largeur (gauche / droite),
+//   2. puis la hauteur (haut / bas), à part.
+// Et pour chaque direction, on teste les DEUX coins du côté où l'on va
+// (le héros fait 8 pixels : un seul coin ne suffit pas).
+
+#include &lt;Tuile&gt;    // un dessin de 8 × 8 pixels
+#include &lt;lire&gt;     // lit la tuile posée sur une case
+#include &lt;ecran&gt;    // éteint ou rallume l’écran
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;poser&gt;    // pose une tuile sur une case du fond
+#include &lt;bouton&gt;   // lit un bouton de la manette
+#include &lt;sprite&gt;   // place un lutin de 8 × 8 au pixel près</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — HEROS</p>
+    <pre><code>Tuile HEROS = {
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAeUlEQVR4nO3XsQ2AMAxE0ZSMQJkRGYOxGIERMgYlPZGMFQUj+b50rc+viayUdp2vWdY6JZ5dBRAgAVBftB/bI571nilAgBRAnurIAAKkAIo8roAAaYL+DSBA+UDGn814nN9NAQKkABormkUEBCgfyLhzAaA+gAClA93R8clXI4wb5wAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un dessin — MUR</p>
+    <pre><code>Tuile MUR = {
+  "33333333", "31111113", "31222213", "31222213",
+  "31222213", "31222213", "31111113", "33333333",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAVUlEQVR4nO3OOQ3AIAAAQMZKYKwItFQDIzIqC2kMdUDKk/aSE3DhiOdWwvKBkND40F3LNEJCQo+Ur1cICQkJCQkJCQkJCQkJ9YXGERL6Z2gtIaHPhRq4GfJqCH16wgAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une variable — x</p>
+    <pre><code>uint8_t x = 40;             // Le héros, en pixels (coin en haut à gauche).</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une variable — y</p>
+    <pre><code>uint8_t y = 40;
+
+// 1 si le PIXEL (px, py) n'est pas dans un mur.
+// Exemple : libre(100, 40) → lire(12, 5) : la colonne 12 est un mur → rend 0.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">6. une fonction — libre()</p>
+    <pre><code>uint8_t libre(uint8_t px, uint8_t py) {
+  return lire(px / 8, py / 8) != MUR;
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">7. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                // Le jeu commence ici.
+  ecran(0);                 // Dessin écran éteint.
+  texte(1, 1, "DROITE ET BAS");
+  for (uint8_t l = 3; l &lt; 17; l++) poser(12, l, MUR);    // un mur debout, colonne 12
+  for (uint8_t c = 0; c &lt; 20; c++) poser(c, 16, MUR);    // le sol, ligne 16
+  ecran(1);                 // On rallume.
+
+  while (true) {            // La boucle du jeu :
+    image();
+
+    // 1. La largeur : les deux coins du côté où l'on va.
+    //    À droite : le coin haut (x + 8, y) et le coin bas (x + 8, y + 7).
+    if (bouton(DROITE) &amp;&amp; libre(x + 8, y) &amp;&amp; libre(x + 8, y + 7)) x++;
+    //    À gauche : les deux pixels juste à gauche (x - 1) ; x &gt; 0 évite de passer sous 0.
+    if (bouton(GAUCHE) &amp;&amp; x &gt; 0 &amp;&amp; libre(x - 1, y) &amp;&amp; libre(x - 1, y + 7)) x--;
+
+    // 2. Puis la hauteur, à part : bloqué d'un côté, on avance de l'autre.
+    //    En bas : les deux pixels juste dessous (y + 8), à gauche (x) et à droite (x + 7).
+    if (bouton(BAS) &amp;&amp; libre(x, y + 8) &amp;&amp; libre(x + 7, y + 8)) y++;
+    //    En haut : les deux pixels juste dessus (y - 1) ; pas plus haut que 16.
+    if (bouton(HAUT) &amp;&amp; y &gt; 16 &amp;&amp; libre(x, y - 1) &amp;&amp; libre(x + 7, y - 1)) y--;
+
+    sprite(0, x, y, HEROS); // On pose le héros.
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACdUlEQVR4nO3bwY3TQBiA0T1SAkeKoBZq4EgZlEUJlEAZHAEFraIktmPHiycfT3qHMFmtbH/K7D+RePnx8zthL4dfAW9K4DiB4wSOEzhO4DiB4+YCv3v/4dU96+dv3bN+/nvO35pav+c69/o9a+/rnt8/YuBdXk+trP3Je65z7bt73e+wBBb41uupLXevwKv2vfmfXxV41Z+Sma17HNs/wfMJ/4dP8CPX/ASBr+9K4AFtnKKnbmztFLq4RT8yRW8IvOp+xx+hnYP7BI4TOE7gOIHjBI4TOE7gOIHjBF5w8TXZ+F9dXRB4we+cX799uSBwxynwx8+fXgmcInCcwHECxxmy4hyT4gSOs0XHGbLiBI4TOE7gOENWnGPSbo/v8GexeIXjX+21IwOfdr/T8xp237NFb39wT/HJMGRtf3DXW/SAD07g7Q/OJ/gfOH7IungxGoEfenYz/xyEIWv7g7v5n8cPfyI3r3P8PyVTfNGxQOA4W3ScIStO4DiB4wSOM2TFOSbFCRxni44zZMUJHCdwnMBxhqw4x6Q4geNs0XGGrDiB4wSOEzjOkBXnmBQncJwtOs6QFSdwnMBxAscZsuIck+IEjrNFxxmy4gSOEzhO4DhDVpxjUpzAcbboOENWnMBxAscJHGfIinNMihM4zhYdZ8iKEzhO4DiB4wxZcY5JcQLH2aLjDFlxAscJHCdwnCErzjEpTuA4W3ScIStO4DiB4wSOM2TFOSbFCRxni44zZMUJHCdwnMBxhqy4pz8mTd0ADX8C39yCrDfW/wa+HiKsN9YFjq8LHF8XOL5uyIqvOybF+aIjTuA4geMEjhM4TuA4geMEjvsFc1B7g+lwllgAAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACbElEQVR4nO3bwW0aQRiAUR9dQo4uIrWkhhxTRspyCSnBZeSYWI4QAnbZARbWX570DmSw8LKfmPyD5Ke3378Ie3r4FbAqgeMEjhM4TuA4geMEjpsL/PzlZWfJ+v5TS9b3X2f/qan1Jdd5q9cZfV9LXn+LgW/yeGpl9CeXXOfos7d6v5slsMCnHk9tubcKPLTvzf/8UOCh/0pmtu7tuPwTPJ/wf/gEX3PNnyDw8bsSeIMunKKn3tjoFHp2i75mir4g8ND73f4I7RzcJ3CcwHECxwkcJ3CcwHECxwkcJ/AZB1+Tbf+rqwMCn/E358/XHwcE7vgI/PX7tx2BUwSOEzhO4DhDVpxjUpzAcbboOENWnMBxAscJHGfIinNMuustfuxvF3iV+/uxJe4ePOQCbNFr3dyHf3oMWeve3OMtWuAhWw/sE3ylTQfe3eKDB3f+7QKve39n/nmfCzBkrXhzT/6B+f2vwTEpS+A4W3ScIStO4DiB4wSOM2TFOSbFCRxni44zZMUJHCdwnMBxhqw4x6Q4geNs0XGGrDiB4wSOEzjOkBXnmBQncJwtOs6QFSdwnMBxAscZsuIck+IEjrNFxxmy4gSOEzhO4DhDVpxjUpzAcbboOENWnMBxAscJHGfIinNMihM4zhYdZ8iKEzhO4DiB4wxZcY5JcQLH2aLjDFlxAscJHCdwnCErzjEpTuA4W3ScIStO4DiB4wSOM2TFOSbFCRxni44zZMUJHCdwnMBxhqy4T39MmnoDNLwHPrkFWW+s/wt8PERYb6wLHF8XOL4ucHzdkBVfd0yK80VHnMBxAscJHCdwnMBxAscJHPcHk1N7g68nmbkAAAAASUVORK5CYII=" alt="l’écran après DROITE">
+    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACdUlEQVR4nO3bwY3TQBiA0T1SAkeKoBZq4EgZlEUJlEAZHAEFraIktmPHiycfT3qHMFmtbH/K7D+RePnx8zthL4dfAW9K4DiB4wSOEzhO4DiB4+YCv3v/4dU96+dv3bN+/nvO35pav+c69/o9a+/rnt8/YuBdXk+trP3Je65z7bt73e+wBBb41uupLXevwKv2vfmfXxV41Z+Sma17HNs/wfMJ/4dP8CPX/ASBr+9K4AFtnKKnbmztFLq4RT8yRW8IvOp+xx+hnYP7BI4TOE7gOIHjBI4TOE7gOIHjBF5w8TXZ+F9dXRB4we+cX799uSBwxynwx8+fXgmcInCcwHECxxmy4hyT4gSOs0XHGbLiBI4TOE7gOENWnGPSbo/v8GexeIXjX+21IwOfdr/T8xp237NFb39wT/HJMGRtf3DXW/SAD07g7Q/OJ/gfOH7IungxGoEfenYz/xyEIWv7g7v5n8cPfyI3r3P8PyVTfNGxQOA4W3ScIStO4DiB4wSOM2TFOSbFCRxni44zZMUJHCdwnMBxhqw4x6Q4geNs0XGGrDiB4wSOEzjOkBXnmBQncJwtOs6QFSdwnMBxAscZsuIck+IEjrNFxxmy4gSOEzhO4DhDVpxjUpzAcbboOENWnMBxAscJHGfIinNMihM4zhYdZ8iKEzhO4DiB4wxZcY5JcQLH2aLjDFlxAscJHCdwnCErzjEpTuA4W3ScIStO4DiB4wSOM2TFOSbFCRxni44zZMUJHCdwnMBxhqy4pz8mTd0ADX8C39yCrDfW/wa+HiKsN9YFjq8LHF8XOL5uyIqvOybF+aIjTuA4geMEjhM4TuA4geMEjvsFc1B7g+lwllgAAAAASUVORK5CYII=" alt="l’écran après GAUCHE">
+    <figcaption><strong>GAUCHE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACaklEQVR4nO3azW0aURhAUS9TgpcpIrW4Bi9dRspKCSkhZWTpWEQWAmaYHyIeN0c6C/Kw0DA3PH8P+enX75+EPd39CvinBI4TOE7gOIHjBI4TOG4u8Jfnr5+WrB8/tWT9+HWOn5paX3Kdt3qdte9ryeuPGPgmj6dW1v7kkutc++yt3u+wBBb40uOpLfdWgVfte/M/vyrwql8lM1v3OLZ/gucT/g+f4D3X/ACBz9+VwAPaOEVPvbG1U+jVLXrPFL0h8Kr3O/4I7RzcJ3CcwHECxwkcJ3CcwHECxwkcJ/AVJ1+Tjf/V1QmBr/iT8/uPtxMCdxwCf3t9+SRwisB7b9/gv9UE3nvvDnWHvWsCb79xDzGdGrK237jzLXrAG/co/xGn+ARHrnPK/YeskwejsUXvuncz/xyEIWv7jbv4B3t3vyPn1ylwmcBxAscZsuIck+IEjrNFxxmy4gSOEzhO4DhDVpxjUpzAcbboOENWnMBxAscJHGfIinNMihM4zhYdZ8iKEzhO4DiB4wxZcY5JcQLH2aLjDFlxAscJHCdwnCErzjEpTuA4W3ScIStO4DiB4wSOM2TFOSbFCRxni44zZMUJHCdwnMBxhqw4x6Q4geNs0XGGrDiB4wSOEzjOkBXnmBQncJwtOs6QFSdwnMBxAscZsuIck+IEjrNFxxmy4gSOEzhO4DhDVpxjUpzAcbboOENWnMBxAscJHGfIinNMihM4zhYdZ8iKEzhO4DiB4wxZcQ9/TJp6AzR8BL64BVlvrP8NfD5EWG+sCxxfFzi+LnB83ZAVX3dMivNFR5zAcQLHCRwncJzAcQLHCRz3DhBIe4MeYTHEAAAAAElFTkSuQmCC" alt="l’écran après HAUT">
+    <figcaption><strong>HAUT</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACdUlEQVR4nO3bwY3TQBiA0T1SAkeKoBZq4EgZlEUJlEAZHAEFraIktmPHiycfT3qHMFmtbH/K7D+RePnx8zthL4dfAW9K4DiB4wSOEzhO4DiB4+YCv3v/4dU96+dv3bN+/nvO35pav+c69/o9a+/rnt8/YuBdXk+trP3Je65z7bt73e+wBBb41uupLXevwKv2vfmfXxV41Z+Sma17HNs/wfMJ/4dP8CPX/ASBr+9K4AFtnKKnbmztFLq4RT8yRW8IvOp+xx+hnYP7BI4TOE7gOIHjBI4TOE7gOIHjBF5w8TXZ+F9dXRB4we+cX799uSBwxynwx8+fXgmcInCcwHECxxmy4hyT4gSOs0XHGbLiBI4TOE7gOENWnGPSbo/v8GexeIXjX+21IwOfdr/T8xp237NFb39wT/HJMGRtf3DXW/SAD07g7Q/OJ/gfOH7IungxGoEfenYz/xyEIWv7g7v5n8cPfyI3r3P8PyVTfNGxQOA4W3ScIStO4DiB4wSOM2TFOSbFCRxni44zZMUJHCdwnMBxhqw4x6Q4geNs0XGGrDiB4wSOEzjOkBXnmBQncJwtOs6QFSdwnMBxAscZsuIck+IEjrNFxxmy4gSOEzhO4DhDVpxjUpzAcbboOENWnMBxAscJHGfIinNMihM4zhYdZ8iKEzhO4DiB4wxZcY5JcQLH2aLjDFlxAscJHCdwnCErzjEpTuA4W3ScIStO4DiB4wSOM2TFOSbFCRxni44zZMUJHCdwnMBxhqy4pz8mTd0ADX8C39yCrDfW/wa+HiKsN9YFjq8LHF8XOL5uyIqvOybF+aIjTuA4geMEjhM4TuA4geMEjvsFc1B7g+lwllgAAAAASUVORK5CYII=" alt="l’écran après BAS">
+    <figcaption><strong>BAS</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Un mur debout et un sol ; en poussant DROITE et BAS, le héros descend en frôlant le mur, puis s’arrête sur le sol.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles sont ceux que <code>verification/verifier-cours.mjs</code>
+exige de cette leçon. Ils viennent d’être joués, et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>le mur arrête le pas à droite : x = 88 <span class="detail"> (88)</span></li>
+
+  <li>mais le héros continue de descendre <span class="detail"> (y = 100)</span></li>
+
+  <li>il s’arrête sur le sol : y = 120 <span class="detail"> (120)</span></li>
+
+  <li>sans entrer dans le mur </li>
+</ul>
+
+<p class="navigation">
+  <span>← <a href="48-lire-la-case-devant-soi-le-mur.html">48. Lire la case devant soi : le mur</a></span>
+  <span><a href="index.html">sommaire</a></span>
+  <span><a href="50-le-hasard-dans-une-plage-choisie.html">50. Le hasard dans une plage choisie</a> →</span>
+</p>
+
+<p class="pied">gameboy3 — apprendre à programmer, en écrivant pour la Game Boy</p>
+
+</body>
+</html>

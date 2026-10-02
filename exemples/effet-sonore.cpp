@@ -15,6 +15,11 @@
  * jeu continue aussitôt, sans rien à écarter.
  */
 
+#include <note>     // joue une note
+#include <bruit>    // joue un bruit
+#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+
 uint8_t avantA = 0;
 uint8_t avantB = 0;
 uint8_t avantStart = 0;

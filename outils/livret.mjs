@@ -28,12 +28,14 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { LECONS, NIVEAUX, numeros, partieDe, principales } from '../tuto/lecons.js'
+import { inclusionsDe, fonctionDuTuto, tutosDesFonctions, leconsQuiEmploient } from '../tuto/fonctions.js'
 
 const NUMEROS = numeros(LECONS)
 const TOTAL = principales(LECONS)
 import { STYLE } from '../tuto/style.js'
 import { enrichir, echapper } from '../tuto/enrichir.js'
 import { consoleDuProgramme } from '../tuto/console.mjs'
+import { lignesGravees } from '../analyse-rom.js'
 import { decouperLeProgramme, etapesDeLExecution, controlesJoues, imageDeLEcran } from '../tuto/etapes.mjs'
 import { lireDessins } from '../editeur-tuiles.js'
 
@@ -58,7 +60,7 @@ const enNomDeFichier = (titre) => titre
  */
 function matiereDeLaLecon(lecon) {
   const dessins = new Map(lireDessins(lecon.code).map((d) => [d.nom, d]))
-  const { gb, octets } = consoleDuProgramme(lecon.code, lecon.titre, true, lecon.fichiers)
+  const { gb, octets, grave } = consoleDuProgramme(lecon.code, lecon.titre, true, lecon.fichiers)
 
   return {
     morceaux: decouperLeProgramme(lecon.code, dessins),
@@ -66,6 +68,7 @@ function matiereDeLaLecon(lecon) {
     controles: controlesJoues(lecon),
     apercu: imageDeLEcran(gb),
     octets: octets.length,
+    grave: lignesGravees(grave).join('\n'),
   }
 }
 
@@ -188,16 +191,55 @@ async function photographierLesAteliers() {
    null et l'on n'écrit rien), le numéro, la difficulté et les ateliers. */
 const reperesDe = (lecon, index) => `
   <p class="reperes">
-    <span class="niveau">Niveau ${lecon.difficulte} — ${echapper(NIVEAUX[lecon.difficulte])}</span>
+    <span class="niveau">Chapitre ${lecon.difficulte} — ${echapper(NIVEAUX[lecon.difficulte])}</span>
+    ${lecon.provenance === 'cours' ? '<span class="outil">du cours</span>' : ''}
     ${partieDe(LECONS, index) ? `<span class="niveau">Partie ${partieDe(LECONS, index).lettre} — ${echapper(partieDe(LECONS, index).nom)}</span>` : ''}
     <span>leçon ${NUMEROS[index]} sur ${TOTAL}</span>
-    <span class="jauge" style="--part: ${lecon.difficulte * 10}%">difficulté ${lecon.difficulte} / 10</span>
+    <span class="jauge" style="--part: ${(lecon.niveau ?? lecon.difficulte) * 10}%">difficulté ${lecon.niveau ?? lecon.difficulte} / 10</span>
     ${lecon.dessin ? '<span class="outil">à la souris : atelier de dessin</span>' : ''}
     ${lecon.plan ? '<span class="outil">à la souris : plan du décor</span>' : ''}
     ${lecon.airs ? '<span class="outil">à la souris : partition</span>' : ''}
   </p>`
 
 /** Le livret d'UNE leçon : chaque étape, avec ce qu'on voit à chaque étape. */
+/* ------------------------------------------- les fonctions de la leçon */
+
+/*
+ * « Les fonctions de cette leçon » : chaque « #include » du programme, avec un
+ * lien vers le tuto de la fonction (partie L du chapitre 0). Sur un tuto,
+ * l'autre sens : les leçons qui l'emploient. Dans un livret seul, le lien mène
+ * au livret voisin ; dans le livret complet (et son PDF), à la page de la leçon.
+ */
+const TUTOS = tutosDesFonctions(LECONS)
+const EMPLOIS = leconsQuiEmploient(LECONS)
+const nomDuLivret = (index) =>
+  `lecon-${NUMEROS[index].replace(/^\d+/, (n) => n.padStart(2, '0')).replace('.', '-')}-${enNomDeFichier(LECONS[index].titre)}`
+
+function encadreDesFonctions(index, complet) {
+  const lien = (i, texte) => `<a href="${complet ? '#lecon-' + i : nomDuLivret(i) + '.html'}">${texte}</a>`
+  const cadre = (titre, corps) => `
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">${titre}</p>
+  ${corps}
+</div>`
+  const nom = fonctionDuTuto(LECONS[index])
+  if (nom) {
+    const emplois = EMPLOIS.get(nom) ?? []
+    if (!emplois.length) return ''
+    return cadre(`On retrouve ${echapper(nom)} dans ${emplois.length} leçon${emplois.length > 1 ? 's' : ''}`,
+      `<p style="margin: 0;">${emplois.map((i) => lien(i, NUMEROS[i])).join(', ')}</p>`)
+  }
+  const noms = inclusionsDe(LECONS[index])
+  if (!noms.length) return ''
+  const lignes = noms.map((n) => {
+    const i = TUTOS.get(n)
+    const vers = i === undefined ? '' : ' → ' + lien(i, `${NUMEROS[i]}. ${echapper(LECONS[i].titre)}`)
+    return `  <li><code>#include &lt;${echapper(n)}&gt;</code>${vers}</li>`
+  })
+  return cadre('Les fonctions de cette leçon — et le tuto de chacune',
+    `<ul style="margin: 0; padding-left: 14pt;">\n${lignes.join('\n')}\n</ul>`)
+}
+
 function pageDeLecon(lecon, index, matiere, atelier) {
   const suivante = LECONS[index + 1]
 
@@ -216,10 +258,13 @@ ${reperesDe(lecon, index)}
 
 <h2>1. Ce qu’il faut comprendre</h2>
 ${lecon.texte.map((p) => `<p>${enrichir(p)}</p>`).join('\n')}
+${encadreDesFonctions(index, false)}
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
 <strong>${matiere.octets} octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>${echapper(matiere.grave)}</code></pre>
 
 ${matiere.morceaux.map((m, k) => `
 <div class="morceau">
@@ -278,7 +323,7 @@ la cartouche se refait dans la seconde. C’est le même texte, écrit autrement
 
 <p class="pied">
   ${suivante
-    ? `Ensuite : <strong>${NUMEROS[index + 1]}. ${echapper(suivante.titre)}</strong> — niveau ${suivante.difficulte} sur 10.`
+    ? `Ensuite : <strong>${NUMEROS[index + 1]}. ${echapper(suivante.titre)}</strong> — chapitre ${suivante.difficulte} : ${echapper(NIVEAUX[suivante.difficulte])}.`
     : 'C’est la dernière des ' + TOTAL + ' leçons.'}
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
@@ -296,7 +341,7 @@ function livretComplet(matieres, ateliers) {
   for (const [index, lecon] of LECONS.entries()) {
     if (lecon.difficulte !== niveau) {
       niveau = lecon.difficulte
-      sommaire.push(`<li class="niveau">Niveau ${niveau} — ${echapper(NIVEAUX[niveau])}</li>`)
+      sommaire.push(`<li class="niveau">Chapitre ${niveau} — ${echapper(NIVEAUX[niveau])}</li>`)
     }
     // Sur la leçon qui ouvre une partie, son titre dans le sommaire, avec le
     // même style que celui d'un niveau : par exemple « B. Le temps ».
@@ -306,7 +351,7 @@ function livretComplet(matieres, ateliers) {
       sommaire.push(`<li class="niveau">${lettre}. ${echapper(nom)}</li>`)
     }
     sommaire.push(`<li><span class="numero">${NUMEROS[index]}</span> ${echapper(lecon.titre)}
-      <span class="points">difficulté ${lecon.difficulte}/10</span></li>`)
+      <span class="points">difficulté ${lecon.niveau ?? lecon.difficulte}/10</span></li>`)
   }
 
   const lecons = LECONS.map((lecon, index) => {
@@ -314,12 +359,13 @@ function livretComplet(matieres, ateliers) {
     const atelier = ateliers.get(index)
 
     return `
-<section class="lecon">
+<section class="lecon" id="lecon-${index}">
   ${reperesDe(lecon, index)}
   <h1 class="titre-lecon">${NUMEROS[index]}. ${echapper(lecon.titre)}</h1>
   <p class="idee">${echapper(lecon.idee)}</p>
 
   ${lecon.texte.map((p) => `<p>${enrichir(p)}</p>`).join('\n  ')}
+  ${encadreDesFonctions(index, true)}
 
   <div class="deux">
     <div>

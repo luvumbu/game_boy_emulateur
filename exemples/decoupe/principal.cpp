@@ -7,6 +7,11 @@
 // de C++. L’ordre compte pour les variables : une globale doit être versée
 // avant la fonction qui la nomme, comme si tout était collé bout à bout.
 
+#include <texte>     // écrit un texte à l’écran
+#include <ecran>     // éteint ou rallume l’écran
+#include <effacer>   // efface des cases, ou tout le fond
+#include <bouton>    // lit un bouton de la manette
+
 #include "mesures.cpp"
 #include "titre.cpp"
 #include "dessins.cpp"

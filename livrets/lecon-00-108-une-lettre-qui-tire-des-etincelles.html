@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 0.108 — Une lettre qui tire — des étincelles</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie K — Une lettre qui tire</span>
+    <span>leçon 0.108 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
+    
+    
+    
+  </p>
+<h1>0.108. Une lettre qui tire — des étincelles</h1>
+<p class="idee">La rafale du 0.105.1 : chaque tir est un point, et il casse un seul X, celui qu’il touche en face. Au choc, un petit éclat jaillit : six étincelles de 2 × 2 pixels, jaunes et orange, qui scintillent un instant puis disparaissent.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>On reprend la rafale du 0.105.1</strong>, et on lui ajoute un effet. Le tir est un <strong>point</strong> « . » ; il casse <strong>un seul X</strong>, celui qu’il touche <strong>en face</strong>, et disparaît. Au moment du choc, un petit <strong>éclat</strong> jaillit du trou : six étincelles jaunes et orange, qui scintillent un instant, puis s’éteignent.</p>
+<p><strong>Ce qui est nouveau ici (1) : une étincelle est un lutin.</strong> Une lettre ne bouge que case par case : 8 pixels d’un coup. Un <strong>lutin</strong> (le 0.70) se pose <strong>au pixel près</strong>, avec <code>sprite(numero, x, y, dessin)</code>. Les six étincelles sont les lutins 0 à 5 ; leur place se compte en <strong>pixels</strong> : <code>px[i]</code>, <code>py[i]</code>. La case (c, l) commence au pixel (c × 8, l × 8).</p>
+<p><strong>Ce qui est nouveau ici (2) : un dessin à nous, <code>Tuile ETINCELLE</code>.</strong> Huit lignes de huit chiffres : un chiffre par pixel. 0 est <strong>transparent</strong> (on voit le décor derrière) ; 1 et 2 sont deux couleurs. Seuls quatre pixels, au milieu, sont allumés : 2 × 2, une étincelle.</p>
+<p><strong>Ce qui est nouveau ici (3) : les couleurs.</strong> <code>couleurLutin(palette, teinte, rouge, vert, bleu)</code> règle une teinte d’une palette de lutins, avec trois nombres de 0 à 31. La palette 0 met le jaune (31, 31, 6) en 1 et l’orange (31, 16, 0) en 2 ; la palette 1 les échange. <code>teindreLutin(i, palette)</code> choisit la palette du lutin i. Le programme s’en sert : la console passe <strong>toute seule</strong> en mode couleur.</p>
+<p><strong>Ce qui est nouveau ici (4) : <code>eclat(c, l)</code>.</strong> Quand un tir casse le X en (<code>nx</code>, <code>ny</code>), on appelle <code>eclat(nx, ny)</code> : les six étincelles sont posées au centre de cette case, et chacune reçoit une <strong>vie</strong> de 6 à 11 images (<code>6 + hasard() % 6</code>). Elles ne s’éteignent pas toutes ensemble : c’est ce qui fait « étincelles ».</p>
+<p><strong><code>etinceler()</code>, à chaque image :</strong> chaque étincelle encore vivante perd une image de vie, avance d’un pixel dans <strong>sa</strong> direction (<code>PDX[i]</code>, <code>PDY[i]</code>, gravées dans la cartouche : 255 veut dire -1, le 0.100), est redessinée, et <strong>scintille</strong> : <code>teindreLutin(i, ((images() + i) / 2) % 2)</code> la fait passer du jaune à l’orange toutes les 2 images. À 0, <code>cacher(i)</code> la fait disparaître.</p>
+<p><strong>Un seul X, celui d’en face :</strong> rien ne change dans le pas du tir du 0.105.1. Son arrivée est un X : <code>effacer(nx, ny, 1)</code> efface <strong>cette case-là</strong>, le tir disparaît, et l’éclat part de là. Les X au-dessus et au-dessous ne sont pas touchés.</p>
+<p><strong>Déroulons :</strong> A en (2, 8), bouton A. Le point va de (3, 8) à (11, 8). Pas suivant : l’arrivée (12, 8) est un X. Il est effacé, le tir disparaît, et <code>eclat(12, 8)</code> pose les six étincelles au pixel (96, 64). Une image plus tard, elles s’écartent d’un pixel : deux en haut, deux en bas, deux de chaque côté. Dix images plus tard, il n’en reste plus.</p>
+<p><strong>Essaie :</strong> change les couleurs (du bleu et du blanc pour de la glace : 10, 20, 31 et 31, 31, 31). Ou un éclat plus long : <code>12 + hasard() % 8</code>.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;Tuile&gt;</code> → <a href="lecon-00-107.2-tuile-dessiner-une-case.html">0.107.2. Tuile — dessiner une case</a></li>
+  <li><code>#include &lt;hasard&gt;</code> → <a href="lecon-00-81.2-la-fonction-hasard-un-nombre-au-hasard.html">0.81.2. La fonction hasard() — un nombre au hasard</a></li>
+  <li><code>#include &lt;cacher&gt;</code> → <a href="lecon-00-107.3-la-fonction-cacher-oter-un-lutin.html">0.107.3. La fonction cacher() — ôter un lutin</a></li>
+  <li><code>#include &lt;sprite&gt;</code> → <a href="lecon-00-69.4-la-fonction-sprite-un-lutin-au-pixel-pre.html">0.69.4. La fonction sprite() — un lutin au pixel près</a></li>
+  <li><code>#include &lt;teindreLutin&gt;</code> → <a href="lecon-00-107.5-la-fonction-teindrelutin-un-lutin-dans-u.html">0.107.5. La fonction teindreLutin() — un lutin dans une palette</a></li>
+  <li><code>#include &lt;couleurLutin&gt;</code> → <a href="lecon-00-107.4-la-fonction-couleurlutin-une-couleur-des.html">0.107.4. La fonction couleurLutin() — une couleur des personnages</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+  <li><code>#include &lt;chaque&gt;</code> → <a href="lecon-00-29.3-la-fonction-chaque-toutes-les-n-millisec.html">0.29.3. La fonction chaque() — toutes les n millisecondes</a></li>
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+  <li><code>#include &lt;lire&gt;</code> → <a href="lecon-00-68.4-la-fonction-lire-lire-une-case.html">0.68.4. La fonction lire() — lire une case</a></li>
+  <li><code>#include &lt;effacer&gt;</code> → <a href="lecon-00-16.3-la-fonction-effacer-effacer-des-cases.html">0.16.3. La fonction effacer() — effacer des cases</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;reste&gt;</code> → <a href="lecon-00-8.4-include-reste-a-b.html">0.8.4. #include &lt;reste&gt; — a % b</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1655 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            90 o  ← la console, à l’allumage  — la mise en route de la console
+  chaque_minuteur()   124 o  ← main()  — une fonction fournie par le langage
+  eclat()              78 o  ← main()  — ta fonction
+  etinceler()         247 o  ← main()  — ta fonction
+  main()              762 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EffacerCases, EcrireTexte  — attend de pouvoir écrire une case
+  AdresseCase          10 o  ← poser(), lire(), effacer(), texte()  — trouve l’adresse d’une case de l’écran
+  EffacerCases         12 o  ← effacer()  — efface des cases
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  Reste                10 o  ← eclat()  — le reste d’une division
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         58 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Hasard               25 o  ← hasard()  — tire un nombre au hasard
+  LireManette          37 o  ← bouton()  — lit les huit boutons
+  Tuiles               64 o  ← CopierTuiles  — 3 lettres sur 43, et 1 tuile dessinée
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+  "."                   1 o  ← texte()  — un texte gravé
+  "."                   1 o  ← texte()  — un texte gravé
+  PDX_0                 6 o  ← etinceler()  — une table gravée
+  PDY_1                 6 o  ← etinceler()  — une table gravée
+Lettres gravées : AX.
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EcrireNombre, Diviser, Multiplier, DecalerGauche, DecalerDroite, EffacerFond, EffacerPanneau, Notes
+Fonctions du langage appelées :
+  texte()           × 2    68 o sur place, dans main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  sprite()          × 1    62 o sur place, dans etinceler()
+  effacer()         × 3    61 o sur place, dans main()  + AdresseCase (10 o), EffacerCases (12 o)
+  couleurLutin()    × 4    48 o sur place, dans main()
+  lire()            × 4    44 o sur place, dans main()  + AdresseCase (10 o)
+  poser()           × 3    38 o sur place, dans main()  + AdresseCase (10 o)
+  teindreLutin()    × 1    33 o sur place, dans etinceler()
+  bouton()          × 5    25 o sur place, dans main()  + LireManette (37 o)
+  cacher()          × 1    13 o sur place, dans etinceler()
+  image()           × 1     6 o sur place, dans main()  + AttendreImage (28 o)
+  images()          × 2     4 o sur place, dans chaque_minuteur(), etinceler()
+  hasard()          × 1     3 o sur place, dans eclat()  + Hasard (25 o)
+Tes fonctions appelées :
+  chaque_minuteur() × 3    32 o sur place, dans main()
+  eclat()           × 1    11 o sur place, dans main()
+  etinceler()       × 1     3 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// ---- UNE LETTRE QUI TIRE : des étincelles ----
+// La rafale du 0.105.1 : chaque tir est un point « . », et il casse UN X,
+// celui qu'il touche en face. NOUVEAU : au choc, un petit ÉCLAT jaillit de
+// l'endroit touché — six étincelles de 2 × 2 pixels, jaunes et orange, qui
+// scintillent un instant, puis disparaissent.
+// Une étincelle est un LUTIN (le 0.70) : un petit dessin placé au pixel près.
+// ALPHABET[23] : le X.
+
+#include &lt;Tuile&gt;          // un dessin de 8 × 8 pixels
+#include &lt;hasard&gt;         // tire un nombre au hasard
+#include &lt;cacher&gt;         // cache un lutin
+#include &lt;sprite&gt;         // place un lutin de 8 × 8 au pixel près
+#include &lt;teindreLutin&gt;   // met un lutin dans une palette
+#include &lt;couleurLutin&gt;   // choisit une couleur d’une palette des lutins
+#include &lt;poser&gt;          // pose une tuile sur une case du fond
+#include &lt;ALPHABET&gt;       // les lettres de la police : ALPHABET[0] est le A
+#include &lt;chaque&gt;         // répond 1 toutes les n millisecondes
+#include &lt;bouton&gt;         // lit un bouton de la manette
+#include &lt;lire&gt;           // lit la tuile posée sur une case
+#include &lt;effacer&gt;        // efface des cases, ou tout le fond
+#include &lt;texte&gt;          // écrit un texte à l’écran
+#include &lt;reste&gt;          // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une variable — ax</p>
+    <pre><code>uint8_t ax = 2;              // le A : sa colonne…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une variable — ay</p>
+    <pre><code>uint8_t ay = 8;              // …et sa ligne</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une variable — dx</p>
+    <pre><code>uint8_t dx = 1;              // le sens où regarde le A</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une variable — dy</p>
+    <pre><code>uint8_t dy = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">6. une variable — nx</p>
+    <pre><code>uint8_t nx = 0;              // une case d'ARRIVÉE, calculée avant de bouger</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">7. une variable — ny</p>
+    <pre><code>uint8_t ny = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">8. un tableau — tx</p>
+    <pre><code>uint8_t tx[3];               // les trois tirs : leurs colonnes…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">9. un tableau — ty</p>
+    <pre><code>uint8_t ty[3];               // …leurs lignes…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">10. un tableau — tdx</p>
+    <pre><code>uint8_t tdx[3];              // …et leurs sens</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">11. un tableau — tdy</p>
+    <pre><code>uint8_t tdy[3];</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">12. un tableau — vole</p>
+    <pre><code>uint8_t vole[3];             // vole[i] = 1 : le tir n° i est en vol</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">13. une variable — lance</p>
+    <pre><code>uint8_t lance = 0;
+
+// ---- NOUVEAU : le dessin d'une étincelle, 2 × 2 pixels au milieu ----
+// 0 : transparent (on voit le décor derrière). 1 et 2 : deux couleurs,
+// réglées plus bas avec couleurLutin().</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">14. un dessin — ETINCELLE</p>
+    <pre><code>Tuile ETINCELLE = {
+  "00000000",
+  "00000000",
+  "00000000",
+  "00012000",
+  "00021000",
+  "00000000",
+  "00000000",
+  "00000000",
+};
+
+// ---- NOUVEAU : six étincelles, rangées dans des tableaux ----</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAXElEQVR4nO3OMRGAMAAEwYhCCxookYEsJCABGZTpkzJkPsXOXH9b3u9ZqhIXAAEBAaUFQEBAQGnBP6DrPpu2Y28CAgIaAfX7nggEBDQCmhcQEBBQOiAgIKB0y4EqqrQqqgPttbwAAAAASUVORK5CYII=" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">15. un tableau — px</p>
+    <pre><code>uint8_t px[6];               // leur place, en PIXELS (et non en cases)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">16. un tableau — py</p>
+    <pre><code>uint8_t py[6];</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">17. un tableau — vie</p>
+    <pre><code>uint8_t vie[6];              // les images qu'il leur reste à briller (0 : éteinte)
+
+// ---- NOUVEAU : leurs six directions, gravées dans la cartouche ----
+// De combien de pixels chacune avance à chaque image. 255, c'est -1
+// (un uint8_t fait le tour, le 0.100) :
+//   0 : à droite, un peu en haut     3 : à gauche, un peu en bas
+//   1 : à droite, un peu en bas      4 : tout droit en haut
+//   2 : à gauche, un peu en haut     5 : tout droit en bas</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">18. une table gravée dans la cartouche — PDX</p>
+    <pre><code>const uint8_t PDX[] = {   1,   1, 255, 255,   0,   0 };</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">19. une table gravée dans la cartouche — PDY</p>
+    <pre><code>const uint8_t PDY[] = { 255,   1, 255,   1, 255,   1 };
+
+// ---- NOUVEAU : un éclat, au centre de la case (c, l) ----
+// Une case fait 8 pixels : la case (c, l) commence au pixel (c × 8, l × 8).</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">20. une fonction — eclat()</p>
+    <pre><code>void eclat(uint8_t c, uint8_t l) {
+  for (uint8_t i = 0; i &lt; 6; i++) {
+    px[i] = c * 8;
+    py[i] = l * 8;
+    vie[i] = 6 + hasard() % 6;       // de 6 à 11 images : un instant
+  }
+}
+
+// ---- NOUVEAU : faire vivre les étincelles, une image de plus ----</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">21. une fonction — etinceler()</p>
+    <pre><code>void etinceler() {
+  for (uint8_t i = 0; i &lt; 6; i++) {
+    if (vie[i] &gt; 0) {
+      vie[i] = vie[i] - 1;
+      if (vie[i] == 0) {
+        cacher(i);                   // plus de vie : le lutin i disparaît
+      } else {
+        px[i] = px[i] + PDX[i];      // elle file dans SA direction…
+        py[i] = py[i] + PDY[i];
+        sprite(i, px[i], py[i], ETINCELLE);
+        // …et scintille : toutes les 2 images, elle passe d'une palette à
+        // l'autre (0 : jaune au milieu, 1 : orange). Après sprite(), qui
+        // remet la palette à 0.
+        teindreLutin(i, ((images() + i) / 2) % 2);
+      }
+    }
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">22. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  // ---- NOUVEAU : les deux palettes des étincelles (couleurs de 0 à 31) ----
+  couleurLutin(0, 1, 31, 31,  6);    // palette 0 : jaune…
+  couleurLutin(0, 2, 31, 16,  0);    // …et orange
+  couleurLutin(1, 1, 31, 16,  0);    // palette 1 : orange…
+  couleurLutin(1, 2, 31, 31,  6);    // …et jaune : les mêmes, échangées
+
+  for (uint8_t l = 4; l &lt; 13; l++) {   // le mur : 9 X en colonne 12 (le 0.101)
+    poser(12, l, ALPHABET[23]);
+  }
+  poser(ax, ay, ALPHABET[0]);
+
+  while (true) {
+    image();
+
+    // ---- le A bouge et retient où il regarde ----
+    if (chaque(150)) {
+      nx = ax;
+      ny = ay;
+      if (bouton(DROITE)) {
+        nx = ax + 1;
+        dx = 1;
+        dy = 0;
+      } else if (bouton(GAUCHE)) {
+        nx = ax - 1;
+        dx = -1;
+        dy = 0;
+      } else if (bouton(BAS)) {
+        ny = ay + 1;
+        dx = 0;
+        dy = 1;
+      } else if (bouton(HAUT)) {
+        ny = ay - 1;
+        dx = 0;
+        dy = -1;
+      }
+      if (nx &lt; 20 &amp;&amp; ny &lt; 17) {
+        if (lire(nx, ny) == 0) {
+          effacer(ax, ay, 1);
+          ax = nx;
+          ay = ny;
+          poser(ax, ay, ALPHABET[0]);
+        }
+      }
+    }
+
+    // ---- le bouton A lance un tir, au plus toutes les 250 ms ----
+    if (chaque(250)) {
+      if (bouton(A)) {
+        nx = ax + dx;
+        ny = ay + dy;
+        // la case de départ doit être dans l'écran ET vide (le 0.101)
+        if (nx &lt; 20 &amp;&amp; ny &lt; 17 &amp;&amp; lire(nx, ny) == 0) {
+          lance = 0;
+          for (uint8_t i = 0; i &lt; 3; i++) {
+            if (lance == 0 &amp;&amp; vole[i] == 0) {
+              vole[i] = 1;
+              tx[i] = nx;
+              ty[i] = ny;
+              tdx[i] = dx;
+              tdy[i] = dy;
+              texte(tx[i], ty[i], ".");
+              lance = 1;
+            }
+          }
+        }
+      }
+    }
+
+    // ---- chaque tir avance, et regarde sa case d'arrivée (le 0.105) ----
+    if (chaque(100)) {
+      for (uint8_t i = 0; i &lt; 3; i++) {
+        if (vole[i] == 1) {
+          nx = tx[i] + tdx[i];
+          ny = ty[i] + tdy[i];
+          effacer(tx[i], ty[i], 1);
+          if (nx &gt;= 20 || ny &gt;= 17) {
+            vole[i] = 0;             // 1. hors de l'écran
+          } else if (lire(nx, ny) == ALPHABET[23]) {
+            effacer(nx, ny, 1);      // 2. un X : le tir casse CE X-là, et lui seul…
+            vole[i] = 0;             //    …disparaît…
+            eclat(nx, ny);           //    …et NOUVEAU : un éclat jaillit du choc
+          } else if (lire(nx, ny) != 0) {
+            vole[i] = 0;             // 3. un autre tir : il s'écrase
+          } else {
+            tx[i] = nx;              // 4. une case vide : il y va
+            ty[i] = ny;
+            texte(tx[i], ty[i], ".");
+          }
+        }
+      }
+    }
+
+    // ---- NOUVEAU : les étincelles vivent, une image après l'autre ----
+    etinceler();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABzUlEQVR4nO3XsW0CQRBAUUJKIKT/alyCy3DogMSBpV2Q4Hb/PekFhIy+RrN3+f75Iuxy+D/grQSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LHr7f7v7y0IPCZw36PrdnUFfsKOdQWeZYPL3OA4gVmXwGM2OE7gPq/ovh3rCjzLBpe5wXECsy6Bx2xwnMB9XtF9O9YVeJYNLnOD4wRmXQKP2eA4gfu8ovt2rCvwLBtc5gbHCcy6Xgx8vd0fDh/gA063wVsPfLZ5BX5i5B2HfTHwX4fP8BmbTmqDnxh5x2EFjs8rcHxe38FxAo/Z4DiB+871ij6nHesKPMsGl7nBcQKzLoHHbHCcwH1e0X071hV4lg0uc4PjBGZdAo/Z4DiB+7yi+3asK/AsG1zmBscJzLoEHrPBcQL3eUX37VhX4Fk2uMwNjhOYdQkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECx/0CBtDZDD2NLggAAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABz0lEQVR4nO3WsW0CQRBAUUJKcEj/1bgEl+HQAYkDS3sgGXb+PekFhMx9jWYvX9+fhF3e/g/4VwLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwn8Nr14/bn7xEEXhO47951XF2BHzCxrsBH2eAyNzhOYPYl8JoNjhO4zyu6b2JdgY+ywWVucJzA7EvgNRscJ3CfV3TfxLoCH2WDy9zgOIHZl8BrNjhO4D6v6L6JdQU+ygaXucFxArOvJwNfP253bx/gBU63waMHPtu8Aj8w8sRhnwz829tneI2hk9rgB0aeOKzA8Xn3DbzPpzxdYAYReM0Gxwncd65X9DlNrCvwUTa4zA2OE5h9Cbxmg+ME7vOK7ptYV+CjbHCZGxwnMPsSeM0Gxwnc5xXdN7GuwEfZ4DI3OE5g9iXwmg2OE7jPK7pvYl2Bj7LBZW5wnMDsS+A4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM47gfX/takrMDSuQAAAABJRU5ErkJggg==" alt="l’écran après A">
+    <figcaption><strong>A</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB00lEQVR4nO3XsU1DQRBAQUJKcOj+q6EEyiAkICGwdGfxkW+fRprAoddPqz2/fX59EPb28m/AvxI4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4gdfeb/eHn0cQeE3gvp+u4+oK/ISJdQXeZYPL3OA4gTmXwGs2OE7gPq/ovol1Bd5lg8vc4DiBOZfAazY4TuA+r+i+iXUF3mWDy9zgOIE5l8BrNjhO4D6v6L6JdQXeZYPL3OA4gTnXxYHfb/cfLx/s2qEefh7hysCjf4jqXAI/MdrEoS4O/NvLZ7vW0Ils8BOjTRxK4Phc/cB//yZnzrXJ/+A4gddscJzAfV7RfRPrCrzLBpe5wXECcy6B12xwnMB9XtF9E+sKvMsGl7nBcQJzLoHXbHCcwH1e0X0T6wq8ywaXucFxAnMugddscJzAfV7RfRPrCrzLBpe5wXECcy6B4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LhvlQnWpFOHXT8AAAAASUVORK5CYII=" alt="l’écran après DROITE">
+    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB5UlEQVR4nO3ZwUkDQRSA4RxTQo4pwlqswaNlpKyUYAmW4dGDFxHJjIGwO78ffIQcZ/l5+wb28P7xRthh8xPwUALHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwn8NjxdP71/xIEHhO476vrcnUF/oMV6wo8ywSX2cFxArNfAo+Z4DiB+9yi+1asK/AsE1xmB8cJzH4JPGaC4wTuc4vuW7GuwLNMcJkdHCcw+yXwmAmOE7jPLbpvxboCzzLBZXZwnMDs152Bj6fzl80fgNvuCbz0K+sOl+vr08vz99/NjzRP4LEfdS/X182PNO/OwN9t/gzcYILjBB6zg7d/jIf6dzuYhQg8tvQbS+Axgft8Tepbsa7As0xwmR0cJzD7JfCYCY4TuM8tum/FugLPMsFldnCcwOyXwGMmOE7gPrfovhXrCjzLBJfZwXECs18Cj5ngOIH73KL7Vqwr8CwTXGYHxwnMfgkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECx30CTnrYjFpRm+sAAAAASUVORK5CYII=" alt="l’écran après GAUCHE">
+    <figcaption><strong>GAUCHE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAByklEQVR4nO3ZMW5CMRBAQUqOQMn9T5Mj5BgpU9CkiGSDBN9+f6QpKFk9rdYkl++fL8Iuh38D3krgOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBB673u7/ft6CwGMC9z26bldX4CfsWFfgWTa4zA2OE5h1CTxmg+ME7vOK7tuxrsCzbHCZGxwnMOsSeMwGxwnc5xXdt2NdgWfZ4DI3OE5g1vVi4Ovt/nD4AB9wug3eeuCzzSvwEyPvOOyLgf86fIbP2HRSG/zEyDsOK3B8XoHj8/odHCdwnMBxAscJHCdwnMBxAscJHCfwmL9kxQncd67/Jp3TjnUFnmWDy9zgOIFZl8BjNjhO4D6v6L4d6wo8ywaXucFxArMugcdscJzAfV7RfTvWFXiWDS5zg+MEZl0Cj9ngOIH7vKL7dqwr8CwbXOYGxwnMugSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB434B+cr4VH4+qY4AAAAASUVORK5CYII=" alt="l’écran après HAUT">
+    <figcaption><strong>HAUT</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABwElEQVR4nO3ZsW1CMRhG0ZSMQMn+02SEjJEyBU2KCDtIEf5vjnQKSp6uvmcj3j4+3wl7e/k34E8JHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBrl+vtx88jCLwmcN+967i6Av/CxLoC77LgMmdwnMCcS+A1C44TuM8tum9iXYF3WXCZMzhOYM4l8JoFxwnc5xbdN7GuwLssuMwZHCcw5xJ4zYLjBO5zi+6bWFfgXRZc5gyOE5hzPRn4cr3dvfwBeOyZwKNfWf+NwHFPBv7u5c/AAxYcJ3CcwHF+B8cJvDb6jSXwmsB9/k3qm1hX4F0WXOYMjhOYcwm8ZsFxAve5RfdNrCvwLgsucwbHCcy5BF6z4DiB+9yi+ybWFXiXBZc5g+ME5lwCr1lwnMB9btF9E+sKvMuCy5zBcQJzLoHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7guC8qfvhUW8wyEgAAAABJRU5ErkJggg==" alt="l’écran après BAS">
+    <figcaption><strong>BAS</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Chaque point de la rafale casse le X qu’il touche en face, et lui seul ; au choc, un petit éclat jaune et orange jaillit du trou, scintille un instant, puis disparaît.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>avant le choc : ni jaune ni orange </li>
+
+  <li>le tir casse un seul X, celui d’en face (12, 8) ; les autres restent </li>
+
+  <li>au choc, un éclat jaune et orange, tout près du trou </li>
+
+  <li>un instant plus tard, il a disparu </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>0.109. La fonction changerDessin() — redessiner une tuile partout</strong> — chapitre 0 : Avant tout.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 0.93.7 — Un jeu de bombes — la flamme détruit les W</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie I — Le jeu de bombes</span>
+    <span>leçon 0.93.7 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
+    
+    
+    
+  </p>
+<h1>0.93.7. Un jeu de bombes — la flamme détruit les W</h1>
+<p class="idee">Le 0.93.6, et une flamme qui tombe sur un W le détruit : vivant[i] passe à 0, le score gagne 1. Un W détruit ne bouge plus.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>C’est le 0.93.6, avec une chose en plus : détruire les W.</strong> Si une flamme tombe sur un W, il disparaît, et le <strong>score</strong> gagne 1. Le score s’affiche sous le terrain, ligne 17.</p>
+<p><strong>Un troisième tableau, <code>vivant[3]</code> :</strong> <code>vivant[i]</code> vaut 1 si le W n° <code>i</code> est là, 0 s’il a été détruit. Au départ, les trois valent 1.</p>
+<p><strong>Ce qui est nouveau ici : chercher QUEL W est sous la flamme.</strong> Dans <code>caseFeu</code>, juste avant d’écrire une flamme : <code>if (lire(c, l) == ALPHABET[22])</code> : « y a-t-il un W sur cette case ? ». L’écran dit <strong>qu’il y a</strong> un W, mais pas <strong>lequel</strong>. La fonction <code>toucheW(c, l)</code> le cherche : elle passe sur les trois, et celui qui est <strong>vivant ET</strong> en (<code>c</code>, <code>l</code>) est détruit : <code>vivant[i] = 0;</code>, <code>score = score + 1;</code>.</p>
+<p><strong><code>vivant[i] == 1 &amp;&amp; ex[i] == c &amp;&amp; ey[i] == l</code> :</strong> trois conditions, toutes vraies à la fois (<code>&amp;&amp;</code>, le 0.75). <code>vivant[i] == 1</code> évite de compter deux fois un W déjà détruit qui aurait gardé la même place.</p>
+<p><strong>La flamme recouvre le W :</strong> <code>texte()</code> écrit la flamme <strong>par-dessus</strong> la lettre W. Quand la flamme s’éteint, <code>effacer()</code> vide la case : le W a disparu de l’écran.</p>
+<p><strong>Un W détruit ne fait plus rien :</strong> dans la boucle des W, <code>if (vivant[i] == 1)</code> entoure tout son pas. Après les flammes, on ne redessine que les W vivants.</p>
+<p><strong>Le score :</strong> <code>texte(0, 17, "SCORE")</code> une fois au départ, puis <code>nombre(6, 17, score)</code> à chaque image, comme dans le serpent.</p>
+<p><strong><code>toucheW</code> est écrite avant <code>caseFeu</code> :</strong> en C++, une fonction doit être écrite <strong>avant</strong> celles qui l’appellent.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;effacer&gt;</code> → <a href="lecon-00-16.3-la-fonction-effacer-effacer-des-cases.html">0.16.3. La fonction effacer() — effacer des cases</a></li>
+  <li><code>#include &lt;lire&gt;</code> → <a href="lecon-00-68.4-la-fonction-lire-lire-une-case.html">0.68.4. La fonction lire() — lire une case</a></li>
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;chaque&gt;</code> → <a href="lecon-00-29.3-la-fonction-chaque-toutes-les-n-millisec.html">0.29.3. La fonction chaque() — toutes les n millisecondes</a></li>
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+  <li><code>#include &lt;hasard&gt;</code> → <a href="lecon-00-81.2-la-fonction-hasard-un-nombre-au-hasard.html">0.81.2. La fonction hasard() — un nombre au hasard</a></li>
+  <li><code>#include &lt;nombre&gt;</code> → <a href="lecon-00-8.3-la-fonction-nombre-ecrire-un-nombre.html">0.8.3. La fonction nombre() — écrire un nombre</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>2167 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage          102 o  ← la console, à l’allumage  — la mise en route de la console
+  chaque_minuteur()  124 o  ← main()  — une fonction fournie par le langage
+  toucheW()           81 o  ← caseFeu()  — ta fonction
+  caseFeu()           98 o  ← flammes()  — ta fonction
+  flammes()          285 o  ← main()  — ta fonction
+  main()             851 o  ← démarrage  — ta fonction
+  VBlank               8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage       28 o  ← image()  — attend l’image suivante
+  AttendreVBlank      16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces       12 o  ← EffacerCases, EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase         10 o  ← effacer(), lire(), texte(), poser()  — trouve l’adresse d’une case de l’écran
+  EffacerCases        12 o  ← effacer()  — efface des cases
+  EcrireTexte         10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre        33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles        94 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte        14 o  ← démarrage  — vide les deux cartes de l’écran
+  Hasard              25 o  ← hasard()  — tire un nombre au hasard
+  LireManette         37 o  ← bouton()  — lit les huit boutons
+  Tuiles             320 o  ← CopierTuiles  — 20 lettres sur 43
+  "|"                  1 o  ← texte()  — un texte gravé
+  "-"                  1 o  ← texte()  — un texte gravé
+  "SCORE"              5 o  ← texte()  — un texte gravé
+Lettres gravées : BCEORSWX0123456789-|
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser()           × 9   165 o sur place, dans main()  + AdresseCase (10 o)
+  lire()            × 7   101 o sur place, dans caseFeu(), flammes(), main()  + AdresseCase (10 o)
+  effacer()         × 3    61 o sur place, dans caseFeu(), main()  + AdresseCase (10 o), EffacerCases (12 o)
+  texte()           × 3    47 o sur place, dans caseFeu(), main()  + AdresseCase (10 o), EcrireTexte (10 o)
+  bouton()          × 5    25 o sur place, dans main()  + LireManette (37 o)
+  nombre()          × 1    10 o sur place, dans main()  + EcrireNombre (33 o)
+  image()           × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+  hasard()          × 1     3 o sur place, dans main()  + Hasard (25 o)
+  images()          × 1     2 o sur place, dans chaque_minuteur()
+Tes fonctions appelées :
+  caseFeu()         × 5   108 o sur place, dans flammes()
+  chaque_minuteur() × 2    21 o sur place, dans main()
+  flammes()         × 2    13 o sur place, dans main()
+  toucheW()         × 1    11 o sur place, dans caseFeu()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// ---- UN JEU DE BOMBES ----
+// Les lettres : X = un mur, O = le joueur, B = une bombe, W = un ennemi.
+// ALPHABET[23] : le X    ALPHABET[14] : le O
+// ALPHABET[1]  : le B    ALPHABET[22] : le W
+
+#include &lt;effacer&gt;    // efface des cases, ou tout le fond
+#include &lt;lire&gt;       // lit la tuile posée sur une case
+#include &lt;ALPHABET&gt;   // les lettres de la police : ALPHABET[0] est le A
+#include &lt;texte&gt;      // écrit un texte à l’écran
+#include &lt;poser&gt;      // pose une tuile sur une case du fond
+#include &lt;chaque&gt;     // répond 1 toutes les n millisecondes
+#include &lt;bouton&gt;     // lit un bouton de la manette
+#include &lt;hasard&gt;     // tire un nombre au hasard
+#include &lt;nombre&gt;     // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une variable — ox</p>
+    <pre><code>uint8_t ox = 1;           // le O, le joueur : sa colonne… (le 0.93.1)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une variable — oy</p>
+    <pre><code>uint8_t oy = 1;           // …et sa ligne. Il part du coin (1, 1).</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une variable — nx</p>
+    <pre><code>uint8_t nx = 0;           // la case d'ARRIVÉE, calculée AVANT de bouger (le 0.82)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une variable — ny</p>
+    <pre><code>uint8_t ny = 0;</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">6. une variable — bombe</p>
+    <pre><code>uint8_t bombe = 0;        // 1 : une bombe est posée ; 0 : pas de bombe (le 0.93.2)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">7. une variable — bx</p>
+    <pre><code>uint8_t bx = 0;           // la place de la bombe : sa colonne…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">8. une variable — by</p>
+    <pre><code>uint8_t by = 0;           // …et sa ligne</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">9. une variable — bdelai</p>
+    <pre><code>uint8_t bdelai = 0;       // les images passées depuis la pose de la bombe (le 0.93.3)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">10. une variable — feu</p>
+    <pre><code>uint8_t feu = 0;          // 1 : les flammes sont à l'écran ; 0 : non</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">11. une variable — fdelai</p>
+    <pre><code>uint8_t fdelai = 0;       // les images passées depuis l'explosion</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">12. une variable — fx</p>
+    <pre><code>uint8_t fx = 0;           // le centre de l'explosion : sa colonne…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">13. une variable — fy</p>
+    <pre><code>uint8_t fy = 0;           // …et sa ligne</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">14. un tableau — ex</p>
+    <pre><code>uint8_t ex[3];            // les TROIS W : leurs colonnes… (le 0.93.6)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">15. un tableau — ey</p>
+    <pre><code>uint8_t ey[3];            // …et leurs lignes. Le W n° i est en (ex[i], ey[i]).</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">16. une variable — d</p>
+    <pre><code>uint8_t d = 0;            // la direction tirée au hasard, 0 à 3 (le 0.93.5)</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">17. un tableau — vivant</p>
+    <pre><code>uint8_t vivant[3];        // NOUVEAU : vivant[i] : 1 si le W n° i est là, 0 s'il est détruit</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">18. une variable — score</p>
+    <pre><code>uint8_t score = 0;        // les W détruits
+
+// ---- NOUVEAU : une flamme sur la case (c, l) : y a-t-il un W ? ----
+// On cherche le W n° i qui est vivant ET sur cette case. S'il y en a un,
+// il est détruit (vivant[i] = 0) et le score gagne 1.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">19. une fonction — toucheW()</p>
+    <pre><code>void toucheW(uint8_t c, uint8_t l) {
+  for (uint8_t i = 0; i &lt; 3; i++) {
+    if (vivant[i] == 1 &amp;&amp; ex[i] == c &amp;&amp; ey[i] == l) {
+      vivant[i] = 0;
+      score = score + 1;
+    }
+  }
+}
+
+// ---- UNE case de flamme (le 0.93.3) ----
+// allume = 1 : on dessine la flamme ; allume = 0 : on l'efface.
+// debout = 1 : une flamme verticale, le | ; debout = 0 : horizontale, le -.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">20. une fonction — caseFeu()</p>
+    <pre><code>void caseFeu(uint8_t c, uint8_t l, uint8_t allume, uint8_t debout) {
+  if (allume == 0) {
+    effacer(c, l, 1);                   // la flamme s'éteint : la case est vide
+  } else {
+    if (lire(c, l) == ALPHABET[22]) {   // NOUVEAU : un W sous la flamme ?
+      toucheW(c, l);
+    }
+    if (debout == 1) {
+      texte(c, l, "|");
+    } else {
+      texte(c, l, "-");
+    }
+  }
+}
+
+// ---- Toute l'explosion (le 0.93.3) : des bras de DEUX cases (le 0.93.4) ----
+//
+//          |
+//          |            chaque bras : jusqu'à 2 cases,
+//      - - - - -        mais il s'arrête au premier X.
+//          |            break : on sort de la boucle, tout de suite.
+//          |</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">21. une fonction — flammes()</p>
+    <pre><code>void flammes(uint8_t allume) {
+  caseFeu(fx, fy, allume, 0);                     // le centre
+  for (uint8_t k = 1; k &lt;= 2; k++) {              // à droite : fx + 1, puis fx + 2
+    if (lire(fx + k, fy) == ALPHABET[23]) break;  // un X : le bras s'arrête là
+    caseFeu(fx + k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k &lt;= 2; k++) {              // à gauche : fx - 1, puis fx - 2
+    if (lire(fx - k, fy) == ALPHABET[23]) break;
+    caseFeu(fx - k, fy, allume, 0);
+  }
+  for (uint8_t k = 1; k &lt;= 2; k++) {              // en bas
+    if (lire(fx, fy + k) == ALPHABET[23]) break;
+    caseFeu(fx, fy + k, allume, 1);
+  }
+  for (uint8_t k = 1; k &lt;= 2; k++) {              // en haut
+    if (lire(fx, fy - k) == ALPHABET[23]) break;
+    caseFeu(fx, fy - k, allume, 1);
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">22. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  // ---- Le terrain : le cadre et les piliers X (le 0.93) ----
+  for (uint8_t l = 0; l &lt; 17; l++) {
+    for (uint8_t c = 0; c &lt; 19; c++) {
+      if (l == 0 || l == 16 || c == 0 || c == 18) {   // le cadre
+        poser(c, l, ALPHABET[23]);
+      }
+      if (c % 2 == 0 &amp;&amp; l % 2 == 0) {                 // les piliers : colonne ET ligne paires
+        poser(c, l, ALPHABET[23]);
+      }
+    }
+  }
+
+  poser(ox, oy, ALPHABET[14]);            // le O à sa place (le 0.93)
+
+  // les trois W, dans trois coins (le 0.93.6)
+  ex[0] = 17;                             // le n° 0 : en bas à droite
+  ey[0] = 15;
+  ex[1] = 17;                             // le n° 1 : en haut à droite
+  ey[1] = 1;
+  ex[2] = 1;                              // le n° 2 : en bas à gauche
+  ey[2] = 15;
+  for (uint8_t i = 0; i &lt; 3; i++) {
+    vivant[i] = 1;                        // NOUVEAU : au départ, les trois sont vivants
+    poser(ex[i], ey[i], ALPHABET[22]);
+  }
+  texte(0, 17, "SCORE");                  // NOUVEAU : le score, sous le terrain
+
+  while (true) {
+    image();
+
+    // ---- le O bouge avec la croix, un pas toutes les 150 ms (le 0.93.1) ----
+    if (chaque(150)) {
+      // 1. la case d'ARRIVÉE : on part de la case actuelle (le 0.82).
+      //    else if : une seule flèche à la fois, pas de pas en diagonale.
+      nx = ox;
+      ny = oy;
+      if (bouton(DROITE)) {
+        nx = ox + 1;
+      } else if (bouton(GAUCHE)) {
+        nx = ox - 1;
+      } else if (bouton(BAS)) {
+        ny = oy + 1;
+      } else if (bouton(HAUT)) {
+        ny = oy - 1;
+      }
+
+      // 2. une flèche est tenue (l'arrivée n'est pas la case où l'on est)…
+      if (nx != ox || ny != oy) {
+        // 3. …et l'arrivée est VIDE : ni X, ni B, ni W, ni flamme. (le 0.93.2)
+        //    lire() rend 0 pour une case vide : c'est l'espace, la tuile 0.
+        if (lire(nx, ny) == 0) {
+          effacer(ox, oy, 1);                 // le O quitte sa case…
+          if (bombe == 1 &amp;&amp; ox == bx &amp;&amp; oy == by) {
+            poser(bx, by, ALPHABET[1]);         // …mais s'il était sur la bombe, la B apparaît (le 0.93.2)
+          }
+          ox = nx;                            // …et va sur la case d'arrivée
+          oy = ny;
+          poser(ox, oy, ALPHABET[14]);
+        }
+      }
+    }
+
+    // ---- A : poser une bombe, là où est le O (le 0.93.2) ----
+    // bombe == 0 : une seule bombe à la fois.
+    // feu == 0 : pas pendant les flammes (le 0.93.3).
+    if (bouton(A) &amp;&amp; bombe == 0 &amp;&amp; feu == 0) {
+      bombe = 1;
+      bx = ox;                              // la bombe est sous le O
+      by = oy;
+      bdelai = 0;                           // on commence à compter (le 0.93.3)
+    }
+
+    // ---- la bombe explose au bout de 2 secondes (le 0.93.3) ----
+    // image() revient 60 fois par seconde : 120 images, 2 secondes.
+    if (bombe == 1) {
+      bdelai = bdelai + 1;
+      if (bdelai == 120) {
+        bombe = 0;                          // plus de bombe…
+        fx = bx;                            // …elle explose, là où elle était
+        fy = by;
+        feu = 1;
+        fdelai = 0;
+        flammes(1);                         // on dessine les flammes
+      }
+    }
+
+    // ---- les flammes s'éteignent au bout d'une demi-seconde (30 images) (le 0.93.3) ----
+    if (feu == 1) {
+      fdelai = fdelai + 1;
+      if (fdelai == 30) {
+        feu = 0;
+        flammes(0);                         // on efface les MÊMES cases
+        poser(ox, oy, ALPHABET[14]);        // le O était peut-être dans une flamme : on le remet
+        for (uint8_t i = 0; i &lt; 3; i++) {   // et les W encore vivants
+          if (vivant[i] == 1) {
+            poser(ex[i], ey[i], ALPHABET[22]);
+          }
+        }
+      }
+    }
+
+    // ---- les W se promènent au hasard (le 0.93.5) : les TROIS, un par un (le 0.93.6) ----
+    if (chaque(400)) {
+      for (uint8_t i = 0; i &lt; 3; i++) {
+        if (vivant[i] == 1) {               // NOUVEAU : un W détruit ne bouge plus
+          d = hasard() % 4;                     // sa direction, au hasard (le 0.93.5)
+          nx = ex[i];
+          ny = ey[i];
+          if (d == 0) nx = ex[i] + 1;
+          if (d == 1) ny = ey[i] + 1;
+          if (d == 2) nx = ex[i] - 1;
+          if (d == 3) ny = ey[i] - 1;
+          if (lire(nx, ny) == 0) {              // seulement sur une case VIDE
+            effacer(ex[i], ey[i], 1);
+            ex[i] = nx;
+            ey[i] = ny;
+            poser(ex[i], ey[i], ALPHABET[22]);
+          }
+        }
+      }
+    }
+
+    nombre(6, 17, score);                   // NOUVEAU : le score, à chaque image
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADIklEQVR4nO2ZQW4DIRAEc8wTcvT/X5Mn+Bk+5mBp17JhlrUZGjol1YFMWra1vcA0fF1vv98/l+vt9w7jdcdFvib5cYwTDd50r2rqa9WrBgdq6mvVywbP9iZSf69eNniG/YPx52MMNh9XDQZjohl8//OO/If+Q2RLNIyh5xJd7MowWEu8sp7ooosfgcFyHl2M3QlgBs9LYHBuDoYxbO3tU5/brcmii9ZCDoZjDmZwEfQL6THYXH9wmxR/B/r59cf3wfF3oJ9czww217MHm+sx2FxPDjbnnRkMWtKXaNAyIgeDlhE5GLTk5mDQkpuDQQtNljnkYNjhJMtcj8Hmem6TzPXcB5vrmcHmevZgcz0Gm+vJweZwkrUe6Us0aBmRg0HLiBwMWnJzMGjJzcGghSbLHHIw7HCSZa7HYHM9t0nmeu6DzfXMYHM9e7C5HoPN9eRgczjJWo/0JRq0jMjBoGVEDgYtuTkYtOTmYNBCk2UOORh2OMky12OwuZ7bJHM998HmemawuZ492FyPweZ6crA5nGStR/oSDVpG5GDQMiIHg5bcHAxacnMwaKHJMoccDDucZJnrMdhcz22SuZ77YHM9M9hczx5srsdgcz052BxOstYjfYkGLSNyMGgZkYNBS24OBi25ORi00GSZQw6GHU6yzPUYbK7nNslcz32wuZ4ZbK5nDzbXY7C5nhxsDidZ65G+RIOWETkYtIzIwaAlNweDltwcDFposswhB8MOJ1nmegw213ObZK7nPthczww217MHm+sx2FxPDjYnmsFn3yzoSxdfMHheuhlc68owWEvw/Pvk4MdPweDxxM+/Qw7GYC3B8++Tg79/LtsHYfB4as+fJsuEnk0WuPLODGY85xiDzcdVgw97ceqr1KsGB2rqa9XLBs/2JlJ/r142eIb9g/HnYww2H1cNBmP2PXjj8d/FYq1++CHtR56nvjeow/MS/fTUuo9bGPld9rQa3MuAFjZ97ZC9sQ6FJfpDg08t3bHBr0ngbB0KTVbLzItnanGDPPWbHl+F1xeovQ4nDD41blwJAoO7jGHfg7t0rS1LN120wGAw5g83YAQL6iqAdQAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADN0lEQVR4nO2ZQW4rIRBEs8wRsvz3P02OkGNk+ReWZqwYGBjTXVB60lvgdmlsuQx0wcfP7/fn17+f3+8HjPcdF/lY5MsxDjT40L2qqe9VrxrcUFPfq142eLV/IvV79bLBK+wfjN8fY7D5uGowGNOawY+XD+Rf1JihGZmxRMNcwg2udWUYnMON33msi649GoNzeHar/3fuVDKD9dwwODYHw1yONrazn53WZNFF55DRZIErFzO4CPqN9Bhsrr+4TWp/Bvr19df3we3PQL+4nhlsrmcPNtdjsLmeHGzOnRkMWsKXaNCSkYNBS0YOBi2xORi0xOZg0EKTZQ45GE44yTLXY7C5ntskcz33weZ6ZrC5nj3YXI/B5npysDmcZO1H+BINWjJyMGjJyMGgJTYHg5bYHAxaaLLMIQfDCSdZ5noMNtdzm2Su5z7YXM8MNtezB5vrMdhcTw42h5Os/QhfokFLRg4GLRk5GLTE5mDQEpuDQQtNljnkYDjhJMtcj8Hmem6TzPXcB5vrmcHmevZgcz0Gm+vJweZwkrUf4Us0aMnIwaAlIweDltgcDFpiczBoockyhxwMJ5xkmesx2FzPbZK5nvtgcz0z2FzPHmyux2BzPTnYHE6y9iN8iQYtGTkYtGTkYNASm4NBS2wOBi00WeaQg+GEkyxzPQab67lNMtdzH2yuZwab69mDzfUYbK4nB5vDSdZ+hC/RoCUjB4OWjBwMWmJzMGiJzcGghSbLHHIwnLRm8Oi4BnqhHoPN9a0uuvGgdW5L0HcZXFQ/P6X2bj/oJfrrGXz5Vv+3QZ+vv9iDjwexB2+qp8ky15ODzeEka12mrKAYvC7TDL7RxUECU84huA9elynnEMzgdZlyDsEevC5TziEweF1mNlngysyTLMbaMQabj6sGX/bi1HepVw1uqKnvVS8bvNo/kfq9etngFfYPxu+PMdh8XDUYjDn34IPnt4vFWv3yIcVHFRn63EYd/i7Rf3616eMeMj/Lnl6DZxnQw6GvHbJ31qGwRL9p8NDS3Tb4NQmM1qHQZPXMvPZMLW6QQ9/p+a/w+gfqr8OAwUPjzpWgYfCUMZx78JSutWfpposWGAzG/Af28AQLcxEtjwAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout d’une seconde — image 60</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADK0lEQVR4nO2aQW4DIRAEfcwTcvT/X5Mn5Bk55mBp17KBZdfMNLRKqgMZt7yW28A05Pb79/P1ff/9+3nAeN1xkdskH45xoMGb7l1Nfa161eCGmvpa9bLBs/0SqV+rlw2eYf9g/PkYg83HVYPBmNYMfvz5QP5BjTk1IzOWaBhLuMG1rgyDc7jwPZ/romtvjcE5PLvV/z13KpnBei4YHJuDYSxbG9vZzw5rsuiic8hossCVgxlcBP1Cegw21x/cJrWfgX5+/fF9cPsZ6CfXM4PN9ezB5noMNteTg825MoNBS/gSDVoycjBoycjBoCU2B4OW2BwMWmiyzCEHww4nWeZ6DDbXc5tkruc+2FzPDDbXsweb6zHYXE8ONoeTrPUIX6JBS0YOBi0ZORi0xOZg0BKbg0ELTZY55GDY4STLXI/B5npuk8z13Aeb65nB5nr2YHM9BpvrycHmcJK1HuFLNGjJyMGgJSMHg5bYHAxaYnMwaKHJMoccDDucZJnrMdhcz22SuZ77YHM9M9hczx5srsdgcz052BxOstYjfIkGLRk5GLRk5GDQEpuDQUtsDgYtNFnmkINhh5Mscz0Gm+u5TTLXcx9srmcGm+vZg831GGyuJwebw0nWeoQv0aAlIweDlowcDFpiczBoic3BoIUmyxxyMOxwkmWux2BzPbdJ5nrug831zGBzPXuwuR6DzfXkYHM4yVqP8CUatGTkYNCSkYNBS2wOBi2xORi00GSZQw6GHU6y5tWfHWPwYvphBk91+4G+x8iMHIw+Wv/sYu3VQ5jB8+obBsfmYPQ5+q/v+2YkTZahfmSTBa5kzGAYy3RLNIwlPAdjsJzYHNzOZ5BDYA7GYDnhObiYzyAHmixzyMGw05rBjNcaY7D5uGpwoyujvla9anBDTX2tetng2X6J1K/VywbPsH8w/nyMwebjqsFgzL4Hbzy/XCzW6odv0n+0eeq5jTq8LtEv39rwcQ+Zz7Kn1+BRBvSw6Wv/bNZZh8IS/aHBp5butsHvSeBsHQpNVs/Ma8/U4gZ56jM9/xTef0D9dThh8Klx50rQMHjIGPY9eEjX2rN000ULDAZj/gEGuwQL7+DB6QAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout de trois secondes — image 180</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADLUlEQVR4nO2bS47rIBREe9hL6GHvfzVZQpaRYQ8imSjBGGMuBdVHOgPefSXbosKnQP11f9y+f37vj9sT2uu2s3xN8nG0Aw3edJ9q6mvVdw0uqKmvVc8bPNsvkXpbPW/wDOsH7ettDDZv7xoMxpRG8POfT+QfuhCnRlj081umaOhoQPTzS7toDB5gwJVX1O6i9z4Fg6/3fly/VT6ZERzV9aEGx+ZgOOz9zYAp1mB20UIDop9PDjbnYARnQb+QHoPN9Qe3SeV3oJ9ff3wfXH4H+sn1jGBzPWuwuR6DzfXkYHNaRjBoCZ+iQcuIHAxaRuRg0BKbg0FLbA4GLWyyzCEHQ4KTLHM9BpvruU0y13MfbK5nBJvrWYPN9RhsricHm8NJ1nqET9GgZUQOBi0jcjBoic3BoCU2B4MWNlnmkIMhwUmWuR6DzfXcJpnruQ821zOCzfWsweZ6DDbXk4PN4SRrPcKnaNAyIgeDlhE5GLTE5mDQEpuDQQubLHPIwZDgJMtcj8Hmem6TzPXcB5vrGcHmetZgcz0Gm+vJweZwkrUe4VM0aBmRg0HLiBwMWmJzMGiJzcGghU2WOeRgSHCSZa7HYHM9t0nmeu6DzfWMYHM9a7C5HoPN9eRgczjJWo/wKRq0jMjBoGVEDgYtsTkYtMTmYNDCJssccjAkOMky12OwuZ7bJHM998HmekawuZ412FyPweZ6crA5PU+yej3nvzHdFN3rQ6Gt30bk4C4fCs39NiIHl9+KwdH9FpuDO34oNPRbbA4uvHV7MQbH9RubrMUgB0M7nGSZ6zHYXM9tkrme+2BzPSPYXM8abK7HYHM9Odgc/rJhPcKnaNAyIgeDlhE5GLTE5mDQEpuDQQubLHPIwZAojWDaa7Ux2Ly9a3BhV0Z9rfquwQU19bXqeYNn+yVSb6vnDZ5h/aB9vY3B5u1dg8GYtAZvvP53trhXP3xI/Z+0nHpvoQ7vU/Rbr3Vv1zDyXfbUGtzLgBo2/dugPFuHzBR90eBTU3fZ4M8kcLYOmU1Wzcgrj9TsAnnqm15/Cp8/oPo6nDD4VLtyJigY3KUNaQ3usmutmbrZRQsMBmP+AFVFBAuGNFswAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>au bout de sept secondes — image 420</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADSElEQVR4nO2cS24rIRREM8wSMsz+V5MlZBkZZmCp24qBBppLQeVIZ8C7rmesLvMpkPP2/fP1/vH5/fP1gPa+7SRvi3w42oEGH7pXNfW96lmDC2rqe9XTBq/2TaTeV08bvML6Qft+G4PN21mDwZjSCH7884H8gy5I00hS9dszRYP2+fRM0cldGQYPfNARXdfuonMfEYPrn/L851PZIyP47iOWGBybg+F4JseDXnoNZhc94UGr+iUHm3MxgpOg30iPweb6i9ukch/o19df3weX+0C/uJ4RbK5nDTbXY7C5nhxsTs8IBi3hUzRomZGDQcuMHAxaYnMwaInNwaCFTZY55GA44STLXI/B5npuk8z13Aeb6xnB5nrWYHM9BpvrycHmcJK1H+FTNGiZkYNBy4wcDFpiczBoic3BoIVNljnkYDjhJMtcj8Hmem6TzPXcB5vrGcHmetZgcz0Gm+vJweZwkrUf4VM0aJmRg0HLjBwMWmJzMGiJzcGghU2WOeRgOOEky1yPweZ6bpPM9dwHm+sZweZ61mBzPQab68nB5nCStR/hUzRomZGDQcuMHAxaYnMwaInNwaCFTZY55GA44STLXI/B5npuk8z13Aeb6xnB5nrWYHM9BpvrycHmcJK1H+FTNGiZkYNBy4wcDFpiczBoic3BoIVNljnkYDgZeZLV2m59f/Qdegw214+8TSp0vM7tyn/Tj7wPfu419+qd90ffoR8/gi9f6n5/9B36wWvw0TFr8CJ6NlnmenKwOZxk6VluioaxrJiDYSAdA2xGDoZRlM8Pyv/rEkawng6DY3MwjCV3flDQJ9tJMFgPORj64ZcN5noMNtfz60JzPb8PNtczgs31rMHmegw215ODzeEkaz/Cp2jQMiMHg5YZORi0xOZg0BKbg0ELmyxzyMFwUhrBtPdqY7B5O2twYVdGfa961uCCmvpe9bTBq30TqffV0wavsH7Qvt/GYPN21mAw5lyDD55fThZz9cs3qfxpRmu/hTr8naL/PLXh7Rpm9mVPrcGjDKjh0Of+mEtlHRJT9E2Dm6bussGvSaC1DolNVs3IK4/U5ALZ9JmevwqvX6D6OjQY3NSunAkKBg9pw7kGD9m11kzd7KIFBoMxvxTkBAtnw/ENAAAAAElFTkSuQmCC" alt="l’écran après A">
+    <figcaption><strong>A</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADS0lEQVR4nO2cS24rIRREM8wSMnz7X02WkGVkmMGTui0baKC5FJSPdAboumKsLvMpkPPx8/v9+fXv5/f7P7T3bSf5WOTD0Q40+NC9qqnvVc8aXFBT36ueNni1byL1vnra4BXWD9r32xhs3s4aDMZcjOCDpz/L1d+KppGk6nfkFP1ubGNwbleGwQMfdETXtbvo3EfMTdEY/PqU5z+Hyh4ZwXcfscRgTQ5+N465bfJ+c+Qmi130qAet6pccbE5pBOdAv5Eeg831F7dJ5T7Qr6+/vg8u94F+cT0j2FzPGmyux2BzPTnYnJ4RDFrCp2jQMiMHg5YZORi0xOZg0BKbg0ELmyxzyMFwwkmWuR6DzfXcJpnruQ821zOCzfWsweZ6DDbXk4PN4SRrP8KnaNAyIweDlhk5GLTE5mDQEpuDQQubLHPIwXDCSZa5HoPN9dwmmeu5DzbXM4LN9azB5noMNteTg83hJGs/wqdo0DIjB4OWGTkYtMTmYNASm4NBC5ssc8jBcMJJlrkeg8313CaZ67kPNtczgs31rMHmegw215ODzeEkaz/Cp2jQMiMHg5YZORi0xOZg0BKbg0ELmyxzyMFwwkmWuR6DzfXcJpnruQ821zOCzfWsweZ6DDbXk4PN4SRrP8KnaNAyIweDlhk5GLTE5mDQEpuDQQubLHPIwXAy8iSrtd36/ug79Bhsrh95m1ToeJ3blXfTj7wPfuw19+qd90ffoR8/gi9f6n5/9B36wWvw0TFr8CJ6NlnmenKwOZxk6VluioaxrJiDYSAdA2xGDoZRlM8Pyn91CSNYT4fBsTkYxpI7Pyjok+0kGKyHHAz98MsGcz0Gm+v5daG5nt8Hm+sZweZ61mBzPQab68nB5nCStR/hUzRomZGDQcuMHAxaYnMwaInNwaCFTZY55GA4KY1g2nu1Mdi8nTW4sCujvlc9a3BBTX2vetrg1b6J1PvqaYNXWD9o329jsHk7azAYc67BB48vJ4u5+uWbVP40o7XfQh2ep+inpza8XcPMvuypNXiUATUc+tw/c6msQ2KKvmlw09RdNvg1CbTWIbHJqhl55ZGaXCCbPtPjV+H1C1RfhwaDm9qVM0HB4CFtONfgIbvWmqmbXbTAYDDmDyn309yqX85gAAAAAElFTkSuQmCC" alt="l’écran après DROITE">
+    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADUklEQVR4nO2cS27jMBBEs5wjZDn3P02OkGNkOYsBJMMmaYpid5GVB7wF0a5Ihsr8FAnl4/vn68/n3++fr//Q3rdd5GORL0c70OBD96qmvle9anBDTX2vetng1X6J1MfqZYNXmD9o329jsHm7ajAY86YHHzz9Wa0OV3tY9PVnDtGQ83xGhujiqgyDEwy4c4veVXTtq9SGaAzuf/pxz6fzyvTgqEcfarAmB8PxTA4DlpiDWUULDYi+PjnYnFYProF+Iz0Gm+vfnCa174F+ff378+D2PdAvrqcHm+uZg831GGyuJwebM9KDQUv4EA1aMnIwaMnIwaAlNgeDltgcDFpYZJlDDoYTdrLM9Rhsruc0yVzPebC5nh5srmcONtdjsLmeHGwOO1n7ET5Eg5aMHAxaMnIwaInNwaAlNgeDFhZZ5pCD4YSdLHM9BpvrOU0y13MebK6nB5vrmYPN9RhsricHm8NO1n6ED9GgJSMHg5aMHAxaYnMwaInNwaCFRZY55GA4YSfLXI/B5npOk8z1nAeb6+nB5nrmYHM9BpvrycHmsJO1H+FDNGjJyMGgJSMHg5bYHAxaYnMwaGGRZQ45GE7YyTLXY7C5ntMkcz3nweZ6erC5njnYXI/B5npysDnsZO1H+BANWjJyMGjJyMGgJTYHg5bYHAxaWGSZQw6Gk5k7WVfbV6+PfkCPweb6madJjRuvc7ry2/Qzz4Mf71r79M710Q/o5/fgtx8NXx/9gH7yHHzcmDl4ET2LLHM9OdgcdrLymPWcw4doSDBm1nU4TcpjYkfKyMFwx5X7Tzs2B8OwJVMedWwOhmFXivsEA9cptotgcB7KRRa4wpsN5noMNtfzdqG5nveDzfX0YHM9c7C5HoPN9eRgc9jJ2o/wIRq0ZORg0JKRg0FLbA4GLbE5GLSwyDKHHAwnrR5Me682Bpu3qwY3VmXU96pXDW6oqe9VLxu82i+R+li9bPAK8wft+20MNm9XDQZjzjn44PHjYrFWf3uR/lc2Lt23UYfnIfrpqU1v95B5L3t6DZ5lQA+HvvbPXDrrUBiibxp8aehuG/yaBK7WobDI6ul57Z5anCAvfafHn8LrD6i/DhcMvtTuHAkaBk9pwzkHT1m19gzdrKIFBoMx/wAp99PcE3mWnQAAAABJRU5ErkJggg==" alt="l’écran après GAUCHE">
+    <figcaption><strong>GAUCHE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADUElEQVR4nO2bS27jMBBEs8wRspz7nyZHyDGyzGIAybBJipLYXWT5AW9BtCuSoDI/RcYfP7/fn1//fn6//0N73XaRj0kejnagwZvuVU19rXrV4Iaa+lr1ssGzfROpX6uXDZ5h/qB9v43B5u2qwWDMQQ/eePqzWh3O9rDo648coiHn/VwZoourMgxOMODOLXpX0bVHqQ3RGNz/9uPeT+eV6cFRrz7UYE0Ohu2dbAZMMQezihYaEH19crA5rR5cA/1Cegw21x+cJrXvgX5+/fF5cPse6CfX04PN9czB5noMNteTg8250oNBS/gQDVoycjBoycjBoCU2B4OW2BwMWlhkmUMOhh12ssz1GGyu5zTJXM95sLmeHmyuZw4212OwuZ4cbA47WesRPkSDlowcDFoycjBoic3BoCU2B4MWFlnmkINhh50scz0Gm+s5TTLXcx5srqcHm+uZg831GGyuJwebw07WeoQP0aAlIweDlowcDFpiczBoic3BoIVFljnkYNhhJ8tcj8Hmek6TzPWcB5vr6cHmeuZgcz0Gm+vJweawk7Ue4UM0aMnIwaAlIweDltgcDFpiczBoYZFlDjkYdtjJMtdjsLme0yRzPefB5np6sLmeOdhcj8HmenKwOexkrUf4EA1aMnIwaMnIwaAlNgeDltgcDFpYZJlDDoadkTtZZ9tnr4/+gh6DzfUjT5MaN57ndOXd9CPPgx/vWvv0zvXRX9CP78GHH12+PvoL+sFz8HZj5uBJ9CyyzPXkYHPYyVqP8CEatGTkYNCSkYNBS2wOBi2xORi0sMgyhxwMO/yyIU8v2enD4DcweKrTD2N9w5i45+H3wXn6R1dqnw5/Hnpwnr5hcGwPXmUOW10vOS/H4PdYZIEr7GStR/gQDVoycjBoycjBoCU2B4OW2BwMWlhkmUMOhp1WD6a9VhuDzdtVgxurMupr1asGN9TU16qXDZ7tm0j9Wr1s8AzzB+37bQw2b1cNBmP2OXjj8eNisVY/vEjxUkVO3bdRh+ch+umtDW/3kHkve3oNHmVAD5u+9s9pnXUoDNE3DT41dLcNfk0CZ+tQWGT19Lx2Ty1OkKee6fGr8PoF6q/DCYNPtTtHgobBQ9qwz8FDVq09QzeraIHBYMwfWpzT3CauDmAAAAAASUVORK5CYII=" alt="l’écran après HAUT">
+    <figcaption><strong>HAUT</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADTUlEQVR4nO2cS27sIBREM8wSMsz+V5MlZBkZZhDJbnUDBnw/UDnSGaDb9XDkaj4F6vf2/fP1/vH5/fP1B+1920XeFvnjaDsafOhe1dT3qlcNbqip71UvG7zaN5H6XL1s8ArrB+37bQwWb1cNBmEuRvDB0z+r1aHB0Miz6sdyigZDY6z6ae2iMdgWw/c2touuPbI2RWPwfVfuv7fOHhjBcRganJOD4dKVw5hVNlnsog3J3GSBKq0RXAP9RnoMFtdf3Ca1n4F+ff31fXD7GegX1zOCxfWsweJ6DBbXk4PFmRnBkIv7FA25RORgyCUiB0MuvjkYcvHNwZALmyxxyMFwwkmWuB6DxfXcJonruQ8W1zOCxfWsweJ6DBbXk4PF4SRrP9ynaMglIgdDLhE5GHLxzcGQi28OhlzYZIlDDoYTTrLE9Rgsruc2SVzPfbC4nhEsrmcNFtdjsLieHCwOJ1n74T5FQy4RORhyicjBkItvDoZcfHMw5MImSxxyMJxwkiWux2BxPbdJ4nrug8X1jGBxPWuwuB6DxfXkYHE4ydoP9ykaconIwZBLRA6GXHxzMOTim4MhFzZZ4pCD4YSTLHE9BovruU0S13MfLK5nBIvrWYPF9RgsricHi8NJ1n64T9GQS0QOhlwicjDk4puDIRffHAy5sMkShxwMJ5YnWaPt0f7RT+gxWFxveZvUePA6tyv/TW95H/z41Nqnd/pHP6G3H8GXH033j35Cb7wGHw9mDV5EzyZLXE8OFoeTrDis3rP7FA0Bxlj1w21SHIYDKSIHwx1X7r9t3xwM05aYvGrfHAzTrhTPCSb6KbaLYHAcmZssUIVfNojrMVhcz68LxfX8PlhczwgW17MGi+sxWFxPDhaHk6z9cJ+iIZeIHAy5RORgyMU3B0MuvjkYcmGTJQ45GE5aI5j2Xm0MFm9XDW7syqjvVa8a3FBT36teNni1byL1uXrZ4BXWD9r32xgs3q4aDMKca/DB48fFYq1+2Un/TzaGntuow/MU/fTWzNs9RD5Lnl6DrQzo4dDX/jOXzjoUpuibBg9N3W2DX5PAaB0Km6yekdceqcUFcuhvevwqvH6B+uswYPBQu3MmaBhs0oZzDTbZtfZM3eyiEwwGYX4BObPT3LBEUVEAAAAASUVORK5CYII=" alt="l’écran après BAS">
+    <figcaption><strong>BAS</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Pose des bombes sur le chemin des W : une flamme qui en touche un le détruit, et le SCORE monte.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>au départ : SCORE 000 </li>
+
+  <li>à force de bombes, un W est détruit <span class="detail"> (score = 1)</span></li>
+
+  <li>il ne reste que les W vivants à l’écran <span class="detail"> (2 W)</span></li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>0.93.8. Un jeu de bombes — touché : la partie s’arrête</strong> — chapitre 0 : Avant tout.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

@@ -110,7 +110,10 @@ b.egal('celui de la voix 2 aussi', gb.mmu.read(0xc0b0), 1)
 
 /* ------------------------------------------- un air qui s'arrête tout seul */
 
-const FINI = `
+const FINI = `#include <Air>
+#include <jouer>
+#include <airFini>
+
 Air COURT = { "DO4 12", "MI4 12", "--" };
 uint8_t fini = 0;
 int main() {
@@ -137,7 +140,8 @@ b.verifier('la voix se tait à la fin', !apres.gb2.apu.canal2.joue)
 
 /* ------------------------------------------------- ce qui doit être refusé */
 
-const refuser = (source) => () => compiler(analyser(source))
+/* « libre » : ces refus-là ne portent pas sur les « #include ». */
+const refuser = (source) => () => compiler(analyser(source), { libre: true })
 
 b.refuse('une hauteur qui n’existe pas est nommée',
   refuser('Air FANFARE = { "UT4 12" }; int main() { jouer(1, FANFARE, 8); return 0; }'),
@@ -161,7 +165,10 @@ b.refuse('un air ne se joue pas sur la voix du bruit',
 
 /* ------------------------------------------------ l'atelier de la page */
 
-const PROGRAMME = `Air THEME = {
+const PROGRAMME = `#include <Air>
+#include <jouer>
+
+Air THEME = {
   "DO4 12", "==", "--", "MI4 9",
 };
 

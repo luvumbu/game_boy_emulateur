@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 133 — Ralentir sans compter les images à la main</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 23 — Un vrai jeu</span>
+    
+    
+    <span>leçon 133 sur 143</span>
+    <span class="jauge" style="--part: 90%">difficulté 9 / 10</span>
+    
+    
+    
+  </p>
+<h1>133. Ralentir sans compter les images à la main</h1>
+<p class="idee">`retard()` dit quand le tour de boucle a débordé.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><code>retard()</code> rend 1 si le tour précédent a duré <strong>plus d’une image</strong>. C’est la seule façon honnête de savoir qu’un jeu ne tient plus les soixante images par seconde : le compteur d’images de la page mesure le navigateur, pas la console.</p>
+<p>Redessiner trois cent soixante tuiles à chaque tour est un bon moyen de faire monter ce compteur. <strong>Un vrai jeu ne redessine que ce qui a changé</strong> — et c’est exactement le débordement qui fait rater un <code>images() % 20 == 0</code>.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;nombre&gt;</code> → <a href="lecon-00-8.3-la-fonction-nombre-ecrire-un-nombre.html">0.8.3. La fonction nombre() — écrire un nombre</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1011 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()          102 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← poser()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre     33 o  ← nombre()  — écrit un nombre en chiffres
+  CopierTuiles     18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          704 o  ← CopierTuiles  — la police entière
+  "RETARDS"         7 o  ← texte()  — un texte gravé
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser()  × 1    23 o sur place, dans main()  + AdresseCase (10 o)
+  texte()  × 1    11 o sur place, dans main()  + EcrireTexte (10 o)
+  nombre() × 1    10 o sur place, dans main()  + EcrireNombre (33 o)
+  image()  × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+  retard() × 1     2 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : redessine tout l'écran à chaque tour (trop de travail !),
+// et compte les tours qui ont duré plus d'une image.
+//
+// retard() rend 1 si le tour d'avant a pris PLUS d'une image (1/60 de seconde).
+// Un jeu qui prend du retard ralentit : un vrai jeu ne redessine
+// que ce qui a changé.
+
+#include &lt;poser&gt;    // pose une tuile sur une case du fond
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre en chiffres</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                    // Le jeu commence ici.
+  uint8_t sautees = 0;          // Le nombre de tours en retard.
+
+  while (true) {                // Répète pour toujours :
+    // Un travail volontairement lourd, pour voir la mesure bouger. La
+    // première ligne est laissée au compte rendu : la redessiner l'effacerait
+    // aussitôt, et l'on croirait que texte() ne marche pas.
+    for (uint8_t y = 2; y &lt; 18; y++)     // lignes 2 à 17...
+      for (uint8_t x = 0; x &lt; 20; x++)   //   ... toutes les colonnes :
+        poser(x, y, (x + y) % 4);        //     les tuiles 0, 1, 2, 3 à tour de rôle.
+                                         //     16 × 20 = 320 tuiles à chaque tour.
+
+    if (retard()) sautees++;    //   Le tour d'avant a débordé ? On le compte.
+
+    texte(1, 0, "RETARDS");
+    nombre(10, 0, sautees);     //   Le compteur monte : le travail est trop lourd.
+    image();                    //   Attend l'image suivante.
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADGElEQVR4nO3bUW6bUBBAUX92Cf3s/lfTJXQZ/cxPVVlxDI8HxObqSKMI4eQaPMwbJvje/vz9/Sx+/Pz1P57tv3/p2f77l7byBw9pa6zyR873EnFb/hRWt5f/apyzdXtndqffS4KvlODHFejL/dfN7nqCty6hzxK8uqSPXBALS+tEgu9/Lu+/bnaHKnjrqW6t4PHfP+rjvr9EHi+4L/kXze7oEr3pbCeW6PEKPirBm7b7Cf7ySl+4Ed35gc61hq05Hr+LziZYBEKC4yHB8ZDgeEhwPCQ4HhIcDwmOhwTH4zb4/HUQN/18F/8k/u3AR3VnPwrEn+CPJnjw8jn8oPF38peW6Ik3mH7ui38SXwXH+XpwnH/kXfTCweG/im8Ojse/BL//PIc/x1/qwQv0Q7bxv4H/OcGDl8/hB41/En8ywb15scpXwXG+Hhznz9xFL0CvOy9W+ebgeKwk+H3mOfw5/l59NNOrqvyzEjwS+N/AH/WDR24WJk4A/2y+Co7z9eA4f68f/PgnF50Xq3xzcDyW/pP1VvMc/hx/5jtZyV5V5e9N8Ejgv5D/+Ut3I8184gTwX8VXwXG+HhznryT4feY5/Dm+OTge/OA4n5sU57ML43x+cJyvguN8PTjO5wfH+ebgePCD43xuUpzPLozz+cFxvgqO8/XgOJ8fHOebg+PBD47zuUlxPrswzucHx/kqOM7Xg+N8fnCcbw6OBz84zucmxfnswjifHxznq+A4Xw+O8/nBcb45OB784DifmxTnswvjfH5wnK+C43w9OM7nB8f55uB48IPjfG5SnM8ujPP5wXG+Co7z9eA4nx8c55uD48EPjvO5SXE+uzDO5wfH+So4zteD43x+cJxvDo4HPzjO5ybF+ezCOJ8fHOer4DhfD47z+cFxvjk4HvzgOJ+bFOezC+N8fnCcr4LjfD04zucHx/nm4Hjwg+N8blKczy6M8/nBcb4KjvP14DifHxznm4PjwQ+O87lJcT67MM7nB8f5KjjO14PjfH5wnG8Ojgc/OM7nJsX57MI4nx8c56vgOF8PjvP5wXG+OTgeH0sUNSK7ILkFAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADFUlEQVR4nO3bQW4TQRCGUS85AkvufxqOwDFYskGRZZieds9MYn96UglZDnmxU2nXVJz/9uv3z6369v3HR23df/+hrfvvP/SsP/mQnq1df+b5vkXdxt+F3dvjz5p3nr19sLvLX0uD36nBgxP53/vfrrv7DX72JXSrwbsv6VvCzEv9WoPv/612d+oEj0/kZIMHt+f//1nf7vsfkcln96bdnX2JHpyw4w0e+xc1eMvJjN6PWpzB4wvdZxs88B+csy5ln71abjZYBUqD46XB8dLgeGlwvDQ4XhocLw2OlwbH6zb5/uskt/z+Lv8i/3biW3VXvxXIX/BnGzz543P6g+Yf9Ecv0QtfYPl9X/5FvhMc983guH/mVfTgwfG/yrcHx+tvg19/n+Ov+aMZPNBPuc3/BP+xwZM/Pqc/aP5F/mKDe/ti1XeC474ZHPdXrqIH6Pvui1XfHhyvnQa/zj7HX/OPxkczs6rqX9XgmeJ/gj+bD565WFh4AvyrfSc47pvBcf9oPvjfT3nTfbHq24PjNfpN1kvtc/w1f+VvspKzquofbfBM8b/Qf/yju5lhvvAE+F/lO8Fx3wyO+zsNfp19jr/m24PjJR8c92WT4r50YdyXD477TnDcN4Pjvnxw3LcHx0s+OO7LJsV96cK4Lx8c953guG8Gx3354LhvD46XfHDcl02K+9KFcV8+OO47wXHfDI778sFx3x4cL/nguC+bFPelC+O+fHDcd4Ljvhkc9+WD4749OF7ywXFfNinuSxfGffnguO8Ex30zOO7LB8d9e3C85IPjvmxS3JcujPvywXHfCY77ZnDclw+O+/bgeMkHx33ZpLgvXRj35YPjvhMc983guC8fHPftwfGSD477sklxX7ow7ssHx30nOO6bwXFfPjju24PjJR8c92WT4r50YdyXD477TnDcN4Pjvnxw3LcHx0s+OO7LJsV96cK4Lx8c953guG8Gx3354LhvD46XfHDcl02K+9KFcV8+OO47wXHfDI778sFx3x4cL/nguC+bFPelC+O+fHDcd4Ljvhkc9+WD4749OF5/AKHTQSoV744sAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>au bout d’une seconde — image 60</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADFklEQVR4nO3bTW7bQBAFYS1zhCxz/9PkCDlGlt4EgWBDw+GItMTCBzwEhB2XflrNZpuu25+/vx/lx89f//Po6/ffevT1+2/t5U8+pb3Z5M+83kvkNn4XNo/HPzXP2Xv8ZHWXH0uBr1Tgr2eg8WNdrrrbBd57Cn1U4M1T+swHYnBqXSjw/b8z/CtWd6qDxx05WeDB8fz/P+rtvi/hZAdftLqzp+hdr3bhFD3fwUcVeNdxv8Bfj8cXuk++oWujYW+N56+iswWWQBQ4HgWOR4HjUeB4FDgeBY5HgeNR4Hhuk/dfJ3HL93fxT+LfDrxVd/atQPwF/myBJz8+hz9p/Cf5o1P0wgMs3/fFP4mvg+N8MzjOP/IqevDk8F/FtwfH86/A77/P4a/xRzN4QD/kGP8b+J8LPPnxOfxJ45/EXyxwb1+s8nVwnG8Gx/krV9ED6HX3xSrfHhzPRoHfZ5/DX+M/q49mZlWVf1aBZ4L/DfxZP3jmYmHhBeCfzdfBcb4ZHOc/6wd//ZGL7otVvj04ntFvst5qn8Nf46/8TVZyVlX5zxZ4Jvgv5H/+o7uZYb7wAvBfxdfBcb4ZHOdvFPh99jn8Nb49OB5+cJzPTYrz2YVxPj84ztfBcb4ZHOfzg+N8e3A8/OA4n5sU57ML43x+cJyvg+N8MzjO5wfH+fbgePjBcT43Kc5nF8b5/OA4XwfH+WZwnM8PjvPtwfHwg+N8blKczy6M8/nBcb4OjvPN4DifHxzn24Pj4QfH+dykOJ9dGOfzg+N8HRznm8FxPj84zrcHx8MPjvO5SXE+uzDO5wfH+To4zjeD43x+cJxvD46HHxznc5PifHZhnM8PjvN1cJxvBsf5/OA43x4cDz84zucmxfnswjifHxzn6+A43wyO8/nBcb49OB5+cJzPTYrz2YVxPj84ztfBcb4ZHOfzg+N8e3A8/OA4n5sU57ML43x+cJyvg+N8MzjO5wfH+fbgePjBcT43Kc5nF8b5/OA4XwfH+WZwnM8PjvPtwfHwg+N8blKczy6M8/nBcb4OjvPN4DifHxzn24Pj+QBe7jnyuxz8UwAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout de trois secondes — image 180</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAADGElEQVR4nO3bQW6bYBBAYS97hC57/9P0CD1Gl91UkeUU+PkNsXn9pFFETHgGxsMwwe/26/fPpfj2/cdHLL1+v2rp9ftVe/mDu7Q3Nvkjx3uJuK2fhc3l9a3GOXuXn8zu9HtJ8AUSvLlvS5V6uexuJ3jvJXQpwZuX9M2T/rDJ4dn9+PX+59WzO1TBew91bwWP//2xp3vpg/jPtRfN7ugletfRTlyixyv4qDO+ee35vxL8eXn9Rndvglf4D5xjb6EH7/azCRaBkOB4SHA8JDgeEhwPCY6HBMdDguMhwfG4DT5/HcRNP9/FP4l/O/BR3dmPAvEn+KMJHvz4HL7T+E/y1y7RE28w/dwX/yS+Co7z9eA4/8i76JWdw38V3xwcj78Jfv95Dn+Ov9aDV+iHLON/Af8xwYMfn8N3Gv8k/mSCe/Nila+C43w9OM6fuYtegV53XqzyzcHx2Ejw+8xz+HP8Z/XRTK+q8s9K8EjgfwF/1A8euVmYOAD8s/kqOM7Xg+P8Z/3gz5tcdF6s8s3B8Vj7T9ZbzXP4c/yZ72Qle1WV/2yCRwL/hfzHL92NNPOJA8B/FV8Fx/l6cJy/keD3mefw5/jm4Hjwg+N8blKczy6M8/nBcb4KjvP14DifHxznm4PjwQ+O87lJcT67MM7nB8f5KjjO14PjfH5wnG8Ojgc/OM7nJsX57MI4nx8c56vgOF8PjvP5wXG+OTge/OA4n5sU57ML43x+cJyvguN8PTjO5wfH+ebgePCD43xuUpzPLozz+cFxvgqO8/XgOJ8fHOebg+PBD47zuUlxPrswzucHx/kqOM7Xg+N8fnCcbw6OBz84zucmxfnswjifHxznq+A4Xw+O8/nBcb45OB784DifmxTnswvjfH5wnK+C43w9OM7nB8f55uB48IPjfG5SnM8ujPP5wXG+Co7z9eA4nx8c55uD48EPjvO5SXE+uzDO5wfH+So4zteD43x+cJxvDo4HPzjO5ybF+ezCOJ8fHOer4DhfD47z+cFxvjk4HvzgOJ+bFOezC+N8fnCcr4LjfD04zucHx/nm4Hj8AcKiQSq1toDwAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>au bout de sept secondes — image 420</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Le compteur de retards monte : la boucle ne tient pas l’image.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>l’étiquette est écrite </li>
+
+  <li>la boucle déborde vraiment <span class="detail"> (8 → 68)</span></li>
+
+  <li>et le compteur est affiché </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>134. Passer à la salle suivante, sans bouton</strong> — chapitre 23 : Un vrai jeu.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

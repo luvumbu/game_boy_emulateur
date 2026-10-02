@@ -79,9 +79,11 @@
 
 
   <p class="reperes">
-    <span class="niveau">Niveau 0 — Avant tout</span>
-    <span>leçon 0.32 sur 82</span>
-    <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
+    <span class="niveau">Chapitre 0 — Avant tout</span>
+    
+    <span class="niveau">Partie C — Déplacer une lettre</span>
+    <span>leçon 0.32 sur 143</span>
+    <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
@@ -97,9 +99,41 @@
 <p><strong>La boucle <code>for</code></strong> fait tourner <code>i</code> de 0 à 3 : <code>sizeof(PAS_X)</code> vaut 4, le nombre de cases (comme <code>sizeof(ALPHABET)</code> au 0.9). Et la boucle <code>while (true)</code> autour recommence le trajet sans fin.</p>
 <p><strong>Pour changer le chemin</strong>, on ne touche qu’aux tableaux. Essaie <code>{ 3, 3, 3, -9 }</code> et <code>{ 3, -3, 3, 0 }</code> : un zigzag. Ajoute des cases, la boucle suit toute seule.</p>
 
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;deplace&gt;</code> → <a href="lecon-00-25.3-la-fonction-deplace-avancer-sur-les-deux.html">0.25.3. La fonction deplace() — avancer sur les deux axes</a></li>
+  <li><code>#include &lt;ALPHABET&gt;</code> → <a href="lecon-00-1.4-alphabet-les-lettres-de-la-police.html">0.1.4. ALPHABET — les lettres de la police</a></li>
+</ul>
+</div>
+
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>1836 octets</strong> de cartouche.</p>
+<strong>1195 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        62 o  ← la console, à l’allumage  — la mise en route de la console
+  deplace()       236 o  ← main()  — une fonction fournie par le langage
+  main()           67 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EffacerCases  — attend de pouvoir écrire une case
+  AdresseCase      10 o  ← poser(), effacer()  — trouve l’adresse d’une case de l’écran
+  EffacerCases     12 o  ← effacer()  — efface des cases
+  CopierTuiles     18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          704 o  ← CopierTuiles  — la police entière
+  PAS_X_0           4 o  ← main()  — une table gravée
+  PAS_Y_1           4 o  ← main()  — une table gravée
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser()   × 2    26 o sur place, dans deplace()  + AdresseCase (10 o)
+  effacer() × 1    15 o sur place, dans deplace()  + AdresseCase (10 o), EffacerCases (12 o)
+  image()   × 1     3 o sur place, dans deplace()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  deplace() × 1    39 o sur place, dans main()</code></pre>
 
 
 <div class="morceau">
@@ -107,7 +141,10 @@
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
     <pre><code>// Le trajet : un côté par case. PAS_X[i] et PAS_Y[i] vont ensemble.
 //                         côté 0   côté 1   côté 2   côté 3
-//                         droite   bas      gauche   haut</code></pre>
+//                         droite   bas      gauche   haut
+
+#include &lt;deplace&gt;    // fait avancer une tuile sur les deux axes
+#include &lt;ALPHABET&gt;   // les lettres de la police : ALPHABET[0] est le A</code></pre>
   </div>
   <div></div>
 </div>
@@ -219,7 +256,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 
 <p class="pied">
-  Ensuite : <strong>0.32.1. Le trajet dans un tableau — de base, ailleurs</strong> — niveau 0 sur 10.
+  Ensuite : <strong>0.32.1. Le trajet dans un tableau — de base, ailleurs</strong> — chapitre 0 : Avant tout.
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 

@@ -5,6 +5,13 @@
 // mieux méritent de redevenir des arguments, et les portées de reprendre
 // leur place — c'est là tout l'intérêt d'être passé au C++.
 
+#include <poser>        // pose une tuile sur une case du fond
+#include <texte>        // écrit un texte à l’écran
+#include <hasard>       // tire un nombre au hasard
+#include <ecran>        // éteint ou rallume l’écran
+#include <bouton>       // lit un bouton de la manette
+#include <multiplier>   // a * b, quand les deux se calculent
+
 uint8_t LARGEUR = 10;
 uint8_t HAUTEUR = 17;
 uint8_t COLONNE = 1;

@@ -1,5 +1,11 @@
 /* Les quatre nuances de l'écran, et la palette qui les échange. */
 
+#include <Tuile>         // un dessin de 8 × 8 pixels
+#include <texte>         // écrit un texte à l’écran
+#include <poser>         // pose une tuile sur une case du fond
+#include <bouton>        // lit un bouton de la manette
+#include <paletteFond>   // choisit les quatre nuances du fond
+
 Tuile BANDE = { "........", "--------", "++++++++", "########", "........", "--------", "++++++++", "########" };
 
 uint8_t sombre = 0;
