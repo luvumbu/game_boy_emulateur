@@ -2117,3 +2117,948 @@ régénérés. Le projet d'essai `projets/mon_jeu/` est supprimé.
 | `verification/verifier-*.mjs` | adaptés aux `#include` et au parcours |
 | `LISEZMOI.md` | « Apprendre : un seul parcours » ; « Les fonctions fournies — et leur `#include` » |
 | `documents/TUTORIELS.md`, `documents/COURS.md`, `documents/livret.html`, `documents/tutoriel.pdf`, `cours/`, `livrets/`, `tutoriels/` | régénérés |
+
+# Le cours complet en PDF, les leçons en double, et l'onglet « Les sources »
+
+*Le 2026-10-03.*
+
+## 1. Le cours complet, en un PDF
+
+`outils/cours-complet.mjs` (nouveau, `npm run cours-complet`) écrit
+`documents/cours-complet.pdf` et `documents/cours-complet.html` : tout le
+parcours, **dans l'ordre de `tuto.html`** — couverture, sommaire des 25
+chapitres, les 71 `#include` dans leur ordre d'apparition, chaque chapitre et
+ses leçons (avec l'encadré « #include » : ce qui est nouveau, ce qui est déjà
+vu), puis l'index des `#include`.
+
+L'ancien `tutoriel.pdf` avait une couverture de hauteur fixe : le sommaire de
+587 leçons débordait sur les pages suivantes. Ici, aucune hauteur n'est fixée,
+et avant d'imprimer, le script vérifie dans la page qu'**aucun bloc n'en
+recouvre un autre**.
+
+## 2. Les leçons qui se répétaient
+
+Toutes les leçons compilaient et tous les contrôles étaient verts : les
+erreurs étaient des **doublons**.
+
+- **Les 0.5, 0.6 et 0.7** s'appelaient tous « La même ligne, avec… » : on
+  croyait lire trois fois la même leçon. Chaque titre dit maintenant ce qu'il
+  apporte (et ses deux variantes « de base, ailleurs » et « doublé, deux
+  positions » suivent) :
+  - 0.5 — « La boucle for : la ligne en trois lignes de code » ;
+  - 0.6 — « La boucle while : les trois morceaux du for, séparés » ;
+  - 0.7 — « La boucle do … while : au moins un tour ».
+- **Quatre tutos de fonction avaient le programme exact de la leçon qui
+  suit** (comparés sans les commentaires ni les espaces) :
+
+  | Tuto | Doublait | Montre maintenant |
+  |---|---|---|
+  | 0.33.3 `carre()` | le 0.34 | un **C** qui tourne autour de (15, 4) |
+  | 0.66.3 `deplace_croix()` | le 0.71 | un **B** parti de (3, 4) |
+  | 0.70.3 `glisse_croix()` | le 0.70.4 et le 0.73 | un **B** parti du pixel (8, 8) |
+  | 0.86.3 `texteGrand()` | le 0.87 | un grand **B** |
+
+  Leurs contrôles suivent la nouvelle lettre et la nouvelle place.
+- **Le 0.70.4** (« Plus fluide — en simple ») était, lui aussi, le 0.73 mot
+  pour mot. Il montre maintenant un **C** parti du pixel (120, 20).
+- **Deux étapes s'appelaient « Une méthode : la fonction qui connaît son
+  objet »** (88 et 93). Celle des tutoriels devient « Une méthode : ce qu'elle
+  coûte, ce qui reste refusé » ; celle du cours garde son titre (c'est aussi
+  celui de `cours/29-…`).
+
+Après correction : **aucun** programme identique entre deux étapes, aucun
+titre en double.
+
+## 3. L'onglet « Les sources »
+
+Un sixième onglet dans l'atelier, **« 📚 Les sources »** (`index.html#sources`),
+donne le lien de chaque document, ouvert dans un nouvel onglet :
+
+- **les livres** : le cours complet, le livret des leçons, « Passer d'un écran
+  à l'autre », la valorisation — chacun en PDF et en page ;
+- **les 61 cours**, un fichier chacun (PDF et page), lus dans `cours/index.html` ;
+- **les 587 livrets**, un par leçon, rangés par chapitre dans des blocs repliés ;
+  leur nom est calculé avec la règle de `outils/livret.mjs` ;
+- **les textes** : `LISEZMOI.md`, `PARCOURS.md`, `COURS.md`, `TUTORIELS.md`,
+  `CHANGEMENTS.md` et la planche des écrans.
+
+L'onglet ouvert est retenu, comme les autres.
+
+## 4. Régénéré
+
+Les titres ayant changé, les noms des livrets aussi : `livrets/` (1174
+fichiers), `documents/livret.html`, `documents/tutoriel.pdf`,
+`documents/TUTORIELS.md` et `documents/cours-complet.*` sont régénérés.
+
+## 5. Ce qui a été vérifié
+
+- `npm run verifier` : les 14 suites sont vertes (587 leçons, 1629 contrôles,
+  un `#include` nouveau à la fois).
+- Les 1313 liens de l'onglet « Les sources » mènent tous à un fichier qui
+  existe.
+- **Pas encore vu dans un navigateur** : l'affichage de l'onglet lui-même.
+
+## 6. Ce qui reste
+
+- Le **plantage signalé au 0.6** (voir la passe précédente, § 6) n'a toujours
+  pas été reproduit : à reprendre avec le message d'erreur exact.
+- `documents/PARCOURS.md` cite encore les numéros d'avant.
+
+## Les fichiers ajoutés ou mis à jour
+
+| Fichier | Rôle |
+|---|---|
+| `outils/cours-complet.mjs` | **nouveau** : le cours complet en un PDF |
+| `package.json` | le script `cours-complet` |
+| `sources.js` | **nouveau** : l'onglet « Les sources » |
+| `index.html` | l'onglet, sa zone, son style, `#sources` |
+| `tuto/lecons.js` | les titres des 0.5 à 0.7 ; les tutos `carre`, `deplace_croix`, `glisse_croix`, `texteGrand` ; le 0.70.4 |
+| `tuto/tutoriels.js` | le titre de la méthode en double |
+| `LISEZMOI.md` | le cours en PDF ; l'onglet « Les sources » |
+| `documents/cours-complet.*`, `documents/livret.html`, `documents/tutoriel.pdf`, `documents/TUTORIELS.md`, `livrets/` | régénérés |
+
+# Le bouton « LES SOURCES », tes propres #include, et le PDF pour tous les niveaux
+
+*Le 2026-10-04.*
+
+## 1. Le bouton « 🔗 LES SOURCES », dans la barre du haut
+
+L'onglet « 📚 Les sources » n'existait que dans le mode création, parmi les
+onglets des ateliers : il fallait presque deviner qu'il était là. Un bouton
+**« 🔗 LES SOURCES »** (« tous les cours et documents ») rejoint maintenant
+les boutons de mode, à droite de « 🔎 MODE MACHINE », avec le même style. Un
+clic passe en mode création et ouvre les sources ; le bouton brille tant
+qu'elles sont affichées, et « MODE CRÉATION » s'éteint pour qu'un seul bouton
+brille (`allumerLesSources`). La visite guidée le cite.
+
+## 2. Une fonction de plus dans la console : `bande()`
+
+`bande(colonne, ligne, tuile, longueur)` pose la même tuile « longueur » fois,
+de gauche à droite. Elle est écrite **en C++**, comme les fonctions de
+l'élève (`SOURCE_BANDE`, dans `compilateur/emetteur.js`, inscrite dans
+`FONCTIONS_EN_C`), avec son nom dans `BIBLIOTHEQUES` et sa fiche dans
+`aide-fonctions.js` : **72 `#include`**. Elle a son tuto (« La fonction
+bande() »), que le parcours place tout seul avant sa première étape.
+
+Elle sert d'exemple : c'est exactement ce qu'il faut faire pour ajouter une
+fonction à la console.
+
+## 3. Le chapitre « Tes propres #include »
+
+Un chapitre 15 au cours (`tuto/programmation.js`), placé **à la fin du
+parcours** (26 chapitres, 597 étapes). Une seule fonction le traverse, une
+chose nouvelle par étape :
+
+1. `bande()` écrite dans le programme ;
+2. appelée trois fois ;
+3. rangée dans l'onglet `outils.cpp` (`#include "outils.cpp"`) ;
+4. le fichier voisin écrit son propre `#include <poser>` ;
+5. une deuxième fonction, `pile()` ;
+6. *(le tuto de `bande()`)* — puis `#include <bande>` : elle vient de la
+   console, et le texte montre les trois fichiers du compilateur ;
+7. une `bande()` à soi, en pointillés, passe avant celle de la console ;
+8. un cadre, et la marche à suivre en 7 étapes pour ajouter sa fonction.
+
+`verifier-cours.mjs` passe maintenant les fichiers voisins (`lecon.fichiers`)
+au compilateur : les leçons à plusieurs onglets n'existaient jusqu'ici que
+dans `lecons.js`.
+
+## 4. Le PDF « Ajouter son propre #include », pour tous les niveaux
+
+`outils/pdf-include.mjs` (nouveau, `npm run pdf-include`) écrit
+`documents/ajouter-un-include.pdf` et sa page `.html` : 47 pages.
+
+- **Partie 0, les bases**, en douze sections, depuis zéro : fichier et
+  extension, programme et compilateur, l'octet, l'écran et les tuiles, la
+  fonction, la boucle `for` déroulée, la ponctuation du C++, l'atelier,
+  l'éditeur de texte et les touches, la fenêtre de commande, git.
+- Chaque partie affiche son **niveau** (● débutant, ●● intermédiaire,
+  ●●● avancé) et ce qu'il faut avoir lu avant, avec des liens.
+- **A** les deux sortes d'`#include` ; **B** la compilation, d'abord en images
+  (cinq personnes en cuisine), puis avec le vrai code expliqué morceau par
+  morceau ; **C** les étapes du chapitre, avec leurs écrans ; **D** le
+  JavaScript qu'il faut (avec un exercice corrigé) ; **E** la recette ;
+  **F** six erreurs et le message exact du compilateur ; **G** les coûts
+  mesurés ; **H** les questions fréquentes ; **I** l'aide-mémoire à cocher ;
+  **J** les 72 `#include` ; **K** un lexique de 50 mots.
+- **Rien n'est recopié à la main** : le code montré est lu dans les fichiers
+  du compilateur, les messages et les octets viennent d'une vraie
+  compilation, les écrans de l'émulateur.
+
+Il est dans « 🔗 LES SOURCES ».
+
+## 5. Ce que la mesure a appris
+
+**Un appel à `bande()` coûte plus que dix `poser()` écrits en clair** : 911
+octets contre 229. La fonction ne pèse que 38 octets ; mais la tuile lui
+arrive par un **paramètre**, une variable, et le compilateur ne peut plus
+savoir laquelle sera posée : il grave **toute la police** (704 octets) au lieu
+du seul A (16). C'est vrai aussi avec un dessin à soi (`Tuile`). Le PDF
+l'explique (partie G) ; une première version disait le contraire, et a été
+corrigée avant d'être livrée.
+
+## 6. Une erreur corrigée dans les explications
+
+La leçon 15.3 et la foire aux questions du PDF disaient qu'un fichier voisin
+doit être collé **avant** ce qui se sert de ses fonctions. C'est faux pour les
+**fonctions** — le compilateur les relève toutes avant de traduire, et un
+`#include "outils.cpp"` écrit après `main()` est accepté (essayé) — et vrai
+seulement pour les **variables globales** et les **dessins**. Les deux textes
+le disent maintenant.
+
+## 7. Ce qui a été vérifié
+
+- `verifier-cours` : 69 leçons, 259 contrôles, verts.
+- `verifier-tuto` : 597 étapes, 1653 contrôles, verts ; un `#include` nouveau
+  à la fois.
+- Les suites de `npm run verifier`, une par une : toutes vertes, sauf
+  **`verifier-portage`**, qui ne peut pas tourner sur ce PC (il compare avec
+  `../gameboy2/exemples/*.gb`, absent) — sans rapport avec cette passe.
+- `verifier-tutoriels` était rouge (le `.md` en retard sur les leçons) :
+  `documents/TUTORIELS.md` est régénéré.
+- Le PDF : ses 99 liens internes mènent tous quelque part. **Seuls la
+  couverture, le sommaire et la Partie 0 ont été regardés en image** ; le
+  reste a été relu dans le texte de la page.
+- **Pas vu dans un navigateur** : le bouton « 🔗 LES SOURCES » et le chapitre
+  dans l'atelier.
+
+## 8. Ce qui reste
+
+- Régénérer le cours complet (`npm run cours-complet`), les livrets
+  (`npm run livret`) et `documents/PARCOURS.md` : ils ne connaissent pas
+  encore le chapitre 15 ni le tuto de `bande()`.
+- Le tuto de `bande()` ne parle pas du coût de la police (§ 5).
+
+## Les fichiers ajoutés ou mis à jour
+
+| Fichier | Rôle |
+|---|---|
+| `index.html` | le bouton « 🔗 LES SOURCES » et `allumerLesSources` |
+| `compilateur/emetteur.js` | `SOURCE_BANDE`, et `bande` dans `FONCTIONS_EN_C` |
+| `compilateur/inclusion.js` | `bande` dans `BIBLIOTHEQUES` |
+| `aide-fonctions.js` | la fiche de `bande` |
+| `tuto/programmation.js` | le chapitre 15, « Tes propres #include » |
+| `tuto/parcours.js` | le 26e chapitre du parcours |
+| `tuto/lecons.js` | le tuto de `bande()` |
+| `verification/verifier-cours.mjs` | les fichiers voisins des leçons du cours |
+| `outils/pdf-include.mjs` | **nouveau** : le PDF « Ajouter son propre #include » |
+| `documents/ajouter-un-include.*` | **nouveau** : le PDF et sa page |
+| `sources.js` | le PDF dans « Les sources » |
+| `package.json` | le script `pdf-include` |
+| `LISEZMOI.md` | 26 chapitres, 72 `#include`, le bouton, `bande()`, « Ajouter sa propre fonction à la console », le PDF |
+| `README.md` | renvoie vers `LISEZMOI.md` |
+| `documents/TUTORIELS.md` | régénéré |
+
+
+## Plus tard le même jour : l'onglet « 📦 Tout le jeu »
+
+Chaque création de l'atelier vit dans le code, sous son nom — mais dans un
+grand jeu, on ne voyait plus ce qu'on avait, ni où. Un nouvel onglet du mode
+création, **« 📦 Tout le jeu »** (`tout-le-jeu.js`, `index.html#tout`), lit
+**tous les onglets** du programme et range chaque élément en six dossiers :
+Personnages, Tuiles, Cartes, Scènes jouables, Musiques, Couleurs. Chaque
+élément montre sa miniature, son fichier et sa ligne, la ligne à écrire pour
+s'en servir (à copier), et « ✏ ouvrir » le choisit dans son atelier, dans le
+bon onglet. Une recherche filtre par nom.
+
+**L'image de chaque dossier** se choisit par l'élève (« 🖼 », un fichier de
+son ordinateur, réduit à 96 × 96) et se retire (« ✕ »). Elle reste dans le
+navigateur (localStorage) : ce n'est pas le programme, ni la cartouche.
+
+Rien n'est déplacé : l'onglet lit, il n'écrit pas. Les ateliers des tuiles,
+des airs et de la carte ont reçu une méthode `choisir(nom)`.
+
+**Vérifié dans un vrai navigateur** : `npm run tout-le-jeu`
+(`verification/verifier-tout-le-jeu.mjs`, nouveau) — 16 contrôles verts :
+les six dossiers, les comptes de l'exemple « musique », le fichier et la
+ligne, l'appel, la miniature, la recherche, « ✏ ouvrir », l'image choisie
+par un vrai fichier puis retirée, aucune erreur JavaScript.
+`verifier-atelier.mjs` reste vert. Les cartes et les scènes ont été essayées
+hors navigateur (une carte et une scène écrites par les fonctions des
+ateliers, et une tuile dans un second fichier) ; aucun exemple du projet n'a
+encore de carte.
+
+| Fichier | Rôle |
+|---|---|
+| `tout-le-jeu.js` | **nouveau** : l'onglet, l'inventaire, l'image des dossiers |
+| `index.html` | l'onglet, sa zone, son style, `#tout`, le lien avec les ateliers |
+| `editeur-tuiles.js`, `editeur-airs.js`, `editeur-carte.js` | `choisir(nom)` |
+| `verification/verifier-tout-le-jeu.mjs` | **nouveau** : le contrôle dans le navigateur |
+| `package.json` | le script `tout-le-jeu` |
+| `LISEZMOI.md` | « Tout le jeu, d'un coup d'œil » |
+
+
+## Plus tard encore : un seul mode pour créer et écrire
+
+Le **MODE CODE** ne faisait que cacher les ateliers pour agrandir l'éditeur :
+le programme, les fichiers et « + fichier » étaient déjà dans le MODE
+CRÉATION. Deux boutons pour un même travail faisaient croire à deux
+programmes. Il n'y a plus qu'**un mode, « 🎨 MODE CRÉATION »** (« dessiner,
+composer, écrire le code »), et à côté du titre du programme, un bouton
+**« ⤢ Agrandir le code » / « ⤡ Revoir les ateliers »** qui passe d'une vue à
+l'autre. Le bouton de mode reste allumé dans les deux vues.
+
+Rien n'est perdu : la vue « code en grand » est l'ancien mode, avec sa
+hauteur de champ et son aide. Le bouton « MODE CODE » reste dans la page,
+caché, pour l'adresse `index.html#code` et le réglage « Par quoi la page
+s'ouvre » (renommé « Création, le code en grand »). La visite guidée montre
+le nouveau bouton ; elle annonce « Quatre façons de travailler ».
+
+**Vérifié dans un vrai navigateur** : `verifier-page.mjs` (le test complet
+de la page) est vert, avec quatre contrôles nouveaux — plus de bouton à part,
+le bouton présent avec les ateliers, le code en grand sans eux (et « MODE
+CRÉATION » toujours allumé), le retour aux ateliers. `verifier-atelier.mjs`
+et `verifier-tout-le-jeu.mjs` restent verts.
+
+| Fichier | Rôle |
+|---|---|
+| `index.html` | « MODE CODE » caché, « ⤢ Agrandir le code », l'allumage, le titre, le réglage, la visite guidée |
+| `verification/verifier-page.mjs` | le nouveau bouton, au lieu de l'ancien |
+| `LISEZMOI.md`, `outils/pdf-include.mjs` (et le PDF régénéré) | le texte suit |
+
+
+## Plus tard encore : la taille d'un personnage, et son fichier
+
+**Choisir la taille avant de dessiner.** « ▦ Les tuiles » a trois boutons :
+« + tuile 8 × 8 », « + perso 16 × 16 », et le nouveau **« + grand 32 × 32 »**.
+
+**Le `Grand`, 32 × 32** — trois `#include` de plus (75 en tout) :
+
+- `Grand BOSS = { 32 rangées de 32 };` : le compilateur en fait un seul dessin
+  de **seize tuiles**, rangées comme quatre `Perso` à la suite (haut-gauche,
+  haut-droite, bas-gauche, bas-droite) — `enregistrerDessin`, `donnees`,
+  `noterTuile`, la déclaration, les messages (`compilateur/emetteur.js`,
+  `analyseur.js`, `inclusion.js`).
+- `sprite32(n, x, y, BOSS)` : quatre `sprite16` (lutins n à n + 15, 24 au
+  plus), et retourné, les quarts échangés. `cacher32(n)` ôte les seize.
+- Leurs trois tutos dans `tuto/lecons.js` (« Grand — dessiner un grand
+  personnage », « sprite32() », « cacher32() »), placés par le parcours :
+  **600 étapes**, 1 658 contrôles, un `#include` nouveau à la fois.
+- L'atelier (`editeur-tuiles.js`) lit et écrit les `Grand`, les peint (une
+  palette de lutins, le 0 transparent), et « Tout le jeu » les range dans
+  Personnages, avec `sprite32`.
+
+Essayé dans l'émulateur : les seize lutins à leur place avec les seize tuiles
+dans l'ordre, chaque quart de la bonne nuance à l'écran, `MIROIR_X`,
+`cacher32`, et trois refus (sans `#include <Grand>`, au-delà de 24, une rangée
+de moins).
+
+**Ranger les personnages dans `personnages.cpp`** (`ranger-personnages.js`,
+nouveau) :
+
+- une case **« 📁 personnages dans personnages.cpp »** à côté des boutons
+  (retenue par le navigateur, décochée au départ ; seulement en création) :
+  un nouveau personnage s'écrit dans cet onglet, créé s'il manque avec ses
+  `#include`, et versé dans `principal.cpp` par `#include "personnages.cpp"`,
+  avant le code ;
+- dans « 📦 Tout le jeu », le dossier Personnages a **« 📁 Ranger dans
+  personnages.cpp »** : tous les `Perso` et `Grand` des autres onglets y
+  partent, avec leur table de palettes et leurs marques ; « ↶ » le défait.
+
+Essayé hors navigateur sur Mario et `perso16` : le programme compile, et
+l'écran est **identique au pixel près** après deux secondes ; ranger deux fois
+ne change rien.
+
+**Une erreur trouvée en regardant une capture** : la vignette d'un `Grand` en
+couleur était peinte comme une tuile de fond (une condition `cote !== 16`
+existante l'attrapait). Corrigée (`cote === 8`).
+
+**Vérifié** : les 15 suites de `npm run verifier` (sauf `verifier-portage`,
+qui ne tourne pas sur ce PC) ; dans un vrai navigateur, `verifier-page`,
+`verifier-atelier` et `verifier-tout-le-jeu` — ce dernier passe à **29
+contrôles** : Mario rangé (onglet créé, MARIO et ENNEMI dedans, le jeu compile
+pareil, « ↶ » remet tout), la case cochée puis « + grand 32 × 32 » (BOSS
+écrit dans personnages.cpp avec `#include <Grand>`, sa vignette, un vrai clic
+qui peint un pixel et lui seul, et son appel `sprite32` dans « Tout le jeu »).
+
+**Ce qui n'est pas fait** : un `Grand` n'a pas de palette par quart (un
+`Perso` en a) ; il ne peut pas être joueur ou acteur d'une scène ; l'atelier
+ne montre que les dessins de l'onglet ouvert.
+
+| Fichier | Rôle |
+|---|---|
+| `compilateur/emetteur.js`, `analyseur.js`, `inclusion.js` | `Grand`, `sprite32`, `cacher32` |
+| `aide-fonctions.js` | leurs fiches |
+| `editeur-tuiles.js` | « + grand 32 × 32 », les `Grand`, la case de rangement |
+| `ranger-personnages.js` | **nouveau** : ranger dans personnages.cpp |
+| `tout-le-jeu.js` | les Grand, « 📁 Ranger dans personnages.cpp » |
+| `index.html` | le lien entre les deux |
+| `tuto/lecons.js` | trois tutos |
+| `verification/verifier-tout-le-jeu.mjs` | 13 contrôles de plus |
+| `LISEZMOI.md`, `documents/TUTORIELS.md`, `documents/ajouter-un-include.*` | à jour |
+
+
+## Plus tard encore : verrouiller un dessin, comme un modèle
+
+Un personnage fini devient un **modèle** qu'on utilise sans le modifier —
+comme une classe : chaque `sprite16(numero, …, MARIO)` en fait un exemplaire,
+l'original ne bouge pas. **🔒 Verrouiller** (« ▦ Les tuiles », ou « 📦 Tout le
+jeu ») écrit une marque sous le dessin, `/* MARIO : verrouillé */` : elle
+s'enregistre avec le projet et part avec lui dans `personnages.cpp`.
+
+Le garde (`verrous.js`, nouveau, pur) compare l'avant et l'après :
+
+- **un atelier** (`poserLeCode`, genre « atelier ») qui changerait un dessin
+  verrouillé — ses rangées ou sa table de palettes — est refusé, et l'atelier
+  le dit dans sa barre ; renommer un dessin verrouillé aussi ;
+- **la frappe** (`surFrappeDansLeCode`) qui le changerait, l'effacerait ou
+  ôterait sa marque est défaite aussitôt, curseur compris ;
+- les retours en arrière, les versions et les programmes remplacés en entier
+  passent ; la marque se pose et s'ôte par 🔒 / 🔓 seulement.
+
+« ⧉ Dupliquer » devient **« ⧉ Créer une variante »** sur un dessin verrouillé :
+une copie libre. La vignette porte un cadenas ; « Tout le jeu » aussi, avec
+son bouton.
+
+**Un défaut trouvé en chemin** : dans `ranger-personnages.js`, « `\b` » ne
+voit pas la fin d'un mot qui finit par « é » — la marque « verrouillé »
+n'aurait pas suivi son dessin dans `personnages.cpp`. Corrigé, et essayé.
+
+**Vérifié** : hors navigateur, neuf contrôles (la marque, peindre refusé,
+un autre dessin permis, la marque ôtée ou la déclaration effacée à la main
+vues, 🔓 qui rend le texte d'avant, le rangement qui emporte la marque) ;
+dans un vrai navigateur, `verifier-tout-le-jeu` passe à **42 contrôles** —
+verrouiller depuis « Tout le jeu », le cadenas, peindre refusé et dit, taper
+dans ses rangées défait, écrire ailleurs permis, une variante qui se peint
+avec l'original intact, puis 🔓 et le même clic qui peint. `verifier-atelier`,
+`verifier-page`, `verifier-tuto`, `verifier-langage`, `verifier-inclusion` et
+`verifier-exemples` restent verts.
+
+| Fichier | Rôle |
+|---|---|
+| `verrous.js` | **nouveau** : la marque, et ce qui serait refusé |
+| `index.html` | le garde dans `poserLeCode` et à la frappe ; 🔒 / 🔓 ; le cadenas |
+| `editeur-tuiles.js` | le bouton 🔒 / 🔓, « Créer une variante », le refus dit dans la barre |
+| `tout-le-jeu.js` | le cadenas et son bouton |
+| `ranger-personnages.js` | la marque part avec le dessin |
+| `verification/verifier-tout-le-jeu.mjs` | 13 contrôles de plus |
+| `LISEZMOI.md` | « Verrouiller un dessin » |
+
+
+## Plus tard encore : supprimer un élément, seulement s'il ne sert pas
+
+« 🗑 Effacer » ne faisait que vider le dessin : il devient **« 🧽 Vider le
+dessin »** (le nom reste), et **« 🗑 Supprimer »** arrive, qui ôte l'élément du
+programme avec ce qui l'accompagne (table de palettes, marques d'étiquettes,
+de palette, de verrou).
+
+La suppression est **refusée** :
+
+- tant qu'une ligne du projet s'en sert, dans **n'importe quel onglet** — la
+  page dit combien de fois, et où (« SOL est utilisé 1 fois dans le projet…
+  principal.cpp, ligne 186 : t = SOL; ») ;
+- si l'élément est **verrouillé** (un modèle ne se supprime pas).
+
+Les commentaires et les textes entre guillemets ne comptent pas. Un dessin
+compte comme utilisé quand son nom, ou sa table `NOM_PALETTES`, apparaît dans
+le code hors de lui-même. Pris en charge : `Tuile`, `Perso`, `Grand`, `Air`,
+les cartes (le bloc et son défilement). Pas les scènes ni les couleurs.
+
+Dans **« 📦 Tout le jeu »**, chaque élément dit **« ✔ utilisé N fois »** ou
+**« ∅ jamais utilisé »**, et porte **« 🗑 supprimer »**, grisé avec la raison
+quand c'est impossible. Les utilisations sont comptées une fois pour tout
+l'inventaire : chaque fichier n'est nettoyé et relevé qu'une fois
+(`compteurDUtilisations`), et le compte est le même que la recherche détaillée
+(vérifié sur les six dessins de Mario).
+
+**Vérifié** : hors navigateur, quatorze contrôles (SOL utilisé refusé avec sa
+ligne, un dessin inutilisé supprimé avec sa marque et le programme qui
+compile, un verrouillé refusé, un commentaire et un texte qui ne comptent pas,
+une tuile d'`outils.cpp` utilisée dans `principal.cpp` refusée, les airs, une
+carte appelée refusée et une carte libre ôtée en entier) ; dans un vrai
+navigateur, `verifier-tout-le-jeu` passe à **52 contrôles** — le compte et le
+bouton grisé de SOL, une tuile neuve « jamais utilisée » supprimée et dite,
+« ↶ » qui la rend, verrouillée puis refusée, et dans l'atelier « 🗑 Supprimer »
+sur SOL refusé et expliqué. `verifier-atelier`, `verifier-page`,
+`verifier-tuto`, `verifier-langage`, `verifier-exemples` et `verifier-refus`
+restent verts.
+
+| Fichier | Rôle |
+|---|---|
+| `supprimer.js` | **nouveau** : où un élément sert, et le supprimer |
+| `index.html` | `supprimerDuProjet`, le lien avec l'atelier et « Tout le jeu » |
+| `editeur-tuiles.js` | « 🗑 Supprimer », « 🧽 Vider le dessin » |
+| `tout-le-jeu.js` | « utilisé N fois », « 🗑 supprimer » |
+| `verification/verifier-tout-le-jeu.mjs` | 10 contrôles de plus |
+| `LISEZMOI.md` | « Supprimer un élément » |
+
+
+## Plus tard encore : le personnage qu'on voit, et le cours de son #include
+
+**Le tuto « Perso » (35.1) montre enfin le personnage.** Il ne faisait
+qu'écrire « UN PERSO ECRIT » : le dessin n'apparaissait qu'à l'étape d'après,
+avec `sprite16()`. Maintenant, BONHOMME est **dans son fichier**,
+`personnages.cpp` (avec `#include <Perso>`), `principal.cpp` le verse par
+`#include "personnages.cpp"`, et le pose en **quatre cases** du fond avec
+`poser()` — `BONHOMME`, `BONHOMME + 1`, `+ 2`, `+ 3`, les quatre quarts. Le seul
+`#include` nouveau reste `<Perso>` (`poser` est connu depuis le 0.1.3, et les
+fichiers à soi depuis le 0.67).
+
+**Un cours de plus, dans le chapitre 6 « Dessiner »**, juste après les tutos
+des personnages : **35.4 à 35.8**, des étapes intermédiaires — aucun autre
+numéro ne bouge (la 36 reste la 36). Le même BONHOMME, une chose à la fois :
+
+| N° | Étape |
+|---|---|
+| 35.4 | BONHOMME, de son fichier à l'écran : `sprite16()` |
+| 35.5 | Un nouveau fichier qui l'appelle : `heros.cpp`, `montrerHeros(x, y)` |
+| 35.6 | Deux BONHOMME, un seul dessin : le modèle, comme une classe |
+| 35.7 | BONHOMME qui marche, depuis `principal.cpp` |
+| 35.8 | BONHOMME verrouillé : on s'en sert, on ne le modifie pas |
+
+Trois onglets, trois rôles : `personnages.cpp` (à quoi il ressemble),
+`heros.cpp` (ce qu'on en fait), `principal.cpp` (quand et où). Essayé avant
+d'écrire : l'ordre des deux `#include` ne compte pas pour un personnage et
+une fonction.
+
+**Vérifié** : `verifier-tuto` — **605 étapes**, 1 673 contrôles, un `#include`
+nouveau à la fois ; les quinze contrôles des six étapes (le quart haut-gauche
+posé et la tête sombre à sa place ; les lutins, leurs tuiles et leurs places ;
+les deux exemplaires aux mêmes tuiles ; la marche jusqu'à 120 ; le verrou sans
+effet sur le jeu). `verifier-tutoriels` (avec `TUTORIELS.md` régénéré),
+`verifier-tuto-page` et `verifier-page` sont verts dans un vrai navigateur.
+
+| Fichier | Rôle |
+|---|---|
+| `tuto/lecons.js` | le tuto « Perso », et les cinq étapes 35.4 à 35.8 |
+| `documents/TUTORIELS.md` | régénéré |
+
+
+## Plus tard encore : un personnage, un fichier — le parent et ses enfants
+
+En création, un personnage ne s'écrit **plus jamais dans la source
+principale** : il a son fichier, « enfant » de la liste des personnages.
+
+```
+principal.cpp        #include "personnages.cpp"   ← une ligne, écrite une seule fois
+personnages.cpp      le parent : #include "perso_HEROS.cpp", #include "perso_BOSS.cpp"…
+perso_HEROS.cpp      HEROS et son #include <Perso>
+perso_BOSS.cpp       BOSS et son #include <Grand>
+```
+
+- **« + perso 16 × 16 » / « + grand 32 × 32 »** créent l'enfant, ajoutent sa
+  ligne au parent, et l'ouvrent ; la case « 📁 personnages dans
+  personnages.cpp » disparaît — c'est toujours ainsi, en création. Une leçon
+  garde son programme.
+- **L'atelier voit tout le projet** : la bande montre les dessins de tous les
+  onglets (« ↗ » pour un autre onglet), avec les numéros de tuile comptés sur le
+  programme assemblé ; un clic ouvre le fichier du dessin. On ne retouche que
+  le contenu visé.
+- **Renommer** agit partout, fichier et ligne du parent compris ; **⧉ Créer une
+  variante** d'un personnage lui donne son fichier ; **🗑 Supprimer** ôte
+  l'enfant vide et sa ligne.
+- **Les onglets** des personnages sont repliés : « 📁 personnages (N) ▸ ».
+- **« 📦 Tout le jeu »** : « 📁 Un fichier par personnage » range un projet
+  existant (personnages de `principal.cpp`, d'un fichier voisin, ou d'un ancien
+  `personnages.cpp` d'un seul bloc), marques comprises ; « ↶ » le défait.
+
+`ranger-personnages.js` est réécrit (parent et enfants : `creerEnfant`,
+`rangerLesPersonnages`, `renommerDansLeProjet`, `nettoyerLesEnfants`).
+
+**Vérifié** : hors navigateur, vingt contrôles — créer HEROS puis BOSS
+(principal.cpp touché la première fois seulement, puis plus jamais), Mario
+rangé en deux enfants avec la marque de verrou, l'écran **identique au pixel
+près**, ranger deux fois sans effet, un ancien personnages.cpp d'un bloc devenu
+liste, renommer ENNEMI → GOOMBA (fichier, ligne du parent, appels), un enfant
+vide nettoyé. Dans un vrai navigateur, `verifier-tout-le-jeu` passe à **58
+contrôles** : Mario rangé, le groupe d'onglets replié puis déplié, le jeu qui
+compile pareil, « ↶ » qui remet tout ; BOSS et HEROS créés chacun dans son
+fichier, **principal.cpp inchangé au second**, le parent qui liste les deux, un
+clic sur MARIO qui ouvre principal.cpp, une variante dans son propre fichier
+et l'original intact. `verifier-atelier`, `verifier-page`, `verifier-tuto-page`,
+`verifier-tuto`, `verifier-langage`, `verifier-exemples` et
+`verifier-inclusion` restent verts.
+
+**Ce qui reste** : les tuiles, les musiques et les cartes ne sont pas encore
+rangées ainsi (les personnages d'abord) ; les leçons 35.x montrent le
+`personnages.cpp` d'un seul bloc, plus simple pour apprendre.
+
+| Fichier | Rôle |
+|---|---|
+| `ranger-personnages.js` | réécrit : le parent et ses enfants |
+| `editeur-tuiles.js` | la bande de tout le projet, la création en enfant, renommer et variante |
+| `index.html` | le projet pour l'atelier, `poserLesFichiers`, les onglets repliés, la suppression qui nettoie |
+| `tout-le-jeu.js` | « 📁 Un fichier par personnage » |
+| `verification/verifier-tout-le-jeu.mjs` | les sections 8 et 9 réécrites, 58 contrôles |
+| `LISEZMOI.md` | « Un personnage, un fichier » |
+
+
+**Correction — le compteur « 📁 personnages (N) » affichait (0).** Il comptait
+les FICHIERS enfants (`perso_….cpp`), et non les personnages : un BONHOMME écrit
+dans `personnages.cpp` d'un seul bloc (les leçons 35.x, un ancien rangement, une
+écriture à la main) n'était pas vu. Il compte maintenant les `Perso` et `Grand`
+de tous les fichiers du groupe, et suit la frappe (rafraîchi 400 ms après la
+dernière touche). Ajouté à `verifier-tout-le-jeu` (**60 contrôles**) : un
+`personnages.cpp` vide affiche (0), un Perso tapé dedans fait passer à (1).
+`verifier-page` et `verifier-atelier` restent verts.
+
+
+## Plus tard encore : un personnage est un Perso, en 16 × 16 comme en 32 × 32
+
+« `#include <Perso>` — un dessin de 16 × 16 » laissait croire qu'un personnage
+de 32 × 32 n'était pas un personnage. **Un `Perso` est un personnage, quelle
+que soit sa taille** : seize rangées en font un 16 × 16, trente-deux un
+32 × 32 — la taille se lit sur le dessin, dans le compilateur
+(`compilateur/emetteur.js`) comme dans l'atelier (`lireDessins`). `Grand`
+reste accepté : c'est l'autre nom d'un Perso de 32 × 32, rien n'est cassé.
+
+- Le message d'un dessin de la mauvaise taille dit « un Perso en veut 16 (un
+  personnage de 16 × 16) ou 32 (un personnage de 32 × 32) ». Un 32 × 32 écrit
+  sur place dans `sprite32` demande `#include <Perso>`.
+- L'atelier écrit `Perso` pour les deux tailles ; le bouton devient
+  **« + perso 32 × 32 »**. Les fichiers `perso_NOM.cpp` portent
+  `#include <Perso>`.
+- `#include <Perso>` se décrit « un personnage : un dessin de 16 × 16 ou de
+  32 × 32 pixels » ; `<Grand>`, « un autre nom pour un Perso de 32 × 32 ».
+
+**Les leçons, plus claires — tous les personnages dans un fichier, deux noms :**
+
+- **35.1 « Perso — dessiner des personnages »** : `personnages.cpp` regroupe
+  **BONHOMME et ROBOT**, avec **un seul** `#include <Perso>` (« une ligne pour
+  tous les personnages de ce fichier ») ; `principal.cpp` les pose tous deux,
+  chacun en quatre cases. Contrôlé : les huit quarts, ROBOT = BONHOMME + 4, les
+  deux visibles à l'écran.
+- **35.2 `sprite16()`** : les deux, du même fichier, descendent ensemble (lutins
+  0 à 3, puis 4 à 7).
+- **35.4 `sprite32()`** montre un 32 × 32 (un `Perso` de trente-deux rangées) à
+  côté d'un 16 × 16 ; **35.5 `cacher32()`** aussi en `Perso`. Le tuto `<Grand>`
+  devient « l'autre nom d'un Perso de 32 × 32 ».
+- **35.6 à 35.10** (le cours de BONHOMME, avant 35.4 à 35.8) gardent le même
+  `personnages.cpp` à deux personnages.
+
+**Une lenteur trouvée en vérifiant — et corrigée.** `verifier-page` a échoué
+(« la console tourne » : rien au bout de 3 secondes). Mesuré : charger les
+leçons prenait **2 370 ms**. Le parcours place chaque tuto après la première
+étape où tout ce qu'il emploie est connu, et RECOMPTAIT depuis le début à
+chaque pas ; c'était sans effet tant que `sprite32` et `cacher32` restaient dans
+le dictionnaire du chapitre 0, mais en `Perso`, ils attendent le chapitre 6.
+La recherche avance maintenant en un seul passage (`tuto/parcours.js`) :
+**63 ms**, l'ordre des 605 étapes **identique** (comparé ligne à ligne), et la
+page s'ouvre, console tournante, en **0,7 s** au lieu de 3,2 à 3,9 s.
+
+**Vérifié** : les 15 suites de `npm run verifier` (sauf `verifier-portage`,
+sans `../gameboy2` sur ce PC) ; `verifier-tuto` : **605 étapes, 1 677
+contrôles**, un `#include` nouveau à la fois ; dans un vrai navigateur,
+`verifier-tout-le-jeu` (**60 contrôles**, BOSS désormais en `Perso` de 32
+rangées), `verifier-atelier`, `verifier-tuto-page` et — après la correction —
+`verifier-page`, tous verts. Le PDF `ajouter-un-include` et `TUTORIELS.md` sont
+régénérés.
+
+| Fichier | Rôle |
+|---|---|
+| `compilateur/emetteur.js`, `compilateur/inclusion.js` | un Perso de 16 ou 32 rangées ; les messages ; `<Grand>` l'autre nom |
+| `editeur-tuiles.js` | lire un Perso de 32 × 32, « + perso 32 × 32 » |
+| `ranger-personnages.js`, `tout-le-jeu.js`, `aide-fonctions.js` | `#include <Perso>` pour les deux tailles |
+| `tuto/lecons.js` | 35.1 et 35.2 à deux personnages ; 35.4, 35.5 en Perso ; le tuto `<Grand>` ; 35.6 à 35.10 |
+| `tuto/parcours.js` | la recherche en un passage |
+| `verification/verifier-tout-le-jeu.mjs` | BOSS en Perso |
+| `LISEZMOI.md`, `documents/TUTORIELS.md`, `documents/ajouter-un-include.*` | à jour |
+
+## Plus tard encore : les dessins dans leur fichier, et une leçon qui ne revient plus en arrière
+
+**Dans les tutos des personnages, la source n'appelle que.** `cacher16`
+(35.3), `sprite32` (35.4), `cacher32` (35.5) et le tuto `<Grand>` dessinaient
+encore leurs personnages dans la source principale. Les dessins sont
+maintenant dans l'onglet **`personnages.cpp`** (avec son `#include <Perso>` ou
+`<Grand>`) ; `principal.cpp` ne garde que les `#include` et les appels
+(`sprite32(…, GEANT)`, `sprite16(…, BONHOMME)`). Dans 35.4, le 16 × 16 est le
+BONHOMME du 35.1 et le 32 × 32 s'appelle GEANT : « ROBOT » désignait un 16 × 16
+au 35.1 et un 32 × 32 au 35.4. De 35.1 à 35.10, toutes les leçons de
+personnages ont leur `personnages.cpp`. Restent dessinés dans la source : la
+36 et la 47, liées à l'atelier de la leçon (qui ne lit que la source).
+
+Le vieux commentaire « `#include <Perso>` — un dessin de 16 × 16 pixels, pour
+un lutin » est corrigé dans les leçons et les exemples (« un personnage : un
+dessin de 16 × 16 ou de 32 × 32 pixels »). `projets/mon_mario/principal.cpp`,
+un projet de l'élève, n'est pas touché.
+
+**Pourquoi la 35.4 restait dans son ancienne version, même après Ctrl+F5.**
+Le disque et le serveur avaient la nouvelle version (vérifié). C'est l'atelier
+qui, en rouvrant sur une leçon, GARDE le programme retenu — au cas où on l'a
+modifié à la main — et remontrait donc l'ancienne 35.4. L'atelier retient
+maintenant l'**empreinte** de la leçon chargée (FNV-1a de son titre, son code,
+ses fichiers) : si la leçon a changé depuis, ou si l'empreinte manque, la
+nouvelle version s'ouvre, la leçon affiche « 🔄 leçon mise à jour », et
+l'ancienne reste dans l'historique (« ↶ » la rend). Une leçon inchangée garde,
+comme avant, le programme modifié à la main.
+
+Dans une leçon, le groupe d'onglets « 📁 personnages » est **déplié d'office** :
+`personnages.cpp` est le fichier dont elle parle.
+
+**Vérifié** : `verifier-tuto` (605 étapes, vert), `verifier-tutoriels`
+(`TUTORIELS.md` régénéré), `verifier-exemples`, `verifier-console`,
+`verifier-surplace`, `verifier-inclusion` ; dans un vrai navigateur,
+`verifier-tout-le-jeu` passe à **66 contrôles** — dont le cas réel : l'ancienne
+35.4 retenue, la page rouverte sur la nouvelle avec `personnages.cpp`, le
+message, « ↶ » qui rend l'ancienne, puis la nouvelle qui reste — ainsi que
+`verifier-tuto-page`, `verifier-page` et `verifier-atelier`.
+
+
+## Plus tard encore : un personnage, un fichier, dans les leçons aussi
+
+Les leçons de personnages mettaient tous les dessins dans un même
+`personnages.cpp`. **Chaque personnage a maintenant son fichier**, un dessin
+chacun — comme deux images — et la source principale verse chaque fichier
+d'une ligne :
+
+```cpp
+#include "perso_BONHOMME.cpp"   // le dessin 1
+#include "perso_ROBOT.cpp"      // le dessin 2
+```
+
+| Leçon | Ses fichiers |
+|---|---|
+| 35.1 Perso, 35.2 `sprite16()` | `perso_BONHOMME.cpp`, `perso_ROBOT.cpp` |
+| 35.3 `cacher16()` | `perso_BONHOMME.cpp` |
+| 35.4 `sprite32()` — la comparaison | `perso_GEANT.cpp` (32 × 32), `perso_BONHOMME.cpp` (16 × 16) |
+| 35.5 `cacher32()`, le tuto `<Grand>` | `perso_GEANT.cpp` |
+| 35.6 à 35.10 (le cours de BONHOMME) | `perso_BONHOMME.cpp` (et `heros.cpp`) |
+
+Chaque fichier écrit son `#include <Perso>` pour se suffire à lui-même — deux
+fois, c'est sans coût. Les textes et les commentaires suivent ; la phrase du
+35.6 sur l'atelier parlait encore de l'ancienne case à cocher : elle dit
+maintenant « + perso » et « 📁 Un fichier par personnage ». Les dessins sont
+repris tels quels des leçons ; le script vérifie qu'il ne reste aucun
+`personnages.cpp` dans ces onze leçons.
+
+**Vérifié** : `verifier-tuto` — 605 étapes, 1 677 contrôles, verts ;
+`verifier-tutoriels` (`TUTORIELS.md` régénéré) ; dans un vrai navigateur,
+`verifier-tout-le-jeu` (66 contrôles — la 35.4 rouverte montre ses deux
+onglets, `perso_GEANT.cpp` et `perso_BONHOMME.cpp`), `verifier-tuto-page`,
+`verifier-page` et `verifier-atelier`, tous verts.
+
+## Plus tard encore : un include qui inclut tous les fichiers
+
+Chaque personnage a son fichier, et **`personnages.cpp` est l'include qui les
+inclut tous** : il porte **`#include <Perso>` UNE fois**, pour tous, puis une
+ligne par personnage. La source principale n'a qu'**une** ligne,
+`#include "personnages.cpp"` ; chaque `perso_….cpp` n'est **que son dessin**,
+comme une image.
+
+```
+principal.cpp        #include "personnages.cpp"
+personnages.cpp      #include <Perso>               ← une fois, pour tous
+                     #include "perso_BONHOMME.cpp"
+                     #include "perso_GEANT.cpp"
+perso_BONHOMME.cpp   Perso BONHOMME = { … };        ← juste le dessin
+perso_GEANT.cpp      Perso GEANT = { … };           ← juste le dessin
+```
+
+Mesuré avant de choisir : `#include <Perso>` écrit dans chaque fichier ou une
+seule fois donne la **même cartouche, octet pour octet** (1 136 octets, trois
+personnages). C'est une autorisation, pas un dessin.
+
+- **L'atelier** (`ranger-personnages.js`) : la liste porte `#include <Perso>`
+  (et `<Grand>` si un enfant écrit « Grand »), ajouté s'il manque ; un
+  personnage créé, ou rangé par « 📁 Un fichier par personnage », ne reçoit que
+  son dessin.
+- **Les leçons 35.1 à 35.10 et le tuto `<Grand>`** : la même organisation. Le
+  script qui les réécrit s'est arrêté deux fois avant d'enregistrer (des
+  phrases entre guillemets doubles d'un côté, simples de l'autre ; puis un
+  remplacement qui visait le texte de la leçon au lieu de son code) : rien n'a
+  été écrit à moitié.
+- `LISEZMOI.md` : le schéma, et l'`#include <Perso>` unique.
+
+**Vérifié** : hors navigateur, les vingt contrôles du parent et des enfants
+(dont : les enfants sans aucune ligne `#include`, la liste avec un seul
+`#include <Perso>`, Mario rangé à l'écran identique) ; `verifier-tuto` (605
+étapes, 1 677 contrôles), `verifier-tutoriels` (`TUTORIELS.md` régénéré),
+`verifier-exemples`, `verifier-inclusion` ; dans un vrai navigateur,
+`verifier-tout-le-jeu` (**67 contrôles** — BOSS « juste le dessin, sans
+#include », la liste avec « #include <Perso> UNE fois, pour tous »),
+`verifier-tuto-page`, `verifier-page` et `verifier-atelier`. Tout est vert.
+
+## Plus tard encore : l'alphabet des titres, ALPHABET_TITRE
+
+Un **troisième alphabet**, pour écrire le nom d'un jeu sur son écran titre,
+dans le style des grandes lettres des titres Game Boy : les lettres
+**épaisses** d'`ALPHABET_GRAS`, avec une **ombre** grise (nuance 2) en bas à
+droite de chaque pixel du trait — un relief qui tient dans la tuile de 8 × 8.
+Ce sont **nos** lettres, calculées à partir de la police du projet
+(`lettresTitre`, dans `compilateur/police.js`) : elles évoquent ce style sans
+recopier celles d'aucun jeu.
+
+- `#include <ALPHABET_TITRE>` (le 76ᵉ) ; `ALPHABET_TITRE[0]` est le A,
+  `[25]` le Z ; chaque lettre se pose avec `poser()`.
+- Comme `ALPHABET_GRAS` : 26 « Tuile TITRE_A … » et leur tableau, ajoutés à la
+  cartouche **seulement** si le programme écrit `ALPHABET_TITRE` (environ
+  1 200 octets dès la première lettre).
+- **Son tuto, 0.110 du parcours** (« ALPHABET_TITRE — les lettres des
+  titres ») : « TITRE » en lettres de titre, et le même mot en lettres
+  ordinaires en dessous ; il explique comment trouver la place d'une lettre
+  (T = 19, I = 8…). Cinq contrôles, dont l'ombre (63 pixels gris).
+- `police.js` est en fins de ligne Windows (CRLF) : le script qui l'a modifié
+  les respecte.
+
+Regardé : l'écran du tuto, exporté de l'émulateur — les lettres épaisses à
+l'ombre grise, nettement distinctes des lettres ordinaires.
+
+**Vérifié** : `verifier-tuto` (**606 étapes, 1 682 contrôles**, un `#include`
+nouveau à la fois), `verifier-tutoriels` (`TUTORIELS.md` régénéré),
+`verifier-langage`, `verifier-refus`, `verifier-inclusion`,
+`verifier-exemples`, `verifier-console`, et `verifier-tuto-page` dans un vrai
+navigateur — tous verts. `LISEZMOI.md` (la ligne `ALPHABET_TITRE`, 76
+`#include`) et le PDF `ajouter-un-include` sont à jour.
+
+## Plus tard encore : les GROSSES lettres de titre, texteTitre()
+
+`ALPHABET_TITRE` donnait des lettres d'**une** case : trop petites pour le
+nom d'un jeu. `texteTitre(colonne, ligne, "MOT")` écrit un **mot entier** en
+grosses lettres, dans le style des écrans titres Game Boy « dessin animé » :
+24 × 24 pixels par lettre (trois cases sur trois), rondes, l'intérieur clair,
+un **contour noir épais**, une **ombre** grise, et une lettre sur deux
+descendue de 4 pixels — le mot **sautille**.
+
+- **Les lettres** (`grandeLettreTitre`, dans `compilateur/police.js`) : le
+  gras de la police, agrandi deux fois, coins arrondis, contour de deux
+  pixels, ombre d'un pixel. Ce sont **nos** lettres : elles évoquent ce style
+  sans recopier celles d'aucun jeu.
+- **Le compilateur** (`compilateur/emetteur.js`) : l'appel devient, pour
+  chaque case non vide, un `poser(c, l, { dessin })` écrit par la console
+  (ni `#include <poser>` ni `<Tuile>` demandés). Seules les lettres du mot
+  vont dans la cartouche, et deux cases dessinées pareil ne coûtent qu'une
+  tuile. Refus clairs : un mot qui dépasse les 20 colonnes (avec le calcul),
+  une lettre qui sort par le bas, un mot qui n'est pas écrit entre guillemets.
+- `#include <texteTitre>` (le 77ᵉ) ; une fiche dans l'aide des fonctions.
+- **Son tuto, 35.11** : « TITRE » au milieu de l'écran ; quatre contrôles
+  (les deux T faits des mêmes tuiles, l'ombre, le I plus bas que le T).
+- **La leçon 35.12, « L'écran titre de ton jeu »**, juste après le cours
+  BONHOMME : SUPER et JEU centrés sur deux lignes, BONHOMME (de son fichier,
+  par `montrerHeros`) dessous, et « APPUIE SUR START ». Six contrôles.
+- `ALPHABET_TITRE` (0.110) reste disponible, pour les petites lettres.
+
+Regardé : l'écran exporté de l'émulateur — SUPER / JEU 2! en grosses lettres
+rondes, contour noir, ombre, qui sautillent.
+
+**Vérifié** : `verifier-tuto` (**608 étapes, 1 692 contrôles**, un `#include`
+nouveau à la fois), `verifier-tutoriels` (`TUTORIELS.md` régénéré),
+`verifier-langage`, `verifier-refus`, `verifier-inclusion`,
+`verifier-exemples`, `verifier-console`, et dans un vrai navigateur
+`verifier-tuto-page`, `verifier-page` et `verifier-tout-le-jeu` — tous
+verts. `LISEZMOI.md` (77 `#include`, la ligne `texteTitre`) à jour.
+
+## Plus tard encore : la taille des lettres de titre
+
+`texteTitre()` prend un **quatrième argument, facultatif : la taille**, le
+nombre de cases de côté d'une lettre.
+
+| taille | une lettre | lettres par ligne |
+|---|---|---|
+| 2 | 16 × 16 pixels (2 × 2 cases) | 10 |
+| 3 (sans 4ᵉ argument) | 24 × 24 pixels (3 × 3 cases) | 6 |
+| 4 | 32 × 32 pixels (4 × 4 cases) | 5 |
+
+- **Les lettres** (`grandeLettreTitre(caractere, enBas, taille)`, dans
+  `compilateur/police.js`) : les mesures de chaque taille sont rangées dans
+  `TAILLES_DE_TITRE` (agrandissement, place, épaisseur du contour, coins
+  arrondis ou non, saut). La taille 3 est exactement celle d'avant ; la
+  taille 2 a un contour d'un pixel et pas d'arrondi (ses traits de 2 pixels
+  disparaîtraient).
+- **Dans la même fonction, pas dans une autre** : les lettres sont dessinées
+  par le compilateur, avant que le jeu ne tourne. La taille s'écrit donc en
+  clair ; une variable, ou une taille autre que 2, 3 ou 4, est refusée avec
+  l'explication. Le refus « trop large » ou « trop bas » compte avec la taille.
+- **La leçon 35.13, « Choisir la taille du titre »** : TITRE dans les trois
+  tailles, l'un sous l'autre ; quatre contrôles (les colonnes de chaque
+  taille, et des dessins propres à chaque taille).
+- L'aide des fonctions et `#include <texteTitre>` parlent de la taille.
+
+Regardé : l'écran exporté de l'émulateur — SUPER en tailles 2 et 3, JEU en
+taille 4.
+
+**Vérifié** : `verifier-tuto` (**609 étapes, 1 696 contrôles**, un `#include`
+nouveau à la fois), `verifier-tutoriels` (`TUTORIELS.md` régénéré),
+`verifier-langage`, `verifier-refus`, `verifier-inclusion`,
+`verifier-exemples`, `verifier-console`, et dans un vrai navigateur
+`verifier-tuto-page` et `verifier-page` — tous verts. Les refus essayés à
+part : taille variable, taille 5, 11 lettres en taille 2, une lettre de
+taille 4 en ligne 15. `LISEZMOI.md` (la ligne `texteTitre`) à jour.
+
+## Plus tard encore : un titre entre manga et dessin animé, texteManga()
+
+Un **deuxième style** de lettres de titre, demandé « entre manga et » le style
+dessin animé de `texteTitre()`. `texteManga(colonne, ligne, "MOT", taille)` :
+
+- des lettres **penchées** vers la droite (le haut décalé d'un pixel toutes
+  les quelques rangées), comme une écriture qui fonce ;
+- des **coins coupés en biais** (en haut à droite, en bas à gauche) au lieu
+  d'arrondis, et un contour noir **carré**, aux angles vifs ;
+- le **bas** de chaque lettre en **trame** (un pixel sur deux en gris clair),
+  comme les trames des pages de manga — en taille 2, un gris plein ;
+- une **ombre portée** grise plus longue, en bas à droite ;
+- et, côté dessin animé, une lettre sur deux un peu plus bas.
+
+Ce sont **nos** lettres (`lettreManga` et `TAILLES_MANGA`, dans
+`compilateur/police.js`), calculées à partir de la police du projet, sans
+recopier celles d'aucun manga ni d'aucun jeu.
+
+- **Le compilateur** : `texteManga` suit exactement le chemin de
+  `texteTitre` (mêmes arguments, mêmes tailles 2, 3 ou 4, mêmes refus, qui
+  nomment la bonne fonction) ; seul le dessinateur des lettres change.
+- `#include <texteManga>` (le 78ᵉ) et une fiche dans l'aide des fonctions.
+- **Son tuto, 35.14** : « MANGA » en taille 3 ; quatre contrôles (la place,
+  la pente du M, la trame, l'ombre).
+- **La leçon 35.15, « Deux styles pour un titre »** : SUPER par
+  `texteTitre()` puis par `texteManga()`, chacun sous son nom ; cinq
+  contrôles, dont « la trame, dans le manga seulement ».
+
+Regardé : l'écran exporté de l'émulateur — SUPER en tailles 2 et 3, JEU en
+taille 4, en lettres manga.
+
+**Vérifié** : `verifier-tuto` (**611 étapes, 1 705 contrôles**, un `#include`
+nouveau à la fois), `verifier-tutoriels` (`TUTORIELS.md` régénéré),
+`verifier-langage`, `verifier-refus`, `verifier-inclusion`,
+`verifier-exemples`, `verifier-console`, et dans un vrai navigateur
+`verifier-tuto-page` et `verifier-page` — tous verts. `LISEZMOI.md` (78
+`#include`, la ligne `texteManga`) à jour.
+
+## Plus tard encore : un avion dans les dessins tout faits
+
+Un **AVION** de 16 × 16 rejoint les personnages de la bibliothèque
+(`bibliotheque.js`, après le VAISSEAU) : vu du dessus, le nez en haut, les
+ailes et la queue ; un contour plein (`#`), la carlingue moyenne (`+`), le
+cockpit clair (`-`). On le prend dans l'onglet des modèles de « ▦ Les
+tuiles », comme les autres : il entre dans le programme avec son nom.
+
+Regardé : l'avion compilé et posé par `sprite16()` dans l'émulateur, agrandi.
+
+**Vérifié** : `verifier-page` (17 modèles sur 17, 5 personnages),
+`verifier-atelier` et `verifier-tout-le-jeu` — tous verts.
+
+La **leçon 35.16, « Un avion qui vole »**, en fait un personnage qu'on pilote :
+AVION rangé dans `perso_AVION.cpp`, versé par `personnages.cpp` ; `sprite16()`
+le pose, la croix le déplace d'un pixel par image, et `px < 144`, `py < 128`
+(160 − 16, 144 − 16) le gardent entier à l'écran. Cinq contrôles (le départ
+au milieu, droite, haut, l'arrêt au bord gauche, le lutin qui suit).
+**Vérifié** : `verifier-tuto` (**612 étapes, 1 710 contrôles**),
+`verifier-tutoriels` (`TUTORIELS.md` régénéré), `verifier-langage`,
+`verifier-inclusion`, `verifier-tuto-page` — tous verts.
+
+Puis **deux leçons pour régler la vitesse de l'avion** :
+
+- **35.17, « La vitesse de l'avion »** : une variable `vitesse` (pixels par
+  image : 1 = 60 px/s, 2 = 120, 4 = 240) ; `px = px + vitesse;`. Les bords se
+  testent AVANT le pas — `px >= vitesse`, `px + vitesse <= 144` — parce qu'un
+  `uint8_t` ne descend pas sous 0 : il repart à 255, et l'avion sauterait à
+  l'autre bout de l'écran. Cinq contrôles (deux fois plus loin qu'au 35.16,
+  arrêts pile à 144 et à 0).
+- **35.18, « Changer de vitesse en vol »** : A accélère, B ralentit, entre 1
+  et 4 ; `aAvant` / `bAvant` retiennent l'image d'avant, pour qu'un appui
+  tenu plusieurs images ne compte qu'une fois. `texte()` et `nombre()`
+  affichent « VITESSE 2 ». Cinq contrôles (un appui de 6 images = +1, les
+  limites 4 et 1, le chiffre affiché).
+
+**Vérifié** : `verifier-tuto` (**614 étapes, 1 720 contrôles**),
+`verifier-tutoriels` (`TUTORIELS.md` régénéré), `verifier-langage`,
+`verifier-inclusion`, `verifier-tuto-page` — tous verts.
+
+Et **35.19, « Plus lent qu'un pixel par image »** — « vitesse 2, c'est déjà
+trop rapide » : `vitesse` ne descend pas sous 1 (60 pixels par seconde), un
+`uint8_t` n'a pas de demi. L'avion garde donc un pas d'UN pixel, mais
+n'avance qu'une image sur `lenteur`, grâce à un compteur `compte`.
+`lenteur = 3` : 20 pixels par seconde, trois fois moins vite qu'au 35.16,
+et toujours fluide ; le tableau 1 → 60, 2 → 30, 3 → 20, 4 → 15, 6 → 10.
+Quatre contrôles (30 images de flèche = 10 pixels environ, arrêts pile à 0
+et à 128, le lutin qui suit). **Vérifié** : `verifier-tuto` (**615 étapes,
+1 724 contrôles**), `verifier-tutoriels`, `verifier-langage`,
+`verifier-tuto-page` — tous verts.

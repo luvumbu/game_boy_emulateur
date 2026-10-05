@@ -223,7 +223,7 @@ export function analyser(source) {
    * appel de fonction : c'est le même début. Un langage à déclarations comme
    * C++ demande de savoir ce qui est un type avant de lire la ligne.
    */
-  const structures = new Set(['Tuile', 'Perso', 'Air', 'Mot', 'Carre'])
+  const structures = new Set(['Tuile', 'Perso', 'Grand', 'Air', 'Mot', 'Carre'])
   /* Le nom d'un « enum » est un type lui aussi — mais un type d'un octet :
      « Scene ou = TITRE; » se lit mieux que « uint8_t ou = TITRE; », et dit ce
      que la variable a le droit de contenir. */
@@ -311,7 +311,7 @@ export function analyser(source) {
       if (enumerations.has(nom)) return { nom: 'uint8_t', constant, ligne: jeton.ligne }
       throw new Error(
         `ligne ${jeton.ligne} : type inconnu « ${nom} ». Ceux qui existent : ` +
-          'uint8_t, int, char, bool, auto, void, Tuile, Perso, Air, Mot, Carre, et les « struct » du programme.',
+          'uint8_t, int, char, bool, auto, void, Tuile, Perso, Grand, Air, Mot, Carre, et les « struct » du programme.',
       )
     }
     return { nom, constant, ligne: jeton.ligne }

@@ -2825,6 +2825,12 @@ export function installer({
       rafraichirBande()
       rafraichirGrille()
     },
+    /* Ouvrir une carte (ou sa scène) par son nom (l'onglet « Tout le jeu »). */
+    choisir(nom) {
+      if (listerLesCartes(lireSource()).includes(nom)) carteChoisie = nom
+      rafraichirBande()
+      rafraichirGrille()
+    },
   }
 }
 

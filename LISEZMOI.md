@@ -80,7 +80,7 @@ Les leçons, les tutoriels et le cours ne forment plus qu'**une seule suite** :
 `cours.html` y mène). Rien n'a été retiré : chaque leçon et chaque cours garde
 son texte, son programme et ses contrôles. `tuto/parcours.js` les range :
 
-- **25 chapitres**, de « Avant tout » à « Aller au bout ». Les niveaux des
+- **26 chapitres**, de « Avant tout » à « Tes propres #include ». Les niveaux des
   leçons et les chapitres du cours y sont entremêlés **par sujet**, chaque
   série gardant son ordre : aucune notion n'arrive avant ce dont elle a besoin.
 - **Un `#include` nouveau à la fois.** Chaque fonction de la console a son
@@ -92,6 +92,29 @@ son texte, son programme et ses contrôles. `tuto/parcours.js` les range :
   qui arrivent — calculée sur le parcours lui-même.
 - Dans chaque étape, l'encadré **« Les fonctions de cette leçon »** mène au
   tuto de chacune ; un tuto dit, lui, où l'on retrouve sa fonction.
+
+**Le même parcours, en PDF :** `npm run cours-complet` écrit
+`documents/cours-complet.pdf` (et sa page `documents/cours-complet.html`) :
+la couverture, le sommaire, les 78 `#include`, chaque chapitre et chaque
+leçon dans l'ordre du parcours, puis l'index des `#include`.
+
+**Tous les documents, d'un clic :** dans l'atelier, le bouton **« 🔗 LES
+SOURCES »** de la barre du haut (le même contenu que l'onglet **« 📚 Les
+sources »** du mode création, ou l'adresse `index.html#sources`) donne le lien de
+chaque fichier — le cours complet, le livret, les fiches, les 61 cours
+(`cours/`), les 587 livrets d'une leçon (`livrets/`, rangés par chapitre) et
+les textes `.md`. Rien n'y est recopié : la liste des cours est lue dans
+`cours/index.html`, le nom de chaque livret est calculé comme le fait
+`outils/livret.mjs` (`sources.js`).
+
+**Ajouter son propre `#include`, pour tous les niveaux :** `npm run pdf-include`
+écrit `documents/ajouter-un-include.pdf` (et sa page `.html`), un document
+d'une cinquantaine de pages qui part de zéro (fichier, octet, fonction, boucle,
+éditeur de texte, fenêtre de commande, git), explique les deux sortes
+d'`#include`, puis la recette pour faire entrer une fonction dans la console.
+Rien n'y est recopié à la main : le code du compilateur est lu dans ses
+fichiers, les messages d'erreur et les octets viennent d'une vraie compilation,
+les écrans de l'émulateur.
 
 ## Ce que c'est, et ce que ce n'est pas
 
@@ -240,6 +263,7 @@ int main() {                     // par où la console commence
 | `sizeof(P)`, `sizeof(T)/sizeof(T[0])` | les tailles, connues à la compilation |
 | `Tuile SOL = { "…", … };` | **une tuile à soi**, huit rangées de huit nuances — en chiffres `0123` **ou** en signes `.-+#` ; le nom devient son numéro |
 | `Perso MARIO = { "…", … };` | **un personnage entier**, seize sur seize ; le compilateur en fait quatre tuiles |
+| `Perso BOSS = { "…", … };` (32 rangées) | **un personnage de 32 × 32** : un `Perso` de trente-deux rangées ; le compilateur en fait seize tuiles, quatre quarts de 16 × 16 à la suite. `Grand BOSS = { … };` en est l'autre nom |
 | `Air THEME = { "DO4 12", "==", … };` | **une mélodie**, un pas par élément ; `jouer()` la lance et elle avance toute seule |
 | `'A'`, `0x2A`, `0b1010` | un caractère est un nombre ; les bases s'écrivent comme en C++ |
 | `#include "autre.cpp"` | **verse un autre fichier ici**, avant toute compilation — en ligne de commande comme dans la page, où les fichiers sont des onglets |
@@ -324,7 +348,7 @@ si on l'**inclut**, par son nom, écrit exactement comme dans le programme.
 - Les éditeurs de l'atelier (tuiles, couleurs, airs, carte, scènes, modèles)
   écrivent eux-mêmes les lignes dont leur code a besoin.
 - Les noms : chaque fonction ci-dessous (`<texte>`, `<chaque>`, `<deplace_x>`…),
-  `<ALPHABET>`, `<ALPHABET_GRAS>`, les types `<Tuile>`, `<Perso>`, `<Mot>`,
+  `<ALPHABET>`, `<ALPHABET_GRAS>`, `<ALPHABET_TITRE>`, `<texteTitre>`, `<texteManga>`, les types `<Tuile>`, `<Perso>`, `<Mot>`,
   `<Carre>`, `<Air>`, et quatre calculs que le processeur ne sait pas faire
   seul : `<multiplier>` (`a * b`, les deux calculés), `<diviser>` et `<reste>`
   (`a / b`, `a % b`, sauf par 1, 2, 4, 8… écrits en clair), `<decaler>`
@@ -340,6 +364,7 @@ si on l'**inclut**, par son nom, écrit exactement comme dans le programme.
 | `effacer(colonne, ligne, quoi)` | **efface, sans compter les lettres**. « quoi » est le texte lui-même, le nom d'un `const char`, ou un nombre de cases — la longueur est lue par le compilateur |
 | `texte(MOT)` / `effacer(MOT)` | écrit ou efface un **`Mot`** : la colonne, la ligne et le texte rangés sous un seul nom (voir plus bas) |
 | `poser(colonne, ligne, tuile)` | pose **une** tuile à une position calculée. « tuile » est un nom, un numéro, ou **les huit rangées du dessin, écrites sur place** |
+| `bande(colonne, ligne, tuile, longueur)` | pose la **même tuile** « longueur » fois, de gauche à droite : `bande(2, 5, ALPHABET[0], 10)` écrit dix A. Écrite **en C++** dans le compilateur (`SOURCE_BANDE`) : c'est l'exemple du chapitre « Tes propres #include » (voir « Ajouter sa propre fonction à la console ») |
 | `poserS(colonne, ligne, tuile)` | comme `poser()`, mais **passe à la ligne tout seul**, comme `textS` : `poserS(i, 0, ALPHABET[i])` pose l'alphabet sur deux lignes, sans `% 20` ni `/ 20` |
 | `attendre(secondes)` | **arrête tout le programme** ce nombre de secondes (jusqu'à 255), lutins et musique compris, puis continue. Simple, mais rien d'autre ne bouge pendant ce temps : pour plusieurs rythmes à la fois, compter les images |
 | `ms(durée)` / `secondes(n)` | une durée **traduite en images** (60 par seconde), par le compilateur : `ms(250)` vaut 15, `ms(1000)` et `secondes(1)` valent 60. Ne coûte rien. À comparer à un compteur d'images : `if (images == ms(250))`. Jusqu'à 4250 ms |
@@ -361,7 +386,8 @@ si on l'**inclut**, par son nom, écrit exactement comme dans le programme.
 | `ecran(0)` / `ecran(1)` | éteint / rallume l'écran, le temps d'un gros redessin |
 | `sprite(n, x, y, tuile)` | **un lutin au pixel près**, hors de la grille du fond. `sprite(n, x, y, t, 1)` le retourne. Le dessin s'écrit ici aussi |
 | `sprite16(n, x, y, tuile)` | **un personnage de seize** : quatre lutins posés en carré, en un appel. Écrit sur place, il prend seize rangées de seize |
-| `cacher(n)` / `cacher16(n)` | ôte le lutin, ou les quatre, de l'écran |
+| `sprite32(n, x, y, tuile)` | **un grand personnage de 32 × 32** : seize lutins (n à n + 15, 24 au plus), quatre `sprite16` en un appel. Un cinquième argument `MIROIR_X` le retourne |
+| `cacher(n)` / `cacher16(n)` / `cacher32(n)` | ôte le lutin, les quatre, ou les seize, de l'écran |
 | `defiler(x, y)` | fait glisser le décor. La carte fait 256 pixels et revient toute seule à zéro |
 | `images()` | le nombre d'images écoulées depuis l'allumage — une horloge que le jeu ne peut pas fausser |
 | `retard()` | rend 1 si le tour de boucle précédent a duré plus d'une image |
@@ -373,6 +399,9 @@ Deux noms sont fournis par la console, sans rien déclarer :
 |---|---|
 | `ALPHABET` | les 26 lettres de la police : `ALPHABET[0]` est A (la tuile 1), `ALPHABET[25]` est Z. `sizeof(ALPHABET)` vaut 26. Rien n'est recopié : `ALPHABET[i]` se calcule `1 + i`. Il se lit, il ne s'écrit pas, et le nom est réservé |
 | `ALPHABET_GRAS` | un **second alphabet, en gras** : les mêmes 26 lettres, aux traits de 2 pixels (`ALPHABET_GRAS[0]` est le A gras). `sizeof(ALPHABET_GRAS)` vaut 26. Ajouté à la cartouche seulement si le programme s’en sert ; `ALPHABET` ne change pas |
+| `ALPHABET_TITRE` | un **troisième alphabet, pour les titres** : les lettres épaisses du gras, avec une **ombre** grise en bas à droite qui leur donne du relief — pour écrire le nom d’un jeu sur son écran titre (`ALPHABET_TITRE[19]` est le T). Chaque lettre est une tuile à trois nuances (fond 0, ombre 2, trait 3), posée avec `poser()`. Calculées à partir de la police du projet, dans le style des titres de la Game Boy, sans recopier celles d’aucun jeu. Environ 1 200 octets dès la première lettre ; ajouté seulement si le programme s’en sert. Son tuto : 0.110 du parcours |
+| `texteTitre(colonne, ligne, "MOT", taille)` | écrit un **mot entier en GROSSES lettres de titre**, dans le style des écrans titres Game Boy « dessin animé » : rondes, l’intérieur clair, un **contour noir épais**, une **ombre** grise, et **une lettre sur deux un peu plus bas** : le mot sautille. **La taille** (facultative) est le nombre de cases de côté d’une lettre : **2** (16 × 16 pixels, 10 lettres par ligne), **3** si on ne la donne pas (24 × 24, 6 lettres), **4** (32 × 32, 5 lettres). Elle s’écrit en clair (2, 3 ou 4), jamais avec une variable : les lettres sont dessinées par le compilateur. Le compilateur refuse un mot qui sort de l’écran, avec le calcul. Seules **les lettres du mot** vont dans la cartouche, et deux cases dessinées pareil ne coûtent qu’une tuile. Nos lettres, calculées à partir de la police du projet (`grandeLettreTitre`, dans `police.js`), sans recopier celles d’aucun jeu. Son tuto : 35.11 ; « L’écran titre de ton jeu » : 35.12 ; « Choisir la taille du titre » : 35.13 |
+| `texteManga(colonne, ligne, "MOT", taille)` | un **deuxième style de titre, entre manga et dessin animé** : des lettres **penchées** vers la droite, des coins **coupés en biais**, un contour noir **carré**, le bas de chaque lettre en **trame** grise (un pixel sur deux, comme les trames des pages de manga), une **ombre portée** plus longue, et une lettre sur deux un peu plus bas. Le même appel et les mêmes tailles que `texteTitre()` (2, 3 ou 4), les mêmes refus ; seules les lettres du mot vont dans la cartouche. Nos lettres (`lettreManga`, dans `police.js`), calculées à partir de la police du projet. Son tuto : 35.14 ; « Deux styles pour un titre » : 35.15 |
 | `texteGrand(x, y, "…", taille)` | un texte **agrandi de 1 à 20 fois** (à 20, une lettre remplit l’écran), calculé à partir de la police : chaque pixel devient un carré de taille × taille, les proportions sont gardées. Une lettre prend taille × taille cases. Le texte et la taille s’écrivent en clair ; seules les tuiles utiles sont fabriquées, une fois chacune |
 | `texteGrandS(x, y, "…", taille)` | comme `texteGrand`, mais qui **va à la ligne** quand le texte est trop large (comme `textS`) ; **refusé** s’il dépasse le bas de l’écran, avec le nombre de lignes qu’il faudrait. Tout s’écrit en clair |
 | `Mot` | un type : **la place et le texte sous un seul nom**. `Mot SALUT = { 5, 6, "BONJOUR" };` puis `texte(SALUT)` et `effacer(SALUT)`. La colonne et la ligne peuvent être des variables : elles sont relues à chaque appel |
@@ -519,9 +548,14 @@ par pas**.
 
 La page s'ouvre en **MODE CRÉATION** : les ateliers occupent la place, et le
 programme se réduit à une bande — il reste sous les yeux, car c'est lui que la
-souris écrit. **MODE CODE**, en haut, rend tout l'écran au texte. Les deux
-touches sont dans la barre du haut : un onglet discret sous le champ de texte
-ne se voyait pas, et l'atelier de musique passait pour ne pas exister.
+souris écrit. Le bouton **« ⤢ Agrandir le code »**, à côté du titre du
+programme, rend tout l'écran au texte, sans quitter le mode ; **« ⤡ Revoir
+les ateliers »** les fait revenir. Il n'y a plus de « MODE CODE » à part :
+il ne faisait que cacher les ateliers, et deux boutons pour un même travail
+faisaient croire à deux programmes (l'adresse `index.html#code` ouvre
+toujours le code en grand). Les modes sont dans la barre du haut : un onglet
+discret sous le champ de texte ne se voyait pas, et l'atelier de musique
+passait pour ne pas exister.
 
 Dans l'atelier, l'onglet **« Les airs »** montre les
 mélodies du programme et les écrit à la place où on clique : la partition est
@@ -708,6 +742,97 @@ cohérentes, et huit lignes de `sprite()` par personnage, avec les moitiés à
 échanger quand il regarde à gauche. Une erreur invisible, qui donne un visage à
 l'envers.
 
+**Plus grand : un `Perso` de 32 × 32.** Un personnage est un `Perso`, quelle que soit sa taille : la taille se lit sur ses rangées (16 ou 32). Pour un boss, un `Perso` prend trente-deux
+rangées de trente-deux signes ; le compilateur le range comme quatre `Perso` à
+la suite (haut-gauche, haut-droite, bas-gauche, bas-droite), seize tuiles, et
+`sprite32(n, x, y, BOSS)` le pose en seize lutins — quatre `sprite16`, quarts
+échangés quand il est retourné. Il coûte cher : seize des quarante lutins.
+
+**La taille se choisit avant de dessiner** : dans « ▦ Les tuiles », trois
+boutons, « + tuile 8 × 8 », « + perso 16 × 16 », « + perso 32 × 32 ». Le nom
+est demandé, puis la grille a la bonne taille.
+
+**Un personnage, un fichier : le parent et ses enfants.** En création, chaque
+nouveau `Perso` (16 × 16 ou 32 × 32) s'écrit dans **son propre fichier**, jamais dans la
+source principale :
+
+```
+principal.cpp                  #include "personnages.cpp"   ← UNE ligne, écrite une seule fois
+personnages.cpp                le parent : l'include qui inclut tous les fichiers
+  #include <Perso>             ← UNE fois, pour TOUS les personnages
+  #include "perso_HEROS.cpp"
+  #include "perso_BOSS.cpp"
+perso_HEROS.cpp                un enfant : le dessin de HEROS, rien d'autre
+perso_BOSS.cpp                 un enfant : le dessin de BOSS (32 × 32), rien d'autre
+```
+
+`#include <Perso>` n'est écrit qu'**une fois**, dans la liste : il n'ajoute rien à la
+cartouche, c'est une autorisation (« on a le droit d'écrire des Perso »). Écrit
+une fois ou dans chaque fichier, la cartouche est la même, octet pour octet
+(vérifié). Chaque `perso_….cpp` n'est donc que son dessin, comme une image. Les leçons de personnages (35.1 à 35.10, chapitre 6 « Dessiner ») suivent la même organisation. Puis, toujours rangé ainsi, **l’AVION** (un dessin tout fait de la bibliothèque, « ▦ Les tuiles », onglet des modèles) : 35.16 « Un avion qui vole » (la croix, un pixel par image), 35.17 « La vitesse de l’avion » (une variable `vitesse`, des bords testés avant le pas), 35.18 « Changer de vitesse en vol » (A accélère, B ralentit) et 35.19 « Plus lent qu’un pixel par image » (`lenteur` : un pas une image sur trois, 20 pixels par seconde).
+
+- **« + perso 16 × 16 » / « + perso 32 × 32 »** créent l'enfant, ajoutent sa
+  ligne au parent et l'ouvrent. `principal.cpp` ne reçoit
+  `#include "personnages.cpp"` que la toute première fois — sans elle le
+  compilateur ne verrait pas les personnages — puis ne change plus.
+- **« ▦ Les tuiles » voit tous les onglets** : la bande montre les dessins de
+  tout le projet (ceux d'un autre onglet portent « ↗ »), et un clic ouvre le
+  fichier où le dessin est écrit. On ne repeint donc que le contenu visé.
+- **Renommer** change le nom partout, le fichier (`perso_ANCIEN.cpp` →
+  `perso_NEUF.cpp`) et la ligne du parent ; **⧉ Créer une variante** d'un
+  personnage lui donne son propre fichier ; **🗑 Supprimer** ôte le fichier
+  vide et sa ligne.
+- **Les onglets** des personnages sont repliés dans un groupe **« 📁 personnages
+  (N) ▸ »**, qui se déplie d'un clic et reste ouvert quand on travaille dedans.
+- **Un projet existant** : « 📦 Tout le jeu », dossier Personnages, **« 📁 Un
+  fichier par personnage »** range tout ainsi — ceux de `principal.cpp`, d'un
+  fichier voisin, ou d'un ancien `personnages.cpp` d'un seul bloc — avec leur
+  table de palettes et leurs marques ; « ↶ » le défait. Sur Mario, l'écran est
+  le même au pixel près.
+- **Dans une leçon** (📚 APPRENDRE), rien de tout cela : la leçon garde son
+  programme tel qu'elle l'a écrit.
+
+Le programme compilé ne change pas : les `#include "…"` collent les fichiers de
+proche en proche, et pour des dessins l'ordre ne compte pas
+(`ranger-personnages.js`).
+
+**Verrouiller un dessin : un modèle, comme une classe.** Un `Perso` est déjà un
+modèle — chaque `sprite16(numero, x, y, ENNEMI)` en fait un exemplaire à
+l'écran, et l'original ne bouge pas. **🔒 Verrouiller** (dans « ▦ Les tuiles »,
+ou sur l'élément dans « 📦 Tout le jeu ») le garantit : une marque est écrite
+sous le dessin, dans le code (`/* MARIO : verrouillé */`), donc enregistrée
+avec le projet et emportée quand on le range dans `personnages.cpp`. Tant
+qu'elle est là, on le voit et on s'en sert, mais **on ne le modifie plus** :
+
+- dans l'atelier, pinceau, miroir, coller, effacer, palettes et renommer sont
+  refusés, avec le message « 🔒 MARIO est verrouillé » ;
+- dans l'éditeur de code, une frappe qui changerait ses rangées, sa table de
+  palettes, l'effacerait ou ôterait sa marque est **défaite aussitôt** ;
+- **⧉ Créer une variante** en fait une copie modifiable (`MARIO_ROUGE`),
+  l'original intact ; **🔓 Déverrouiller** le rend modifiable.
+
+Les retours en arrière (↶, une version) et un programme remplacé en entier
+passent. Ce n'est pas une sécurité — un fichier ouvert dans le Bloc-notes reste
+modifiable — mais un garde-fou contre les erreurs (`verrous.js`). Il vaut pour
+les `Tuile` et les `Perso` (16 × 16 ou 32 × 32).
+
+**Supprimer un élément — seulement s'il ne sert nulle part.** « 🧽 Vider le
+dessin » efface les pixels mais garde le nom ; **🗑 Supprimer** ôte l'élément du
+programme, avec ce qui l'accompagne (table de palettes, marques). C'est
+**refusé** tant qu'une ligne du projet s'en sert — dans n'importe quel onglet :
+`poser(5, 5, SOL);` dans `principal.cpp` empêche de supprimer un `SOL` écrit
+dans `tuiles.cpp` — et la page dit où (« SOL est utilisé 1 fois dans le
+projet… principal.cpp, ligne 186 : t = SOL; »). Refusé aussi pour un élément
+**verrouillé**. Les commentaires et les textes entre guillemets ne comptent
+pas comme une utilisation. « ↶ » fait revenir ce qu'on a supprimé.
+
+On supprime ainsi les tuiles, personnages, grands, airs et cartes — dans
+« ▦ Les tuiles » (« 🗑 Supprimer ») ou dans « 📦 Tout le jeu », où chaque
+élément dit **« ✔ utilisé N fois »** ou **« ∅ jamais utilisé »** : de quoi
+repérer ce qui prend de la place dans la cartouche sans servir. Les scènes et
+les couleurs ne se suppriment pas ainsi : une scène est tissée dans tout le jeu
+(`supprimer.js`).
+
 ### Les lutins, et pourquoi ils existent
 
 Un décor vit sur une grille de huit pixels. Un personnage, non : s'il ne
@@ -749,6 +874,39 @@ Trois conséquences à connaître :
 
 Il n'y a ni unité de compilation séparée, ni éditeur de liens : il n'y en a pas
 besoin, et en promettre serait promettre un cloisonnement qui n'existe pas.
+
+### Ajouter sa propre fonction à la console
+
+Un fichier voisin (`#include "outils.cpp"`) suffit pour **ranger** ses
+fonctions. Pour qu'une fonction devienne une fonction **de la console**, qu'on
+demande par `#include <nom>` comme `poser()`, il suffit de l'écrire en C++ et
+de l'inscrire à trois endroits — c'est ainsi que `bande()` y est entrée :
+
+| Fichier | Ce qu'on y ajoute |
+|---|---|
+| `compilateur/emetteur.js` | sa source C++, dans une constante `SOURCE_BANDE` (un texte entre accents graves, sur plusieurs lignes), puis une ligne `bande: SOURCE_BANDE,` dans `FONCTIONS_EN_C` |
+| `compilateur/inclusion.js` | son nom dans `BIBLIOTHEQUES` : `bande: 'pose la même tuile plusieurs fois, de gauche à droite',` |
+| `aide-fonctions.js` | sa fiche pour l'éditeur (facultatif) : `bande: { args: [...], dit: '...' },` |
+
+- Le compilateur n'ajoute la source **que si le programme appelle la
+  fonction**, et seulement s'il n'en a pas écrit une du même nom : **la sienne
+  passe avant**.
+- La source n'écrit pas ses propres `#include` (`bande()` appelle `poser()`
+  sans `#include <poser>`) : ce que la console ajoute est marqué `deLaConsole`.
+- Après la modification, **Ctrl+F5** dans l'atelier, puis `npm run verifier`.
+- Chaque `#include` a son tuto dans `tuto/lecons.js`, reconnu à la première
+  ligne de son programme : `// ---- #include <bande> : … ----`. Le parcours le
+  place juste avant la première étape qui l'emploie.
+
+**Un coût à connaître :** `bande()` ne pèse que 38 octets, mais une tuile qui
+lui arrive par un **paramètre** est une variable : le compilateur ne peut plus
+savoir laquelle sera posée, et grave **toute la police** (704 octets) au lieu
+du seul dessin employé. Dix `poser()` en clair font 229 octets ; un appel à
+`bande()`, 911.
+
+Tout est expliqué pas à pas dans le dernier chapitre du parcours (« Tes
+propres #include », 8 étapes et le tuto de `bande()`) et dans
+`documents/ajouter-un-include.pdf`.
 
 ### Les numéros de tuiles
 
@@ -955,7 +1113,7 @@ pause.
 | **La taille du texte** | `13 px` | Celle du champ de code, et de lui seul. |
 | **La police du code** | `systeme` | Toutes à chasse fixe : une colonne de code doit rester une colonne. |
 | **L’interligne** | `150%` | De l’air entre les lignes, ou le plus de code possible à l’écran. |
-| **La hauteur du champ** | `300 px` | En mode code, où le champ prend toute la place qu’on lui donne. |
+| **La hauteur du champ** | `300 px` | Quand le code est en grand (« ⤢ Agrandir le code »), où le champ prend toute la place qu’on lui donne. |
 | **Revenir à la ligne tout seul** | coché | Décoché, une longue ligne déborde à droite plutôt que de se replier. |
 | **La largeur d’une indentation** | `2` | Ce que « Tab » insère, et ce que l’indentation automatique recopie. |
 | **« Tab » indente le code** | coché | Décoché, « Tab » passe au champ suivant, comme partout ailleurs dans la page. |
@@ -1073,7 +1231,7 @@ elles entrent dans le programme au premier coup de pinceau.
   la glisse, elle retombe sur la case la plus proche. Dans l’atelier des tuiles,
   « ⬚ Sélectionner et déplacer » fait de même dans une tuile ou un personnage, et
   « 📋 Copier le dessin », « 📌 Coller ici », « ⧉ Dupliquer » copient un dessin entier.
-- **🗑 Effacer la carte**, **🗑 Effacer la tuile / le personnage**.
+- **🗑 Effacer la carte**, **🧽 Vider le dessin** (la tuile ou le personnage garde son nom), et **🗑 Supprimer** (il quitte le programme — refusé s'il sert quelque part, voir « Supprimer un élément »).
 - 👾 Les acteurs : une **galerie** de vignettes pour choisir le dessin d'un
   acteur, avant de le poser ou après ; celui qui est pris est entouré.
 
@@ -1115,6 +1273,36 @@ les textes de **fin** (« PERDU ! », « BRAVO ! ») se changent. Avec un titre,
 dire **qui parle** et montrer son **portrait** (un dessin de 16 × 16) ; l'action
 **« un menu »** pose une question avec jusqu'à quatre réponses, choisies au curseur
 « > » (HAUT, BAS, A) — la variable reçoit le numéro de la réponse.
+
+### Tout le jeu, d'un coup d'œil
+
+L'onglet **« 📦 Tout le jeu »** du mode création montre **chaque élément du
+programme**, de tous ses onglets (`principal.cpp` et ses fichiers voisins),
+rangé en six **dossiers** : Personnages, Tuiles, Cartes, Scènes jouables,
+Musiques, Couleurs. Pour chaque élément :
+
+- une **miniature** (le dessin, la carte réduite, la mélodie en barres, les palettes) ;
+- **où il est écrit** : le fichier et la ligne ;
+- **la ligne à écrire pour s'en servir**, avec « 📋 copier » :
+  `sprite16(0, 80, 72, MARIO);` (ou `sprite32(0, 64, 56, BOSS);` pour un personnage de 32 × 32), `poser(10, 9, SOL);`, `FOND();`,
+  `FOND_entrer(FOND_DEPART_X, FOND_DEPART_Y);`, `jouer(THEME);` ;
+- **« ✏ ouvrir »** : passe à l'onglet du fichier, puis à l'atelier de
+  l'élément, où il est déjà choisi ;
+- **« 🔒 verrouiller » / « 🔓 déverrouiller »** pour une tuile ou un
+  personnage (voir « Un personnage se dessine en entier ») ;
+- **« ✔ utilisé N fois »** ou **« ∅ jamais utilisé »**, compté dans tout le
+  projet, et **« 🗑 supprimer »**, possible seulement pour ce qui ne sert pas
+  et n'est pas verrouillé.
+
+Une recherche filtre par nom. **L'image de chaque dossier** se choisit avec
+« 🖼 » (un fichier image de l'ordinateur, réduit à 96 × 96) et se retire avec
+« ✕ ». Elle décore l'atelier : elle reste **dans le navigateur**
+(localStorage), pas dans le programme ni dans la cartouche.
+
+L'onglet ne range rien ailleurs : chaque élément reste écrit dans le code,
+sous son nom (`tout-le-jeu.js` lit, il n'écrit pas). Adresse directe :
+`index.html#tout`. Contrôlé dans un vrai navigateur par
+`npm run tout-le-jeu` (`verification/verifier-tout-le-jeu.mjs`).
 
 ### Versions, et retrouver ses dessins
 

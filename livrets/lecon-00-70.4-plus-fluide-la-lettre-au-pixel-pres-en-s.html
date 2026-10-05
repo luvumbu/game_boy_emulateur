@@ -89,10 +89,11 @@
     
   </p>
 <h1>0.70.4. Plus fluide : la lettre au pixel près — en simple</h1>
-<p class="idee">Le 0.70 en une ligne : glisse_croix(0, px, py, ALPHABET[0], 1).</p>
+<p class="idee">Le 0.70 en une ligne : glisse_croix(0, px, py, ALPHABET[2], 1). Cette fois, un C, parti du pixel (120, 20).</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
-<p><strong>C’est le 0.70, en plus simple :</strong> les quatre <code>if</code> des flèches et le <code>sprite</code> sont remplacés par une ligne, <code>glisse_croix</code> (le 0.73).</p>
+<p><strong>C’est le 0.70, en plus simple :</strong> les quatre <code>if</code> des flèches et le <code>sprite</code> sont remplacés par une ligne, <code>glisse_croix</code> (le 0.73 la reprend avec le A au milieu).</p>
+<p><strong>Une autre lettre, ailleurs :</strong> un C (<code>ALPHABET[2]</code>), parti du pixel (120, 20), en haut à droite.</p>
 <p><strong>La vitesse, 1 :</strong> un pixel par image, comme au 0.70.</p>
 
 <div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
@@ -134,7 +135,7 @@ Tes fonctions appelées :
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
     <pre><code>#include &lt;glisse_croix&gt;   // un lutin qui suit la croix, au pixel près
-#include &lt;ALPHABET&gt;       // les lettres de la police : ALPHABET[0] est le A</code></pre>
+#include &lt;ALPHABET&gt;       // les lettres de la police : ALPHABET[2] est le C</code></pre>
   </div>
   <div></div>
 </div>
@@ -142,7 +143,7 @@ Tes fonctions appelées :
 <div class="morceau">
   <div>
     <p class="quoi">2. une variable — px</p>
-    <pre><code>uint8_t px = 76;      // en pixels : le milieu</code></pre>
+    <pre><code>uint8_t px = 120;     // le C, en pixels : en haut à droite</code></pre>
   </div>
   <div></div>
 </div>
@@ -150,7 +151,7 @@ Tes fonctions appelées :
 <div class="morceau">
   <div>
     <p class="quoi">3. une variable — py</p>
-    <pre><code>uint8_t py = 68;</code></pre>
+    <pre><code>uint8_t py = 20;</code></pre>
   </div>
   <div></div>
 </div>
@@ -161,7 +162,7 @@ Tes fonctions appelées :
     <pre><code>int main() {
   while (true) {
     image();
-    glisse_croix(0, px, py, ALPHABET[0], 1);   // tout le 0.70
+    glisse_croix(0, px, py, ALPHABET[2], 1);   // tout le 0.70, en une ligne
   }
 }</code></pre>
   </div>
@@ -182,7 +183,7 @@ programme.</p>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABhElEQVR4nO3RoQ3DUBQEQcOUYJj+q0kJLsMwIMQg1P7SvJUGHDxpt+P8BLYtf5BbFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYNygwK/9/bP8yZOmBL52HdW4wLhBga+W/3nMoMB/N6/AuALjpgQeq8C4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCsw7gtWWfKjdi8m+AAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgUlEQVR4nO3WsQmEQBBAUUNLuND+q7EEy7jQQDiuAB3h8+Dls/AZZpfjuxO2vP4CHiVwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAo9aP9tlbKLAc/67jjUWeM7k4v4IPEfgOIHj3OA+v2huJnCcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcdwJl6v6rRerBKAAAAABJRU5ErkJggg==" alt="l’écran">
     <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
   </figure>
 </div>
@@ -190,7 +191,7 @@ programme.</p>
 
 
 <h2>4. Ce qu’on doit voir</h2>
-<p class="avoir">Comme au 0.70 : un A qui glisse pixel par pixel avec les flèches.</p>
+<p class="avoir">Un C en haut à droite, qui glisse pixel par pixel avec les flèches, comme le A du 0.70.</p>
 
 <h2>5. Ce que la console répond</h2>
 <p>Ces contrôles ne sont pas décoratifs : ce sont ceux que

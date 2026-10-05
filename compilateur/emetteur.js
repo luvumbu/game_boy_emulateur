@@ -25,7 +25,7 @@
  * moment de compiler, en nommant le cycle.
  */
 
-import { numeroDe, octetsDesTuiles, NOMBRE_DE_TUILES, lettresGrasses, pixelsDe, ORDRE } from './police.js'
+import { numeroDe, octetsDesTuiles, NOMBRE_DE_TUILES, lettresGrasses, lettresTitre, grandeLettreTitre, lettreManga, pixelsDe, ORDRE } from './police.js'
 import { analyser } from './analyseur.js'
 import { BIBLIOTHEQUES } from './inclusion.js'
 
@@ -286,7 +286,7 @@ function verifierDessin(rangees, ligne, cote, sujet) {
   if (rangees.length !== cote) {
     throw new Error(
       `ligne ${ligne} : ${sujet} a ${rangees.length} rangée${rangees.length > 1 ? 's' : ''} ; ` +
-        `${cote === 16 ? 'un Perso' : 'une Tuile'} en veut exactement ${cote}.`,
+        (cote === 8 ? 'une Tuile en veut exactement 8.' : 'un Perso en veut exactement 16 (un personnage de 16 × 16) ou 32 (un personnage de 32 × 32).'),
     )
   }
   for (const rangee of rangees) {
@@ -511,7 +511,7 @@ export class Emetteur {
       this.policeEntiere ||= `${this.fonctionDuLangage ?? 'une tuile'} reçoit un numéro calculé`
       return
     }
-    const combien = cote === 16 ? 4 : 1
+    const combien = cote === 32 ? 16 : cote === 16 ? 4 : 1
     for (let i = 0; i < combien; i++) {
       if (numero + i < NOMBRE_DE_TUILES) this.lettres.add(numero + i)
     }
@@ -582,7 +582,7 @@ export class Emetteur {
    */
   dessiner(nom, rangees, ligne, cote) {
     if (this.dessins.has(nom)) return this.dessins.get(nom)
-    const sujet = `${cote === 16 ? 'le Perso' : 'la tuile'} « ${nom} »`
+    const sujet = `${cote >= 16 ? 'le Perso' : 'la tuile'} « ${nom} »`
     verifierDessin(rangees, ligne, cote, sujet)
     return this.enregistrerDessin(nom, rangees, ligne, cote, sujet, nom)
   }
@@ -625,8 +625,10 @@ export class Emetteur {
   enregistrerDessin(cle, rangees, ligne, cote, sujet, appellation) {
     /* Un dessin de seize occupe QUATRE tuiles : le matériel ne connaît que des
        carrés de huit. Elles se suivent dans l'ordre haut-gauche, haut-droite,
-       bas-gauche, bas-droite — c'est ce que « sprite16 » attend. */
-    const combien = cote === 16 ? 4 : 1
+       bas-gauche, bas-droite — c'est ce que « sprite16 » attend. Un Grand
+       (32 × 32) en occupe SEIZE : quatre Perso à la suite, un par quart, dans
+       le même ordre — c'est ce que « sprite32 » attend. */
+    const combien = cote === 32 ? 16 : cote === 16 ? 4 : 1
     const numero = this.prochaineTuile
     if (numero + combien > 256) throw new Error(`ligne ${ligne} : plus de place pour ${sujet}`)
     this.prochaineTuile += combien
@@ -1411,8 +1413,14 @@ function resoudreDeclaration(e, n, portee, initialisations) {
   }
 
   /* Une tuile dessinée : son nom devient son numéro, connu à la compilation. */
-  if (n.type.nom === 'Tuile' || n.type.nom === 'Perso') {
-    const cote = n.type.nom === 'Perso' ? 16 : 8
+  if (n.type.nom === 'Tuile' || n.type.nom === 'Perso' || n.type.nom === 'Grand') {
+    /*
+     * Un Perso est un PERSONNAGE, quelle que soit sa taille : seize rangées en
+     * font un 16 × 16, trente-deux un 32 × 32 — la taille se lit sur le dessin.
+     * « Grand » reste un autre nom du 32 × 32.
+     */
+    const nRangees = n.valeur?.genre === 'liste' ? n.valeur.valeurs.length : 0
+    const cote = n.type.nom === 'Grand' ? 32 : n.type.nom === 'Perso' ? (nRangees === 32 ? 32 : 16) : 8
     if (n.tableau) throw new Error(`ligne ${n.ligne} : un ${n.type.nom} ne se met pas en tableau`)
     if (!n.valeur || n.valeur.genre !== 'liste') {
       throw new Error(
@@ -2755,7 +2763,7 @@ function valeur(e, n) {
 
 const BUILTINS = new Set([
   'texte', 'poser', 'lire', 'image', 'bouton', 'hasard', 'semer', 'ecran',
-  'sprite', 'sprite16', 'cacher', 'cacher16', 'defiler',
+  'sprite', 'sprite16', 'sprite32', 'cacher', 'cacher16', 'cacher32', 'defiler', 'texteTitre', 'texteManga',
   'panneau', 'cacherPanneau', 'effacerPanneau', 'poserPanneau', 'lirePanneau', 'textePanneau',
   'effacer', 'textS', 'poserS', 'attendre',
   'couleurFond', 'couleurLutin', 'teindre', 'teindreLutin', 'teindrePanneau',
@@ -2778,6 +2786,7 @@ const TUILE_ATTENDUE = new Map([
   ['poserPanneau', { rang: 2, cote: 8 }],
   ['sprite', { rang: 3, cote: 8 }],
   ['sprite16', { rang: 3, cote: 16 }],
+  ['sprite32', { rang: 3, cote: 32 }],
 ])
 
 /**
@@ -2789,7 +2798,7 @@ const TUILE_ATTENDUE = new Map([
  * fois dépenserait seize tuiles pour un seul personnage.
  */
 function tuileSurPlace(e, liste, cote, nom) {
-  exiger(e, cote === 16 ? 'Perso' : 'Tuile', liste.ligne)
+  exiger(e, cote >= 16 ? 'Perso' : 'Tuile', liste.ligne)
   const rangees = liste.valeurs.map((v) => {
     if (v.genre !== 'texte') {
       throw new Error(
@@ -2931,7 +2940,7 @@ const BESOINS = {
   hasard: ['hasard'],
   note: ['son'], bruit: ['son'], silence: ['son'], volumeSon: ['son'], airFini: ['son'],
   jouer: ['airs', 'son', 'horloge'],
-  sprite: ['lutins'], sprite16: ['lutins'], cacher: ['lutins'], cacher16: ['lutins'],
+  sprite: ['lutins'], sprite16: ['lutins'], sprite32: ['lutins'], cacher: ['lutins'], cacher16: ['lutins'], cacher32: ['lutins'],
   couleurLutin: ['lutins'], teindreLutin: ['lutins'], paletteLutins: ['lutins'],
 }
 const SANS_FOND = new Set([...Object.keys(BESOINS), 'semer', 'bouton', 'sauver', 'sauvegarde'])
@@ -3942,6 +3951,136 @@ function appelSansTrace(e, n) {
    * les moitiés quand il regarde à gauche — une erreur invisible, qui donne un
    * visage à l'envers.
    */
+  /*
+   * Un mot en GROSSES lettres de titre, d'un appel.
+   *
+   *   texteTitre(1, 2, "SUPER");      // taille 3 : 3 × 3 cases par lettre
+   *   texteTitre(1, 6, "SUPER", 2);   // taille 2 : 2 × 2 cases ; 4 : 4 × 4
+   *
+   * Chaque lettre fait « taille » cases de côté (3 si on ne le dit pas), une
+   * sur deux un peu descendue : le mot sautille (voir grandeLettreTitre, dans
+   * police.js). La taille s'écrit en clair : les lettres sont dessinées par
+   * le compilateur, avant que le jeu ne tourne. L'appel devient, pour chaque case non vide, un « poser(c, l,
+   * { dessin }) » ordinaire : deux cases dessinées pareil ne coûtent qu'une
+   * tuile, et SEULES les lettres du mot sont gravées — l'alphabet entier, à
+   * neuf cases par lettre, ne tiendrait pas dans les 256 tuiles de la console.
+   * Ces « poser » sont écrits par la console : ils ne demandent ni
+   * #include <poser> ni #include <Tuile>.
+   *
+   * texteManga() suit le même chemin, avec les lettres de lettreManga : un
+   * style entre manga et dessin animé (penchées, coins coupés, une trame).
+   */
+  if (nom === 'texteTitre' || nom === 'texteManga') {
+    const dessiner = nom === 'texteManga' ? lettreManga : grandeLettreTitre
+    if (args.length !== 3 && args.length !== 4) {
+      throw new Error(`ligne ${n.ligne} : ${nom}(colonne, ligne, "MOT") prend trois arguments, ou quatre avec la taille : ${nom}(colonne, ligne, "MOT", 2)`)
+    }
+    const taille = args.length === 4 ? constante(args[3]) : 3
+    if (taille === null) {
+      throw new Error(`ligne ${n.ligne} : la taille de ${nom}() s'écrit en clair — 2, 3 ou 4 —, pas avec une variable : les lettres sont dessinées par le compilateur, avant que le jeu ne tourne`)
+    }
+    if (![2, 3, 4].includes(taille)) {
+      throw new Error(`ligne ${n.ligne} : la taille de ${nom}() est 2, 3 ou 4 (le nombre de cases de côté d'une lettre), pas ${taille}`)
+    }
+    if (args[2].genre !== 'texte') {
+      throw new Error(`ligne ${n.ligne} : le mot de ${nom}() s'écrit en clair, entre guillemets — comme ${nom}(1, 2, "SUPER")`)
+    }
+    const mot = args[2].valeur
+    const colonne = constante(args[0])
+    const ligneDuMot = constante(args[1])
+    if (colonne !== null && colonne + mot.length * taille > 20) {
+      throw new Error(
+        `ligne ${n.ligne} : « ${mot} » fait ${mot.length} caractères × ${taille} colonnes = ${mot.length * taille} colonnes, à partir de la colonne ${colonne} ; ` +
+          `l'écran n'en a que 20. Écrire le titre sur deux lignes, avec deux ${nom}(), ou plus petit.`,
+      )
+    }
+    if (ligneDuMot !== null && ligneDuMot + taille > 18) {
+      throw new Error(`ligne ${n.ligne} : en taille ${taille}, une lettre de titre fait ${taille} lignes ; à partir de la ligne ${ligneDuMot}, elle sortirait de l'écran (18 lignes)`)
+    }
+    const nombre = (valeurEntiere) => ({ genre: 'nombre', valeur: valeurEntiere, ligne: n.ligne })
+    const plus = (noeud, combien) => combien === 0 ? noeud
+      : { genre: 'calcul', operateur: '+', gauche: noeud, droite: nombre(combien), ligne: n.ligne }
+    const avant = e.dansLaConsole
+    e.dansLaConsole = true // ce que la console écrit ne demande pas d'#include
+    try {
+      ;[...mot].forEach((caractere, k) => {
+        if (caractere === ' ') return
+        const lettre = dessiner(caractere, k % 2 === 1, taille)
+        if (!lettre) throw new Error(`ligne ${n.ligne} : « ${caractere} » n'a pas de lettre de titre (A à Z, 0 à 9, et ! ? . - : # |)`)
+        for (let ty = 0; ty < taille; ty++) {
+          for (let tx = 0; tx < taille; tx++) {
+            const rangees = lettre.slice(ty * 8, ty * 8 + 8).map((r) => r.slice(tx * 8, tx * 8 + 8))
+            if (rangees.every((r) => r === '00000000')) continue // une case vide : rien à poser
+            appel(e, {
+              genre: 'appel',
+              nom: 'poser',
+              ligne: n.ligne,
+              arguments: [
+                colonne === null ? plus(args[0], k * taille + tx) : nombre(colonne + k * taille + tx),
+                ligneDuMot === null ? plus(args[1], ty) : nombre(ligneDuMot + ty),
+                { genre: 'liste', ligne: n.ligne, valeurs: rangees.map((r) => ({ genre: 'texte', valeur: r, ligne: n.ligne })) },
+              ],
+            })
+          }
+        }
+      })
+    } finally {
+      e.dansLaConsole = avant
+    }
+    return
+  }
+
+  /*
+   * Un grand personnage, 32 × 32 : quatre « sprite16 », un par quart.
+   *
+   *   sprite32(0, 64, 56, BOSS);   les lutins 0 à 15, coin haut-gauche au pixel (64, 56)
+   *
+   * Un Grand occupe seize tuiles qui se suivent, quatre Perso à la suite (voir
+   * enregistrerDessin) : le quart n° q commence à la tuile « BOSS + 4 × q ».
+   * Retourné, ce sont les QUARTS qui échangent leurs places, et chacun est
+   * retourné sur lui-même par son sprite16 — comme sprite16 le fait de ses
+   * quatre carrés de huit.
+   */
+  if (nom === 'sprite32') {
+    if (args.length !== 4 && args.length !== 5) {
+      throw new Error(`ligne ${n.ligne} : sprite32(numero, x, y, tuile) prend quatre arguments, ou cinq avec le retournement`)
+    }
+    const premier = constante(args[0])
+    if (premier !== null && premier > 24) {
+      throw new Error(`ligne ${n.ligne} : un grand personnage de 32 × 32 occupe seize lutins ; 24 au maximum`)
+    }
+    const options = args.length === 5 ? constante(args[4]) : 0
+    if (options === null) {
+      throw new Error(
+        `ligne ${n.ligne} : les options de sprite32() s'écrivent en clair — 0, MIROIR_X, ` +
+          'MIROIR_Y, ou les deux. Pour un personnage qui change de sens, écrire les deux cas dans un « if ».',
+      )
+    }
+    const drapeaux = options === 1 ? 0x20 : options
+    const nombre = (valeurEntiere) => ({ genre: 'nombre', valeur: valeurEntiere, ligne: n.ligne })
+    const plus = (noeud, combien) => combien === 0 ? noeud
+      : { genre: 'calcul', operateur: '+', gauche: noeud, droite: nombre(combien), ligne: n.ligne }
+    let quarts = [0, 1, 2, 3]
+    if (drapeaux & 0x20) quarts = [quarts[1], quarts[0], quarts[3], quarts[2]]
+    if (drapeaux & 0x40) quarts = [quarts[2], quarts[3], quarts[0], quarts[1]]
+    const tuile = constante(args[3])
+    quarts.forEach((quart, place) => {
+      appel(e, {
+        genre: 'appel',
+        nom: 'sprite16',
+        ligne: n.ligne,
+        arguments: [
+          premier === null ? plus(args[0], place * 4) : nombre(premier + place * 4),
+          plus(args[1], (place % 2) * 16),
+          plus(args[2], place > 1 ? 16 : 0),
+          tuile === null ? plus(args[3], quart * 4) : nombre(tuile + quart * 4),
+          nombre(drapeaux),
+        ],
+      })
+    })
+    return
+  }
+
   if (nom === 'sprite16') {
     if (args.length !== 4 && args.length !== 5) {
       throw new Error(`ligne ${n.ligne} : sprite16(numero, x, y, tuile) prend quatre arguments, ou cinq avec le retournement`)
@@ -3997,9 +4136,9 @@ function appelSansTrace(e, n) {
   }
 
   /* Ôter un lutin de l'écran. Le remettre à zéro le range au-dessus du bord. */
-  if (nom === 'cacher' || nom === 'cacher16') {
-    const combien = nom === 'cacher16' ? 4 : 1
-    const maximum = nom === 'cacher16' ? 36 : 39
+  if (nom === 'cacher' || nom === 'cacher16' || nom === 'cacher32') {
+    const combien = nom === 'cacher32' ? 16 : nom === 'cacher16' ? 4 : 1
+    const maximum = nom === 'cacher32' ? 24 : nom === 'cacher16' ? 36 : 39
     if (args.length !== 1) throw new Error(`ligne ${n.ligne} : ${nom}(numero) prend un argument`)
     const numero = constante(args[0])
     if (numero !== null && numero > maximum) {
@@ -5412,8 +5551,34 @@ uint8_t chaque_minuteur(uint8_t numero, uint8_t duree) {
 }
 `
 
+/*
+ * bande(colonne, ligne, tuile, longueur) : la même tuile posée « longueur »
+ * fois, de gauche à droite, à partir de (colonne, ligne).
+ *
+ *   bande(2, 5, ALPHABET[0], 10);   dix A sur la ligne 5, colonnes 2 à 11
+ *
+ * C'est l'exemple du chapitre « Tes propres #include » du cours : une
+ * fonction écrite d'abord par l'élève dans son programme, puis dans un
+ * fichier voisin, et enfin ici — devenue une fonction de la console, qu'on
+ * demande par « #include <bande> ». Elle est écrite en C, comme celles de
+ * l'élève : ajouter une fonction à la console, c'est écrire sa source ici,
+ * l'inscrire dans FONCTIONS_EN_C (juste en dessous), et donner son nom à
+ * BIBLIOTHEQUES (compilateur/inclusion.js).
+ *
+ * Elle se sert de poser() sans « #include <poser> » : ce que la console
+ * ajoute elle-même n'a rien à inclure (voir « deLaConsole »).
+ */
+const SOURCE_BANDE = `
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i < longueur; i++) {   // longueur fois :
+    poser(colonne + i, ligne, tuile);        //   une case de plus vers la droite
+  }
+}
+`
+
 /** Les fonctions de la console écrites en C : leur nom, et leur texte. */
 const FONCTIONS_EN_C = {
+  bande: SOURCE_BANDE,
   chaque_minuteur: SOURCE_CHAQUE,
   tourne_carre: SOURCE_TOURNE_CARRE, defile: SOURCE_DEFILE,
   deplace_croix: SOURCE_DEPLACE_CROIX, glisse_croix: SOURCE_GLISSE_CROIX,
@@ -5850,6 +6015,16 @@ function rangerLaPosition(noeud, siennes) {
  * tableau qui les range dans l'ordre. Le compilateur les ajoute SEULEMENT si
  * le programme parle d'ALPHABET_GRAS : sinon, pas un octet de plus.
  */
+/*
+ * ALPHABET_TITRE : l'alphabet des titres — les lettres épaisses, avec une
+ * ombre grise (voir lettresTitre, dans police.js). Comme ALPHABET_GRAS : 26
+ * « Tuile TITRE_A = { … }; » et un tableau qui les range, ajoutés SEULEMENT si
+ * le programme parle d'ALPHABET_TITRE.
+ */
+const SOURCE_ALPHABET_TITRE = lettresTitre().map(({ lettre, lignes }) =>
+  `Tuile TITRE_${lettre} = {\n${lignes.map((l) => `  "${l}",`).join('\n')}\n};\n`).join('') +
+  `const uint8_t ALPHABET_TITRE[] = { ${lettresTitre().map(({ lettre }) => 'TITRE_' + lettre).join(', ')} };\n`
+
 const SOURCE_ALPHABET_GRAS = lettresGrasses().map(({ lettre, lignes }) =>
   `Tuile GRAS_${lettre} = {\n${lignes.map((l) => `  "${l}",`).join('\n')}\n};\n`).join('') +
   `const uint8_t ALPHABET_GRAS[] = { ${lettresGrasses().map(({ lettre }) => 'GRAS_' + lettre).join(', ')} };\n`
@@ -5894,6 +6069,8 @@ function avecLesFonctionsEnC(programme) {
   /* L'alphabet en gras, si le programme en parle (et n'a pas le sien). */
   const siensGlobaux = new Set(programme.filter((n) => n.genre === 'declarer').map((n) => n.nom))
   if (!siensGlobaux.has('ALPHABET_GRAS') && nomme(programme, 'ALPHABET_GRAS')) ajoutees.unshift(...analyser(SOURCE_ALPHABET_GRAS))
+  /* L'alphabet des titres, de même. */
+  if (!siensGlobaux.has('ALPHABET_TITRE') && nomme(programme, 'ALPHABET_TITRE')) ajoutees.unshift(...analyser(SOURCE_ALPHABET_TITRE))
   /* Ce qui vient de la console, et non du programme : on ne lui demande pas
      ses « #include ». */
   for (const n of ajoutees) n.deLaConsole = true
@@ -5914,7 +6091,7 @@ function avecLesFonctionsEnC(programme) {
  * Les calculs (« a * b ») et les dessins écrits sur place sont relevés plus
  * tard, à la traduction : c'est là qu'on sait s'ils coûtent une routine.
  */
-const TYPES_A_INCLURE = new Set(['Tuile', 'Perso', 'Mot', 'Carre', 'Air'])
+const TYPES_A_INCLURE = new Set(['Tuile', 'Perso', 'Grand', 'Mot', 'Carre', 'Air'])
 
 function inclusionsEmployees(programme) {
   const siennes = new Set(programme.filter((n) => n.genre === 'fonction').map((n) => n.nom))
@@ -5926,7 +6103,7 @@ function inclusionsEmployees(programme) {
     if (!n || typeof n !== 'object') return
     if (n.genre === 'appel' && Object.hasOwn(BIBLIOTHEQUES, n.nom) && !siennes.has(n.nom)) noter(n.nom, n.ligne)
     if (n.genre === 'declarer' && TYPES_A_INCLURE.has(n.type?.nom)) noter(n.type.nom, n.ligne)
-    if (n.genre === 'variable' && (n.nom === 'ALPHABET' || n.nom === 'ALPHABET_GRAS') && !sesGlobales.has(n.nom)) noter(n.nom, n.ligne)
+    if (n.genre === 'variable' && (n.nom === 'ALPHABET' || n.nom === 'ALPHABET_GRAS' || n.nom === 'ALPHABET_TITRE') && !sesGlobales.has(n.nom)) noter(n.nom, n.ligne)
     for (const v of Object.values(n)) fouiller(v)
   }
   fouiller(programme)
@@ -7301,7 +7478,17 @@ function donnees(e) {
     e.ecrire(...octetsDesTuiles())
   }
   for (const { rangees, cote } of e.dessins.values()) {
-    if (cote === 16) {
+    if (cote === 32) {
+      /* Un Grand : ses quatre quarts de seize, dans l'ordre haut-gauche,
+         haut-droite, bas-gauche, bas-droite — et chacun rangé comme un Perso. */
+      for (const [haut, gauche] of [[0, 0], [0, 16], [16, 0], [16, 16]]) {
+        for (const [depart, moitie] of [[0, 0], [0, 8], [8, 0], [8, 8]]) {
+          for (let y = haut + depart; y < haut + depart + 8; y++) {
+            e.ecrire(...octetsDeLaRangee(rangees[y].slice(gauche + moitie, gauche + moitie + 8)))
+          }
+        }
+      }
+    } else if (cote === 16) {
       /* Les quatre quarts, dans l'ordre : haut-gauche, haut-droite,
          bas-gauche, bas-droite. */
       for (const [depart, moitie] of [[0, 0], [0, 8], [8, 0], [8, 8]]) {

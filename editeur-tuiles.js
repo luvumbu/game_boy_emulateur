@@ -88,7 +88,7 @@ export function poserNuances(quatre) {
 /** La police occupe les 44 premiers numéros ; les dessins suivent. */
 const PREMIER_DESSIN = 44
 
-const MOTIF = /\b(Tuile|Perso)\s+([A-Za-z_][\w]*)\s*=\s*\{([\s\S]*?)\}\s*;/g
+const MOTIF = /\b(Tuile|Perso|Grand)\s+([A-Za-z_][\w]*)\s*=\s*\{([\s\S]*?)\}\s*;/g
 
 /**
  * Retrouve les tuiles dessinées dans un programme.
@@ -108,9 +108,15 @@ export function lireDessins(source) {
   let coup
 
   while ((coup = MOTIF.exec(source)) !== null) {
-    const cote = coup[1] === 'Perso' ? 16 : 8
-    const attendu = new RegExp(`'([${CLASSE}]{${cote}})'|"([${CLASSE}]{${cote}})"`, 'g')
-    const rangees = [...coup[3].matchAll(attendu)].map((m) => m[1] ?? m[2])
+    /* Un Perso est un personnage de 16 × 16 OU de 32 × 32 : sa taille se lit sur
+       ses rangées, comme le fait le compilateur. « Grand » est l'autre nom du 32. */
+    const lire = (c) => [...coup[3].matchAll(new RegExp(`'([${CLASSE}]{${c}})'|"([${CLASSE}]{${c}})"`, 'g'))].map((m) => m[1] ?? m[2])
+    let cote = coup[1] === 'Grand' ? 32 : coup[1] === 'Perso' ? 16 : 8
+    let rangees = lire(cote)
+    if (coup[1] === 'Perso' && rangees.length !== 16) {
+      const grandes = lire(32)
+      if (grandes.length === 32) { cote = 32; rangees = grandes }
+    }
     if (rangees.length !== cote) continue // une tuile mal formée est laissée au compilateur
 
     trouves.push({
@@ -121,18 +127,21 @@ export function lireDessins(source) {
       fin: coup.index + coup[0].length,
       numero: prochain,
     })
-    prochain += cote === 16 ? 4 : 1
+    prochain += cote === 32 ? 16 : cote === 16 ? 4 : 1
   }
 
   return trouves
 }
+
+/** Le mot qui déclare un dessin de ce côté : Tuile (8), Perso (16 ou 32). */
+export const typeDuDessin = (cote) => (cote >= 16 ? 'Perso' : 'Tuile') // un personnage, 16 × 16 ou 32 × 32
 
 /** Réécrit une tuile dans le texte, en gardant l'indentation d'origine. */
 export function remplacerDessin(source, dessin, rangees) {
   const avant = source.slice(0, dessin.debut)
   const debutDeLigne = avant.lastIndexOf('\n') + 1
   const marge = avant.slice(debutDeLigne).match(/^[ \t]*/)[0]
-  const type = dessin.cote === 16 ? 'Perso' : 'Tuile'
+  const type = typeDuDessin(dessin.cote)
 
   const texte = [
     `${type} ${dessin.nom} = {`,
@@ -182,7 +191,7 @@ export function renommerPartout(source, ancien, neuf) {
  */
 export function ajouterDessin(source, nom, cote = 8, modele = null) {
   const dessins = lireDessins(source)
-  const type = cote === 16 ? 'Perso' : 'Tuile'
+  const type = typeDuDessin(cote)
   const rangees = modele ?? Array.from({ length: cote }, () => '0'.repeat(cote))
   const bloc = [`${type} ${nom} = {`, ...rangees.map((r) => `  "${r}",`), '};'].join('\n')
 
@@ -267,7 +276,7 @@ export function ecrireEtiquettes(source, nom, etiquettes) {
   const ligne = `/* ${nom} : étiquettes ${propres.join(' ')} */${SAUT}`
   if (motif.test(source)) return source.replace(motif, () => (propres.length ? ligne : ''))
   if (!propres.length) return source
-  const debut = source.search(new RegExp(`\\b(?:Tuile|Perso)\\s+${nom}\\s*=\\s*\\{`))
+  const debut = source.search(new RegExp(`\\b(?:Tuile|Perso|Grand)\\s+${nom}\\s*=\\s*\\{`))
   if (debut < 0) return source
   const fin = source.indexOf('};', debut)
   if (fin < 0) return source
@@ -370,7 +379,35 @@ export function installer({
   /* Rend les huit palettes de la console si le programme est en couleur,
      « null » sinon. L'atelier ne connaît pas l'émulateur : il demande. */
   palettesDeLaConsole = () => null,
+  /*
+   * Le projet entier, en création : l'atelier voit les dessins de TOUS les
+   * onglets, et un personnage vit dans son fichier à lui (ranger-personnages.js).
+   * La page le fournit :
+   *   actif()                      vrai en création (pas dans une leçon)
+   *   tousLesDessins()             [{ nom, cote, rangees, numero, fichier, etiquettes }]
+   *   fichierCourant()             l'onglet ouvert
+   *   aller(fichier)               ouvre cet onglet
+   *   noms()                       les noms pris, dans tout le projet
+   *   creer(nom, cote, rangees)    un personnage dans perso_NOM.cpp, onglet ouvert
+   *   renommer(ancien, neuf)       partout, fichier compris
+   */
+  projet = null,
+  /* Le verrou d'un dessin : { est(nom), basculer(nom) } — voir verrous.js. */
+  verrou = null,
+  /* Supprimer un dessin du programme : { supprimer(nom) } rend la phrase à dire.
+     C'est la page qui vérifie, dans TOUS les onglets, qu'il ne sert nulle part. */
+  suppression = null,
 }) {
+  /* Un geste refusé par le verrou (la page rend « false ») se dit ici, sous les
+     yeux, et pas seulement sous l'éditeur de code. */
+  const ecrireSansLeDire = ecrireSource
+  ecrireSource = (texte, ...reste) => {
+    const fait = ecrireSansLeDire(texte, ...reste)
+    if (fait === false && verrou && choisi && verrou.est(choisi)) {
+      barre?.dire(`🔒 ${choisi} est verrouillé : on s’en sert, on ne le modifie pas. « 🔓 Déverrouiller » pour le changer, ou « ⧉ Créer une variante ».`, 'alerte')
+    }
+    return fait
+  }
   let choisi = null // le nom de la tuile en cours d'édition
   let nuance = 3
   let paletteVue = 0     // avec quelle palette on REGARDE la tuile
@@ -416,7 +453,7 @@ export function installer({
       tuileVue = choisi
       palettePosee = null
       /* Un personnage de seize se regarde d'abord avec les palettes des personnages. */
-      vueLutins = dessinChoisi()?.cote === 16
+      vueLutins = (dessinChoisi()?.cote ?? 8) >= 16
       const dansLeProgramme = paletteDUneTuile(lireSource(), choisi)
       paletteVue = dansLeProgramme === null ? (vueLutins ? 1 : 0) : dansLeProgramme
       const d = dessinChoisi()
@@ -446,12 +483,17 @@ export function installer({
      * peignait : on la passait en palette 3, et tout le monde semblait passer en
      * palette 3 avec elle — alors qu'aucune autre tuile n'avait changé.
      */
-    if (dessin.cote !== 16) {
+    if (dessin.cote === 8) {
       const p = dessin.nom === choisi ? paletteVue : (paletteDUneTuile(texte, dessin.nom) ?? 0)
       const pal = palettesMontrees(texte, false)[Math.min(7, p)]
       return (x, y, n) => versDiese(pal[n])
     }
     const palettes = palettesMontrees(texte, true)
+    if (dessin.cote === 32) {
+      /* Un Grand n'a pas (encore) de palette par quart : toute sa palette est celle qu'on regarde. */
+      const pal = palettes[Math.min(7, dessin.nom === choisi ? paletteVue : 1)]
+      return (x, y, n) => n === 0 ? ((x + y) & 1 ? '#c8c8c8' : '#ececec') : versDiese(pal[n])
+    }
     const quarts = quartsDe(texte, dessin)
     /* Le n° 0 d'un personnage est TRANSPARENT : un damier, comme sa pastille. */
     return (x, y, n) => n === 0
@@ -472,7 +514,11 @@ export function installer({
    * ne saurait plus laquelle on veut. Un nom libre remplace l'ancien partout.
    */
   async function renommer(ancien) {
-    const pris = nomsDuProgramme(lireSource())
+    if (verrou?.est(ancien)) {
+      barre?.dire(`🔒 ${ancien} est verrouillé : son nom ne change pas. « 🔓 Déverrouiller » d’abord.`, 'alerte')
+      return
+    }
+    const pris = projet?.actif() ? projet.noms() : nomsDuProgramme(lireSource())
     pris.delete(ancien)
 
     const neuf = demanderUnNom
@@ -480,7 +526,8 @@ export function installer({
       : demanderSansBoite(ancien, pris)
     if (!neuf || neuf === ancien) return
 
-    ecrireSource(renommerPartout(lireSource(), ancien, neuf))
+    if (projet?.actif()) projet.renommer(ancien, neuf)
+    else ecrireSource(renommerPartout(lireSource(), ancien, neuf))
     if (choisi === ancien) choisi = neuf
     surChangement()
     rafraichirBande()
@@ -511,8 +558,8 @@ export function installer({
     bouton.className = 'tuile neuve'
     bouton.textContent = texte
     bouton.addEventListener('click', async () => {
-      const pris = new Set(dessins().map((d) => d.nom))
-      const racine = cote === 16 ? 'PERSO' : 'TUILE'
+      const pris = projet?.actif() ? projet.noms() : new Set(dessins().map((d) => d.nom))
+      const racine = cote >= 16 ? 'PERSO' : 'TUILE'
       let n = 1
       while (pris.has(racine + n)) n++
 
@@ -525,11 +572,19 @@ export function installer({
        * dessine qui décide.
        */
       const nom = demanderUnNom
-        ? await demanderUnNom({ quoi: cote === 16 ? 'ton personnage' : 'ta tuile', propose: racine + n, pris })
+        ? await demanderUnNom({ quoi: cote === 32 ? 'ton personnage de 32 × 32' : cote === 16 ? 'ton personnage de 16 × 16' : 'ta tuile', propose: racine + n, pris })
         : racine + n
       if (!nom) return
 
       choisi = nom
+      /* Un personnage, en création : dans son fichier à lui, jamais dans la source principale. */
+      if (cote >= 16 && projet?.actif()) {
+        projet.creer(nom, cote)
+        surChangement()
+        rafraichirBande()
+        rafraichirGrille()
+        return
+      }
       ecrireSource(ajouterDessin(lireSource(), choisi, cote))
       rafraichirBande()
       rafraichirGrille()
@@ -565,8 +620,12 @@ export function installer({
   function rafraichirBande() {
     poserLesNuances()
     const texteDesEtiquettes = lireSource()
+    /* En création, tous les onglets : un personnage rangé dans son fichier
+       reste sous les yeux, et un clic ouvre son fichier. */
+    const tousLesDessins = projet?.actif() ? projet.tousLesDessins() : null
+    const ici = projet?.actif() ? projet.fichierCourant() : null
     /* Les favoris d'abord, puis les autres, chacun dans l'ordre du programme. */
-    const liste = dessins().map((d, i) => ({ d, i, etiquettes: lireEtiquettes(texteDesEtiquettes, d.nom) }))
+    const liste = (tousLesDessins ?? dessins()).map((d, i) => ({ d, i, etiquettes: d.etiquettes ?? lireEtiquettes(texteDesEtiquettes, d.nom) }))
       .sort((a, b) => (b.etiquettes.includes('★') - a.etiquettes.includes('★')) || a.i - b.i)
       .map(({ d, etiquettes }) => Object.assign(d, { etiquettes }))
     bande.textContent = ''
@@ -575,7 +634,7 @@ export function installer({
        s'ouvrait sur une bande de vignettes et une grande place vide, et l'on
        cherchait l'éditeur en le regardant. C'est la même règle que pour les
        airs — deux ateliers côte à côte doivent se comporter pareil. */
-    if (choisi === null && liste.length > 0) choisi = liste[0].nom
+    if (choisi === null && liste.length > 0) choisi = (dessins()[0] ?? liste[0]).nom
 
     if (liste.length === 0) {
       const vide = document.createElement('p')
@@ -590,13 +649,20 @@ export function installer({
       const bouton = document.createElement('button')
       bouton.type = 'button'
       bouton.className = 'tuile' + (dessin.nom === choisi ? ' choisie' : '')
-      bouton.title = `${dessin.nom} — ${dessin.cote} × ${dessin.cote}, tuile numéro ${dessin.numero}` +
-        (dessin.cote === 16 ? ' à ' + (dessin.numero + 3) : '')
+      if (verrou?.est(dessin.nom)) bouton.classList.add('verrouille')
+      bouton.title = (verrou?.est(dessin.nom) ? '🔒 ' : '') + `${dessin.nom} — ${dessin.cote} × ${dessin.cote}, tuile numéro ${dessin.numero}` +
+        (dessin.cote > 8 ? ' à ' + (dessin.numero + (dessin.cote === 32 ? 15 : 3)) : '')
+      /* Écrit dans un autre onglet : le dire, et l'ouvrir au clic. */
+      const ailleurs = ici !== null && dessin.fichier && dessin.fichier !== ici
+      if (dessin.fichier && ici !== null) bouton.title += ` — dans ${dessin.fichier}`
+      if (ailleurs) bouton.classList.add('ailleurs')
+      bouton.dataset.fichier = dessin.fichier ?? ''
+      if (ailleurs && verrou?.est(dessin.nom) === false && dessin.verrouille) bouton.classList.add('verrouille')
 
       const canevas = document.createElement('canvas')
       canevas.width = dessin.cote
       canevas.height = dessin.cote
-      if (dessin.cote === 16) canevas.classList.add('grand')
+      if (dessin.cote >= 16) canevas.classList.add('grand')
       peindre(canevas, dessin.rangees, dessin.cote, peintureDe(dessin))
 
       const nom = document.createElement('span')
@@ -614,6 +680,7 @@ export function installer({
       etoile.title = favori ? 'retirer des favoris' : 'mettre en favori : il passe en tête de la bande'
       etoile.addEventListener('click', (e) => {
         e.stopPropagation()
+        if (ailleurs) projet.aller(dessin.fichier)
         const neuves = favori ? dessin.etiquettes.filter((t) => t !== '★') : [...dessin.etiquettes, '★']
         ecrireSource(ecrireEtiquettes(lireSource(), dessin.nom, neuves))
         surChangement()
@@ -643,6 +710,7 @@ export function installer({
 
       bouton.append(canevas, nom, etoile, crayon)
       bouton.addEventListener('click', () => {
+        if (ailleurs) projet.aller(dessin.fichier)
         choisi = dessin.nom
         rafraichirBande()
         rafraichirGrille()
@@ -651,7 +719,14 @@ export function installer({
       bande.append(bouton)
     }
 
-    bande.append(boutonNeuf('+ tuile 8 × 8', 8), boutonNeuf('+ perso 16 × 16', 16))
+    bande.append(boutonNeuf('+ tuile 8 × 8', 8), boutonNeuf('+ perso 16 × 16', 16), boutonNeuf('+ perso 32 × 32', 32))
+    if (projet?.actif()) {
+      const dit = document.createElement('span')
+      dit.className = 'aide rangement-perso'
+      dit.textContent = '📁 un personnage = son fichier perso_NOM.cpp'
+      dit.title = 'en création, chaque nouveau personnage (16 × 16 ou 32 × 32) s’écrit dans son propre fichier, listé par personnages.cpp : principal.cpp ne change pas'
+      bande.append(dit)
+    }
     filtrer()
   }
 
@@ -1192,7 +1267,9 @@ export function installer({
     nom.textContent = dessin.nom
     const numero = document.createElement('span')
     numero.className = 'aide'
-    numero.textContent = dessin.cote === 16
+    numero.textContent = dessin.cote === 32
+      ? `tuiles n° ${dessin.numero} à ${dessin.numero + 15} — sprite32(n, x, y, ${dessin.nom})`
+      : dessin.cote === 16
       ? `tuiles n° ${dessin.numero} à ${dessin.numero + 3} — sprite16(n, x, y, ${dessin.nom})`
       : `tuile n° ${dessin.numero} — poser(x, y, ${dessin.nom})`
     titre.append(nom, numero)
@@ -1563,14 +1640,28 @@ export function installer({
         if (dessinCopie && dessinCopie.cote !== dessin.cote) b.title = `le dessin copié fait ${dessinCopie.cote} × ${dessinCopie.cote} : il se colle sur un dessin de la même taille`
         return b
       })(),
-      bouton('⧉ Dupliquer', `une nouvelle ${dessin.cote === 16 ? 'personnage' : 'tuile'}, avec le même dessin que ${dessin.nom}`, async () => {
+      ...(verrou ? [bouton(verrou.est(dessin.nom) ? '🔓 Déverrouiller' : '🔒 Verrouiller',
+        verrou.est(dessin.nom)
+          ? `${dessin.nom} redevient modifiable`
+          : `${dessin.nom} devient un modèle : on s’en sert, on ne le modifie plus (une marque est écrite sous son dessin)`,
+        () => {
+          verrou.basculer(dessin.nom)
+          barre?.dire(verrou.est(dessin.nom)
+            ? `🔒 ${dessin.nom} est verrouillé : on s’en sert, on ne le modifie plus. « ⧉ Créer une variante » pour une version différente.`
+            : `🔓 ${dessin.nom} est de nouveau modifiable.`, 'info')
+          surChangement()
+          rafraichirBande()
+          rafraichirGrille()
+        })] : []),
+      bouton(verrou?.est(dessin.nom) ? '⧉ Créer une variante' : '⧉ Dupliquer', `une nouvelle ${dessin.cote >= 16 ? 'personnage' : 'tuile'}, avec le même dessin que ${dessin.nom}`, async () => {
         const d = dessinChoisi() ?? dessin
-        const pris = new Set(dessins().map((x) => x.nom))
+        const pris = projet?.actif() ? projet.noms() : new Set(dessins().map((x) => x.nom))
         let k = 2
         while (pris.has(d.nom + k)) k++
         const nom = demanderUnNom ? await demanderUnNom({ quoi: 'la copie de ' + d.nom, propose: d.nom + k, pris }) : d.nom + k
         if (!nom) return
-        ecrireSource(ajouterDessin(lireSource(), nom, d.cote, d.rangees))
+        if (d.cote >= 16 && projet?.actif()) projet.creer(nom, d.cote, d.rangees)
+        else ecrireSource(ajouterDessin(lireSource(), nom, d.cote, d.rangees))
         choisi = nom
         barre?.dire(`${nom} : une copie de ${d.nom}. Tu peux la modifier sans toucher à l’original.`, 'info')
         surChangement()
@@ -1579,8 +1670,17 @@ export function installer({
       }),
       /* Tout effacer : le dessin redevient vide — le n° 0 partout, le fond ou
          le transparent. Il revient avec ↶ : l'historique garde le programme. */
-      bouton(dessin.cote === 16 ? '🗑 Effacer le personnage' : '🗑 Effacer la tuile',
-        `vide tout le dessin de ${dessin.nom} — ↶ (Ctrl+Z) le fait revenir`, () => {
+      ...(suppression ? [bouton('🗑 Supprimer', `ôte ${dessin.nom} du programme — seulement s’il n’est utilisé nulle part et pas verrouillé ; ↶ le fait revenir`, () => {
+        if (!confirm(`Supprimer « ${dessin.nom} » du programme ?\n\nRefusé s’il est utilisé quelque part ou verrouillé. ↶ (Ctrl+Z) le fera revenir.`)) return
+        const dit = suppression.supprimer(dessin.nom)
+        barre?.dire(dit, dit.startsWith('🗑') ? 'info' : 'alerte')
+        if (!dessins().some((d) => d.nom === choisi)) choisi = null
+        surChangement()
+        rafraichirBande()
+        rafraichirGrille()
+      })] : []),
+      bouton('🧽 Vider le dessin',
+        `vide tout le dessin de ${dessin.nom}, mais garde son nom — ↶ (Ctrl+Z) le fait revenir`, () => {
           if (!confirm(`Effacer tout le dessin de « ${dessin.nom} » (${dessin.cote} × ${dessin.cote}) ?\n\n↶ (Ctrl+Z) le fera revenir si tu changes d’avis.`)) return
           const actuel = dessinChoisi()
           if (!actuel) return
@@ -1659,6 +1759,13 @@ export function installer({
       /* Le texte a pu changer sous nos pieds — un autre exemple chargé, une
          retouche à la main. Une tuile disparue ne reste pas sélectionnée. */
       if (choisi && !dessinChoisi()) choisi = null
+      rafraichirBande()
+      rafraichirGrille()
+    },
+    /* Ouvrir une tuile ou un personnage par son nom (l'onglet « Tout le jeu »). */
+    choisir(nom) {
+      choisi = nom
+      if (!dessinChoisi()) choisi = null
       rafraichirBande()
       rafraichirGrille()
     },

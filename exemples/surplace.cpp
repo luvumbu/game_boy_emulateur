@@ -25,7 +25,7 @@
 #include <sprite16>       // place un lutin de 16 × 16 au pixel près
 #include <panneau>        // montre le panneau, à une place choisie
 #include <poserPanneau>   // pose une tuile sur le panneau
-#include <Perso>          // un dessin de 16 × 16 pixels, pour un lutin
+#include <Perso>          // un personnage : un dessin de 16 × 16 ou de 32 × 32 pixels
 
 Tuile SOL = {
   "22222222",

@@ -24,6 +24,7 @@
  *  12. les états du jeu  — enum, switch, le record gardé
  *  13. le son            — une note, un bruit, un air
  *  14. le défilement     — defiler(), la caméra
+ *  15. tes propres #include — ranger ses fonctions, en ajouter à la console
  *
  * L'ORDRE EST CELUI DU FICHIER : rien n'est trié. Le champ `difficulte` porte
  * ici le numéro du CHAPITRE, pour que les outils des leçons (la page, le
@@ -53,6 +54,7 @@ export const CHAPITRES = {
   12: 'Les états du jeu : titre, partie, fin',
   13: 'Le son : notes, bruits, airs',
   14: 'Le défilement : un monde plus grand que l’écran',
+  15: 'Tes propres #include : ajouter une fonction',
 }
 
 /** La nuance (0 à 3) d'un pixel de l'écran, sur la Game Boy d'origine. */
@@ -5223,5 +5225,456 @@ int main() {                           // Le jeu commence ici.
         ['et le héros va seul jusqu’au bord : 248 - 96 = 152', bout[1] === 152, ` (${bout[1]})`],
       ]
     },
+  },
+
+  /* ================================================ 15 — tes propres #include */
+
+  /*
+   * Le chapitre que l'élève a demandé : « comment faire si je voulais ajouter
+   * moi-même un #include ». Une seule fonction le traverse, bande(), qui fait
+   * le voyage complet : écrite dans le programme (15.1), réemployée (15.2),
+   * rangée dans un fichier voisin (15.3, 15.4), accompagnée d'une seconde
+   * (15.5), devenue une fonction de la console (15.6), remplacée par la
+   * sienne (15.7), et enfin la marche à suivre pour en ajouter une soi-même
+   * (15.8). Une seule chose change d'une étape à l'autre.
+   */
+
+  {
+    titre: 'Une fonction à toi : bande()',
+    difficulte: 15,
+    provenance: 'cours',
+    idee: 'Avant de parler d’#include, on écrit une fonction à soi : bande() pose la même tuile plusieurs fois, de gauche à droite.',
+    texte: [
+      '**Ce chapitre répond à une question : « comment ajouter moi-même un `#include` ? »** Il y a deux sortes d’`#include`, et on va les faire toutes les deux, avec **une seule fonction**, du début à la fin : `bande()`.',
+      '**On part de ce qu’on sait déjà faire** (chapitre « Les fonctions : nommer un geste ») : écrire une fonction dans son programme. `bande(colonne, ligne, tuile, longueur)` pose la tuile `longueur` fois, une case plus à droite à chaque fois.',
+      '**Lis la fonction ligne par ligne :** `void` dit qu’elle ne rend rien ; entre les parenthèses, ses **quatre paramètres**, quatre cases de mémoire remplies par l’appel. La boucle `for` compte `i` de 0 jusqu’à `longueur - 1`, et pose la tuile en `colonne + i`.',
+      '**Déroulé de `bande(2, 5, ALPHABET[0], 10)` :** i = 0 → case (2, 5) ; i = 1 → case (3, 5) ; … ; i = 9 → case (11, 5). Puis i = 10 : `10 < 10` est faux, la boucle s’arrête. Dix A, des colonnes 2 à 11.',
+      '**Pour l’instant, aucun `#include` nouveau :** la fonction est **dans** le programme, elle n’a rien à demander à la console. Elle se sert seulement de `poser()`, déjà incluse.',
+    ],
+    code: `// Une fonction à toi : bande().
+// Elle est écrite ICI, dans le programme : pas besoin d'#include pour elle.
+
+#include <poser>      // pose une tuile sur une case du fond (bande() s'en sert)
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+// bande(colonne, ligne, tuile, longueur) : la même tuile, « longueur » fois,
+// de gauche à droite. Exemple : bande(2, 5, ALPHABET[0], 10) → dix A,
+// des colonnes 2 à 11, sur la ligne 5.
+//
+//   void         elle ne rend rien : elle agit, c'est tout
+//   uint8_t ...  ses quatre paramètres : des nombres de 0 à 255
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  // for (départ ; condition ; après chaque tour)
+  //   i = 0 au départ ; on continue tant que i < longueur ; i++ ajoute 1.
+  for (uint8_t i = 0; i < longueur; i++) {
+    poser(colonne + i, ligne, tuile);   // une case plus à droite à chaque tour
+  }
+}
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // l'appel : dix A sur la ligne 5
+
+  while (true) {   // la boucle du jeu
+    image();       // attend l'image suivante (native : pas d'#include)
+  }
+}
+`,
+    aVoir: 'Dix A côte à côte sur la ligne 5, des colonnes 2 à 11.',
+    controle: (c) => [
+      ['dix A sur la ligne 5, de la colonne 2 à la 11', c.mot(2, 5, 10) === 'AAAAAAAAAA'],
+      ['rien avant la colonne 2', c.mot(1, 5, 1) !== 'A'],
+      ['et rien après la colonne 11', c.mot(12, 5, 1) !== 'A'],
+    ],
+  },
+
+  {
+    titre: 'La même fonction, trois fois',
+    difficulte: 15,
+    provenance: 'cours',
+    idee: 'Une fonction s’écrit une fois et s’appelle autant qu’on veut : trois bandes, trois longueurs, trois lettres.',
+    texte: [
+      '**C’est le programme d’avant**, avec **deux appels de plus** dans `main()`. La fonction, elle, ne change pas d’une lettre.',
+      '**Chaque appel remplit les paramètres autrement :** `bande(2, 7, ALPHABET[1], 6)` met 2 dans `colonne`, 7 dans `ligne`, le B dans `tuile`, 6 dans `longueur`. Six B, des colonnes 2 à 7.',
+      '**C’est tout l’intérêt d’une fonction :** le geste (« poser une rangée ») est écrit **une seule fois**. C’est aussi ce qui va nous donner envie de la **ranger à part** : une fonction aussi utile, on voudrait la réemployer dans d’autres programmes, sans la recopier.',
+      '**Essaie :** ajoute `bande(0, 11, ALPHABET[3], 20);` — une ligne entière de D, de la colonne 0 à la 19.',
+    ],
+    code: `// La même fonction, trois fois : seuls les appels de main() changent.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // ALPHABET[0] = A, [1] = B, [2] = C…
+
+// bande(colonne, ligne, tuile, longueur) : comme à l'étape d'avant.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i < longueur; i++) {
+    poser(colonne + i, ligne, tuile);
+  }
+}
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // dix A  : colonnes 2 à 11, ligne 5
+  bande(2, 7, ALPHABET[1], 6);    // NOUVEAU : six B   : colonnes 2 à 7,  ligne 7
+  bande(2, 9, ALPHABET[2], 3);    // NOUVEAU : trois C : colonnes 2 à 4,  ligne 9
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Trois rangées : dix A, six B, trois C, toutes calées à gauche sur la colonne 2.',
+    controle: (c) => [
+      ['dix A sur la ligne 5', c.mot(2, 5, 10) === 'AAAAAAAAAA'],
+      ['six B sur la ligne 7', c.mot(2, 7, 6) === 'BBBBBB' && c.mot(8, 7, 1) !== 'B'],
+      ['trois C sur la ligne 9', c.mot(2, 9, 3) === 'CCC' && c.mot(5, 9, 1) !== 'C'],
+    ],
+  },
+
+  {
+    titre: 'Ranger sa fonction dans un fichier voisin : #include "outils.cpp"',
+    difficulte: 15,
+    provenance: 'cours',
+    idee: 'La première sorte d’#include, avec des guillemets : bande() déménage dans l’onglet outils.cpp, et principal.cpp le verse chez lui.',
+    texte: [
+      '**Ce qui est nouveau ici : la fonction a déménagé.** Elle n’est plus dans `principal.cpp` : elle est dans un **second onglet**, `outils.cpp`. Dans l’atelier, c’est le bouton **« + fichier »**, au-dessus de l’éditeur, qui crée un onglet comme celui-là.',
+      '**`#include "outils.cpp"` veut dire « verse ici tout le texte d’`outils.cpp` ».** Avant de compiler, la console remplace cette ligne par le contenu du fichier, mot pour mot. Le compilateur voit donc **exactement** le programme de l’étape d’avant : même cartouche, même écran.',
+      '**Les guillemets `"…"` désignent un fichier À TOI**, écrit à côté du programme. Retiens-le bien, car l’étape 15.6 montrera l’autre sorte, avec des chevrons `<…>`, qui désigne une fonction **de la console**.',
+      '**Où placer la ligne :** l’habitude est de mettre tous les `#include` en haut, ensemble. Pour des **fonctions**, l’ordre ne compte pas : le compilateur relève toutes les fonctions avant de les traduire, et `main()` peut appeler `bande()` même si son texte est collé plus bas. Pour des **variables globales** ou des **dessins**, si : ils doivent être versés **avant** la fonction qui s’en sert.',
+      '**Pourquoi l’extension `.cpp` et pas `.h` :** les deux marchent ici. Par habitude, un `.h` (« header ») contient des déclarations (des variables, des noms) ; un `.cpp` contient du code, des fonctions. `outils.cpp` contient une fonction.',
+    ],
+    fichiers: {
+      'outils.cpp': `// outils.cpp : MES fonctions, rangées à part.
+// Ce fichier ne fait rien tout seul : principal.cpp le verse chez lui
+// avec #include "outils.cpp" (des GUILLEMETS : c'est un fichier à moi).
+
+// bande(colonne, ligne, tuile, longueur) : la même tuile, « longueur » fois,
+// de gauche à droite. Exemple : bande(2, 5, ALPHABET[0], 10) → dix A.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i < longueur; i++) {
+    poser(colonne + i, ligne, tuile);   // poser() : incluse par principal.cpp
+  }
+}
+`,
+    },
+    code: `// Le changement : bande() n'est plus écrite ici, mais dans outils.cpp.
+//
+//   #include "outils.cpp"
+//   |        |
+//   |        +-- le fichier à verser : l'onglet « outils.cpp », à côté
+//   +----------- « verse ici » : avant la compilation, cette ligne est
+//                remplacée par tout le texte d'outils.cpp. Tout se passe
+//                comme si bande() était écrite ici, comme à l'étape d'avant.
+
+#include <poser>      // pose une tuile (c'est bande() qui s'en sert)
+#include <ALPHABET>   // les lettres de la police
+#include "outils.cpp" // NOUVEAU : mes fonctions à moi, versées ici
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // bande() vient d'outils.cpp
+  bande(2, 7, ALPHABET[1], 6);
+  bande(2, 9, ALPHABET[2], 3);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Exactement l’écran d’avant : dix A, six B, trois C. Mais le programme est rangé en deux onglets.',
+    controle: (c) => [
+      ['bande() vient d’outils.cpp : dix A sur la ligne 5', c.mot(2, 5, 10) === 'AAAAAAAAAA'],
+      ['six B, trois C : le même écran qu’avant', c.mot(2, 7, 6) === 'BBBBBB' && c.mot(2, 9, 3) === 'CCC'],
+    ],
+  },
+
+  {
+    titre: 'Le fichier voisin écrit ses propres #include <…>',
+    difficulte: 15,
+    provenance: 'cours',
+    idee: 'outils.cpp se sert de poser() : c’est donc lui qui écrit #include <poser>. Le fichier se suffit à lui-même.',
+    texte: [
+      '**Le seul changement : la ligne `#include <poser>` a changé d’onglet.** Elle était dans `principal.cpp` ; elle est maintenant **en haut d’`outils.cpp`**.',
+      '**Pourquoi c’est mieux :** c’est `bande()` qui se sert de `poser()`, pas `main()`. En écrivant la ligne **dans le fichier qui en a besoin**, `outils.cpp` se suffit à lui-même : un autre programme qui écrit `#include "outils.cpp"` n’a rien d’autre à penser.',
+      '**Et si deux fichiers écrivent la même ligne ?** Si `principal.cpp` gardait aussi son `#include <poser>`, ce ne serait pas une erreur : une fonction de la console n’est gravée **qu’une fois**, et une ligne de trop ne coûte rien.',
+      '**Le texte versé, en entier :** `#include <ALPHABET>`, puis tout `outils.cpp` (son `#include <poser>` et `bande()`), puis `main()`. Un `#include <…>` vaut pour **tout** le programme assemblé, où qu’il soit écrit : celui d’`outils.cpp` autorise `poser()` partout.',
+    ],
+    fichiers: {
+      'outils.cpp': `// outils.cpp : MES fonctions, rangées à part.
+// Il écrit LUI-MÊME ce dont il a besoin : il se suffit à lui-même.
+
+#include <poser>   // NOUVEAU ICI : bande() se sert de poser()
+
+// bande(colonne, ligne, tuile, longueur) : la même tuile, « longueur » fois,
+// de gauche à droite. Exemple : bande(2, 5, ALPHABET[0], 10) → dix A.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i < longueur; i++) {
+    poser(colonne + i, ligne, tuile);
+  }
+}
+`,
+    },
+    code: `// Le changement : « #include <poser> » est parti dans outils.cpp,
+// le fichier qui s'en sert. main() n'appelle pas poser() lui-même.
+
+#include <ALPHABET>   // les lettres : c'est main() qui s'en sert
+#include "outils.cpp" // mes fonctions (et leurs #include à elles)
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);
+  bande(2, 7, ALPHABET[1], 6);
+  bande(2, 9, ALPHABET[2], 3);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Toujours le même écran : dix A, six B, trois C.',
+    controle: (c) => [
+      ['outils.cpp inclut poser() lui-même : les bandes sont là', c.mot(2, 5, 10) === 'AAAAAAAAAA' && c.mot(2, 9, 3) === 'CCC'],
+    ],
+  },
+
+  {
+    titre: 'Une deuxième fonction dans outils.cpp : pile()',
+    difficulte: 15,
+    provenance: 'cours',
+    idee: 'Un fichier d’outils grandit : pile() fait comme bande(), mais vers le bas. principal.cpp n’a rien à ajouter pour s’en servir.',
+    texte: [
+      '**Ce qui est nouveau ici : `pile(colonne, ligne, tuile, hauteur)`**, une deuxième fonction dans `outils.cpp`. C’est `bande()` tournée d’un quart de tour : la tuile est posée **vers le bas**, en `ligne + i`.',
+      '**Déroulé de `pile(15, 4, ALPHABET[3], 6)` :** i = 0 → (15, 4) ; i = 1 → (15, 5) ; … ; i = 5 → (15, 9). Six D, l’un sous l’autre.',
+      '**Aucune ligne ajoutée dans principal.cpp pour l’avoir :** le `#include "outils.cpp"` verse **tout** le fichier, donc toutes ses fonctions. Un fichier d’outils, c’est cela : une boîte où l’on range ses fonctions, et qu’on ouvre d’une seule ligne.',
+      '**Essaie :** écris une troisième fonction dans `outils.cpp`, par exemple `void carreDe(colonne, ligne, tuile)` qui appelle `bande()` deux fois.',
+    ],
+    fichiers: {
+      'outils.cpp': `// outils.cpp : MES fonctions, rangées à part.
+
+#include <poser>   // bande() et pile() se servent de poser()
+
+// bande(colonne, ligne, tuile, longueur) : vers la DROITE.
+// Exemple : bande(2, 5, ALPHABET[0], 10) → dix A, colonnes 2 à 11.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i < longueur; i++) {
+    poser(colonne + i, ligne, tuile);   // la COLONNE avance
+  }
+}
+
+// NOUVEAU : pile(colonne, ligne, tuile, hauteur) : vers le BAS.
+// Exemple : pile(15, 4, ALPHABET[3], 6) → six D, lignes 4 à 9.
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i < hauteur; i++) {
+    poser(colonne, ligne + i, tuile);   // c'est la LIGNE qui avance
+  }
+}
+`,
+    },
+    code: `// Le changement : main() appelle aussi pile(), la nouvelle fonction
+// d'outils.cpp. Rien à ajouter en haut : outils.cpp est déjà versé.
+
+#include <ALPHABET>
+#include "outils.cpp" // bande() ET pile()
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);
+  bande(2, 7, ALPHABET[1], 6);
+  bande(2, 9, ALPHABET[2], 3);
+  pile(15, 4, ALPHABET[3], 6);    // NOUVEAU : six D, de la ligne 4 à la 9
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Les trois bandes d’avant, et une colonne de six D à droite (colonne 15, lignes 4 à 9).',
+    controle: (c) => {
+      const colonne = [4, 5, 6, 7, 8, 9].map((l) => c.mot(15, l, 1)).join('')
+      return [
+        ['six D l’un sous l’autre, colonne 15', colonne === 'DDDDDD', ` (${colonne})`],
+        ['rien en dessous, ligne 10', c.mot(15, 10, 1) !== 'D'],
+        ['les bandes sont toujours là', c.mot(2, 5, 10) === 'AAAAAAAAAA'],
+      ]
+    },
+  },
+
+  {
+    titre: 'bande() devient une fonction de la console : #include <bande>',
+    difficulte: 15,
+    provenance: 'cours',
+    idee: 'La seconde sorte d’#include, avec des chevrons : bande() a été ajoutée à la console elle-même. On ne l’écrit plus, on la demande.',
+    texte: [
+      '**Ce qui est nouveau ici : `#include <bande>`**, avec des **chevrons**. `bande()` n’est plus dans `outils.cpp` (il n’y reste que `pile()`) : elle fait maintenant partie **de la console**, comme `poser()` ou `texte()`. On ne l’écrit plus, on la **demande**.',
+      '**Guillemets ou chevrons, la différence en une phrase :** `#include "outils.cpp"` verse **ton fichier** ; `#include <bande>` demande **une fonction de la console**, que le compilateur connaît déjà et n’ajoute à la cartouche que si le programme l’appelle.',
+      '**Sans la ligne, le compilateur refuse :** efface `#include <bande>` et lance. Le message dit : « il faut #include <bande> pour employer bande() ». C’est la règle de toute la console : ce qu’on emploie, on l’inclut par son nom.',
+      '**Comment `bande()` est entrée dans la console.** Il a fallu toucher **trois fichiers du projet** (pas le programme : le compilateur lui-même). On les ouvre dans un éditeur de texte, à côté d’`index.html` :',
+      '**1. `compilateur/emetteur.js` — le code de la fonction.** On y écrit sa source, **en C, exactement comme dans `outils.cpp`**, dans une constante, `SOURCE_BANDE`, entre deux accents graves (la touche AltGr + 7) : le texte de la fonction, mot pour mot. Puis on l’inscrit dans le tableau `FONCTIONS_EN_C`, juste en dessous : `bande: SOURCE_BANDE,`. Le compilateur ajoute ce texte au programme **seulement** s’il appelle `bande()`.',
+      '**2. `compilateur/inclusion.js` — le nom à inclure.** Dans le tableau `BIBLIOTHEQUES`, une ligne : `bande: \'pose la même tuile plusieurs fois, de gauche à droite\',`. C’est elle qui rend `#include <bande>` valable, et la phrase sert de commentaire quand l’atelier écrit les `#include` tout seul.',
+      '**3. `aide-fonctions.js` — l’aide de l’éditeur.** Dans `FONCTIONS` : `bande: { args: [\'colonne\', \'ligne\', \'tuile\', \'longueur\'], dit: \'…\' },`. L’éditeur propose alors `bande` quand on tape « ban… », et montre les arguments pendant qu’on les écrit.',
+      '**Un détail : dans la console, `bande()` n’écrit pas `#include <poser>`.** Ce que la console ajoute elle-même n’a rien à inclure : le compilateur le sait (c’est le drapeau `deLaConsole`).',
+      '**Après avoir changé ces fichiers :** recharge la page avec **Ctrl+F5**. Le compilateur est relu, et `#include <bande>` marche aussitôt.',
+    ],
+    fichiers: {
+      'outils.cpp': `// outils.cpp : MES fonctions. bande() n'y est plus : elle est
+// dans la console, demandée par #include <bande> dans principal.cpp.
+
+#include <poser>   // pile() se sert de poser()
+
+// pile(colonne, ligne, tuile, hauteur) : vers le BAS.
+// Exemple : pile(15, 4, ALPHABET[3], 6) → six D, lignes 4 à 9.
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i < hauteur; i++) {
+    poser(colonne, ligne + i, tuile);
+  }
+}
+`,
+    },
+    code: `// Le changement : bande() vient de la CONSOLE, plus d'outils.cpp.
+//
+//   #include <bande>     des CHEVRONS : une fonction de la console
+//   #include "outils.cpp"  des GUILLEMETS : un fichier à moi
+
+#include <ALPHABET>
+#include <bande>      // NOUVEAU : pose la même tuile plusieurs fois, de gauche à droite
+#include "outils.cpp" // il ne contient plus que pile()
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // la bande() de la console
+  bande(2, 7, ALPHABET[1], 6);
+  bande(2, 9, ALPHABET[2], 3);
+  pile(15, 4, ALPHABET[3], 6);    // la pile() d'outils.cpp
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Le même écran : trois bandes et une pile. bande() vient maintenant de la console.',
+    controle: (c) => [
+      ['la bande() de la console pose dix A', c.mot(2, 5, 10) === 'AAAAAAAAAA'],
+      ['six B, trois C', c.mot(2, 7, 6) === 'BBBBBB' && c.mot(2, 9, 3) === 'CCC'],
+      ['et la pile() d’outils.cpp est toujours là', c.mot(15, 9, 1) === 'D'],
+    ],
+  },
+
+  {
+    titre: 'Ta fonction passe avant celle de la console',
+    difficulte: 15,
+    provenance: 'cours',
+    idee: 'Si ton programme écrit une fonction du même nom qu’une fonction de la console, c’est la tienne qui compte.',
+    texte: [
+      '**Le seul changement : `outils.cpp` écrit de nouveau une `bande()`**, mais **en pointillés** : une case sur deux. `#include <bande>` est toujours là, dans `principal.cpp`.',
+      '**Laquelle gagne ?** La tienne. Le compilateur ajoute une fonction de la console **seulement si le programme n’en a pas écrit une du même nom**. Ici, il voit ta `bande()` : il n’ajoute pas la sienne, et la ligne `#include <bande>` ne grave rien.',
+      '**La boucle en pointillés :** `i = i + 2` au lieu de `i++`. Déroulé de `bande(2, 5, ALPHABET[0], 10)` : i = 0 → (2, 5) ; i = 2 → (4, 5) ; i = 4 → (6, 5) ; i = 6 → (8, 5) ; i = 8 → (10, 5) ; i = 10 : `10 < 10` est faux, fin. Cinq A, un trou entre chaque.',
+      '**À quoi ça sert :** à **essayer une autre version** d’une fonction de la console sans toucher au compilateur. Si la tienne te plaît, tu sais maintenant comment la faire entrer dans la console (étape précédente).',
+      '**Essaie :** supprime la `bande()` d’`outils.cpp` : celle de la console revient, et les bandes redeviennent pleines.',
+    ],
+    fichiers: {
+      'outils.cpp': `// outils.cpp : MES fonctions.
+
+#include <poser>
+
+// NOUVEAU : MA bande(), en pointillés. Elle porte le même nom que celle de
+// la console : c'est la mienne qui compte, la console n'ajoute pas la sienne.
+// Exemple : bande(2, 5, ALPHABET[0], 10) → A aux colonnes 2, 4, 6, 8, 10.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i < longueur; i = i + 2) {   // i = i + 2 : une case sur deux
+    poser(colonne + i, ligne, tuile);
+  }
+}
+
+// pile(colonne, ligne, tuile, hauteur) : vers le BAS.
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i < hauteur; i++) {
+    poser(colonne, ligne + i, tuile);
+  }
+}
+`,
+    },
+    code: `// Le changement est dans outils.cpp : il écrit sa propre bande().
+// principal.cpp garde « #include <bande> », mais c'est la mienne qui sert.
+
+#include <ALPHABET>
+#include <bande>      // la bande() de la console… qui ne servira pas ici
+#include "outils.cpp" // MA bande() (en pointillés) et pile()
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // MA bande() : cinq A, un trou entre chaque
+  bande(2, 7, ALPHABET[1], 6);    // trois B : colonnes 2, 4, 6
+  bande(2, 9, ALPHABET[2], 3);    // deux C  : colonnes 2, 4
+  pile(15, 4, ALPHABET[3], 6);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Les bandes sont en pointillés : A A A A A, B B B, C C. La pile de D ne change pas.',
+    controle: (c) => [
+      ['ta bande() est en pointillés : un A, un trou, un A…', c.mot(2, 5, 9) === 'A A A A A', ` (${c.mot(2, 5, 9)})`],
+      ['trois B, deux C, eux aussi en pointillés', c.mot(2, 7, 5) === 'B B B' && c.mot(2, 9, 3) === 'C C'],
+      ['pile() n’a pas changé', c.mot(15, 4, 1) === 'D' && c.mot(15, 9, 1) === 'D'],
+    ],
+  },
+
+  {
+    titre: 'À toi : ajouter ta propre fonction de la console, pas à pas',
+    difficulte: 15,
+    provenance: 'cours',
+    idee: 'La marche à suivre complète, de l’idée à « #include <ta_fonction> » — et un cadre dessiné avec bande() et pile().',
+    texte: [
+      '**On revient à la `bande()` de la console** (`outils.cpp` ne contient plus que `pile()`, comme au 15.6), et on s’en sert pour **un cadre** : deux bandes (le haut et le bas), deux piles (la gauche et la droite). C’est la seule nouveauté du programme.',
+      '**Déroulé du cadre :** `bande(3, 3, …, 14)` → le haut, colonnes 3 à 16 ; `bande(3, 12, …, 14)` → le bas ; `pile(3, 4, …, 8)` → la gauche, lignes 4 à 11 ; `pile(16, 4, …, 8)` → la droite. Les coins appartiennent aux bandes : les piles commencent une ligne plus bas.',
+      '**Et maintenant, pour faire entrer `pile()` dans la console à son tour, voici la marche à suivre — la même pour n’importe quelle fonction :**',
+      '**Étape 1 — l’écrire et l’essayer dans ton programme.** D’abord dans `principal.cpp`, ou dans un fichier voisin comme `outils.cpp`. Tant qu’elle n’est pas parfaite, elle reste là : c’est plus facile à corriger.',
+      '**Étape 2 — choisir son nom.** Un nom qu’aucune fonction de la console ne porte déjà (la liste est dans `compilateur/inclusion.js`, tableau `BIBLIOTHEQUES`). Le nom du `#include` sera exactement celui de la fonction : `pile` → `#include <pile>`.',
+      '**Étape 3 — `compilateur/emetteur.js`.** Cherche `const FONCTIONS_EN_C`. Juste au-dessus, colle ta fonction dans une constante, `const SOURCE_PILE = …`, entre deux accents graves (AltGr + 7), comme `SOURCE_BANDE` juste à côté. Dans le tableau, ajoute `pile: SOURCE_PILE,`. Retire son `#include <poser>` : la console n’en a pas besoin.',
+      '**Étape 4 — `compilateur/inclusion.js`.** Dans `BIBLIOTHEQUES`, ajoute une ligne : `pile: \'pose la même tuile plusieurs fois, vers le bas\',`. Sans elle, `#include <pile>` serait refusé : « je ne connais pas cette bibliothèque ».',
+      '**Étape 5 — `aide-fonctions.js`.** Dans `FONCTIONS`, ajoute `pile: { args: [\'colonne\', \'ligne\', \'tuile\', \'hauteur\'], dit: \'…\' },` pour que l’éditeur la propose.',
+      '**Étape 6 — essayer.** Recharge la page (**Ctrl+F5**), enlève `pile()` d’`outils.cpp`, écris `#include <pile>` dans `principal.cpp`, et lance. En ligne de commande : `node outils/gb3.mjs mon-essai.cpp` compile un fichier, et `npm run verifier` vérifie que rien d’autre n’est cassé.',
+      '**Étape 7 — sa leçon.** Dans ce projet, chaque `#include` a son tuto : une leçon dans `tuto/lecons.js` dont le programme commence par `// ---- #include <pile> : …`. Le parcours la place tout seul juste avant la première étape qui emploie `pile()`. Copie celle de `bande()` et change ce qu’il faut.',
+      '**Pour aller plus loin :** les fonctions qui parlent directement au matériel (l’écran, le son) ne sont pas écrites en C mais en instructions du processeur, dans `compilateur/emetteur.js` (cherche `if (nom === \'cacherPanneau\')`). C’est plus difficile : la façon en C suffit pour tout ce qu’on peut écrire avec les fonctions existantes.',
+    ],
+    fichiers: {
+      'outils.cpp': `// outils.cpp : MES fonctions. pile() est la prochaine à faire entrer
+// dans la console, en suivant les étapes 1 à 7 de cette leçon.
+
+#include <poser>   // pile() se sert de poser()
+
+// pile(colonne, ligne, tuile, hauteur) : vers le BAS.
+// Exemple : pile(3, 4, ALPHABET[23], 8) → huit X, lignes 4 à 11.
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i < hauteur; i++) {
+    poser(colonne, ligne + i, tuile);
+  }
+}
+`,
+    },
+    code: `// Un cadre de X : bande() (de la console) pour le haut et le bas,
+// pile() (d'outils.cpp) pour les côtés.
+//
+//   colonnes 3 à 16, lignes 3 à 12 :
+//
+//     XXXXXXXXXXXXXX   ← bande(3, 3, X, 14)   le haut
+//     X            X   ← pile(3, 4, X, 8)  et  pile(16, 4, X, 8)
+//     X            X      les côtés, lignes 4 à 11
+//     XXXXXXXXXXXXXX   ← bande(3, 12, X, 14)  le bas
+
+#include <ALPHABET>
+#include <bande>      // pose la même tuile plusieurs fois, de gauche à droite
+#include "outils.cpp" // pile()
+
+int main() {
+  bande(3, 3, ALPHABET[23], 14);    // le haut  (ALPHABET[23] : le X, 24e lettre)
+  bande(3, 12, ALPHABET[23], 14);   // le bas
+  pile(3, 4, ALPHABET[23], 8);      // le côté gauche  : lignes 4 à 11
+  pile(16, 4, ALPHABET[23], 8);     // le côté droit
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un cadre de X au milieu de l’écran : colonnes 3 à 16, lignes 3 à 12, vide à l’intérieur.',
+    controle: (c) => [
+      ['le haut : quatorze X', c.mot(3, 3, 14) === 'XXXXXXXXXXXXXX'],
+      ['le bas : quatorze X', c.mot(3, 12, 14) === 'XXXXXXXXXXXXXX'],
+      ['les côtés : un X à chaque bout, rien entre les deux', c.mot(3, 7, 1) === 'X' && c.mot(16, 7, 1) === 'X' && !c.mot(4, 7, 12).includes('X')],
+    ],
   },
 ]

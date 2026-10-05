@@ -89,7 +89,7 @@
     
   </p>
 <h1>0.86.3. La fonction texteGrand() — un texte agrandi</h1>
-<p class="idee">#include &lt;texteGrand&gt; : texteGrand(colonne, ligne, "A", 3) écrit un A trois fois plus grand, sans rien dessiner.</p>
+<p class="idee">#include &lt;texteGrand&gt; : texteGrand(colonne, ligne, "B", 3) écrit un B trois fois plus grand, sans rien dessiner.</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
 <p><strong>Ce qu’elle fait :</strong> <code>texteGrand(colonne, ligne, "TEXTE", taille)</code> écrit un texte <strong>agrandi</strong> de 1 à 20 fois. Chaque pixel de la lettre devient un carré de <code>taille × taille</code> pixels : une lettre prend <code>taille × taille</code> cases.</p>
@@ -134,7 +134,8 @@ Tes fonctions appelées :
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
     <pre><code>// ---- #include &lt;texteGrand&gt; : un texte agrandi ----
-// Un A trois fois plus grand : 3 × 3 cases, à partir de la case (2, 2).
+// Un B trois fois plus grand : 3 × 3 cases, à partir de la case (2, 2).
+// (Le A, ce sera la leçon « Agrandir une lettre », juste après.)
 
 #include &lt;texteGrand&gt;   // texteGrand() : les lettres agrandies</code></pre>
   </div>
@@ -145,7 +146,7 @@ Tes fonctions appelées :
   <div>
     <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
     <pre><code>int main() {
-  texteGrand(2, 2, "A", 3);   // colonne 2, ligne 2, le texte, la taille
+  texteGrand(2, 2, "B", 3);   // colonne 2, ligne 2, le texte, la taille
 
   while (true) {
     image();
@@ -169,7 +170,7 @@ programme.</p>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgUlEQVR4nO3asQmAUAxAQUtHsHT/aRzBMSydQBBRPjwPboCEV6TJtB8bYdPwCfiUwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECx70QeF7WK8PXQ+A4geOeB75TUenhBI4TOE7gOIHjBI57IfAdw/f8LYHjBI5zg+MEjhM4TuA4geMEjhM4TuA4geN8VcYJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdw3AmMgJgUoHUDNAAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABfUlEQVR4nO3asQmAMBBAUUtHsHT/aRzBMSwdQVBD4PPglSly/CIcZDmvg7Bl+g0YSuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4gePeB163/dH08RA4TuC4HwJ/PMNQAscJHCdwnMBxAsdZk+IEjhM4zhscJ3CcwHECxwkcJ3CcNSlO4DiB4/yqjBM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4G792bMQ+wwQqAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
   </figure>
 </div>
@@ -177,7 +178,7 @@ programme.</p>
 
 
 <h2>4. Ce qu’on doit voir</h2>
-<p class="avoir">Un grand A, trois cases de large et trois de haut, en haut à gauche.</p>
+<p class="avoir">Un grand B, trois cases de large et trois de haut, en haut à gauche.</p>
 
 <h2>5. Ce que la console répond</h2>
 <p>Ces contrôles ne sont pas décoratifs : ce sont ceux que

@@ -53,6 +53,7 @@ const CHAPITRES_DU_PARCOURS = [
   ['cours', 14, 'Le défilement : un monde plus grand que l’écran'],
   ['lecons', 9, 'Un vrai jeu'],
   ['lecons', 10, 'Aller au bout'],
+  ['cours', 15, 'Tes propres #include : ajouter une fonction'],
 ]
 
 /** Le nom de chaque chapitre du parcours, par numéro : 0 « Avant tout », 1… */
@@ -62,7 +63,7 @@ export const CHAPITRES = Object.fromEntries(CHAPITRES_DU_PARCOURS.map(([, , nom]
  * La difficulté, de 1 à 10, qu'affiche la jauge. Une leçon garde la sienne ;
  * un cours prend celle du niveau de leçons dont son chapitre est voisin.
  */
-const DIFFICULTE_DU_COURS = { 1: 1, 2: 2, 3: 2, 4: 6, 5: 7, 6: 8, 7: 8, 8: 8, 9: 8, 10: 9, 11: 9, 12: 9, 13: 9, 14: 10 }
+const DIFFICULTE_DU_COURS = { 1: 1, 2: 2, 3: 2, 4: 6, 5: 7, 6: 8, 7: 8, 8: 8, 9: 8, 10: 9, 11: 9, 12: 9, 13: 9, 14: 10, 15: 10 }
 
 /*
  * Avant le tout premier « #include » : pourquoi on en écrit.
@@ -268,8 +269,17 @@ export function construireLeParcours(ecrites, tutoriels) {
       dictionnaire.push({ ...tutos.get(nom) })
       continue
     }
+    /* La première étape où tout ce qu'il emploie est connu — en UN passage :
+       recompter depuis le début à chaque pas (dejaVues) coûtait des centaines
+       de milliers de lectures dès qu'un tuto attendait le chapitre 6, et
+       retardait de deux secondes l'ouverture de la page. Même résultat. */
     let ou = 0
-    while (ou < parcours.length && !besoins.every((b) => dejaVues(ou).has(b))) ou++
+    const vus = new Set()
+    while (ou < parcours.length) {
+      for (const n of inclusionsDe(parcours[ou])) vus.add(n)
+      if (besoins.every((b) => vus.has(b))) break
+      ou++
+    }
     parcours.splice(ou + 1, 0, etapeDuTuto(tutos.get(nom), parcours[Math.min(ou, parcours.length - 1)].difficulte))
   }
 

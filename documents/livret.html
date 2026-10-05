@@ -152,23 +152,23 @@
       <span class="points">difficulté 1/10</span></li>
 <li><span class="numero">0.4.2</span> L’alphabet à la main, jusqu’au bout de la ligne — doublé, deux positions
       <span class="points">difficulté 1/10</span></li>
-<li><span class="numero">0.5</span> La même ligne, avec une boucle for
+<li><span class="numero">0.5</span> La boucle for : la ligne en trois lignes de code
       <span class="points">difficulté 1/10</span></li>
-<li><span class="numero">0.5.1</span> La même ligne, avec une boucle for — de base, ailleurs
+<li><span class="numero">0.5.1</span> La boucle for : la ligne en trois lignes de code — de base, ailleurs
       <span class="points">difficulté 1/10</span></li>
-<li><span class="numero">0.5.2</span> La même ligne, avec une boucle for — doublé, deux positions
+<li><span class="numero">0.5.2</span> La boucle for : la ligne en trois lignes de code — doublé, deux positions
       <span class="points">difficulté 1/10</span></li>
-<li><span class="numero">0.6</span> La même ligne, avec une boucle while
+<li><span class="numero">0.6</span> La boucle while : les trois morceaux du for, séparés
       <span class="points">difficulté 1/10</span></li>
-<li><span class="numero">0.6.1</span> La même ligne, avec une boucle while — de base, ailleurs
+<li><span class="numero">0.6.1</span> La boucle while : les trois morceaux du for, séparés — de base, ailleurs
       <span class="points">difficulté 1/10</span></li>
-<li><span class="numero">0.6.2</span> La même ligne, avec une boucle while — doublé, deux positions
+<li><span class="numero">0.6.2</span> La boucle while : les trois morceaux du for, séparés — doublé, deux positions
       <span class="points">difficulté 1/10</span></li>
-<li><span class="numero">0.7</span> La même ligne, avec do … while
+<li><span class="numero">0.7</span> La boucle do … while : au moins un tour
       <span class="points">difficulté 1/10</span></li>
-<li><span class="numero">0.7.1</span> La même ligne, avec do … while — de base, ailleurs
+<li><span class="numero">0.7.1</span> La boucle do … while : au moins un tour — de base, ailleurs
       <span class="points">difficulté 1/10</span></li>
-<li><span class="numero">0.7.2</span> La même ligne, avec do … while — doublé, deux positions
+<li><span class="numero">0.7.2</span> La boucle do … while : au moins un tour — doublé, deux positions
       <span class="points">difficulté 1/10</span></li>
 <li><span class="numero">0.8</span> Tout l’alphabet, avec deux boucles
       <span class="points">difficulté 1/10</span></li>
@@ -1174,7 +1174,7 @@
       <span class="points">difficulté 8/10</span></li>
 <li><span class="numero">87</span> Un tableau de « struct »
       <span class="points">difficulté 8/10</span></li>
-<li><span class="numero">88</span> Une méthode : la fonction qui connaît son objet
+<li><span class="numero">88</span> Une méthode : ce qu’elle coûte, ce qui reste refusé
       <span class="points">difficulté 8/10</span></li>
 <li><span class="numero">89</span> Les trois façons de faire la même chose
       <span class="points">difficulté 8/10</span></li>
@@ -2393,7 +2393,7 @@ int main() {            // Le programme commence ici.
     
     
   </p>
-  <h1 class="titre-lecon">0.5. La même ligne, avec une boucle for</h1>
+  <h1 class="titre-lecon">0.5. La boucle for : la ligne en trois lignes de code</h1>
   <p class="idee">Vingt lignes presque pareilles deviennent une seule, répétée vingt fois.</p>
 
   <p><strong><code>for (uint8_t i = 0; i &lt; 20; i++)</code></strong> répète ce qui est entre ses accolades <strong>20 fois</strong>. <code>i</code> vaut 0 au premier tour, puis 1, 2… jusqu’à 19.</p>
@@ -2452,7 +2452,7 @@ int main() {
     
     
   </p>
-  <h1 class="titre-lecon">0.5.1. La même ligne, avec une boucle for — de base, ailleurs</h1>
+  <h1 class="titre-lecon">0.5.1. La boucle for : la ligne en trois lignes de code — de base, ailleurs</h1>
   <p class="idee">Le 0.5 sur la ligne 5 : un seul nombre change dans la boucle.</p>
 
   <p><strong>C’est le 0.5</strong>, avec un seul changement : la <strong>ligne</strong> : 5 au lieu de 0, dans le <code>poser</code> de la boucle.</p>
@@ -2512,7 +2512,7 @@ int main() {
     
     
   </p>
-  <h1 class="titre-lecon">0.5.2. La même ligne, avec une boucle for — doublé, deux positions</h1>
+  <h1 class="titre-lecon">0.5.2. La boucle for : la ligne en trois lignes de code — doublé, deux positions</h1>
   <p class="idee">La boucle deux fois : la ligne 0 puis la ligne 5.</p>
 
   <p><strong>C’est le 0.5 et le 0.5.1 réunis</strong> : la boucle du 0.5 (ligne 0), puis celle du 0.5.1 (ligne 5).</p>
@@ -2575,7 +2575,7 @@ int main() {
     
     
   </p>
-  <h1 class="titre-lecon">0.6. La même ligne, avec une boucle while</h1>
+  <h1 class="titre-lecon">0.6. La boucle while : les trois morceaux du for, séparés</h1>
   <p class="idee">La boucle for, décomposée en ses trois morceaux.</p>
 
   <p><code>while (i &lt; 20)</code> répète <strong>tant que</strong> la condition est vraie. C’est la même boucle que <code>while (true)</code> du 0.0, mais celle-ci <strong>s’arrête</strong>.</p>
@@ -2637,7 +2637,7 @@ int main() {
     
     
   </p>
-  <h1 class="titre-lecon">0.6.1. La même ligne, avec une boucle while — de base, ailleurs</h1>
+  <h1 class="titre-lecon">0.6.1. La boucle while : les trois morceaux du for, séparés — de base, ailleurs</h1>
   <p class="idee">Le 0.6 sur la ligne 5 : un seul nombre change dans la boucle.</p>
 
   <p><strong>C’est le 0.6</strong>, avec un seul changement : la <strong>ligne</strong> : 5 au lieu de 0, dans le <code>poser</code> de la boucle.</p>
@@ -2699,7 +2699,7 @@ int main() {
     
     
   </p>
-  <h1 class="titre-lecon">0.6.2. La même ligne, avec une boucle while — doublé, deux positions</h1>
+  <h1 class="titre-lecon">0.6.2. La boucle while : les trois morceaux du for, séparés — doublé, deux positions</h1>
   <p class="idee">La boucle deux fois : la ligne 0 puis la ligne 5.</p>
 
   <p><strong>C’est le 0.6 et le 0.6.1 réunis</strong> : la boucle du 0.6 (ligne 0), puis celle du 0.6.1 (ligne 5).</p>
@@ -2766,7 +2766,7 @@ int main() {
     
     
   </p>
-  <h1 class="titre-lecon">0.7. La même ligne, avec do … while</h1>
+  <h1 class="titre-lecon">0.7. La boucle do … while : au moins un tour</h1>
   <p class="idee">La boucle qui vérifie sa condition à la fin : elle fait toujours au moins un tour.</p>
 
   <p><code>do { … } while (i &lt; 20);</code> fait le tour <strong>d’abord</strong>, et vérifie la condition <strong>ensuite</strong>. Il fait donc <strong>toujours au moins un tour</strong>, même si la condition est fausse dès le départ.</p>
@@ -2832,7 +2832,7 @@ int main() {                    // Le programme commence ici.
     
     
   </p>
-  <h1 class="titre-lecon">0.7.1. La même ligne, avec do … while — de base, ailleurs</h1>
+  <h1 class="titre-lecon">0.7.1. La boucle do … while : au moins un tour — de base, ailleurs</h1>
   <p class="idee">Le 0.7 sur la ligne 5 : un seul nombre change dans la boucle.</p>
 
   <p><strong>C’est le 0.7</strong>, avec un seul changement : la <strong>ligne</strong> : 5 au lieu de 0, dans le <code>poser</code> de la boucle.</p>
@@ -2894,7 +2894,7 @@ int main() {
     
     
   </p>
-  <h1 class="titre-lecon">0.7.2. La même ligne, avec do … while — doublé, deux positions</h1>
+  <h1 class="titre-lecon">0.7.2. La boucle do … while : au moins un tour — doublé, deux positions</h1>
   <p class="idee">La boucle deux fois : la ligne 0 puis la ligne 5.</p>
 
   <p><strong>C’est le 0.7 et le 0.7.1 réunis</strong> : la boucle du 0.7 (ligne 0), puis celle du 0.7.1 (ligne 5).</p>
@@ -9373,11 +9373,14 @@ int main() {                           // Le programme commence ici.
       
       <pre><code>// ---- #include &lt;carre&gt; : tourner en carré ----
 
+// Un C qui tourne autour de la case (15, 4), en haut à droite.
+// (Le A au milieu, ce sera la leçon suivante.)
+
 #include &lt;carre&gt;      // carre() : des tours en carré
 #include &lt;ALPHABET&gt;
 
 int main() {
-  carre(10, 8, ALPHABET[0], 1, 1, 250, 1);   // centre (10, 8), taille 1, un tour
+  carre(15, 4, ALPHABET[2], 1, 1, 250, 1);   // centre (15, 4), taille 1, un tour
 
   while (true) {
     image();
@@ -9387,9 +9390,9 @@ int main() {
 
     <div>
       <h3>Ce qu’on doit voir</h3>
-      <p class="avoir">Un A qui fait un tour en carré autour du milieu, puis s’y arrête.</p>
+      <p class="avoir">Un C qui fait un tour en carré autour de la case (15, 4), puis s’y arrête.</p>
       <figure style="margin-top: 8pt">
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgUlEQVR4nO3RoQ1CQRRE0ZWUgKT/aiiBMpBffLMCS15y9iZHjJzkrs/3Hdgaf5C/KjCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwDg88OP5uo0/mSIH3rse27jAODzwbvzPCDzwz32UAuMKjJMDp8C+AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCsw7gKFfPKje1PJIgAAAABJRU5ErkJggg==" alt="l’écran de la console" style="width: 100%">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABf0lEQVR4nO3WsQmAQBBFQUNLMLT/aizBMgwNTCzg9OAxMAV8eMHucl4HYcv0BXxK4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wT+xLrtj+lLBB7v3XV6Y4HHmx71TeDxBI4TOM4N7vNF8xOB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LgbneL+q1Llz+UAAAAASUVORK5CYII=" alt="l’écran de la console" style="width: 100%">
         <figcaption>l’écran, au bout de vingt images</figcaption>
       </figure>
     </div>
@@ -16608,27 +16611,28 @@ int main() {
       
       
       <pre><code>// ---- #include &lt;deplace_croix&gt; : suivre la croix, case par case ----
-// La croix fait bouger le A, une case tous les quarts de seconde.
+// La croix fait bouger le B, une case tous les quarts de seconde.
+// (Le A au milieu, ce seront les leçons de la croix, juste après.)
 
 #include &lt;deplace_croix&gt;   // deplace_croix() : la tuile suit la croix
 #include &lt;ALPHABET&gt;
 
-uint8_t x = 9;
-uint8_t y = 8;
+uint8_t x = 3;   // le B part de la colonne 3…
+uint8_t y = 4;   // …ligne 4
 
 int main() {
   while (true) {
     image();
-    deplace_croix(x, y, ALPHABET[0], 250);   // x et y suivent la tuile
+    deplace_croix(x, y, ALPHABET[1], 250);   // x et y suivent la tuile
   }
 }</code></pre>
     </div>
 
     <div>
       <h3>Ce qu’on doit voir</h3>
-      <p class="avoir">Un A au milieu ; la croix le promène, case par case.</p>
+      <p class="avoir">Un B en haut à gauche ; la croix le promène, case par case.</p>
       <figure style="margin-top: 8pt">
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgUlEQVR4nO3RoQ1CQRRE0ZWUgKT/aiiBMpBffLMCS15y9iZHjJzkrs/3Hdgaf5C/KjCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwDg88OP5uo0/mSIH3rse27jAODzwbvzPCDzwz32UAuMKjJMDp8C+AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCsw7gK2IfKjQZTL7QAAAABJRU5ErkJggg==" alt="l’écran de la console" style="width: 100%">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABfUlEQVR4nO3XsQmAMBBAUUtHsHT/aRzBMSwtBCvLSODz4BUpc3xykOW8DsKW6TfgVwLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRw3MvC67a/pg/EYHPjzzEQCx1nRcV5wnMBxVnScf3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3DcDbWp7dN97TeDAAAAAElFTkSuQmCC" alt="l’écran de la console" style="width: 100%">
         <figcaption>l’écran, au bout de vingt images</figcaption>
       </figure>
     </div>
@@ -18075,25 +18079,28 @@ int main() {
       
       <pre><code>// ---- #include &lt;glisse_croix&gt; : suivre la croix, au pixel près ----
 
+// Un B, parti du pixel (8, 8), en haut à gauche.
+// (Le A au milieu, ce seront les leçons qui suivent.)
+
 #include &lt;glisse_croix&gt;   // glisse_croix() : un lutin qui suit la croix
 #include &lt;ALPHABET&gt;
 
-uint8_t px = 76;
-uint8_t py = 68;
+uint8_t px = 8;
+uint8_t py = 8;
 
 int main() {
   while (true) {
     image();
-    glisse_croix(0, px, py, ALPHABET[0], 1);   // le lutin 0, un pixel par image
+    glisse_croix(0, px, py, ALPHABET[1], 1);   // le lutin 0, un pixel par image
   }
 }</code></pre>
     </div>
 
     <div>
       <h3>Ce qu’on doit voir</h3>
-      <p class="avoir">Un A au milieu ; la croix le fait glisser en douceur.</p>
+      <p class="avoir">Un B en haut à gauche ; la croix le fait glisser en douceur.</p>
       <figure style="margin-top: 8pt">
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABhElEQVR4nO3RoQ3DUBQEQcOUYJj+q0kJLsMwIMQg1P7SvJUGHDxpt+P8BLYtf5BbFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYNygwK/9/bP8yZOmBL52HdW4wLhBga+W/3nMoMB/N6/AuALjpgQeq8C4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCsw7gtWWfKjdi8m+AAAAABJRU5ErkJggg==" alt="l’écran de la console" style="width: 100%">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABfUlEQVR4nO3XsQmAQBAAQUNLMLT/aizBMgzNjERBEHEZmODDg+UOfli3hbDh8wl4lcBxAscJHCdwnMBxAsddBR6n+fD5oDxzE/j0zY8IHOdEx9ngOIHjnOg4/+A4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4HQz87dPk7/zxAAAAAElFTkSuQmCC" alt="l’écran de la console" style="width: 100%">
         <figcaption>l’écran, au bout de vingt images</figcaption>
       </figure>
     </div>
@@ -18115,9 +18122,10 @@ int main() {
     
   </p>
   <h1 class="titre-lecon">0.70.4. Plus fluide : la lettre au pixel près — en simple</h1>
-  <p class="idee">Le 0.70 en une ligne : glisse_croix(0, px, py, ALPHABET[0], 1).</p>
+  <p class="idee">Le 0.70 en une ligne : glisse_croix(0, px, py, ALPHABET[2], 1). Cette fois, un C, parti du pixel (120, 20).</p>
 
-  <p><strong>C’est le 0.70, en plus simple :</strong> les quatre <code>if</code> des flèches et le <code>sprite</code> sont remplacés par une ligne, <code>glisse_croix</code> (le 0.73).</p>
+  <p><strong>C’est le 0.70, en plus simple :</strong> les quatre <code>if</code> des flèches et le <code>sprite</code> sont remplacés par une ligne, <code>glisse_croix</code> (le 0.73 la reprend avec le A au milieu).</p>
+  <p><strong>Une autre lettre, ailleurs :</strong> un C (<code>ALPHABET[2]</code>), parti du pixel (120, 20), en haut à droite.</p>
   <p><strong>La vitesse, 1 :</strong> un pixel par image, comme au 0.70.</p>
   
 <div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
@@ -18134,24 +18142,24 @@ int main() {
       
       
       <pre><code>#include &lt;glisse_croix&gt;   // un lutin qui suit la croix, au pixel près
-#include &lt;ALPHABET&gt;       // les lettres de la police : ALPHABET[0] est le A
+#include &lt;ALPHABET&gt;       // les lettres de la police : ALPHABET[2] est le C
 
-uint8_t px = 76;      // en pixels : le milieu
-uint8_t py = 68;
+uint8_t px = 120;     // le C, en pixels : en haut à droite
+uint8_t py = 20;
 
 int main() {
   while (true) {
     image();
-    glisse_croix(0, px, py, ALPHABET[0], 1);   // tout le 0.70
+    glisse_croix(0, px, py, ALPHABET[2], 1);   // tout le 0.70, en une ligne
   }
 }</code></pre>
     </div>
 
     <div>
       <h3>Ce qu’on doit voir</h3>
-      <p class="avoir">Comme au 0.70 : un A qui glisse pixel par pixel avec les flèches.</p>
+      <p class="avoir">Un C en haut à droite, qui glisse pixel par pixel avec les flèches, comme le A du 0.70.</p>
       <figure style="margin-top: 8pt">
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABhElEQVR4nO3RoQ3DUBQEQcOUYJj+q0kJLsMwIMQg1P7SvJUGHDxpt+P8BLYtf5BbFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYNygwK/9/bP8yZOmBL52HdW4wLhBga+W/3nMoMB/N6/AuALjpgQeq8C4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCsw7gtWWfKjdi8m+AAAAABJRU5ErkJggg==" alt="l’écran de la console" style="width: 100%">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgUlEQVR4nO3WsQmEQBBAUUNLuND+q7EEy7jQQDiuAB3h8+Dls/AZZpfjuxO2vP4CHiVwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAo9aP9tlbKLAc/67jjUWeM7k4v4IPEfgOIHj3OA+v2huJnCcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcdwJl6v6rRerBKAAAAABJRU5ErkJggg==" alt="l’écran de la console" style="width: 100%">
         <figcaption>l’écran, au bout de vingt images</figcaption>
       </figure>
     </div>
@@ -22687,7 +22695,7 @@ int main() {
     
   </p>
   <h1 class="titre-lecon">0.86.3. La fonction texteGrand() — un texte agrandi</h1>
-  <p class="idee">#include &lt;texteGrand&gt; : texteGrand(colonne, ligne, "A", 3) écrit un A trois fois plus grand, sans rien dessiner.</p>
+  <p class="idee">#include &lt;texteGrand&gt; : texteGrand(colonne, ligne, "B", 3) écrit un B trois fois plus grand, sans rien dessiner.</p>
 
   <p><strong>Ce qu’elle fait :</strong> <code>texteGrand(colonne, ligne, "TEXTE", taille)</code> écrit un texte <strong>agrandi</strong> de 1 à 20 fois. Chaque pixel de la lettre devient un carré de <code>taille × taille</code> pixels : une lettre prend <code>taille × taille</code> cases.</p>
   <p><strong>La ligne à écrire : <code>#include &lt;texteGrand&gt;</code>.</strong></p>
@@ -22706,12 +22714,13 @@ int main() {
       
       
       <pre><code>// ---- #include &lt;texteGrand&gt; : un texte agrandi ----
-// Un A trois fois plus grand : 3 × 3 cases, à partir de la case (2, 2).
+// Un B trois fois plus grand : 3 × 3 cases, à partir de la case (2, 2).
+// (Le A, ce sera la leçon « Agrandir une lettre », juste après.)
 
 #include &lt;texteGrand&gt;   // texteGrand() : les lettres agrandies
 
 int main() {
-  texteGrand(2, 2, "A", 3);   // colonne 2, ligne 2, le texte, la taille
+  texteGrand(2, 2, "B", 3);   // colonne 2, ligne 2, le texte, la taille
 
   while (true) {
     image();
@@ -22721,9 +22730,9 @@ int main() {
 
     <div>
       <h3>Ce qu’on doit voir</h3>
-      <p class="avoir">Un grand A, trois cases de large et trois de haut, en haut à gauche.</p>
+      <p class="avoir">Un grand B, trois cases de large et trois de haut, en haut à gauche.</p>
       <figure style="margin-top: 8pt">
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgUlEQVR4nO3asQmAUAxAQUtHsHT/aRzBMSydQBBRPjwPboCEV6TJtB8bYdPwCfiUwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECx70QeF7WK8PXQ+A4geOeB75TUenhBI4TOE7gOIHjBI57IfAdw/f8LYHjBI5zg+MEjhM4TuA4geMEjhM4TuA4geN8VcYJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdw3AmMgJgUoHUDNAAAAABJRU5ErkJggg==" alt="l’écran de la console" style="width: 100%">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABfUlEQVR4nO3asQmAMBBAUUtHsHT/aRzBMSwdQVBD4PPglSly/CIcZDmvg7Bl+g0YSuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4gePeB163/dH08RA4TuC4HwJ/PMNQAscJHCdwnMBxAsdZk+IEjhM4zhscJ3CcwHECxwkcJ3CcNSlO4DiB4/yqjBM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4G792bMQ+wwQqAAAAAElFTkSuQmCC" alt="l’écran de la console" style="width: 100%">
         <figcaption>l’écran, au bout de vingt images</figcaption>
       </figure>
     </div>
@@ -45724,7 +45733,7 @@ int main() {                         // Le jeu commence ici.
   <p>- La caméra : c’est le monde qui bouge</p>
   <p>- Trois variables qui parlent de la même chose</p>
   <p>- Un tableau de « struct »</p>
-  <p>- Une méthode : la fonction qui connaît son objet</p>
+  <p>- Une méthode : ce qu’elle coûte, ce qui reste refusé</p>
   <p>- Les trois façons de faire la même chose</p>
   <p>- Une méthode qui en appelle une autre</p>
   <p><strong>Aucune fonction nouvelle ici :</strong> ce chapitre n’emploie que des fonctions déjà présentées. Tout l’effort porte sur la façon d’écrire le programme.</p>
@@ -46249,7 +46258,7 @@ int main() {                  // Le jeu commence ici.
     
     
   </p>
-  <h1 class="titre-lecon">88. Une méthode : la fonction qui connaît son objet</h1>
+  <h1 class="titre-lecon">88. Une méthode : ce qu’elle coûte, ce qui reste refusé</h1>
   <p class="idee">`troupe[i].avancer()` plutôt que `avancer(i)`.</p>
 
   <p><strong>Une méthode s’écrit dans la <code>struct</code>, et travaille sur l’objet devant le point.</strong> Dans son corps, les champs s’écrivent sous leur nom nu : <code>x++</code>, et non <code>this-&gt;x++</code>.</p>

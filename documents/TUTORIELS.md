@@ -1,6 +1,6 @@
 # Apprendre — le parcours, du plus facile au plus dur
 
-**587 étapes** — leçons, cours et fonctions —, rangées en 25 chapitres. Chacune est un **programme
+**615 étapes** — leçons, cours et fonctions —, rangées en 26 chapitres. Chacune est un **programme
 entier** : le code se colle tel quel dans `http://localhost/gameboy3/`, ou se
 compile en ligne de commande, et il tourne.
 
@@ -30,7 +30,7 @@ avant la première étape qui l’emploie — un `#include` nouveau à la fois.
 
 | Chapitre | Ce qu’on y apprend | Étapes |
 |---|---|---|
-| 0 | Avant tout | 0.0 – 0.111 |
+| 0 | Avant tout | 0.0 – 0.113 |
 | 1 | Les tout premiers pas | 0.1 – 8 |
 | 2 | Les variables : la mémoire de la console | 8.1 – 12 |
 | 3 | Retenir, et réagir | 12.1 – 20 |
@@ -55,6 +55,7 @@ avant la première étape qui l’emploie — un `#include` nouveau à la fois.
 | 22 | Le défilement : un monde plus grand que l’écran | 123.1 – 125 |
 | 23 | Un vrai jeu | 125.1 – 134 |
 | 24 | Aller au bout | 134.1 – 143 |
+| 25 | Tes propres #include : ajouter une fonction | 143.1 – 151 |
 
 | Partie | Chapitre | Étapes |
 |---|---|---|
@@ -69,7 +70,7 @@ avant la première étape qui l’emploie — un `#include` nouveau à la fois.
 | I. Le jeu de bombes | 0 | 0.93 – 0.94.1 |
 | J. Un micro Zelda | 0 | 0.95 – 0.95.1 |
 | K. Une lettre qui tire | 0 | 0.96 – 0.108 |
-| L. Les fonctions de la console, une par une | 0 | 0.109 – 0.111 |
+| L. Les fonctions de la console, une par une | 0 | 0.109 – 0.113 |
 
 ---
 
@@ -200,7 +201,7 @@ int main() {
 
 **Essaie :** écris ton prénom en (0, 17), tout en bas à gauche.
 
-**On retrouve texte dans** — 0.0.1, 0.1, 0.1.1, 0.1.2, 0.3, 0.3.1, 0.3.2, 0.4, 0.4.1, 0.4.2, 0.79, 0.79.1, 0.81, 0.81.1, 0.81.3, 0.82.1, 0.83, 0.83.2, 0.84, 0.88, 0.88.1, 0.88.2, 0.89.2, 0.90, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 0.1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 1.9, 1.10, 1.11, 1.12, 2, 2.1, 2.2, 2.3, 4, 5, 6, 7, 8, 8.1, 9, 10, 11, 12, 12.1, 13, 14, 16, 17, 18, 19, 20, 20.1, 21, 22, 23, 24, 24.1, 25, 26, 27, 28, 29, 30, 31, 32, 33, 33.1, 34, 35, 36, 37, 38, 39, 41, 43, 43.1, 44, 45, 46, 47, 52.1, 53, 54, 55, 56, 57, 58, 59, 59.1, 60, 65, 66, 66.1, 67, 68, 69, 70, 71, 71.1, 72, 73, 75, 77, 78, 78.1, 79, 80, 81, 82, 82.1, 83, 84, 85, 86, 90, 90.1, 91, 92, 93, 94, 94.1, 95, 96, 97, 98, 99, 100, 100.1, 101, 102, 103, 104, 105, 106, 106.1, 107, 108, 109, 110, 110.1, 111, 112, 113, 113.1, 114, 115, 116, 117, 117.1, 118, 119, 120, 120.1, 121, 122, 123, 123.1, 124, 125.1, 126, 127, 128, 129, 133, 134, 134.1, 135, 136, 138, 139, 141, 143
+**On retrouve texte dans** — 0.0.1, 0.1, 0.1.1, 0.1.2, 0.3, 0.3.1, 0.3.2, 0.4, 0.4.1, 0.4.2, 0.79, 0.79.1, 0.81, 0.81.1, 0.81.3, 0.82.1, 0.83, 0.83.2, 0.84, 0.88, 0.88.1, 0.88.2, 0.89.2, 0.90, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 0.1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 1.9, 1.10, 1.11, 1.12, 2, 2.1, 2.2, 2.3, 4, 5, 6, 7, 8, 8.1, 9, 10, 11, 12, 12.1, 13, 14, 16, 17, 18, 19, 20, 20.1, 21, 22, 23, 24, 24.1, 25, 26, 27, 28, 29, 30, 31, 32, 33, 33.1, 34, 35, 35.12, 35.15, 35.18, 36, 37, 38, 39, 41, 43, 43.1, 44, 45, 46, 47, 52.1, 53, 54, 55, 56, 57, 58, 59, 59.1, 60, 65, 66, 66.1, 67, 68, 69, 70, 71, 71.1, 72, 73, 75, 77, 78, 78.1, 79, 80, 81, 82, 82.1, 83, 84, 85, 86, 90, 90.1, 91, 92, 93, 94, 94.1, 95, 96, 97, 98, 99, 100, 100.1, 101, 102, 103, 104, 105, 106, 106.1, 107, 108, 109, 110, 110.1, 111, 112, 113, 113.1, 114, 115, 116, 117, 117.1, 118, 119, 120, 120.1, 121, 122, 123, 123.1, 124, 125.1, 126, 127, 128, 129, 133, 134, 134.1, 135, 136, 138, 139, 141, 143, 143.1
 
 **Ce qu’on doit voir** — BONJOUR au milieu de l’écran, EN HAUT dans le coin en haut à gauche.  
 **Ce qu’il coûte** — 425 octets de programme, 0 variable.  
@@ -350,7 +351,7 @@ int main() {
 
 **Essaie :** pose un B (la tuile 2) dans chaque coin de l’écran.
 
-**On retrouve poser dans** — 0.2, 0.2.1, 0.2.2, 0.5, 0.5.1, 0.5.2, 0.6, 0.6.1, 0.6.2, 0.7, 0.7.1, 0.7.2, 0.8, 0.8.1, 0.8.2, 0.9, 0.9.1, 0.9.2, 0.12, 0.12.1, 0.12.2, 0.13, 0.13.1, 0.13.2, 0.14, 0.14.1, 0.14.2, 0.15, 0.15.1, 0.15.2, 0.16, 0.16.1, 0.16.2, 0.17, 0.17.1, 0.17.2, 0.30, 0.30.1, 0.30.2, 0.31, 0.31.1, 0.31.2, 0.33, 0.33.1, 0.33.2, 0.65, 0.65.1, 0.65.2, 0.66, 0.66.1, 0.66.2, 0.67, 0.67.1, 0.67.2, 0.68, 0.68.1, 0.68.2, 0.69, 0.69.1, 0.69.2, 0.76.1, 0.76.2, 0.76.3, 0.76.4, 0.76.5, 0.76.6, 0.76.8, 0.77, 0.78, 0.78.1, 0.81, 0.81.1, 0.81.3, 0.82, 0.82.1, 0.83, 0.83.2, 0.85, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93, 0.93.1, 0.93.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.95.1, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 3, 13, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44, 47, 52, 60, 61, 62, 63, 64, 72, 73, 74, 76, 84, 85, 95, 96, 97, 98, 99, 101, 102, 103, 105, 106, 112, 113, 122, 124, 125, 132, 133, 134, 135, 136, 137
+**On retrouve poser dans** — 0.2, 0.2.1, 0.2.2, 0.5, 0.5.1, 0.5.2, 0.6, 0.6.1, 0.6.2, 0.7, 0.7.1, 0.7.2, 0.8, 0.8.1, 0.8.2, 0.9, 0.9.1, 0.9.2, 0.12, 0.12.1, 0.12.2, 0.13, 0.13.1, 0.13.2, 0.14, 0.14.1, 0.14.2, 0.15, 0.15.1, 0.15.2, 0.16, 0.16.1, 0.16.2, 0.17, 0.17.1, 0.17.2, 0.30, 0.30.1, 0.30.2, 0.31, 0.31.1, 0.31.2, 0.33, 0.33.1, 0.33.2, 0.65, 0.65.1, 0.65.2, 0.66, 0.66.1, 0.66.2, 0.67, 0.67.1, 0.67.2, 0.68, 0.68.1, 0.68.2, 0.69, 0.69.1, 0.69.2, 0.76.1, 0.76.2, 0.76.3, 0.76.4, 0.76.5, 0.76.6, 0.76.8, 0.77, 0.78, 0.78.1, 0.81, 0.81.1, 0.81.3, 0.82, 0.82.1, 0.83, 0.83.2, 0.85, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93, 0.93.1, 0.93.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.95.1, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 3, 13, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44, 47, 52, 60, 61, 62, 63, 64, 72, 73, 74, 76, 84, 85, 95, 96, 97, 98, 99, 101, 102, 103, 105, 106, 112, 113, 122, 124, 125, 132, 133, 134, 135, 136, 137, 144, 145, 146, 147, 148, 149, 150, 151
 
 **Ce qu’on doit voir** — Un A au milieu, un Z en haut à gauche.  
 **Ce qu’il coûte** — 206 octets de programme, 0 variable.  
@@ -387,7 +388,7 @@ int main() {
 
 **Essaie :** remplace `ALPHABET[7]` par `ALPHABET[i]` dans une boucle : regarde la ROM grossir de 700 octets.
 
-**On retrouve ALPHABET dans** — 0.2, 0.2.1, 0.2.2, 0.5, 0.5.1, 0.5.2, 0.6, 0.6.1, 0.6.2, 0.7, 0.7.1, 0.7.2, 0.8, 0.8.1, 0.8.2, 0.9, 0.9.1, 0.9.2, 0.10, 0.10.1, 0.10.2, 0.12, 0.12.1, 0.12.2, 0.13, 0.13.1, 0.13.2, 0.14, 0.14.1, 0.14.2, 0.15, 0.15.1, 0.15.2, 0.16, 0.16.1, 0.16.2, 0.17, 0.17.1, 0.17.2, 0.18, 0.18.1, 0.18.2, 0.19, 0.19.1, 0.19.2, 0.20, 0.20.1, 0.20.2, 0.21, 0.21.1, 0.21.2, 0.22, 0.22.1, 0.22.2, 0.23, 0.23.1, 0.23.2, 0.24, 0.24.1, 0.24.2, 0.25, 0.25.1, 0.25.2, 0.26, 0.26.1, 0.26.2, 0.27, 0.27.1, 0.27.2, 0.28, 0.28.1, 0.28.2, 0.29, 0.29.1, 0.29.2, 0.30, 0.30.1, 0.30.2, 0.31, 0.31.1, 0.31.2, 0.32, 0.32.1, 0.32.2, 0.33, 0.33.1, 0.33.2, 0.34, 0.34.1, 0.34.2, 0.35, 0.35.1, 0.35.2, 0.36, 0.36.1, 0.36.2, 0.37, 0.37.1, 0.37.2, 0.38, 0.38.1, 0.38.2, 0.39, 0.39.1, 0.39.2, 0.40, 0.40.1, 0.40.2, 0.41, 0.41.1, 0.41.2, 0.42, 0.42.1, 0.42.2, 0.43, 0.43.1, 0.43.2, 0.44, 0.44.1, 0.44.2, 0.45, 0.45.1, 0.45.2, 0.46, 0.46.1, 0.46.2, 0.47, 0.47.1, 0.47.2, 0.48, 0.48.1, 0.48.2, 0.49, 0.49.1, 0.49.2, 0.50, 0.50.1, 0.50.2, 0.51, 0.51.1, 0.51.2, 0.52, 0.52.1, 0.52.2, 0.53, 0.53.1, 0.53.2, 0.54, 0.54.1, 0.54.2, 0.55, 0.55.1, 0.55.2, 0.56, 0.56.1, 0.56.2, 0.57, 0.57.1, 0.57.2, 0.58, 0.58.1, 0.58.2, 0.59, 0.59.1, 0.59.2, 0.60, 0.60.1, 0.60.2, 0.61, 0.61.1, 0.61.2, 0.62, 0.62.1, 0.62.2, 0.63, 0.63.1, 0.63.2, 0.64, 0.64.1, 0.64.2, 0.65, 0.65.1, 0.65.2, 0.65.4, 0.66, 0.66.1, 0.66.2, 0.66.4, 0.67, 0.67.1, 0.67.2, 0.67.3, 0.68, 0.68.1, 0.68.2, 0.68.3, 0.69, 0.69.1, 0.69.2, 0.69.3, 0.70, 0.70.1, 0.70.2, 0.70.4, 0.71, 0.71.1, 0.71.2, 0.72, 0.72.1, 0.72.2, 0.73, 0.73.1, 0.73.2, 0.74, 0.74.1, 0.74.2, 0.75, 0.75.1, 0.75.2, 0.76, 0.76.1, 0.76.2, 0.76.3, 0.76.4, 0.76.5, 0.76.6, 0.76.7, 0.76.8, 0.76.10, 0.76.11, 0.76.12, 0.76.13, 0.76.14, 0.77, 0.78, 0.78.1, 0.79, 0.79.1, 0.80, 0.80.1, 0.80.2, 0.81, 0.81.1, 0.81.3, 0.82, 0.82.1, 0.83, 0.83.2, 0.84, 0.85, 0.86.2, 0.90.2, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93, 0.93.1, 0.93.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.95.1, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108
+**On retrouve ALPHABET dans** — 0.2, 0.2.1, 0.2.2, 0.5, 0.5.1, 0.5.2, 0.6, 0.6.1, 0.6.2, 0.7, 0.7.1, 0.7.2, 0.8, 0.8.1, 0.8.2, 0.9, 0.9.1, 0.9.2, 0.10, 0.10.1, 0.10.2, 0.12, 0.12.1, 0.12.2, 0.13, 0.13.1, 0.13.2, 0.14, 0.14.1, 0.14.2, 0.15, 0.15.1, 0.15.2, 0.16, 0.16.1, 0.16.2, 0.17, 0.17.1, 0.17.2, 0.18, 0.18.1, 0.18.2, 0.19, 0.19.1, 0.19.2, 0.20, 0.20.1, 0.20.2, 0.21, 0.21.1, 0.21.2, 0.22, 0.22.1, 0.22.2, 0.23, 0.23.1, 0.23.2, 0.24, 0.24.1, 0.24.2, 0.25, 0.25.1, 0.25.2, 0.26, 0.26.1, 0.26.2, 0.27, 0.27.1, 0.27.2, 0.28, 0.28.1, 0.28.2, 0.29, 0.29.1, 0.29.2, 0.30, 0.30.1, 0.30.2, 0.31, 0.31.1, 0.31.2, 0.32, 0.32.1, 0.32.2, 0.33, 0.33.1, 0.33.2, 0.34, 0.34.1, 0.34.2, 0.35, 0.35.1, 0.35.2, 0.36, 0.36.1, 0.36.2, 0.37, 0.37.1, 0.37.2, 0.38, 0.38.1, 0.38.2, 0.39, 0.39.1, 0.39.2, 0.40, 0.40.1, 0.40.2, 0.41, 0.41.1, 0.41.2, 0.42, 0.42.1, 0.42.2, 0.43, 0.43.1, 0.43.2, 0.44, 0.44.1, 0.44.2, 0.45, 0.45.1, 0.45.2, 0.46, 0.46.1, 0.46.2, 0.47, 0.47.1, 0.47.2, 0.48, 0.48.1, 0.48.2, 0.49, 0.49.1, 0.49.2, 0.50, 0.50.1, 0.50.2, 0.51, 0.51.1, 0.51.2, 0.52, 0.52.1, 0.52.2, 0.53, 0.53.1, 0.53.2, 0.54, 0.54.1, 0.54.2, 0.55, 0.55.1, 0.55.2, 0.56, 0.56.1, 0.56.2, 0.57, 0.57.1, 0.57.2, 0.58, 0.58.1, 0.58.2, 0.59, 0.59.1, 0.59.2, 0.60, 0.60.1, 0.60.2, 0.61, 0.61.1, 0.61.2, 0.62, 0.62.1, 0.62.2, 0.63, 0.63.1, 0.63.2, 0.64, 0.64.1, 0.64.2, 0.65, 0.65.1, 0.65.2, 0.65.4, 0.66, 0.66.1, 0.66.2, 0.66.4, 0.67, 0.67.1, 0.67.2, 0.67.3, 0.68, 0.68.1, 0.68.2, 0.68.3, 0.69, 0.69.1, 0.69.2, 0.69.3, 0.70, 0.70.1, 0.70.2, 0.70.4, 0.71, 0.71.1, 0.71.2, 0.72, 0.72.1, 0.72.2, 0.73, 0.73.1, 0.73.2, 0.74, 0.74.1, 0.74.2, 0.75, 0.75.1, 0.75.2, 0.76, 0.76.1, 0.76.2, 0.76.3, 0.76.4, 0.76.5, 0.76.6, 0.76.7, 0.76.8, 0.76.10, 0.76.11, 0.76.12, 0.76.13, 0.76.14, 0.77, 0.78, 0.78.1, 0.79, 0.79.1, 0.80, 0.80.1, 0.80.2, 0.81, 0.81.1, 0.81.3, 0.82, 0.82.1, 0.83, 0.83.2, 0.84, 0.85, 0.86.2, 0.90.2, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93, 0.93.1, 0.93.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.95.1, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 144, 145, 146, 147, 148, 149, 150, 151
 
 **Ce qu’on doit voir** — HI au milieu de l’écran.  
 **Ce qu’il coûte** — 197 octets de programme, 0 variable.  
@@ -751,7 +752,7 @@ int main() {            // Le programme commence ici.
 
 ---
 
-### 0.5. La même ligne, avec une boucle for
+### 0.5. La boucle for : la ligne en trois lignes de code
 
 > Vingt lignes presque pareilles deviennent une seule, répétée vingt fois.
 
@@ -787,7 +788,7 @@ int main() {
 
 ---
 
-### 0.5.1. La même ligne, avec une boucle for — de base, ailleurs
+### 0.5.1. La boucle for : la ligne en trois lignes de code — de base, ailleurs
 
 > Le 0.5 sur la ligne 5 : un seul nombre change dans la boucle.
 
@@ -824,7 +825,7 @@ int main() {
 
 ---
 
-### 0.5.2. La même ligne, avec une boucle for — doublé, deux positions
+### 0.5.2. La boucle for : la ligne en trois lignes de code — doublé, deux positions
 
 > La boucle deux fois : la ligne 0 puis la ligne 5.
 
@@ -863,7 +864,7 @@ int main() {
 
 ---
 
-### 0.6. La même ligne, avec une boucle while
+### 0.6. La boucle while : les trois morceaux du for, séparés
 
 > La boucle for, décomposée en ses trois morceaux.
 
@@ -902,7 +903,7 @@ Les trois morceaux que `for` réunit sur une ligne sont ici écrits **séparéme
 
 ---
 
-### 0.6.1. La même ligne, avec une boucle while — de base, ailleurs
+### 0.6.1. La boucle while : les trois morceaux du for, séparés — de base, ailleurs
 
 > Le 0.6 sur la ligne 5 : un seul nombre change dans la boucle.
 
@@ -941,7 +942,7 @@ int main() {
 
 ---
 
-### 0.6.2. La même ligne, avec une boucle while — doublé, deux positions
+### 0.6.2. La boucle while : les trois morceaux du for, séparés — doublé, deux positions
 
 > La boucle deux fois : la ligne 0 puis la ligne 5.
 
@@ -984,7 +985,7 @@ int main() {
 
 ---
 
-### 0.7. La même ligne, avec do … while
+### 0.7. La boucle do … while : au moins un tour
 
 > La boucle qui vérifie sa condition à la fin : elle fait toujours au moins un tour.
 
@@ -1027,7 +1028,7 @@ Attention au **point-virgule** après `while (i < 20)` : il est obligatoire avec
 
 ---
 
-### 0.7.1. La même ligne, avec do … while — de base, ailleurs
+### 0.7.1. La boucle do … while : au moins un tour — de base, ailleurs
 
 > Le 0.7 sur la ligne 5 : un seul nombre change dans la boucle.
 
@@ -1066,7 +1067,7 @@ int main() {
 
 ---
 
-### 0.7.2. La même ligne, avec do … while — doublé, deux positions
+### 0.7.2. La boucle do … while : au moins un tour — doublé, deux positions
 
 > La boucle deux fois : la ligne 0 puis la ligne 5.
 
@@ -1262,7 +1263,7 @@ int main() {
 
 **Essaie :** `nombre(4, 10, score, 2);` : deux chiffres seulement.
 
-**On retrouve nombre dans** — 0.20, 0.20.1, 0.20.2, 0.23, 0.23.1, 0.23.2, 0.24, 0.25, 0.26, 0.27, 0.28, 0.29, 0.31, 0.68, 0.68.1, 0.68.2, 0.68.3, 0.69, 0.69.1, 0.69.2, 0.69.3, 0.75, 0.75.1, 0.75.2, 0.76, 0.76.1, 0.76.2, 0.76.3, 0.76.4, 0.76.5, 0.76.6, 0.76.7, 0.76.8, 0.76.10, 0.76.11, 0.76.12, 0.76.13, 0.76.14, 0.79.1, 0.80, 0.80.1, 0.80.2, 0.81, 0.81.1, 0.81.3, 0.82.1, 0.83, 0.83.2, 0.84, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.102, 0.102.1, 0.103, 0.104, 7, 9, 10, 11, 12, 15, 16, 18, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 36, 56, 59, 65, 67, 68, 69, 70, 71, 75, 77, 78, 79, 81, 82, 86, 87, 88, 89, 90, 91, 94, 102, 111, 114, 116, 117, 119, 120, 122, 124, 125, 129, 133, 138, 139, 141, 142
+**On retrouve nombre dans** — 0.20, 0.20.1, 0.20.2, 0.23, 0.23.1, 0.23.2, 0.24, 0.25, 0.26, 0.27, 0.28, 0.29, 0.31, 0.68, 0.68.1, 0.68.2, 0.68.3, 0.69, 0.69.1, 0.69.2, 0.69.3, 0.75, 0.75.1, 0.75.2, 0.76, 0.76.1, 0.76.2, 0.76.3, 0.76.4, 0.76.5, 0.76.6, 0.76.7, 0.76.8, 0.76.10, 0.76.11, 0.76.12, 0.76.13, 0.76.14, 0.79.1, 0.80, 0.80.1, 0.80.2, 0.81, 0.81.1, 0.81.3, 0.82.1, 0.83, 0.83.2, 0.84, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.102, 0.102.1, 0.103, 0.104, 7, 9, 10, 11, 12, 15, 16, 18, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 35.18, 36, 56, 59, 65, 67, 68, 69, 70, 71, 75, 77, 78, 79, 81, 82, 86, 87, 88, 89, 90, 91, 94, 102, 111, 114, 116, 117, 119, 120, 122, 124, 125, 129, 133, 138, 139, 141, 142
 
 **Ce qu’on doit voir** — 042, puis 42, puis 050, les uns sous les autres.  
 **Ce qu’il coûte** — 394 octets de programme, 1 variable.  
@@ -5435,11 +5436,14 @@ int main() {                           // Le programme commence ici.
 ```cpp
 // ---- #include <carre> : tourner en carré ----
 
+// Un C qui tourne autour de la case (15, 4), en haut à droite.
+// (Le A au milieu, ce sera la leçon suivante.)
+
 #include <carre>      // carre() : des tours en carré
 #include <ALPHABET>
 
 int main() {
-  carre(10, 8, ALPHABET[0], 1, 1, 250, 1);   // centre (10, 8), taille 1, un tour
+  carre(15, 4, ALPHABET[2], 1, 1, 250, 1);   // centre (15, 4), taille 1, un tour
 
   while (true) {
     image();
@@ -5459,7 +5463,7 @@ int main() {
 
 **On retrouve carre dans** — 0.34, 0.34.1, 0.34.2, 0.35, 0.35.1, 0.35.2, 0.36, 0.36.1, 0.36.2, 0.37, 0.37.1, 0.37.2, 0.38, 0.38.1, 0.38.2, 0.39, 0.39.1, 0.39.2, 0.40, 0.40.1, 0.40.2, 0.41, 0.41.1, 0.41.2, 0.42, 0.42.1, 0.42.2, 0.43, 0.43.1, 0.43.2, 0.44, 0.44.1, 0.44.2, 0.45, 0.45.1, 0.45.2, 0.46, 0.46.1, 0.46.2, 0.47, 0.47.1, 0.47.2, 0.48, 0.48.1, 0.48.2, 0.49, 0.49.1, 0.49.2, 0.50, 0.50.1, 0.50.2, 0.51, 0.51.1, 0.51.2, 0.52, 0.52.1, 0.52.2, 0.53, 0.53.1, 0.53.2, 0.54, 0.54.1, 0.54.2
 
-**Ce qu’on doit voir** — Un A qui fait un tour en carré autour du milieu, puis s’y arrête.  
+**Ce qu’on doit voir** — Un C qui fait un tour en carré autour de la case (15, 4), puis s’y arrête.  
 **Ce qu’il coûte** — 1349 octets de programme, 15 variables.  
 **Ce qui est gravé** — `démarrage` (49 o), `carre()` (440 o), `main()` (38 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `AdresseCase` (10 o, pour poser(), effacer()), `EffacerCases` (12 o, pour effacer()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (704 o) · appels : `poser()` ×4 (52 o), `effacer()` ×3 (45 o), `carre()` ×1 (31 o), `image()` ×4 (12 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreFinVBlank, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
 
@@ -10028,7 +10032,7 @@ int main() {
 
 **Essaie :** un deuxième `if`, avec `bouton(B)`, qui écrit ailleurs.
 
-**On retrouve bouton dans** — 0.66, 0.66.1, 0.66.2, 0.67, 0.67.1, 0.67.2, 0.68, 0.68.1, 0.68.2, 0.69, 0.69.1, 0.69.2, 0.69.3, 0.70, 0.70.1, 0.70.2, 0.82, 0.82.1, 0.83.2, 0.84, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.1, 0.93.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.95.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 2, 2.1, 2.2, 2.3, 14, 16, 17, 18, 19, 20, 21, 23, 44, 45, 47, 48, 49, 51, 52, 53, 54, 55, 57, 70, 81, 82, 84, 85, 89, 91, 94, 97, 98, 100, 102, 106, 107, 108, 109, 110, 111, 112, 113, 114, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 129, 131, 132, 134, 136, 137, 138, 143
+**On retrouve bouton dans** — 0.66, 0.66.1, 0.66.2, 0.67, 0.67.1, 0.67.2, 0.68, 0.68.1, 0.68.2, 0.69, 0.69.1, 0.69.2, 0.69.3, 0.70, 0.70.1, 0.70.2, 0.82, 0.82.1, 0.83.2, 0.84, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.1, 0.93.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.95.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 2, 2.1, 2.2, 2.3, 14, 16, 17, 18, 19, 20, 21, 23, 35.16, 35.17, 35.18, 35.19, 44, 45, 47, 48, 49, 51, 52, 53, 54, 55, 57, 70, 81, 82, 84, 85, 89, 91, 94, 97, 98, 100, 102, 106, 107, 108, 109, 110, 111, 112, 113, 114, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 129, 131, 132, 134, 136, 137, 138, 143
 
 **Ce qu’on doit voir** — APPUIE SUR A en haut ; APPUYE apparaît au milieu tant qu’on tient le bouton A.  
 **Ce qu’il coûte** — 465 octets de programme, 0 variable.  
@@ -10194,18 +10198,19 @@ int main() {
 
 ```cpp
 // ---- #include <deplace_croix> : suivre la croix, case par case ----
-// La croix fait bouger le A, une case tous les quarts de seconde.
+// La croix fait bouger le B, une case tous les quarts de seconde.
+// (Le A au milieu, ce seront les leçons de la croix, juste après.)
 
 #include <deplace_croix>   // deplace_croix() : la tuile suit la croix
 #include <ALPHABET>
 
-uint8_t x = 9;
-uint8_t y = 8;
+uint8_t x = 3;   // le B part de la colonne 3…
+uint8_t y = 4;   // …ligne 4
 
 int main() {
   while (true) {
     image();
-    deplace_croix(x, y, ALPHABET[0], 250);   // x et y suivent la tuile
+    deplace_croix(x, y, ALPHABET[1], 250);   // x et y suivent la tuile
   }
 }
 ```
@@ -10222,7 +10227,7 @@ int main() {
 
 **On retrouve deplace_croix dans** — 0.66.4, 0.67.3, 0.68.3, 0.69.3, 0.71, 0.71.1, 0.71.2, 0.72, 0.72.1, 0.72.2, 0.75, 0.75.1, 0.75.2, 0.76, 0.76.1, 0.76.2, 0.76.3, 0.76.4, 0.76.5, 0.76.6, 0.76.7, 0.76.8, 0.76.10, 0.76.11, 0.76.12, 0.76.13, 0.76.14, 0.79, 0.79.1, 0.80, 0.80.1, 0.80.2, 0.81, 0.81.1, 0.81.3, 0.83, 0.84, 0.85, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6
 
-**Ce qu’on doit voir** — Un A au milieu ; la croix le promène, case par case.  
+**Ce qu’on doit voir** — Un B en haut à gauche ; la croix le promène, case par case.  
 **Ce qu’il coûte** — 1181 octets de programme, 15 variables.  
 **Ce qui est gravé** — `démarrage` (73 o), `deplace_croix()` (217 o), `main()` (32 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `AdresseCase` (10 o, pour effacer(), poser()), `EffacerCases` (12 o, pour effacer()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `LireManette` (37 o, pour bouton()), `Tuiles` (704 o) · appels : `bouton()` ×4 (20 o), `deplace_croix()` ×1 (19 o), `effacer()` ×1 (15 o), `poser()` ×1 (13 o), `image()` ×1 (3 o), `images()` ×1 (2 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreFinVBlank, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, DonneesTransfert, Notes
 
@@ -11334,16 +11339,19 @@ int main() {
 ```cpp
 // ---- #include <glisse_croix> : suivre la croix, au pixel près ----
 
+// Un B, parti du pixel (8, 8), en haut à gauche.
+// (Le A au milieu, ce seront les leçons qui suivent.)
+
 #include <glisse_croix>   // glisse_croix() : un lutin qui suit la croix
 #include <ALPHABET>
 
-uint8_t px = 76;
-uint8_t py = 68;
+uint8_t px = 8;
+uint8_t py = 8;
 
 int main() {
   while (true) {
     image();
-    glisse_croix(0, px, py, ALPHABET[0], 1);   // le lutin 0, un pixel par image
+    glisse_croix(0, px, py, ALPHABET[1], 1);   // le lutin 0, un pixel par image
   }
 }
 ```
@@ -11360,7 +11368,7 @@ int main() {
 
 **On retrouve glisse_croix dans** — 0.70.4, 0.73, 0.73.1, 0.73.2, 0.74, 0.74.1, 0.74.2
 
-**Ce qu’on doit voir** — Un A au milieu ; la croix le fait glisser en douceur.  
+**Ce qu’on doit voir** — Un B en haut à gauche ; la croix le fait glisser en douceur.  
 **Ce qu’il coûte** — 1142 octets de programme, 9 variables.  
 **Ce qui est gravé** — `démarrage` (62 o), `glisse_croix()` (195 o), `main()` (38 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (18 o), `LireManette` (37 o, pour bouton()), `Tuiles` (704 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×1 (50 o), `glisse_croix()` ×1 (22 o), `bouton()` ×4 (20 o), `image()` ×1 (6 o) · lettres : toutes (sprite() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, Notes
 
@@ -11368,24 +11376,26 @@ int main() {
 
 ### 0.70.4. Plus fluide : la lettre au pixel près — en simple
 
-> Le 0.70 en une ligne : glisse_croix(0, px, py, ALPHABET[0], 1).
+> Le 0.70 en une ligne : glisse_croix(0, px, py, ALPHABET[2], 1). Cette fois, un C, parti du pixel (120, 20).
 
 ```cpp
 #include <glisse_croix>   // un lutin qui suit la croix, au pixel près
-#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+#include <ALPHABET>       // les lettres de la police : ALPHABET[2] est le C
 
-uint8_t px = 76;      // en pixels : le milieu
-uint8_t py = 68;
+uint8_t px = 120;     // le C, en pixels : en haut à droite
+uint8_t py = 20;
 
 int main() {
   while (true) {
     image();
-    glisse_croix(0, px, py, ALPHABET[0], 1);   // tout le 0.70
+    glisse_croix(0, px, py, ALPHABET[2], 1);   // tout le 0.70, en une ligne
   }
 }
 ```
 
-**C’est le 0.70, en plus simple :** les quatre `if` des flèches et le `sprite` sont remplacés par une ligne, `glisse_croix` (le 0.73).
+**C’est le 0.70, en plus simple :** les quatre `if` des flèches et le `sprite` sont remplacés par une ligne, `glisse_croix` (le 0.73 la reprend avec le A au milieu).
+
+**Une autre lettre, ailleurs :** un C (`ALPHABET[2]`), parti du pixel (120, 20), en haut à droite.
 
 **La vitesse, 1 :** un pixel par image, comme au 0.70.
 
@@ -11394,7 +11404,7 @@ int main() {
 - `#include <glisse_croix>` → 0.70.3. La fonction glisse_croix() — suivre la croix, au pixel près
 - `#include <ALPHABET>` → 0.1.4. ALPHABET — les lettres de la police
 
-**Ce qu’on doit voir** — Comme au 0.70 : un A qui glisse pixel par pixel avec les flèches.  
+**Ce qu’on doit voir** — Un C en haut à droite, qui glisse pixel par pixel avec les flèches, comme le A du 0.70.  
 **Ce qu’il coûte** — 1142 octets de programme, 9 variables.  
 **Ce qui est gravé** — `démarrage` (62 o), `glisse_croix()` (195 o), `main()` (38 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (18 o), `LireManette` (37 o, pour bouton()), `Tuiles` (704 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×1 (50 o), `glisse_croix()` ×1 (22 o), `bouton()` ×4 (20 o), `image()` ×1 (6 o) · lettres : toutes (sprite() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, Notes
 
@@ -14744,16 +14754,17 @@ int main() {
 
 ### 0.86.3. La fonction texteGrand() — un texte agrandi
 
-> #include <texteGrand> : texteGrand(colonne, ligne, "A", 3) écrit un A trois fois plus grand, sans rien dessiner.
+> #include <texteGrand> : texteGrand(colonne, ligne, "B", 3) écrit un B trois fois plus grand, sans rien dessiner.
 
 ```cpp
 // ---- #include <texteGrand> : un texte agrandi ----
-// Un A trois fois plus grand : 3 × 3 cases, à partir de la case (2, 2).
+// Un B trois fois plus grand : 3 × 3 cases, à partir de la case (2, 2).
+// (Le A, ce sera la leçon « Agrandir une lettre », juste après.)
 
 #include <texteGrand>   // texteGrand() : les lettres agrandies
 
 int main() {
-  texteGrand(2, 2, "A", 3);   // colonne 2, ligne 2, le texte, la taille
+  texteGrand(2, 2, "B", 3);   // colonne 2, ligne 2, le texte, la taille
 
   while (true) {
     image();
@@ -14773,7 +14784,7 @@ int main() {
 
 **On retrouve texteGrand dans** — 0.87, 0.87.1, 0.87.2, 0.87.3, 0.87.4, 0.90, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2
 
-**Ce qu’on doit voir** — Un grand A, trois cases de large et trois de haut, en haut à gauche.  
+**Ce qu’on doit voir** — Un grand B, trois cases de large et trois de haut, en haut à gauche.  
 **Ce qu’il coûte** — 1170 octets de programme, 3 variables.  
 **Ce qui est gravé** — `démarrage` (55 o), `texte_grand_0()` (146 o), `main()` (18 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (848 o), `GRAND_TABLE_0_0_0` (3 o, pour poser()), `GRAND_TABLE_0_1_1` (3 o, pour poser()), `GRAND_TABLE_0_2_2` (3 o, pour poser()) · appels : `poser()` ×3 (91 o), `texte_grand_0()` ×1 (3 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
 
@@ -26137,7 +26148,136 @@ int main() {
 
 ---
 
-### 0.110. La fonction volumeSon() — le volume général
+### 0.110. ALPHABET_TITRE — les lettres des titres
+
+> #include <ALPHABET_TITRE> : ALPHABET_TITRE[0] est le A des titres — une lettre épaisse, avec une ombre grise —, pour écrire le nom d’un jeu sur son écran titre.
+
+```cpp
+// ---- #include <ALPHABET_TITRE> : les lettres des titres ----
+// Le mot « TITRE » en lettres de titre — épaisses, avec une ombre —,
+// et en dessous, le même mot en lettres ordinaires, pour comparer.
+
+#include <ALPHABET_TITRE>   // ALPHABET_TITRE : 26 lettres de titre
+#include <poser>            // poser() : une tuile sur une case du fond
+#include <texte>            // texte() : le même mot, en lettres ordinaires
+
+int main() {
+  // ALPHABET_TITRE[place] : la place de la lettre dans l'alphabet, à partir de 0.
+  //   A = 0, B = 1, C = 2, … E = 4, … I = 8, … R = 17, … T = 19
+  poser(7, 6, ALPHABET_TITRE[19]);    // T
+  poser(8, 6, ALPHABET_TITRE[8]);     // I
+  poser(9, 6, ALPHABET_TITRE[19]);    // T
+  poser(10, 6, ALPHABET_TITRE[17]);   // R
+  poser(11, 6, ALPHABET_TITRE[4]);    // E
+
+  texte(7, 9, "TITRE");               // le même mot, en lettres ordinaires
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce que c’est :** un **troisième alphabet**, pour les **titres** : des lettres **épaisses** (comme `ALPHABET_GRAS`) avec une **ombre** grise en bas à droite, qui leur donne du relief — le genre de lettres qu’on voit sur l’écran titre d’un jeu Game Boy. `ALPHABET_TITRE[0]` est le A, `ALPHABET_TITRE[25]` le Z. L’alphabet ordinaire ne change pas.
+
+**La ligne à écrire : `#include <ALPHABET_TITRE>`.**
+
+**Comment trouver une lettre :** le nombre entre crochets est sa **place dans l’alphabet**, en comptant à partir de 0. A = 0, B = 1, C = 2… T = 19. Pour écrire « TITRE » : T = 19, I = 8, T = 19, R = 17, E = 4.
+
+**Chaque lettre est une tuile** de 8 × 8, avec trois nuances : le fond (0), l’ombre (2) et le trait (3). On la pose avec `poser()`, comme n’importe quelle tuile, une case par lettre.
+
+**Ce qu’il coûte :** **beaucoup**, environ **1 200 octets** dès la première lettre — les 26 dessins et le tableau qui les range partent ensemble. C’est fait pour un **titre**, pas pour tout le texte du jeu.
+
+**Ce sont nos lettres :** elles sont calculées à partir de la police de l’atelier, dans le style des titres de la Game Boy, sans recopier celles d’aucun jeu.
+
+**Essaie :** écris le nom de ton jeu. Une lettre par case : `poser(colonne, ligne, ALPHABET_TITRE[place])`.
+
+**Ce qu’on doit voir** — TITRE en grandes lettres épaisses avec une ombre grise, et en dessous, TITRE en lettres ordinaires.  
+**Ce qu’il coûte** — 1384 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (49 o), `main()` (78 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (1120 o), `"TITRE"` (5 o, pour texte()), `ALPHABET_TITRE_0` (26 o, pour poser()) · appels : `poser()` ×5 (60 o), `texte()` ×1 (11 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 0.111. Grand — l’autre nom d’un Perso de 32 × 32
+
+> #include <Grand> : Grand NOM = { trente-deux rangées }; l’autre nom d’un Perso de 32 × 32. Un Perso de trente-deux rangées est déjà un 32 × 32 : Grand ne sert qu’à le dire dans le nom du type.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Grand>   // UNE fois, pour TOUS les personnages de la liste (Grand : l'autre nom d'un Perso de 32 × 32)
+
+#include "perso_GEANT.cpp"   // une grande tête de robot, 32 × 32
+```
+
+`perso_GEANT.cpp`
+
+```cpp
+// perso_GEANT.cpp : une grande tête de robot, GEANT (32 × 32) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Grand> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Grand GEANT = {
+  "################################", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#.......++++++++++++++++.......#",
+  "#.......++++++++++++++++.......#", "#.......++++++++++++++++.......#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "################################",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- #include <Grand> : un grand personnage de 32 × 32 ----
+// GEANT est dessiné dans perso_GEANT.cpp, en Grand ; ici, on le verse.
+
+#include <texte>
+#include "personnages.cpp"   // la liste : GEANT
+
+int main() {
+  texte(2, 8, "UN GRAND ECRIT");
+  texte(2, 10, "SPRITE32 LE MONTRE");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Un personnage de 32 × 32 est un Perso** : `Perso BOSS = { … }` avec trente-deux rangées de trente-deux signes, et `#include <Perso>`. **`Grand` en est l’autre nom**, pour qui veut que le type dise la taille. Les deux donnent exactement la même chose.
+
+**Ce que c’est :** un **Grand** est un dessin de **32 × 32 pixels** : trente-deux rangées de trente-deux signes. C’est quatre fois un `Perso` : le compilateur le coupe en **quatre quarts de 16 × 16**, rangés l’un après l’autre (haut-gauche, haut-droite, bas-gauche, bas-droite), soit **seize tuiles**.
+
+**La ligne à écrire : `#include <Grand>`.** Un Grand écrit ne s’affiche pas tout seul : c’est un dessin rangé, prêt à servir. `sprite32()` le montre à l’écran (chapitre 6, avec les personnages).
+
+**Ce qu’il coûte :** **256 octets** de dessin (seize tuiles de seize octets) — gravés quand on s’en sert.
+
+**Dans l’atelier :** « ▦ Les tuiles », bouton **« + perso 32 × 32 »** : on choisit la taille AVANT de dessiner, puis on peint dans une grille de 32 × 32 ; l’atelier écrit un `Perso`.
+
+**Essaie :** dans l’onglet `perso_GEANT.cpp`, écris `Perso GEANT` au lieu de `Grand GEANT` (et, dans la liste, `#include <Perso>`) : c’est exactement le même personnage.
+
+**Ce qu’on doit voir** — UN GRAND ECRIT : le dessin compile ; l’étape suivante le montre.  
+**Ce qu’il coûte** — 820 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (49 o), `main()` (29 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (528 o), `"UN GRAND ECRIT"` (14 o, pour texte()), `"SPRITE32 LE MON…"` (18 o, pour texte()) · appels : `texte()` ×2 (22 o), `image()` ×1 (3 o) · lettres : ACDEGILMNOPRSTU23 · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 0.112. La fonction volumeSon() — le volume général
 
 > #include <volumeSon> : volumeSon(0 à 7) règle le volume de toute la console.
 
@@ -26175,7 +26315,7 @@ int main() {
 
 ---
 
-### 0.111. #include <decaler> — a << b et a >> b
+### 0.113. #include <decaler> — a << b et a >> b
 
 > #include <decaler> : décaler les bits d’un nombre calculé de rangs — chaque rang à gauche double, chaque rang à droite divise par deux.
 
@@ -29184,7 +29324,7 @@ Et même sans écrire à l’écran, un `for` trop long dans la boucle du jeu co
 
 ### 33.1. Chapitre 6 — Dessiner : ce qui vient
 
-> L’entrée du chapitre 6 : ce qu’on a vu jusqu’ici, et ce que ses 10 étapes vont ajouter, une à la fois.
+> L’entrée du chapitre 6 : ce qu’on a vu jusqu’ici, et ce que ses 22 étapes vont ajouter, une à la fois.
 
 ```cpp
 // ---- Chapitre 6 : Dessiner ----
@@ -29204,29 +29344,35 @@ int main() {
 
 **D’où l’on vient.** Le chapitre 5, « Les boucles : répéter », vient de se terminer. Tout ce qu’il a montré reste valable : on s’en sert à partir d’ici sans le réexpliquer.
 
-**Ce que ce chapitre apporte : Dessiner.** Il compte 10 étapes :
+**Ce que ce chapitre apporte : Dessiner.** Il compte 22 étapes :
 
 - Dessiner sa propre tuile
 
 - Le dessin écrit là où on le pose
 
-- Intégrer une carte dans son projet
+- BONHOMME, de son fichier à l’écran : sprite16()
 
-- Les couleurs : palettes, variétés et thèmes
+- Un nouveau fichier qui appelle BONHOMME : heros.cpp
 
-- Poser tes tuiles à la souris
+- Deux BONHOMME, un seul dessin : le modèle, comme une classe
 
-- Poser une tuile
+- BONHOMME qui marche : le faire bouger depuis principal.cpp
 
-- Quatre nuances, quatre signes
+- BONHOMME verrouillé : on s’en sert, on ne le modifie pas
 
-- Une rangée, puis un mur
+- L’écran titre de ton jeu : le nom en GROSSES lettres
 
-- Un damier
+- Choisir la taille du titre : texteTitre(…, taille)
 
-- Un lutin, hors de la grille
+- Deux styles pour un titre : dessin animé ou manga
 
-**Les fonctions qui arrivent :** `#include <Perso>`, `#include <sprite16>`, `#include <cacher16>`. Chacune sera présentée seule, juste avant la première étape qui l’emploie : jamais deux lignes nouvelles d’un coup.
+- Un avion qui vole : AVION dans son fichier, la croix pour le piloter
+
+- La vitesse de l’avion : une variable, vitesse
+
+- … et 10 autres.
+
+**Les fonctions qui arrivent :** `#include <Perso>`, `#include <sprite16>`, `#include <cacher16>`, `#include <sprite32>`, `#include <cacher32>`, `#include <texteTitre>`, `#include <texteManga>`. Chacune sera présentée seule, juste avant la première étape qui l’emploie : jamais deux lignes nouvelles d’un coup.
 
 **Comment avancer :** une étape à la fois. Lis l’explication, lance le programme, regarde ce qu’on doit voir, puis fais l’essai proposé. Si quelque chose t’échappe, l’étape d’avant contient la pièce qui manque.
 
@@ -29389,17 +29535,29 @@ Une chose que le dessin sur place ne fait pas : **il n’apparaît pas dans l’
 
 ---
 
-### 35.1. Perso — dessiner un personnage de 16 × 16
+### 35.1. Perso — dessiner des personnages
 
-> #include <Perso> : Perso NOM = { seize rangées de seize pixels }; un personnage entier, que sprite16() promène au pixel près.
+> #include <Perso> : Perso NOM = { … }; un personnage (16 × 16 ou 32 × 32). Deux personnages, deux dessins, DEUX FICHIERS : perso_BONHOMME.cpp et perso_ROBOT.cpp, rangés par une liste, personnages.cpp, qui porte UNE fois #include <Perso> ; la source verse la liste d’une ligne et les pose pour les voir.
+
+`personnages.cpp`
 
 ```cpp
-// ---- #include <Perso> : un personnage de 16 × 16 ----
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
 
-#include <Perso>      // Perso : un dessin de 16 × 16
-#include <texte>
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
 
-// Le dessin : seize rangées de seize signes. Il est écrit, pas encore montré.
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+#include "perso_ROBOT.cpp"   // un robot, 16 × 16
+```
+
+`perso_BONHOMME.cpp`
+
+```cpp
+// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
 Perso BONHOMME = {
   "......####......",
   ".....######.....",
@@ -29418,10 +29576,62 @@ Perso BONHOMME = {
   "....###..###....",
   "....###..###....",
 };
+```
+
+`perso_ROBOT.cpp`
+
+```cpp
+// perso_ROBOT.cpp : un robot, ROBOT (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso ROBOT = {
+  "..############..",
+  "..#..........#..",
+  "..#.++....++.#..",
+  "..#.++....++.#..",
+  "..#..........#..",
+  "..#..######..#..",
+  "..############..",
+  "......####......",
+  ".##############.",
+  ".#.##########.#.",
+  ".#.##########.#.",
+  ".#.##########.#.",
+  "...##########...",
+  "...###....###...",
+  "...###....###...",
+  "..####....####..",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- #include <Perso> : un personnage de 16 × 16 ----
+// BONHOMME et ROBOT sont dessinés chacun dans SON fichier ; la liste
+// personnages.cpp les inclut tous. Ici, UNE ligne verse la liste, et on
+// pose chacun en quatre cases pour les voir.
+
+#include <poser>             // poser() : une tuile sur une case du fond
+#include "personnages.cpp"   // la liste : BONHOMME et ROBOT
 
 int main() {
-  texte(2, 8, "UN PERSO ECRIT");
-  texte(2, 10, "SPRITE16 LE MONTRE");
+  // Un Perso de 16 × 16, ce sont quatre tuiles qui se suivent :
+  //   NOM      le quart haut-gauche     NOM + 1  le quart haut-droite
+  //   NOM + 2  le quart bas-gauche      NOM + 3  le quart bas-droite
+
+  // BONHOMME, à gauche : colonnes 4 et 5, lignes 8 et 9
+  poser(4, 8, BONHOMME);
+  poser(5, 8, BONHOMME + 1);
+  poser(4, 9, BONHOMME + 2);
+  poser(5, 9, BONHOMME + 3);
+
+  // ROBOT, à droite : colonnes 14 et 15, lignes 8 et 9
+  poser(14, 8, ROBOT);
+  poser(15, 8, ROBOT + 1);
+  poser(14, 9, ROBOT + 2);
+  poser(15, 9, ROBOT + 3);
 
   while (true) {
     image();
@@ -29429,66 +29639,148 @@ int main() {
 }
 ```
 
-**Ce que c’est :** un **Perso** est un dessin de **16 × 16 pixels** : seize rangées de seize signes. Le compilateur le coupe en quatre tuiles.
+**Ce que c’est :** un **Perso** est un **personnage** : un dessin de **16 × 16 pixels** (seize rangées de seize signes) ou de **32 × 32** (trente-deux rangées de trente-deux). Sa taille se lit sur son dessin. Le compilateur le coupe en tuiles de 8 × 8 qui se suivent : quatre pour un 16 × 16 — haut-gauche, haut-droite, bas-gauche, bas-droite.
 
-**La ligne à écrire : `#include <Perso>`.** Un Perso écrit ne s’affiche pas tout seul : c’est un dessin rangé, prêt à servir. L’étape suivante, `sprite16()`, le montre à l’écran.
+**Un personnage, un fichier : le dessin 1, le dessin 2.** BONHOMME est dessiné dans **`perso_BONHOMME.cpp`**, ROBOT dans **`perso_ROBOT.cpp`** : deux onglets à côté de `principal.cpp`, un dessin chacun — comme deux images. Pour changer ROBOT, on n’ouvre que son fichier.
 
-**Ce qu’il coûte :** **64 octets** de dessin (quatre tuiles) — gravés quand on s’en sert.
+**Deux personnages, deux noms : `BONHOMME` et `ROBOT`.** Chacun a son `Perso NOM = { … };`. Le nom est ce qui compte : c’est par lui qu’on l’appellera partout dans le jeu.
 
-**Essaie :** change une rangée, puis passe à l’étape suivante pour le voir.
+**La liste, `personnages.cpp` : l’include qui inclut tous les fichiers.** Elle porte **`#include <Perso>` UNE fois**, pour tous les personnages (cette ligne n’est pas celle d’un personnage : elle dit « on a le droit d’écrire des Perso »), puis une ligne par personnage : `#include "perso_BONHOMME.cpp"`, `#include "perso_ROBOT.cpp"`. **`principal.cpp` n’a qu’UNE ligne pour les avoir tous :** `#include "personnages.cpp"`.
 
-**On retrouve Perso dans** — 36, 47
+**Comment ça colle :** `#include "personnages.cpp"` colle la liste ; la liste colle chaque `perso_…` (des guillemets : des fichiers à toi, comme `variables.h` au 0.67). BONHOMME et ROBOT arrivent, chacun avec son nom.
 
-**Ce qu’on doit voir** — UN PERSO ECRIT : le dessin compile ; l’étape suivante le montre.  
-**Ce qu’il coûte** — 580 octets de programme, 0 variable.  
-**Ce qui est gravé** — `démarrage` (49 o), `main()` (29 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (288 o), `"UN PERSO ECRIT"` (14 o, pour texte()), `"SPRITE16 LE MON…"` (18 o, pour texte()) · appels : `texte()` ×2 (22 o), `image()` ×1 (3 o) · lettres : CEILMNOPRSTU16 · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+**Pour les voir tout de suite**, on les pose sur le fond, chacun en **quatre cases**, avec `poser()` que tu connais : `BONHOMME` est le numéro de sa première tuile (le quart haut-gauche), `BONHOMME + 1` la suivante (haut-droite), `BONHOMME + 2` (bas-gauche), `BONHOMME + 3` (bas-droite). Pareil pour `ROBOT`.
+
+**Déroulé :** BONHOMME à gauche, en colonnes 4 et 5, lignes 8 et 9 ; ROBOT à droite, en colonnes 14 et 15, lignes 8 et 9. Ses tuiles viennent juste après celles de BONHOMME : `ROBOT` vaut `BONHOMME + 4`.
+
+**Sur le fond, ils ne bougent pas** : ils sont collés à la grille des cases. L’étape suivante, `sprite16()`, en fait des **lutins**, qui se déplacent au pixel près.
+
+**Ce qu’ils coûtent :** **64 octets** de dessin chacun (quatre tuiles). La ligne `#include <Perso>`, elle, ne coûte rien.
+
+**Essaie :** dans l’onglet `perso_ROBOT.cpp`, change les yeux de ROBOT (les `+`) : seul ROBOT change. Ou ajoute un troisième personnage : un fichier `perso_…` de plus, et une ligne de plus dans la liste `personnages.cpp` — `principal.cpp` ne change pas.
+
+**On retrouve Perso dans** — 35.6, 35.7, 35.8, 35.9, 35.10, 35.12, 35.16, 35.17, 35.18, 35.19, 36, 47
+
+**Ce qu’on doit voir** — Deux personnages sur le fond : le bonhomme à gauche, le robot à droite.  
+**Ce qu’il coûte** — 329 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (49 o), `main()` (55 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `CopierTuiles` (31 o), `EffacerCarte` (14 o), `Tuiles` (128 o) · appels : `poser()` ×8 (48 o), `image()` ×1 (3 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
 
 ---
 
 ### 35.2. La fonction sprite16() — un personnage de 16 × 16
 
-> #include <sprite16> : sprite16(numero, x, y, PERSO) place quatre lutins en carré, d’un appel.
+> #include <sprite16> : sprite16(numero, x, y, PERSO) place un personnage de 16 × 16 — quatre lutins en carré — d’un appel. BONHOMME et ROBOT, chacun de son fichier, descendent ensemble.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+#include "perso_ROBOT.cpp"   // un robot, 16 × 16
+```
+
+`perso_BONHOMME.cpp`
+
+```cpp
+// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+```
+
+`perso_ROBOT.cpp`
+
+```cpp
+// perso_ROBOT.cpp : un robot, ROBOT (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso ROBOT = {
+  "..############..",
+  "..#..........#..",
+  "..#.++....++.#..",
+  "..#.++....++.#..",
+  "..#..........#..",
+  "..#..######..#..",
+  "..############..",
+  "......####......",
+  ".##############.",
+  ".#.##########.#.",
+  ".#.##########.#.",
+  ".#.##########.#.",
+  "...##########...",
+  "...###....###...",
+  "...###....###...",
+  "..####....####..",
+};
+```
+
+`principal.cpp`
 
 ```cpp
 // ---- #include <sprite16> : un personnage de 16 × 16 ----
-// Un bloc 16 × 16, écrit sur place, qui descend d'un pixel par image.
+// BONHOMME et ROBOT (chacun dans son fichier) descendent d'un pixel par image.
 
-#include <sprite16>   // sprite16() : quatre lutins en carré
-#include <Perso>      // le dessin de 16 × 16
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include "personnages.cpp"   // la liste : BONHOMME et ROBOT
 
-Perso BLOC = {
-  "################", "#..............#", "#.############.#", "#.#..........#.#",
-  "#.#.########.#.#", "#.#.#......#.#.#", "#.#.#.####.#.#.#", "#.#.#.#..#.#.#.#",
-  "#.#.#.#..#.#.#.#", "#.#.#.####.#.#.#", "#.#.#......#.#.#", "#.#.########.#.#",
-  "#.#..........#.#", "#.############.#", "#..............#", "################",
-};
-
-uint8_t y = 0;
+uint8_t y = 0;   // la hauteur des deux personnages, en pixels
 
 int main() {
   while (true) {
     image();
-    if (y < 120) y = y + 1;     // il descend, et s'arrête en 120
-    sprite16(0, 72, y, BLOC);   // les lutins 0, 1, 2, 3
+    if (y < 120) y = y + 1;          // ils descendent, et s'arrêtent en 120
+    sprite16(0, 40, y, BONHOMME);    // BONHOMME : les lutins 0, 1, 2, 3
+    sprite16(4, 104, y, ROBOT);      // ROBOT    : les lutins 4, 5, 6, 7
   }
 }
 ```
 
-**Ce qu’elle fait :** `sprite16(numero, x, y, perso)` place un personnage de **16 × 16** : les lutins `numero` à `numero + 3`, en carré. Le dessin est un `Perso`, ou seize rangées écrites sur place.
+**Ce qu’elle fait :** `sprite16(numero, x, y, perso)` place un personnage de **16 × 16** au pixel près : les lutins `numero` à `numero + 3`, en carré, par-dessus le fond. Un seul appel, au lieu des quatre `poser()` du 35.1 — et il peut bouger.
 
 **La ligne à écrire : `#include <sprite16>`.**
 
-**Ses arguments :** comme `sprite()` ; le numéro du premier des quatre lutins.
+**Ses arguments :** le numéro du **premier** des quatre lutins, x et y (le coin haut-gauche, en pixels), et le **nom** du personnage. Un cinquième, `MIROIR_X`, le retourne.
 
-**Ce qu’elle coûte :** environ **270 octets** avec son dessin.
+**Deux personnages, deux appels, chacun ses lutins :** `sprite16(0, 40, y, BONHOMME)` prend les lutins 0 à 3 ; `sprite16(4, 104, y, ROBOT)` les lutins 4 à 7. Le second commence à 4 : un personnage de 16 × 16 occupe **quatre** lutins, il ne faut pas qu’ils se chevauchent.
 
-**Essaie :** un deuxième personnage avec le numéro 4 : les lutins 4 à 7.
+**Les personnages viennent de leurs fichiers**, ceux du 35.1, sans changement : la liste `personnages.cpp` les inclut, et `principal.cpp` la verse d’une ligne.
 
-**On retrouve sprite16 dans** — 36, 47
+**Déroulé :** `y` part de 0 et grandit d’un pixel à chaque image jusqu’à 120 ; à chaque tour, les deux `sprite16` les reposent à la hauteur `y` : ils descendent ensemble, et s’arrêtent en bas.
 
-**Ce qu’on doit voir** — Un bloc carré qui descend au milieu de l’écran, et s’arrête en bas.  
-**Ce qu’il coûte** — 356 octets de programme, 1 variable.  
-**Ce qui est gravé** — `démarrage` (50 o), `main()` (123 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `Tuiles` (64 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×4 (100 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+**Ce qu’elle coûte :** environ **270 octets** avec ses dessins.
+
+**Pour un personnage de 32 × 32**, c’est `sprite32()`, avec seize lutins.
+
+**Essaie :** fais descendre ROBOT moins vite : `sprite16(4, 104, y / 2, ROBOT)`.
+
+**On retrouve sprite16 dans** — 35.6, 35.7, 35.8, 35.9, 35.10, 35.12, 35.16, 35.17, 35.18, 35.19, 36, 47
+
+**Ce qu’on doit voir** — Le bonhomme et le robot descendent ensemble, côte à côte, et s’arrêtent en bas.  
+**Ce qu’il coûte** — 520 octets de programme, 1 variable.  
+**Ce qui est gravé** — `démarrage` (50 o), `main()` (223 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `Tuiles` (128 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×8 (200 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
 
 ---
 
@@ -29496,27 +29788,61 @@ int main() {
 
 > #include <cacher16> : cacher16(numero) ôte les quatre lutins d’un personnage de 16 × 16.
 
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+```
+
+`perso_BONHOMME.cpp`
+
+```cpp
+// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+```
+
+`principal.cpp`
+
 ```cpp
 // ---- #include <cacher16> : ôter un personnage de 16 × 16 ----
+// BONHOMME est dessiné dans perso_BONHOMME.cpp ; ici, on ne fait que l'appeler.
 
-#include <sprite16>
-#include <cacher16>   // cacher16() : ôter les quatre lutins
-#include <Perso>
-
-Perso BLOC = {
-  "################", "################", "################", "################",
-  "################", "################", "################", "################",
-  "################", "################", "################", "################",
-  "################", "################", "################", "################",
-};
+#include <sprite16>          // sprite16() : le poser
+#include <cacher16>          // cacher16() : ôter ses quatre lutins
+#include "personnages.cpp"   // la liste : BONHOMME
 
 int main() {
-  sprite16(0, 72, 64, BLOC);
+  sprite16(0, 72, 64, BONHOMME);   // les lutins 0, 1, 2 et 3
 
   while (true) {
     image();
     if (images() == 120) {
-      cacher16(0);            // les lutins 0, 1, 2 et 3
+      cacher16(0);                 // les lutins 0, 1, 2 et 3 s'en vont
     }
   }
 }
@@ -29532,9 +29858,1370 @@ int main() {
 
 **Essaie :** fais-le réapparaître à l’image 240.
 
-**Ce qu’on doit voir** — Un carré plein au milieu, qui disparaît au bout de deux secondes.  
+**Ce qu’on doit voir** — Le bonhomme au milieu, qui disparaît au bout de deux secondes.  
 **Ce qu’il coûte** — 356 octets de programme, 0 variable.  
 **Ce qui est gravé** — `démarrage` (47 o), `main()` (126 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `Tuiles` (64 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×4 (96 o), `cacher16()` ×1 (13 o), `image()` ×1 (6 o), `images()` ×1 (2 o), `sprite16()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 35.4. La fonction sprite32() — un grand personnage de 32 × 32
+
+> #include <sprite32> : sprite32(numero, x, y, PERSO) place un personnage de 32 × 32 — seize lutins en carré — d’un appel ; à côté, un 16 × 16 posé par sprite16(), pour comparer.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_GEANT.cpp"   // une grande tête de robot, 32 × 32
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+```
+
+`perso_GEANT.cpp`
+
+```cpp
+// perso_GEANT.cpp : une grande tête de robot, GEANT (32 × 32) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso GEANT = {
+  "################################", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#.......++++++++++++++++.......#",
+  "#.......++++++++++++++++.......#", "#.......++++++++++++++++.......#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "################################",
+};
+```
+
+`perso_BONHOMME.cpp`
+
+```cpp
+// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- #include <sprite32> : un grand personnage de 32 × 32 ----
+// Deux personnages, deux fichiers : perso_GEANT.cpp (32 × 32) et
+// perso_BONHOMME.cpp (16 × 16), inclus par la liste personnages.cpp.
+// Ici, UNE ligne verse la liste, et on ne fait que les APPELER :
+// sprite32() pour le 32 × 32, sprite16() pour le 16 × 16.
+
+#include <sprite32>          // sprite32() : seize lutins en carré
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include "personnages.cpp"   // la liste : GEANT et BONHOMME
+
+uint8_t y = 0;   // la hauteur de GEANT, en pixels
+
+int main() {
+  while (true) {
+    image();
+    if (y < 100) y = y + 1;          // GEANT descend, et s'arrête en 100
+    sprite32(0, 64, y, GEANT);       // GEANT    : les lutins 0 à 15
+    sprite16(16, 16, 16, BONHOMME);  // BONHOMME : les lutins 16 à 19, en haut à gauche
+  }
+}
+```
+
+**Ce qu’elle fait :** `sprite32(numero, x, y, perso)` place un personnage de **32 × 32** (un `Perso` de trente-deux rangées) : les lutins `numero` à `numero + 15`, en carré. C’est quatre `sprite16()` d’un coup, un par quart.
+
+**La ligne à écrire : `#include <sprite32>`.**
+
+**Ses arguments :** comme `sprite16()` ; le numéro du premier des seize lutins (**24 au plus** : la console n’en a que quarante). Un cinquième, `MIROIR_X`, le retourne.
+
+**Deux personnages, deux fichiers, à comparer :** `perso_BONHOMME.cpp` (16 rangées : un 16 × 16) et `perso_GEANT.cpp` (32 rangées : un 32 × 32). Les deux sont des `Perso` — la liste `personnages.cpp` porte `#include <Perso>` UNE fois pour les deux — : c’est le nombre de rangées qui fait la taille. La source ne fait qu’**appeler** : `sprite16(…, BONHOMME)` pour l’un, `sprite32(…, GEANT)` pour l’autre.
+
+**À côté, pour comparer :** BONHOMME, le personnage de 16 × 16 du 35.1, posé par `sprite16()`. Les deux sont des `Perso` : seize rangées pour l’un, trente-deux pour l’autre — c’est le nombre de rangées qui fait la taille, et la fonction qui va avec : `sprite16()` pour un 16 × 16, `sprite32()` pour un 32 × 32.
+
+**Attention à la place :** seize lutins, c’est beaucoup. Avec un grand personnage, il en reste 24 pour tout le reste du jeu.
+
+**Essaie :** `sprite32(0, 64, y, GEANT, MIROIR_X);` — GEANT regarde de l’autre côté.
+
+**Ce qu’on doit voir** — Une grande tête de robot (GEANT) qui descend au milieu de l’écran et s’arrête en bas ; le petit bonhomme reste en haut à gauche.  
+**Ce qu’il coûte** — 1024 octets de programme, 1 variable.  
+**Ce qui est gravé** — `démarrage` (50 o), `main()` (535 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `Tuiles` (320 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×20 (512 o), `image()` ×1 (6 o), `sprite16()` ×5 (0 o), `sprite32()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 35.5. La fonction cacher32() — ôter un grand personnage
+
+> #include <cacher32> : cacher32(numero) ôte les seize lutins d’un grand personnage de 32 × 32.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_GEANT.cpp"   // une grande tête de robot, 32 × 32
+```
+
+`perso_GEANT.cpp`
+
+```cpp
+// perso_GEANT.cpp : une grande tête de robot, GEANT (32 × 32) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso GEANT = {
+  "################################", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#.......++++++++++++++++.......#",
+  "#.......++++++++++++++++.......#", "#.......++++++++++++++++.......#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "################################",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- #include <cacher32> : ôter un grand personnage de 32 × 32 ----
+// GEANT est dessiné dans perso_GEANT.cpp ; ici, on ne fait que l'appeler.
+
+#include <sprite32>          // sprite32() : le poser
+#include <cacher32>          // cacher32() : ôter ses seize lutins
+#include "personnages.cpp"   // la liste : GEANT
+
+int main() {
+  sprite32(0, 64, 56, GEANT);   // les lutins 0 à 15
+
+  while (true) {
+    image();
+    if (images() == 120) {
+      cacher32(0);              // les lutins 0 à 15 s'en vont
+    }
+  }
+}
+```
+
+**Ce qu’elle fait :** `cacher32(numero)` ôte les seize lutins `numero` à `numero + 15` : tout le grand personnage.
+
+**La ligne à écrire : `#include <cacher32>`.**
+
+**Son argument :** le numéro du premier lutin, comme pour `sprite32()`.
+
+**Essaie :** fais-le réapparaître à l’image 240.
+
+**Ce qu’on doit voir** — La grande tête de robot (GEANT) au milieu, qui disparaît au bout de deux secondes.  
+**Ce qu’il coûte** — 872 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (47 o), `main()` (450 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `Tuiles` (256 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×16 (384 o), `cacher32()` ×1 (49 o), `image()` ×1 (6 o), `images()` ×1 (2 o), `sprite16()` ×4 (0 o), `sprite32()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 35.6. BONHOMME, de son fichier à l’écran : sprite16()
+
+> Le BONHOMME de perso_BONHOMME.cpp devient un lutin : sprite16() le pose au pixel près, et principal.cpp n’a qu’une ligne pour l’avoir.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+```
+
+`perso_BONHOMME.cpp`
+
+```cpp
+// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// BONHOMME vient de perso_BONHOMME.cpp ; ici, on s'en sert.
+
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include "personnages.cpp"   // la liste : BONHOMME
+
+int main() {
+  sprite16(0, 72, 64, BONHOMME);   // les lutins 0 à 3, coin haut-gauche en (72, 64)
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce cours** fait voyager un personnage entre les fichiers, une étape à la fois : il est rangé dans **`perso_BONHOMME.cpp`**, on l’appelle depuis un **autre fichier**, on en met **deux** à l’écran, on le **fait bouger**, et on le **verrouille**.
+
+**Ce qui est nouveau ici :** le BONHOMME du 35.1 (dans `perso_BONHOMME.cpp`, sans changement) n’est plus posé en quatre cases : `sprite16(0, 72, 64, BONHOMME)` en fait un **lutin** de 16 × 16 — les lutins 0, 1, 2 et 3, en carré, par-dessus le fond.
+
+**principal.cpp n’a qu’une ligne pour l’avoir :** `#include "personnages.cpp"`, la liste. Le dessin et ses seize rangées sont dans `perso_BONHOMME.cpp` ; l’autorisation `#include <Perso>`, une fois, dans la liste. On voit ce que fait le jeu, sans les rangées du dessin au milieu.
+
+**Rappel :** `#include "personnages.cpp"` **colle** la liste à cet endroit avant de compiler, et la liste colle `perso_BONHOMME.cpp` (des guillemets : un fichier à toi). `#include <sprite16>` **demande** une fonction de la console (des chevrons).
+
+**Dans l’atelier :** « + perso » de « ▦ Les tuiles » donne tout seul son fichier à chaque nouveau personnage ; pour ceux qui existent déjà, « 📁 Un fichier par personnage » dans « 📦 Tout le jeu ».
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le bonhomme au milieu de l’écran, en lutin.  
+**Ce qu’il coûte** — 336 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (47 o), `main()` (106 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `Tuiles` (64 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×4 (96 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 35.7. Un nouveau fichier qui appelle BONHOMME : heros.cpp
+
+> Un troisième onglet, heros.cpp, écrit montrerHeros(x, y) avec le BONHOMME d’un autre fichier : chaque fichier a son rôle.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+```
+
+`perso_BONHOMME.cpp`
+
+```cpp
+// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+```
+
+`heros.cpp`
+
+```cpp
+// heros.cpp : ce qu'on FAIT avec BONHOMME.
+// BONHOMME n'est pas écrit ici : il vient de perso_BONHOMME.cpp.
+
+#include <sprite16>   // sprite16() : quatre lutins en carré
+
+// montrerHeros(x, y) : BONHOMME à l'écran, coin haut-gauche en (x, y).
+// Exemple : montrerHeros(72, 64) → les lutins 0 à 3, en carré, en (72, 64).
+void montrerHeros(uint8_t x, uint8_t y) {
+  sprite16(0, x, y, BONHOMME);   // le lutin 0 et les trois suivants
+}
+```
+
+`principal.cpp`
+
+```cpp
+// principal.cpp ne dit plus que QUAND : montrerHeros() fait le reste.
+
+#include "personnages.cpp"   // la liste : BONHOMME
+#include "heros.cpp"         // montrerHeros() : ce qu'on en fait
+
+int main() {
+  montrerHeros(72, 64);   // la fonction de heros.cpp, avec le BONHOMME de perso_BONHOMME.cpp
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce qui est nouveau ici : un troisième fichier, `heros.cpp`.** Il contient une fonction, `montrerHeros(x, y)`, qui se sert de `BONHOMME` — **sans l’écrire** : BONHOMME vient de `perso_BONHOMME.cpp`.
+
+**Chaque fichier a son rôle :** `perso_BONHOMME.cpp` dit **à quoi ressemble** le personnage ; `heros.cpp` dit **ce qu’on en fait** ; `principal.cpp` dit **quand** : il ne fait qu’appeler `montrerHeros(72, 64)`.
+
+**Pourquoi heros.cpp connaît BONHOMME :** `principal.cpp` verse les deux fichiers. Une fois collés, tout est **un seul programme**, où BONHOMME est connu partout. Pour des fonctions et des dessins, l’ordre des deux `#include` ne compte pas : on peut verser `heros.cpp` avant `personnages.cpp`.
+
+**Le `#include <sprite16>` a changé d’onglet :** c’est `heros.cpp` qui appelle `sprite16()`, c’est donc lui qui écrit la ligne — comme `outils.cpp` au chapitre « Tes propres #include ».
+
+**Dans l’atelier :** un fichier se crée avec « ⤢ Agrandir le code », puis « + fichier ».
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+
+**Ce qu’on doit voir** — Le même bonhomme au milieu de l’écran — mais posé par une fonction d’un autre fichier.  
+**Ce qu’il coûte** — 356 octets de programme, 2 variables.  
+**Ce qui est gravé** — `démarrage` (47 o), `montrerHeros()` (105 o), `main()` (21 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `Tuiles` (64 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×4 (104 o), `montrerHeros()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 35.8. Deux BONHOMME, un seul dessin : le modèle, comme une classe
+
+> Un Perso est un modèle : montrerHeros(numero, x, y) en pose deux exemplaires, chacun avec ses lutins, sans copier le dessin.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+```
+
+`perso_BONHOMME.cpp`
+
+```cpp
+// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+```
+
+`heros.cpp`
+
+```cpp
+// heros.cpp : ce qu'on FAIT avec BONHOMME.
+// BONHOMME n'est pas écrit ici : il vient de perso_BONHOMME.cpp.
+
+#include <sprite16>   // sprite16() : quatre lutins en carré
+
+// montrerHeros(numero, x, y) : un BONHOMME à l'écran.
+//   numero : le premier de ses quatre lutins (0 → lutins 0 à 3, 4 → lutins 4 à 7)
+//   x, y   : son coin haut-gauche, en pixels
+// Exemple : montrerHeros(4, 104, 64) → un BONHOMME avec les lutins 4 à 7, en (104, 64).
+void montrerHeros(uint8_t numero, uint8_t x, uint8_t y) {
+  sprite16(numero, x, y, BONHOMME);
+}
+```
+
+`principal.cpp`
+
+```cpp
+// Deux exemplaires du même modèle : le dessin n'est écrit qu'une fois.
+
+#include "personnages.cpp"   // la liste : BONHOMME
+#include "heros.cpp"         // montrerHeros(numero, x, y)
+
+int main() {
+  montrerHeros(0, 40, 64);    // le premier : lutins 0 à 3, en (40, 64)
+  montrerHeros(4, 104, 64);   // le second  : lutins 4 à 7, en (104, 64)
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce qui est nouveau ici : `montrerHeros` reçoit un `numero`**, le premier lutin à employer. Avec lui, on pose **deux** BONHOMME : `montrerHeros(0, 40, 64)` prend les lutins 0 à 3, `montrerHeros(4, 104, 64)` les lutins 4 à 7.
+
+**Un seul dessin, deux exemplaires.** BONHOMME n’est écrit qu’**une** fois, et ses quatre tuiles ne sont gravées qu’**une** fois dans la cartouche. Chaque `sprite16` en fait un **exemplaire** à l’écran, avec sa place à lui. C’est l’idée d’une **classe** : le modèle (BONHOMME) et ses objets (les deux à l’écran).
+
+**Pourquoi 4 et pas 1 :** un personnage de 16 × 16 occupe **quatre** lutins. Le second doit donc commencer après les quatre du premier : 0, 1, 2, 3 pour l’un, 4, 5, 6, 7 pour l’autre. Avec `montrerHeros(1, …)`, les deux se partageraient trois lutins, et l’un écraserait l’autre.
+
+**Déroulé de `montrerHeros(4, 104, 64)` :** `numero` vaut 4, `x` 104, `y` 64, puis `sprite16(4, 104, 64, BONHOMME)` pose les lutins 4 (104, 64), 5 (112, 64), 6 (104, 72) et 7 (112, 72).
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+
+**Ce qu’on doit voir** — Deux bonshommes côte à côte, le même dessin.  
+**Ce qu’il coûte** — 488 octets de programme, 3 variables.  
+**Ce qui est gravé** — `démarrage` (47 o), `montrerHeros()` (219 o), `main()` (39 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `Tuiles` (64 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×4 (218 o), `montrerHeros()` ×2 (29 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 35.9. BONHOMME qui marche : le faire bouger depuis principal.cpp
+
+> Le premier BONHOMME avance d’un pixel par image : principal.cpp change x, montrerHeros() le repose à chaque tour.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+```
+
+`perso_BONHOMME.cpp`
+
+```cpp
+// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+```
+
+`heros.cpp`
+
+```cpp
+// heros.cpp : ce qu'on FAIT avec BONHOMME.
+// BONHOMME n'est pas écrit ici : il vient de perso_BONHOMME.cpp.
+
+#include <sprite16>   // sprite16() : quatre lutins en carré
+
+// montrerHeros(numero, x, y) : un BONHOMME à l'écran.
+//   numero : le premier de ses quatre lutins (0 → lutins 0 à 3, 4 → lutins 4 à 7)
+//   x, y   : son coin haut-gauche, en pixels
+// Exemple : montrerHeros(4, 104, 64) → un BONHOMME avec les lutins 4 à 7, en (104, 64).
+void montrerHeros(uint8_t numero, uint8_t x, uint8_t y) {
+  sprite16(numero, x, y, BONHOMME);
+}
+```
+
+`principal.cpp`
+
+```cpp
+// principal.cpp fait marcher BONHOMME : x change, montrerHeros() suit.
+
+#include "personnages.cpp"   // la liste : BONHOMME
+#include "heros.cpp"         // montrerHeros(numero, x, y)
+
+uint8_t x = 0;   // la place du premier BONHOMME, en pixels : de 0 à 120
+
+int main() {
+  montrerHeros(4, 104, 64);       // le second, posé une fois : il ne bouge pas
+
+  while (true) {
+    image();                      // une image : 1/60 de seconde
+    if (x < 120) x = x + 1;       // un pixel de plus, jusqu'à 120
+    montrerHeros(0, x, 64);       // le premier, reposé à sa nouvelle place
+  }
+}
+```
+
+**Ce qui est nouveau ici : une variable `x`** pour le premier BONHOMME, qui grandit d’un pixel à chaque image, jusqu’à 120. `montrerHeros(0, x, 64)` est appelé **dans la boucle**, à chaque tour : le lutin suit.
+
+**Les trois fichiers n’ont pas bougé :** `perso_BONHOMME.cpp` et `heros.cpp` sont ceux de l’étape d’avant. Seul `principal.cpp` change — il décide **quand** et **où**, les autres fichiers savent **comment**.
+
+**Déroulé :** au départ `x` vaut 0 ; image 1 → `x` = 1, BONHOMME en (1, 64) ; image 2 → (2, 64) ; … ; image 120 → (120, 64), et `if (x < 120)` devient faux : il s’arrête. Le second reste en (104, 64) : l’un passe sur l’autre.
+
+**Essaie :** fais avancer le second aussi, avec une variable `x2` qui part de 104 et recule.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+
+**Ce qu’on doit voir** — Le premier bonhomme traverse l’écran vers la droite et s’arrête ; le second ne bouge pas.  
+**Ce qu’il coûte** — 504 octets de programme, 4 variables.  
+**Ce qui est gravé** — `démarrage` (50 o), `montrerHeros()` (219 o), `main()` (52 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `Tuiles` (64 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×4 (218 o), `montrerHeros()` ×2 (29 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 35.10. BONHOMME verrouillé : on s’en sert, on ne le modifie pas
+
+> Une marque sous le dessin, /* BONHOMME : verrouillé */ : le jeu s’en sert comme avant, l’atelier refuse de le retoucher.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+```
+
+`perso_BONHOMME.cpp`
+
+```cpp
+// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+/* BONHOMME : verrouillé */   // 🔒 on s'en sert, on ne le modifie plus — 🔓 dans l'atelier pour le changer
+```
+
+`heros.cpp`
+
+```cpp
+// heros.cpp : ce qu'on FAIT avec BONHOMME.
+// BONHOMME n'est pas écrit ici : il vient de perso_BONHOMME.cpp.
+
+#include <sprite16>   // sprite16() : quatre lutins en carré
+
+// montrerHeros(numero, x, y) : un BONHOMME à l'écran.
+//   numero : le premier de ses quatre lutins (0 → lutins 0 à 3, 4 → lutins 4 à 7)
+//   x, y   : son coin haut-gauche, en pixels
+// Exemple : montrerHeros(4, 104, 64) → un BONHOMME avec les lutins 4 à 7, en (104, 64).
+void montrerHeros(uint8_t numero, uint8_t x, uint8_t y) {
+  sprite16(numero, x, y, BONHOMME);
+}
+```
+
+`principal.cpp`
+
+```cpp
+// Le même jeu : la seule différence est la marque, dans perso_BONHOMME.cpp.
+
+#include "personnages.cpp"   // la liste : BONHOMME
+#include "heros.cpp"         // montrerHeros(numero, x, y)
+
+uint8_t x = 0;
+
+int main() {
+  montrerHeros(4, 104, 64);
+
+  while (true) {
+    image();
+    if (x < 120) x = x + 1;
+    montrerHeros(0, x, 64);   // verrouillé, il s'appelle comme avant
+  }
+}
+```
+
+**Ce qui est nouveau ici : une ligne de plus dans `perso_BONHOMME.cpp`**, juste sous le dessin : `/* BONHOMME : verrouillé */`. C’est un **commentaire** : le compilateur l’ignore, le jeu est **exactement le même**.
+
+**C’est l’atelier qui la lit.** Tant qu’elle est là, BONHOMME est un **modèle** : on le voit, on l’appelle partout (`montrerHeros`, deux exemplaires, qui marchent), mais **on ne le modifie plus** — le pinceau, le miroir, l’effacer et le renommer sont refusés, et une frappe dans ses rangées est défaite aussitôt. Il ne se supprime pas non plus.
+
+**Pour la poser ou l’ôter**, pas besoin de l’écrire : « 🔒 Verrouiller » / « 🔓 Déverrouiller » dans « ▦ Les tuiles », ou sur BONHOMME dans « 📦 Tout le jeu ». Pour une version différente : « ⧉ Créer une variante », une copie qu’on peut changer.
+
+**Le bilan du cours :** `perso_BONHOMME.cpp` — à quoi il ressemble, verrouillé ; `heros.cpp` — ce qu’on en fait ; `principal.cpp` — quand et où. Trois fichiers, trois rôles, et un modèle qu’on ne casse pas par mégarde.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+
+**Ce qu’on doit voir** — Exactement l’étape d’avant : le bonhomme marche, l’autre attend. Le verrou ne change rien au jeu.  
+**Ce qu’il coûte** — 504 octets de programme, 4 variables.  
+**Ce qui est gravé** — `démarrage` (50 o), `montrerHeros()` (219 o), `main()` (52 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `Tuiles` (64 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×4 (218 o), `montrerHeros()` ×2 (29 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 35.11. La fonction texteTitre() — un mot en GROSSES lettres de titre
+
+> #include <texteTitre> : texteTitre(colonne, ligne, "MOT") écrit un mot entier en grosses lettres rondes, avec un contour noir et une ombre, qui sautillent — comme le nom d’un jeu sur son écran titre.
+
+```cpp
+// ---- #include <texteTitre> : des GROSSES lettres de titre ----
+// Le mot « TITRE » en grosses lettres de titre, d'un seul appel.
+
+#include <texteTitre>   // texteTitre() : un mot en GROSSES lettres de titre
+
+int main() {
+  // texteTitre(colonne, ligne, "MOT") : la première lettre en (colonne, ligne).
+  // Chaque lettre prend 3 colonnes : T de 3 à 5, I de 6 à 8, T de 9 à 11,
+  // R de 12 à 14, E de 15 à 17 ; et 3 lignes : de 6 à 8.
+  texteTitre(3, 6, "TITRE");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce que c’est :** une fonction qui écrit un **mot entier** en **GROSSES lettres de titre** : rondes, l’intérieur clair, un **contour noir épais** et une **ombre** grise, et **une lettre sur deux un peu plus bas**, pour que le mot **sautille**. C’est le style des écrans titres des jeux Game Boy « dessin animé ».
+
+**La ligne à écrire : `#include <texteTitre>`.**
+
+**Comment on l’appelle :** `texteTitre(colonne, ligne, "MOT")` — comme `texte()`, la colonne (0 à 19) et la ligne (0 à 17) de la **première** lettre, puis le mot entre guillemets.
+
+**La taille :** chaque lettre prend **3 colonnes et 3 lignes** (24 × 24 pixels, neuf cases). L’écran a 20 colonnes : **6 lettres par ligne au plus**. Pour un titre plus long, deux appels, l’un sous l’autre. Si le mot ne tient pas, le compilateur le dit, avec le calcul.
+
+**Ce qu’il coûte :** seules **les lettres du mot** vont dans la cartouche, et **une case dessinée pareil ne coûte qu’une tuile** : dans « TITRE », les deux T ne coûtent qu’une fois. L’alphabet entier, à neuf cases par lettre, ne tiendrait pas : la console n’a que 256 tuiles.
+
+**Ce sont nos lettres :** elles sont calculées à partir de la police de l’atelier (le gras, agrandi deux fois, les coins arrondis, puis le contour et l’ombre), dans ce style, sans recopier celles d’aucun jeu.
+
+**Différence avec `ALPHABET_TITRE` :** `ALPHABET_TITRE` donne des lettres d’**une** case, posées une par une avec `poser()`. `texteTitre()` écrit le **mot entier**, en lettres **neuf fois plus grandes**.
+
+**Essaie :** écris le nom de ton jeu à la place de « TITRE ». Les lettres connues : A à Z, 0 à 9, et ! ? . - : # |. Une espace laisse 3 colonnes vides.
+
+**On retrouve texteTitre dans** — 35.12, 35.13, 35.15
+
+**Ce qu’on doit voir** — TITRE en grosses lettres rondes, contour noir et ombre grise, au milieu de l’écran ; le I et le R un peu plus bas que les autres : le mot sautille.  
+**Ce qu’il coûte** — 823 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (49 o), `main()` (229 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `CopierTuiles` (31 o), `EffacerCarte` (14 o), `Tuiles` (448 o) · appels : `poser()` ×37 (222 o), `image()` ×1 (3 o), `texteTitre()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 35.12. L’écran titre de ton jeu : le nom en GROSSES lettres
+
+> texteTitre() écrit le nom du jeu en grosses lettres de titre ; BONHOMME, de son fichier, pose dessous ; une ligne de texte invite à jouer.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+```
+
+`perso_BONHOMME.cpp`
+
+```cpp
+// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+/* BONHOMME : verrouillé */   // 🔒 on s'en sert, on ne le modifie plus — 🔓 dans l'atelier pour le changer
+```
+
+`heros.cpp`
+
+```cpp
+// heros.cpp : ce qu'on FAIT avec BONHOMME.
+// BONHOMME n'est pas écrit ici : il vient de perso_BONHOMME.cpp.
+
+#include <sprite16>   // sprite16() : quatre lutins en carré
+
+// montrerHeros(numero, x, y) : un BONHOMME à l'écran.
+//   numero : le premier de ses quatre lutins (0 → lutins 0 à 3, 4 → lutins 4 à 7)
+//   x, y   : son coin haut-gauche, en pixels
+// Exemple : montrerHeros(4, 104, 64) → un BONHOMME avec les lutins 4 à 7, en (104, 64).
+void montrerHeros(uint8_t numero, uint8_t x, uint8_t y) {
+  sprite16(numero, x, y, BONHOMME);
+}
+```
+
+`principal.cpp`
+
+```cpp
+// L'écran titre : le nom du jeu en GROSSES lettres, le héros, une invitation.
+
+#include "personnages.cpp"   // la liste : BONHOMME
+#include "heros.cpp"         // montrerHeros(numero, x, y)
+#include <texteTitre>        // texteTitre() : un mot en GROSSES lettres de titre
+#include <texte>             // texte() : une ligne en lettres ordinaires
+
+int main() {
+  // Chaque lettre de titre prend 3 colonnes et 3 lignes.
+  texteTitre(2, 1, "SUPER");   // 5 lettres → colonnes 2 à 16, lignes 1 à 3
+  texteTitre(5, 5, "JEU");     // 3 lettres → colonnes 5 à 13, lignes 5 à 7
+
+  montrerHeros(0, 72, 88);     // BONHOMME, au milieu, sous le titre
+
+  texte(2, 15, "APPUIE SUR START");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce qui est nouveau ici : `#include <texteTitre>`**, dans `principal.cpp`. Une seule ligne de plus, et `texteTitre(colonne, ligne, "MOT")` écrit un mot en **GROSSES lettres** : rondes, un contour noir, une ombre grise, et qui **sautillent**.
+
+**Le titre tient sur deux lignes :** chaque lettre prend 3 colonnes, l’écran en a 20 — 6 lettres au plus. « SUPER » (5 lettres, 15 colonnes) commence en colonne **2** : il va de 2 à 16, centré. « JEU » (9 colonnes) commence en colonne **5**, centré aussi. Et 3 lignes par lettre : SUPER en lignes 1 à 3, JEU en lignes 5 à 7.
+
+**Le héros ne change pas :** `perso_BONHOMME.cpp`, `heros.cpp` et `personnages.cpp` sont **ceux du cours d’avant**. `principal.cpp` appelle `montrerHeros(0, 72, 88)` : BONHOMME, au milieu, sous le titre.
+
+**Les lettres du titre sont des cases du fond**, comme `texte()` ; BONHOMME est fait de **lutins**. Les deux se superposent sans se gêner.
+
+**Ce qu’il coûte :** seules **les lettres de SUPER et de JEU** vont dans la cartouche — le E, présent deux fois, ne coûte qu’une fois.
+
+**À toi :** mets le nom de **ton** jeu à la place de SUPER et JEU, puis recentre : colonne = (20 − 3 × nombre de lettres) ÷ 2.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texteTitre>` → 35.11. La fonction texteTitre() — un mot en GROSSES lettres de titre
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+
+**Ce qu’on doit voir** — SUPER puis JEU en grosses lettres rondes qui sautillent, le bonhomme au milieu, et « APPUIE SUR START » en bas.  
+**Ce qu’il coûte** — 1889 octets de programme, 3 variables.  
+**Ce qui est gravé** — `démarrage` (57 o), `montrerHeros()` (219 o), `main()` (437 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (960 o), `DonneesTransfert` (10 o), `"APPUIE SUR START"` (16 o, pour texte()) · appels : `poser()` ×67 (402 o), `sprite()` ×4 (218 o), `montrerHeros()` ×1 (14 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o), `texteTitre()` ×2 (0 o) · lettres : AEIPRSTU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 35.13. Choisir la taille du titre : texteTitre(…, taille)
+
+> Un 4e argument, la taille : 2, 3 ou 4 cases de côté par lettre. Le même mot TITRE, dans les trois tailles, l’un sous l’autre.
+
+```cpp
+// Le même mot, TITRE, dans les trois tailles : le 4e argument de texteTitre().
+
+#include <texteTitre>   // texteTitre(colonne, ligne, "MOT", taille)
+
+int main() {
+  // taille 2 : chaque lettre fait 2 × 2 cases → colonnes 0 à 9, lignes 0 à 1
+  texteTitre(0, 0, "TITRE", 2);
+
+  // sans 4e argument : taille 3, 3 × 3 cases → colonnes 0 à 14, lignes 3 à 5
+  texteTitre(0, 3, "TITRE");
+
+  // taille 4 : 4 × 4 cases → colonnes 0 à 19 (tout l'écran), lignes 8 à 11
+  texteTitre(0, 8, "TITRE", 4);
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce qui est nouveau ici : un quatrième argument, la taille.** `texteTitre(colonne, ligne, "MOT", taille)` : la taille est le **nombre de cases de côté** d’une lettre. Sans lui, c’est 3, comme jusqu’ici.
+
+**Les trois tailles :** **2** → une lettre de 16 × 16 pixels (2 colonnes, 2 lignes), **10 lettres** par ligne ; **3** → 24 × 24 pixels, **6 lettres** ; **4** → 32 × 32 pixels, **5 lettres**. Le style ne change pas : rondes, un contour noir, une ombre, et elles sautillent. En taille 2, le contour est plus fin et les coins ne sont pas arrondis : la place manque.
+
+**Le calcul de la place :** une lettre prend « taille » colonnes. TITRE (5 lettres) prend donc 5 × 2 = **10** colonnes en taille 2, 5 × 3 = **15** en taille 3, 5 × 4 = **20** en taille 4 — tout l’écran. Et « taille » lignes : en lignes 0 à 1, puis 3 à 5, puis 8 à 11.
+
+**La taille s’écrit en clair** — `2`, `3` ou `4` —, **jamais avec une variable** : les lettres sont **dessinées par le compilateur**, avant que le jeu ne tourne, donc il doit connaître leur taille en lisant le programme. Avec une variable, ou une taille 5, le compilateur refuse et dit pourquoi.
+
+**Ce qu’il coûte :** chaque taille a ses propres dessins. Le T en taille 2 et le T en taille 4 ne sont pas les mêmes tuiles : un titre dans les trois tailles coûte trois fois. Dans un vrai jeu, on en choisit une.
+
+**À toi :** écris le nom de ton jeu dans la taille qui lui va. Dix lettres ? Taille 2. Un nom court qui doit frapper ? Taille 4.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texteTitre>` → 35.11. La fonction texteTitre() — un mot en GROSSES lettres de titre
+
+**Ce qu’on doit voir** — Trois fois TITRE, de plus en plus grand : petit en haut (la moitié de l’écran), moyen au milieu, et en bas, grand, sur toute la largeur.  
+**Ce qu’il coûte** — 2355 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (49 o), `main()` (721 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `CopierTuiles` (31 o), `EffacerCarte` (14 o), `Tuiles` (1488 o) · appels : `poser()` ×119 (714 o), `image()` ×1 (3 o), `texteTitre()` ×3 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 35.14. La fonction texteManga() — un titre entre manga et dessin animé
+
+> #include <texteManga> : texteManga(colonne, ligne, "MOT") écrit un mot en lettres de titre penchées, aux coins coupés, avec une trame grise et une ombre portée.
+
+```cpp
+// ---- #include <texteManga> : un titre entre manga et dessin animé ----
+// Le mot « MANGA » en lettres de titre manga, d'un seul appel.
+
+#include <texteManga>   // texteManga() : penchées, coins coupés, une trame
+
+int main() {
+  // texteManga(colonne, ligne, "MOT") : la première lettre en (colonne, ligne).
+  // Taille 3 (la taille si on ne la donne pas) : chaque lettre prend 3 colonnes
+  // et 3 lignes. M de 2 à 4, A de 5 à 7, N de 8 à 10, G de 11 à 13, A de 14 à 16.
+  texteManga(2, 6, "MANGA");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce que c’est :** un **deuxième style** de lettres de titre, à mi-chemin entre les **titres de manga** et ceux des **dessins animés**. Les lettres sont **penchées** vers la droite, comme si elles fonçaient ; leurs coins sont **coupés en biais** ; le contour noir est **carré**, aux angles vifs ; le **bas** de chaque lettre est en **trame** (un pixel sur deux en gris clair), comme les trames des pages de manga ; une **ombre portée** grise les détache du fond. Et, côté dessin animé, une lettre sur deux est un peu plus bas.
+
+**La ligne à écrire : `#include <texteManga>`.**
+
+**Comment on l’appelle :** exactement comme `texteTitre()` : `texteManga(colonne, ligne, "MOT")`, et un 4ᵉ argument facultatif pour la taille — 2, 3 (si on ne la donne pas) ou 4 cases de côté par lettre.
+
+**La place :** en taille 3, chaque lettre prend 3 colonnes et 3 lignes. « MANGA » (5 lettres) prend 15 colonnes : en commençant en colonne 2, il va de 2 à 16.
+
+**Ce qu’il coûte :** comme `texteTitre()`, seules **les lettres du mot** vont dans la cartouche. Dans « MANGA », les deux A sont-ils les mêmes tuiles ? Non : le premier A est la lettre 1 (un peu plus bas), le second la lettre 4 (en haut). Ils sont dessinés différemment, donc gravés deux fois.
+
+**Ce sont nos lettres :** calculées à partir de la police de l’atelier (le gras, agrandi, penché, les coins coupés, puis le contour, la trame et l’ombre), sans recopier celles d’aucun manga ni d’aucun jeu.
+
+**Essaie :** écris le nom de ton jeu à la place de « MANGA », puis change la taille : `texteManga(2, 6, "MANGA", 2)`.
+
+**On retrouve texteManga dans** — 35.15
+
+**Ce qu’on doit voir** — MANGA en grosses lettres penchées vers la droite, aux coins coupés, le bas des lettres en trame grise, avec une ombre portée.  
+**Ce qu’il coûte** — 983 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (49 o), `main()` (277 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `CopierTuiles` (31 o), `EffacerCarte` (14 o), `Tuiles` (560 o) · appels : `poser()` ×45 (270 o), `image()` ×1 (3 o), `texteManga()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 35.15. Deux styles pour un titre : dessin animé ou manga
+
+> Le même mot, SUPER, écrit par texteTitre() puis par texteManga() : deux styles, le même appel. On choisit celui qui va à son jeu.
+
+```cpp
+// Le même mot, SUPER, dans les deux styles de titre.
+
+#include <texteTitre>   // texteTitre() : rondes, le style dessin animé
+#include <texteManga>   // texteManga() : penchées, coins coupés, le style manga
+#include <texte>        // texte() : le nom de chaque style, en lettres ordinaires
+
+int main() {
+  texte(2, 0, "DESSIN ANIME");
+  texteTitre(2, 2, "SUPER");    // colonnes 2 à 16, lignes 2 à 4
+
+  texte(2, 8, "MANGA");
+  texteManga(2, 10, "SUPER");   // colonnes 2 à 16, lignes 10 à 12
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce qui est nouveau ici : les deux styles côte à côte.** `texteTitre()` écrit des lettres **rondes**, droites, au contour doux — le style **dessin animé**. `texteManga()` écrit des lettres **penchées**, aux **coins coupés**, avec une **trame** grise — le style **manga**.
+
+**Le même appel :** les deux prennent `(colonne, ligne, "MOT")`, et la même taille facultative. Pour changer de style, on change **le nom de la fonction**, rien d’autre — et son `#include`.
+
+**Deux `#include`, un par fonction :** `#include <texteTitre>` et `#include <texteManga>`. Chacun ajoute à la cartouche **seulement les lettres** que sa fonction écrit.
+
+**La place :** SUPER en taille 3 prend 15 colonnes ; en commençant en colonne 2, de 2 à 16. Le premier en lignes 2 à 4, le second en lignes 10 à 12. Au-dessus de chacun, son nom en lettres ordinaires, avec `texte()`.
+
+**Ce qu’il coûte :** deux styles, deux séries de dessins — le S rond et le S manga ne sont pas les mêmes tuiles. Dans un vrai jeu, on en choisit **un** pour le titre.
+
+**À toi :** écris le nom de ton jeu dans les deux styles, regarde, et garde celui que tu préfères.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texteTitre>` → 35.11. La fonction texteTitre() — un mot en GROSSES lettres de titre
+- `#include <texteManga>` → 35.14. La fonction texteManga() — un titre entre manga et dessin animé
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+
+**Ce qu’on doit voir** — En haut, SUPER en lettres rondes ; en bas, SUPER en lettres penchées avec une trame ; au-dessus de chacun, le nom de son style.  
+**Ce qu’il coûte** — 2086 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (49 o), `main()` (551 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `CopierTuiles` (85 o), `EffacerCarte` (14 o), `Tuiles` (1296 o), `"DESSIN ANIME"` (12 o, pour texte()), `"MANGA"` (5 o, pour texte()) · appels : `poser()` ×87 (522 o), `texte()` ×2 (22 o), `image()` ×1 (3 o), `texteTitre()` ×1 (0 o), `texteManga()` ×1 (0 o) · lettres : ADEGIMNS · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 35.16. Un avion qui vole : AVION dans son fichier, la croix pour le piloter
+
+> AVION, le dessin tout fait de la bibliothèque, rangé dans perso_AVION.cpp ; sprite16() le pose, la croix le fait voler d’un pixel par image, sans sortir de l’écran.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_AVION.cpp"   // un avion vu du dessus, 16 × 16
+```
+
+`perso_AVION.cpp`
+
+```cpp
+// perso_AVION.cpp : un avion vu du dessus, le nez en haut, AVION (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le contour, « + » la carlingue, « - » le cockpit, « . » le transparent.
+
+Perso AVION = {
+  ".......##.......",
+  "......#++#......",
+  "......#--#......",
+  "......#--#......",
+  "......#++#......",
+  ".....##++##.....",
+  "...###++++###...",
+  ".##++++++++++##.",
+  "#++++++++++++++#",
+  "####..#++#..####",
+  "......#++#......",
+  "......#++#......",
+  "....###++###....",
+  "...#++++++++#...",
+  "...##########...",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// L'avion vole : la croix le déplace d'un pixel par image.
+
+#include "personnages.cpp"   // la liste : AVION
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include <bouton>            // bouton() : lit un bouton de la manette
+
+uint8_t px = 72;   // la place de l'avion, en pixels : de 0 à 144 (160 - 16)…
+uint8_t py = 64;   // …et de 0 à 128 (144 - 16). Il part du milieu.
+
+int main() {
+  while (true) {
+    image();
+
+    if (bouton(DROITE) && px < 144) px++;   // un pixel par image
+    if (bouton(GAUCHE) && px > 0)   px--;
+    if (bouton(BAS) && py < 128)    py++;
+    if (bouton(HAUT) && py > 0)     py--;
+
+    sprite16(0, px, py, AVION);             // l'avion à sa place : lutins 0 à 3
+  }
+}
+```
+
+**Ce qui est nouveau ici : un personnage qu’on pilote.** L’avion est rangé comme BONHOMME : son dessin dans `perso_AVION.cpp`, la liste `personnages.cpp` qui le verse, et `principal.cpp` qui verse la liste d’**une** ligne. Le dessin est celui de la bibliothèque (« ▦ Les tuiles », onglet des modèles, AVION).
+
+**Sa place, en pixels :** `px` (de gauche à droite) et `py` (de haut en bas). Il part de (72, 64), le milieu de l’écran. À chaque image, `sprite16(0, px, py, AVION)` le pose à sa place : les lutins 0 à 3, en carré.
+
+**La croix :** `bouton(DROITE)` vaut vrai **tant que** la flèche droite est enfoncée ; alors `px++` — l’avion avance d’**un pixel par image**, soit 60 pixels par seconde. Même chose pour `GAUCHE` (`px--`), `BAS` (`py++`) et `HAUT` (`py--`). Deux flèches à la fois : il vole en diagonale.
+
+**Les bords de l’écran :** l’écran fait 160 × 144 pixels, et l’avion 16 × 16. Son coin haut-gauche va donc de 0 à **144** (160 − 16) en largeur, et de 0 à **128** (144 − 16) en hauteur. Les conditions `px < 144`, `px > 0`, `py < 128`, `py > 0` le gardent entier à l’écran.
+
+**Pourquoi au pixel et pas à la case :** un lutin se pose au pixel près — le vol est **fluide**. Une tuile du fond, elle, saute de 8 pixels à chaque pas.
+
+**À toi :** fais-le voler plus vite — `px = px + 2;` — ou ajoute un deuxième avion, `sprite16(4, …, AVION)`, avec les lutins 4 à 7.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <bouton>` → 0.65.5. La fonction bouton() — lire la manette
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — L’avion au milieu de l’écran ; avec les flèches, il vole dans les quatre directions, sans jamais sortir de l’écran.  
+**Ce qu’il coûte** — 469 octets de programme, 2 variables.  
+**Ce qui est gravé** — `démarrage` (55 o), `main()` (194 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `LireManette` (37 o, pour bouton()), `Tuiles` (64 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×4 (104 o), `bouton()` ×4 (20 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, Notes
+
+---
+
+### 35.17. La vitesse de l’avion : une variable, vitesse
+
+> Une variable, vitesse, dit combien de pixels l’avion parcourt à chaque image : 1 lent, 2 normal, 4 très rapide. Les bords se calculent avec elle.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_AVION.cpp"   // un avion vu du dessus, 16 × 16
+```
+
+`perso_AVION.cpp`
+
+```cpp
+// perso_AVION.cpp : un avion vu du dessus, le nez en haut, AVION (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le contour, « + » la carlingue, « - » le cockpit, « . » le transparent.
+
+Perso AVION = {
+  ".......##.......",
+  "......#++#......",
+  "......#--#......",
+  "......#--#......",
+  "......#++#......",
+  ".....##++##.....",
+  "...###++++###...",
+  ".##++++++++++##.",
+  "#++++++++++++++#",
+  "####..#++#..####",
+  "......#++#......",
+  "......#++#......",
+  "....###++###....",
+  "...#++++++++#...",
+  "...##########...",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// La vitesse de l'avion : un seul nombre à changer, en haut.
+
+#include "personnages.cpp"   // la liste : AVION
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include <bouton>            // bouton() : lit un bouton de la manette
+
+uint8_t vitesse = 2;   // pixels par image : 1 = lent, 2 = normal, 4 = très rapide
+uint8_t px = 72;       // la place de l'avion, en pixels : de 0 à 144 (160 - 16)…
+uint8_t py = 64;       // …et de 0 à 128 (144 - 16). Il part du milieu.
+
+int main() {
+  while (true) {
+    image();
+
+    // On vérifie AVANT de bouger que le pas tient dans l'écran.
+    if (bouton(DROITE) && px + vitesse <= 144) px = px + vitesse;
+    if (bouton(GAUCHE) && px >= vitesse)       px = px - vitesse;
+    if (bouton(BAS) && py + vitesse <= 128)    py = py + vitesse;
+    if (bouton(HAUT) && py >= vitesse)         py = py - vitesse;
+
+    sprite16(0, px, py, AVION);   // l'avion à sa place : lutins 0 à 3
+  }
+}
+```
+
+**Ce qui est nouveau ici : une variable `vitesse`.** Au 35.16, l’avion avançait toujours d’**un** pixel par image (`px++`). Maintenant il avance de **`vitesse`** pixels : `px = px + vitesse;`. Pour changer sa vitesse, on change **un seul nombre**, en haut du programme.
+
+**Ce que vaut chaque réglage :** l’écran se redessine 60 fois par seconde. `vitesse = 1` → 60 pixels par seconde (le 35.16) ; `2` → **120** (il traverse l’écran en un peu plus d’une seconde) ; `4` → **240**, très rapide. Au-delà, le vol devient saccadé : l’œil voit l’avion sauter.
+
+**Pourquoi les bords changent :** avec `vitesse = 2`, l’ancien test `px > 0` ne suffit plus. Si `px` vaut **1**, il est plus grand que 0, et `px - 2` donnerait… pas −1 : un `uint8_t` ne descend **jamais sous 0**, il **repart à 255**. L’avion sauterait à l’autre bout de l’écran.
+
+**Les nouveaux tests :** on vérifie **avant** de bouger que le pas tient. À gauche : `px >= vitesse` (il reste au moins un pas avant 0). À droite : `px + vitesse <= 144` (après le pas, il est encore entier à l’écran). Pareil en hauteur, avec 128. Ces tests marchent **quelle que soit** la vitesse.
+
+**Déroulé, vitesse 2, flèche gauche tenue depuis px = 4 :** 4 ≥ 2, donc px = 2 ; 2 ≥ 2, donc px = 0 ; 0 ≥ 2 est faux : il s’arrête, **pile au bord**.
+
+**À toi :** essaie `vitesse = 1`, puis `4`. Avec `5`, regarde où il s’arrête : 72 + 5 + 5 + … ne tombe pas juste sur 144 — il s’arrête à **142**, le dernier pas qui tient (142 + 5 = 147, trop loin). À gauche, il s’arrête à **2** (2 ≥ 5 est faux) : jamais de saut à 255.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <bouton>` → 0.65.5. La fonction bouton() — lire la manette
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le même avion, deux fois plus rapide qu’au 35.16 : il traverse l’écran en un peu plus d’une seconde, et s’arrête toujours pile au bord.  
+**Ce qu’il coûte** — 497 octets de programme, 3 variables.  
+**Ce qui est gravé** — `démarrage` (59 o), `main()` (218 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `LireManette` (37 o, pour bouton()), `Tuiles` (64 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×4 (104 o), `bouton()` ×4 (20 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, Notes
+
+---
+
+### 35.18. Changer de vitesse en vol : A accélère, B ralentit
+
+> Le bouton A ajoute 1 à la vitesse, B en enlève 1, entre 1 et 4 ; un appui compte une fois, même tenu longtemps. VITESSE et son chiffre s’affichent en haut.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_AVION.cpp"   // un avion vu du dessus, 16 × 16
+```
+
+`perso_AVION.cpp`
+
+```cpp
+// perso_AVION.cpp : un avion vu du dessus, le nez en haut, AVION (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le contour, « + » la carlingue, « - » le cockpit, « . » le transparent.
+
+Perso AVION = {
+  ".......##.......",
+  "......#++#......",
+  "......#--#......",
+  "......#--#......",
+  "......#++#......",
+  ".....##++##.....",
+  "...###++++###...",
+  ".##++++++++++##.",
+  "#++++++++++++++#",
+  "####..#++#..####",
+  "......#++#......",
+  "......#++#......",
+  "....###++###....",
+  "...#++++++++#...",
+  "...##########...",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// Changer de vitesse en vol : A accélère, B ralentit, entre 1 et 4.
+
+#include "personnages.cpp"   // la liste : AVION
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include <bouton>            // bouton() : lit un bouton de la manette
+#include <texte>             // texte() : le mot VITESSE
+#include <nombre>            // nombre() : le chiffre de la vitesse
+
+uint8_t vitesse = 2;   // pixels par image, de 1 à 4
+uint8_t aAvant = 0;    // 1 si A était déjà enfoncé à l'image d'avant
+uint8_t bAvant = 0;    // pareil pour B
+uint8_t px = 72;
+uint8_t py = 64;
+
+int main() {
+  texte(1, 0, "VITESSE");
+
+  while (true) {
+    image();
+
+    // A : seulement au DÉBUT de l'appui (enfoncé maintenant, pas avant).
+    if (bouton(A)) {
+      if (aAvant == 0 && vitesse < 4) vitesse++;
+      aAvant = 1;
+    } else {
+      aAvant = 0;
+    }
+    // B : pareil, pour ralentir.
+    if (bouton(B)) {
+      if (bAvant == 0 && vitesse > 1) vitesse--;
+      bAvant = 1;
+    } else {
+      bAvant = 0;
+    }
+
+    if (bouton(DROITE) && px + vitesse <= 144) px = px + vitesse;
+    if (bouton(GAUCHE) && px >= vitesse)       px = px - vitesse;
+    if (bouton(BAS) && py + vitesse <= 128)    py = py + vitesse;
+    if (bouton(HAUT) && py >= vitesse)         py = py - vitesse;
+
+    sprite16(0, px, py, AVION);
+    nombre(9, 0, vitesse, 1);   // le chiffre, juste après VITESSE
+  }
+}
+```
+
+**Ce qui est nouveau ici : la vitesse change pendant le vol.** Un appui sur **A** l’augmente de 1, un appui sur **B** la baisse de 1. Elle reste entre **1** et **4** : `vitesse < 4` avant d’ajouter, `vitesse > 1` avant d’enlever.
+
+**Le piège : un appui dure plusieurs images.** Même un appui rapide garde le bouton enfoncé pendant 5 ou 6 images. Si on écrivait seulement `if (bouton(A)) vitesse++;`, la vitesse monterait de 1 **à chaque image** : de 1 à 4 en un clin d’œil.
+
+**La solution : se souvenir de l’image d’avant.** La variable `aAvant` vaut 1 si A était déjà enfoncé à l’image précédente, 0 sinon. On n’ajoute que si A est enfoncé **maintenant** et ne l’était **pas avant** : c’est le **début** de l’appui, et il n’arrive qu’une fois. Puis on note où en est A pour l’image suivante. `bAvant` fait pareil pour B.
+
+**Déroulé d’un appui sur A de 5 images, vitesse 2 :** image 1 — A enfoncé, `aAvant` = 0 → vitesse 3, `aAvant` = 1 ; images 2 à 5 — A enfoncé, mais `aAvant` = 1 → rien ; image 6 — A lâché → `aAvant` = 0. Un appui, **+1**.
+
+**L’affichage :** `texte(1, 0, "VITESSE")` une fois, avant la boucle ; puis à chaque image `nombre(9, 0, vitesse, 1)` écrit son chiffre (1 chiffre) juste après.
+
+**À toi :** monte la limite à 6, ou fais démarrer l’avion à la vitesse 1.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <bouton>` → 0.65.5. La fonction bouton() — lire la manette
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <nombre>` → 0.8.3. La fonction nombre() — écrire un nombre
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — VITESSE 2 en haut ; chaque appui sur A fait monter le chiffre (jusqu’à 4) et l’avion va plus vite ; chaque appui sur B le fait descendre (jusqu’à 1).  
+**Ce qu’il coûte** — 967 octets de programme, 5 variables.  
+**Ce qui est gravé** — `démarrage` (75 o), `main()` (311 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `EcrireNombre` (33 o, pour nombre()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `LireManette` (37 o, pour bouton()), `Tuiles` (304 o), `DonneesTransfert` (10 o), `"VITESSE"` (7 o, pour texte()) · appels : `sprite()` ×4 (104 o), `bouton()` ×6 (30 o), `texte()` ×1 (11 o), `nombre()` ×1 (10 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : EISTV0123456789 · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, Notes
+
+---
+
+### 35.19. Plus lent qu’un pixel par image : la lenteur
+
+> Pour aller moins vite que 1 pixel par image, l’avion n’avance qu’une image sur « lenteur » : lenteur 3, c’est 20 pixels par seconde, trois fois moins vite que le 35.16.
+
+`personnages.cpp`
+
+```cpp
+// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_AVION.cpp"   // un avion vu du dessus, 16 × 16
+```
+
+`perso_AVION.cpp`
+
+```cpp
+// perso_AVION.cpp : un avion vu du dessus, le nez en haut, AVION (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le contour, « + » la carlingue, « - » le cockpit, « . » le transparent.
+
+Perso AVION = {
+  ".......##.......",
+  "......#++#......",
+  "......#--#......",
+  "......#--#......",
+  "......#++#......",
+  ".....##++##.....",
+  "...###++++###...",
+  ".##++++++++++##.",
+  "#++++++++++++++#",
+  "####..#++#..####",
+  "......#++#......",
+  "......#++#......",
+  "....###++###....",
+  "...#++++++++#...",
+  "...##########...",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// Plus lent : l'avion n'avance qu'une image sur « lenteur ».
+
+#include "personnages.cpp"   // la liste : AVION
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include <bouton>            // bouton() : lit un bouton de la manette
+
+uint8_t lenteur = 3;   // avance une image sur 3 : 1 = 60 px/s, 2 = 30, 3 = 20, 4 = 15, 6 = 10
+uint8_t compte = 0;    // les images comptées depuis le dernier pas
+uint8_t px = 72;       // la place de l'avion, en pixels : de 0 à 144…
+uint8_t py = 64;       // …et de 0 à 128. Il part du milieu.
+
+int main() {
+  while (true) {
+    image();
+
+    compte++;                  // une image de plus
+    if (compte >= lenteur) {   // c'est l'image d'un pas : une sur « lenteur »
+      compte = 0;              // on recommence à compter
+      if (bouton(DROITE) && px < 144) px++;   // un seul pixel : le vol reste fluide
+      if (bouton(GAUCHE) && px > 0)   px--;
+      if (bouton(BAS) && py < 128)    py++;
+      if (bouton(HAUT) && py > 0)     py--;
+    }
+
+    sprite16(0, px, py, AVION);   // posé à CHAQUE image, même sans pas
+  }
+}
+```
+
+**Le problème :** au 35.17, `vitesse` compte des **pixels par image**. Le plus petit pas est **1** — 60 pixels par seconde, l’écran traversé en 2,4 secondes. Encore trop rapide pour piloter tranquillement. Et `vitesse = 0.5` ne marche pas : un `uint8_t` ne garde que des **nombres entiers**.
+
+**L’idée : garder le pas d’un pixel, mais ne pas avancer à chaque image.** L’avion avance **une image sur `lenteur`**, et attend pendant les autres. `lenteur = 3` : il avance à l’image 3, à l’image 6, à l’image 9… — **20 pixels par seconde**, trois fois moins vite. Le vol reste **fluide** : chaque pas fait toujours un seul pixel.
+
+**Ce qui est nouveau ici : un compteur, `compte`.** À chaque image, `compte++`. Quand il atteint `lenteur`, on le remet à 0 et on laisse les flèches faire **un pas**. Le reste du temps, les flèches ne font rien.
+
+**Déroulé avec `lenteur = 3`, flèche droite tenue :** image 1 — compte = 1, rien ; image 2 — compte = 2, rien ; image 3 — compte = 3 ≥ 3, donc compte = 0 et **px + 1** ; image 4 — compte = 1, rien… Un pixel toutes les trois images.
+
+**Le tableau des lenteurs :** `1` → 60 pixels par seconde (le 35.16) ; `2` → 30 ; **`3` → 20** (le réglage de cette leçon) ; `4` → 15 ; `6` → 10, très lent. Ici, **plus le nombre est grand, plus l’avion est lent** — c’est le contraire de `vitesse`.
+
+**Les bords :** le pas est d’un pixel, donc les tests du 35.16 suffisent : `px < 144`, `px > 0`, `py < 128`, `py > 0`.
+
+**À toi :** essaie `lenteur = 2`, puis `6`, et garde celle qui te va. Le nombre se change **en haut du programme**, à un seul endroit.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <bouton>` → 0.65.5. La fonction bouton() — lire la manette
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le même avion, trois fois moins vite qu’au 35.16 : il glisse doucement, un pixel à la fois, et s’arrête toujours au bord.  
+**Ce qu’il coûte** — 493 octets de programme, 4 variables.  
+**Ce qui est gravé** — `démarrage` (62 o), `main()` (211 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `LireManette` (37 o, pour bouton()), `Tuiles` (64 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×4 (104 o), `bouton()` ×4 (20 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, Notes
 
 ---
 
@@ -29546,7 +31233,7 @@ int main() {
 /* Une TUILE de 8 × 8 : un arbre. Elle se peint dans ▦ Les tuiles. */
 
 #include <Tuile>         // un dessin de 8 × 8 pixels
-#include <Perso>         // un dessin de 16 × 16 pixels, pour un lutin
+#include <Perso>         // un personnage : un dessin de 16 × 16 ou de 32 × 32 pixels
 #include <poser>         // pose une tuile sur une case du fond
 #include <couleurFond>   // choisit une couleur d’une palette du fond
 #include <texte>         // écrit un texte à l’écran
@@ -29772,7 +31459,7 @@ Une **carte**, c’est un décor entier dessiné à la souris, dans l’onglet �
 **Les fonctions de cette leçon — et le tuto de chacune**
 
 - `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
-- `#include <Perso>` → 35.1. Perso — dessiner un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
 - `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
 - `#include <couleurFond>` → 0.88.3. La fonction couleurFond() — une couleur du décor
 - `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
@@ -30491,7 +32178,7 @@ La relance remet **les trois** : la hauteur, les seizièmes et la vitesse. Le so
 > Huit pixels de côté, c’est petit pour un héros.
 
 ```cpp
-#include <Perso>      // un dessin de 16 × 16 pixels, pour un lutin
+#include <Perso>      // un personnage : un dessin de 16 × 16 ou de 32 × 32 pixels
 #include <texte>      // écrit un texte à l’écran
 #include <poser>      // pose une tuile sur une case du fond
 #include <bouton>     // lit un bouton de la manette
@@ -30554,7 +32241,7 @@ Dans l’atelier, **« + perso 16 × 16 »** en ajoute un, et la grille passe à
 
 **Les fonctions de cette leçon — et le tuto de chacune**
 
-- `#include <Perso>` → 35.1. Perso — dessiner un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
 - `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
 - `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
 - `#include <bouton>` → 0.65.5. La fonction bouton() — lire la manette
@@ -33539,7 +35226,7 @@ int main() {
 
 - Un tableau de « struct »
 
-- Une méthode : la fonction qui connaît son objet
+- Une méthode : ce qu’elle coûte, ce qui reste refusé
 
 - Les trois façons de faire la même chose
 
@@ -33914,7 +35601,7 @@ C’est ici que la `struct` prend son sens. Passer de un à trois ennemis coûte
 
 ---
 
-### 88. Une méthode : la fonction qui connaît son objet
+### 88. Une méthode : ce qu’elle coûte, ce qui reste refusé
 
 > `troupe[i].avancer()` plutôt que `avancer(i)`.
 
@@ -39406,6 +41093,631 @@ Le reste est déjà connu : `aAvant` pour agir **au front** — un seul basculem
 **Ce qu’on doit voir** — Une balle qui ondule en traversant l’écran ; A bascule « SINUS » en « COSINUS », et elle saute d’un quart de tour.  
 **Ce qu’il coûte** — 693 octets de programme, 7 variables.  
 **Ce qui est gravé** — `démarrage` (69 o), `main()` (171 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `LireManette` (37 o, pour bouton()), `Tuiles` (144 o), `DonneesTransfert` (10 o), `"A : COSINUS"` (11 o, pour texte()), `"A : SINUS  "` (11 o, pour texte()), `SINUS_0` (32 o) · appels : `sprite()` ×1 (23 o), `texte()` ×2 (22 o), `bouton()` ×1 (12 o), `image()` ×1 (6 o) · lettres : ACINOSU: · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, Notes
+
+---
+
+## Chapitre 25 — Tes propres #include : ajouter une fonction
+
+### 143.1. Chapitre 25 — Tes propres #include : ajouter une fonction : ce qui vient
+
+> L’entrée du chapitre 25 : ce qu’on a vu jusqu’ici, et ce que ses 8 étapes vont ajouter, une à la fois.
+
+```cpp
+// ---- Chapitre 25 : Tes propres #include : ajouter une fonction ----
+// L'entrée du chapitre : rien de neuf dans ce programme. Il annonce la suite.
+
+#include <texte>   // écrit un texte à l’écran
+
+int main() {
+  texte(1, 7, "CHAPITRE 25");   // le numéro du chapitre
+  texte(1, 9, "C EST PARTI");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**D’où l’on vient.** Le chapitre 24, « Aller au bout », vient de se terminer. Tout ce qu’il a montré reste valable : on s’en sert à partir d’ici sans le réexpliquer.
+
+**Ce que ce chapitre apporte : Tes propres #include : ajouter une fonction.** Il compte 8 étapes, dont 8 venues du cours :
+
+- Une fonction à toi : bande()
+
+- La même fonction, trois fois
+
+- Ranger sa fonction dans un fichier voisin : #include "outils.cpp"
+
+- Le fichier voisin écrit ses propres #include <…>
+
+- Une deuxième fonction dans outils.cpp : pile()
+
+- bande() devient une fonction de la console : #include <bande>
+
+- Ta fonction passe avant celle de la console
+
+- À toi : ajouter ta propre fonction de la console, pas à pas
+
+**Les fonctions qui arrivent :** `#include <bande>`. Chacune sera présentée seule, juste avant la première étape qui l’emploie : jamais deux lignes nouvelles d’un coup.
+
+**Comment avancer :** une étape à la fois. Lis l’explication, lance le programme, regarde ce qu’on doit voir, puis fais l’essai proposé. Si quelque chose t’échappe, l’étape d’avant contient la pièce qui manque.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+
+**Ce qu’on doit voir** — CHAPITRE 25, puis C EST PARTI.  
+**Ce qu’il coûte** — 458 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (49 o), `main()` (29 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (176 o), `"CHAPITRE 25"` (11 o, pour texte()), `"C EST PARTI"` (11 o, pour texte()) · appels : `texte()` ×2 (22 o), `image()` ×1 (3 o) · lettres : ACEHIPRST25 · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 144. Une fonction à toi : bande()
+
+> Avant de parler d’#include, on écrit une fonction à soi : bande() pose la même tuile plusieurs fois, de gauche à droite.
+
+```cpp
+// Une fonction à toi : bande().
+// Elle est écrite ICI, dans le programme : pas besoin d'#include pour elle.
+
+#include <poser>      // pose une tuile sur une case du fond (bande() s'en sert)
+#include <ALPHABET>   // les lettres de la police : ALPHABET[0] est le A
+
+// bande(colonne, ligne, tuile, longueur) : la même tuile, « longueur » fois,
+// de gauche à droite. Exemple : bande(2, 5, ALPHABET[0], 10) → dix A,
+// des colonnes 2 à 11, sur la ligne 5.
+//
+//   void         elle ne rend rien : elle agit, c'est tout
+//   uint8_t ...  ses quatre paramètres : des nombres de 0 à 255
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  // for (départ ; condition ; après chaque tour)
+  //   i = 0 au départ ; on continue tant que i < longueur ; i++ ajoute 1.
+  for (uint8_t i = 0; i < longueur; i++) {
+    poser(colonne + i, ligne, tuile);   // une case plus à droite à chaque tour
+  }
+}
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // l'appel : dix A sur la ligne 5
+
+  while (true) {   // la boucle du jeu
+    image();       // attend l'image suivante (native : pas d'#include)
+  }
+}
+```
+
+**Ce chapitre répond à une question : « comment ajouter moi-même un `#include` ? »** Il y a deux sortes d’`#include`, et on va les faire toutes les deux, avec **une seule fonction**, du début à la fin : `bande()`.
+
+**On part de ce qu’on sait déjà faire** (chapitre « Les fonctions : nommer un geste ») : écrire une fonction dans son programme. `bande(colonne, ligne, tuile, longueur)` pose la tuile `longueur` fois, une case plus à droite à chaque fois.
+
+**Lis la fonction ligne par ligne :** `void` dit qu’elle ne rend rien ; entre les parenthèses, ses **quatre paramètres**, quatre cases de mémoire remplies par l’appel. La boucle `for` compte `i` de 0 jusqu’à `longueur - 1`, et pose la tuile en `colonne + i`.
+
+**Déroulé de `bande(2, 5, ALPHABET[0], 10)` :** i = 0 → case (2, 5) ; i = 1 → case (3, 5) ; … ; i = 9 → case (11, 5). Puis i = 10 : `10 < 10` est faux, la boucle s’arrête. Dix A, des colonnes 2 à 11.
+
+**Pour l’instant, aucun `#include` nouveau :** la fonction est **dans** le programme, elle n’a rien à demander à la console. Elle se sert seulement de `poser()`, déjà incluse.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+- `#include <ALPHABET>` → 0.1.4. ALPHABET — les lettres de la police
+
+**Ce qu’on doit voir** — Dix A côte à côte sur la ligne 5, des colonnes 2 à 11.  
+**Ce qu’il coûte** — 911 octets de programme, 5 variables.  
+**Ce qui est gravé** — `démarrage` (49 o), `bande()` (38 o), `main()` (26 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (704 o) · appels : `bande()` ×1 (19 o), `poser()` ×1 (17 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 145. La même fonction, trois fois
+
+> Une fonction s’écrit une fois et s’appelle autant qu’on veut : trois bandes, trois longueurs, trois lettres.
+
+```cpp
+// La même fonction, trois fois : seuls les appels de main() changent.
+
+#include <poser>      // pose une tuile sur une case du fond
+#include <ALPHABET>   // ALPHABET[0] = A, [1] = B, [2] = C…
+
+// bande(colonne, ligne, tuile, longueur) : comme à l'étape d'avant.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i < longueur; i++) {
+    poser(colonne + i, ligne, tuile);
+  }
+}
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // dix A  : colonnes 2 à 11, ligne 5
+  bande(2, 7, ALPHABET[1], 6);    // NOUVEAU : six B   : colonnes 2 à 7,  ligne 7
+  bande(2, 9, ALPHABET[2], 3);    // NOUVEAU : trois C : colonnes 2 à 4,  ligne 9
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**C’est le programme d’avant**, avec **deux appels de plus** dans `main()`. La fonction, elle, ne change pas d’une lettre.
+
+**Chaque appel remplit les paramètres autrement :** `bande(2, 7, ALPHABET[1], 6)` met 2 dans `colonne`, 7 dans `ligne`, le B dans `tuile`, 6 dans `longueur`. Six B, des colonnes 2 à 7.
+
+**C’est tout l’intérêt d’une fonction :** le geste (« poser une rangée ») est écrit **une seule fois**. C’est aussi ce qui va nous donner envie de la **ranger à part** : une fonction aussi utile, on voudrait la réemployer dans d’autres programmes, sans la recopier.
+
+**Essaie :** ajoute `bande(0, 11, ALPHABET[3], 20);` — une ligne entière de D, de la colonne 0 à la 19.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+- `#include <ALPHABET>` → 0.1.4. ALPHABET — les lettres de la police
+
+**Ce qu’on doit voir** — Trois rangées : dix A, six B, trois C, toutes calées à gauche sur la colonne 2.  
+**Ce qu’il coûte** — 949 octets de programme, 5 variables.  
+**Ce qui est gravé** — `démarrage` (49 o), `bande()` (38 o), `main()` (64 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (704 o) · appels : `bande()` ×3 (57 o), `poser()` ×1 (17 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 146. Ranger sa fonction dans un fichier voisin : #include "outils.cpp"
+
+> La première sorte d’#include, avec des guillemets : bande() déménage dans l’onglet outils.cpp, et principal.cpp le verse chez lui.
+
+`outils.cpp`
+
+```cpp
+// outils.cpp : MES fonctions, rangées à part.
+// Ce fichier ne fait rien tout seul : principal.cpp le verse chez lui
+// avec #include "outils.cpp" (des GUILLEMETS : c'est un fichier à moi).
+
+// bande(colonne, ligne, tuile, longueur) : la même tuile, « longueur » fois,
+// de gauche à droite. Exemple : bande(2, 5, ALPHABET[0], 10) → dix A.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i < longueur; i++) {
+    poser(colonne + i, ligne, tuile);   // poser() : incluse par principal.cpp
+  }
+}
+```
+
+`principal.cpp`
+
+```cpp
+// Le changement : bande() n'est plus écrite ici, mais dans outils.cpp.
+//
+//   #include "outils.cpp"
+//   |        |
+//   |        +-- le fichier à verser : l'onglet « outils.cpp », à côté
+//   +----------- « verse ici » : avant la compilation, cette ligne est
+//                remplacée par tout le texte d'outils.cpp. Tout se passe
+//                comme si bande() était écrite ici, comme à l'étape d'avant.
+
+#include <poser>      // pose une tuile (c'est bande() qui s'en sert)
+#include <ALPHABET>   // les lettres de la police
+#include "outils.cpp" // NOUVEAU : mes fonctions à moi, versées ici
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // bande() vient d'outils.cpp
+  bande(2, 7, ALPHABET[1], 6);
+  bande(2, 9, ALPHABET[2], 3);
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce qui est nouveau ici : la fonction a déménagé.** Elle n’est plus dans `principal.cpp` : elle est dans un **second onglet**, `outils.cpp`. Dans l’atelier, c’est le bouton **« + fichier »**, au-dessus de l’éditeur, qui crée un onglet comme celui-là.
+
+**`#include "outils.cpp"` veut dire « verse ici tout le texte d’`outils.cpp` ».** Avant de compiler, la console remplace cette ligne par le contenu du fichier, mot pour mot. Le compilateur voit donc **exactement** le programme de l’étape d’avant : même cartouche, même écran.
+
+**Les guillemets `"…"` désignent un fichier À TOI**, écrit à côté du programme. Retiens-le bien, car l’étape 15.6 montrera l’autre sorte, avec des chevrons `<…>`, qui désigne une fonction **de la console**.
+
+**Où placer la ligne :** l’habitude est de mettre tous les `#include` en haut, ensemble. Pour des **fonctions**, l’ordre ne compte pas : le compilateur relève toutes les fonctions avant de les traduire, et `main()` peut appeler `bande()` même si son texte est collé plus bas. Pour des **variables globales** ou des **dessins**, si : ils doivent être versés **avant** la fonction qui s’en sert.
+
+**Pourquoi l’extension `.cpp` et pas `.h` :** les deux marchent ici. Par habitude, un `.h` (« header ») contient des déclarations (des variables, des noms) ; un `.cpp` contient du code, des fonctions. `outils.cpp` contient une fonction.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+- `#include <ALPHABET>` → 0.1.4. ALPHABET — les lettres de la police
+
+**Ce qu’on doit voir** — Exactement l’écran d’avant : dix A, six B, trois C. Mais le programme est rangé en deux onglets.  
+**Ce qu’il coûte** — 949 octets de programme, 5 variables.  
+**Ce qui est gravé** — `démarrage` (49 o), `bande()` (38 o), `main()` (64 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (704 o) · appels : `bande()` ×3 (57 o), `poser()` ×1 (17 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 147. Le fichier voisin écrit ses propres #include <…>
+
+> outils.cpp se sert de poser() : c’est donc lui qui écrit #include <poser>. Le fichier se suffit à lui-même.
+
+`outils.cpp`
+
+```cpp
+// outils.cpp : MES fonctions, rangées à part.
+// Il écrit LUI-MÊME ce dont il a besoin : il se suffit à lui-même.
+
+#include <poser>   // NOUVEAU ICI : bande() se sert de poser()
+
+// bande(colonne, ligne, tuile, longueur) : la même tuile, « longueur » fois,
+// de gauche à droite. Exemple : bande(2, 5, ALPHABET[0], 10) → dix A.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i < longueur; i++) {
+    poser(colonne + i, ligne, tuile);
+  }
+}
+```
+
+`principal.cpp`
+
+```cpp
+// Le changement : « #include <poser> » est parti dans outils.cpp,
+// le fichier qui s'en sert. main() n'appelle pas poser() lui-même.
+
+#include <ALPHABET>   // les lettres : c'est main() qui s'en sert
+#include "outils.cpp" // mes fonctions (et leurs #include à elles)
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);
+  bande(2, 7, ALPHABET[1], 6);
+  bande(2, 9, ALPHABET[2], 3);
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le seul changement : la ligne `#include <poser>` a changé d’onglet.** Elle était dans `principal.cpp` ; elle est maintenant **en haut d’`outils.cpp`**.
+
+**Pourquoi c’est mieux :** c’est `bande()` qui se sert de `poser()`, pas `main()`. En écrivant la ligne **dans le fichier qui en a besoin**, `outils.cpp` se suffit à lui-même : un autre programme qui écrit `#include "outils.cpp"` n’a rien d’autre à penser.
+
+**Et si deux fichiers écrivent la même ligne ?** Si `principal.cpp` gardait aussi son `#include <poser>`, ce ne serait pas une erreur : une fonction de la console n’est gravée **qu’une fois**, et une ligne de trop ne coûte rien.
+
+**Le texte versé, en entier :** `#include <ALPHABET>`, puis tout `outils.cpp` (son `#include <poser>` et `bande()`), puis `main()`. Un `#include <…>` vaut pour **tout** le programme assemblé, où qu’il soit écrit : celui d’`outils.cpp` autorise `poser()` partout.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <ALPHABET>` → 0.1.4. ALPHABET — les lettres de la police
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+
+**Ce qu’on doit voir** — Toujours le même écran : dix A, six B, trois C.  
+**Ce qu’il coûte** — 949 octets de programme, 5 variables.  
+**Ce qui est gravé** — `démarrage` (49 o), `bande()` (38 o), `main()` (64 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (704 o) · appels : `bande()` ×3 (57 o), `poser()` ×1 (17 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 148. Une deuxième fonction dans outils.cpp : pile()
+
+> Un fichier d’outils grandit : pile() fait comme bande(), mais vers le bas. principal.cpp n’a rien à ajouter pour s’en servir.
+
+`outils.cpp`
+
+```cpp
+// outils.cpp : MES fonctions, rangées à part.
+
+#include <poser>   // bande() et pile() se servent de poser()
+
+// bande(colonne, ligne, tuile, longueur) : vers la DROITE.
+// Exemple : bande(2, 5, ALPHABET[0], 10) → dix A, colonnes 2 à 11.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i < longueur; i++) {
+    poser(colonne + i, ligne, tuile);   // la COLONNE avance
+  }
+}
+
+// NOUVEAU : pile(colonne, ligne, tuile, hauteur) : vers le BAS.
+// Exemple : pile(15, 4, ALPHABET[3], 6) → six D, lignes 4 à 9.
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i < hauteur; i++) {
+    poser(colonne, ligne + i, tuile);   // c'est la LIGNE qui avance
+  }
+}
+```
+
+`principal.cpp`
+
+```cpp
+// Le changement : main() appelle aussi pile(), la nouvelle fonction
+// d'outils.cpp. Rien à ajouter en haut : outils.cpp est déjà versé.
+
+#include <ALPHABET>
+#include "outils.cpp" // bande() ET pile()
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);
+  bande(2, 7, ALPHABET[1], 6);
+  bande(2, 9, ALPHABET[2], 3);
+  pile(15, 4, ALPHABET[3], 6);    // NOUVEAU : six D, de la ligne 4 à la 9
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce qui est nouveau ici : `pile(colonne, ligne, tuile, hauteur)`**, une deuxième fonction dans `outils.cpp`. C’est `bande()` tournée d’un quart de tour : la tuile est posée **vers le bas**, en `ligne + i`.
+
+**Déroulé de `pile(15, 4, ALPHABET[3], 6)` :** i = 0 → (15, 4) ; i = 1 → (15, 5) ; … ; i = 5 → (15, 9). Six D, l’un sous l’autre.
+
+**Aucune ligne ajoutée dans principal.cpp pour l’avoir :** le `#include "outils.cpp"` verse **tout** le fichier, donc toutes ses fonctions. Un fichier d’outils, c’est cela : une boîte où l’on range ses fonctions, et qu’on ouvre d’une seule ligne.
+
+**Essaie :** écris une troisième fonction dans `outils.cpp`, par exemple `void carreDe(colonne, ligne, tuile)` qui appelle `bande()` deux fois.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <ALPHABET>` → 0.1.4. ALPHABET — les lettres de la police
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+
+**Ce qu’on doit voir** — Les trois bandes d’avant, et une colonne de six D à droite (colonne 15, lignes 4 à 9).  
+**Ce qu’il coûte** — 1010 octets de programme, 10 variables.  
+**Ce qui est gravé** — `démarrage` (49 o), `bande()` (38 o), `pile()` (42 o), `main()` (83 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (704 o) · appels : `bande()` ×3 (57 o), `poser()` ×2 (38 o), `pile()` ×1 (19 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 148.1. La fonction bande() — la même tuile, plusieurs fois
+
+> #include <bande> : bande(colonne, ligne, tuile, longueur) pose la même tuile « longueur » fois, de gauche à droite.
+
+```cpp
+// ---- #include <bande> : la même tuile, plusieurs fois ----
+// Dix A sur la ligne 5, des colonnes 2 à 11, en un seul appel.
+
+#include <ALPHABET>   // les lettres : ALPHABET[0] est le A
+#include <bande>      // bande() : la même tuile, de gauche à droite
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // colonne 2, ligne 5, le A, dix fois
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce qu’elle fait :** `bande(2, 5, ALPHABET[0], 10)` pose **dix A** sur la ligne 5, des colonnes 2 à 11 — comme dix `poser()` d’affilée, une case plus à droite à chaque fois.
+
+**La ligne à écrire : `#include <bande>`.**
+
+**Ses arguments :** la colonne et la ligne de la première case, la tuile, et combien de fois la poser.
+
+**D’où elle vient :** c’est la fonction que le chapitre « Tes propres #include » écrit d’abord dans le programme, puis range dans un fichier voisin, et fait enfin entrer dans la console. Elle est écrite en C, comme une fonction de l’élève (`compilateur/emetteur.js`, `SOURCE_BANDE`).
+
+**Ce qu’elle coûte :** sa boucle, et `poser()` qu’elle appelle — gravées seulement si le programme appelle `bande()`.
+
+**Essaie :** `bande(0, 17, ALPHABET[1], 20);` — une ligne de B tout en bas.
+
+**On retrouve bande dans** — 149, 150, 151
+
+**Ce qu’on doit voir** — Dix A côte à côte sur la ligne 5.  
+**Ce qu’il coûte** — 911 octets de programme, 5 variables.  
+**Ce qui est gravé** — `démarrage` (49 o), `bande()` (38 o), `main()` (26 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (704 o) · appels : `bande()` ×1 (19 o), `poser()` ×1 (17 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 149. bande() devient une fonction de la console : #include <bande>
+
+> La seconde sorte d’#include, avec des chevrons : bande() a été ajoutée à la console elle-même. On ne l’écrit plus, on la demande.
+
+`outils.cpp`
+
+```cpp
+// outils.cpp : MES fonctions. bande() n'y est plus : elle est
+// dans la console, demandée par #include <bande> dans principal.cpp.
+
+#include <poser>   // pile() se sert de poser()
+
+// pile(colonne, ligne, tuile, hauteur) : vers le BAS.
+// Exemple : pile(15, 4, ALPHABET[3], 6) → six D, lignes 4 à 9.
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i < hauteur; i++) {
+    poser(colonne, ligne + i, tuile);
+  }
+}
+```
+
+`principal.cpp`
+
+```cpp
+// Le changement : bande() vient de la CONSOLE, plus d'outils.cpp.
+//
+//   #include <bande>     des CHEVRONS : une fonction de la console
+//   #include "outils.cpp"  des GUILLEMETS : un fichier à moi
+
+#include <ALPHABET>
+#include <bande>      // NOUVEAU : pose la même tuile plusieurs fois, de gauche à droite
+#include "outils.cpp" // il ne contient plus que pile()
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // la bande() de la console
+  bande(2, 7, ALPHABET[1], 6);
+  bande(2, 9, ALPHABET[2], 3);
+  pile(15, 4, ALPHABET[3], 6);    // la pile() d'outils.cpp
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce qui est nouveau ici : `#include <bande>`**, avec des **chevrons**. `bande()` n’est plus dans `outils.cpp` (il n’y reste que `pile()`) : elle fait maintenant partie **de la console**, comme `poser()` ou `texte()`. On ne l’écrit plus, on la **demande**.
+
+**Guillemets ou chevrons, la différence en une phrase :** `#include "outils.cpp"` verse **ton fichier** ; `#include <bande>` demande **une fonction de la console**, que le compilateur connaît déjà et n’ajoute à la cartouche que si le programme l’appelle.
+
+**Sans la ligne, le compilateur refuse :** efface `#include <bande>` et lance. Le message dit : « il faut #include <bande> pour employer bande() ». C’est la règle de toute la console : ce qu’on emploie, on l’inclut par son nom.
+
+**Comment `bande()` est entrée dans la console.** Il a fallu toucher **trois fichiers du projet** (pas le programme : le compilateur lui-même). On les ouvre dans un éditeur de texte, à côté d’`index.html` :
+
+**1. `compilateur/emetteur.js` — le code de la fonction.** On y écrit sa source, **en C, exactement comme dans `outils.cpp`**, dans une constante, `SOURCE_BANDE`, entre deux accents graves (la touche AltGr + 7) : le texte de la fonction, mot pour mot. Puis on l’inscrit dans le tableau `FONCTIONS_EN_C`, juste en dessous : `bande: SOURCE_BANDE,`. Le compilateur ajoute ce texte au programme **seulement** s’il appelle `bande()`.
+
+**2. `compilateur/inclusion.js` — le nom à inclure.** Dans le tableau `BIBLIOTHEQUES`, une ligne : `bande: 'pose la même tuile plusieurs fois, de gauche à droite',`. C’est elle qui rend `#include <bande>` valable, et la phrase sert de commentaire quand l’atelier écrit les `#include` tout seul.
+
+**3. `aide-fonctions.js` — l’aide de l’éditeur.** Dans `FONCTIONS` : `bande: { args: ['colonne', 'ligne', 'tuile', 'longueur'], dit: '…' },`. L’éditeur propose alors `bande` quand on tape « ban… », et montre les arguments pendant qu’on les écrit.
+
+**Un détail : dans la console, `bande()` n’écrit pas `#include <poser>`.** Ce que la console ajoute elle-même n’a rien à inclure : le compilateur le sait (c’est le drapeau `deLaConsole`).
+
+**Après avoir changé ces fichiers :** recharge la page avec **Ctrl+F5**. Le compilateur est relu, et `#include <bande>` marche aussitôt.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <ALPHABET>` → 0.1.4. ALPHABET — les lettres de la police
+- `#include <bande>` → 148.1. La fonction bande() — la même tuile, plusieurs fois
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+
+**Ce qu’on doit voir** — Le même écran : trois bandes et une pile. bande() vient maintenant de la console.  
+**Ce qu’il coûte** — 1010 octets de programme, 10 variables.  
+**Ce qui est gravé** — `démarrage` (49 o), `bande()` (38 o), `pile()` (42 o), `main()` (83 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (704 o) · appels : `bande()` ×3 (57 o), `poser()` ×2 (38 o), `pile()` ×1 (19 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 150. Ta fonction passe avant celle de la console
+
+> Si ton programme écrit une fonction du même nom qu’une fonction de la console, c’est la tienne qui compte.
+
+`outils.cpp`
+
+```cpp
+// outils.cpp : MES fonctions.
+
+#include <poser>
+
+// NOUVEAU : MA bande(), en pointillés. Elle porte le même nom que celle de
+// la console : c'est la mienne qui compte, la console n'ajoute pas la sienne.
+// Exemple : bande(2, 5, ALPHABET[0], 10) → A aux colonnes 2, 4, 6, 8, 10.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i < longueur; i = i + 2) {   // i = i + 2 : une case sur deux
+    poser(colonne + i, ligne, tuile);
+  }
+}
+
+// pile(colonne, ligne, tuile, hauteur) : vers le BAS.
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i < hauteur; i++) {
+    poser(colonne, ligne + i, tuile);
+  }
+}
+```
+
+`principal.cpp`
+
+```cpp
+// Le changement est dans outils.cpp : il écrit sa propre bande().
+// principal.cpp garde « #include <bande> », mais c'est la mienne qui sert.
+
+#include <ALPHABET>
+#include <bande>      // la bande() de la console… qui ne servira pas ici
+#include "outils.cpp" // MA bande() (en pointillés) et pile()
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // MA bande() : cinq A, un trou entre chaque
+  bande(2, 7, ALPHABET[1], 6);    // trois B : colonnes 2, 4, 6
+  bande(2, 9, ALPHABET[2], 3);    // deux C  : colonnes 2, 4
+  pile(15, 4, ALPHABET[3], 6);
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le seul changement : `outils.cpp` écrit de nouveau une `bande()`**, mais **en pointillés** : une case sur deux. `#include <bande>` est toujours là, dans `principal.cpp`.
+
+**Laquelle gagne ?** La tienne. Le compilateur ajoute une fonction de la console **seulement si le programme n’en a pas écrit une du même nom**. Ici, il voit ta `bande()` : il n’ajoute pas la sienne, et la ligne `#include <bande>` ne grave rien.
+
+**La boucle en pointillés :** `i = i + 2` au lieu de `i++`. Déroulé de `bande(2, 5, ALPHABET[0], 10)` : i = 0 → (2, 5) ; i = 2 → (4, 5) ; i = 4 → (6, 5) ; i = 6 → (8, 5) ; i = 8 → (10, 5) ; i = 10 : `10 < 10` est faux, fin. Cinq A, un trou entre chaque.
+
+**À quoi ça sert :** à **essayer une autre version** d’une fonction de la console sans toucher au compilateur. Si la tienne te plaît, tu sais maintenant comment la faire entrer dans la console (étape précédente).
+
+**Essaie :** supprime la `bande()` d’`outils.cpp` : celle de la console revient, et les bandes redeviennent pleines.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <ALPHABET>` → 0.1.4. ALPHABET — les lettres de la police
+- `#include <bande>` → 148.1. La fonction bande() — la même tuile, plusieurs fois
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+
+**Ce qu’on doit voir** — Les bandes sont en pointillés : A A A A A, B B B, C C. La pile de D ne change pas.  
+**Ce qu’il coûte** — 1011 octets de programme, 10 variables.  
+**Ce qui est gravé** — `démarrage` (49 o), `bande()` (39 o), `pile()` (42 o), `main()` (83 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (704 o) · appels : `bande()` ×3 (57 o), `poser()` ×2 (38 o), `pile()` ×1 (19 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 151. À toi : ajouter ta propre fonction de la console, pas à pas
+
+> La marche à suivre complète, de l’idée à « #include <ta_fonction> » — et un cadre dessiné avec bande() et pile().
+
+`outils.cpp`
+
+```cpp
+// outils.cpp : MES fonctions. pile() est la prochaine à faire entrer
+// dans la console, en suivant les étapes 1 à 7 de cette leçon.
+
+#include <poser>   // pile() se sert de poser()
+
+// pile(colonne, ligne, tuile, hauteur) : vers le BAS.
+// Exemple : pile(3, 4, ALPHABET[23], 8) → huit X, lignes 4 à 11.
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i < hauteur; i++) {
+    poser(colonne, ligne + i, tuile);
+  }
+}
+```
+
+`principal.cpp`
+
+```cpp
+// Un cadre de X : bande() (de la console) pour le haut et le bas,
+// pile() (d'outils.cpp) pour les côtés.
+//
+//   colonnes 3 à 16, lignes 3 à 12 :
+//
+//     XXXXXXXXXXXXXX   ← bande(3, 3, X, 14)   le haut
+//     X            X   ← pile(3, 4, X, 8)  et  pile(16, 4, X, 8)
+//     X            X      les côtés, lignes 4 à 11
+//     XXXXXXXXXXXXXX   ← bande(3, 12, X, 14)  le bas
+
+#include <ALPHABET>
+#include <bande>      // pose la même tuile plusieurs fois, de gauche à droite
+#include "outils.cpp" // pile()
+
+int main() {
+  bande(3, 3, ALPHABET[23], 14);    // le haut  (ALPHABET[23] : le X, 24e lettre)
+  bande(3, 12, ALPHABET[23], 14);   // le bas
+  pile(3, 4, ALPHABET[23], 8);      // le côté gauche  : lignes 4 à 11
+  pile(16, 4, ALPHABET[23], 8);     // le côté droit
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**On revient à la `bande()` de la console** (`outils.cpp` ne contient plus que `pile()`, comme au 15.6), et on s’en sert pour **un cadre** : deux bandes (le haut et le bas), deux piles (la gauche et la droite). C’est la seule nouveauté du programme.
+
+**Déroulé du cadre :** `bande(3, 3, …, 14)` → le haut, colonnes 3 à 16 ; `bande(3, 12, …, 14)` → le bas ; `pile(3, 4, …, 8)` → la gauche, lignes 4 à 11 ; `pile(16, 4, …, 8)` → la droite. Les coins appartiennent aux bandes : les piles commencent une ligne plus bas.
+
+**Et maintenant, pour faire entrer `pile()` dans la console à son tour, voici la marche à suivre — la même pour n’importe quelle fonction :**
+
+**Étape 1 — l’écrire et l’essayer dans ton programme.** D’abord dans `principal.cpp`, ou dans un fichier voisin comme `outils.cpp`. Tant qu’elle n’est pas parfaite, elle reste là : c’est plus facile à corriger.
+
+**Étape 2 — choisir son nom.** Un nom qu’aucune fonction de la console ne porte déjà (la liste est dans `compilateur/inclusion.js`, tableau `BIBLIOTHEQUES`). Le nom du `#include` sera exactement celui de la fonction : `pile` → `#include <pile>`.
+
+**Étape 3 — `compilateur/emetteur.js`.** Cherche `const FONCTIONS_EN_C`. Juste au-dessus, colle ta fonction dans une constante, `const SOURCE_PILE = …`, entre deux accents graves (AltGr + 7), comme `SOURCE_BANDE` juste à côté. Dans le tableau, ajoute `pile: SOURCE_PILE,`. Retire son `#include <poser>` : la console n’en a pas besoin.
+
+**Étape 4 — `compilateur/inclusion.js`.** Dans `BIBLIOTHEQUES`, ajoute une ligne : `pile: 'pose la même tuile plusieurs fois, vers le bas',`. Sans elle, `#include <pile>` serait refusé : « je ne connais pas cette bibliothèque ».
+
+**Étape 5 — `aide-fonctions.js`.** Dans `FONCTIONS`, ajoute `pile: { args: ['colonne', 'ligne', 'tuile', 'hauteur'], dit: '…' },` pour que l’éditeur la propose.
+
+**Étape 6 — essayer.** Recharge la page (**Ctrl+F5**), enlève `pile()` d’`outils.cpp`, écris `#include <pile>` dans `principal.cpp`, et lance. En ligne de commande : `node outils/gb3.mjs mon-essai.cpp` compile un fichier, et `npm run verifier` vérifie que rien d’autre n’est cassé.
+
+**Étape 7 — sa leçon.** Dans ce projet, chaque `#include` a son tuto : une leçon dans `tuto/lecons.js` dont le programme commence par `// ---- #include <pile> : …`. Le parcours la place tout seul juste avant la première étape qui emploie `pile()`. Copie celle de `bande()` et change ce qu’il faut.
+
+**Pour aller plus loin :** les fonctions qui parlent directement au matériel (l’écran, le son) ne sont pas écrites en C mais en instructions du processeur, dans `compilateur/emetteur.js` (cherche `if (nom === 'cacherPanneau')`). C’est plus difficile : la façon en C suffit pour tout ce qu’on peut écrire avec les fonctions existantes.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <ALPHABET>` → 0.1.4. ALPHABET — les lettres de la police
+- `#include <bande>` → 148.1. La fonction bande() — la même tuile, plusieurs fois
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+
+**Ce qu’on doit voir** — Un cadre de X au milieu de l’écran : colonnes 3 à 16, lignes 3 à 12, vide à l’intérieur.  
+**Ce qu’il coûte** — 1010 octets de programme, 10 variables.  
+**Ce qui est gravé** — `démarrage` (49 o), `bande()` (38 o), `pile()` (42 o), `main()` (83 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (704 o) · appels : `poser()` ×2 (38 o), `bande()` ×2 (38 o), `pile()` ×2 (38 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
 
 ---
 

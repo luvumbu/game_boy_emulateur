@@ -13,6 +13,7 @@
 export const FONCTIONS = {
   texte: { args: ['colonne', 'ligne', '"…"'], dit: 'écrit un texte à l’écran — 20 colonnes, 18 lignes. Un nombre se colle à la suite : "SCORE " + score. Avec un Mot : texte(SALUT).' },
   nombre: { args: ['colonne', 'ligne', 'valeur'], options: ['chiffres'], dit: 'écrit un nombre calculé, en base dix. Le 4e argument dit combien de chiffres (3 par défaut).' },
+  bande: { args: ['colonne', 'ligne', 'tuile', 'longueur'], dit: 'pose la même tuile « longueur » fois, de gauche à droite : bande(2, 5, ALPHABET[0], 10) écrit dix A sur la ligne 5.' },
   poserS: { args: ['colonne', 'ligne', 'tuile'], dit: 'comme poser(), mais passe à la ligne tout seul : la colonne 20 devient (0, ligne + 1), comme textS.' },
   textS: { args: ['colonne', 'ligne', '"…"'], dit: 'comme texte(), mais passe à la ligne tout seul : après la colonne 19, la suite reprend en colonne 0 de la ligne d’en dessous ; après la ligne 17, en haut.' },
   texteGrand: { args: ['colonne', 'ligne', '"…"', 'taille'], dit: 'écrit un texte AGRANDI de 1 à 20 fois (20 : une lettre remplit l’écran), sans rien dessiner : chaque pixel devient un carré de taille × taille. Une lettre prend taille × taille cases. Le texte et la taille s’écrivent en clair : texteGrand(2, 2, "A", 3).' },
@@ -51,6 +52,10 @@ export const FONCTIONS = {
   sprite16: { args: ['numero', 'x', 'y', 'tuile'], options: ['MIROIR_X'], dit: 'un personnage 16 × 16 : quatre lutins en carré (numero à numero + 3). Le 5e argument le retourne.' },
   cacher: { args: ['numero'], dit: 'ôte un lutin de l’écran.' },
   cacher16: { args: ['numero'], dit: 'ôte les quatre lutins d’un personnage 16 × 16.' },
+  texteTitre: { args: ['colonne', 'ligne', '"MOT"', 'taille'], dit: 'écrit un mot en GROSSES lettres de titre — rondes, contour noir, une ombre, et qui sautillent. La taille (facultative, écrite en clair) est le nombre de cases de côté d’une lettre : 2 (10 lettres par ligne), 3 si on ne la donne pas (6 lettres), 4 (5 lettres). Seules les lettres du mot vont dans la cartouche.' },
+  texteManga: { args: ['colonne', 'ligne', '"MOT"', 'taille'], dit: 'comme texteTitre(), dans un style entre manga et dessin animé : des lettres PENCHÉES qui foncent, des coins coupés en biais, un contour noir carré, le bas de la lettre en trame grise, une ombre portée, et une lettre sur deux un peu plus bas. Taille facultative, en clair : 2, 3 (si on ne la donne pas) ou 4 cases de côté.' },
+  sprite32: { args: ['numero', 'x', 'y', 'tuile'], options: ['MIROIR_X'], dit: 'un personnage de 32 × 32 (un Perso de trente-deux rangées) : seize lutins en carré (numero à numero + 15, 24 au plus). Le 5e argument le retourne.' },
+  cacher32: { args: ['numero'], dit: 'ôte les seize lutins d’un grand personnage 32 × 32.' },
   defiler: { args: ['x', 'y'], dit: 'fait glisser le décor. La carte fait 256 pixels, et revient toute seule à zéro.' },
   panneau: { args: ['x', 'y'], dit: 'place le panneau (la fenêtre par-dessus le décor), en pixels, et l’allume.' },
   cacherPanneau: { args: [], dit: 'ôte le panneau, sans rien perdre de son contenu.' },

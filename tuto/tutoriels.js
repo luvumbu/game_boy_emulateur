@@ -2035,7 +2035,7 @@ int main() {                  // Le jeu commence ici.
   },
 
   {
-    titre: 'Une méthode : la fonction qui connaît son objet',
+    titre: 'Une méthode : ce qu’elle coûte, ce qui reste refusé',
     difficulte: 8,
     provenance: 'tutoriel',
     idee: '`troupe[i].avancer()` plutôt que `avancer(i)`.',

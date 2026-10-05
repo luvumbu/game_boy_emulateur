@@ -765,10 +765,22 @@ try {
       (await evaluer(`document.querySelector('#grille-airs .toile-air') !== null`)))
   controle('et le texte de la leçon reste lisible au-dessus', await vu('lecon-texte'))
 
-  await evaluer(`document.getElementById('mode-code').click()`)
+  /* Le MODE CODE a rejoint la création : un seul mode, et « ⤢ Agrandir le code ». */
+  controle('il n’y a plus de bouton « MODE CODE » à part', !(await vu('mode-code')))
+  await evaluer(`document.getElementById('mode-creation').click()`)
   await patienter(400)
-  controle('« MODE CODE » rend tout l’écran au programme',
-    !(await vu('zone-lecons')) && !(await vu('atelier-airs')))
+  controle('en création, « ⤢ Agrandir le code » est là, avec les ateliers',
+    (await vu('bascule-code')) && (await vu('zone-creation')))
+  await evaluer(`document.getElementById('bascule-code').click()`)
+  await patienter(400)
+  controle('« ⤢ Agrandir le code » rend tout l’écran au programme',
+    !(await vu('zone-lecons')) && !(await vu('atelier-airs')) && !(await vu('zone-creation')) &&
+      (await evaluer(`document.getElementById('mode-creation').classList.contains('actif')`)))
+  await evaluer(`document.getElementById('bascule-code').click()`)
+  await patienter(400)
+  controle('et « ⤡ Revoir les ateliers » les fait revenir', await vu('zone-creation'))
+  await evaluer(`document.getElementById('bascule-code').click()`)
+  await patienter(400)
 
   /* --- ce que la console exécute --- */
 

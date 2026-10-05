@@ -191,6 +191,208 @@ export function lettresGrasses() {
 }
 
 /*
+ * L'alphabet des TITRES, pour ALPHABET_TITRE : les lettres épaisses du gras,
+ * avec une OMBRE. Comme les grandes lettres d'un écran titre : chaque pixel
+ * du trait (3, le plus sombre) jette une ombre grise (2) sur le pixel d'en
+ * bas à droite, s'il est vide. Le relief tient dans la tuile : le gras
+ * occupe les colonnes 1 à 6 et les rangées 0 à 6, l'ombre déborde sur la
+ * colonne 7 et la rangée 7.
+ *
+ * C'est NOTRE dessin, calculé à partir de la police du projet : il évoque
+ * le style des titres de la Game Boy sans recopier les lettres d'aucun jeu.
+ *
+ * Rend 26 dessins, de A à Z : 8 chaînes de 8 chiffres — 0 le fond, 2 l'ombre,
+ * 3 le trait.
+ */
+export function lettresTitre() {
+  return lettresGrasses().map(({ lettre, lignes }) => {
+    const p = lignes.map((l) => [...l])
+    for (let y = 0; y < 7; y++) {
+      for (let x = 0; x < 7; x++) {
+        if (lignes[y][x] === '3' && lignes[y + 1][x + 1] === '0') p[y + 1][x + 1] = '2'
+      }
+    }
+    return { lettre, lignes: p.map((r) => r.join('')) }
+  })
+}
+
+/*
+ * Les GROSSES lettres des titres, pour texteTitre(). Dans le style des titres
+ * « dessin animé » de la Game Boy : grosses, rondes, un contour noir épais,
+ * l'intérieur clair, une ombre. Trois tailles — « taille » est le nombre de
+ * cases de côté d'une lettre :
+ *
+ *   taille 2 : 16 × 16 pixels — le gras tel quel, un contour d'un pixel ;
+ *   taille 3 : 24 × 24 pixels — le gras agrandi deux fois (la taille d'avant) ;
+ *   taille 4 : 32 × 32 pixels — le gras agrandi trois fois.
+ *
+ * Pour la taille 3 :
+ *
+ *   1. le gras (traits de 2 pixels), agrandi deux fois : traits de 4 ;
+ *   2. les coins arrondis : un pixel du bord qui n'a ni voisin au-dessus (ou
+ *      au-dessous) ni voisin à gauche (ou à droite) est ôté ;
+ *   3. un contour noir (3) de deux pixels tout autour ;
+ *   4. une ombre grise (2) d'un pixel, en bas à droite ;
+ *   5. « enBas » : la lettre descend de 4 pixels — une lettre sur deux, et le
+ *      mot sautille.
+ *
+ * C'est NOTRE dessin, calculé à partir de la police du projet : il évoque ce
+ * style sans recopier les lettres d'aucun jeu.
+ *
+ * Les tailles 2 et 4 suivent les mêmes étapes, avec leurs propres mesures
+ * (TAILLES_DE_TITRE, juste en dessous) ; la taille 2 n'arrondit pas : ses
+ * traits, de 2 pixels, disparaîtraient.
+ *
+ * Rend « 8 × taille » chaînes d'autant de chiffres (0 le fond et l'intérieur,
+ * 2 l'ombre, 3 le contour), ou null pour un caractère que la police ne
+ * connaît pas.
+ */
+export const TAILLES_DE_TITRE = {
+  //   agrandi : chaque pixel du gras devient « agrandi × agrandi » pixels
+  //   gauche, haut : où commence la lettre dans son carré
+  //   contour : son épaisseur ; arrondi : coins arrondis ou non
+  //   saut : de combien descend une lettre sur deux
+  2: { agrandi: 1, gauche: 2, haut: 2, contour: 1, arrondi: false, saut: 2 },
+  3: { agrandi: 2, gauche: 1, haut: 2, contour: 2, arrondi: true, saut: 4 },
+  4: { agrandi: 3, gauche: 2, haut: 2, contour: 2, arrondi: true, saut: 3 },
+}
+
+export function grandeLettreTitre(caractere, enBas = false, taille = 3) {
+  const t = TAILLES_DE_TITRE[taille]
+  if (!t) return null
+  const c = normaliser(caractere)
+  if (!ORDRE.includes(c)) return null
+  /* Le gras : celui d'ALPHABET_GRAS pour A à Z, sinon la police épaissie d'un pixel. */
+  let gras
+  const deLAlphabet = lettresGrasses().find((l) => l.lettre === c)
+  if (deLAlphabet) gras = deLAlphabet.lignes.map((l) => [...l].map((n) => n === '3'))
+  else {
+    const p = pixelsDe(c)
+    gras = p.map((r) => r.map((v, x) => v === 3 || (x > 0 && r[x - 1] === 3)))
+  }
+  const N = 8 * taille
+  const plein = Array.from({ length: N }, () => Array(N).fill(false))
+  for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) if (gras[y][x]) {
+    for (let a = 0; a < t.agrandi; a++) for (let b = 0; b < t.agrandi; b++) {
+      plein[t.haut + y * t.agrandi + a][t.gauche + x * t.agrandi + b] = true
+    }
+  }
+  const v = (g, y, x) => y >= 0 && y < N && x >= 0 && x < N && g[y][x]
+  const rond = plein.map((l) => l.slice())
+  if (t.arrondi) for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (plein[y][x]) {
+    const h = v(plein, y - 1, x), b = v(plein, y + 1, x), g = v(plein, y, x - 1), d = v(plein, y, x + 1)
+    if ((!h && !g) || (!h && !d) || (!b && !g) || (!b && !d)) rond[y][x] = false
+  }
+  const sortie = Array.from({ length: N }, () => Array(N).fill(-1))
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    if (rond[y][x]) { sortie[y][x] = 0; continue }
+    let pres = false
+    const r = t.contour
+    for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+      if (Math.abs(dy) + Math.abs(dx) <= r + 1 && v(rond, y + dy, x + dx)) pres = true
+    }
+    if (pres) sortie[y][x] = 3
+  }
+  const ombre = sortie.map((l) => l.slice())
+  for (let y = 0; y < N - 1; y++) for (let x = 0; x < N - 1; x++) {
+    if (sortie[y][x] === 3 && sortie[y + 1][x + 1] === -1) ombre[y + 1][x + 1] = 2
+  }
+  const decale = enBas ? t.saut : 0
+  return Array.from({ length: N }, (_, y) => {
+    const source = y - decale
+    if (source < 0) return '0'.repeat(N)
+    return ombre[source].map((n) => (n === -1 ? '0' : String(n))).join('')
+  })
+}
+
+/*
+ * Les lettres de titre MANGA, pour texteManga() : un style à mi-chemin entre
+ * les titres de manga et ceux des dessins animés. Mêmes tailles que
+ * texteTitre (2, 3 ou 4 cases de côté), mais :
+ *
+ *   1. PENCHÉES vers la droite, comme une écriture qui fonce : le haut de la
+ *      lettre est décalé d'un pixel toutes les « penche » rangées ;
+ *   2. des coins COUPÉS en biais — en haut à droite et en bas à gauche —, au
+ *      lieu d'arrondis : la lettre a l'air taillée ;
+ *   3. un contour noir CARRÉ (3), aux angles vifs ;
+ *   4. l'intérieur en deux : le haut clair (0), le bas en TRAME (un pixel sur
+ *      deux en gris clair, 1), comme les trames des pages de manga ;
+ *   5. une ombre portée grise (2), plus longue, en bas à droite ;
+ *   6. une lettre sur deux un peu plus bas : le côté dessin animé.
+ *
+ * C'est NOTRE dessin, calculé à partir de la police du projet, sans recopier
+ * les lettres d'aucun manga ni d'aucun jeu. Rend « 8 × taille » chaînes
+ * d'autant de chiffres, ou null pour un caractère inconnu.
+ */
+export const TAILLES_MANGA = {
+  //   penche : un pixel de décalage toutes les « penche » rangées
+  //   ombre : la longueur de l'ombre portée ; trame : le bas en trame, ou plein
+  2: { agrandi: 1, gauche: 1, haut: 2, contour: 1, penche: 3, ombre: 1, saut: 1, trame: false },
+  3: { agrandi: 2, gauche: 2, haut: 2, contour: 2, penche: 5, ombre: 2, saut: 2, trame: true },
+  4: { agrandi: 3, gauche: 1, haut: 2, contour: 2, penche: 6, ombre: 2, saut: 2, trame: true },
+}
+
+export function lettreManga(caractere, enBas = false, taille = 3) {
+  const t = TAILLES_MANGA[taille]
+  if (!t) return null
+  const c = normaliser(caractere)
+  if (!ORDRE.includes(c)) return null
+  let gras
+  const deLAlphabet = lettresGrasses().find((l) => l.lettre === c)
+  if (deLAlphabet) gras = deLAlphabet.lignes.map((l) => [...l].map((n) => n === '3'))
+  else {
+    const p = pixelsDe(c)
+    gras = p.map((r) => r.map((v, x) => v === 3 || (x > 0 && r[x - 1] === 3)))
+  }
+  const N = 8 * taille
+  const H = 8 * t.agrandi // la hauteur de la lettre, en pixels
+  const dedans = (y, x) => y >= 0 && y < N && x >= 0 && x < N
+  /* 1. Agrandie et penchée : plus la rangée est haute, plus elle va à droite. */
+  const plein = Array.from({ length: N }, () => Array(N).fill(false))
+  for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) if (gras[y][x]) {
+    for (let a = 0; a < t.agrandi; a++) for (let b = 0; b < t.agrandi; b++) {
+      const yy = y * t.agrandi + a
+      const decalage = Math.floor((H - 1 - yy) / t.penche)
+      const py = t.haut + yy, px = t.gauche + x * t.agrandi + b + decalage
+      if (dedans(py, px)) plein[py][px] = true
+    }
+  }
+  const v = (g, y, x) => dedans(y, x) && g[y][x]
+  /* 2. Les coins coupés : en haut à droite et en bas à gauche. */
+  const taille_ = plein.map((l) => l.slice())
+  if (t.agrandi >= 2) for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (plein[y][x]) {
+    const h = v(plein, y - 1, x), b = v(plein, y + 1, x), g = v(plein, y, x - 1), d = v(plein, y, x + 1)
+    if ((!h && !d) || (!b && !g)) taille_[y][x] = false
+  }
+  /* 3 et 4. Le contour carré, l'intérieur clair en haut, en trame en bas. */
+  const milieu = t.haut + H / 2
+  const sortie = Array.from({ length: N }, () => Array(N).fill(-1))
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    if (taille_[y][x]) {
+      sortie[y][x] = y < milieu ? 0 : t.trame ? (x + y) % 2 : 1
+      continue
+    }
+    let pres = false
+    for (let dy = -t.contour; dy <= t.contour; dy++) for (let dx = -t.contour; dx <= t.contour; dx++) {
+      if (v(taille_, y + dy, x + dx)) pres = true
+    }
+    if (pres) sortie[y][x] = 3
+  }
+  /* 5. L'ombre portée : un pixel vide, avec du contour en haut à gauche, à moins de « ombre » pixels. */
+  const ombre = sortie.map((l) => l.slice())
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (sortie[y][x] === -1) {
+    for (let k = 1; k <= t.ombre; k++) if (dedans(y - k, x - k) && sortie[y - k][x - k] === 3) ombre[y][x] = 2
+  }
+  /* 6. Une lettre sur deux, un peu plus bas. */
+  const decale = enBas ? t.saut : 0
+  return Array.from({ length: N }, (_, y) => {
+    const source = y - decale
+    if (source < 0) return '0'.repeat(N)
+    return ombre[source].map((n) => (n === -1 ? '0' : String(n))).join('')
+  })
+}
+
+/*
  * Les pixels d'un caractère, tels qu'ils sont posés dans sa tuile : 8 rangées
  * de 8 nombres (0 le fond, 3 le trait), comme le fait octetsDesTuiles. Sert à
  * texteGrand, qui AGRANDIT ces pixels. Rend null pour un caractère inconnu.

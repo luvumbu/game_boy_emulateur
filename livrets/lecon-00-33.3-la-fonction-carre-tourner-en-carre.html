@@ -135,6 +135,9 @@ Tes fonctions appelées :
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
     <pre><code>// ---- #include &lt;carre&gt; : tourner en carré ----
 
+// Un C qui tourne autour de la case (15, 4), en haut à droite.
+// (Le A au milieu, ce sera la leçon suivante.)
+
 #include &lt;carre&gt;      // carre() : des tours en carré
 #include &lt;ALPHABET&gt;</code></pre>
   </div>
@@ -145,7 +148,7 @@ Tes fonctions appelées :
   <div>
     <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
     <pre><code>int main() {
-  carre(10, 8, ALPHABET[0], 1, 1, 250, 1);   // centre (10, 8), taille 1, un tour
+  carre(15, 4, ALPHABET[2], 1, 1, 250, 1);   // centre (15, 4), taille 1, un tour
 
   while (true) {
     image();
@@ -169,17 +172,17 @@ programme.</p>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgUlEQVR4nO3RoQ1CQRRE0ZWUgKT/aiiBMpBffLMCS15y9iZHjJzkrs/3Hdgaf5C/KjCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwDg88OP5uo0/mSIH3rse27jAODzwbvzPCDzwz32UAuMKjJMDp8C+AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCsw7gKFfPKje1PJIgAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABf0lEQVR4nO3WsQmAQBBFQUNLMLT/aizBMgwNTCzg9OAxMAV8eMHucl4HYcv0BXxK4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wT+xLrtj+lLBB7v3XV6Y4HHmx71TeDxBI4TOM4N7vNF8xOB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LgbneL+q1Llz+UAAAAASUVORK5CYII=" alt="l’écran">
     <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgklEQVR4nO3UsQnDQBBFwQtVgkP3X41KcBkOFQh8di5x+DEwBXx47I7XeydsLF/ArQSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4B/b43lavuQqAk/fXTONBZ4Ejvv859KXFnhywXECxwnM/xE4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjjsApPTyow4LrsoAAAAASUVORK5CYII=" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgklEQVR4nO3WsQnDMBBAUZUeIaX3n8YjZIyUKQLGdbCQ+Tx49SH4HKfx/hyEjeUvYCqB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOE/gRttf+c/tkgde7dr29scDrzVjck8DrCRwncJwb3OcXzZ8EjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geO+e7z+q8zOWEkAAAAASUVORK5CYII=" alt="l’écran">
     <figcaption>au bout d’une seconde — image 60</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgUlEQVR4nO3UsQmAUBAFQUNLMLT/aizBMgwNBDEwFWH/wAQXHiy8aT82wqbfP+BTAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHDdo4HlZL79/8rURAz+75hsLLHDOvc8jrPSggV/vJIEFzhGYDoHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7guBPF3fKjNuRuCAAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgUlEQVR4nO3WsQmEQBBAUUNLuND+q7EEy7jQQDiuAB3h8+Dls/AZZpfjuxO2vP4CHiVwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAo9aP9tlbKLAc/67jjUWeM7k4v4IPEfgOIHj3OA+v2huJnCcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcdwLamf6rXltLtQAAAABJRU5ErkJggg==" alt="l’écran">
     <figcaption>au bout de trois secondes — image 180</figcaption>
   </figure>
 </div>
@@ -187,7 +190,7 @@ programme.</p>
 
 
 <h2>4. Ce qu’on doit voir</h2>
-<p class="avoir">Un A qui fait un tour en carré autour du milieu, puis s’y arrête.</p>
+<p class="avoir">Un C qui fait un tour en carré autour de la case (15, 4), puis s’y arrête.</p>
 
 <h2>5. Ce que la console répond</h2>
 <p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
@@ -196,9 +199,9 @@ et voici ce qu’ils ont mesuré.</p>
 
 <ul class="controles">
 
-  <li>les quatre coins, dans le sens des aiguilles <span class="detail"> (9,7 11,7 11,9 9,9)</span></li>
+  <li>les quatre coins, dans le sens des aiguilles <span class="detail"> (14,3 16,3 16,5 14,5)</span></li>
 
-  <li>le A revient au centre </li>
+  <li>le C revient au centre </li>
 </ul>
 
 

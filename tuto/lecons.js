@@ -563,7 +563,7 @@ int main() {            // Le programme commence ici.
   },
 
   {
-    titre: 'La même ligne, avec une boucle for',
+    titre: 'La boucle for : la ligne en trois lignes de code',
     difficulte: 0,
     idee: 'Vingt lignes presque pareilles deviennent une seule, répétée vingt fois.',
     texte: [
@@ -595,7 +595,7 @@ int main() {
   },
 
   {
-    titre: 'La même ligne, avec une boucle for — de base, ailleurs',
+    titre: 'La boucle for : la ligne en trois lignes de code — de base, ailleurs',
     difficulte: 0,
     suite: true,
     idee: 'Le 0.5 sur la ligne 5 : un seul nombre change dans la boucle.',
@@ -628,7 +628,7 @@ int main() {
   },
 
   {
-    titre: 'La même ligne, avec une boucle for — doublé, deux positions',
+    titre: 'La boucle for : la ligne en trois lignes de code — doublé, deux positions',
     difficulte: 0,
     suite: true,
     idee: 'La boucle deux fois : la ligne 0 puis la ligne 5.',
@@ -665,7 +665,7 @@ int main() {
   },
 
   {
-    titre: 'La même ligne, avec une boucle while',
+    titre: 'La boucle while : les trois morceaux du for, séparés',
     difficulte: 0,
     idee: 'La boucle for, décomposée en ses trois morceaux.',
     texte: [
@@ -700,7 +700,7 @@ int main() {
   },
 
   {
-    titre: 'La même ligne, avec une boucle while — de base, ailleurs',
+    titre: 'La boucle while : les trois morceaux du for, séparés — de base, ailleurs',
     difficulte: 0,
     suite: true,
     idee: 'Le 0.6 sur la ligne 5 : un seul nombre change dans la boucle.',
@@ -735,7 +735,7 @@ int main() {
   },
 
   {
-    titre: 'La même ligne, avec une boucle while — doublé, deux positions',
+    titre: 'La boucle while : les trois morceaux du for, séparés — doublé, deux positions',
     difficulte: 0,
     suite: true,
     idee: 'La boucle deux fois : la ligne 0 puis la ligne 5.',
@@ -776,7 +776,7 @@ int main() {
   },
 
   {
-    titre: 'La même ligne, avec do … while',
+    titre: 'La boucle do … while : au moins un tour',
     difficulte: 0,
     idee: 'La boucle qui vérifie sa condition à la fin : elle fait toujours au moins un tour.',
     texte: [
@@ -815,7 +815,7 @@ int main() {                    // Le programme commence ici.
   },
 
   {
-    titre: 'La même ligne, avec do … while — de base, ailleurs',
+    titre: 'La boucle do … while : au moins un tour — de base, ailleurs',
     difficulte: 0,
     suite: true,
     idee: 'Le 0.7 sur la ligne 5 : un seul nombre change dans la boucle.',
@@ -850,7 +850,7 @@ int main() {
   },
 
   {
-    titre: 'La même ligne, avec do … while — doublé, deux positions',
+    titre: 'La boucle do … while : au moins un tour — doublé, deux positions',
     difficulte: 0,
     suite: true,
     idee: 'La boucle deux fois : la ligne 0 puis la ligne 5.',
@@ -9562,25 +9562,26 @@ int main() {
     titre: 'Plus fluide : la lettre au pixel près — en simple',
     difficulte: 0,
     suite: true,
-    idee: 'Le 0.70 en une ligne : glisse_croix(0, px, py, ALPHABET[0], 1).',
+    idee: 'Le 0.70 en une ligne : glisse_croix(0, px, py, ALPHABET[2], 1). Cette fois, un C, parti du pixel (120, 20).',
     texte: [
-      '**C’est le 0.70, en plus simple :** les quatre `if` des flèches et le `sprite` sont remplacés par une ligne, `glisse_croix` (le 0.73).',
+      '**C’est le 0.70, en plus simple :** les quatre `if` des flèches et le `sprite` sont remplacés par une ligne, `glisse_croix` (le 0.73 la reprend avec le A au milieu).',
+      '**Une autre lettre, ailleurs :** un C (`ALPHABET[2]`), parti du pixel (120, 20), en haut à droite.',
       '**La vitesse, 1 :** un pixel par image, comme au 0.70.',
     ],
     code: `#include <glisse_croix>   // un lutin qui suit la croix, au pixel près
-#include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
+#include <ALPHABET>       // les lettres de la police : ALPHABET[2] est le C
 
-uint8_t px = 76;      // en pixels : le milieu
-uint8_t py = 68;
+uint8_t px = 120;     // le C, en pixels : en haut à droite
+uint8_t py = 20;
 
 int main() {
   while (true) {
     image();
-    glisse_croix(0, px, py, ALPHABET[0], 1);   // tout le 0.70
+    glisse_croix(0, px, py, ALPHABET[2], 1);   // tout le 0.70, en une ligne
   }
 }
 `,
-    aVoir: 'Comme au 0.70 : un A qui glisse pixel par pixel avec les flèches.',
+    aVoir: 'Un C en haut à droite, qui glisse pixel par pixel avec les flèches, comme le A du 0.70.',
     controle: (c) => {
       c.avancer(10)
       const d = c.lutin(0).x
@@ -23362,7 +23363,7 @@ int main() {
   {
     titre: 'La fonction texteGrand() — un texte agrandi',
     difficulte: 0,
-    idee: '#include <texteGrand> : texteGrand(colonne, ligne, "A", 3) écrit un A trois fois plus grand, sans rien dessiner.',
+    idee: '#include <texteGrand> : texteGrand(colonne, ligne, "B", 3) écrit un B trois fois plus grand, sans rien dessiner.',
     texte: [
       '**Ce qu’elle fait :** `texteGrand(colonne, ligne, "TEXTE", taille)` écrit un texte **agrandi** de 1 à 20 fois. Chaque pixel de la lettre devient un carré de `taille × taille` pixels : une lettre prend `taille × taille` cases.',
       '**La ligne à écrire : `#include <texteGrand>`.**',
@@ -23371,19 +23372,20 @@ int main() {
       '**Essaie :** `texteGrand(0, 0, "GO", 5);` : deux lettres de 5 × 5 cases.',
     ],
     code: `// ---- #include <texteGrand> : un texte agrandi ----
-// Un A trois fois plus grand : 3 × 3 cases, à partir de la case (2, 2).
+// Un B trois fois plus grand : 3 × 3 cases, à partir de la case (2, 2).
+// (Le A, ce sera la leçon « Agrandir une lettre », juste après.)
 
 #include <texteGrand>   // texteGrand() : les lettres agrandies
 
 int main() {
-  texteGrand(2, 2, "A", 3);   // colonne 2, ligne 2, le texte, la taille
+  texteGrand(2, 2, "B", 3);   // colonne 2, ligne 2, le texte, la taille
 
   while (true) {
     image();
   }
 }
 `,
-    aVoir: 'Un grand A, trois cases de large et trois de haut, en haut à gauche.',
+    aVoir: 'Un grand B, trois cases de large et trois de haut, en haut à gauche.',
     controle: (c) => {
       let pleines = 0
       for (let l = 2; l < 5; l++) for (let k = 2; k < 5; k++) if (c.lire(k, l) !== 0) pleines++
@@ -23872,6 +23874,39 @@ int main() {
   },
 
   {
+    titre: 'La fonction bande() — la même tuile, plusieurs fois',
+    difficulte: 0,
+    idee: '#include <bande> : bande(colonne, ligne, tuile, longueur) pose la même tuile « longueur » fois, de gauche à droite.',
+    texte: [
+      '**Ce qu’elle fait :** `bande(2, 5, ALPHABET[0], 10)` pose **dix A** sur la ligne 5, des colonnes 2 à 11 — comme dix `poser()` d’affilée, une case plus à droite à chaque fois.',
+      '**La ligne à écrire : `#include <bande>`.**',
+      '**Ses arguments :** la colonne et la ligne de la première case, la tuile, et combien de fois la poser.',
+      '**D’où elle vient :** c’est la fonction que le chapitre « Tes propres #include » écrit d’abord dans le programme, puis range dans un fichier voisin, et fait enfin entrer dans la console. Elle est écrite en C, comme une fonction de l’élève (`compilateur/emetteur.js`, `SOURCE_BANDE`).',
+      '**Ce qu’elle coûte :** sa boucle, et `poser()` qu’elle appelle — gravées seulement si le programme appelle `bande()`.',
+      '**Essaie :** `bande(0, 17, ALPHABET[1], 20);` — une ligne de B tout en bas.',
+    ],
+    code: `// ---- #include <bande> : la même tuile, plusieurs fois ----
+// Dix A sur la ligne 5, des colonnes 2 à 11, en un seul appel.
+
+#include <ALPHABET>   // les lettres : ALPHABET[0] est le A
+#include <bande>      // bande() : la même tuile, de gauche à droite
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // colonne 2, ligne 5, le A, dix fois
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Dix A côte à côte sur la ligne 5.',
+    controle: (c) => [
+      ['dix A, des colonnes 2 à 11', c.mot(2, 5, 10) === 'AAAAAAAAAA'],
+      ['et pas un de plus', c.mot(12, 5, 1) !== 'A'],
+    ],
+  },
+
+  {
     titre: 'La fonction effacerPanneau() — effacer dans le panneau',
     difficulte: 0,
     idee: '#include <effacerPanneau> : effacerPanneau(colonne, ligne, quoi) efface un mot du panneau ; sans argument, tout le panneau.',
@@ -24115,6 +24150,158 @@ int main() {
   },
 
   {
+    titre: 'ALPHABET_TITRE — les lettres des titres',
+    difficulte: 0,
+    idee: '#include <ALPHABET_TITRE> : ALPHABET_TITRE[0] est le A des titres — une lettre épaisse, avec une ombre grise —, pour écrire le nom d’un jeu sur son écran titre.',
+    texte: [
+      '**Ce que c’est :** un **troisième alphabet**, pour les **titres** : des lettres **épaisses** (comme `ALPHABET_GRAS`) avec une **ombre** grise en bas à droite, qui leur donne du relief — le genre de lettres qu’on voit sur l’écran titre d’un jeu Game Boy. `ALPHABET_TITRE[0]` est le A, `ALPHABET_TITRE[25]` le Z. L’alphabet ordinaire ne change pas.',
+      '**La ligne à écrire : `#include <ALPHABET_TITRE>`.**',
+      '**Comment trouver une lettre :** le nombre entre crochets est sa **place dans l’alphabet**, en comptant à partir de 0. A = 0, B = 1, C = 2… T = 19. Pour écrire « TITRE » : T = 19, I = 8, T = 19, R = 17, E = 4.',
+      '**Chaque lettre est une tuile** de 8 × 8, avec trois nuances : le fond (0), l’ombre (2) et le trait (3). On la pose avec `poser()`, comme n’importe quelle tuile, une case par lettre.',
+      '**Ce qu’il coûte :** **beaucoup**, environ **1 200 octets** dès la première lettre — les 26 dessins et le tableau qui les range partent ensemble. C’est fait pour un **titre**, pas pour tout le texte du jeu.',
+      '**Ce sont nos lettres :** elles sont calculées à partir de la police de l’atelier, dans le style des titres de la Game Boy, sans recopier celles d’aucun jeu.',
+      '**Essaie :** écris le nom de ton jeu. Une lettre par case : `poser(colonne, ligne, ALPHABET_TITRE[place])`.',
+    ],
+    code: `// ---- #include <ALPHABET_TITRE> : les lettres des titres ----
+// Le mot « TITRE » en lettres de titre — épaisses, avec une ombre —,
+// et en dessous, le même mot en lettres ordinaires, pour comparer.
+
+#include <ALPHABET_TITRE>   // ALPHABET_TITRE : 26 lettres de titre
+#include <poser>            // poser() : une tuile sur une case du fond
+#include <texte>            // texte() : le même mot, en lettres ordinaires
+
+int main() {
+  // ALPHABET_TITRE[place] : la place de la lettre dans l'alphabet, à partir de 0.
+  //   A = 0, B = 1, C = 2, … E = 4, … I = 8, … R = 17, … T = 19
+  poser(7, 6, ALPHABET_TITRE[19]);    // T
+  poser(8, 6, ALPHABET_TITRE[8]);     // I
+  poser(9, 6, ALPHABET_TITRE[19]);    // T
+  poser(10, 6, ALPHABET_TITRE[17]);   // R
+  poser(11, 6, ALPHABET_TITRE[4]);    // E
+
+  texte(7, 9, "TITRE");               // le même mot, en lettres ordinaires
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'TITRE en grandes lettres épaisses avec une ombre grise, et en dessous, TITRE en lettres ordinaires.',
+    controle: (c) => {
+      const t = c.lire(7, 6)
+      /* L'ombre : au moins un pixel gris (2) dans les cases du mot de titre. */
+      let ombre = 0
+      for (let y = 48; y < 56; y++) for (let x = 56; x < 96; x++) if (c.gb.framebuffer[y * 160 + x] === 2) ombre++
+      return [
+        ['les deux T sont la même tuile de titre', t !== 0 && c.lire(9, 6) === t, ` (${t})`],
+        ['les cinq lettres sont posées, toutes différentes du T sauf le second', [8, 10, 11].every((col) => c.lire(col, 6) !== t && c.lire(col, 6) !== 0)],
+        ['ce n’est pas le T ordinaire', t !== c.lire(7, 9)],
+        ['les lettres ont leur ombre grise', ombre > 10, ` (${ombre} pixels gris)`],
+        ['et en dessous, TITRE en lettres ordinaires', c.mot(7, 9, 5) === 'TITRE'],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction texteTitre() — un mot en GROSSES lettres de titre',
+    difficulte: 0,
+    idee: '#include <texteTitre> : texteTitre(colonne, ligne, "MOT") écrit un mot entier en grosses lettres rondes, avec un contour noir et une ombre, qui sautillent — comme le nom d’un jeu sur son écran titre.',
+    texte: [
+      '**Ce que c’est :** une fonction qui écrit un **mot entier** en **GROSSES lettres de titre** : rondes, l’intérieur clair, un **contour noir épais** et une **ombre** grise, et **une lettre sur deux un peu plus bas**, pour que le mot **sautille**. C’est le style des écrans titres des jeux Game Boy « dessin animé ».',
+      '**La ligne à écrire : `#include <texteTitre>`.**',
+      '**Comment on l’appelle :** `texteTitre(colonne, ligne, "MOT")` — comme `texte()`, la colonne (0 à 19) et la ligne (0 à 17) de la **première** lettre, puis le mot entre guillemets.',
+      '**La taille :** chaque lettre prend **3 colonnes et 3 lignes** (24 × 24 pixels, neuf cases). L’écran a 20 colonnes : **6 lettres par ligne au plus**. Pour un titre plus long, deux appels, l’un sous l’autre. Si le mot ne tient pas, le compilateur le dit, avec le calcul.',
+      '**Ce qu’il coûte :** seules **les lettres du mot** vont dans la cartouche, et **une case dessinée pareil ne coûte qu’une tuile** : dans « TITRE », les deux T ne coûtent qu’une fois. L’alphabet entier, à neuf cases par lettre, ne tiendrait pas : la console n’a que 256 tuiles.',
+      '**Ce sont nos lettres :** elles sont calculées à partir de la police de l’atelier (le gras, agrandi deux fois, les coins arrondis, puis le contour et l’ombre), dans ce style, sans recopier celles d’aucun jeu.',
+      '**Différence avec `ALPHABET_TITRE` :** `ALPHABET_TITRE` donne des lettres d’**une** case, posées une par une avec `poser()`. `texteTitre()` écrit le **mot entier**, en lettres **neuf fois plus grandes**.',
+      '**Essaie :** écris le nom de ton jeu à la place de « TITRE ». Les lettres connues : A à Z, 0 à 9, et ! ? . - : # |. Une espace laisse 3 colonnes vides.',
+    ],
+    code: `// ---- #include <texteTitre> : des GROSSES lettres de titre ----
+// Le mot « TITRE » en grosses lettres de titre, d'un seul appel.
+
+#include <texteTitre>   // texteTitre() : un mot en GROSSES lettres de titre
+
+int main() {
+  // texteTitre(colonne, ligne, "MOT") : la première lettre en (colonne, ligne).
+  // Chaque lettre prend 3 colonnes : T de 3 à 5, I de 6 à 8, T de 9 à 11,
+  // R de 12 à 14, E de 15 à 17 ; et 3 lignes : de 6 à 8.
+  texteTitre(3, 6, "TITRE");
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'TITRE en grosses lettres rondes, contour noir et ombre grise, au milieu de l’écran ; le I et le R un peu plus bas que les autres : le mot sautille.',
+    controle: (c) => {
+      const fb = c.gb.framebuffer
+      /* Les pixels sombres (3) et gris (2) dans la rangée de pixels y, entre les colonnes de pixels x0 et x1. */
+      const compter = (y, x0, x1, teinte) => { let n = 0; for (let x = x0; x < x1; x++) if (fb[y * 160 + x] === teinte) n++; return n }
+      let ombre = 0
+      for (let y = 48; y < 72; y++) ombre += compter(y, 24, 144, 2)
+      /* Le haut du T (lettre 0, pixels 24 à 47) commence à la rangée 48 ; celui du I (lettre 1, pixels 48 à 71), 4 pixels plus bas. */
+      const hautDuT = compter(48, 24, 48, 3)
+      const hautDuI = compter(48, 48, 72, 3)
+      return [
+        ['le mot occupe les cases de la colonne 3 à 17, ligne 6', c.lire(4, 6) !== 0 && c.lire(16, 7) !== 0],
+        ['les deux T sont faits des mêmes tuiles : ils ne coûtent qu’une fois', c.lire(3, 7) === c.lire(9, 7) && c.lire(4, 6) === c.lire(10, 6), ` (${c.lire(4, 6)})`],
+        ['les lettres ont leur ombre grise', ombre > 30, ` (${ombre} pixels gris)`],
+        ['le I est plus bas que le T : le mot sautille', hautDuT > 0 && hautDuI === 0, ` (T : ${hautDuT}, I : ${hautDuI})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction texteManga() — un titre entre manga et dessin animé',
+    difficulte: 0,
+    idee: '#include <texteManga> : texteManga(colonne, ligne, "MOT") écrit un mot en lettres de titre penchées, aux coins coupés, avec une trame grise et une ombre portée.',
+    texte: [
+      '**Ce que c’est :** un **deuxième style** de lettres de titre, à mi-chemin entre les **titres de manga** et ceux des **dessins animés**. Les lettres sont **penchées** vers la droite, comme si elles fonçaient ; leurs coins sont **coupés en biais** ; le contour noir est **carré**, aux angles vifs ; le **bas** de chaque lettre est en **trame** (un pixel sur deux en gris clair), comme les trames des pages de manga ; une **ombre portée** grise les détache du fond. Et, côté dessin animé, une lettre sur deux est un peu plus bas.',
+      '**La ligne à écrire : `#include <texteManga>`.**',
+      '**Comment on l’appelle :** exactement comme `texteTitre()` : `texteManga(colonne, ligne, "MOT")`, et un 4ᵉ argument facultatif pour la taille — 2, 3 (si on ne la donne pas) ou 4 cases de côté par lettre.',
+      '**La place :** en taille 3, chaque lettre prend 3 colonnes et 3 lignes. « MANGA » (5 lettres) prend 15 colonnes : en commençant en colonne 2, il va de 2 à 16.',
+      '**Ce qu’il coûte :** comme `texteTitre()`, seules **les lettres du mot** vont dans la cartouche. Dans « MANGA », les deux A sont-ils les mêmes tuiles ? Non : le premier A est la lettre 1 (un peu plus bas), le second la lettre 4 (en haut). Ils sont dessinés différemment, donc gravés deux fois.',
+      '**Ce sont nos lettres :** calculées à partir de la police de l’atelier (le gras, agrandi, penché, les coins coupés, puis le contour, la trame et l’ombre), sans recopier celles d’aucun manga ni d’aucun jeu.',
+      '**Essaie :** écris le nom de ton jeu à la place de « MANGA », puis change la taille : `texteManga(2, 6, "MANGA", 2)`.',
+    ],
+    code: `// ---- #include <texteManga> : un titre entre manga et dessin animé ----
+// Le mot « MANGA » en lettres de titre manga, d'un seul appel.
+
+#include <texteManga>   // texteManga() : penchées, coins coupés, une trame
+
+int main() {
+  // texteManga(colonne, ligne, "MOT") : la première lettre en (colonne, ligne).
+  // Taille 3 (la taille si on ne la donne pas) : chaque lettre prend 3 colonnes
+  // et 3 lignes. M de 2 à 4, A de 5 à 7, N de 8 à 10, G de 11 à 13, A de 14 à 16.
+  texteManga(2, 6, "MANGA");
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'MANGA en grosses lettres penchées vers la droite, aux coins coupés, le bas des lettres en trame grise, avec une ombre portée.',
+    controle: (c) => {
+      const fb = c.gb.framebuffer
+      /* Le pixel noir le plus à gauche d'une rangée de pixels, entre x0 et x1. */
+      const gauche = (y, x0, x1) => { for (let x = x0; x < x1; x++) if (fb[y * 160 + x] === 3) return x; return -1 }
+      let trame = 0, ombre = 0
+      for (let y = 48; y < 72; y++) for (let x = 16; x < 136; x++) {
+        if (fb[y * 160 + x] === 1) trame++
+        if (fb[y * 160 + x] === 2) ombre++
+      }
+      /* La barre gauche du M : en haut (rangée 50), elle commence plus à droite qu'en bas (rangée 64). */
+      const haut = gauche(50, 16, 40), bas = gauche(64, 16, 40)
+      return [
+        ['le mot occupe les cases de la colonne 2 à 16, ligne 6', c.lire(3, 7) !== 0 && c.lire(15, 7) !== 0],
+        ['les lettres sont penchées : le haut du M est plus à droite que le bas', haut > bas && bas >= 0, ` (haut ${haut}, bas ${bas})`],
+        ['le bas des lettres est en trame', trame > 30, ` (${trame} pixels de trame)`],
+        ['et elles ont leur ombre portée', ombre > 30, ` (${ombre} pixels d’ombre)`],
+      ]
+    },
+  },
+
+  {
     titre: 'Tuile — dessiner une case',
     difficulte: 0,
     idee: '#include <Tuile> : Tuile NOM = { huit rangées de huit pixels }; dessine une case à toi, que poser() pose comme une lettre.',
@@ -24158,21 +24345,34 @@ int main() {
   },
 
   {
-    titre: 'Perso — dessiner un personnage de 16 × 16',
+    titre: 'Perso — dessiner des personnages',
     difficulte: 0,
-    idee: '#include <Perso> : Perso NOM = { seize rangées de seize pixels }; un personnage entier, que sprite16() promène au pixel près.',
+    idee: '#include <Perso> : Perso NOM = { … }; un personnage (16 × 16 ou 32 × 32). Deux personnages, deux dessins, DEUX FICHIERS : perso_BONHOMME.cpp et perso_ROBOT.cpp, rangés par une liste, personnages.cpp, qui porte UNE fois #include <Perso> ; la source verse la liste d’une ligne et les pose pour les voir.',
     texte: [
-      '**Ce que c’est :** un **Perso** est un dessin de **16 × 16 pixels** : seize rangées de seize signes. Le compilateur le coupe en quatre tuiles.',
-      '**La ligne à écrire : `#include <Perso>`.** Un Perso écrit ne s’affiche pas tout seul : c’est un dessin rangé, prêt à servir. L’étape suivante, `sprite16()`, le montre à l’écran.',
-      '**Ce qu’il coûte :** **64 octets** de dessin (quatre tuiles) — gravés quand on s’en sert.',
-      '**Essaie :** change une rangée, puis passe à l’étape suivante pour le voir.',
+      '**Ce que c’est :** un **Perso** est un **personnage** : un dessin de **16 × 16 pixels** (seize rangées de seize signes) ou de **32 × 32** (trente-deux rangées de trente-deux). Sa taille se lit sur son dessin. Le compilateur le coupe en tuiles de 8 × 8 qui se suivent : quatre pour un 16 × 16 — haut-gauche, haut-droite, bas-gauche, bas-droite.',
+      '**Un personnage, un fichier : le dessin 1, le dessin 2.** BONHOMME est dessiné dans **`perso_BONHOMME.cpp`**, ROBOT dans **`perso_ROBOT.cpp`** : deux onglets à côté de `principal.cpp`, un dessin chacun — comme deux images. Pour changer ROBOT, on n’ouvre que son fichier.',
+      '**Deux personnages, deux noms : `BONHOMME` et `ROBOT`.** Chacun a son `Perso NOM = { … };`. Le nom est ce qui compte : c’est par lui qu’on l’appellera partout dans le jeu.',
+      '**La liste, `personnages.cpp` : l’include qui inclut tous les fichiers.** Elle porte **`#include <Perso>` UNE fois**, pour tous les personnages (cette ligne n’est pas celle d’un personnage : elle dit « on a le droit d’écrire des Perso »), puis une ligne par personnage : `#include "perso_BONHOMME.cpp"`, `#include "perso_ROBOT.cpp"`. **`principal.cpp` n’a qu’UNE ligne pour les avoir tous :** `#include "personnages.cpp"`.',
+      '**Comment ça colle :** `#include "personnages.cpp"` colle la liste ; la liste colle chaque `perso_…` (des guillemets : des fichiers à toi, comme `variables.h` au 0.67). BONHOMME et ROBOT arrivent, chacun avec son nom.',
+      '**Pour les voir tout de suite**, on les pose sur le fond, chacun en **quatre cases**, avec `poser()` que tu connais : `BONHOMME` est le numéro de sa première tuile (le quart haut-gauche), `BONHOMME + 1` la suivante (haut-droite), `BONHOMME + 2` (bas-gauche), `BONHOMME + 3` (bas-droite). Pareil pour `ROBOT`.',
+      '**Déroulé :** BONHOMME à gauche, en colonnes 4 et 5, lignes 8 et 9 ; ROBOT à droite, en colonnes 14 et 15, lignes 8 et 9. Ses tuiles viennent juste après celles de BONHOMME : `ROBOT` vaut `BONHOMME + 4`.',
+      '**Sur le fond, ils ne bougent pas** : ils sont collés à la grille des cases. L’étape suivante, `sprite16()`, en fait des **lutins**, qui se déplacent au pixel près.',
+      '**Ce qu’ils coûtent :** **64 octets** de dessin chacun (quatre tuiles). La ligne `#include <Perso>`, elle, ne coûte rien.',
+      '**Essaie :** dans l’onglet `perso_ROBOT.cpp`, change les yeux de ROBOT (les `+`) : seul ROBOT change. Ou ajoute un troisième personnage : un fichier `perso_…` de plus, et une ligne de plus dans la liste `personnages.cpp` — `principal.cpp` ne change pas.',
     ],
-    code: `// ---- #include <Perso> : un personnage de 16 × 16 ----
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
 
-#include <Perso>      // Perso : un dessin de 16 × 16
-#include <texte>
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
 
-// Le dessin : seize rangées de seize signes. Il est écrit, pas encore montré.
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+#include "perso_ROBOT.cpp"   // un robot, 16 × 16
+`,
+      'perso_BONHOMME.cpp': `// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
 Perso BONHOMME = {
   "......####......",
   ".....######.....",
@@ -24191,20 +24391,73 @@ Perso BONHOMME = {
   "....###..###....",
   "....###..###....",
 };
+`,
+      'perso_ROBOT.cpp': `// perso_ROBOT.cpp : un robot, ROBOT (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso ROBOT = {
+  "..############..",
+  "..#..........#..",
+  "..#.++....++.#..",
+  "..#.++....++.#..",
+  "..#..........#..",
+  "..#..######..#..",
+  "..############..",
+  "......####......",
+  ".##############.",
+  ".#.##########.#.",
+  ".#.##########.#.",
+  ".#.##########.#.",
+  "...##########...",
+  "...###....###...",
+  "...###....###...",
+  "..####....####..",
+};
+`,
+    },
+    code: `// ---- #include <Perso> : un personnage de 16 × 16 ----
+// BONHOMME et ROBOT sont dessinés chacun dans SON fichier ; la liste
+// personnages.cpp les inclut tous. Ici, UNE ligne verse la liste, et on
+// pose chacun en quatre cases pour les voir.
+
+#include <poser>             // poser() : une tuile sur une case du fond
+#include "personnages.cpp"   // la liste : BONHOMME et ROBOT
 
 int main() {
-  texte(2, 8, "UN PERSO ECRIT");
-  texte(2, 10, "SPRITE16 LE MONTRE");
+  // Un Perso de 16 × 16, ce sont quatre tuiles qui se suivent :
+  //   NOM      le quart haut-gauche     NOM + 1  le quart haut-droite
+  //   NOM + 2  le quart bas-gauche      NOM + 3  le quart bas-droite
+
+  // BONHOMME, à gauche : colonnes 4 et 5, lignes 8 et 9
+  poser(4, 8, BONHOMME);
+  poser(5, 8, BONHOMME + 1);
+  poser(4, 9, BONHOMME + 2);
+  poser(5, 9, BONHOMME + 3);
+
+  // ROBOT, à droite : colonnes 14 et 15, lignes 8 et 9
+  poser(14, 8, ROBOT);
+  poser(15, 8, ROBOT + 1);
+  poser(14, 9, ROBOT + 2);
+  poser(15, 9, ROBOT + 3);
 
   while (true) {
     image();
   }
 }
 `,
-    aVoir: 'UN PERSO ECRIT : le dessin compile ; l’étape suivante le montre.',
-    controle: (c) => [
-      ['le programme compile avec son Perso', c.mot(2, 8, 14) === 'UN PERSO ECRIT'],
-    ],
+    aVoir: 'Deux personnages sur le fond : le bonhomme à gauche, le robot à droite.',
+    controle: (c) => {
+      const b = c.lire(4, 8)
+      const r = c.lire(14, 8)
+      const px = (x, y) => c.gb.framebuffer[y * 160 + x]
+      return [
+        ['BONHOMME : ses quatre quarts en carré, colonnes 4-5', b >= 44 && c.lire(5, 8) === b + 1 && c.lire(4, 9) === b + 2 && c.lire(5, 9) === b + 3, ` (tuile ${b})`],
+        ['ROBOT : ses quatre quarts en carré, colonnes 14-15', c.lire(15, 8) === r + 1 && c.lire(14, 9) === r + 2 && c.lire(15, 9) === r + 3],
+        ['ROBOT a ses tuiles à lui, juste après BONHOMME', r === b + 4, ` (${b}, ${r})`],
+        ['et on les voit : la tête du bonhomme, le haut du robot', px(39, 66) === 3 && px(119, 64) === 3],
+      ]
+    },
   },
 
   {
@@ -24291,43 +24544,337 @@ int main() {
   {
     titre: 'La fonction sprite16() — un personnage de 16 × 16',
     difficulte: 0,
-    idee: '#include <sprite16> : sprite16(numero, x, y, PERSO) place quatre lutins en carré, d’un appel.',
+    idee: '#include <sprite16> : sprite16(numero, x, y, PERSO) place un personnage de 16 × 16 — quatre lutins en carré — d’un appel. BONHOMME et ROBOT, chacun de son fichier, descendent ensemble.',
     texte: [
-      '**Ce qu’elle fait :** `sprite16(numero, x, y, perso)` place un personnage de **16 × 16** : les lutins `numero` à `numero + 3`, en carré. Le dessin est un `Perso`, ou seize rangées écrites sur place.',
+      '**Ce qu’elle fait :** `sprite16(numero, x, y, perso)` place un personnage de **16 × 16** au pixel près : les lutins `numero` à `numero + 3`, en carré, par-dessus le fond. Un seul appel, au lieu des quatre `poser()` du 35.1 — et il peut bouger.',
       '**La ligne à écrire : `#include <sprite16>`.**',
-      '**Ses arguments :** comme `sprite()` ; le numéro du premier des quatre lutins.',
-      '**Ce qu’elle coûte :** environ **270 octets** avec son dessin.',
-      '**Essaie :** un deuxième personnage avec le numéro 4 : les lutins 4 à 7.',
+      '**Ses arguments :** le numéro du **premier** des quatre lutins, x et y (le coin haut-gauche, en pixels), et le **nom** du personnage. Un cinquième, `MIROIR_X`, le retourne.',
+      '**Deux personnages, deux appels, chacun ses lutins :** `sprite16(0, 40, y, BONHOMME)` prend les lutins 0 à 3 ; `sprite16(4, 104, y, ROBOT)` les lutins 4 à 7. Le second commence à 4 : un personnage de 16 × 16 occupe **quatre** lutins, il ne faut pas qu’ils se chevauchent.',
+      '**Les personnages viennent de leurs fichiers**, ceux du 35.1, sans changement : la liste `personnages.cpp` les inclut, et `principal.cpp` la verse d’une ligne.',
+      '**Déroulé :** `y` part de 0 et grandit d’un pixel à chaque image jusqu’à 120 ; à chaque tour, les deux `sprite16` les reposent à la hauteur `y` : ils descendent ensemble, et s’arrêtent en bas.',
+      '**Ce qu’elle coûte :** environ **270 octets** avec ses dessins.',
+      '**Pour un personnage de 32 × 32**, c’est `sprite32()`, avec seize lutins.',
+      '**Essaie :** fais descendre ROBOT moins vite : `sprite16(4, 104, y / 2, ROBOT)`.',
     ],
-    code: `// ---- #include <sprite16> : un personnage de 16 × 16 ----
-// Un bloc 16 × 16, écrit sur place, qui descend d'un pixel par image.
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
 
-#include <sprite16>   // sprite16() : quatre lutins en carré
-#include <Perso>      // le dessin de 16 × 16
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
 
-Perso BLOC = {
-  "################", "#..............#", "#.############.#", "#.#..........#.#",
-  "#.#.########.#.#", "#.#.#......#.#.#", "#.#.#.####.#.#.#", "#.#.#.#..#.#.#.#",
-  "#.#.#.#..#.#.#.#", "#.#.#.####.#.#.#", "#.#.#......#.#.#", "#.#.########.#.#",
-  "#.#..........#.#", "#.############.#", "#..............#", "################",
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+#include "perso_ROBOT.cpp"   // un robot, 16 × 16
+`,
+      'perso_BONHOMME.cpp': `// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
 };
+`,
+      'perso_ROBOT.cpp': `// perso_ROBOT.cpp : un robot, ROBOT (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
 
-uint8_t y = 0;
+Perso ROBOT = {
+  "..############..",
+  "..#..........#..",
+  "..#.++....++.#..",
+  "..#.++....++.#..",
+  "..#..........#..",
+  "..#..######..#..",
+  "..############..",
+  "......####......",
+  ".##############.",
+  ".#.##########.#.",
+  ".#.##########.#.",
+  ".#.##########.#.",
+  "...##########...",
+  "...###....###...",
+  "...###....###...",
+  "..####....####..",
+};
+`,
+    },
+    code: `// ---- #include <sprite16> : un personnage de 16 × 16 ----
+// BONHOMME et ROBOT (chacun dans son fichier) descendent d'un pixel par image.
+
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include "personnages.cpp"   // la liste : BONHOMME et ROBOT
+
+uint8_t y = 0;   // la hauteur des deux personnages, en pixels
 
 int main() {
   while (true) {
     image();
-    if (y < 120) y = y + 1;     // il descend, et s'arrête en 120
-    sprite16(0, 72, y, BLOC);   // les lutins 0, 1, 2, 3
+    if (y < 120) y = y + 1;          // ils descendent, et s'arrêtent en 120
+    sprite16(0, 40, y, BONHOMME);    // BONHOMME : les lutins 0, 1, 2, 3
+    sprite16(4, 104, y, ROBOT);      // ROBOT    : les lutins 4, 5, 6, 7
   }
 }
 `,
-    aVoir: 'Un bloc carré qui descend au milieu de l’écran, et s’arrête en bas.',
+    aVoir: 'Le bonhomme et le robot descendent ensemble, côte à côte, et s’arrêtent en bas.',
     controle: (c) => {
       c.avancer(150)
       return [
-        ['le bloc est arrivé en y = 120', c.lutin(0).y === 120, ` (${c.lutin(0).y})`],
-        ['les quatre lutins font un carré de 16', c.lutin(1).x === 80 && c.lutin(2).y === 128 && c.lutin(3).x === 80],
+        ['BONHOMME est arrivé en y = 120', c.lutin(0).y === 120 && c.lutin(0).x === 40, ` (${c.lutin(0).x}, ${c.lutin(0).y})`],
+        ['ses quatre lutins font un carré de 16', c.lutin(1).x === 48 && c.lutin(2).y === 128 && c.lutin(3).x === 48],
+        ['ROBOT, lutins 4 à 7, en (104, 120)', c.lutin(4).x === 104 && c.lutin(4).y === 120 && c.lutin(7).x === 112],
+        ['chacun avec ses tuiles', c.lutin(4).tuile === c.lutin(0).tuile + 4],
+      ]
+    },
+  },
+
+  {
+    titre: 'Grand — l’autre nom d’un Perso de 32 × 32',
+    difficulte: 0,
+    idee: '#include <Grand> : Grand NOM = { trente-deux rangées }; l’autre nom d’un Perso de 32 × 32. Un Perso de trente-deux rangées est déjà un 32 × 32 : Grand ne sert qu’à le dire dans le nom du type.',
+    texte: [
+      '**Un personnage de 32 × 32 est un Perso** : `Perso BOSS = { … }` avec trente-deux rangées de trente-deux signes, et `#include <Perso>`. **`Grand` en est l’autre nom**, pour qui veut que le type dise la taille. Les deux donnent exactement la même chose.',
+      '**Ce que c’est :** un **Grand** est un dessin de **32 × 32 pixels** : trente-deux rangées de trente-deux signes. C’est quatre fois un `Perso` : le compilateur le coupe en **quatre quarts de 16 × 16**, rangés l’un après l’autre (haut-gauche, haut-droite, bas-gauche, bas-droite), soit **seize tuiles**.',
+      '**La ligne à écrire : `#include <Grand>`.** Un Grand écrit ne s’affiche pas tout seul : c’est un dessin rangé, prêt à servir. `sprite32()` le montre à l’écran (chapitre 6, avec les personnages).',
+      '**Ce qu’il coûte :** **256 octets** de dessin (seize tuiles de seize octets) — gravés quand on s’en sert.',
+      '**Dans l’atelier :** « ▦ Les tuiles », bouton **« + perso 32 × 32 »** : on choisit la taille AVANT de dessiner, puis on peint dans une grille de 32 × 32 ; l’atelier écrit un `Perso`.',
+      '**Essaie :** dans l’onglet `perso_GEANT.cpp`, écris `Perso GEANT` au lieu de `Grand GEANT` (et, dans la liste, `#include <Perso>`) : c’est exactement le même personnage.',
+    ],
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Grand>   // UNE fois, pour TOUS les personnages de la liste (Grand : l'autre nom d'un Perso de 32 × 32)
+
+#include "perso_GEANT.cpp"   // une grande tête de robot, 32 × 32
+`,
+      'perso_GEANT.cpp': `// perso_GEANT.cpp : une grande tête de robot, GEANT (32 × 32) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Grand> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Grand GEANT = {
+  "################################", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#.......++++++++++++++++.......#",
+  "#.......++++++++++++++++.......#", "#.......++++++++++++++++.......#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "################################",
+};
+`,
+    },
+    code: `// ---- #include <Grand> : un grand personnage de 32 × 32 ----
+// GEANT est dessiné dans perso_GEANT.cpp, en Grand ; ici, on le verse.
+
+#include <texte>
+#include "personnages.cpp"   // la liste : GEANT
+
+int main() {
+  texte(2, 8, "UN GRAND ECRIT");
+  texte(2, 10, "SPRITE32 LE MONTRE");
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'UN GRAND ECRIT : le dessin compile ; l’étape suivante le montre.',
+    controle: (c) => [
+      ['le dessin de 32 × 32 compile', c.mot(2, 8, 14) === 'UN GRAND ECRIT'],
+    ],
+  },
+
+  {
+    titre: 'La fonction sprite32() — un grand personnage de 32 × 32',
+    difficulte: 0,
+    idee: '#include <sprite32> : sprite32(numero, x, y, PERSO) place un personnage de 32 × 32 — seize lutins en carré — d’un appel ; à côté, un 16 × 16 posé par sprite16(), pour comparer.',
+    texte: [
+      '**Ce qu’elle fait :** `sprite32(numero, x, y, perso)` place un personnage de **32 × 32** (un `Perso` de trente-deux rangées) : les lutins `numero` à `numero + 15`, en carré. C’est quatre `sprite16()` d’un coup, un par quart.',
+      '**La ligne à écrire : `#include <sprite32>`.**',
+      '**Ses arguments :** comme `sprite16()` ; le numéro du premier des seize lutins (**24 au plus** : la console n’en a que quarante). Un cinquième, `MIROIR_X`, le retourne.',
+      '**Deux personnages, deux fichiers, à comparer :** `perso_BONHOMME.cpp` (16 rangées : un 16 × 16) et `perso_GEANT.cpp` (32 rangées : un 32 × 32). Les deux sont des `Perso` — la liste `personnages.cpp` porte `#include <Perso>` UNE fois pour les deux — : c’est le nombre de rangées qui fait la taille. La source ne fait qu’**appeler** : `sprite16(…, BONHOMME)` pour l’un, `sprite32(…, GEANT)` pour l’autre.',
+      '**À côté, pour comparer :** BONHOMME, le personnage de 16 × 16 du 35.1, posé par `sprite16()`. Les deux sont des `Perso` : seize rangées pour l’un, trente-deux pour l’autre — c’est le nombre de rangées qui fait la taille, et la fonction qui va avec : `sprite16()` pour un 16 × 16, `sprite32()` pour un 32 × 32.',
+      '**Attention à la place :** seize lutins, c’est beaucoup. Avec un grand personnage, il en reste 24 pour tout le reste du jeu.',
+      '**Essaie :** `sprite32(0, 64, y, GEANT, MIROIR_X);` — GEANT regarde de l’autre côté.',
+    ],
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_GEANT.cpp"   // une grande tête de robot, 32 × 32
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+`,
+      'perso_GEANT.cpp': `// perso_GEANT.cpp : une grande tête de robot, GEANT (32 × 32) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso GEANT = {
+  "################################", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#.......++++++++++++++++.......#",
+  "#.......++++++++++++++++.......#", "#.......++++++++++++++++.......#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "################################",
+};
+`,
+      'perso_BONHOMME.cpp': `// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+`,
+    },
+    code: `// ---- #include <sprite32> : un grand personnage de 32 × 32 ----
+// Deux personnages, deux fichiers : perso_GEANT.cpp (32 × 32) et
+// perso_BONHOMME.cpp (16 × 16), inclus par la liste personnages.cpp.
+// Ici, UNE ligne verse la liste, et on ne fait que les APPELER :
+// sprite32() pour le 32 × 32, sprite16() pour le 16 × 16.
+
+#include <sprite32>          // sprite32() : seize lutins en carré
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include "personnages.cpp"   // la liste : GEANT et BONHOMME
+
+uint8_t y = 0;   // la hauteur de GEANT, en pixels
+
+int main() {
+  while (true) {
+    image();
+    if (y < 100) y = y + 1;          // GEANT descend, et s'arrête en 100
+    sprite32(0, 64, y, GEANT);       // GEANT    : les lutins 0 à 15
+    sprite16(16, 16, 16, BONHOMME);  // BONHOMME : les lutins 16 à 19, en haut à gauche
+  }
+}
+`,
+    aVoir: 'Une grande tête de robot (GEANT) qui descend au milieu de l’écran et s’arrête en bas ; le petit bonhomme reste en haut à gauche.',
+    controle: (c) => {
+      c.avancer(130)
+      return [
+        ['GEANT est arrivé en y = 100', c.lutin(0).y === 100, ` (${c.lutin(0).y})`],
+        ['ses seize lutins font un carré de 32', c.lutin(5).x === 88 && c.lutin(10).y === 124 && c.lutin(15).x === 88 && c.lutin(15).y === 124],
+        ['BONHOMME, en 16 × 16, prend les lutins 16 à 19', c.lutin(16).x === 16 && c.lutin(19).x === 24 && c.lutin(19).y === 24],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction cacher32() — ôter un grand personnage',
+    difficulte: 0,
+    idee: '#include <cacher32> : cacher32(numero) ôte les seize lutins d’un grand personnage de 32 × 32.',
+    texte: [
+      '**Ce qu’elle fait :** `cacher32(numero)` ôte les seize lutins `numero` à `numero + 15` : tout le grand personnage.',
+      '**La ligne à écrire : `#include <cacher32>`.**',
+      '**Son argument :** le numéro du premier lutin, comme pour `sprite32()`.',
+      '**Essaie :** fais-le réapparaître à l’image 240.',
+    ],
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_GEANT.cpp"   // une grande tête de robot, 32 × 32
+`,
+      'perso_GEANT.cpp': `// perso_GEANT.cpp : une grande tête de robot, GEANT (32 × 32) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso GEANT = {
+  "################################", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#......++++++......++++++......#", "#......++++++......++++++......#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#.......++++++++++++++++.......#",
+  "#.......++++++++++++++++.......#", "#.......++++++++++++++++.......#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "#..............................#",
+  "#..............................#", "################################",
+};
+`,
+    },
+    code: `// ---- #include <cacher32> : ôter un grand personnage de 32 × 32 ----
+// GEANT est dessiné dans perso_GEANT.cpp ; ici, on ne fait que l'appeler.
+
+#include <sprite32>          // sprite32() : le poser
+#include <cacher32>          // cacher32() : ôter ses seize lutins
+#include "personnages.cpp"   // la liste : GEANT
+
+int main() {
+  sprite32(0, 64, 56, GEANT);   // les lutins 0 à 15
+
+  while (true) {
+    image();
+    if (images() == 120) {
+      cacher32(0);              // les lutins 0 à 15 s'en vont
+    }
+  }
+}
+`,
+    aVoir: 'La grande tête de robot (GEANT) au milieu, qui disparaît au bout de deux secondes.',
+    controle: (c) => {
+      const avant = c.lutin(15)
+      c.avancer(120)
+      const dehors = Array.from({ length: 16 }, (_, n) => c.lutin(n)).every((l) => l.y < -8)
+      return [
+        ['au départ, GEANT est là', avant.x === 88 && avant.y === 80, ` (${avant.x}, ${avant.y})`],
+        ['puis ses seize lutins sont hors de l’écran', dehors],
       ]
     },
   },
@@ -24385,37 +24932,63 @@ int main() {
       '**Ce qu’elle coûte :** environ **105 octets** avec la mise en place des lutins.',
       '**Essaie :** fais-le réapparaître à l’image 240.',
     ],
-    code: `// ---- #include <cacher16> : ôter un personnage de 16 × 16 ----
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
 
-#include <sprite16>
-#include <cacher16>   // cacher16() : ôter les quatre lutins
-#include <Perso>
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
 
-Perso BLOC = {
-  "################", "################", "################", "################",
-  "################", "################", "################", "################",
-  "################", "################", "################", "################",
-  "################", "################", "################", "################",
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+`,
+      'perso_BONHOMME.cpp': `// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
 };
+`,
+    },
+    code: `// ---- #include <cacher16> : ôter un personnage de 16 × 16 ----
+// BONHOMME est dessiné dans perso_BONHOMME.cpp ; ici, on ne fait que l'appeler.
+
+#include <sprite16>          // sprite16() : le poser
+#include <cacher16>          // cacher16() : ôter ses quatre lutins
+#include "personnages.cpp"   // la liste : BONHOMME
 
 int main() {
-  sprite16(0, 72, 64, BLOC);
+  sprite16(0, 72, 64, BONHOMME);   // les lutins 0, 1, 2 et 3
 
   while (true) {
     image();
     if (images() == 120) {
-      cacher16(0);            // les lutins 0, 1, 2 et 3
+      cacher16(0);                 // les lutins 0, 1, 2 et 3 s'en vont
     }
   }
 }
 `,
-    aVoir: 'Un carré plein au milieu, qui disparaît au bout de deux secondes.',
+    aVoir: 'Le bonhomme au milieu, qui disparaît au bout de deux secondes.',
     controle: (c) => {
       const avant = c.lutin(3)
       c.avancer(120)
       const dehors = [0, 1, 2, 3].every((n) => c.lutin(n).y < -8 || c.lutin(n).y >= 144 || c.lutin(n).x < -8 || c.lutin(n).x >= 160)
       return [
-        ['au départ, le carré est là', avant.x === 80 && avant.y === 72],
+        ['au départ, BONHOMME est là', avant.x === 80 && avant.y === 72],
         ['puis ses quatre lutins sont hors de l’écran', dehors],
       ]
     },
@@ -24955,22 +25528,23 @@ int main() {
       '**Essaie :** une vitesse de 100 : le A file.',
     ],
     code: `// ---- #include <deplace_croix> : suivre la croix, case par case ----
-// La croix fait bouger le A, une case tous les quarts de seconde.
+// La croix fait bouger le B, une case tous les quarts de seconde.
+// (Le A au milieu, ce seront les leçons de la croix, juste après.)
 
 #include <deplace_croix>   // deplace_croix() : la tuile suit la croix
 #include <ALPHABET>
 
-uint8_t x = 9;
-uint8_t y = 8;
+uint8_t x = 3;   // le B part de la colonne 3…
+uint8_t y = 4;   // …ligne 4
 
 int main() {
   while (true) {
     image();
-    deplace_croix(x, y, ALPHABET[0], 250);   // x et y suivent la tuile
+    deplace_croix(x, y, ALPHABET[1], 250);   // x et y suivent la tuile
   }
 }
 `,
-    aVoir: 'Un A au milieu ; la croix le promène, case par case.',
+    aVoir: 'Un B en haut à gauche ; la croix le promène, case par case.',
     controle: (c) => {
       c.avancer(10)
       const depart = c.variable('x')
@@ -24979,9 +25553,9 @@ int main() {
       c.gb.setButton('right', false)
       c.avancer(5)
       return [
-        ['au départ, le A est en (9, 8)', depart === 9],
-        ['DROITE tenue : il est allé à droite', c.variable('x') > 9, ` (x = ${c.variable('x')})`],
-        ['et la lettre est là où dit x', c.mot(c.variable('x'), 8, 1) === 'A'],
+        ['au départ, le B est en (3, 4)', depart === 3],
+        ['DROITE tenue : il est allé à droite', c.variable('x') > 3, ` (x = ${c.variable('x')})`],
+        ['et la lettre est là où dit x', c.mot(c.variable('x'), 4, 1) === 'B'],
       ]
     },
   },
@@ -24999,20 +25573,23 @@ int main() {
     ],
     code: `// ---- #include <glisse_croix> : suivre la croix, au pixel près ----
 
+// Un B, parti du pixel (8, 8), en haut à gauche.
+// (Le A au milieu, ce seront les leçons qui suivent.)
+
 #include <glisse_croix>   // glisse_croix() : un lutin qui suit la croix
 #include <ALPHABET>
 
-uint8_t px = 76;
-uint8_t py = 68;
+uint8_t px = 8;
+uint8_t py = 8;
 
 int main() {
   while (true) {
     image();
-    glisse_croix(0, px, py, ALPHABET[0], 1);   // le lutin 0, un pixel par image
+    glisse_croix(0, px, py, ALPHABET[1], 1);   // le lutin 0, un pixel par image
   }
 }
 `,
-    aVoir: 'Un A au milieu ; la croix le fait glisser en douceur.',
+    aVoir: 'Un B en haut à gauche ; la croix le fait glisser en douceur.',
     controle: (c) => {
       c.avancer(5)
       c.gb.setButton('down', true)
@@ -25020,7 +25597,7 @@ int main() {
       c.gb.setButton('down', false)
       c.avancer(3)
       return [
-        ['BAS tenu 30 images : py a grandi d’environ 30', c.variable('py') >= 90 && c.variable('py') <= 100, ` (py = ${c.variable('py')})`],
+        ['BAS tenu 30 images : py a grandi d’environ 30', c.variable('py') >= 30 && c.variable('py') <= 40, ` (py = ${c.variable('py')})`],
         ['le lutin est là où dit py', c.lutin(0).y === c.variable('py')],
       ]
     },
@@ -25039,24 +25616,27 @@ int main() {
     ],
     code: `// ---- #include <carre> : tourner en carré ----
 
+// Un C qui tourne autour de la case (15, 4), en haut à droite.
+// (Le A au milieu, ce sera la leçon suivante.)
+
 #include <carre>      // carre() : des tours en carré
 #include <ALPHABET>
 
 int main() {
-  carre(10, 8, ALPHABET[0], 1, 1, 250, 1);   // centre (10, 8), taille 1, un tour
+  carre(15, 4, ALPHABET[2], 1, 1, 250, 1);   // centre (15, 4), taille 1, un tour
 
   while (true) {
     image();
   }
 }
 `,
-    aVoir: 'Un A qui fait un tour en carré autour du milieu, puis s’y arrête.',
+    aVoir: 'Un C qui fait un tour en carré autour de la case (15, 4), puis s’y arrête.',
     controle: (c) => {
-      const chemin = suivre(c, 'A', 300).A
-      const coins = chemin.filter((p) => ['9,7', '11,7', '11,9', '9,9'].includes(p))
+      const chemin = suivre(c, 'C', 300).C
+      const coins = chemin.filter((p) => ['14,3', '16,3', '16,5', '14,5'].includes(p))
       return [
-        ['les quatre coins, dans le sens des aiguilles', coins.slice(0, 4).join(' ') === '9,7 11,7 11,9 9,9', ` (${coins.slice(0, 4).join(' ')})`],
-        ['le A revient au centre', chemin.at(-1) === '10,8'],
+        ['les quatre coins, dans le sens des aiguilles', coins.slice(0, 4).join(' ') === '14,3 16,3 16,5 14,5', ` (${coins.slice(0, 4).join(' ')})`],
+        ['le C revient au centre', chemin.at(-1) === '15,4'],
       ]
     },
   },
@@ -26940,6 +27520,980 @@ int main() {
   },
 
   {
+    titre: "BONHOMME, de son fichier à l’écran : sprite16()",
+    difficulte: 3,
+    suite: true,
+    idee: "Le BONHOMME de perso_BONHOMME.cpp devient un lutin : sprite16() le pose au pixel près, et principal.cpp n’a qu’une ligne pour l’avoir.",
+    texte: [
+      "**Ce cours** fait voyager un personnage entre les fichiers, une étape à la fois : il est rangé dans **`perso_BONHOMME.cpp`**, on l’appelle depuis un **autre fichier**, on en met **deux** à l’écran, on le **fait bouger**, et on le **verrouille**.",
+      "**Ce qui est nouveau ici :** le BONHOMME du 35.1 (dans `perso_BONHOMME.cpp`, sans changement) n’est plus posé en quatre cases : `sprite16(0, 72, 64, BONHOMME)` en fait un **lutin** de 16 × 16 — les lutins 0, 1, 2 et 3, en carré, par-dessus le fond.",
+      "**principal.cpp n’a qu’une ligne pour l’avoir :** `#include \"personnages.cpp\"`, la liste. Le dessin et ses seize rangées sont dans `perso_BONHOMME.cpp` ; l’autorisation `#include <Perso>`, une fois, dans la liste. On voit ce que fait le jeu, sans les rangées du dessin au milieu.",
+      "**Rappel :** `#include \"personnages.cpp\"` **colle** la liste à cet endroit avant de compiler, et la liste colle `perso_BONHOMME.cpp` (des guillemets : un fichier à toi). `#include <sprite16>` **demande** une fonction de la console (des chevrons).",
+      "**Dans l’atelier :** « + perso » de « ▦ Les tuiles » donne tout seul son fichier à chaque nouveau personnage ; pour ceux qui existent déjà, « 📁 Un fichier par personnage » dans « 📦 Tout le jeu ».",
+    ],
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+`,
+      'perso_BONHOMME.cpp': `// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+`,
+    },
+    code: `// BONHOMME vient de perso_BONHOMME.cpp ; ici, on s'en sert.
+
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include "personnages.cpp"   // la liste : BONHOMME
+
+int main() {
+  sprite16(0, 72, 64, BONHOMME);   // les lutins 0 à 3, coin haut-gauche en (72, 64)
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: "Le bonhomme au milieu de l’écran, en lutin.",
+    controle: (c) => {
+      c.avancer(3)
+      const l = [0, 1, 2, 3].map((n) => c.lutin(n))
+      return [
+        ['le lutin 0 est en (72, 64)', l[0].x === 72 && l[0].y === 64, ` (${l[0].x}, ${l[0].y})`],
+        ['les quatre lutins font un carré de 16', l[1].x === 80 && l[2].y === 72 && l[3].x === 80 && l[3].y === 72],
+        ['avec les quatre tuiles de BONHOMME', l[1].tuile === l[0].tuile + 1 && l[3].tuile === l[0].tuile + 3 && l[0].tuile >= 44],
+      ]
+    },
+  },
+
+  {
+    titre: "Un nouveau fichier qui appelle BONHOMME : heros.cpp",
+    difficulte: 3,
+    suite: true,
+    idee: "Un troisième onglet, heros.cpp, écrit montrerHeros(x, y) avec le BONHOMME d’un autre fichier : chaque fichier a son rôle.",
+    texte: [
+      "**Ce qui est nouveau ici : un troisième fichier, `heros.cpp`.** Il contient une fonction, `montrerHeros(x, y)`, qui se sert de `BONHOMME` — **sans l’écrire** : BONHOMME vient de `perso_BONHOMME.cpp`.",
+      "**Chaque fichier a son rôle :** `perso_BONHOMME.cpp` dit **à quoi ressemble** le personnage ; `heros.cpp` dit **ce qu’on en fait** ; `principal.cpp` dit **quand** : il ne fait qu’appeler `montrerHeros(72, 64)`.",
+      "**Pourquoi heros.cpp connaît BONHOMME :** `principal.cpp` verse les deux fichiers. Une fois collés, tout est **un seul programme**, où BONHOMME est connu partout. Pour des fonctions et des dessins, l’ordre des deux `#include` ne compte pas : on peut verser `heros.cpp` avant `personnages.cpp`.",
+      "**Le `#include <sprite16>` a changé d’onglet :** c’est `heros.cpp` qui appelle `sprite16()`, c’est donc lui qui écrit la ligne — comme `outils.cpp` au chapitre « Tes propres #include ».",
+      "**Dans l’atelier :** un fichier se crée avec « ⤢ Agrandir le code », puis « + fichier ».",
+    ],
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+`,
+      'perso_BONHOMME.cpp': `// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+`,
+      'heros.cpp': `// heros.cpp : ce qu'on FAIT avec BONHOMME.
+// BONHOMME n'est pas écrit ici : il vient de perso_BONHOMME.cpp.
+
+#include <sprite16>   // sprite16() : quatre lutins en carré
+
+// montrerHeros(x, y) : BONHOMME à l'écran, coin haut-gauche en (x, y).
+// Exemple : montrerHeros(72, 64) → les lutins 0 à 3, en carré, en (72, 64).
+void montrerHeros(uint8_t x, uint8_t y) {
+  sprite16(0, x, y, BONHOMME);   // le lutin 0 et les trois suivants
+}
+`,
+    },
+    code: `// principal.cpp ne dit plus que QUAND : montrerHeros() fait le reste.
+
+#include "personnages.cpp"   // la liste : BONHOMME
+#include "heros.cpp"         // montrerHeros() : ce qu'on en fait
+
+int main() {
+  montrerHeros(72, 64);   // la fonction de heros.cpp, avec le BONHOMME de perso_BONHOMME.cpp
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: "Le même bonhomme au milieu de l’écran — mais posé par une fonction d’un autre fichier.",
+    controle: (c) => {
+      c.avancer(3)
+      const l0 = c.lutin(0)
+      return [
+        ['montrerHeros(72, 64) pose le lutin 0 en (72, 64)', l0.x === 72 && l0.y === 64, ` (${l0.x}, ${l0.y})`],
+        ['avec la première tuile de BONHOMME', l0.tuile >= 44 && c.lutin(3).tuile === l0.tuile + 3],
+      ]
+    },
+  },
+
+  {
+    titre: "Deux BONHOMME, un seul dessin : le modèle, comme une classe",
+    difficulte: 3,
+    suite: true,
+    idee: "Un Perso est un modèle : montrerHeros(numero, x, y) en pose deux exemplaires, chacun avec ses lutins, sans copier le dessin.",
+    texte: [
+      "**Ce qui est nouveau ici : `montrerHeros` reçoit un `numero`**, le premier lutin à employer. Avec lui, on pose **deux** BONHOMME : `montrerHeros(0, 40, 64)` prend les lutins 0 à 3, `montrerHeros(4, 104, 64)` les lutins 4 à 7.",
+      "**Un seul dessin, deux exemplaires.** BONHOMME n’est écrit qu’**une** fois, et ses quatre tuiles ne sont gravées qu’**une** fois dans la cartouche. Chaque `sprite16` en fait un **exemplaire** à l’écran, avec sa place à lui. C’est l’idée d’une **classe** : le modèle (BONHOMME) et ses objets (les deux à l’écran).",
+      "**Pourquoi 4 et pas 1 :** un personnage de 16 × 16 occupe **quatre** lutins. Le second doit donc commencer après les quatre du premier : 0, 1, 2, 3 pour l’un, 4, 5, 6, 7 pour l’autre. Avec `montrerHeros(1, …)`, les deux se partageraient trois lutins, et l’un écraserait l’autre.",
+      "**Déroulé de `montrerHeros(4, 104, 64)` :** `numero` vaut 4, `x` 104, `y` 64, puis `sprite16(4, 104, 64, BONHOMME)` pose les lutins 4 (104, 64), 5 (112, 64), 6 (104, 72) et 7 (112, 72).",
+    ],
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+`,
+      'perso_BONHOMME.cpp': `// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+`,
+      'heros.cpp': `// heros.cpp : ce qu'on FAIT avec BONHOMME.
+// BONHOMME n'est pas écrit ici : il vient de perso_BONHOMME.cpp.
+
+#include <sprite16>   // sprite16() : quatre lutins en carré
+
+// montrerHeros(numero, x, y) : un BONHOMME à l'écran.
+//   numero : le premier de ses quatre lutins (0 → lutins 0 à 3, 4 → lutins 4 à 7)
+//   x, y   : son coin haut-gauche, en pixels
+// Exemple : montrerHeros(4, 104, 64) → un BONHOMME avec les lutins 4 à 7, en (104, 64).
+void montrerHeros(uint8_t numero, uint8_t x, uint8_t y) {
+  sprite16(numero, x, y, BONHOMME);
+}
+`,
+    },
+    code: `// Deux exemplaires du même modèle : le dessin n'est écrit qu'une fois.
+
+#include "personnages.cpp"   // la liste : BONHOMME
+#include "heros.cpp"         // montrerHeros(numero, x, y)
+
+int main() {
+  montrerHeros(0, 40, 64);    // le premier : lutins 0 à 3, en (40, 64)
+  montrerHeros(4, 104, 64);   // le second  : lutins 4 à 7, en (104, 64)
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: "Deux bonshommes côte à côte, le même dessin.",
+    controle: (c) => {
+      c.avancer(3)
+      const a = c.lutin(0)
+      const b = c.lutin(4)
+      return [
+        ['le premier en (40, 64)', a.x === 40 && a.y === 64, ` (${a.x}, ${a.y})`],
+        ['le second en (104, 64)', b.x === 104 && b.y === 64, ` (${b.x}, ${b.y})`],
+        ['le même dessin : les mêmes tuiles', a.tuile === b.tuile && c.lutin(3).tuile === c.lutin(7).tuile],
+      ]
+    },
+  },
+
+  {
+    titre: "BONHOMME qui marche : le faire bouger depuis principal.cpp",
+    difficulte: 3,
+    suite: true,
+    idee: "Le premier BONHOMME avance d’un pixel par image : principal.cpp change x, montrerHeros() le repose à chaque tour.",
+    texte: [
+      "**Ce qui est nouveau ici : une variable `x`** pour le premier BONHOMME, qui grandit d’un pixel à chaque image, jusqu’à 120. `montrerHeros(0, x, 64)` est appelé **dans la boucle**, à chaque tour : le lutin suit.",
+      "**Les trois fichiers n’ont pas bougé :** `perso_BONHOMME.cpp` et `heros.cpp` sont ceux de l’étape d’avant. Seul `principal.cpp` change — il décide **quand** et **où**, les autres fichiers savent **comment**.",
+      "**Déroulé :** au départ `x` vaut 0 ; image 1 → `x` = 1, BONHOMME en (1, 64) ; image 2 → (2, 64) ; … ; image 120 → (120, 64), et `if (x < 120)` devient faux : il s’arrête. Le second reste en (104, 64) : l’un passe sur l’autre.",
+      "**Essaie :** fais avancer le second aussi, avec une variable `x2` qui part de 104 et recule.",
+    ],
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+`,
+      'perso_BONHOMME.cpp': `// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+`,
+      'heros.cpp': `// heros.cpp : ce qu'on FAIT avec BONHOMME.
+// BONHOMME n'est pas écrit ici : il vient de perso_BONHOMME.cpp.
+
+#include <sprite16>   // sprite16() : quatre lutins en carré
+
+// montrerHeros(numero, x, y) : un BONHOMME à l'écran.
+//   numero : le premier de ses quatre lutins (0 → lutins 0 à 3, 4 → lutins 4 à 7)
+//   x, y   : son coin haut-gauche, en pixels
+// Exemple : montrerHeros(4, 104, 64) → un BONHOMME avec les lutins 4 à 7, en (104, 64).
+void montrerHeros(uint8_t numero, uint8_t x, uint8_t y) {
+  sprite16(numero, x, y, BONHOMME);
+}
+`,
+    },
+    code: `// principal.cpp fait marcher BONHOMME : x change, montrerHeros() suit.
+
+#include "personnages.cpp"   // la liste : BONHOMME
+#include "heros.cpp"         // montrerHeros(numero, x, y)
+
+uint8_t x = 0;   // la place du premier BONHOMME, en pixels : de 0 à 120
+
+int main() {
+  montrerHeros(4, 104, 64);       // le second, posé une fois : il ne bouge pas
+
+  while (true) {
+    image();                      // une image : 1/60 de seconde
+    if (x < 120) x = x + 1;       // un pixel de plus, jusqu'à 120
+    montrerHeros(0, x, 64);       // le premier, reposé à sa nouvelle place
+  }
+}
+`,
+    aVoir: "Le premier bonhomme traverse l’écran vers la droite et s’arrête ; le second ne bouge pas.",
+    controle: (c) => {
+      c.avancer(30)
+      const pendant = c.lutin(0).x
+      c.avancer(130)
+      return [
+        ['il avance : au bout d’une demi-seconde, il a quitté le bord', pendant > 10 && pendant < 120, ` (x = ${pendant})`],
+        ['puis il s’arrête en 120', c.lutin(0).x === 120 && c.variable('x') === 120],
+        ['le second n’a pas bougé', c.lutin(4).x === 104],
+      ]
+    },
+  },
+
+  {
+    titre: "BONHOMME verrouillé : on s’en sert, on ne le modifie pas",
+    difficulte: 3,
+    suite: true,
+    idee: "Une marque sous le dessin, /* BONHOMME : verrouillé */ : le jeu s’en sert comme avant, l’atelier refuse de le retoucher.",
+    texte: [
+      "**Ce qui est nouveau ici : une ligne de plus dans `perso_BONHOMME.cpp`**, juste sous le dessin : `/* BONHOMME : verrouillé */`. C’est un **commentaire** : le compilateur l’ignore, le jeu est **exactement le même**.",
+      "**C’est l’atelier qui la lit.** Tant qu’elle est là, BONHOMME est un **modèle** : on le voit, on l’appelle partout (`montrerHeros`, deux exemplaires, qui marchent), mais **on ne le modifie plus** — le pinceau, le miroir, l’effacer et le renommer sont refusés, et une frappe dans ses rangées est défaite aussitôt. Il ne se supprime pas non plus.",
+      "**Pour la poser ou l’ôter**, pas besoin de l’écrire : « 🔒 Verrouiller » / « 🔓 Déverrouiller » dans « ▦ Les tuiles », ou sur BONHOMME dans « 📦 Tout le jeu ». Pour une version différente : « ⧉ Créer une variante », une copie qu’on peut changer.",
+      "**Le bilan du cours :** `perso_BONHOMME.cpp` — à quoi il ressemble, verrouillé ; `heros.cpp` — ce qu’on en fait ; `principal.cpp` — quand et où. Trois fichiers, trois rôles, et un modèle qu’on ne casse pas par mégarde.",
+    ],
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+`,
+      'perso_BONHOMME.cpp': `// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+/* BONHOMME : verrouillé */   // 🔒 on s'en sert, on ne le modifie plus — 🔓 dans l'atelier pour le changer
+`,
+      'heros.cpp': `// heros.cpp : ce qu'on FAIT avec BONHOMME.
+// BONHOMME n'est pas écrit ici : il vient de perso_BONHOMME.cpp.
+
+#include <sprite16>   // sprite16() : quatre lutins en carré
+
+// montrerHeros(numero, x, y) : un BONHOMME à l'écran.
+//   numero : le premier de ses quatre lutins (0 → lutins 0 à 3, 4 → lutins 4 à 7)
+//   x, y   : son coin haut-gauche, en pixels
+// Exemple : montrerHeros(4, 104, 64) → un BONHOMME avec les lutins 4 à 7, en (104, 64).
+void montrerHeros(uint8_t numero, uint8_t x, uint8_t y) {
+  sprite16(numero, x, y, BONHOMME);
+}
+`,
+    },
+    code: `// Le même jeu : la seule différence est la marque, dans perso_BONHOMME.cpp.
+
+#include "personnages.cpp"   // la liste : BONHOMME
+#include "heros.cpp"         // montrerHeros(numero, x, y)
+
+uint8_t x = 0;
+
+int main() {
+  montrerHeros(4, 104, 64);
+
+  while (true) {
+    image();
+    if (x < 120) x = x + 1;
+    montrerHeros(0, x, 64);   // verrouillé, il s'appelle comme avant
+  }
+}
+`,
+    aVoir: "Exactement l’étape d’avant : le bonhomme marche, l’autre attend. Le verrou ne change rien au jeu.",
+    controle: (c) => {
+      c.avancer(160)
+      return [
+        ['verrouillé, BONHOMME marche comme avant', c.lutin(0).x === 120],
+        ['et le second est toujours là', c.lutin(4).x === 104 && c.lutin(4).tuile === c.lutin(0).tuile],
+      ]
+    },
+  },
+
+  {
+    titre: "L’écran titre de ton jeu : le nom en GROSSES lettres",
+    difficulte: 3,
+    suite: true,
+    idee: "texteTitre() écrit le nom du jeu en grosses lettres de titre ; BONHOMME, de son fichier, pose dessous ; une ligne de texte invite à jouer.",
+    texte: [
+      "**Ce qui est nouveau ici : `#include <texteTitre>`**, dans `principal.cpp`. Une seule ligne de plus, et `texteTitre(colonne, ligne, \"MOT\")` écrit un mot en **GROSSES lettres** : rondes, un contour noir, une ombre grise, et qui **sautillent**.",
+      "**Le titre tient sur deux lignes :** chaque lettre prend 3 colonnes, l’écran en a 20 — 6 lettres au plus. « SUPER » (5 lettres, 15 colonnes) commence en colonne **2** : il va de 2 à 16, centré. « JEU » (9 colonnes) commence en colonne **5**, centré aussi. Et 3 lignes par lettre : SUPER en lignes 1 à 3, JEU en lignes 5 à 7.",
+      "**Le héros ne change pas :** `perso_BONHOMME.cpp`, `heros.cpp` et `personnages.cpp` sont **ceux du cours d’avant**. `principal.cpp` appelle `montrerHeros(0, 72, 88)` : BONHOMME, au milieu, sous le titre.",
+      "**Les lettres du titre sont des cases du fond**, comme `texte()` ; BONHOMME est fait de **lutins**. Les deux se superposent sans se gêner.",
+      "**Ce qu’il coûte :** seules **les lettres de SUPER et de JEU** vont dans la cartouche — le E, présent deux fois, ne coûte qu’une fois.",
+      "**À toi :** mets le nom de **ton** jeu à la place de SUPER et JEU, puis recentre : colonne = (20 − 3 × nombre de lettres) ÷ 2.",
+    ],
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_BONHOMME.cpp"   // un petit bonhomme, 16 × 16
+`,
+      'perso_BONHOMME.cpp': `// perso_BONHOMME.cpp : un petit bonhomme, BONHOMME (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le plus sombre, « + » sombre, « . » le plus clair (le transparent, en lutin).
+
+Perso BONHOMME = {
+  "......####......",
+  ".....######.....",
+  ".....#+##+#.....",
+  ".....######.....",
+  "......####......",
+  "...##########...",
+  "..############..",
+  "..##.######.##..",
+  "..##.######.##..",
+  "..##.######.##..",
+  ".....######.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  ".....##..##.....",
+  "....###..###....",
+  "....###..###....",
+};
+/* BONHOMME : verrouillé */   // 🔒 on s'en sert, on ne le modifie plus — 🔓 dans l'atelier pour le changer
+`,
+      'heros.cpp': `// heros.cpp : ce qu'on FAIT avec BONHOMME.
+// BONHOMME n'est pas écrit ici : il vient de perso_BONHOMME.cpp.
+
+#include <sprite16>   // sprite16() : quatre lutins en carré
+
+// montrerHeros(numero, x, y) : un BONHOMME à l'écran.
+//   numero : le premier de ses quatre lutins (0 → lutins 0 à 3, 4 → lutins 4 à 7)
+//   x, y   : son coin haut-gauche, en pixels
+// Exemple : montrerHeros(4, 104, 64) → un BONHOMME avec les lutins 4 à 7, en (104, 64).
+void montrerHeros(uint8_t numero, uint8_t x, uint8_t y) {
+  sprite16(numero, x, y, BONHOMME);
+}
+`,
+    },
+    code: `// L'écran titre : le nom du jeu en GROSSES lettres, le héros, une invitation.
+
+#include "personnages.cpp"   // la liste : BONHOMME
+#include "heros.cpp"         // montrerHeros(numero, x, y)
+#include <texteTitre>        // texteTitre() : un mot en GROSSES lettres de titre
+#include <texte>             // texte() : une ligne en lettres ordinaires
+
+int main() {
+  // Chaque lettre de titre prend 3 colonnes et 3 lignes.
+  texteTitre(2, 1, "SUPER");   // 5 lettres → colonnes 2 à 16, lignes 1 à 3
+  texteTitre(5, 5, "JEU");     // 3 lettres → colonnes 5 à 13, lignes 5 à 7
+
+  montrerHeros(0, 72, 88);     // BONHOMME, au milieu, sous le titre
+
+  texte(2, 15, "APPUIE SUR START");
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: "SUPER puis JEU en grosses lettres rondes qui sautillent, le bonhomme au milieu, et « APPUIE SUR START » en bas.",
+    controle: (c) => {
+      c.avancer(3)
+      const l0 = c.lutin(0)
+      let ombre = 0
+      for (let y = 8; y < 64; y++) for (let x = 16; x < 136; x++) if (c.gb.framebuffer[y * 160 + x] === 2) ombre++
+      return [
+        ['SUPER est écrit en grosses lettres, lignes 1 à 3', c.lire(3, 1) !== 0 && c.lire(15, 2) !== 0],
+        ['JEU en dessous, lignes 5 à 7', c.lire(6, 5) !== 0 && c.lire(12, 6) !== 0],
+        ['le E de SUPER et celui de JEU sont les mêmes tuiles', c.lire(12, 2) === c.lire(9, 6) && c.lire(11, 3) === c.lire(8, 7), ` (${c.lire(12, 2)})`],
+        ['les lettres ont leur ombre grise', ombre > 50, ` (${ombre} pixels gris)`],
+        ['BONHOMME sous le titre, en (72, 88)', l0.x === 72 && l0.y === 88],
+        ['APPUIE SUR START en bas', c.mot(2, 15, 16) === 'APPUIE SUR START'],
+      ]
+    },
+  },
+
+  {
+    titre: "Choisir la taille du titre : texteTitre(…, taille)",
+    difficulte: 3,
+    suite: true,
+    idee: "Un 4e argument, la taille : 2, 3 ou 4 cases de côté par lettre. Le même mot TITRE, dans les trois tailles, l’un sous l’autre.",
+    texte: [
+      "**Ce qui est nouveau ici : un quatrième argument, la taille.** `texteTitre(colonne, ligne, \"MOT\", taille)` : la taille est le **nombre de cases de côté** d’une lettre. Sans lui, c’est 3, comme jusqu’ici.",
+      "**Les trois tailles :** **2** → une lettre de 16 × 16 pixels (2 colonnes, 2 lignes), **10 lettres** par ligne ; **3** → 24 × 24 pixels, **6 lettres** ; **4** → 32 × 32 pixels, **5 lettres**. Le style ne change pas : rondes, un contour noir, une ombre, et elles sautillent. En taille 2, le contour est plus fin et les coins ne sont pas arrondis : la place manque.",
+      "**Le calcul de la place :** une lettre prend « taille » colonnes. TITRE (5 lettres) prend donc 5 × 2 = **10** colonnes en taille 2, 5 × 3 = **15** en taille 3, 5 × 4 = **20** en taille 4 — tout l’écran. Et « taille » lignes : en lignes 0 à 1, puis 3 à 5, puis 8 à 11.",
+      "**La taille s’écrit en clair** — `2`, `3` ou `4` —, **jamais avec une variable** : les lettres sont **dessinées par le compilateur**, avant que le jeu ne tourne, donc il doit connaître leur taille en lisant le programme. Avec une variable, ou une taille 5, le compilateur refuse et dit pourquoi.",
+      "**Ce qu’il coûte :** chaque taille a ses propres dessins. Le T en taille 2 et le T en taille 4 ne sont pas les mêmes tuiles : un titre dans les trois tailles coûte trois fois. Dans un vrai jeu, on en choisit une.",
+      "**À toi :** écris le nom de ton jeu dans la taille qui lui va. Dix lettres ? Taille 2. Un nom court qui doit frapper ? Taille 4.",
+    ],
+    code: `// Le même mot, TITRE, dans les trois tailles : le 4e argument de texteTitre().
+
+#include <texteTitre>   // texteTitre(colonne, ligne, "MOT", taille)
+
+int main() {
+  // taille 2 : chaque lettre fait 2 × 2 cases → colonnes 0 à 9, lignes 0 à 1
+  texteTitre(0, 0, "TITRE", 2);
+
+  // sans 4e argument : taille 3, 3 × 3 cases → colonnes 0 à 14, lignes 3 à 5
+  texteTitre(0, 3, "TITRE");
+
+  // taille 4 : 4 × 4 cases → colonnes 0 à 19 (tout l'écran), lignes 8 à 11
+  texteTitre(0, 8, "TITRE", 4);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: "Trois fois TITRE, de plus en plus grand : petit en haut (la moitié de l’écran), moyen au milieu, et en bas, grand, sur toute la largeur.",
+    controle: (c) => [
+      ['taille 2 : TITRE en colonnes 0 à 9, et rien après', c.lire(1, 0) !== 0 && c.lire(8, 1) !== 0 && c.lire(11, 0) === 0 && c.lire(11, 1) === 0],
+      ['taille 3 : TITRE en colonnes 0 à 14, et rien après', c.lire(1, 4) !== 0 && c.lire(13, 4) !== 0 && c.lire(16, 4) === 0],
+      ['taille 4 : TITRE sur toute la largeur, jusqu’à la colonne 19', c.lire(1, 9) !== 0 && c.lire(18, 9) !== 0],
+      ['chaque taille a ses propres dessins', c.lire(1, 0) !== c.lire(1, 4) && c.lire(1, 4) !== c.lire(1, 9), ` (${c.lire(1, 0)}, ${c.lire(1, 4)}, ${c.lire(1, 9)})`],
+    ],
+  },
+
+  {
+    titre: "Deux styles pour un titre : dessin animé ou manga",
+    difficulte: 3,
+    suite: true,
+    idee: "Le même mot, SUPER, écrit par texteTitre() puis par texteManga() : deux styles, le même appel. On choisit celui qui va à son jeu.",
+    texte: [
+      "**Ce qui est nouveau ici : les deux styles côte à côte.** `texteTitre()` écrit des lettres **rondes**, droites, au contour doux — le style **dessin animé**. `texteManga()` écrit des lettres **penchées**, aux **coins coupés**, avec une **trame** grise — le style **manga**.",
+      "**Le même appel :** les deux prennent `(colonne, ligne, \"MOT\")`, et la même taille facultative. Pour changer de style, on change **le nom de la fonction**, rien d’autre — et son `#include`.",
+      "**Deux `#include`, un par fonction :** `#include <texteTitre>` et `#include <texteManga>`. Chacun ajoute à la cartouche **seulement les lettres** que sa fonction écrit.",
+      "**La place :** SUPER en taille 3 prend 15 colonnes ; en commençant en colonne 2, de 2 à 16. Le premier en lignes 2 à 4, le second en lignes 10 à 12. Au-dessus de chacun, son nom en lettres ordinaires, avec `texte()`.",
+      "**Ce qu’il coûte :** deux styles, deux séries de dessins — le S rond et le S manga ne sont pas les mêmes tuiles. Dans un vrai jeu, on en choisit **un** pour le titre.",
+      "**À toi :** écris le nom de ton jeu dans les deux styles, regarde, et garde celui que tu préfères.",
+    ],
+    code: `// Le même mot, SUPER, dans les deux styles de titre.
+
+#include <texteTitre>   // texteTitre() : rondes, le style dessin animé
+#include <texteManga>   // texteManga() : penchées, coins coupés, le style manga
+#include <texte>        // texte() : le nom de chaque style, en lettres ordinaires
+
+int main() {
+  texte(2, 0, "DESSIN ANIME");
+  texteTitre(2, 2, "SUPER");    // colonnes 2 à 16, lignes 2 à 4
+
+  texte(2, 8, "MANGA");
+  texteManga(2, 10, "SUPER");   // colonnes 2 à 16, lignes 10 à 12
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: "En haut, SUPER en lettres rondes ; en bas, SUPER en lettres penchées avec une trame ; au-dessus de chacun, le nom de son style.",
+    controle: (c) => {
+      const fb = c.gb.framebuffer
+      /* La trame (nuance 1) : seulement dans les lettres manga. */
+      const trameEntre = (y0, y1) => { let n = 0; for (let y = y0; y < y1; y++) for (let x = 16; x < 136; x++) if (fb[y * 160 + x] === 1) n++; return n }
+      return [
+        ['SUPER dessin animé, lignes 2 à 4', c.lire(3, 3) !== 0 && c.lire(15, 3) !== 0],
+        ['SUPER manga, lignes 10 à 12', c.lire(3, 11) !== 0 && c.lire(15, 11) !== 0],
+        ['les deux S ne sont pas les mêmes tuiles', c.lire(3, 3) !== c.lire(3, 11), ` (${c.lire(3, 3)} / ${c.lire(3, 11)})`],
+        ['la trame : dans le manga seulement', trameEntre(80, 104) > 30 && trameEntre(16, 40) === 0],
+        ['et le nom de chaque style au-dessus', c.mot(2, 0, 12) === 'DESSIN ANIME' && c.mot(2, 8, 5) === 'MANGA'],
+      ]
+    },
+  },
+
+  {
+    titre: "Un avion qui vole : AVION dans son fichier, la croix pour le piloter",
+    difficulte: 3,
+    suite: true,
+    idee: "AVION, le dessin tout fait de la bibliothèque, rangé dans perso_AVION.cpp ; sprite16() le pose, la croix le fait voler d’un pixel par image, sans sortir de l’écran.",
+    texte: [
+      "**Ce qui est nouveau ici : un personnage qu’on pilote.** L’avion est rangé comme BONHOMME : son dessin dans `perso_AVION.cpp`, la liste `personnages.cpp` qui le verse, et `principal.cpp` qui verse la liste d’**une** ligne. Le dessin est celui de la bibliothèque (« ▦ Les tuiles », onglet des modèles, AVION).",
+      "**Sa place, en pixels :** `px` (de gauche à droite) et `py` (de haut en bas). Il part de (72, 64), le milieu de l’écran. À chaque image, `sprite16(0, px, py, AVION)` le pose à sa place : les lutins 0 à 3, en carré.",
+      "**La croix :** `bouton(DROITE)` vaut vrai **tant que** la flèche droite est enfoncée ; alors `px++` — l’avion avance d’**un pixel par image**, soit 60 pixels par seconde. Même chose pour `GAUCHE` (`px--`), `BAS` (`py++`) et `HAUT` (`py--`). Deux flèches à la fois : il vole en diagonale.",
+      "**Les bords de l’écran :** l’écran fait 160 × 144 pixels, et l’avion 16 × 16. Son coin haut-gauche va donc de 0 à **144** (160 − 16) en largeur, et de 0 à **128** (144 − 16) en hauteur. Les conditions `px < 144`, `px > 0`, `py < 128`, `py > 0` le gardent entier à l’écran.",
+      "**Pourquoi au pixel et pas à la case :** un lutin se pose au pixel près — le vol est **fluide**. Une tuile du fond, elle, saute de 8 pixels à chaque pas.",
+      "**À toi :** fais-le voler plus vite — `px = px + 2;` — ou ajoute un deuxième avion, `sprite16(4, …, AVION)`, avec les lutins 4 à 7.",
+    ],
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_AVION.cpp"   // un avion vu du dessus, 16 × 16
+`,
+      'perso_AVION.cpp': `// perso_AVION.cpp : un avion vu du dessus, le nez en haut, AVION (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le contour, « + » la carlingue, « - » le cockpit, « . » le transparent.
+
+Perso AVION = {
+  ".......##.......",
+  "......#++#......",
+  "......#--#......",
+  "......#--#......",
+  "......#++#......",
+  ".....##++##.....",
+  "...###++++###...",
+  ".##++++++++++##.",
+  "#++++++++++++++#",
+  "####..#++#..####",
+  "......#++#......",
+  "......#++#......",
+  "....###++###....",
+  "...#++++++++#...",
+  "...##########...",
+  "................",
+};
+`,
+    },
+    code: `// L'avion vole : la croix le déplace d'un pixel par image.
+
+#include "personnages.cpp"   // la liste : AVION
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include <bouton>            // bouton() : lit un bouton de la manette
+
+uint8_t px = 72;   // la place de l'avion, en pixels : de 0 à 144 (160 - 16)…
+uint8_t py = 64;   // …et de 0 à 128 (144 - 16). Il part du milieu.
+
+int main() {
+  while (true) {
+    image();
+
+    if (bouton(DROITE) && px < 144) px++;   // un pixel par image
+    if (bouton(GAUCHE) && px > 0)   px--;
+    if (bouton(BAS) && py < 128)    py++;
+    if (bouton(HAUT) && py > 0)     py--;
+
+    sprite16(0, px, py, AVION);             // l'avion à sa place : lutins 0 à 3
+  }
+}
+`,
+    aVoir: "L’avion au milieu de l’écran ; avec les flèches, il vole dans les quatre directions, sans jamais sortir de l’écran.",
+    controle: (c) => {
+      c.avancer(5)
+      const depart = c.lutin(0)
+      c.presser('right', 20)
+      const x = c.variable('px')
+      c.presser('up', 20)
+      const y = c.variable('py')
+      c.presser('left', 200)
+      const bord = c.variable('px')
+      c.avancer(3)
+      const l = c.lutin(0)
+      return [
+        ['l’avion part du milieu, en (72, 64)', depart.x === 72 && depart.y === 64, ` (${depart.x}, ${depart.y})`],
+        ['la flèche droite le pousse à droite', x > 72, ` (px = ${x})`],
+        ['la flèche haut le fait monter', y < 64, ` (py = ${y})`],
+        ['à gauche, il s’arrête au bord : px = 0', bord === 0],
+        ['le lutin suit sa place', l.x === 0 && l.y === y && c.lutin(3).tuile === l.tuile + 3],
+      ]
+    },
+  },
+
+  {
+    titre: "La vitesse de l’avion : une variable, vitesse",
+    difficulte: 3,
+    suite: true,
+    idee: "Une variable, vitesse, dit combien de pixels l’avion parcourt à chaque image : 1 lent, 2 normal, 4 très rapide. Les bords se calculent avec elle.",
+    texte: [
+      "**Ce qui est nouveau ici : une variable `vitesse`.** Au 35.16, l’avion avançait toujours d’**un** pixel par image (`px++`). Maintenant il avance de **`vitesse`** pixels : `px = px + vitesse;`. Pour changer sa vitesse, on change **un seul nombre**, en haut du programme.",
+      "**Ce que vaut chaque réglage :** l’écran se redessine 60 fois par seconde. `vitesse = 1` → 60 pixels par seconde (le 35.16) ; `2` → **120** (il traverse l’écran en un peu plus d’une seconde) ; `4` → **240**, très rapide. Au-delà, le vol devient saccadé : l’œil voit l’avion sauter.",
+      "**Pourquoi les bords changent :** avec `vitesse = 2`, l’ancien test `px > 0` ne suffit plus. Si `px` vaut **1**, il est plus grand que 0, et `px - 2` donnerait… pas −1 : un `uint8_t` ne descend **jamais sous 0**, il **repart à 255**. L’avion sauterait à l’autre bout de l’écran.",
+      "**Les nouveaux tests :** on vérifie **avant** de bouger que le pas tient. À gauche : `px >= vitesse` (il reste au moins un pas avant 0). À droite : `px + vitesse <= 144` (après le pas, il est encore entier à l’écran). Pareil en hauteur, avec 128. Ces tests marchent **quelle que soit** la vitesse.",
+      "**Déroulé, vitesse 2, flèche gauche tenue depuis px = 4 :** 4 ≥ 2, donc px = 2 ; 2 ≥ 2, donc px = 0 ; 0 ≥ 2 est faux : il s’arrête, **pile au bord**.",
+      "**À toi :** essaie `vitesse = 1`, puis `4`. Avec `5`, regarde où il s’arrête : 72 + 5 + 5 + … ne tombe pas juste sur 144 — il s’arrête à **142**, le dernier pas qui tient (142 + 5 = 147, trop loin). À gauche, il s’arrête à **2** (2 ≥ 5 est faux) : jamais de saut à 255.",
+    ],
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_AVION.cpp"   // un avion vu du dessus, 16 × 16
+`,
+      'perso_AVION.cpp': `// perso_AVION.cpp : un avion vu du dessus, le nez en haut, AVION (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le contour, « + » la carlingue, « - » le cockpit, « . » le transparent.
+
+Perso AVION = {
+  ".......##.......",
+  "......#++#......",
+  "......#--#......",
+  "......#--#......",
+  "......#++#......",
+  ".....##++##.....",
+  "...###++++###...",
+  ".##++++++++++##.",
+  "#++++++++++++++#",
+  "####..#++#..####",
+  "......#++#......",
+  "......#++#......",
+  "....###++###....",
+  "...#++++++++#...",
+  "...##########...",
+  "................",
+};
+`,
+    },
+    code: `// La vitesse de l'avion : un seul nombre à changer, en haut.
+
+#include "personnages.cpp"   // la liste : AVION
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include <bouton>            // bouton() : lit un bouton de la manette
+
+uint8_t vitesse = 2;   // pixels par image : 1 = lent, 2 = normal, 4 = très rapide
+uint8_t px = 72;       // la place de l'avion, en pixels : de 0 à 144 (160 - 16)…
+uint8_t py = 64;       // …et de 0 à 128 (144 - 16). Il part du milieu.
+
+int main() {
+  while (true) {
+    image();
+
+    // On vérifie AVANT de bouger que le pas tient dans l'écran.
+    if (bouton(DROITE) && px + vitesse <= 144) px = px + vitesse;
+    if (bouton(GAUCHE) && px >= vitesse)       px = px - vitesse;
+    if (bouton(BAS) && py + vitesse <= 128)    py = py + vitesse;
+    if (bouton(HAUT) && py >= vitesse)         py = py - vitesse;
+
+    sprite16(0, px, py, AVION);   // l'avion à sa place : lutins 0 à 3
+  }
+}
+`,
+    aVoir: "Le même avion, deux fois plus rapide qu’au 35.16 : il traverse l’écran en un peu plus d’une seconde, et s’arrête toujours pile au bord.",
+    controle: (c) => {
+      c.avancer(5)
+      c.presser('right', 20)
+      const x = c.variable('px')
+      c.presser('right', 100)
+      const droite = c.variable('px')
+      c.presser('left', 200)
+      const gauche = c.variable('px')
+      c.presser('up', 200)
+      const haut = c.variable('py')
+      c.avancer(3)
+      return [
+        ['vitesse 2 : il va deux fois plus loin qu’au 35.16', x >= 104 && x <= 116, ` (px = ${x})`],
+        ['à droite, il s’arrête pile à 144', droite === 144],
+        ['à gauche, pile à 0 — sans repartir à 255', gauche === 0],
+        ['en haut, pile à 0', haut === 0],
+        ['le lutin suit sa place', c.lutin(0).x === 0 && c.lutin(0).y === 0],
+      ]
+    },
+  },
+
+  {
+    titre: "Changer de vitesse en vol : A accélère, B ralentit",
+    difficulte: 3,
+    suite: true,
+    idee: "Le bouton A ajoute 1 à la vitesse, B en enlève 1, entre 1 et 4 ; un appui compte une fois, même tenu longtemps. VITESSE et son chiffre s’affichent en haut.",
+    texte: [
+      "**Ce qui est nouveau ici : la vitesse change pendant le vol.** Un appui sur **A** l’augmente de 1, un appui sur **B** la baisse de 1. Elle reste entre **1** et **4** : `vitesse < 4` avant d’ajouter, `vitesse > 1` avant d’enlever.",
+      "**Le piège : un appui dure plusieurs images.** Même un appui rapide garde le bouton enfoncé pendant 5 ou 6 images. Si on écrivait seulement `if (bouton(A)) vitesse++;`, la vitesse monterait de 1 **à chaque image** : de 1 à 4 en un clin d’œil.",
+      "**La solution : se souvenir de l’image d’avant.** La variable `aAvant` vaut 1 si A était déjà enfoncé à l’image précédente, 0 sinon. On n’ajoute que si A est enfoncé **maintenant** et ne l’était **pas avant** : c’est le **début** de l’appui, et il n’arrive qu’une fois. Puis on note où en est A pour l’image suivante. `bAvant` fait pareil pour B.",
+      "**Déroulé d’un appui sur A de 5 images, vitesse 2 :** image 1 — A enfoncé, `aAvant` = 0 → vitesse 3, `aAvant` = 1 ; images 2 à 5 — A enfoncé, mais `aAvant` = 1 → rien ; image 6 — A lâché → `aAvant` = 0. Un appui, **+1**.",
+      "**L’affichage :** `texte(1, 0, \"VITESSE\")` une fois, avant la boucle ; puis à chaque image `nombre(9, 0, vitesse, 1)` écrit son chiffre (1 chiffre) juste après.",
+      "**À toi :** monte la limite à 6, ou fais démarrer l’avion à la vitesse 1.",
+    ],
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_AVION.cpp"   // un avion vu du dessus, 16 × 16
+`,
+      'perso_AVION.cpp': `// perso_AVION.cpp : un avion vu du dessus, le nez en haut, AVION (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le contour, « + » la carlingue, « - » le cockpit, « . » le transparent.
+
+Perso AVION = {
+  ".......##.......",
+  "......#++#......",
+  "......#--#......",
+  "......#--#......",
+  "......#++#......",
+  ".....##++##.....",
+  "...###++++###...",
+  ".##++++++++++##.",
+  "#++++++++++++++#",
+  "####..#++#..####",
+  "......#++#......",
+  "......#++#......",
+  "....###++###....",
+  "...#++++++++#...",
+  "...##########...",
+  "................",
+};
+`,
+    },
+    code: `// Changer de vitesse en vol : A accélère, B ralentit, entre 1 et 4.
+
+#include "personnages.cpp"   // la liste : AVION
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include <bouton>            // bouton() : lit un bouton de la manette
+#include <texte>             // texte() : le mot VITESSE
+#include <nombre>            // nombre() : le chiffre de la vitesse
+
+uint8_t vitesse = 2;   // pixels par image, de 1 à 4
+uint8_t aAvant = 0;    // 1 si A était déjà enfoncé à l'image d'avant
+uint8_t bAvant = 0;    // pareil pour B
+uint8_t px = 72;
+uint8_t py = 64;
+
+int main() {
+  texte(1, 0, "VITESSE");
+
+  while (true) {
+    image();
+
+    // A : seulement au DÉBUT de l'appui (enfoncé maintenant, pas avant).
+    if (bouton(A)) {
+      if (aAvant == 0 && vitesse < 4) vitesse++;
+      aAvant = 1;
+    } else {
+      aAvant = 0;
+    }
+    // B : pareil, pour ralentir.
+    if (bouton(B)) {
+      if (bAvant == 0 && vitesse > 1) vitesse--;
+      bAvant = 1;
+    } else {
+      bAvant = 0;
+    }
+
+    if (bouton(DROITE) && px + vitesse <= 144) px = px + vitesse;
+    if (bouton(GAUCHE) && px >= vitesse)       px = px - vitesse;
+    if (bouton(BAS) && py + vitesse <= 128)    py = py + vitesse;
+    if (bouton(HAUT) && py >= vitesse)         py = py - vitesse;
+
+    sprite16(0, px, py, AVION);
+    nombre(9, 0, vitesse, 1);   // le chiffre, juste après VITESSE
+  }
+}
+`,
+    aVoir: "VITESSE 2 en haut ; chaque appui sur A fait monter le chiffre (jusqu’à 4) et l’avion va plus vite ; chaque appui sur B le fait descendre (jusqu’à 1).",
+    controle: (c) => {
+      c.avancer(5)
+      const depart = c.mot(1, 0, 9)
+      c.presser('a', 6)
+      c.avancer(3)
+      const un = c.variable('vitesse')
+      c.presser('a', 6); c.avancer(3)
+      c.presser('a', 6); c.avancer(3)
+      const max = c.variable('vitesse')
+      c.presser('b', 6); c.avancer(3)
+      c.presser('b', 6); c.avancer(3)
+      c.presser('b', 6); c.avancer(3)
+      c.presser('b', 6); c.avancer(3)
+      const min = c.variable('vitesse')
+      c.avancer(2)
+      return [
+        ['VITESSE 2 s’affiche en haut', depart === 'VITESSE 2', ` (« ${depart} »)`],
+        ['un appui sur A, tenu 6 images : +1, pas +6', un === 3, ` (vitesse ${un})`],
+        ['A ne dépasse pas 4', max === 4],
+        ['B ne descend pas sous 1', min === 1],
+        ['le chiffre affiché suit', c.mot(9, 0, 1) === '1'],
+      ]
+    },
+  },
+
+  {
+    titre: "Plus lent qu’un pixel par image : la lenteur",
+    difficulte: 3,
+    suite: true,
+    idee: "Pour aller moins vite que 1 pixel par image, l’avion n’avance qu’une image sur « lenteur » : lenteur 3, c’est 20 pixels par seconde, trois fois moins vite que le 35.16.",
+    texte: [
+      "**Le problème :** au 35.17, `vitesse` compte des **pixels par image**. Le plus petit pas est **1** — 60 pixels par seconde, l’écran traversé en 2,4 secondes. Encore trop rapide pour piloter tranquillement. Et `vitesse = 0.5` ne marche pas : un `uint8_t` ne garde que des **nombres entiers**.",
+      "**L’idée : garder le pas d’un pixel, mais ne pas avancer à chaque image.** L’avion avance **une image sur `lenteur`**, et attend pendant les autres. `lenteur = 3` : il avance à l’image 3, à l’image 6, à l’image 9… — **20 pixels par seconde**, trois fois moins vite. Le vol reste **fluide** : chaque pas fait toujours un seul pixel.",
+      "**Ce qui est nouveau ici : un compteur, `compte`.** À chaque image, `compte++`. Quand il atteint `lenteur`, on le remet à 0 et on laisse les flèches faire **un pas**. Le reste du temps, les flèches ne font rien.",
+      "**Déroulé avec `lenteur = 3`, flèche droite tenue :** image 1 — compte = 1, rien ; image 2 — compte = 2, rien ; image 3 — compte = 3 ≥ 3, donc compte = 0 et **px + 1** ; image 4 — compte = 1, rien… Un pixel toutes les trois images.",
+      "**Le tableau des lenteurs :** `1` → 60 pixels par seconde (le 35.16) ; `2` → 30 ; **`3` → 20** (le réglage de cette leçon) ; `4` → 15 ; `6` → 10, très lent. Ici, **plus le nombre est grand, plus l’avion est lent** — c’est le contraire de `vitesse`.",
+      "**Les bords :** le pas est d’un pixel, donc les tests du 35.16 suffisent : `px < 144`, `px > 0`, `py < 128`, `py > 0`.",
+      "**À toi :** essaie `lenteur = 2`, puis `6`, et garde celle qui te va. Le nombre se change **en haut du programme**, à un seul endroit.",
+    ],
+    fichiers: {
+      'personnages.cpp': `// personnages.cpp : la liste des personnages — l'include qui inclut tous les fichiers.
+// principal.cpp la verse d'UNE ligne : #include "personnages.cpp".
+
+#include <Perso>   // UNE fois, pour TOUS les personnages de la liste (16 × 16 ou 32 × 32)
+
+#include "perso_AVION.cpp"   // un avion vu du dessus, 16 × 16
+`,
+      'perso_AVION.cpp': `// perso_AVION.cpp : un avion vu du dessus, le nez en haut, AVION (16 × 16) — juste le dessin.
+// Il est versé par personnages.cpp, la liste, qui porte « #include <Perso> ».
+// « # » le contour, « + » la carlingue, « - » le cockpit, « . » le transparent.
+
+Perso AVION = {
+  ".......##.......",
+  "......#++#......",
+  "......#--#......",
+  "......#--#......",
+  "......#++#......",
+  ".....##++##.....",
+  "...###++++###...",
+  ".##++++++++++##.",
+  "#++++++++++++++#",
+  "####..#++#..####",
+  "......#++#......",
+  "......#++#......",
+  "....###++###....",
+  "...#++++++++#...",
+  "...##########...",
+  "................",
+};
+`,
+    },
+    code: `// Plus lent : l'avion n'avance qu'une image sur « lenteur ».
+
+#include "personnages.cpp"   // la liste : AVION
+#include <sprite16>          // sprite16() : quatre lutins en carré
+#include <bouton>            // bouton() : lit un bouton de la manette
+
+uint8_t lenteur = 3;   // avance une image sur 3 : 1 = 60 px/s, 2 = 30, 3 = 20, 4 = 15, 6 = 10
+uint8_t compte = 0;    // les images comptées depuis le dernier pas
+uint8_t px = 72;       // la place de l'avion, en pixels : de 0 à 144…
+uint8_t py = 64;       // …et de 0 à 128. Il part du milieu.
+
+int main() {
+  while (true) {
+    image();
+
+    compte++;                  // une image de plus
+    if (compte >= lenteur) {   // c'est l'image d'un pas : une sur « lenteur »
+      compte = 0;              // on recommence à compter
+      if (bouton(DROITE) && px < 144) px++;   // un seul pixel : le vol reste fluide
+      if (bouton(GAUCHE) && px > 0)   px--;
+      if (bouton(BAS) && py < 128)    py++;
+      if (bouton(HAUT) && py > 0)     py--;
+    }
+
+    sprite16(0, px, py, AVION);   // posé à CHAQUE image, même sans pas
+  }
+}
+`,
+    aVoir: "Le même avion, trois fois moins vite qu’au 35.16 : il glisse doucement, un pixel à la fois, et s’arrête toujours au bord.",
+    controle: (c) => {
+      c.avancer(5)
+      c.presser('right', 30)
+      const x = c.variable('px')
+      c.presser('left', 300)
+      const gauche = c.variable('px')
+      c.presser('down', 400)
+      const bas = c.variable('py')
+      c.avancer(3)
+      return [
+        ['30 images de flèche droite : environ 10 pixels, au lieu de 30', x >= 80 && x <= 84, ` (px = ${x})`],
+        ['à gauche, il s’arrête pile à 0', gauche === 0],
+        ['en bas, pile à 128', bas === 128],
+        ['le lutin suit sa place', c.lutin(0).x === 0 && c.lutin(0).y === 128],
+      ]
+    },
+  },
+
+  {
     titre: 'Intégrer une carte dans son projet',
     difficulte: 3,
     idee: 'Une carte dessinée à la souris est une fonction du programme : on l’appelle, et le décor apparaît.',
@@ -26961,7 +28515,7 @@ int main() {
     code: `/* Une TUILE de 8 × 8 : un arbre. Elle se peint dans ▦ Les tuiles. */
 
 #include <Tuile>         // un dessin de 8 × 8 pixels
-#include <Perso>         // un dessin de 16 × 16 pixels, pour un lutin
+#include <Perso>         // un personnage : un dessin de 16 × 16 ou de 32 × 32 pixels
 #include <poser>         // pose une tuile sur une case du fond
 #include <couleurFond>   // choisit une couleur d’une palette du fond
 #include <texte>         // écrit un texte à l’écran
@@ -28675,7 +30229,7 @@ int main() {
       '**Sur le fond, il n’y a pas de `poser16()`** — une case du décor fait huit pixels, et le personnage en couvre quatre. On pose donc ses quarts un par un, et l’ordre est celui des numéros : `poser(10, 8, HEROS); poser(11, 8, HEROS + 1); poser(10, 9, HEROS + 2); poser(11, 9, HEROS + 3);`. C’est ce que fait le programme ci-dessous, en plus du lutin.',
       'Dans l’atelier, **« + perso 16 × 16 »** en ajoute un, et la grille passe à seize sur seize. Le reste ne change pas : on peint, et le programme se réécrit.',
     ],
-    code: `#include <Perso>      // un dessin de 16 × 16 pixels, pour un lutin
+    code: `#include <Perso>      // un personnage : un dessin de 16 × 16 ou de 32 × 32 pixels
 #include <texte>      // écrit un texte à l’écran
 #include <poser>      // pose une tuile sur une case du fond
 #include <bouton>     // lit un bouton de la manette

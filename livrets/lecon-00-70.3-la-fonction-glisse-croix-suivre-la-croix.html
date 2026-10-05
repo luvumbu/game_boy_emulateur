@@ -135,6 +135,9 @@ Tes fonctions appelées :
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
     <pre><code>// ---- #include &lt;glisse_croix&gt; : suivre la croix, au pixel près ----
 
+// Un B, parti du pixel (8, 8), en haut à gauche.
+// (Le A au milieu, ce seront les leçons qui suivent.)
+
 #include &lt;glisse_croix&gt;   // glisse_croix() : un lutin qui suit la croix
 #include &lt;ALPHABET&gt;</code></pre>
   </div>
@@ -144,7 +147,7 @@ Tes fonctions appelées :
 <div class="morceau">
   <div>
     <p class="quoi">2. une variable — px</p>
-    <pre><code>uint8_t px = 76;</code></pre>
+    <pre><code>uint8_t px = 8;</code></pre>
   </div>
   <div></div>
 </div>
@@ -152,7 +155,7 @@ Tes fonctions appelées :
 <div class="morceau">
   <div>
     <p class="quoi">3. une variable — py</p>
-    <pre><code>uint8_t py = 68;</code></pre>
+    <pre><code>uint8_t py = 8;</code></pre>
   </div>
   <div></div>
 </div>
@@ -163,7 +166,7 @@ Tes fonctions appelées :
     <pre><code>int main() {
   while (true) {
     image();
-    glisse_croix(0, px, py, ALPHABET[0], 1);   // le lutin 0, un pixel par image
+    glisse_croix(0, px, py, ALPHABET[1], 1);   // le lutin 0, un pixel par image
   }
 }</code></pre>
   </div>
@@ -184,7 +187,7 @@ programme.</p>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABhElEQVR4nO3RoQ3DUBQEQcOUYJj+q0kJLsMwIMQg1P7SvJUGHDxpt+P8BLYtf5BbFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYFyBcQXGFRhXYNygwK/9/bP8yZOmBL52HdW4wLhBga+W/3nMoMB/N6/AuALjpgQeq8C4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCsw7gtWWfKjdi8m+AAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABfUlEQVR4nO3XsQmAQBAAQUNLMLT/aizBMgzNjERBEHEZmODDg+UOfli3hbDh8wl4lcBxAscJHCdwnMBxAsddBR6n+fD5oDxzE/j0zY8IHOdEx9ngOIHjnOg4/+A4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4HQz87dPk7/zxAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
   </figure>
 </div>
@@ -192,7 +195,7 @@ programme.</p>
 
 
 <h2>4. Ce qu’on doit voir</h2>
-<p class="avoir">Un A au milieu ; la croix le fait glisser en douceur.</p>
+<p class="avoir">Un B en haut à gauche ; la croix le fait glisser en douceur.</p>
 
 <h2>5. Ce que la console répond</h2>
 <p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
@@ -201,7 +204,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 <ul class="controles">
 
-  <li>BAS tenu 30 images : py a grandi d’environ 30 <span class="detail"> (py = 98)</span></li>
+  <li>BAS tenu 30 images : py a grandi d’environ 30 <span class="detail"> (py = 38)</span></li>
 
   <li>le lutin est là où dit py </li>
 </ul>

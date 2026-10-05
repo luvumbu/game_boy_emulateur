@@ -29,7 +29,7 @@ for (const [index, lecon] of COURS.entries()) {
   let laConsole
   let octets
   try {
-    const bati = consoleDuProgramme(lecon.code, lecon.titre)
+    const bati = consoleDuProgramme(lecon.code, lecon.titre, true, lecon.fichiers ?? {})   // ses fichiers voisins aussi (chapitre 15)
     laConsole = bati.laConsole
     octets = bati.octets
   } catch (erreur) {

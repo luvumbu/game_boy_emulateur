@@ -1,6 +1,6 @@
 /* Un personnage de SEIZE : quatre tuiles, un seul appel. */
 
-#include <Perso>      // un dessin de 16 × 16 pixels, pour un lutin
+#include <Perso>      // un personnage : un dessin de 16 × 16 ou de 32 × 32 pixels
 #include <texte>      // écrit un texte à l’écran
 #include <bouton>     // lit un bouton de la manette
 #include <sprite16>   // place un lutin de 16 × 16 au pixel près

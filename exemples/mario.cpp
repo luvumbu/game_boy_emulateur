@@ -6,7 +6,7 @@
 // leur place — c'est là tout l'intérêt d'être passé au C++.
 
 #include <Tuile>      // un dessin de 8 × 8 pixels
-#include <Perso>      // un dessin de 16 × 16 pixels, pour un lutin
+#include <Perso>      // un personnage : un dessin de 16 × 16 ou de 32 × 32 pixels
 #include <poser>      // pose une tuile sur une case du fond
 #include <sprite16>   // place un lutin de 16 × 16 au pixel près
 #include <cacher16>   // cache un lutin de 16 × 16

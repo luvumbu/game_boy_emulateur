@@ -561,6 +561,41 @@
      montrent en même temps et les onglets ne servent à rien. */
   .atelier[hidden] { display: none; }
 
+  /* --- l'onglet « Tout le jeu » : un dossier par groupe d'éléments --- */
+  .tout-recherche { width: 100%; max-width: 360px; margin: 2px 0 6px; padding: 5px 8px; border-radius: 6px;
+    border: 1px solid var(--bord); background: var(--panneau-clair); color: var(--texte); }
+  .tout-dossiers { display: flex; flex-direction: column; gap: 8px; }
+  .tout-dossier { border: 1px solid var(--bord); border-radius: 8px; background: var(--panneau-clair); }
+  .tout-dossier > summary { display: flex; align-items: center; gap: 10px; padding: 6px 8px; cursor: pointer; list-style: none; }
+  .tout-dossier > summary::-webkit-details-marker { display: none; }
+  .tout-dossier > summary::before { content: '▸'; color: var(--gris); }
+  .tout-dossier[open] > summary::before { content: '▾'; }
+  .tout-pochette { width: 48px; height: 48px; flex: 0 0 48px; border-radius: 8px; object-fit: cover; border: 1px solid var(--bord); }
+  .tout-icone { display: grid; place-items: center; font-size: 26px; background: #0b0d10; }
+  .tout-titre { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+  .tout-compte { color: var(--gris); font-weight: normal; }
+  .tout-dit { color: var(--gris); font-size: 11px; }
+  .tout-outils-dossier { display: flex; align-items: center; gap: 4px; }
+  .tout-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; padding: 0 8px 8px; }
+  .tout-element { display: flex; gap: 8px; padding: 6px; border: 1px solid var(--bord); border-radius: 6px; background: var(--fond, #0b0d10); min-width: 0; }
+  .tout-cadre { flex: 0 0 64px; height: 64px; display: grid; place-items: center; background: #0b0d10; border-radius: 4px; }
+  .tout-miniature { max-width: 64px; max-height: 64px; width: 64px; image-rendering: pixelated; }
+  .tout-texte { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 12px; }
+  .tout-ou { color: var(--gris); font-size: 11px; }
+  .tout-marque { font-size: 10px; color: var(--vert); }
+  .tout-emploi { font-size: 11px; color: var(--vert); }
+  .tout-emploi.jamais { color: var(--gris); }
+  .tout-appel { font-size: 11px; white-space: pre-wrap; word-break: break-word; }
+  .tout-actions { display: flex; gap: 4px; margin-top: 2px; }
+  .tout-inclure { padding: 0 8px 8px; margin: 0; }
+  @media (max-width: 520px) { .tout-grille { grid-template-columns: 1fr; } }
+
+  /* --- l'onglet « Les sources » : des listes de liens --- */
+  .sources h3 { margin: 6px 0 0; font-size: 14px; }
+  .sources-liste { margin: 0; padding-left: 18px; line-height: 1.7; }
+  .sources-liste a { color: var(--texte); }
+  .sources-chapitre summary { cursor: pointer; padding: 2px 0; }
+
   /* --- la boîte qui demande un nom --- */
 
   .voile {
@@ -888,6 +923,9 @@
   .bande-recherche { width: 100%; max-width: 360px; margin: 0 0 6px; box-sizing: border-box; }
   .tuile { position: relative; }
   .tuile[hidden] { display: none; }
+  /* Un dessin verrouillé : un cadenas dans le coin, et un cadre en pointillés. */
+  .tuile.verrouille { outline: 1px dashed var(--gris); outline-offset: -3px; }
+  .tuile.verrouille::after { content: '🔒'; position: absolute; top: 1px; left: 3px; font-size: 11px; }
   .bande-etoile { position: absolute; top: 1px; right: 3px; font-size: 13px; color: #8889; cursor: pointer; }
   .bande-etoile.allumee { color: #ffd23f; }
   .bande-etoile::before { content: "☆"; }
@@ -1185,6 +1223,12 @@
   .fichier .oter:hover { color: var(--rouge); background: none; }
 
   .fichier.neuf { color: var(--texte); font-family: inherit; }
+  .fichier.groupe { color: var(--texte); font-family: inherit; border: 1px dashed var(--bord); }
+  .fichier.groupe.deplie { border-style: solid; }
+  .fichier.du-groupe { background: #10161b; font-size: 11px; }
+  /* Un dessin écrit dans un autre onglet : un clic ouvre son fichier. */
+  .tuile.ailleurs { opacity: .85; }
+  .tuile.ailleurs::before { content: '↗'; position: absolute; bottom: 1px; right: 3px; font-size: 10px; color: var(--gris); }
   body[data-mode="creation"] .aide-longue { display: none; }
   body[data-mode="creation"] .zone-creation { display: flex; flex-direction: column; gap: 12px; }
 
@@ -1297,9 +1341,12 @@
     <div class="modes" role="tablist" aria-label="Mode de travail">
       <button type="button" class="mode actif" id="mode-creation" role="tab" aria-selected="true">
         <b>🎨 MODE CRÉATION</b>
-        <small>dessiner, composer</small>
+        <small>dessiner, composer, écrire le code</small>
       </button>
-      <button type="button" class="mode" id="mode-code" role="tab" aria-selected="false">
+      <!-- Le MODE CODE a rejoint la création : un seul mode, où « ⤢ Agrandir le
+           code » donne tout l'écran au programme. Ce bouton reste pour les
+           anciens liens (#code) et les réglages, caché. -->
+      <button type="button" class="mode" id="mode-code" role="tab" aria-selected="false" hidden>
         <b>⌨ MODE CODE</b>
         <small>écrire le programme</small>
       </button>
@@ -1315,6 +1362,13 @@
       <button type="button" class="mode" id="mode-machine" role="tab" aria-selected="false">
         <b>🔎 MODE MACHINE</b>
         <small>ce que la console exécute</small>
+      </button>
+      <!-- Les sources : le même contenu que l'onglet « 📚 Les sources » du mode
+           création, mais ici, aussi visible que les autres modes : plus besoin
+           de deviner qu'il existe. -->
+      <button type="button" class="mode" id="mode-sources" role="tab" aria-selected="false">
+        <b>🔗 LES SOURCES</b>
+        <small>tous les cours et documents</small>
       </button>
     </div>
 
@@ -1476,6 +1530,8 @@
       <div class="zone-code" id="zone-code">
         <h2 class="rangee">
           <span id="titre-code">Ton programme</span>
+          <button type="button" class="petit" id="bascule-code" hidden
+            title="donner tout l'écran au programme, ou faire revenir les ateliers">⤢ Agrandir le code</button>
           <span class="pousse"></span>
           <span class="aide poignee">↕ tire le bas du cadre pour changer sa hauteur</span>
         </h2>
@@ -1552,6 +1608,12 @@
         <button type="button" class="onglet" id="onglet-modeles" role="tab" aria-selected="false">
           🖼 Les modèles
         </button>
+        <button type="button" class="onglet" id="onglet-tout" role="tab" aria-selected="false" title="tout ce que ton jeu contient, rangé par dossier">
+          📦 Tout le jeu
+        </button>
+        <button type="button" class="onglet" id="onglet-sources" role="tab" aria-selected="false">
+          📚 Les sources
+        </button>
         <span class="pousse"></span>
         <span class="aide" id="compte-atelier"></span>
       </div>
@@ -1589,6 +1651,12 @@
         <div class="bande" id="bande-carte"></div>
         <div id="grille-carte"></div>
       </div>
+
+      <!-- Les sources : tous les documents (PDF, pages, textes), remplis par sources.js. -->
+      <div id="atelier-sources" class="atelier sources" hidden></div>
+
+      <!-- Tout le jeu : chaque élément du programme, rangé par dossier (tout-le-jeu.js). -->
+      <div id="atelier-tout" class="atelier tout" hidden></div>
 
       <div id="atelier-modeles" class="atelier" hidden>
         <p class="aide">
@@ -1742,7 +1810,7 @@ import { installerEditeur } from './editeur-code.js'
 import { installer as installerCouleurs } from './editeur-couleurs.js'
 import { installer as installerAirs } from './editeur-airs.js'
 import { installer as installerCarte, ecrireCarte, listerLesCartes, LARGEUR_PX, HAUTEUR_PX } from './editeur-carte.js'
-import { ajouterDessin, peindre, lireDessins } from './editeur-tuiles.js'
+import { ajouterDessin, peindre, lireDessins, lireEtiquettes, nomsDuProgramme } from './editeur-tuiles.js'
 import { MODELES } from './bibliotheque.js'
 import { tuileDepuisUneImage, tuilesDepuisUneImageEnGrille, fichierDeLaGrille, imagesDUnGif } from './importer-image.js'
 import { lireAnimations, ecrireAnimations } from './animations-tuiles.js'
@@ -1765,6 +1833,53 @@ import { installer as installerLInspecteur } from './inspecteur.js'
 import { champDeRecherche, correspond, fiche, filtrerUnMenu, filtrerUneGrille, motsDe, motsDuCode, normaliser } from './recherche.js'
 import { installer as installerToutChercher } from './recherche-globale.js'
 import { FONCTIONS } from './aide-fonctions.js'
+import { installer as installerLesSources } from './sources.js'
+import { installer as installerToutLeJeu } from './tout-le-jeu.js'
+import { rangerLesPersonnages, creerEnfant, nettoyerLesEnfants, renommerDansLeProjet, fichierEnfant, estEnfant, estDuGroupe, FICHIER_DES_PERSONNAGES } from './ranger-personnages.js'
+
+/*
+ * Poser tout un programme changé à la fois (des fichiers ajoutés, renommés,
+ * ôtés) : l'onglet ouvert suit son fichier, ou revient au principal s'il n'est
+ * plus là. « renommes » : ancien nom de fichier → nouveau.
+ */
+function poserLesFichiers(neufs, renommes = new Map()) {
+  fichiers.clear()
+  for (const [nom, texte] of neufs) fichiers.set(nom, texte)
+  if (renommes.has(fichierCourant)) fichierCourant = renommes.get(fichierCourant)
+  if (!fichiers.has(fichierCourant)) fichierCourant = PRINCIPAL
+  $('source').value = fichiers.get(fichierCourant)
+  texteConnu = $('source').value
+  if (typeof editeurDeCode !== 'undefined') editeurDeCode.rafraichir()
+  rafraichirFichiers()
+  atelier.rafraichir()
+  atelierAirs.rafraichir()
+  atelierCarte.rafraichir()
+  retenirLeProgramme()
+  if (typeof projets !== 'undefined') projets.marquerModifie()
+  compilerEtLancer()
+}
+
+/* Tout le programme, l'onglet ouvert compris (le champ peut être plus récent que sa copie). */
+function tousLesFichiers() {
+  fichiers.set(fichierCourant, $('source').value)
+  return [...fichiers]
+}
+import { atteintesAuxVerrous, phraseDuRefus, verrouiller, estVerrouille } from './verrous.js'
+import { supprimerLElement } from './supprimer.js'
+
+/*
+ * Supprimer un élément de tout le projet — refusé s'il sert quelque part, ou
+ * s'il est verrouillé (supprimer.js). Une seule étape à annuler. Rend la phrase.
+ */
+function supprimerDuProjet(nom, genre) {
+  fichiers.set(fichierCourant, $('source').value)
+  const { fichiers: neufs, refus } = supprimerLElement([...fichiers], nom, genre)
+  if (refus) return refus.pourquoi
+  retenirLeProgrammeEntier()
+  /* Un personnage seul dans son fichier : le fichier part, et sa ligne dans personnages.cpp. */
+  poserLesFichiers(nettoyerLesEnfants([...neufs]))
+  return `🗑 ${nom} est supprimé du programme. « ↶ » (Ctrl+Z) le fait revenir.`
+}
 
 /*
  * Les exemples ne sont PAS recopiés ici : la page va chercher les mêmes
@@ -2200,7 +2315,7 @@ const CATALOGUE = [
   {
     cle: 'modeDemarrage', groupe: 'La page', type: 'liste', defaut: 'dernier',
     titre: 'Le mode au chargement', aide: 'Par quoi la page s’ouvre, la prochaine fois.',
-    options: [['dernier', 'Celui que je quitte'], ['creation', 'Création'], ['code', 'Code'], ['lecons', 'Apprendre']],
+    options: [['dernier', 'Celui que je quitte'], ['creation', 'Création'], ['code', 'Création, le code en grand'], ['lecons', 'Apprendre']],
     appliquer: () => {},
   },
   {
@@ -2403,7 +2518,33 @@ function gestesDuCode(e) {
  */
 let minuterieDeFrappe = 0
 
+/*
+ * Le verrou, à la frappe : une touche qui changerait un dessin verrouillé
+ * (ses rangées, sa table de palettes), l'effacerait, ou ôterait sa marque,
+ * est défaite aussitôt — le texte revient tel qu'il était, le curseur aussi.
+ */
+function refuserSiVerrouille() {
+  if (texteConnu === null) return false
+  const champ = $('source')
+  const atteintes = atteintesAuxVerrous(texteConnu, champ.value)
+  const phrase = phraseDuRefus(atteintes)
+  if (!phrase) return false
+  const ou = Math.max(0, champ.selectionStart - (champ.value.length - texteConnu.length))
+  champ.value = texteConnu
+  champ.setSelectionRange(ou, ou)
+  if (typeof editeurDeCode !== 'undefined') editeurDeCode.rafraichir()
+  direLeVerrou(phrase)
+  return true
+}
+
+/** Le refus d'un verrou, là où l'on regarde : sous l'éditeur, et dans la barre de l'atelier. */
+function direLeVerrou(phrase) {
+  $('etat').className = 'etat erreur'
+  $('etat').textContent = phrase
+}
+
 function surFrappeDansLeCode() {
+  if (refuserSiVerrouille()) return
   if (texteConnu !== null) retenirPourAnnuler(texteConnu, $('source').value, 'frappe')
   texteConnu = $('source').value
   fichiers.set(fichierCourant, $('source').value)
@@ -2632,7 +2773,18 @@ function inclureDansLaCartouche(nom, oui) {
  * « #include » qui lui manquent — chaque fonction de la console s'inclut, et
  * l'on ne demande pas à quelqu'un qui peint une tuile d'écrire « #include <Tuile> ».
  */
-function poserLeCode(texte, genre = 'atelier', { tel = false } = {}) {
+function poserLeCode(texte, genre = 'atelier', { tel = false, sansVerrou = false } = {}) {
+  /* Le verrou : un atelier ne retouche pas un dessin verrouillé. Les retours en
+     arrière (↶, une version) et les programmes remplacés en entier passent. */
+  if (genre === 'atelier' && !sansVerrou && !enRestauration) {
+    const atteintes = atteintesAuxVerrous($('source').value, texte)
+    if (atteintes.modifies.length) {
+      direLeVerrou(phraseDuRefus({ ...atteintes, disparus: [], deverrouilles: [] }))
+      /* L'atelier a déjà dessiné son geste : il se redessine depuis le texte, inchangé. */
+      if (typeof atelier !== 'undefined') atelier.rafraichir()
+      return false
+    }
+  }
   if (!tel && fichierCourant === PRINCIPAL) {
     const autres = Object.fromEntries([...fichiers].filter(([nom]) => nom !== PRINCIPAL))
     texte = completerLesInclusions(texte, autres)
@@ -3864,6 +4016,56 @@ const atelier = installerTuiles({
   ecrireSource: poserLeCode,
   surChangement: surChangementDeLAtelier,
   demanderUnNom,
+  /* 🗑 Supprimer : refusé si le dessin sert quelque part, ou s'il est verrouillé. */
+  suppression: { supprimer: (nom) => supprimerDuProjet(nom, 'dessin') },
+  /* 🔒 / 🔓 : la marque sous le dessin, posée ou ôtée sans passer par le garde. */
+  verrou: {
+    est: (nom) => estVerrouille($('source').value, nom),
+    basculer: (nom) => poserLeCode(verrouiller($('source').value, nom, !estVerrouille($('source').value, nom)), 'atelier', { sansVerrou: true, tel: true }),
+  },
+  /*
+   * Le projet entier, en création (pas dans une leçon, qui garde son programme) :
+   * la bande montre les dessins de tous les onglets, et un personnage créé vit
+   * dans son fichier perso_NOM.cpp, listé par personnages.cpp — la source
+   * principale ne reçoit qu'une ligne, la toute première fois.
+   */
+  projet: {
+    actif: () => document.body.dataset.mode === 'creation',
+    fichierCourant: () => fichierCourant,
+    aller: (fichier) => { if (fichier !== fichierCourant && fichiers.has(fichier)) ouvrirFichier(fichier) },
+    noms: () => {
+      const pris = new Set()
+      for (const [, texte] of tousLesFichiers()) for (const n of nomsDuProgramme(texte)) pris.add(n)
+      return pris
+    },
+    tousLesDessins: () => {
+      const tous = tousLesFichiers()
+      /* Les numéros de tuile se comptent sur le programme ASSEMBLÉ : c'est son ordre qui compte. */
+      let numeros = new Map()
+      try {
+        const texte = rassembler((nom) => fichiers.get(nom) ?? '', PRINCIPAL).texte
+        numeros = new Map(lireDessins(texte).map((d) => [d.nom, d.numero]))
+      } catch { /* un fichier manquant : les numéros de chaque fichier suffiront */ }
+      const liste = []
+      for (const [fichier, texte] of tous) {
+        for (const d of lireDessins(texte)) {
+          liste.push({ ...d, fichier, numero: numeros.get(d.nom) ?? d.numero, etiquettes: lireEtiquettes(texte, d.nom), verrouille: estVerrouille(texte, d.nom) })
+        }
+      }
+      return liste
+    },
+    creer: (nom, cote, rangees = null) => {
+      const neufs = creerEnfant(tousLesFichiers(), PRINCIPAL, nom, cote, rangees)
+      retenirLeProgrammeEntier()
+      poserLesFichiers(neufs)
+      ouvrirFichier(fichierEnfant(nom))
+    },
+    renommer: (ancien, neuf) => {
+      const { fichiers: neufs, renommes } = renommerDansLeProjet(tousLesFichiers(), ancien, neuf)
+      retenirLeProgrammeEntier()
+      poserLesFichiers(neufs, renommes)
+    },
+  },
   /*
    * En couleur ou non, c'est TON CHOIX qui le dit (en haut de la page, ou à la création), et non
    * la cartouche déjà compilée : un programme neuf n'a encore aucune couleur, il sortait donc en
@@ -4084,7 +4286,7 @@ const DIDACTICIEL = [
     titre: '🧭 Premiers pas : la page',
     dit: 'Où est quoi : les modes, le programme, la console, les projets.',
     etapes: [
-      { selecteur: '.modes', titre: 'Cinq façons de travailler', texte: 'CRÉATION pour dessiner et faire un jeu à la souris, CODE pour écrire le programme, APPRENDRE pour suivre le parcours, MACHINE pour voir ce que la console exécute vraiment.' },
+      { selecteur: '.modes', titre: 'Quatre façons de travailler', texte: 'CRÉATION pour dessiner, composer et écrire le programme (« ⤢ Agrandir le code » lui donne tout l’écran), APPRENDRE pour suivre le parcours, MACHINE pour voir ce que la console exécute vraiment, LES SOURCES pour ouvrir tous les cours et documents.' },
       { selecteur: '#source', titre: 'Le programme', avant: allerA('code'), texte: 'Tout ton jeu est ici, en C++. Les ateliers l’écrivent pour toi quand tu dessines ; tu peux aussi l’écrire toi-même.' },
       { selecteur: '#lancer', titre: 'Compiler et lancer', texte: 'Transforme le programme en cartouche et la fait tourner dans la console. Raccourci : Ctrl + Entrée.' },
       { selecteur: '#ecran', titre: 'La console', texte: 'Ta Game Boy. Clique dedans, puis joue : flèches pour la croix, X pour A, Z pour B, Entrée pour Start. Une manette USB marche aussi.' },
@@ -4154,7 +4356,7 @@ const DIDACTICIEL = [
     titre: '⌨ Écrire du code',
     dit: 'Le programme, les fautes, ce que coûte la cartouche.',
     etapes: [
-      { selecteur: '#mode-code', titre: 'Le mode Code', avant: allerA('code'), texte: 'Toute la place pour le programme. Le langage est un C++ simple, fait pour la Game Boy.' },
+      { selecteur: '#bascule-code', titre: 'Le code en grand', avant: allerA('code'), texte: 'Toute la place pour le programme, sans quitter le mode : « ⤡ Revoir les ateliers » les fait revenir. Le langage est un C++ simple, fait pour la Game Boy.' },
       { selecteur: '#source', titre: 'L’éditeur', avant: allerA('code'), texte: 'La cartouche se refait toute seule quand tu t’arrêtes d’écrire. « + fichier » ajoute un onglet, relié par #include.' },
       { selecteur: '#etat', titre: 'La compilation', texte: 'Ce qui a marché — ou la faute, avec sa ligne et une explication. Le curseur saute sur la ligne en cause.' },
       { selecteur: '#analyse', titre: 'Ce que coûte la cartouche', texte: 'La ROM (32 Ko), la mémoire de travail et la mémoire rapide, en barres — et ce qui pèse le plus. Au-delà de 90 %, des conseils.' },
@@ -4396,6 +4598,8 @@ function montrerAtelier(lequel) {
     ['onglet-couleurs', 'atelier-couleurs', 'couleurs'],
     ['onglet-carte', 'atelier-carte', 'carte'],
     ['onglet-modeles', 'atelier-modeles', 'modeles'],
+    ['onglet-sources', 'atelier-sources', 'sources'],
+    ['onglet-tout', 'atelier-tout', 'tout'],
   ]) {
     $(zone).hidden = lequel !== sien
     $(onglet).classList.toggle('actif', lequel === sien)
@@ -4406,7 +4610,22 @@ function montrerAtelier(lequel) {
   if (lequel !== 'airs') atelierAirs.arreter()
   if (lequel === 'couleurs') atelierCouleurs.rafraichir()
   if (lequel === 'carte') atelierCarte.rafraichir()
+  if (lequel === 'tout') toutLeJeu.rafraichir()
   compterLAtelier()
+  allumerLesSources()
+}
+
+/* Le bouton « 🔗 LES SOURCES » du haut brille quand les sources sont sous les
+   yeux ; « MODE CRÉATION » s'éteint alors, pour qu'un seul bouton brille. */
+function allumerLesSources() {
+  const enCreation = document.body.dataset.mode === 'creation'
+  const surLesSources = enCreation && !$('atelier-sources').hidden
+  $('mode-sources').classList.toggle('actif', surLesSources)
+  $('mode-sources').setAttribute('aria-selected', String(surLesSources))
+  if (enCreation) {
+    $('mode-creation').classList.toggle('actif', !surLesSources)
+    $('mode-creation').setAttribute('aria-selected', String(!surLesSources))
+  }
 }
 
 $('onglet-tuiles').addEventListener('click', () => montrerAtelier('tuiles'))
@@ -4414,6 +4633,67 @@ $('onglet-airs').addEventListener('click', () => montrerAtelier('airs'))
 $('onglet-couleurs').addEventListener('click', () => montrerAtelier('couleurs'))
 $('onglet-carte').addEventListener('click', () => montrerAtelier('carte'))
 $('onglet-modeles').addEventListener('click', () => montrerAtelier('modeles'))
+$('onglet-sources').addEventListener('click', () => montrerAtelier('sources'))
+$('onglet-tout').addEventListener('click', () => montrerAtelier('tout'))
+
+/* L'onglet « Les sources » : la liste de tous les documents du projet. */
+installerLesSources({ zone: $('atelier-sources'), LECONS, NIVEAUX, numeros })
+
+/*
+ * « 📦 Tout le jeu » : tous les éléments, de TOUS les onglets du programme.
+ * Le texte de l'onglet ouvert est pris dans le champ (il peut être plus récent
+ * que la copie gardée), et principal.cpp vient en premier.
+ * « ✏ ouvrir » passe à l'onglet du fichier où l'élément est écrit, puis à son
+ * atelier, et l'y choisit par son nom.
+ */
+const toutLeJeu = installerToutLeJeu({
+  zone: $('atelier-tout'),
+  lireFichiers: () => {
+    const tous = new Map(fichiers)
+    tous.set(fichierCourant, $('source').value)
+    return [...tous].sort(([a], [b]) => (a === PRINCIPAL ? -1 : b === PRINCIPAL ? 1 : 0))
+  },
+  ouvrir: (groupe, nom, fichier) => {
+    if (fichier !== fichierCourant && fichiers.has(fichier)) ouvrirFichier(fichier)
+    montrerAtelier(groupe.atelier)
+    const lAtelier = { tuiles: atelier, airs: atelierAirs, carte: atelierCarte }[groupe.atelier]
+    lAtelier?.choisir?.(nom)
+  },
+  supprimer: (groupe, nom) => supprimerDuProjet(nom, groupe.genre),
+  /* 🔒 / 🔓 depuis « Tout le jeu » : dans le fichier où le dessin est écrit. */
+  verrouiller: (nom, fichier, oui) => {
+    fichiers.set(fichierCourant, $('source').value)
+    const avant = fichiers.get(fichier)
+    if (avant === undefined) return
+    const apres = verrouiller(avant, nom, oui)
+    if (apres === avant) return
+    retenirLeProgrammeEntier()
+    fichiers.set(fichier, apres)
+    if (fichier === fichierCourant) { $('source').value = apres; texteConnu = apres; if (typeof editeurDeCode !== 'undefined') editeurDeCode.rafraichir() }
+    atelier.rafraichir()
+    retenirLeProgramme()
+    if (typeof projets !== 'undefined') projets.marquerModifie()
+  },
+  /* « 📁 Un fichier par personnage » : chaque Perso et Grand, de tous les
+     onglets, dans son perso_NOM.cpp, listé par personnages.cpp — une seule
+     étape à annuler. */
+  ranger: (groupe) => {
+    if (groupe.id !== 'personnages') return ''
+    fichiers.set(fichierCourant, $('source').value)
+    const { fichiers: neufs, deplaces } = rangerLesPersonnages([...fichiers], PRINCIPAL)
+    if (!deplaces.length) return 'Rien à ranger : chacun est déjà dans son fichier.'
+    retenirLeProgrammeEntier()
+    poserLesFichiers(neufs)
+    return `${deplaces.length} rangé${deplaces.length > 1 ? 's' : ''}, un fichier chacun : ${deplaces.map(fichierEnfant).join(', ')}. « ↶ » le défait.`
+  },
+})
+/* Le programme change sous nos yeux (une frappe, un autre exemple) : l'inventaire suit. */
+let toutLeJeuEnRetard = null
+$('source').addEventListener('input', () => {
+  if ($('atelier-tout').hidden) return
+  clearTimeout(toutLeJeuEnRetard)
+  toutLeJeuEnRetard = setTimeout(() => toutLeJeu.rafraichir(), 400)
+})
 
 remplirLaBibliotheque()
 
@@ -4469,23 +4749,33 @@ function montrerMode(lequel) {
      page, si l'on n'y a jamais touché. */
   $('source').style.height = hauteurChoisie[lequel] ?? ''
   $('source').classList.toggle('taille-choisie', hauteurChoisie[lequel] !== null)
+  /* « code » n'est plus un mode à part : c'est la création, le code en grand.
+     Le bouton « MODE CRÉATION » reste donc allumé dans les deux vues. */
+  const allume = lequel === 'code' ? 'creation' : lequel
   for (const [bouton, sien] of [['mode-creation', 'creation'], ['mode-code', 'code'], ['mode-lecons', 'lecons'], ['mode-cours', 'cours'], ['mode-machine', 'machine']]) {
-    $(bouton).classList.toggle('actif', lequel === sien)
-    $(bouton).setAttribute('aria-selected', String(lequel === sien))
+    $(bouton).classList.toggle('actif', allume === sien)
+    $(bouton).setAttribute('aria-selected', String(allume === sien))
   }
+  $('bascule-code').hidden = !(lequel === 'creation' || lequel === 'code')
+  $('bascule-code').textContent = lequel === 'code' ? '⤡ Revoir les ateliers' : '⤢ Agrandir le code'
 
   $('titre-code').textContent =
     lequel === 'creation' ? 'Ton programme — il se réécrit quand tu dessines'
       : vue === 'lecons' ? 'Le programme de la leçon — à modifier, c’est fait pour'
-        : 'Ton programme'
+        : lequel === 'code' ? 'Ton programme — en grand'
+          : 'Ton programme'
   /* Rien ne joue quand on quitte l'atelier : une mélodie qu'on n'a plus sous
      les yeux n'a pas à continuer de sonner. */
   if (!avecAtelier) atelierAirs.arreter()
+  allumerLesSources()
 }
 
 $('mode-creation').addEventListener('click', () => montrerMode('creation'))
 $('mode-code').addEventListener('click', () => montrerMode('code'))
+/* Le seul passage entre les deux vues du mode : les ateliers, ou le code en grand. */
+$('bascule-code').addEventListener('click', () => montrerMode(document.body.dataset.mode === 'code' ? 'creation' : 'code'))
 $('mode-machine').addEventListener('click', () => montrerMode('machine'))
+$('mode-sources').addEventListener('click', () => { montrerMode('creation'); montrerAtelier('sources') })
 
 /* On arrive sur une leçon, pas sur une page vide : celle où l'on en était —
    dans CETTE série. Passer des leçons au cours ouvre donc la leçon du cours. */
@@ -5063,16 +5353,68 @@ function ouvrirProgramme(texte, autres = null) {
   rafraichirFichiers()
 }
 
+/*
+ * Les fichiers des personnages (personnages.cpp et ses perso_NOM.cpp) sont
+ * repliés dans UN groupe : avec un fichier par personnage, la rangée
+ * d'onglets déborderait. Il se déplie d'un clic, et reste ouvert quand on
+ * travaille dans l'un d'eux.
+ */
+let groupeDesPersonnagesOuvert = false
+
+/* Un personnage tapé à la main dans un fichier du groupe : le compteur suit la
+   frappe (un peu après, pour ne pas redessiner les onglets à chaque touche). */
+let compteurEnRetard = null
+$('source').addEventListener('input', () => {
+  if (!$('groupe-personnages')) return
+  clearTimeout(compteurEnRetard)
+  compteurEnRetard = setTimeout(rafraichirFichiers, 400)
+})
+
 function rafraichirFichiers() {
   const zone = $('fichiers')
   zone.textContent = ''
 
+  const duGroupe = [...fichiers.keys()].filter((nom) => estDuGroupe(nom))
+  /* Dans une leçon, déplié d'office : personnages.cpp est le fichier dont elle parle. */
+  const ouvert = groupeDesPersonnagesOuvert || estDuGroupe(fichierCourant) || document.body.dataset.mode === 'lecons'
+
   /* Un onglet par fichier, dans l’ordre où ils sont arrivés ; le principal
      en tête, puisque c’est par lui que la compilation commence. */
-  for (const nom of fichiers.keys()) {
+  for (const nom of [...fichiers.keys()].filter((n) => !estDuGroupe(n)).concat(duGroupe.length ? ['\u0000groupe'] : [])) {
+    if (nom === '\u0000groupe') {
+      const bascule = document.createElement('button')
+      bascule.type = 'button'
+      bascule.className = 'fichier groupe' + (ouvert ? ' deplie' : '')
+      bascule.id = 'groupe-personnages'
+      /* Les PERSONNAGES du groupe, et non ses fichiers : un BONHOMME écrit
+         dans personnages.cpp d'un seul bloc (une leçon, un ancien rangement,
+         une écriture à la main) compte aussi. L'onglet ouvert est lu dans le
+         champ, plus récent que sa copie. */
+      const personnages = duGroupe.reduce((n, f) => n +
+        lireDessins(f === fichierCourant ? $('source').value : fichiers.get(f)).filter((d) => d.cote >= 16).length, 0)
+      bascule.textContent = `📁 personnages (${personnages}) ${ouvert ? '▾' : '▸'}`
+      bascule.title = ouvert ? 'replier les fichiers des personnages' : `déplier : ${FICHIER_DES_PERSONNAGES} et un fichier par personnage`
+      bascule.addEventListener('click', () => {
+        groupeDesPersonnagesOuvert = !ouvert
+        if (!groupeDesPersonnagesOuvert && estDuGroupe(fichierCourant)) ouvrirFichier(PRINCIPAL)
+        rafraichirFichiers()
+      })
+      zone.append(bascule)
+      if (!ouvert) continue
+      for (const membre of duGroupe) zone.append(ongletDuFichier(membre, true))
+      continue
+    }
+    zone.append(ongletDuFichier(nom, false))
+  }
+
+  zone.append(boutonNouveauFichier())
+}
+
+/** L'onglet d'un fichier — en retrait quand il est dans le groupe des personnages. */
+function ongletDuFichier(nom, dansLeGroupe) {
     const onglet = document.createElement('button')
     onglet.type = 'button'
-    onglet.className = 'fichier' + (nom === fichierCourant ? ' ouvert' : '')
+    onglet.className = 'fichier' + (nom === fichierCourant ? ' ouvert' : '') + (dansLeGroupe ? ' du-groupe' : '')
     onglet.title = nom === PRINCIPAL
       ? 'le fichier principal : c’est par lui que la compilation commence'
       : `écrire « #include "${nom}" » dans ${PRINCIPAL} pour le verser`
@@ -5101,9 +5443,11 @@ function rafraichirFichiers() {
       onglet.append(oter)
     }
 
-    zone.append(onglet)
-  }
+    return onglet
+}
 
+/** « + fichier » : un fichier de plus, à verser avec #include. */
+function boutonNouveauFichier() {
   const neuf = document.createElement('button')
   neuf.type = 'button'
   neuf.className = 'fichier neuf'
@@ -5136,7 +5480,7 @@ function rafraichirFichiers() {
     fichiers.set(nom, `// ${nom}\n//\n// Pour le verser dans le programme, écrire dans ${PRINCIPAL} :\n//\n//   #include "${nom}"\n`)
     ouvrirFichier(nom)
   })
-  zone.append(neuf)
+  return neuf
 }
 
 /* ------------------------------------------------ la conversion */
@@ -5769,6 +6113,22 @@ $('lecon-atelier').addEventListener('click', () => {
  *   defiler      — false : on ne remonte pas en haut, la page remet elle-même
  *                  la hauteur où l'on lisait.
  */
+/*
+ * L'empreinte d'une leçon : son titre, son code, ses fichiers, réduits à un
+ * nombre (FNV-1a, 32 bits). Elle dit si la leçon a changé depuis qu'on l'a
+ * chargée — pas besoin de garder tout son texte.
+ */
+const EMPREINTE_DE_LA_LECON = 'gameboy3-lecon-empreinte'
+function empreinteDeLaLecon(lecon) {
+  const texte = `${lecon.titre}\u0000${lecon.code ?? ''}\u0000${JSON.stringify(lecon.fichiers ?? {})}`
+  let h = 0x811c9dc5
+  for (let i = 0; i < texte.length; i++) {
+    h ^= texte.charCodeAt(i)
+    h = Math.imul(h, 0x01000193) >>> 0
+  }
+  return h.toString(16)
+}
+
 function allerALaLecon(index, { garderLeCode = false, defiler = true } = {}) {
   const LECONS = liste() // celles de la série ouverte : leçons ou cours
   if (index < 0 || index >= LECONS.length) return
@@ -5871,12 +6231,28 @@ function allerALaLecon(index, { garderLeCode = false, defiler = true } = {}) {
   /* Au rafraîchissement, le programme retenu est gardé : c'est peut-être le
      code de la leçon, modifié à la main — le remplacer l'effacerait sans le
      dire. « ⟲ Remettre le code » est là pour revenir à celui de la leçon. */
+  /*
+   * Mais si la LEÇON a changé depuis (le parcours a été mis à jour), garder
+   * le programme retenu remontrerait l'ancienne version à chaque rechargement,
+   * même avec Ctrl+F5 — c'est arrivé avec la 35.4. On retient donc l'empreinte
+   * de la leçon chargée : différente, ou absente, la nouvelle version s'ouvre ;
+   * l'ancienne reste dans l'historique, « ↶ » la rend.
+   */
+  const empreinte = empreinteDeLaLecon(lecon)
+  let misAJour = false
+  if (garderLeCode && lireLeStockage(EMPREINTE_DE_LA_LECON, '') !== empreinte) {
+    garderLeCode = false
+    misAJour = true
+    retenirLeProgrammeEntier()
+  }
   if (!garderLeCode) {
     ouvrirProgramme(lecon.code, lecon.fichiers ? new Map(Object.entries(lecon.fichiers)) : null)
     /* Et on le retient tout de suite : sans cela, le navigateur garderait le
        programme d'AVANT, qui reviendrait sous cette leçon au rafraîchissement. */
     retenirLeProgramme()
+    try { localStorage.setItem(EMPREINTE_DE_LA_LECON, empreinte) } catch { /* tant pis */ }
   }
+  if (misAJour) repere('🔄 leçon mise à jour : voici sa nouvelle version — « ↶ » rend celle d’avant', 'outil')
   compilerEtLancer()
   atelier.rafraichir()
   atelierAirs.rafraichir()
@@ -5891,7 +6267,7 @@ function allerALaLecon(index, { garderLeCode = false, defiler = true } = {}) {
 /* Ce que ce programme contient, dit là où on le cherche. */
 function compterLAtelier() {
   const source = $('source').value
-  const tuiles = (source.match(/\b(Tuile|Perso)\s+[A-Za-z_]/g) ?? []).length
+  const tuiles = (source.match(/\b(Tuile|Perso|Grand)\s+[A-Za-z_]/g) ?? []).length
   const airs = (source.match(/\bAir\s+[A-Za-z_]/g) ?? []).length
   const compter = (n, un, plusieurs) => `${n} ${n > 1 ? plusieurs : un}`
   $('compte-atelier').textContent =
@@ -5924,6 +6300,8 @@ const DEMANDES = {
   '#airs': () => { montrerMode('creation'); montrerAtelier('airs') },
   '#tuiles': () => { montrerMode('creation'); montrerAtelier('tuiles') },
   '#carte': () => { montrerMode('creation'); montrerAtelier('carte') },
+  '#sources': () => { montrerMode('creation'); montrerAtelier('sources') },
+  '#tout': () => { montrerMode('creation'); montrerAtelier('tout') },
   '#code': () => montrerMode('code'),
   '#lecons': () => { montrerMode('lecons'); allerALaLecon(0) },
   /* Le cours a rejoint le parcours : « #cours » ouvre son premier cours. */
@@ -6016,7 +6394,7 @@ const leconAvecAtelier = (() => {
   const lecon = liste()[leconCourante]
   return Boolean(lecon?.dessin || lecon?.airs || lecon?.carte)
 })()
-const ATELIERS = ['tuiles', 'airs', 'couleurs', 'carte', 'modeles']
+const ATELIERS = ['tuiles', 'airs', 'couleurs', 'carte', 'modeles', 'sources', 'tout']
 if (ATELIERS.includes(atelierRetenu) && !leconAvecAtelier) montrerAtelier(atelierRetenu)
 
 atelier.rafraichir()
@@ -6104,7 +6482,7 @@ var editeurDeCode = installerEditeur({
 })
 new MutationObserver(() => editeurDeCode.marquer()).observe($('etat'), { childList: true, characterData: true, subtree: true, attributes: true })
 /* Le champ change de taille avec le mode et la poignée : l'éditeur se recale. */
-for (const id of ['mode-creation', 'mode-code', 'mode-lecons', 'mode-cours', 'mode-machine']) {
+for (const id of ['mode-creation', 'mode-code', 'mode-lecons', 'mode-cours', 'mode-machine', 'mode-sources']) {
   $(id)?.addEventListener('click', () => requestAnimationFrame(() => editeurDeCode.caler()))
 }
 

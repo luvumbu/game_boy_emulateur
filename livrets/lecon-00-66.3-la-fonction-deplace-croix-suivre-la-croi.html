@@ -137,7 +137,8 @@ Tes fonctions appelées :
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
     <pre><code>// ---- #include &lt;deplace_croix&gt; : suivre la croix, case par case ----
-// La croix fait bouger le A, une case tous les quarts de seconde.
+// La croix fait bouger le B, une case tous les quarts de seconde.
+// (Le A au milieu, ce seront les leçons de la croix, juste après.)
 
 #include &lt;deplace_croix&gt;   // deplace_croix() : la tuile suit la croix
 #include &lt;ALPHABET&gt;</code></pre>
@@ -148,7 +149,7 @@ Tes fonctions appelées :
 <div class="morceau">
   <div>
     <p class="quoi">2. une variable — x</p>
-    <pre><code>uint8_t x = 9;</code></pre>
+    <pre><code>uint8_t x = 3;   // le B part de la colonne 3…</code></pre>
   </div>
   <div></div>
 </div>
@@ -156,7 +157,7 @@ Tes fonctions appelées :
 <div class="morceau">
   <div>
     <p class="quoi">3. une variable — y</p>
-    <pre><code>uint8_t y = 8;</code></pre>
+    <pre><code>uint8_t y = 4;   // …ligne 4</code></pre>
   </div>
   <div></div>
 </div>
@@ -167,7 +168,7 @@ Tes fonctions appelées :
     <pre><code>int main() {
   while (true) {
     image();
-    deplace_croix(x, y, ALPHABET[0], 250);   // x et y suivent la tuile
+    deplace_croix(x, y, ALPHABET[1], 250);   // x et y suivent la tuile
   }
 }</code></pre>
   </div>
@@ -188,7 +189,7 @@ programme.</p>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABgUlEQVR4nO3RoQ1CQRRE0ZWUgKT/aiiBMpBffLMCS15y9iZHjJzkrs/3Hdgaf5C/KjCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwLgC4wqMKzCuwDg88OP5uo0/mSIH3rse27jAODzwbvzPCDzwz32UAuMKjJMDp8C+AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCswrsC4AuMKjCsw7gK2IfKjQZTL7QAAAABJRU5ErkJggg==" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABfUlEQVR4nO3XsQmAMBBAUUtHsHT/aRzBMSwtBCvLSODz4BUpc3xykOW8DsKW6TfgVwLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRw3MvC67a/pg/EYHPjzzEQCx1nRcV5wnMBxVnScf3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3DcDbWp7dN97TeDAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
   </figure>
 </div>
@@ -196,7 +197,7 @@ programme.</p>
 
 
 <h2>4. Ce qu’on doit voir</h2>
-<p class="avoir">Un A au milieu ; la croix le promène, case par case.</p>
+<p class="avoir">Un B en haut à gauche ; la croix le promène, case par case.</p>
 
 <h2>5. Ce que la console répond</h2>
 <p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
@@ -205,9 +206,9 @@ et voici ce qu’ils ont mesuré.</p>
 
 <ul class="controles">
 
-  <li>au départ, le A est en (9, 8) </li>
+  <li>au départ, le B est en (3, 4) </li>
 
-  <li>DROITE tenue : il est allé à droite <span class="detail"> (x = 14)</span></li>
+  <li>DROITE tenue : il est allé à droite <span class="detail"> (x = 8)</span></li>
 
   <li>et la lettre est là où dit x </li>
 </ul>

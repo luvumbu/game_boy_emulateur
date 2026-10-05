@@ -1,0 +1,1425 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Ajouter son propre #include — gameboy3</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+
+  .couverture { padding-top: 40mm; break-after: page; }
+  .couverture h1 { font-size: 30pt; }
+  .couverture .sous { font-size: 14pt; color: var(--gris); margin: 0 0 18pt; }
+  .couverture p { font-size: 11pt; max-width: 150mm; }
+  .marque {
+    display: inline-grid; place-items: center; width: 54pt; height: 54pt; border-radius: 10pt;
+    background: linear-gradient(140deg, #9bbc5a, var(--vert)); color: #12251c;
+    font-weight: 800; font-size: 13pt; margin-bottom: 14pt;
+  }
+  .page { break-before: page; }
+  .sur { color: var(--vert); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin: 0; }
+  .detail { color: var(--gris); font-size: 8.5pt; }
+  a { color: var(--vert); text-decoration: none; }
+  .sommaire { list-style: none; padding: 0; margin: 10pt 0 18pt; font-size: 12pt; }
+  .sommaire li { padding: 5pt 0; border-bottom: 1px dotted var(--bord); }
+  .num {
+    display: inline-block; min-width: 20pt; text-align: center; border-radius: 10pt;
+    background: var(--vert-clair); color: var(--vert); font-weight: 700; font-size: 9pt; margin-right: 6pt;
+  }
+  .cadre {
+    border: 1px solid #c8d4b4; border-left: 4pt solid var(--vert); border-radius: 4pt;
+    background: #f6faf1; padding: 6pt 10pt; margin: 9pt 0; break-inside: avoid;
+  }
+  .cadre.alerte { border-color: #e0c48a; border-left-color: #c98a00; background: #fdf8ec; }
+  .cadre.alerte .cadre-titre { color: #8a5a00; }
+  .cadre-titre { margin: 0 0 4pt; font-weight: 700; color: var(--vert); }
+  .cadre p { margin: 0 0 4pt; }
+  table.comparer, table.includes { width: 100%; border-collapse: collapse; font-size: 9pt; margin: 8pt 0 12pt; }
+  .comparer th, .includes th { text-align: left; color: var(--gris); font-weight: 600; border-bottom: 1pt solid var(--bord); padding: 4pt; vertical-align: top; }
+  .comparer td, .includes td { vertical-align: top; padding: 4pt; border-bottom: 1px dotted var(--bord); }
+  .comparer tbody th { color: var(--encre); width: 28mm; }
+  .comparer tr, .includes tr { break-inside: avoid; }
+  thead { display: table-header-group; }
+  .includes { font-size: 8.5pt; }
+  ol.etapes > li { margin-bottom: 10pt; }
+  .lecon { margin-top: 18pt; padding-top: 10pt; border-top: 2pt solid var(--vert-clair); }
+  .titre-lecon { font-size: 16pt; margin: 2pt 0 3pt; border: 0; padding: 0; break-after: avoid; }
+  .reperes { break-after: avoid; }
+  .fichier { font-size: 8.5pt; text-transform: uppercase; letter-spacing: .06em; color: var(--gris); margin: 9pt 0 3pt; break-after: avoid; }
+  .fichier code { text-transform: none; }
+  .resultat { display: grid; grid-template-columns: 50mm 1fr; gap: 7mm; align-items: start; margin-top: 8pt; break-inside: avoid; }
+  .resultat img { width: 100%; image-rendering: pixelated; }
+  .resultat .fichier { margin-top: 0; }
+  .erreur { margin: 12pt 0 16pt; padding-top: 8pt; border-top: 1px solid var(--bord); }
+  .erreur h3 { margin: 0 0 4pt; break-after: avoid; }
+  .message {
+    font-family: Consolas, monospace; font-size: 8.5pt; background: #fdeeee; color: #8a1f1f;
+    border-left: 3pt solid #c0392b; padding: 6pt 8pt; border-radius: 3pt; break-inside: avoid;
+  }
+  .deux { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; break-inside: avoid; }
+  .deux table.includes { font-size: 7.5pt; margin-top: 2pt; }
+  .faq dt { font-weight: 700; margin-top: 10pt; break-after: avoid; }
+  .faq dd { margin: 3pt 0 0 12pt; }
+  .cocher { list-style: none; padding-left: 0; }
+  .cocher li { padding: 4pt 0 4pt 22pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .cocher li::before { content: ''; position: absolute; left: 2pt; top: 5pt; width: 10pt; height: 10pt; border: 1.2pt solid var(--vert); border-radius: 2pt; }
+  .niveau-partie { font-size: 9pt; border-radius: 4pt; padding: 5pt 9pt; margin: 2pt 0 12pt; border: 1px solid var(--bord); background: #fafbf8; }
+  .pastille { display: inline-block; font-weight: 700; border-radius: 8pt; padding: 0 7pt; color: #fff; }
+  .debutant .pastille, .pastille.debutant { background: #3f8f4f; }
+  .moyen .pastille, .pastille.moyen { background: #c98a00; }
+  .avance .pastille, .pastille.avance { background: #b03a2e; }
+  .pastille.petite { font-size: 7.5pt; margin-left: 6pt; vertical-align: 1pt; }
+  .sous-sommaire { list-style: none; columns: 2; column-gap: 8mm; font-size: 9.5pt; padding: 4pt 0 0 28pt; margin: 0; }
+  .sous-sommaire li { border: 0; padding: 1pt 0; }
+  .base { margin-top: 16pt; }
+  .base h2 .num { margin-right: 4pt; }
+  .lexique { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  .lexique td { vertical-align: top; padding: 4pt; border-bottom: 1px dotted var(--bord); }
+  .lexique tr { break-inside: avoid; }
+  .lexique td:first-child { font-weight: 700; width: 32mm; }
+  .lexique td:last-child { width: 30mm; font-size: 8pt; }
+</style>
+</head>
+<body>
+
+<section class="couverture">
+  <div><span class="marque">#inc</span></div>
+  <h1>Ajouter son propre #include</h1>
+  <p class="sous">Ranger ses fonctions dans un fichier, et en faire entrer dans la console</p>
+  <p>Ce document explique, du tout début jusqu’au bout, comment fonctionnent les lignes <code>#include</code> de l’atelier Game Boy, et comment en <strong>ajouter une à toi</strong>.</p>
+  <p>On y suit une seule fonction, <code>bande()</code>, qui fait tout le voyage : écrite dans le programme, rangée dans un fichier voisin, puis devenue une fonction de la console que l’on demande par <code>#include &lt;bande&gt;</code>.</p>
+  <p class="detail">Tout le code du compilateur montré ici est lu dans les vrais fichiers du projet ; chaque message d’erreur est celui que le compilateur donne vraiment ; chaque écran est celui que le programme affiche dans l’émulateur. Pour remettre ce document à jour : <code>node outils/pdf-include.mjs</code>.</p>
+</section>
+<section class="page">
+  <h2>Sommaire</h2>
+  <ol class="sommaire">
+    <li><a href="#partie-bases"><span class="num">0</span> Les bases : tout ce qu’il faut savoir avant</a> <span class="pastille petite debutant">● débutant</span><ol class="sous-sommaire"><li><a href="#base-0-1">0.1 Ce document, et comment t’en servir</a></li><li><a href="#base-0-2">0.2 Un fichier, un dossier, une extension</a></li><li><a href="#base-0-3">0.3 Un programme, un compilateur, une cartouche</a></li><li><a href="#base-0-4">0.4 L’octet, et la place dans la cartouche</a></li><li><a href="#base-0-5">0.5 L’écran : des cases, des tuiles, la police</a></li><li><a href="#base-0-6">0.6 Une fonction : la définir, l’appeler</a></li><li><a href="#base-0-7">0.7 La boucle for, tour par tour</a></li><li><a href="#base-0-8">0.8 La ponctuation du C++</a></li><li><a href="#base-0-9">0.9 L’atelier : où écrire, où regarder</a></li><li><a href="#base-0-10">0.10 Les touches utiles, et l’éditeur de texte</a></li><li><a href="#base-0-11">0.11 La fenêtre de commande</a></li><li><a href="#base-0-12">0.12 git : garder une trace, revenir en arrière</a></li></ol></li>
+    <li><a href="#partie-a"><span class="num">A</span> Les deux sortes d’#include</a> <span class="pastille petite debutant">● débutant</span></li>
+    <li><a href="#partie-b"><span class="num">B</span> Ce qui se passe quand on compile</a> <span class="pastille petite moyen">●● intermédiaire</span></li>
+    <li><a href="#partie-c"><span class="num">C</span> Le chapitre du parcours, étape par étape</a> <span class="pastille petite moyen">●● intermédiaire</span></li>
+    <li><a href="#partie-js"><span class="num">D</span> Le JavaScript qu’il faut pour la suite</a> <span class="pastille petite moyen">●● intermédiaire</span></li>
+    <li><a href="#partie-d"><span class="num">E</span> La recette : ajouter ta fonction à la console</a> <span class="pastille petite avance">●●● avancé</span></li>
+    <li><a href="#partie-e"><span class="num">F</span> Les erreurs, et ce que le compilateur répond</a> <span class="pastille petite moyen">●● intermédiaire</span></li>
+    <li><a href="#partie-f"><span class="num">G</span> Ce que ça coûte dans la cartouche</a> <span class="pastille petite avance">●●● avancé</span></li>
+    <li><a href="#partie-g"><span class="num">H</span> Les questions qu’on se pose</a> <span class="pastille petite moyen">●● intermédiaire</span></li>
+    <li><a href="#partie-h"><span class="num">I</span> L’aide-mémoire, à garder sous les yeux</a> <span class="pastille petite moyen">●● intermédiaire</span></li>
+    <li><a href="#partie-i"><span class="num">J</span> Tous les #include de la console</a> <span class="pastille petite debutant">● débutant</span></li>
+    <li><a href="#partie-lexique"><span class="num">K</span> Le lexique : chaque mot technique</a> <span class="pastille petite debutant">● débutant</span></li>
+  </ol>
+  <div class="cadre"><p class="cadre-titre"><strong>Comment lire ce document</strong></p><p><strong>Tu débutes ?</strong> Lis la <strong>Partie 0</strong> en entier, puis les parties A et C. Reviens aux autres plus tard, quand tu voudras aller plus loin : rien ne presse.</p>
+<p><strong>Tu as déjà suivi le parcours de l’atelier ?</strong> Survole la Partie 0, lis A, B et C, puis D et E pour ajouter ta propre fonction à la console.</p>
+<p><strong>Chaque partie dit son niveau</strong> (● débutant, ●● intermédiaire, ●●● avancé) et ce qu’il faut avoir lu avant. <strong>Un mot que tu ne connais pas ?</strong> Le lexique (partie K) le définit et renvoie là où il est expliqué.</p></div>
+  <div class="cadre"><p class="cadre-titre"><strong>Si tu n’as que deux minutes</strong></p><p><code>#include "outils.cpp"</code> (des <strong>guillemets</strong>) colle <strong>ton</strong> fichier dans le programme. Tu le crées avec le bouton <strong>« + fichier »</strong> de l’atelier.</p>
+<p><code>#include &lt;bande&gt;</code> (des <strong>chevrons</strong>) demande une <strong>fonction de la console</strong>, qui existe déjà dans le compilateur.</p>
+<p>Pour ajouter une fonction à la console : son code dans <code>compilateur/emetteur.js</code>, son nom dans <code>compilateur/inclusion.js</code>, son aide dans <code>aide-fonctions.js</code>. Puis <strong>Ctrl+F5</strong> dans le navigateur.</p></div>
+</section>
+
+<section class="page" id="partie-bases">
+  <p class="sur">Partie 0</p>
+  <h1>Les bases : tout ce qu’il faut savoir avant</h1>
+  <div class="niveau-partie debutant">
+    <span class="pastille">● débutant</span> <span>aucune connaissance demandée en dehors de ce qui est cité</span>
+    
+  </div>
+  <p><strong>Chaque section ci-dessous explique une seule notion, en partant de zéro.</strong> Les autres parties y renvoient : « À lire avant : 0.6 » veut dire « lis la section 0.6 si tu ne sais pas encore ce qu’est une fonction ».</p>
+  
+  <div class="base" id="base-0-1">
+    <h2><span class="num">0.1</span> Ce document, et comment t’en servir</h2>
+    
+  <p><strong>Ce document répond à une question : « comment ajouter moi-même un <code>#include</code> ? ».</strong> Pour y répondre vraiment, il faut quelques bases : ce qu’est un fichier, un programme, une fonction, un octet… Cette Partie 0 les explique toutes, <strong>en partant de zéro</strong>. Si tu les connais déjà, survole-la.</p>
+<p><strong>Le code est écrit dans des cadres gris</strong>, avec une police où toutes les lettres ont la même largeur. Les mots qui viennent du code, dans le texte, sont écrits <code>comme ceci</code>.</p>
+<p><strong>Les commentaires</strong> : dans le code, tout ce qui suit <code>//</code> sur une ligne est une explication pour l’humain. La console l’ignore. Ce document en met beaucoup : lis-les, ils font partie de l’explication.</p>
+<p><strong>Les flèches</strong> <code>→</code> veulent dire « donne » ou « devient » : <code>2 + 3 → 5</code>.</p>
+  <div class="cadre"><p class="cadre-titre"><strong>Un conseil</strong></p><p>Garde l’atelier ouvert à côté de ce document, et <strong>essaie chaque programme</strong>. Lire un programme et le voir tourner, ce n’est pas du tout la même chose : on comprend dix fois mieux en changeant un nombre et en regardant ce qui se passe.</p></div>
+  </div>
+  <div class="base" id="base-0-2">
+    <h2><span class="num">0.2</span> Un fichier, un dossier, une extension</h2>
+    
+  <p><strong>Un fichier</strong> est un document rangé sur l’ordinateur : un texte, une image, un programme. Il a un <strong>nom</strong>, par exemple <code>inclusion.js</code>.</p>
+<p><strong>L’extension</strong> est la fin du nom, après le point. Elle dit ce que contient le fichier :</p>
+  <table class="comparer"><tbody>
+    <tr><th><code>.cpp</code></th><td>un programme écrit en C++ (le langage de tes programmes Game Boy)</td></tr>
+    <tr><th><code>.h</code></th><td>un « en-tête » C++ : un fichier fait pour être collé en haut d’un autre</td></tr>
+    <tr><th><code>.js</code> <code>.mjs</code></th><td>un programme écrit en JavaScript (le langage de l’atelier et du compilateur, voir partie D)</td></tr>
+    <tr><th><code>.html</code></th><td>une page web, qu’un navigateur affiche</td></tr>
+    <tr><th><code>.pdf</code></th><td>un document à lire ou imprimer, comme celui-ci</td></tr>
+    <tr><th><code>.md</code></th><td>un texte simple, avec un peu de mise en forme</td></tr>
+    <tr><th><code>.gb</code></th><td>une cartouche Game Boy : ce que le compilateur fabrique</td></tr>
+  </tbody></table>
+  <p><strong>Un dossier</strong> est une boîte qui contient des fichiers et d’autres dossiers. Un <strong>chemin</strong> dit où trouver un fichier en ouvrant les boîtes l’une après l’autre, séparées par <code>/</code> : <code>compilateur/inclusion.js</code> veut dire « le fichier <code>inclusion.js</code>, dans le dossier <code>compilateur</code> ».</p>
+<p><strong>Le dossier du projet</strong> est celui qui contient <code>index.html</code> (la page de l’atelier). Tous les chemins de ce document partent de lui. Ceux dont on se sert :</p>
+  <pre><code>le dossier du projet/
+├── index.html              la page de l'atelier
+├── aide-fonctions.js       l'aide de l'éditeur (partie E, étape 5)
+├── compilateur/            le compilateur : il transforme ton C++ en cartouche
+│   ├── inclusion.js        les #include et la liste des fonctions de la console
+│   ├── analyseur.js        la lecture du programme
+│   └── emetteur.js         la traduction, et les fonctions de la console
+├── tuto/                   les leçons du parcours
+│   ├── lecons.js           les leçons (et les tutos des fonctions)
+│   └── programmation.js    le cours (dont le chapitre « Tes propres #include »)
+├── outils/                 des petits programmes : compiler, faire les PDF…
+└── documents/              les documents, dont ce PDF</code></pre>
+  <p><strong>Dans l’atelier, un « onglet » de l’éditeur est un fichier</strong> : <code>principal.cpp</code> est le fichier principal de ton programme ; le bouton « + fichier » en crée un autre, à côté (section 0.9).</p>
+  </div>
+  <div class="base" id="base-0-3">
+    <h2><span class="num">0.3</span> Un programme, un compilateur, une cartouche</h2>
+    
+  <p><strong>Un programme</strong> est une suite d’ordres écrits pour une machine. Tu l’écris en <strong>C++</strong>, un langage fait pour être lu par des humains : <code>poser(2, 5, ALPHABET[0]);</code> se comprend presque comme une phrase.</p>
+<p><strong>Le processeur de la Game Boy ne comprend pas le C++.</strong> Il ne comprend que des <strong>nombres</strong> : chaque nombre est un ordre minuscule (« copie cette case », « ajoute 1 », « saute là-bas »).</p>
+<p><strong>Le compilateur</strong> est le traducteur : il lit ton C++ et écrit les nombres que le processeur comprend. Dans l’atelier, il tourne tout seul dès que tu t’arrêtes d’écrire.</p>
+<p><strong>La cartouche</strong> est le résultat : un fichier <code>.gb</code> qui contient tous ces nombres, plus les dessins et la musique. C’est l’équivalent de la cartouche en plastique qu’on mettait dans une vraie Game Boy.</p>
+<p><strong>L’émulateur</strong> est une Game Boy imitée par l’ordinateur : il lit la cartouche et fait exactement ce qu’une vraie console ferait. C’est l’écran que tu vois dans l’atelier.</p>
+  <pre><code>  ce que tu écris          ce que fait l'atelier                ce que tu vois
+  ┌──────────────┐  le    ┌──────────────┐  l'      ┌──────────────┐
+  │ principal.cpp│ compi- │  cartouche   │ ému-     │   l'écran    │
+  │   (du C++)   │──────▶ │ .gb (nombres)│──────▶   │ de la console│
+  └──────────────┘ lateur └──────────────┘ lateur   └──────────────┘</code></pre>
+  <div class="cadre"><p class="cadre-titre"><strong>Une image pour retenir</strong></p><p>Le C++ est une <strong>recette</strong> écrite en français. Le compilateur est un <strong>traducteur</strong> qui la réécrit dans la langue du cuisinier. La cartouche est la recette traduite. L’émulateur est le <strong>cuisinier</strong> qui la suit, à la lettre.</p></div>
+  </div>
+  <div class="base" id="base-0-4">
+    <h2><span class="num">0.4</span> L’octet, et la place dans la cartouche</h2>
+    
+  <p><strong>Un octet est une petite case de mémoire qui retient un nombre de 0 à 255.</strong> Pas plus : 256 valeurs possibles. C’est l’unité de base de toute la console.</p>
+<p><strong>Pourquoi 255 ?</strong> Un octet est fait de <strong>8 bits</strong>, 8 interrupteurs qui valent 0 ou 1. Huit interrupteurs donnent 2 × 2 × 2 × 2 × 2 × 2 × 2 × 2 = <strong>256</strong> combinaisons : de 0 (tout éteint) à 255 (tout allumé).</p>
+<p><strong>Ce qui se passe au-delà :</strong> 255 + 1 ne donne pas 256, mais <strong>0</strong> — le nombre « fait le tour », comme un compteur kilométrique. Et 0 − 1 donne 255.</p>
+<p><strong>Une cartouche de l’atelier contient 32 768 octets</strong> (on dit « 32 Ko », 32 kilo-octets). Tout le jeu doit tenir dedans : le programme traduit, les dessins, la musique. C’est <strong>très peu</strong> : une seule photo de téléphone en prend des centaines de fois plus.</p>
+<p><strong>C’est pour cela que la console a la règle des <code>#include</code></strong> : chaque fonction de la console prend des octets ; on ne grave que celles qu’on demande (partie A) et qu’on appelle vraiment (partie G).</p>
+  </div>
+  <div class="base" id="base-0-5">
+    <h2><span class="num">0.5</span> L’écran : des cases, des tuiles, la police</h2>
+    
+  <p><strong>L’écran de la Game Boy mesure 160 × 144 points</strong> (des « pixels »). On ne le dessine pas point par point : il est découpé en <strong>cases de 8 × 8 pixels</strong>. Cela fait <strong>20 colonnes</strong> (numérotées de 0 à 19, de gauche à droite) et <strong>18 lignes</strong> (de 0 à 17, de haut en bas).</p>
+<p><strong>Une case se désigne par deux nombres : sa colonne, puis sa ligne.</strong> La case (0, 0) est en haut à gauche ; la case (19, 17) en bas à droite ; (2, 5) est la 3e colonne de la 6e ligne (on compte à partir de 0).</p>
+  <pre><code>        colonnes →  0   1   2   3   4  …  19
+  lignes   0      ┌───┬───┬───┬───┬───┬ ┬───┐
+     ↓     1      ├───┼───┼───┼───┼───┼ ┼───┤
+           …      │   │   │   │   │   │ │   │
+           5      ├───┼───┼─A─┼───┼───┼ ┼───┤   ← poser(2, 5, ALPHABET[0])
+           …      │   │   │   │   │   │ │   │      met un A en colonne 2, ligne 5
+          17      └───┴───┴───┴───┴───┴ ┴───┘</code></pre>
+  <p><strong>Une tuile est le dessin d’une case</strong> : 8 × 8 pixels, chacun dans une des 4 nuances de la console. Une tuile prend <strong>16 octets</strong> de cartouche (2 octets par rangée de 8 pixels, et 8 rangées).</p>
+<p><strong>La police</strong> est l’ensemble des tuiles des lettres : A à Z, les chiffres 0 à 9, l’espace et quelques signes (43 en tout). Elles sont rangées dans un tableau nommé <code>ALPHABET</code> : <code>ALPHABET[0]</code> est le A, <code>ALPHABET[1]</code> le B, <code>ALPHABET[2]</code> le C… <code>ALPHABET[23]</code> le X. Le nombre entre crochets est la <strong>place</strong> dans le tableau, en partant de 0.</p>
+<p><strong><code>poser(colonne, ligne, tuile)</code></strong> met une tuile dans une case. C’est la fonction de la console dont se sert tout ce document.</p>
+  </div>
+  <div class="base" id="base-0-6">
+    <h2><span class="num">0.6</span> Une fonction : la définir, l’appeler</h2>
+    
+  <p><strong>Une fonction est un geste auquel on donne un nom</strong>, pour pouvoir le refaire sans le réécrire. Il y a deux moments bien différents :</p>
+  <pre><code>// 1. LA DÉFINIR : écrire, une fois, ce que fait le geste.
+void saluer(uint8_t ligne) {        // son nom : saluer ; son paramètre : ligne
+  poser(0, ligne, ALPHABET[7]);     // un H…
+  poser(1, ligne, ALPHABET[8]);     // …et un I, sur la ligne demandée
+}
+
+// 2. L'APPELER : faire le geste, autant de fois qu'on veut.
+saluer(3);    // HI sur la ligne 3
+saluer(10);   // HI sur la ligne 10</code></pre>
+  <p><strong>Chaque mot de la première ligne a un rôle :</strong></p>
+  <table class="comparer"><tbody>
+    <tr><th><code>void</code></th><td>« vide » : la fonction ne <strong>rend</strong> rien. Elle agit (elle pose des lettres), c’est tout.</td></tr>
+    <tr><th><code>saluer</code></th><td>son <strong>nom</strong>. C’est lui qu’on écrit pour l’appeler.</td></tr>
+    <tr><th><code>(uint8_t ligne)</code></th><td>son <strong>paramètre</strong> : une case de mémoire nommée <code>ligne</code>, qui sera remplie au moment de l’appel. <code>uint8_t</code> est son <strong>type</strong> : un octet, un nombre de 0 à 255 (section 0.4).</td></tr>
+    <tr><th><code>{ … }</code></th><td>les <strong>accolades</strong> entourent le <strong>corps</strong> : les ordres exécutés à chaque appel.</td></tr>
+  </tbody></table>
+  <p><strong>Paramètre et argument, deux mots pour deux choses.</strong> Le <strong>paramètre</strong> est la case vide dans la définition (<code>ligne</code>). L’<strong>argument</strong> est la valeur qu’on met dedans à l’appel (<code>3</code>). Pendant <code>saluer(3)</code>, <code>ligne</code> vaut 3 ; pendant <code>saluer(10)</code>, elle vaut 10.</p>
+<p><strong>Plusieurs paramètres</strong> se séparent par des virgules, et l’appel donne les arguments <strong>dans le même ordre</strong> : <code>bande(colonne, ligne, tuile, longueur)</code> s’appelle <code>bande(2, 5, ALPHABET[0], 10)</code> → colonne = 2, ligne = 5, tuile = le A, longueur = 10.</p>
+<p><strong>Rendre une valeur</strong> : une fonction peut aussi calculer un résultat et le rendre avec <code>return</code>. Elle s’écrit alors <code>uint8_t</code> au lieu de <code>void</code> : <code>uint8_t double_de(uint8_t n) { return n + n; }</code> → <code>double_de(4)</code> vaut 8.</p>
+<p><strong><code>main()</code></strong> est la fonction par laquelle tout programme commence. La console l’appelle toute seule à l’allumage.</p>
+<p><strong>Une fonction de la console</strong> (<code>poser</code>, <code>texte</code>, <code>bande</code>…) est une fonction comme les autres, sauf qu’elle a été écrite <strong>par le projet</strong>, pas par toi. C’est exactement pour cela qu’on peut en ajouter une (partie E).</p>
+  </div>
+  <div class="base" id="base-0-7">
+    <h2><span class="num">0.7</span> La boucle for, tour par tour</h2>
+    
+  <p><strong>Une boucle répète des ordres.</strong> La boucle <code>for</code> les répète en comptant. Elle a trois morceaux entre ses parenthèses, séparés par des points-virgules :</p>
+  <pre><code>for (uint8_t i = 0;   i &lt; 4;   i++) {
+     └─── départ ───┘ └ tant que ┘ └ après chaque tour ┘
+  poser(2 + i, 5, ALPHABET[0]);      // le corps : répété à chaque tour
+}</code></pre>
+  <table class="comparer"><tbody>
+    <tr><th>départ</th><td><code>uint8_t i = 0</code> : crée un compteur nommé <code>i</code>, qui vaut 0. Fait <strong>une seule fois</strong>, au début.</td></tr>
+    <tr><th>tant que</th><td><code>i &lt; 4</code> : la condition. Vérifiée <strong>avant chaque tour</strong> : si elle est vraie, on fait le tour ; si elle est fausse, la boucle s’arrête.</td></tr>
+    <tr><th>après chaque tour</th><td><code>i++</code> : ajoute 1 à <code>i</code>. (On peut écrire <code>i = i + 2</code> pour avancer de 2.)</td></tr>
+  </tbody></table>
+  <p><strong>Déroulé, tour par tour :</strong></p>
+  <table class="comparer">
+    <thead><tr><th>Tour</th><th>i vaut</th><th>i &lt; 4 ?</th><th>Ce qui est fait</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>0</td><td>oui</td><td><code>poser(2, 5, A)</code> puis i devient 1</td></tr>
+      <tr><td>2</td><td>1</td><td>oui</td><td><code>poser(3, 5, A)</code> puis i devient 2</td></tr>
+      <tr><td>3</td><td>2</td><td>oui</td><td><code>poser(4, 5, A)</code> puis i devient 3</td></tr>
+      <tr><td>4</td><td>3</td><td>oui</td><td><code>poser(5, 5, A)</code> puis i devient 4</td></tr>
+      <tr><td>—</td><td>4</td><td><strong>non</strong></td><td>la boucle s’arrête : 4 A posés, colonnes 2 à 5</td></tr>
+    </tbody>
+  </table>
+  <p><strong>À retenir :</strong> une boucle <code>for (i = 0; i &lt; N; i++)</code> fait <strong>exactement N tours</strong>, avec <code>i</code> qui vaut 0, 1, 2… jusqu’à N − 1. C’est le cœur de <code>bande()</code> : <code>N</code> est la longueur.</p>
+  </div>
+  <div class="base" id="base-0-8">
+    <h2><span class="num">0.8</span> La ponctuation du C++</h2>
+    
+  <table class="comparer"><tbody>
+    <tr><th><code>;</code></th><td>le <strong>point-virgule</strong> termine un ordre, comme un point termine une phrase. L’oublier est l’erreur la plus fréquente.</td></tr>
+    <tr><th><code>{ }</code></th><td>les <strong>accolades</strong> regroupent plusieurs ordres : le corps d’une fonction, d’une boucle, d’un <code>if</code>.</td></tr>
+    <tr><th><code>( )</code></th><td>les <strong>parenthèses</strong> entourent les arguments d’un appel, les paramètres d’une définition, la condition d’un <code>if</code> ou d’une boucle.</td></tr>
+    <tr><th><code>[ ]</code></th><td>les <strong>crochets</strong> désignent une place dans un tableau : <code>ALPHABET[0]</code>.</td></tr>
+    <tr><th><code>,</code></th><td>la <strong>virgule</strong> sépare les arguments : <code>poser(2, 5, A)</code>.</td></tr>
+    <tr><th><code>// …</code></th><td>un <strong>commentaire</strong> : jusqu’au bout de la ligne, ignoré par la console.</td></tr>
+    <tr><th><code>"…"</code></th><td>des <strong>guillemets</strong> entourent un texte : <code>texte(1, 1, "SALUT")</code>. Aussi le nom d’un fichier dans <code>#include "outils.cpp"</code>.</td></tr>
+    <tr><th><code>&lt; &gt;</code></th><td>des <strong>chevrons</strong> : « plus petit que » dans <code>i &lt; 4</code> ; et le nom d’une fonction de la console dans <code>#include &lt;bande&gt;</code>.</td></tr>
+    <tr><th><code>=</code> et <code>==</code></th><td><code>x = 3</code> <strong>range</strong> 3 dans x. <code>x == 3</code> <strong>demande</strong> si x vaut 3 (vrai ou faux).</td></tr>
+    <tr><th><code>#</code></th><td>une ligne qui commence par <code>#</code> n’est pas un ordre pour la console, mais une <strong>consigne pour la préparation du programme</strong> : <code>#include</code>.</td></tr>
+  </tbody></table>
+  </div>
+  <div class="base" id="base-0-9">
+    <h2><span class="num">0.9</span> L’atelier : où écrire, où regarder</h2>
+    
+  <p><strong>L’atelier est la page <code>index.html</code>, ouverte dans un navigateur.</strong> On le lance en double-cliquant <code>lancer.bat</code> dans le dossier du projet ; il s’ouvre à l’adresse <code>http://localhost:8000</code>.</p>
+<p><strong>En haut, des boutons de mode :</strong></p>
+  <ul><li><strong>🎨 MODE CRÉATION</strong> : dessiner les tuiles, composer la musique, à la souris — <strong>et écrire le programme</strong>, dans l’éditeur juste au-dessus des ateliers. Le bouton <strong>« ⤢ Agrandir le code »</strong> donne tout l’écran au programme ; <strong>« ⤡ Revoir les ateliers »</strong> les fait revenir. C’est là qu’on se sert des <code>#include</code>.</li><li><strong>📚 APPRENDRE</strong> : le parcours de leçons. Le chapitre « Tes propres #include » est le dernier.</li><li><strong>🔎 MODE MACHINE</strong> : ce que le processeur exécute vraiment.</li><li><strong>🔗 LES SOURCES</strong> : tous les documents, dont celui-ci.</li></ul>
+  <p><strong>L’éditeur du programme</strong> montre un <strong>onglet par fichier</strong>. Au départ, il n’y a que <code>principal.cpp</code>. Le bouton <strong>« + fichier »</strong>, au-dessus de l’éditeur, en ajoute un : tu lui donnes un nom (par exemple <code>outils.cpp</code>), et il apparaît comme un nouvel onglet. Cliquer un onglet l’ouvre.</p>
+<p><strong>La console se met à jour toute seule</strong> : dès que tu t’arrêtes d’écrire, le programme est recompilé et relancé. Si quelque chose ne va pas, le message du compilateur s’affiche sous l’éditeur.</p>
+  </div>
+  <div class="base" id="base-0-10">
+    <h2><span class="num">0.10</span> Les touches utiles, et l’éditeur de texte</h2>
+    
+  <p><strong>Pour la partie E, on modifie des fichiers du projet lui-même</strong>, en dehors de l’atelier. Il faut un <strong>éditeur de texte</strong> : un programme qui ouvre un fichier, le montre tel quel, et l’enregistre. Le <strong>Bloc-notes</strong> de Windows suffit (clic droit sur le fichier → « Ouvrir avec » → Bloc-notes). <strong>Visual Studio Code</strong> (gratuit) est bien plus confortable : il colore le code et numérote les lignes.</p>
+  <div class="cadre alerte"><p class="cadre-titre"><strong>Attention : pas Word</strong></p><p>Un traitement de texte (Word, LibreOffice) ajoute de la mise en forme invisible et remplace les guillemets droits par des guillemets courbes : le fichier ne marcherait plus. Toujours un <strong>éditeur de texte</strong>.</p></div>
+  <table class="comparer">
+    <thead><tr><th>Touches</th><th>Où</th><th>Ce qu’elles font</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Ctrl+F</strong></td><td>éditeur, navigateur</td><td><strong>chercher</strong> un mot dans le fichier ou la page (« Trouver »)</td></tr>
+      <tr><td><strong>Ctrl+G</strong></td><td>Visual Studio Code</td><td><strong>aller à une ligne</strong> par son numéro</td></tr>
+      <tr><td><strong>Ctrl+S</strong></td><td>éditeur</td><td><strong>enregistrer</strong> le fichier (sans cela, rien n’est changé sur le disque)</td></tr>
+      <tr><td><strong>Ctrl+Z</strong></td><td>partout</td><td><strong>annuler</strong> la dernière modification</td></tr>
+      <tr><td><strong>Ctrl+F5</strong></td><td>navigateur</td><td><strong>recharger la page en relisant tout</strong>. Le navigateur garde une copie des fichiers en mémoire ; F5 seul peut réutiliser l’ancienne. Après avoir modifié le compilateur, c’est toujours Ctrl+F5.</td></tr>
+      <tr><td><strong>F12</strong></td><td>navigateur</td><td>ouvre les <strong>outils de développement</strong> ; l’onglet <strong>Console</strong> montre les erreurs de la page, avec le fichier et la ligne</td></tr>
+      <tr><td><strong>AltGr+7</strong></td><td>clavier français</td><td>l’<strong>accent grave</strong> seul, <code>`</code>, dont la partie E a besoin (appuyer ensuite sur Espace)</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Un numéro de ligne</strong> désigne la place d’une ligne dans un fichier : « vers la ligne 5432 » veut dire « à peu près la 5432e ligne en partant du haut ». Dans le Bloc-notes, le numéro s’affiche en bas à droite (menu Affichage → Barre d’état).</p>
+  </div>
+  <div class="base" id="base-0-11">
+    <h2><span class="num">0.11</span> La fenêtre de commande</h2>
+    
+  <p><strong>Une fenêtre de commande (un « terminal »)</strong> est une fenêtre où l’on tape des ordres au clavier, au lieu de cliquer. On s’en sert pour lancer les vérifications du projet.</p>
+<p><strong>L’ouvrir dans le dossier du projet</strong> : dans l’Explorateur de fichiers, ouvre le dossier du projet, fais un <strong>clic droit dans le vide</strong> → <strong>« Ouvrir dans le Terminal »</strong>. (Autre façon : clique dans la barre d’adresse de l’Explorateur, tape <code>cmd</code>, puis Entrée.)</p>
+<p><strong>Taper un ordre, puis Entrée.</strong> Les trois dont ce document se sert :</p>
+  <table class="comparer"><tbody>
+    <tr><th><code>node outils/gb3.mjs essai.cpp</code></th><td>compile le fichier <code>essai.cpp</code> et dit s’il est accepté (ou le message d’erreur). <code>node</code> est le programme qui fait tourner du JavaScript en dehors du navigateur.</td></tr>
+    <tr><th><code>npm run verifier</code></th><td>lance <strong>tous les contrôles</strong> du projet : chaque leçon est compilée et jouée. Chaque ligne dit <code>OK</code> ou <code>NON</code> ; à la fin, « tout est vert » si rien n’est cassé.</td></tr>
+    <tr><th><code>npm run pdf-include</code></th><td>refait ce document, à jour.</td></tr>
+  </tbody></table>
+  <p><strong>Node.js doit être installé</strong> : c’est le cas si l’atelier démarre avec <code>lancer.bat</code> (il propose de l’installer sinon).</p>
+  </div>
+  <div class="base" id="base-0-12">
+    <h2><span class="num">0.12</span> git : garder une trace, revenir en arrière</h2>
+    
+  <p><strong>git</strong> est un programme qui photographie le projet à chaque étape importante. Si une modification casse tout, on revient à la dernière photo. Le dossier du projet est déjà suivi par git.</p>
+<p><strong>Les commandes, à taper dans la fenêtre de commande (section 0.11) :</strong></p>
+  <table class="comparer"><tbody>
+    <tr><th><code>git status</code></th><td>la liste des fichiers modifiés depuis la dernière photo.</td></tr>
+    <tr><th><code>git diff</code></th><td>ce qui a changé, ligne par ligne : <code>-</code> devant une ligne enlevée, <code>+</code> devant une ligne ajoutée. (Touche <code>q</code> pour sortir.)</td></tr>
+    <tr><th><code>git add -A</code><br><code>git commit -m "ajout de pile()"</code></th><td><strong>prendre la photo</strong>, avec une phrase qui dit ce qu’elle contient.</td></tr>
+    <tr><th><code>git checkout -- compilateur/emetteur.js</code></th><td><strong>annuler</strong> toutes les modifications de ce fichier depuis la dernière photo. Attention : ce qui n’a pas été photographié est perdu.</td></tr>
+  </tbody></table>
+  <div class="cadre"><p class="cadre-titre"><strong>La bonne habitude</strong></p><p>Une photo (<code>git commit</code>) <strong>avant</strong> de toucher au compilateur, et une autre <strong>après</strong>, quand <code>npm run verifier</code> est vert. Si quelque chose casse entre les deux, <code>git checkout -- …</code> remet le fichier comme avant.</p></div>
+  </div>
+</section>
+
+
+<section class="page" id="partie-a">
+  <p class="sur">Partie A</p>
+  <h1>Les deux sortes d’#include</h1>
+  <div class="niveau-partie debutant">
+    <span class="pastille">● débutant</span> <span>aucune connaissance demandée en dehors de ce qui est cité</span>
+    <br><b>À lire avant :</b> <a href="#base-0-2">0.2 Un fichier, un dossier, une extension</a> · <a href="#base-0-3">0.3</a> · <a href="#base-0-6">0.6</a> · <a href="#base-0-9">0.9</a>
+  </div>
+  <p><strong>Une ligne <code>#include</code> veut toujours dire la même chose : « ce programme a besoin de quelque chose qui n’est pas écrit ici ».</strong> Ce qui change, c’est <strong>où</strong> ce quelque chose se trouve. Les signes qui entourent le nom le disent :</p>
+  <table class="comparer">
+    <thead><tr><th></th><th>Des guillemets <code>"…"</code></th><th>Des chevrons <code>&lt;…&gt;</code></th></tr></thead>
+    <tbody>
+      <tr><th>Exemple</th><td><code>#include "outils.cpp"</code></td><td><code>#include &lt;bande&gt;</code></td></tr>
+      <tr><th>Ce que c’est</th><td>un <strong>fichier à toi</strong>, un onglet à côté de <code>principal.cpp</code></td><td>une <strong>fonction de la console</strong>, connue du compilateur</td></tr>
+      <tr><th>Qui l’a écrit</th><td>toi</td><td>le projet (ou toi, si tu l’y as ajoutée : partie E)</td></tr>
+      <tr><th>Ce que fait la ligne</th><td>elle est <strong>remplacée</strong> par tout le texte du fichier, mot pour mot</td><td>elle <strong>autorise</strong> la fonction ; elle reste dans le texte</td></tr>
+      <tr><th>Le nom</th><td>le nom de l’onglet, extension comprise</td><td>le nom de la fonction, exactement comme on l’appelle</td></tr>
+      <tr><th>Sans la ligne</th><td>les fonctions du fichier sont inconnues</td><td>refus : « il faut #include &lt;bande&gt; »</td></tr>
+      <tr><th>Où on la modifie</th><td>dans l’atelier, sans rien installer</td><td>dans les fichiers du compilateur (un éditeur de texte)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Les guillemets : « colle ici mon fichier »</h2>
+  <p><strong>C’est une affaire de texte, rien de plus.</strong> Avant même de lire le programme, la console cherche les lignes <code>#include "…"</code> et remplace chacune par le contenu du fichier nommé. Le compilateur ne voit donc <strong>qu’un seul long texte</strong> : il ne sait même pas qu’il y avait deux onglets.</p>
+<p><strong>Conséquence :</strong> un programme rangé en quatre fichiers donne <strong>exactement la même cartouche</strong>, à l’octet près, que le même programme écrit d’un seul bloc. Ranger ne coûte rien.</p>
+<p><strong>C’est ce que fait le vrai C++.</strong> Le « préprocesseur » colle les fichiers avant la compilation. L’atelier fait pareil, avec une simplification : un fichier versé deux fois ne l’est qu’une fois. Pas besoin des « gardes d’inclusion » (<code>#ifndef … #define … #endif</code>) qu’on voit dans les vrais projets.</p>
+  <pre><code>// principal.cpp                         // outils.cpp
+#include &lt;ALPHABET&gt;                       #include &lt;poser&gt;
+#include "outils.cpp"   ───── colle ───▶  void bande(…) { … }
+int main() { bande(…); }                  void pile(…)  { … }</code></pre>
+  <p><strong>Ce que le compilateur voit vraiment, après collage :</strong></p>
+  <pre><code>#include &lt;ALPHABET&gt;
+#include &lt;poser&gt;          ← venu d'outils.cpp
+void bande(…) { … }       ← venu d'outils.cpp
+void pile(…)  { … }       ← venu d'outils.cpp
+int main() { bande(…); }</code></pre>
+
+  <h2>Les chevrons : « je me sers de cette fonction de la console »</h2>
+  <p><strong>La console a des dizaines de fonctions toutes prêtes</strong> : <code>texte()</code>, <code>poser()</code>, <code>note()</code>, <code>sprite()</code>… Chacune prend de la <strong>place</strong> dans la cartouche (son code, ses petites routines, ses tables). Une cartouche ne fait que 32 768 octets.</p>
+<p><strong>La règle de l’atelier : aucune n’est là d’office.</strong> On écrit <code>#include &lt;texte&gt;</code> pour dire « je me sers de <code>texte()</code> ». Sans la ligne, le compilateur refuse l’appel et écrit la ligne qui manque. Avec elle, il grave la fonction — <strong>mais seulement si le programme l’appelle vraiment</strong> : une ligne de trop ne coûte rien (la partie G le mesure).</p>
+<p><strong>Ce n’est pas un fichier.</strong> <code>#include &lt;bande&gt;</code> ne colle aucun texte dans ton programme : la ligne reste là, et c’est le compilateur qui la lit comme une autorisation.</p>
+<p><strong>Seules quelques fonctions sont natives</strong>, sans <code>#include</code> : <code>image()</code>, <code>images()</code>, <code>retard()</code>, <code>ms()</code> et <code>secondes()</code> — la boucle du jeu et ses horloges, qui ne coûtent presque rien.</p>
+  <div class="cadre alerte"><p class="cadre-titre"><strong>Le piège :</strong> des chevrons autour d’un nom que la console ne connaît pas</p><p>Si le nom entre chevrons n’est <strong>pas</strong> une fonction de la console (une faute de frappe, une majuscule, une fonction pas encore ajoutée), le compilateur le cherche comme un <strong>fichier</strong> — et répond « fichier introuvable ». La partie F montre ce message.</p></div>
+</section>
+
+
+<section class="page" id="partie-b">
+  <p class="sur">Partie B</p>
+  <h1>Ce qui se passe quand on compile</h1>
+  <div class="niveau-partie moyen">
+    <span class="pastille">●● intermédiaire</span> <span>il faut avoir lu ce qui est cité, et avoir essayé</span>
+    <br><b>À lire avant :</b> <a href="#base-0-3">0.3 Un programme, un compilateur, une cartouche</a> · <a href="#partie-a">partie A</a>
+  </div>
+  <p><strong>Compiler, c’est transformer ton texte C++ en nombres que le processeur de la Game Boy exécute</strong> (section 0.3). L’atelier le fait en <strong>cinq passes</strong>, toujours dans le même ordre. Cette partie les raconte deux fois : d’abord <strong>en images, sans code</strong> (B.1) ; puis <strong>avec le vrai code du compilateur</strong>, expliqué morceau par morceau (B.2), pour ceux qui veulent aller plus loin.</p>
+
+  <h2>B.1 — En images, sans code</h2>
+  <p><strong>Imagine que ton programme est une recette, et le compilateur une équipe de cuisine.</strong> Cinq personnes s’en occupent, l’une après l’autre :</p>
+  <ol class="etapes">
+    <li><strong>Le colleur.</strong> Il lit la recette ligne par ligne. Quand il voit <code>#include "outils.cpp"</code>, il va chercher la page <code>outils.cpp</code> dans le classeur, et la <strong>colle</strong> à la place de la ligne. Quand il voit <code>#include &lt;bande&gt;</code>, il ne colle rien : ce n’est pas une page du classeur, c’est un ustensile de la cuisine. Il laisse la ligne.</li>
+    <li><strong>Le lecteur.</strong> Il lit la recette collée et la découpe en morceaux qu’il comprend : « ici une fonction nommée <code>main</code> », « là un appel à <code>bande</code> avec quatre nombres », « là une demande d’ustensile : <code>bande</code> ».</li>
+    <li><strong>Le contrôleur.</strong> Il fait la liste des ustensiles que la recette <strong>utilise</strong> (les fonctions de la console appelées), et la compare à ceux qu’elle <strong>demande</strong> (les <code>#include &lt;…&gt;</code>). S’il en manque un : il arrête tout, et écrit « il faut #include &lt;bande&gt; ». Si la recette a son propre ustensile du même nom (sa propre fonction <code>bande</code>), il ne réclame rien : c’est le sien.</li>
+    <li><strong>Le magasinier.</strong> Pour chaque ustensile demandé <strong>et vraiment utilisé</strong>, il va chercher son mode d’emploi dans la réserve du projet, et l’ajoute au début de la recette. Pour <code>bande()</code>, ce mode d’emploi est écrit en C++, exactement comme si tu l’avais écrit toi-même. Un ustensile demandé mais jamais utilisé reste dans la réserve : il ne coûte rien.</li>
+    <li><strong>Le traducteur.</strong> Il traduit toute la recette (la tienne, plus les modes d’emploi ajoutés) dans la langue du processeur : des nombres. Il les range dans la cartouche, avec les dessins. L’émulateur peut la lancer.</li>
+  </ol>
+  <div class="cadre"><p class="cadre-titre"><strong>À retenir</strong></p><p>Les <strong>guillemets</strong> sont l’affaire du <strong>colleur</strong> (étape 1) : c’est du texte collé, rien de plus.</p>
+<p>Les <strong>chevrons</strong> sont l’affaire du <strong>contrôleur</strong> et du <strong>magasinier</strong> (étapes 3 et 4) : une autorisation, puis l’ajout du code de la fonction, seulement si elle sert.</p>
+<p>Une fonction de la console écrite en C++ est ajoutée <strong>exactement comme si tu l’avais écrite</strong>. C’est pour cela qu’en ajouter une est à ta portée : il suffit de la ranger dans la réserve (partie E).</p></div>
+
+  <h2>B.2 — Avec le vrai code</h2>
+  <p><strong>Cette section montre le vrai code du compilateur</strong>, lu dans ses fichiers pendant la fabrication de ce document. Il est en JavaScript : la partie D explique ce qu’il faut pour le lire. Tu peux la sauter sans rien perdre pour la suite.</p>
+
+  <h3>Étape 1 — Le colleur : reconnaître une ligne #include</h3>
+  <p>Dans <code>compilateur/inclusion.js</code>, une seule ligne décide si une ligne du programme est un <code>#include</code>. C’est un <strong>motif</strong> (on dit une « expression régulière ») : une sorte de pochoir que le compilateur pose sur chaque ligne pour voir si elle a la bonne forme.</p>
+  <p class="fichier"><code>compilateur/inclusion.js</code></p><pre><code>const MOTIF = /^[ \t]*#\s*include\s*(?:"([^"]+)"|&lt;([^&gt;]+)&gt;)[ \t]*(?:\/\/.*)?$/</code></pre>
+  <p><strong>Le pochoir, morceau par morceau</strong> (le motif est entre les deux <code>/</code>) :</p>
+  <table class="comparer">
+    <thead><tr><th>Morceau</th><th>Ce qu’il veut dire</th><th>Dans <code>#include &lt;bande&gt;   // …</code></th></tr></thead>
+    <tbody>
+      <tr><td><code>^</code></td><td>le début de la ligne</td><td>avant le <code>#</code></td></tr>
+      <tr><td><code>[ \t]*</code></td><td>des espaces ou des tabulations, autant qu’on veut (même aucun)</td><td>aucun</td></tr>
+      <tr><td><code>#</code></td><td>le signe dièse, tel quel</td><td><code>#</code></td></tr>
+      <tr><td><code>\s*</code></td><td>des espaces facultatifs</td><td>aucun</td></tr>
+      <tr><td><code>include</code></td><td>le mot <code>include</code>, tel quel</td><td><code>include</code></td></tr>
+      <tr><td><code>\s*</code></td><td>des espaces facultatifs</td><td>un espace</td></tr>
+      <tr><td><code>"([^"]+)"</code></td><td><strong>soit</strong> un nom entre guillemets (<code>[^"]+</code> : un ou plusieurs signes qui ne sont pas des guillemets) — c’est un <strong>fichier</strong></td><td>—</td></tr>
+      <tr><td><code>|</code></td><td>« ou bien »</td><td></td></tr>
+      <tr><td><code>&lt;([^&gt;]+)&gt;</code></td><td><strong>soit</strong> un nom entre chevrons</td><td><code>&lt;bande&gt;</code> → le nom <code>bande</code></td></tr>
+      <tr><td><code>[ \t]*</code></td><td>des espaces facultatifs</td><td>les trois espaces</td></tr>
+      <tr><td><code>(?:\/\/.*)?</code></td><td>un commentaire <code>//</code> facultatif, jusqu’au bout</td><td><code>// …</code></td></tr>
+      <tr><td><code>$</code></td><td>la fin de la ligne</td><td></td></tr>
+    </tbody>
+  </table>
+  <p><strong>Ce qui se passe ensuite :</strong> si le nom est entre guillemets, le colleur remplace la ligne par le fichier. S’il est entre chevrons <strong>et</strong> qu’il figure dans la liste <code>BIBLIOTHEQUES</code> (partie J), la ligne est laissée telle quelle. S’il est entre chevrons mais <strong>absent</strong> de la liste, il est traité comme un nom de fichier — d’où le message « fichier introuvable » de la partie F.</p>
+
+  <h3>Étape 3 — Le contrôleur</h3>
+  <p>Dans <code>compilateur/emetteur.js</code>, la fonction <code>inclusionsEmployees</code> parcourt tout l’arbre du programme. Pour chaque <strong>appel</strong> dont le nom est dans <code>BIBLIOTHEQUES</code> — et qui n’est pas une fonction écrite par le programme lui-même —, elle note le nom et sa ligne. Ensuite, ce qui est noté sans être inclus est refusé, avant toute traduction.</p>
+
+  <h3>Étape 4 — Le magasinier : ajouter les fonctions écrites en C++</h3>
+  <p>Voici, lue dans <code>compilateur/emetteur.js</code>, la boucle qui ajoute les fonctions de la console écrites en C++ :</p>
+  <p class="fichier"><code>compilateur/emetteur.js</code></p><pre><code>  for (const [nom, source] of Object.entries(FONCTIONS_EN_C)) {
+    if (siennes.has(nom) || !appelle(programme, nom)) continue   // la sienne, ou pas appelée
+    ajoutees.push(...analyser(source))
+  }</code></pre>
+  <p><strong>Ligne par ligne :</strong></p>
+  <table class="comparer"><tbody>
+    <tr><th>ligne 1</th><td><code>for (const [nom, source] of Object.entries(FONCTIONS_EN_C))</code> : pour chaque élément de l’objet <code>FONCTIONS_EN_C</code> (D.4), prendre son nom (<code>bande</code>) et sa valeur — la source C++ (<code>SOURCE_BANDE</code>).</td></tr>
+    <tr><th>ligne 2</th><td><code>if (siennes.has(nom) || !appelle(programme, nom)) continue</code> : <strong>si</strong> le programme a écrit sa propre fonction de ce nom, <strong>ou</strong> (<code>||</code>) s’il ne l’appelle <strong>pas</strong> (<code>!</code>), passer à la suivante (<code>continue</code>) sans rien ajouter.</td></tr>
+    <tr><th>ligne 3</th><td><code>ajoutees.push(...analyser(source))</code> : sinon, lire la source C++ avec le même lecteur que ton programme (<code>analyser</code>), et ajouter ce qu’il en tire à la liste des fonctions ajoutées.</td></tr>
+    <tr><th>ligne 4</th><td><code>}</code> : fin de la boucle.</td></tr>
+  </tbody></table>
+  <p>Un peu plus bas, chaque fonction ajoutée reçoit une marque, <code>deLaConsole</code> : c’est elle qui lui évite d’avoir à écrire ses propres <code>#include</code> (<code>bande()</code> appelle <code>poser()</code> sans <code>#include &lt;poser&gt;</code>).</p>
+</section>
+
+
+<section class="page" id="partie-c">
+  <p class="sur">Partie C</p>
+  <h1>Le chapitre du parcours, étape par étape</h1>
+  <div class="niveau-partie moyen">
+    <span class="pastille">●● intermédiaire</span> <span>il faut avoir lu ce qui est cité, et avoir essayé</span>
+    <br><b>À lire avant :</b> <a href="#base-0-5">0.5 L’écran : des cases, des tuiles, la police</a> · <a href="#base-0-6">0.6</a> · <a href="#base-0-7">0.7</a> · <a href="#base-0-8">0.8</a> · <a href="#partie-a">partie A</a>
+  </div>
+  <p><strong>Dans l’atelier, ce chapitre est le dernier du parcours</strong> (bouton <strong>📚 APPRENDRE</strong>), sous le nom « Tes propres #include : ajouter une fonction ». Dans la page du tutoriel, il commence à la leçon 144 : <code>tuto.html#lecon-603</code>.</p>
+<p><strong>Chaque étape reprend la précédente et ne change qu’une chose.</strong> Les voici toutes, avec leur programme complet (et leurs fichiers voisins), et l’écran qu’elles donnent vraiment.</p>
+  
+<article class="lecon">
+  <p class="reperes"><span class="niveau">leçon 144 du parcours</span></p>
+  <h2 class="titre-lecon">144. Une fonction à toi : bande()</h2>
+  <p class="idee">Avant de parler d’#include, on écrit une fonction à soi : bande() pose la même tuile plusieurs fois, de gauche à droite.</p>
+  <p><strong>Ce chapitre répond à une question : « comment ajouter moi-même un <code>#include</code> ? »</strong> Il y a deux sortes d’<code>#include</code>, et on va les faire toutes les deux, avec <strong>une seule fonction</strong>, du début à la fin : <code>bande()</code>.</p>
+  <p><strong>On part de ce qu’on sait déjà faire</strong> (chapitre « Les fonctions : nommer un geste ») : écrire une fonction dans son programme. <code>bande(colonne, ligne, tuile, longueur)</code> pose la tuile <code>longueur</code> fois, une case plus à droite à chaque fois.</p>
+  <p><strong>Lis la fonction ligne par ligne :</strong> <code>void</code> dit qu’elle ne rend rien ; entre les parenthèses, ses <strong>quatre paramètres</strong>, quatre cases de mémoire remplies par l’appel. La boucle <code>for</code> compte <code>i</code> de 0 jusqu’à <code>longueur - 1</code>, et pose la tuile en <code>colonne + i</code>.</p>
+  <p><strong>Déroulé de <code>bande(2, 5, ALPHABET[0], 10)</code> :</strong> i = 0 → case (2, 5) ; i = 1 → case (3, 5) ; … ; i = 9 → case (11, 5). Puis i = 10 : <code>10 &lt; 10</code> est faux, la boucle s’arrête. Dix A, des colonnes 2 à 11.</p>
+  <p><strong>Pour l’instant, aucun <code>#include</code> nouveau :</strong> la fonction est <strong>dans</strong> le programme, elle n’a rien à demander à la console. Elle se sert seulement de <code>poser()</code>, déjà incluse.</p>
+  
+  <p class="fichier"><code>le programme</code></p><pre><code>// Une fonction à toi : bande().
+// Elle est écrite ICI, dans le programme : pas besoin d'#include pour elle.
+
+#include &lt;poser&gt;      // pose une tuile sur une case du fond (bande() s'en sert)
+#include &lt;ALPHABET&gt;   // les lettres de la police : ALPHABET[0] est le A
+
+// bande(colonne, ligne, tuile, longueur) : la même tuile, « longueur » fois,
+// de gauche à droite. Exemple : bande(2, 5, ALPHABET[0], 10) → dix A,
+// des colonnes 2 à 11, sur la ligne 5.
+//
+//   void         elle ne rend rien : elle agit, c'est tout
+//   uint8_t ...  ses quatre paramètres : des nombres de 0 à 255
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  // for (départ ; condition ; après chaque tour)
+  //   i = 0 au départ ; on continue tant que i &lt; longueur ; i++ ajoute 1.
+  for (uint8_t i = 0; i &lt; longueur; i++) {
+    poser(colonne + i, ligne, tuile);   // une case plus à droite à chaque tour
+  }
+}
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // l'appel : dix A sur la ligne 5
+
+  while (true) {   // la boucle du jeu
+    image();       // attend l'image suivante (native : pas d'#include)
+  }
+}</code></pre>
+  <div class="resultat">
+    <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABhUlEQVR4nO3ToQ3DQBAAQcOUYOj+q0kJKcPQwMQgyFIU3XqkAa9D91rd8tnfhC1/34CfEjhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LibgV/rdnrIfK47ga//f8J7NIEF/hb4Kj8fzQW7YIEnE1hgJhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjjsAq3hsxAg8T+4AAAAASUVORK5CYII=" alt="l’écran de la console"><figcaption>l’écran, dans l’émulateur — 911 octets</figcaption></figure>
+    <div><p class="fichier">Ce qu’on doit voir</p><p class="avoir">Dix A côte à côte sur la ligne 5, des colonnes 2 à 11.</p></div>
+  </div>
+</article>
+<article class="lecon">
+  <p class="reperes"><span class="niveau">leçon 145 du parcours</span></p>
+  <h2 class="titre-lecon">145. La même fonction, trois fois</h2>
+  <p class="idee">Une fonction s’écrit une fois et s’appelle autant qu’on veut : trois bandes, trois longueurs, trois lettres.</p>
+  <p><strong>C’est le programme d’avant</strong>, avec <strong>deux appels de plus</strong> dans <code>main()</code>. La fonction, elle, ne change pas d’une lettre.</p>
+  <p><strong>Chaque appel remplit les paramètres autrement :</strong> <code>bande(2, 7, ALPHABET[1], 6)</code> met 2 dans <code>colonne</code>, 7 dans <code>ligne</code>, le B dans <code>tuile</code>, 6 dans <code>longueur</code>. Six B, des colonnes 2 à 7.</p>
+  <p><strong>C’est tout l’intérêt d’une fonction :</strong> le geste (« poser une rangée ») est écrit <strong>une seule fois</strong>. C’est aussi ce qui va nous donner envie de la <strong>ranger à part</strong> : une fonction aussi utile, on voudrait la réemployer dans d’autres programmes, sans la recopier.</p>
+  <p><strong>Essaie :</strong> ajoute <code>bande(0, 11, ALPHABET[3], 20);</code> — une ligne entière de D, de la colonne 0 à la 19.</p>
+  
+  <p class="fichier"><code>le programme</code></p><pre><code>// La même fonction, trois fois : seuls les appels de main() changent.
+
+#include &lt;poser&gt;      // pose une tuile sur une case du fond
+#include &lt;ALPHABET&gt;   // ALPHABET[0] = A, [1] = B, [2] = C…
+
+// bande(colonne, ligne, tuile, longueur) : comme à l'étape d'avant.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i &lt; longueur; i++) {
+    poser(colonne + i, ligne, tuile);
+  }
+}
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // dix A  : colonnes 2 à 11, ligne 5
+  bande(2, 7, ALPHABET[1], 6);    // NOUVEAU : six B   : colonnes 2 à 7,  ligne 7
+  bande(2, 9, ALPHABET[2], 3);    // NOUVEAU : trois C : colonnes 2 à 4,  ligne 9
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  <div class="resultat">
+    <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABnklEQVR4nO3bMQ6CMABAUUaP4Oj9T+MRPIajgwuDYYAA9vOSN5BOkJ8WCmF6vZ+ETaefAbsSOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7guJWBb/fH10XGx7Um8Pz6r3A8NIEF/hV4Lj8+NDPYDBZ4ZAILzMgEjhM4TuA4geMEjhM4TuA4geO2fmz4h3EWFF5VskDgOEt0nBkcJ3CcJTrOPjhO4DiB4wSOEzhO4DiB4wSOEzju5P+D2duZ76I5wNbAW8Y5gMBxAse5B8d5io6zD44TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI77AKj07g4SMM9AAAAAAElFTkSuQmCC" alt="l’écran de la console"><figcaption>l’écran, dans l’émulateur — 949 octets</figcaption></figure>
+    <div><p class="fichier">Ce qu’on doit voir</p><p class="avoir">Trois rangées : dix A, six B, trois C, toutes calées à gauche sur la colonne 2.</p></div>
+  </div>
+</article>
+<article class="lecon">
+  <p class="reperes"><span class="niveau">leçon 146 du parcours</span></p>
+  <h2 class="titre-lecon">146. Ranger sa fonction dans un fichier voisin : #include "outils.cpp"</h2>
+  <p class="idee">La première sorte d’#include, avec des guillemets : bande() déménage dans l’onglet outils.cpp, et principal.cpp le verse chez lui.</p>
+  <p><strong>Ce qui est nouveau ici : la fonction a déménagé.</strong> Elle n’est plus dans <code>principal.cpp</code> : elle est dans un <strong>second onglet</strong>, <code>outils.cpp</code>. Dans l’atelier, c’est le bouton <strong>« + fichier »</strong>, au-dessus de l’éditeur, qui crée un onglet comme celui-là.</p>
+  <p><strong><code>#include "outils.cpp"</code> veut dire « verse ici tout le texte d’<code>outils.cpp</code> ».</strong> Avant de compiler, la console remplace cette ligne par le contenu du fichier, mot pour mot. Le compilateur voit donc <strong>exactement</strong> le programme de l’étape d’avant : même cartouche, même écran.</p>
+  <p><strong>Les guillemets <code>"…"</code> désignent un fichier À TOI</strong>, écrit à côté du programme. Retiens-le bien, car l’étape 15.6 montrera l’autre sorte, avec des chevrons <code>&lt;…&gt;</code>, qui désigne une fonction <strong>de la console</strong>.</p>
+  <p><strong>Où placer la ligne :</strong> l’habitude est de mettre tous les <code>#include</code> en haut, ensemble. Pour des <strong>fonctions</strong>, l’ordre ne compte pas : le compilateur relève toutes les fonctions avant de les traduire, et <code>main()</code> peut appeler <code>bande()</code> même si son texte est collé plus bas. Pour des <strong>variables globales</strong> ou des <strong>dessins</strong>, si : ils doivent être versés <strong>avant</strong> la fonction qui s’en sert.</p>
+  <p><strong>Pourquoi l’extension <code>.cpp</code> et pas <code>.h</code> :</strong> les deux marchent ici. Par habitude, un <code>.h</code> (« header ») contient des déclarations (des variables, des noms) ; un <code>.cpp</code> contient du code, des fonctions. <code>outils.cpp</code> contient une fonction.</p>
+  <p class="fichier"><code>outils.cpp</code></p><pre><code>// outils.cpp : MES fonctions, rangées à part.
+// Ce fichier ne fait rien tout seul : principal.cpp le verse chez lui
+// avec #include "outils.cpp" (des GUILLEMETS : c'est un fichier à moi).
+
+// bande(colonne, ligne, tuile, longueur) : la même tuile, « longueur » fois,
+// de gauche à droite. Exemple : bande(2, 5, ALPHABET[0], 10) → dix A.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i &lt; longueur; i++) {
+    poser(colonne + i, ligne, tuile);   // poser() : incluse par principal.cpp
+  }
+}</code></pre>
+  <p class="fichier"><code>principal.cpp</code></p><pre><code>// Le changement : bande() n'est plus écrite ici, mais dans outils.cpp.
+//
+//   #include "outils.cpp"
+//   |        |
+//   |        +-- le fichier à verser : l'onglet « outils.cpp », à côté
+//   +----------- « verse ici » : avant la compilation, cette ligne est
+//                remplacée par tout le texte d'outils.cpp. Tout se passe
+//                comme si bande() était écrite ici, comme à l'étape d'avant.
+
+#include &lt;poser&gt;      // pose une tuile (c'est bande() qui s'en sert)
+#include &lt;ALPHABET&gt;   // les lettres de la police
+#include "outils.cpp" // NOUVEAU : mes fonctions à moi, versées ici
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // bande() vient d'outils.cpp
+  bande(2, 7, ALPHABET[1], 6);
+  bande(2, 9, ALPHABET[2], 3);
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  <div class="resultat">
+    <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABnklEQVR4nO3bMQ6CMABAUUaP4Oj9T+MRPIajgwuDYYAA9vOSN5BOkJ8WCmF6vZ+ETaefAbsSOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7guJWBb/fH10XGx7Um8Pz6r3A8NIEF/hV4Lj8+NDPYDBZ4ZAILzMgEjhM4TuA4geMEjhM4TuA4geO2fmz4h3EWFF5VskDgOEt0nBkcJ3CcJTrOPjhO4DiB4wSOEzhO4DiB4wSOEzju5P+D2duZ76I5wNbAW8Y5gMBxAse5B8d5io6zD44TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI77AKj07g4SMM9AAAAAAElFTkSuQmCC" alt="l’écran de la console"><figcaption>l’écran, dans l’émulateur — 949 octets</figcaption></figure>
+    <div><p class="fichier">Ce qu’on doit voir</p><p class="avoir">Exactement l’écran d’avant : dix A, six B, trois C. Mais le programme est rangé en deux onglets.</p></div>
+  </div>
+</article>
+<article class="lecon">
+  <p class="reperes"><span class="niveau">leçon 147 du parcours</span></p>
+  <h2 class="titre-lecon">147. Le fichier voisin écrit ses propres #include &lt;…&gt;</h2>
+  <p class="idee">outils.cpp se sert de poser() : c’est donc lui qui écrit #include &lt;poser&gt;. Le fichier se suffit à lui-même.</p>
+  <p><strong>Le seul changement : la ligne <code>#include &lt;poser&gt;</code> a changé d’onglet.</strong> Elle était dans <code>principal.cpp</code> ; elle est maintenant <strong>en haut d’<code>outils.cpp</code></strong>.</p>
+  <p><strong>Pourquoi c’est mieux :</strong> c’est <code>bande()</code> qui se sert de <code>poser()</code>, pas <code>main()</code>. En écrivant la ligne <strong>dans le fichier qui en a besoin</strong>, <code>outils.cpp</code> se suffit à lui-même : un autre programme qui écrit <code>#include "outils.cpp"</code> n’a rien d’autre à penser.</p>
+  <p><strong>Et si deux fichiers écrivent la même ligne ?</strong> Si <code>principal.cpp</code> gardait aussi son <code>#include &lt;poser&gt;</code>, ce ne serait pas une erreur : une fonction de la console n’est gravée <strong>qu’une fois</strong>, et une ligne de trop ne coûte rien.</p>
+  <p><strong>Le texte versé, en entier :</strong> <code>#include &lt;ALPHABET&gt;</code>, puis tout <code>outils.cpp</code> (son <code>#include &lt;poser&gt;</code> et <code>bande()</code>), puis <code>main()</code>. Un <code>#include &lt;…&gt;</code> vaut pour <strong>tout</strong> le programme assemblé, où qu’il soit écrit : celui d’<code>outils.cpp</code> autorise <code>poser()</code> partout.</p>
+  <p class="fichier"><code>outils.cpp</code></p><pre><code>// outils.cpp : MES fonctions, rangées à part.
+// Il écrit LUI-MÊME ce dont il a besoin : il se suffit à lui-même.
+
+#include &lt;poser&gt;   // NOUVEAU ICI : bande() se sert de poser()
+
+// bande(colonne, ligne, tuile, longueur) : la même tuile, « longueur » fois,
+// de gauche à droite. Exemple : bande(2, 5, ALPHABET[0], 10) → dix A.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i &lt; longueur; i++) {
+    poser(colonne + i, ligne, tuile);
+  }
+}</code></pre>
+  <p class="fichier"><code>principal.cpp</code></p><pre><code>// Le changement : « #include &lt;poser&gt; » est parti dans outils.cpp,
+// le fichier qui s'en sert. main() n'appelle pas poser() lui-même.
+
+#include &lt;ALPHABET&gt;   // les lettres : c'est main() qui s'en sert
+#include "outils.cpp" // mes fonctions (et leurs #include à elles)
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);
+  bande(2, 7, ALPHABET[1], 6);
+  bande(2, 9, ALPHABET[2], 3);
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  <div class="resultat">
+    <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABnklEQVR4nO3bMQ6CMABAUUaP4Oj9T+MRPIajgwuDYYAA9vOSN5BOkJ8WCmF6vZ+ETaefAbsSOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7guJWBb/fH10XGx7Um8Pz6r3A8NIEF/hV4Lj8+NDPYDBZ4ZAILzMgEjhM4TuA4geMEjhM4TuA4geO2fmz4h3EWFF5VskDgOEt0nBkcJ3CcJTrOPjhO4DiB4wSOEzhO4DiB4wSOEzju5P+D2duZ76I5wNbAW8Y5gMBxAse5B8d5io6zD44TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI77AKj07g4SMM9AAAAAAElFTkSuQmCC" alt="l’écran de la console"><figcaption>l’écran, dans l’émulateur — 949 octets</figcaption></figure>
+    <div><p class="fichier">Ce qu’on doit voir</p><p class="avoir">Toujours le même écran : dix A, six B, trois C.</p></div>
+  </div>
+</article>
+<article class="lecon">
+  <p class="reperes"><span class="niveau">leçon 148 du parcours</span></p>
+  <h2 class="titre-lecon">148. Une deuxième fonction dans outils.cpp : pile()</h2>
+  <p class="idee">Un fichier d’outils grandit : pile() fait comme bande(), mais vers le bas. principal.cpp n’a rien à ajouter pour s’en servir.</p>
+  <p><strong>Ce qui est nouveau ici : <code>pile(colonne, ligne, tuile, hauteur)</code></strong>, une deuxième fonction dans <code>outils.cpp</code>. C’est <code>bande()</code> tournée d’un quart de tour : la tuile est posée <strong>vers le bas</strong>, en <code>ligne + i</code>.</p>
+  <p><strong>Déroulé de <code>pile(15, 4, ALPHABET[3], 6)</code> :</strong> i = 0 → (15, 4) ; i = 1 → (15, 5) ; … ; i = 5 → (15, 9). Six D, l’un sous l’autre.</p>
+  <p><strong>Aucune ligne ajoutée dans principal.cpp pour l’avoir :</strong> le <code>#include "outils.cpp"</code> verse <strong>tout</strong> le fichier, donc toutes ses fonctions. Un fichier d’outils, c’est cela : une boîte où l’on range ses fonctions, et qu’on ouvre d’une seule ligne.</p>
+  <p><strong>Essaie :</strong> écris une troisième fonction dans <code>outils.cpp</code>, par exemple <code>void carreDe(colonne, ligne, tuile)</code> qui appelle <code>bande()</code> deux fois.</p>
+  <p class="fichier"><code>outils.cpp</code></p><pre><code>// outils.cpp : MES fonctions, rangées à part.
+
+#include &lt;poser&gt;   // bande() et pile() se servent de poser()
+
+// bande(colonne, ligne, tuile, longueur) : vers la DROITE.
+// Exemple : bande(2, 5, ALPHABET[0], 10) → dix A, colonnes 2 à 11.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i &lt; longueur; i++) {
+    poser(colonne + i, ligne, tuile);   // la COLONNE avance
+  }
+}
+
+// NOUVEAU : pile(colonne, ligne, tuile, hauteur) : vers le BAS.
+// Exemple : pile(15, 4, ALPHABET[3], 6) → six D, lignes 4 à 9.
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i &lt; hauteur; i++) {
+    poser(colonne, ligne + i, tuile);   // c'est la LIGNE qui avance
+  }
+}</code></pre>
+  <p class="fichier"><code>principal.cpp</code></p><pre><code>// Le changement : main() appelle aussi pile(), la nouvelle fonction
+// d'outils.cpp. Rien à ajouter en haut : outils.cpp est déjà versé.
+
+#include &lt;ALPHABET&gt;
+#include "outils.cpp" // bande() ET pile()
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);
+  bande(2, 7, ALPHABET[1], 6);
+  bande(2, 9, ALPHABET[2], 3);
+  pile(15, 4, ALPHABET[3], 6);    // NOUVEAU : six D, de la ligne 4 à la 9
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  <div class="resultat">
+    <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB50lEQVR4nO3bMU7DMBiAUUaOwMj9T8MROAYjG2KgUkkTN/+XJ73BytBa+erYatWXz68Pwl6ePgMOJXCcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECr/P69v5j2ZsKvM7vrssaC7yOwHECxwkcJ3CcUzT72xj41iexen0XY1bwrb2kOt4x8KGvL7DAd0/0z6dN9foVA19qLHB8LHB8vGPgGadoBhF4HSs4bswezDYCxwkcJ3CcwHFO0ezv0R8bznB9ijEr+AxfH05sPGYPPkNUge/kES3w3RO1grfdt0MJvM6kwB7RO9630wVmEIHXsYLjxuzBbCNwnMBxAscJHOcUzf6e/P/gSxmzgq/2HfJexuzBtyb33+tXI3CcwHEjA9uDH79vh3KKXmfMKZpBBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjvgGut+of/nu74QAAAABJRU5ErkJggg==" alt="l’écran de la console"><figcaption>l’écran, dans l’émulateur — 1010 octets</figcaption></figure>
+    <div><p class="fichier">Ce qu’on doit voir</p><p class="avoir">Les trois bandes d’avant, et une colonne de six D à droite (colonne 15, lignes 4 à 9).</p></div>
+  </div>
+</article>
+<article class="lecon">
+  <p class="reperes"><span class="niveau">leçon 148.1 du parcours</span><span class="outil">tuto de la fonction</span></p>
+  <h2 class="titre-lecon">148.1. La fonction bande() — la même tuile, plusieurs fois</h2>
+  <p class="idee">#include &lt;bande&gt; : bande(colonne, ligne, tuile, longueur) pose la même tuile « longueur » fois, de gauche à droite.</p>
+  <p><strong>Ce qu’elle fait :</strong> <code>bande(2, 5, ALPHABET[0], 10)</code> pose <strong>dix A</strong> sur la ligne 5, des colonnes 2 à 11 — comme dix <code>poser()</code> d’affilée, une case plus à droite à chaque fois.</p>
+  <p><strong>La ligne à écrire : <code>#include &lt;bande&gt;</code>.</strong></p>
+  <p><strong>Ses arguments :</strong> la colonne et la ligne de la première case, la tuile, et combien de fois la poser.</p>
+  <p><strong>D’où elle vient :</strong> c’est la fonction que le chapitre « Tes propres #include » écrit d’abord dans le programme, puis range dans un fichier voisin, et fait enfin entrer dans la console. Elle est écrite en C, comme une fonction de l’élève (<code>compilateur/emetteur.js</code>, <code>SOURCE_BANDE</code>).</p>
+  <p><strong>Ce qu’elle coûte :</strong> sa boucle, et <code>poser()</code> qu’elle appelle — gravées seulement si le programme appelle <code>bande()</code>.</p>
+  <p><strong>Essaie :</strong> <code>bande(0, 17, ALPHABET[1], 20);</code> — une ligne de B tout en bas.</p>
+  
+  <p class="fichier"><code>le programme</code></p><pre><code>// ---- #include &lt;bande&gt; : la même tuile, plusieurs fois ----
+// Dix A sur la ligne 5, des colonnes 2 à 11, en un seul appel.
+
+#include &lt;ALPHABET&gt;   // les lettres : ALPHABET[0] est le A
+#include &lt;bande&gt;      // bande() : la même tuile, de gauche à droite
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // colonne 2, ligne 5, le A, dix fois
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  <div class="resultat">
+    <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABhUlEQVR4nO3ToQ3DQBAAQcOUYOj+q0kJKcPQwMQgyFIU3XqkAa9D91rd8tnfhC1/34CfEjhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LibgV/rdnrIfK47ga//f8J7NIEF/hb4Kj8fzQW7YIEnE1hgJhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjjsAq3hsxAg8T+4AAAAASUVORK5CYII=" alt="l’écran de la console"><figcaption>l’écran, dans l’émulateur — 911 octets</figcaption></figure>
+    <div><p class="fichier">Ce qu’on doit voir</p><p class="avoir">Dix A côte à côte sur la ligne 5.</p></div>
+  </div>
+</article>
+<article class="lecon">
+  <p class="reperes"><span class="niveau">leçon 149 du parcours</span></p>
+  <h2 class="titre-lecon">149. bande() devient une fonction de la console : #include &lt;bande&gt;</h2>
+  <p class="idee">La seconde sorte d’#include, avec des chevrons : bande() a été ajoutée à la console elle-même. On ne l’écrit plus, on la demande.</p>
+  <p><strong>Ce qui est nouveau ici : <code>#include &lt;bande&gt;</code></strong>, avec des <strong>chevrons</strong>. <code>bande()</code> n’est plus dans <code>outils.cpp</code> (il n’y reste que <code>pile()</code>) : elle fait maintenant partie <strong>de la console</strong>, comme <code>poser()</code> ou <code>texte()</code>. On ne l’écrit plus, on la <strong>demande</strong>.</p>
+  <p><strong>Guillemets ou chevrons, la différence en une phrase :</strong> <code>#include "outils.cpp"</code> verse <strong>ton fichier</strong> ; <code>#include &lt;bande&gt;</code> demande <strong>une fonction de la console</strong>, que le compilateur connaît déjà et n’ajoute à la cartouche que si le programme l’appelle.</p>
+  <p><strong>Sans la ligne, le compilateur refuse :</strong> efface <code>#include &lt;bande&gt;</code> et lance. Le message dit : « il faut #include &lt;bande&gt; pour employer bande() ». C’est la règle de toute la console : ce qu’on emploie, on l’inclut par son nom.</p>
+  <p><strong>Comment <code>bande()</code> est entrée dans la console.</strong> Il a fallu toucher <strong>trois fichiers du projet</strong> (pas le programme : le compilateur lui-même). On les ouvre dans un éditeur de texte, à côté d’<code>index.html</code> :</p>
+  <p><strong>1. <code>compilateur/emetteur.js</code> — le code de la fonction.</strong> On y écrit sa source, <strong>en C, exactement comme dans <code>outils.cpp</code></strong>, dans une constante, <code>SOURCE_BANDE</code>, entre deux accents graves (la touche AltGr + 7) : le texte de la fonction, mot pour mot. Puis on l’inscrit dans le tableau <code>FONCTIONS_EN_C</code>, juste en dessous : <code>bande: SOURCE_BANDE,</code>. Le compilateur ajoute ce texte au programme <strong>seulement</strong> s’il appelle <code>bande()</code>.</p>
+  <p><strong>2. <code>compilateur/inclusion.js</code> — le nom à inclure.</strong> Dans le tableau <code>BIBLIOTHEQUES</code>, une ligne : <code>bande: 'pose la même tuile plusieurs fois, de gauche à droite',</code>. C’est elle qui rend <code>#include &lt;bande&gt;</code> valable, et la phrase sert de commentaire quand l’atelier écrit les <code>#include</code> tout seul.</p>
+  <p><strong>3. <code>aide-fonctions.js</code> — l’aide de l’éditeur.</strong> Dans <code>FONCTIONS</code> : <code>bande: { args: ['colonne', 'ligne', 'tuile', 'longueur'], dit: '…' },</code>. L’éditeur propose alors <code>bande</code> quand on tape « ban… », et montre les arguments pendant qu’on les écrit.</p>
+  <p><strong>Un détail : dans la console, <code>bande()</code> n’écrit pas <code>#include &lt;poser&gt;</code>.</strong> Ce que la console ajoute elle-même n’a rien à inclure : le compilateur le sait (c’est le drapeau <code>deLaConsole</code>).</p>
+  <p><strong>Après avoir changé ces fichiers :</strong> recharge la page avec <strong>Ctrl+F5</strong>. Le compilateur est relu, et <code>#include &lt;bande&gt;</code> marche aussitôt.</p>
+  <p class="fichier"><code>outils.cpp</code></p><pre><code>// outils.cpp : MES fonctions. bande() n'y est plus : elle est
+// dans la console, demandée par #include &lt;bande&gt; dans principal.cpp.
+
+#include &lt;poser&gt;   // pile() se sert de poser()
+
+// pile(colonne, ligne, tuile, hauteur) : vers le BAS.
+// Exemple : pile(15, 4, ALPHABET[3], 6) → six D, lignes 4 à 9.
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i &lt; hauteur; i++) {
+    poser(colonne, ligne + i, tuile);
+  }
+}</code></pre>
+  <p class="fichier"><code>principal.cpp</code></p><pre><code>// Le changement : bande() vient de la CONSOLE, plus d'outils.cpp.
+//
+//   #include &lt;bande&gt;     des CHEVRONS : une fonction de la console
+//   #include "outils.cpp"  des GUILLEMETS : un fichier à moi
+
+#include &lt;ALPHABET&gt;
+#include &lt;bande&gt;      // NOUVEAU : pose la même tuile plusieurs fois, de gauche à droite
+#include "outils.cpp" // il ne contient plus que pile()
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // la bande() de la console
+  bande(2, 7, ALPHABET[1], 6);
+  bande(2, 9, ALPHABET[2], 3);
+  pile(15, 4, ALPHABET[3], 6);    // la pile() d'outils.cpp
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  <div class="resultat">
+    <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB50lEQVR4nO3bMU7DMBiAUUaOwMj9T8MROAYjG2KgUkkTN/+XJ73BytBa+erYatWXz68Pwl6ePgMOJXCcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECr/P69v5j2ZsKvM7vrssaC7yOwHECxwkcJ3CcUzT72xj41iexen0XY1bwrb2kOt4x8KGvL7DAd0/0z6dN9foVA19qLHB8LHB8vGPgGadoBhF4HSs4bswezDYCxwkcJ3CcwHFO0ezv0R8bznB9ijEr+AxfH05sPGYPPkNUge/kES3w3RO1grfdt0MJvM6kwB7RO9630wVmEIHXsYLjxuzBbCNwnMBxAscJHOcUzf6e/P/gSxmzgq/2HfJexuzBtyb33+tXI3CcwHEjA9uDH79vh3KKXmfMKZpBBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjvgGut+of/nu74QAAAABJRU5ErkJggg==" alt="l’écran de la console"><figcaption>l’écran, dans l’émulateur — 1010 octets</figcaption></figure>
+    <div><p class="fichier">Ce qu’on doit voir</p><p class="avoir">Le même écran : trois bandes et une pile. bande() vient maintenant de la console.</p></div>
+  </div>
+</article>
+<article class="lecon">
+  <p class="reperes"><span class="niveau">leçon 150 du parcours</span></p>
+  <h2 class="titre-lecon">150. Ta fonction passe avant celle de la console</h2>
+  <p class="idee">Si ton programme écrit une fonction du même nom qu’une fonction de la console, c’est la tienne qui compte.</p>
+  <p><strong>Le seul changement : <code>outils.cpp</code> écrit de nouveau une <code>bande()</code></strong>, mais <strong>en pointillés</strong> : une case sur deux. <code>#include &lt;bande&gt;</code> est toujours là, dans <code>principal.cpp</code>.</p>
+  <p><strong>Laquelle gagne ?</strong> La tienne. Le compilateur ajoute une fonction de la console <strong>seulement si le programme n’en a pas écrit une du même nom</strong>. Ici, il voit ta <code>bande()</code> : il n’ajoute pas la sienne, et la ligne <code>#include &lt;bande&gt;</code> ne grave rien.</p>
+  <p><strong>La boucle en pointillés :</strong> <code>i = i + 2</code> au lieu de <code>i++</code>. Déroulé de <code>bande(2, 5, ALPHABET[0], 10)</code> : i = 0 → (2, 5) ; i = 2 → (4, 5) ; i = 4 → (6, 5) ; i = 6 → (8, 5) ; i = 8 → (10, 5) ; i = 10 : <code>10 &lt; 10</code> est faux, fin. Cinq A, un trou entre chaque.</p>
+  <p><strong>À quoi ça sert :</strong> à <strong>essayer une autre version</strong> d’une fonction de la console sans toucher au compilateur. Si la tienne te plaît, tu sais maintenant comment la faire entrer dans la console (étape précédente).</p>
+  <p><strong>Essaie :</strong> supprime la <code>bande()</code> d’<code>outils.cpp</code> : celle de la console revient, et les bandes redeviennent pleines.</p>
+  <p class="fichier"><code>outils.cpp</code></p><pre><code>// outils.cpp : MES fonctions.
+
+#include &lt;poser&gt;
+
+// NOUVEAU : MA bande(), en pointillés. Elle porte le même nom que celle de
+// la console : c'est la mienne qui compte, la console n'ajoute pas la sienne.
+// Exemple : bande(2, 5, ALPHABET[0], 10) → A aux colonnes 2, 4, 6, 8, 10.
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i &lt; longueur; i = i + 2) {   // i = i + 2 : une case sur deux
+    poser(colonne + i, ligne, tuile);
+  }
+}
+
+// pile(colonne, ligne, tuile, hauteur) : vers le BAS.
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i &lt; hauteur; i++) {
+    poser(colonne, ligne + i, tuile);
+  }
+}</code></pre>
+  <p class="fichier"><code>principal.cpp</code></p><pre><code>// Le changement est dans outils.cpp : il écrit sa propre bande().
+// principal.cpp garde « #include &lt;bande&gt; », mais c'est la mienne qui sert.
+
+#include &lt;ALPHABET&gt;
+#include &lt;bande&gt;      // la bande() de la console… qui ne servira pas ici
+#include "outils.cpp" // MA bande() (en pointillés) et pile()
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);   // MA bande() : cinq A, un trou entre chaque
+  bande(2, 7, ALPHABET[1], 6);    // trois B : colonnes 2, 4, 6
+  bande(2, 9, ALPHABET[2], 3);    // deux C  : colonnes 2, 4
+  pile(15, 4, ALPHABET[3], 6);
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  <div class="resultat">
+    <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB7klEQVR4nO3bMU7DMBiAUUaOwMj9T8MROAYjG2IApATXzf/1SW/oYKmRvzp2U/Xp/eONsKe7XwE3JXCcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHEC7/P88vpl25sKvM/3rtsaC7yPwHECxwkcJ3CcUzTrnQx89JM4ffwSY1bw0b1k+vhVxuzBVwsg8B9OBj50t5k+/hEDH7rQ6eNXEfii41cR+KLjVxlzimYQgfexguPG7MGcI3CcwHECxwkc5xTNev/9seEK46cYs4KrjxJvbcweLPA5kwK7RZ+btx9f35QVvI/A95yIDSYFdoveMG9L+B4cJ/A+VnDcmD2YcwSOEzhO4DiB45yiWe+i/w9OGrOCPVs+Z8wefPTiHjnqb/MgcJDAcSMD24NvN29LOEXvM+YUzSACxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHGfhExydUX1tH0AAAAASUVORK5CYII=" alt="l’écran de la console"><figcaption>l’écran, dans l’émulateur — 1011 octets</figcaption></figure>
+    <div><p class="fichier">Ce qu’on doit voir</p><p class="avoir">Les bandes sont en pointillés : A A A A A, B B B, C C. La pile de D ne change pas.</p></div>
+  </div>
+</article>
+<article class="lecon">
+  <p class="reperes"><span class="niveau">leçon 151 du parcours</span></p>
+  <h2 class="titre-lecon">151. À toi : ajouter ta propre fonction de la console, pas à pas</h2>
+  <p class="idee">La marche à suivre complète, de l’idée à « #include &lt;ta_fonction&gt; » — et un cadre dessiné avec bande() et pile().</p>
+  <p><strong>On revient à la <code>bande()</code> de la console</strong> (<code>outils.cpp</code> ne contient plus que <code>pile()</code>, comme au 15.6), et on s’en sert pour <strong>un cadre</strong> : deux bandes (le haut et le bas), deux piles (la gauche et la droite). C’est la seule nouveauté du programme.</p>
+  <p><strong>Déroulé du cadre :</strong> <code>bande(3, 3, …, 14)</code> → le haut, colonnes 3 à 16 ; <code>bande(3, 12, …, 14)</code> → le bas ; <code>pile(3, 4, …, 8)</code> → la gauche, lignes 4 à 11 ; <code>pile(16, 4, …, 8)</code> → la droite. Les coins appartiennent aux bandes : les piles commencent une ligne plus bas.</p>
+  <p><strong>Et maintenant, pour faire entrer <code>pile()</code> dans la console à son tour, voici la marche à suivre — la même pour n’importe quelle fonction :</strong></p>
+  <p><strong>Étape 1 — l’écrire et l’essayer dans ton programme.</strong> D’abord dans <code>principal.cpp</code>, ou dans un fichier voisin comme <code>outils.cpp</code>. Tant qu’elle n’est pas parfaite, elle reste là : c’est plus facile à corriger.</p>
+  <p><strong>Étape 2 — choisir son nom.</strong> Un nom qu’aucune fonction de la console ne porte déjà (la liste est dans <code>compilateur/inclusion.js</code>, tableau <code>BIBLIOTHEQUES</code>). Le nom du <code>#include</code> sera exactement celui de la fonction : <code>pile</code> → <code>#include &lt;pile&gt;</code>.</p>
+  <p><strong>Étape 3 — <code>compilateur/emetteur.js</code>.</strong> Cherche <code>const FONCTIONS_EN_C</code>. Juste au-dessus, colle ta fonction dans une constante, <code>const SOURCE_PILE = …</code>, entre deux accents graves (AltGr + 7), comme <code>SOURCE_BANDE</code> juste à côté. Dans le tableau, ajoute <code>pile: SOURCE_PILE,</code>. Retire son <code>#include &lt;poser&gt;</code> : la console n’en a pas besoin.</p>
+  <p><strong>Étape 4 — <code>compilateur/inclusion.js</code>.</strong> Dans <code>BIBLIOTHEQUES</code>, ajoute une ligne : <code>pile: 'pose la même tuile plusieurs fois, vers le bas',</code>. Sans elle, <code>#include &lt;pile&gt;</code> serait refusé : « je ne connais pas cette bibliothèque ».</p>
+  <p><strong>Étape 5 — <code>aide-fonctions.js</code>.</strong> Dans <code>FONCTIONS</code>, ajoute <code>pile: { args: ['colonne', 'ligne', 'tuile', 'hauteur'], dit: '…' },</code> pour que l’éditeur la propose.</p>
+  <p><strong>Étape 6 — essayer.</strong> Recharge la page (<strong>Ctrl+F5</strong>), enlève <code>pile()</code> d’<code>outils.cpp</code>, écris <code>#include &lt;pile&gt;</code> dans <code>principal.cpp</code>, et lance. En ligne de commande : <code>node outils/gb3.mjs mon-essai.cpp</code> compile un fichier, et <code>npm run verifier</code> vérifie que rien d’autre n’est cassé.</p>
+  <p><strong>Étape 7 — sa leçon.</strong> Dans ce projet, chaque <code>#include</code> a son tuto : une leçon dans <code>tuto/lecons.js</code> dont le programme commence par <code>// ---- #include &lt;pile&gt; : …</code>. Le parcours la place tout seul juste avant la première étape qui emploie <code>pile()</code>. Copie celle de <code>bande()</code> et change ce qu’il faut.</p>
+  <p><strong>Pour aller plus loin :</strong> les fonctions qui parlent directement au matériel (l’écran, le son) ne sont pas écrites en C mais en instructions du processeur, dans <code>compilateur/emetteur.js</code> (cherche <code>if (nom === 'cacherPanneau')</code>). C’est plus difficile : la façon en C suffit pour tout ce qu’on peut écrire avec les fonctions existantes.</p>
+  <p class="fichier"><code>outils.cpp</code></p><pre><code>// outils.cpp : MES fonctions. pile() est la prochaine à faire entrer
+// dans la console, en suivant les étapes 1 à 7 de cette leçon.
+
+#include &lt;poser&gt;   // pile() se sert de poser()
+
+// pile(colonne, ligne, tuile, hauteur) : vers le BAS.
+// Exemple : pile(3, 4, ALPHABET[23], 8) → huit X, lignes 4 à 11.
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i &lt; hauteur; i++) {
+    poser(colonne, ligne + i, tuile);
+  }
+}</code></pre>
+  <p class="fichier"><code>principal.cpp</code></p><pre><code>// Un cadre de X : bande() (de la console) pour le haut et le bas,
+// pile() (d'outils.cpp) pour les côtés.
+//
+//   colonnes 3 à 16, lignes 3 à 12 :
+//
+//     XXXXXXXXXXXXXX   ← bande(3, 3, X, 14)   le haut
+//     X            X   ← pile(3, 4, X, 8)  et  pile(16, 4, X, 8)
+//     X            X      les côtés, lignes 4 à 11
+//     XXXXXXXXXXXXXX   ← bande(3, 12, X, 14)  le bas
+
+#include &lt;ALPHABET&gt;
+#include &lt;bande&gt;      // pose la même tuile plusieurs fois, de gauche à droite
+#include "outils.cpp" // pile()
+
+int main() {
+  bande(3, 3, ALPHABET[23], 14);    // le haut  (ALPHABET[23] : le X, 24e lettre)
+  bande(3, 12, ALPHABET[23], 14);   // le bas
+  pile(3, 4, ALPHABET[23], 8);      // le côté gauche  : lignes 4 à 11
+  pile(16, 4, ALPHABET[23], 8);     // le côté droit
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  <div class="resultat">
+    <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACSUlEQVR4nO3dMWoDQRBEUYU+gkPf/zQ+go/h0JkZMChYSe7q4sELlo2G/jQ72d6+vj8pdhs/AS8lcDmBywlcTuByApcTuJzA5QQuJ3A5gcsJXE7gcgKXE7icwOUELidwOYHLCVxO4HIClxO43DMDv71/eH7is8Dlz3GBf8/395TeX3sfF/jOKb2/9v5BNjj6fVbghO9W07PA5c9xgQn0HxvM4NwEnrcm8Etvg9123KLPsxIyNxscYccG+wYHzk3geWsCE8gGz1uzwQIHzs0tOsKOW/R5VkLmZoMj7Nhg3+DAuQk8b01gAtngeWs2WODAublFR9hxiz7PSsjcbHCEHRvsGxw4N4HnrQlMIBs8b80GCxw4N7foCDtu0edZCZmbDY6wY4N9gwPnJvC8NYEJZIPnrdlggQPn5hYdYcct+jwrIXOzwRF2bLBvcODcBJ63JjCBbPC8NRsscODc3KIj7LhFn2clZG42OMKODfYNDpybwPPWBCaQDZ63ZoMFDpybW3SEHbfo86yEzM0GR9ixwb7BgXMTeN6awASywfPWbLDAgXNzi46w4xZ9npWQudngCDs22Dc4cG4Cz1sTmED+AJ77LHD5c1zgO7dB76+9jwt855TeX3v/IBsc/T4rcMJ3q+lZ4PLnuMAEEricwOUELidwOYHLCVxO4HIClxO4nMDlBC4ncDmBywlcTuByApcTuJzA5QQuJ3A5gcsJXE7gcgKXE7icwOUELidwOYHLCVxO4HIClxO4nMDlBC4ncDmBywlcTuByApf7ARixvUgAkZ7kAAAAAElFTkSuQmCC" alt="l’écran de la console"><figcaption>l’écran, dans l’émulateur — 1010 octets</figcaption></figure>
+    <div><p class="fichier">Ce qu’on doit voir</p><p class="avoir">Un cadre de X au milieu de l’écran : colonnes 3 à 16, lignes 3 à 12, vide à l’intérieur.</p></div>
+  </div>
+</article>
+</section>
+
+<section class="page" id="partie-js">
+  <p class="sur">Partie D</p>
+  <h1>Le JavaScript qu’il faut pour la suite</h1>
+  <div class="niveau-partie moyen">
+    <span class="pastille">●● intermédiaire</span> <span>il faut avoir lu ce qui est cité, et avoir essayé</span>
+    <br><b>À lire avant :</b> <a href="#base-0-2">0.2 Un fichier, un dossier, une extension</a> · <a href="#base-0-10">0.10</a>
+  </div>
+  <p><strong>Pourquoi du JavaScript ?</strong> Tes programmes Game Boy sont en C++. Mais l’<strong>atelier</strong> et son <strong>compilateur</strong>, eux, sont écrits en <strong>JavaScript</strong> : c’est le langage que les navigateurs savent faire tourner. Pour ajouter une fonction à la console (partie E), on modifie trois fichiers JavaScript.</p>
+<p><strong>Bonne nouvelle : il n’y a pas besoin d’apprendre le JavaScript.</strong> On ne touche qu’à <strong>trois endroits</strong>, toujours de la même façon : on recopie une ligne qui existe déjà, et on change le nom. Cette partie explique juste assez pour lire ces lignes, et ne pas les casser.</p>
+
+  <h2>D.1 — Les commentaires</h2>
+  <p>Comme en C++ : <code>//</code> commente jusqu’au bout de la ligne. En plus, <code>/* … */</code> commente tout ce qui est entre les deux, même sur plusieurs lignes. Les fichiers du compilateur en sont pleins : ils expliquent le code.</p>
+  <pre><code>// un commentaire d'une ligne
+/*
+ * un commentaire de plusieurs lignes :
+ * les étoiles au début de chaque ligne sont juste décoratives
+ */</code></pre>
+
+  <h2>D.2 — Donner un nom à une valeur : <code>const</code></h2>
+  <pre><code>const SOURCE_BANDE = 'un texte'
+│     │            │ └─ la valeur
+│     │            └─── « reçoit »
+│     └──────────────── le nom choisi
+└────────────────────── « je crée un nom qui ne changera plus »</code></pre>
+  <p><code>const</code> veut dire « constante » : un nom donné une fois pour toutes à une valeur. Ensuite, écrire <code>SOURCE_BANDE</code> ailleurs dans le fichier, c’est comme écrire la valeur elle-même. En JavaScript, le point-virgule au bout de la ligne est facultatif : le projet ne le met pas.</p>
+
+  <h2>D.3 — Les textes : trois façons de les entourer</h2>
+  <table class="comparer">
+    <thead><tr><th>Écrit</th><th>Ce que c’est</th><th>À savoir</th></tr></thead>
+    <tbody>
+      <tr><td><code>'pose une tuile'</code></td><td>un texte entre <strong>apostrophes droites</strong></td><td>sur une seule ligne. Une apostrophe droite <code>'</code> à l’intérieur le fermerait trop tôt : utilise l’apostrophe typographique <code>’</code> (« l’écran »).</td></tr>
+      <tr><td><code>"pose une tuile"</code></td><td>un texte entre <strong>guillemets droits</strong></td><td>la même chose, avec <code>"</code>.</td></tr>
+      <tr><td><code>`…`</code></td><td>un texte entre <strong>accents graves</strong> (AltGr+7)</td><td>peut tenir sur <strong>plusieurs lignes</strong> : c’est ce qu’il faut pour y mettre toute une fonction C++.</td></tr>
+    </tbody>
+  </table>
+  <p><strong>C’est l’astuce de la partie E :</strong> la source C++ d’une fonction de la console est simplement <strong>un texte</strong>, rangé entre deux accents graves, dans une constante. Le compilateur lira ce texte comme si tu l’avais écrit dans ton programme.</p>
+  <pre><code>const SOURCE_PILE = `
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  …
+}
+`
+// ↑ tout ce qui est entre les deux accents graves est UN texte, sur 5 lignes</code></pre>
+
+  <h2>D.4 — Les objets : une liste de « nom : valeur »</h2>
+  <p>Un <strong>objet</strong> est une liste où chaque valeur a un nom. Il s’écrit entre accolades, chaque élément sous la forme <code>nom: valeur</code>, <strong>suivi d’une virgule</strong> :</p>
+  <pre><code>export const BIBLIOTHEQUES = {
+  texte: 'écrit un texte à l’écran',
+  poser: 'pose une tuile sur une case du fond',
+  bande: 'pose la même tuile plusieurs fois, de gauche à droite',
+}</code></pre>
+  <table class="comparer"><tbody>
+    <tr><th><code>export</code></th><td>« les autres fichiers ont le droit de s’en servir ». À laisser tel quel.</td></tr>
+    <tr><th><code>{ … }</code></th><td>le début et la fin de l’objet. Tout ce qu’on ajoute va <strong>entre</strong> les deux.</td></tr>
+    <tr><th><code>bande:</code></th><td>le <strong>nom</strong> de l’élément, suivi de deux-points. Ici, c’est le nom de la fonction de la console.</td></tr>
+    <tr><th><code>'pose la même…'</code></th><td>la <strong>valeur</strong> : ici, un texte (D.3).</td></tr>
+    <tr><th><code>,</code></th><td>la <strong>virgule</strong> sépare un élément du suivant. Le projet en met une même après le dernier : ainsi, on peut toujours ajouter une ligne en dessous sans rien toucher d’autre.</td></tr>
+  </tbody></table>
+  <p><strong>Ajouter un élément, c’est ajouter une ligne</strong> <code>nom: valeur,</code> entre les accolades. L’ordre n’a pas d’importance pour le compilateur ; le projet range les noms par sujet.</p>
+
+  <h2>D.5 — Un objet dans un objet, et les tableaux</h2>
+  <p>Une valeur peut être elle-même un objet, ou un <strong>tableau</strong> — une liste sans noms, entre crochets <code>[ ]</code>, les éléments séparés par des virgules. C’est le cas de l’aide de l’éditeur :</p>
+  <pre><code>  bande: { args: ['colonne', 'ligne', 'tuile', 'longueur'], dit: 'pose la même tuile…' },
+  │       │ │     └───────── un tableau de 4 textes ─────────┘  │    └─ un texte       │
+  │       │ └─ nom : args                                        └─ nom : dit          │
+  │       └─ début de l'objet « fiche de bande »                    fin de l'objet ────┘
+  └─ nom de l'élément, dans le grand objet FONCTIONS</code></pre>
+  <p>Ici : l’élément <code>bande</code> du grand objet <code>FONCTIONS</code> est un petit objet à deux éléments, <code>args</code> (la liste des noms d’arguments) et <code>dit</code> (la phrase d’aide). La virgule tout au bout sépare <code>bande</code> de l’élément suivant du grand objet.</p>
+
+  <h2>D.6 — Ce que tu n’as pas besoin de comprendre</h2>
+  <p><strong>Tout le reste.</strong> <code>compilateur/emetteur.js</code> fait plus de 6 000 lignes : la traduction en instructions du processeur, les optimisations, les registres… Pour ajouter une fonction écrite en C, <strong>tu n’y touches pas</strong>. Tu ajoutes une constante (D.2, D.3) et une ligne dans un objet (D.4). Rien d’autre.</p>
+<p><strong>Si tu vois des mots inconnus autour</strong> (<code>function</code>, <code>return</code>, <code>=&gt;</code>, <code>export</code>, <code>import</code>), laisse-les : ils font partie du compilateur, pas de ce que tu ajoutes.</p>
+
+  <h2>D.7 — Exercice : trouve les trois erreurs</h2>
+  <pre><code>export const BIBLIOTHEQUES = {
+  bande: 'pose la même tuile plusieurs fois'
+  pile: 'pose la même tuile vers le bas',
+  cadre: 'dessine un cadre autour de l'écran',
+}
+const SOURCE_PILE = `
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) { … }</code></pre>
+  <div class="cadre"><p class="cadre-titre"><strong>Les réponses</strong></p><p><strong>1.</strong> Ligne 2 : il manque la <strong>virgule</strong> après <code>'pose la même tuile plusieurs fois'</code>. Le compilateur ne sait plus où finit l’élément <code>bande</code>.</p>
+<p><strong>2.</strong> Ligne 4 : <code>l'écran</code> contient une <strong>apostrophe droite</strong>, qui ferme le texte trop tôt. Écrire <code>l’écran</code>, avec l’apostrophe typographique.</p>
+<p><strong>3.</strong> La source de <code>pile</code> n’a <strong>pas d’accent grave de fermeture</strong> à la fin : tout le reste du fichier serait pris pour du texte.</p>
+<p>Dans les trois cas, l’atelier ne compile plus rien, et <strong>F12 → Console</strong> affiche une erreur JavaScript qui donne le fichier et la ligne (section 0.10).</p></div>
+</section>
+
+
+<section class="page" id="partie-d">
+  <p class="sur">Partie E</p>
+  <h1>La recette : ajouter ta fonction à la console</h1>
+  <div class="niveau-partie avance">
+    <span class="pastille">●●● avancé</span> <span>on modifie le projet lui-même : prends ton temps</span>
+    <br><b>À lire avant :</b> <a href="#base-0-10">0.10 Les touches utiles, et l’éditeur de texte</a> · <a href="#base-0-11">0.11</a> · <a href="#partie-c">partie C</a> · <a href="#partie-js">partie D</a>
+  </div>
+  <p><strong>On va faire entrer <code>pile()</code> dans la console</strong>, exactement comme <code>bande()</code> y est entrée. La même recette marche pour <strong>n’importe quelle fonction</strong> écrite avec les fonctions qui existent déjà.</p>
+<p><strong>Ce qu’il te faut :</strong> un éditeur de texte (le Bloc-notes suffit ; Visual Studio Code est plus confortable) et le dossier du projet. On ne modifie <strong>pas</strong> le programme dans l’atelier, mais <strong>trois fichiers du compilateur</strong>, qui sont à côté d’<code>index.html</code>.</p>
+
+  <h2>Étape 1 — L’écrire et l’essayer dans ton programme</h2>
+  <p>Toujours commencer là : dans <code>principal.cpp</code>, ou dans un onglet voisin (<code>outils.cpp</code>). Tant qu’elle n’est pas parfaite, une fonction se corrige bien plus facilement dans l’atelier que dans le compilateur : l’écran se met à jour à chaque frappe.</p>
+<p>Voici <code>pile()</code>, telle qu’elle est dans <code>outils.cpp</code> au chapitre du parcours :</p>
+  <p class="fichier"><code>outils.cpp</code></p><pre><code>void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i &lt; hauteur; i++) {   // hauteur fois :
+    poser(colonne, ligne + i, tuile);       //   une case de plus vers le bas
+  }
+}</code></pre>
+
+  <h2>Étape 2 — Choisir son nom</h2>
+  <p><strong>Le nom du <code>#include</code> sera exactement celui de la fonction</strong> : <code>pile</code> → <code>#include &lt;pile&gt;</code>. Il doit être <strong>libre</strong> : aucune fonction de la console ne doit déjà le porter (la liste complète est en partie J).</p>
+<p>Des lettres, des chiffres, le tiret bas <code>_</code> ; pas d’espace, pas d’accent, pas de chiffre au début. Les majuscules comptent : <code>Pile</code> et <code>pile</code> sont deux noms différents. L’habitude du projet : <code>motsCollesAvecMajuscules</code> (<code>cacherPanneau</code>) ou <code>mots_avec_tiret</code> (<code>deplace_x</code>).</p>
+
+  <h2>Étape 3 — Le code : <code>compilateur/emetteur.js</code></h2>
+  <p><strong>Ouvre <code>compilateur/emetteur.js</code></strong> et cherche (Ctrl+F) <code>const SOURCE_BANDE</code> : c’est vers la ligne 5571. Voici, lue dans le fichier, la source de <code>bande()</code> :</p>
+  <p class="fichier"><code>compilateur/emetteur.js, ligne 5571</code></p><pre><code>const SOURCE_BANDE = `
+void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  for (uint8_t i = 0; i &lt; longueur; i++) {   // longueur fois :
+    poser(colonne + i, ligne, tuile);        //   une case de plus vers la droite
+  }
+}
+`</code></pre>
+  <p><strong>Lis-la morceau par morceau :</strong></p>
+  <ul><li><code>const SOURCE_BANDE =</code> : une <strong>constante JavaScript</strong> (le compilateur est écrit en JavaScript). Son nom est libre, mais l’habitude est <code>SOURCE_</code> + le nom en majuscules.</li><li>L’<strong>accent grave</strong> (la touche AltGr + 7) ouvre un texte qui peut tenir sur plusieurs lignes. Un second accent grave le ferme, tout à la fin.</li><li>Entre les deux : <strong>ta fonction, en C, mot pour mot</strong> comme dans <code>outils.cpp</code>.</li><li><strong>Différence avec <code>outils.cpp</code> : pas de <code>#include &lt;poser&gt;</code>.</strong> Ce que la console ajoute elle-même n’a rien à inclure.</li></ul>
+  <p><strong>Ajoute la tienne juste en dessous</strong>, avant le commentaire « Les fonctions de la console écrites en C » :</p>
+  <p class="fichier"><code>à ajouter dans compilateur/emetteur.js</code></p><pre><code>const SOURCE_PILE = `
+void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
+  for (uint8_t i = 0; i &lt; hauteur; i++) {   // hauteur fois :
+    poser(colonne, ligne + i, tuile);       //   une case de plus vers le bas
+  }
+}
+`</code></pre>
+  <p><strong>Puis inscris-la dans le tableau <code>FONCTIONS_EN_C</code></strong>, juste en dessous (vers la ligne 5580). Voici son début, lu dans le fichier :</p>
+  <p class="fichier"><code>compilateur/emetteur.js, ligne 5580</code></p><pre><code>/** Les fonctions de la console écrites en C : leur nom, et leur texte. */
+const FONCTIONS_EN_C = {
+  bande: SOURCE_BANDE,</code></pre>
+  <p>Ajoute une ligne, à côté de celle de <code>bande</code> :</p>
+  <pre><code>  bande: SOURCE_BANDE,
+  pile: SOURCE_PILE,          ← NOUVEAU : le nom de la fonction, deux-points, la constante, virgule</code></pre>
+  <div class="cadre alerte"><p class="cadre-titre"><strong>Les petites erreurs qui cassent tout</strong></p><p>Oublier la <strong>virgule</strong> au bout de la ligne du tableau. Oublier l’<strong>accent grave</strong> qui ferme la source. Écrire le nom du tableau (<code>pile</code>) autrement que le nom de la fonction dans la source (<code>void pile(</code>).</p>
+<p>Dans ces cas, l’atelier ne peut plus rien compiler du tout : la page affiche une erreur JavaScript. Ouvre la console du navigateur (<strong>F12</strong>, onglet Console) : elle dit le fichier et la ligne.</p></div>
+
+  <h2>Étape 4 — Le nom : <code>compilateur/inclusion.js</code></h2>
+  <p><strong>Ouvre <code>compilateur/inclusion.js</code></strong> et cherche <code>export const BIBLIOTHEQUES</code> (ligne 42). C’est la liste de tous les noms qu’on peut écrire entre chevrons, chacun avec une phrase qui dit ce qu’il fait. Voici la ligne de <code>bande</code>, lue dans le fichier (ligne 53) :</p>
+  <p class="fichier"><code>compilateur/inclusion.js, ligne 53</code></p><pre><code>  bande: 'pose la même tuile plusieurs fois, de gauche à droite',</code></pre>
+  <p><strong>Ajoute la tienne juste en dessous :</strong></p>
+  <p class="fichier"><code>à ajouter dans compilateur/inclusion.js</code></p><pre><code>  pile: 'pose la même tuile plusieurs fois, vers le bas',</code></pre>
+  <p><strong>Cette ligne fait trois choses :</strong> elle rend <code>#include &lt;pile&gt;</code> valable ; elle oblige tout programme qui appelle <code>pile()</code> à écrire la ligne (sinon : refus) ; et sa phrase est recopiée en commentaire quand l’atelier écrit les <code>#include</code> à ta place (<code>#include &lt;pile&gt;   // pose la même tuile…</code>).</p>
+<p><strong>La phrase est entre apostrophes droites</strong> <code>'…'</code>. Si ta phrase contient une apostrophe, prends l’apostrophe typographique <code>’</code> (comme dans « l’écran ») : une apostrophe droite fermerait le texte trop tôt.</p>
+
+  <h2>Étape 5 — L’aide de l’éditeur : <code>aide-fonctions.js</code></h2>
+  <p><strong>Ouvre <code>aide-fonctions.js</code></strong> (à la racine du projet) et cherche <code>bande: {</code> (ligne 16) :</p>
+  <p class="fichier"><code>aide-fonctions.js, ligne 16</code></p><pre><code>  bande: { args: ['colonne', 'ligne', 'tuile', 'longueur'], dit: 'pose la même tuile « longueur » fois, de gauche à droite : bande(2, 5, ALPHABET[0], 10) écrit dix A sur la ligne 5.' },</code></pre>
+  <p class="fichier"><code>à ajouter dans aide-fonctions.js</code></p><pre><code>  pile: { args: ['colonne', 'ligne', 'tuile', 'hauteur'], dit: 'pose la même tuile « hauteur » fois, vers le bas.' },</code></pre>
+  <p><code>args</code> : le nom de chaque argument, dans l’ordre. Pendant que tu tapes <code>pile(3, </code>, l’éditeur montre <code>pile(colonne, ligne, tuile, hauteur)</code> avec l’argument en cours en gras.</p>
+<p><code>dit</code> : la phrase affichée sous la proposition, quand tu tapes « pil… ».</p>
+<p><strong>Cette étape est facultative</strong> : sans elle, <code>pile()</code> marche, mais l’éditeur ne t’aide pas à l’écrire.</p>
+
+  <h2>Étape 6 — Essayer</h2>
+  <ul><li><strong>Recharge l’atelier avec Ctrl+F5</strong> (pas F5 seul : Ctrl+F5 oblige le navigateur à relire les fichiers du compilateur au lieu de garder l’ancienne version en mémoire).</li><li>Dans <code>outils.cpp</code>, <strong>supprime</strong> ta <code>pile()</code> (sinon, c’est la tienne qui compte, et tu n’essaies pas celle de la console).</li><li>Dans <code>principal.cpp</code>, ajoute <code>#include &lt;pile&gt;</code> en haut, et lance.</li><li>Pour vérifier le message d’oubli : enlève la ligne <code>#include &lt;pile&gt;</code> → le compilateur doit répondre « il faut #include &lt;pile&gt; ».</li><li><strong>En ligne de commande</strong> (une fenêtre ouverte dans le dossier du projet) : <code>node outils/gb3.mjs mon-essai.cpp</code> compile un fichier <code>.cpp</code> et dit s’il est accepté.</li><li><strong>Puis <code>npm run verifier</code></strong> : les centaines de contrôles du projet. S’ils sont tous verts, tu n’as rien cassé.</li></ul>
+
+  <h2>Étape 7 — Sa leçon</h2>
+  <p><strong>Dans ce projet, chaque <code>#include</code> a son tuto</strong> : une leçon qui présente la fonction seule. Elle se met dans <code>tuto/lecons.js</code>. Le plus simple : cherche <code>La fonction bande()</code>, copie toute la leçon (de <code>{</code> à <code>},</code>), colle-la juste en dessous et adapte-la.</p>
+<p><strong>Le point important : la première ligne de son programme.</strong> C’est elle qui fait reconnaître la leçon comme le tuto de la fonction :</p>
+  <pre><code>// ---- #include &lt;pile&gt; : la même tuile, vers le bas ----</code></pre>
+  <p>Le parcours (<code>tuto/parcours.js</code>) place alors ce tuto <strong>tout seul</strong>, juste avant la première étape qui écrit <code>#include &lt;pile&gt;</code>. Le contrôle <code>npm run verifier</code> vérifie qu’aucune étape n’apporte deux <code>#include</code> nouveaux d’un coup.</p>
+<p><strong>Le <code>controle</code></strong> de la leçon dit ce qu’on doit voir à l’écran, et le vérifie dans l’émulateur. Par exemple, pour six D en colonne 15, lignes 4 à 9 : <code>c.mot(15, 4, 1) === 'D'</code>.</p>
+
+  <h2>Et pour aller plus loin : les fonctions en assembleur</h2>
+  <p>Certaines fonctions de la console ne sont <strong>pas</strong> écrites en C, mais directement en instructions du processeur : celles qui parlent au matériel (l’écran, le son, la manette). Par exemple <code>cacherPanneau()</code>, vers la ligne 4491 de <code>compilateur/emetteur.js</code> : trois instructions qui éteignent un bit du registre de l’écran.</p>
+<p>Les ajouter demande de connaître le processeur de la Game Boy (un cousin du Z80) et ses registres. <strong>Pour tout ce qu’on peut écrire avec les fonctions qui existent déjà, la façon en C de cette recette suffit</strong>, et elle est bien plus sûre.</p>
+</section>
+
+
+<section class="page" id="partie-e">
+  <p class="sur">Partie F</p>
+  <h1>Les erreurs, et ce que le compilateur répond</h1>
+  <div class="niveau-partie moyen">
+    <span class="pastille">●● intermédiaire</span> <span>il faut avoir lu ce qui est cité, et avoir essayé</span>
+    <br><b>À lire avant :</b> <a href="#base-0-6">0.6 Une fonction : la définir, l’appeler</a> · <a href="#partie-a">partie A</a>
+  </div>
+  <p><strong>Chaque programme ci-dessous a été compilé pour écrire ce document</strong>, et le message est celui que l’atelier affiche, mot pour mot. Les reconnaître fait gagner beaucoup de temps.</p>
+  
+  <div class="erreur">
+    <h3>1. On appelle bande() sans écrire #include &lt;bande&gt;</h3>
+    <pre><code>#include &lt;ALPHABET&gt;
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);
+  while (true) { image(); }
+}</code></pre>
+    <p class="fichier">Le compilateur répond</p>
+    <p class="message">principal.cpp, ligne 4 : il faut « #include &lt;bande&gt; » pour employer bande(). Chaque fonction de la console prend de la place dans la cartouche : elle ne s’emploie qu’incluse. Écrire en haut du programme : #include &lt;bande&gt;</p>
+    <p><strong>Pourquoi :</strong> C’est l’erreur la plus fréquente. Le compilateur connaît <code>bande()</code>, mais refuse de la graver sans qu’on la demande : il dit exactement quelle ligne écrire, et où.</p>
+<p><strong>Ce qu’il faut faire :</strong> Écrire <code>#include &lt;bande&gt;</code> en haut du programme.</p>
+  </div>
+  <div class="erreur">
+    <h3>2. Le nom est mal écrit : #include &lt;Bande&gt;</h3>
+    <pre><code>#include &lt;ALPHABET&gt;
+#include &lt;Bande&gt;
+
+int main() {
+  bande(2, 5, ALPHABET[0], 10);
+  while (true) { image(); }
+}</code></pre>
+    <p class="fichier">Le compilateur répond</p>
+    <p class="message">fichier introuvable : « Bande » : cette leçon n'a pas d'autre fichier.</p>
+    <p><strong>Pourquoi :</strong> Le nom entre chevrons doit être écrit <strong>exactement</strong> comme la fonction, majuscules comprises. <code>Bande</code> n’est pas <code>bande</code> : n’étant pas une fonction de la console, le nom est cherché comme un FICHIER — et il n’y en a pas.</p>
+<p><strong>Ce qu’il faut faire :</strong> Écrire <code>#include &lt;bande&gt;</code>, en minuscules, comme dans <code>bande(…)</code>.</p>
+  </div>
+  <div class="erreur">
+    <h3>3. On demande une fonction que la console n’a pas : #include &lt;pile&gt;</h3>
+    <pre><code>#include &lt;ALPHABET&gt;
+#include &lt;pile&gt;
+
+int main() {
+  pile(3, 4, ALPHABET[0], 8);
+  while (true) { image(); }
+}</code></pre>
+    <p class="fichier">Le compilateur répond</p>
+    <p class="message">fichier introuvable : « pile » : cette leçon n'a pas d'autre fichier.</p>
+    <p><strong>Pourquoi :</strong> <code>pile()</code> n’est pas (encore) dans <code>BIBLIOTHEQUES</code> : le compilateur ne la connaît pas comme fonction de la console, et cherche donc un fichier nommé <code>pile</code>. C’est le message qu’on obtient tant que l’étape 4 de la recette (le nom dans <code>compilateur/inclusion.js</code>) n’est pas faite.</p>
+<p><strong>Ce qu’il faut faire :</strong> Soit faire entrer <code>pile()</code> dans la console (partie E), soit l’écrire dans un fichier voisin et l’inclure avec des guillemets.</p>
+  </div>
+  <div class="erreur">
+    <h3>4. Le fichier voisin n’existe pas : #include "outils.cpp"</h3>
+    <pre><code>#include "outils.cpp"
+
+int main() {
+  while (true) { image(); }
+}</code></pre>
+    <p class="fichier">Le compilateur répond</p>
+    <p class="message">fichier introuvable : « outils.cpp » : cette leçon n'a pas d'autre fichier.</p>
+    <p><strong>Pourquoi :</strong> Avec des guillemets, le compilateur cherche un ONGLET de ce nom à côté de <code>principal.cpp</code>. S’il n’y en a pas (ou si le nom diffère d’une lettre), il s’arrête.</p>
+<p><strong>Ce qu’il faut faire :</strong> Créer l’onglet avec le bouton « + fichier », et lui donner exactement le nom écrit entre les guillemets.</p>
+  </div>
+  <div class="erreur">
+    <h3>5. On appelle une fonction que personne n’a écrite</h3>
+    <pre><code>#include &lt;ALPHABET&gt;
+
+int main() {
+  pile(3, 4, ALPHABET[0], 8);
+  while (true) { image(); }
+}</code></pre>
+    <p class="fichier">Le compilateur répond</p>
+    <p class="message">principal.cpp, ligne 4 : fonction inconnue « pile ». Celles de la console : texte, poser, lire, image, bouton, hasard, semer, ecran, sprite, sprite16, sprite32, cacher, cacher16, cacher32, defiler, texteTitre, texteManga, panneau, cacherPanneau, effacerPanneau, poserPanneau, lirePanneau, textePanneau, effacer, textS, poserS, attendre, couleurFond, couleurLutin, teindre, teindreLutin, teindrePanneau, paletteFond, paletteLutins, retard, images, note, bruit, silence, volumeSon, jouer, airFini, sauver, sauvegarde, nombre, nombrePanneau, changerDessin. Les vôtres : main</p>
+    <p><strong>Pourquoi :</strong> Ni le programme ni la console n’ont de <code>pile()</code>. Le compilateur donne la liste des fonctions de la console qu’il connaît, puis celles du programme (« les vôtres »).</p>
+<p><strong>Ce qu’il faut faire :</strong> Écrire la fonction (dans le programme ou un fichier voisin), ou l’ajouter à la console.</p>
+  </div>
+  <div class="erreur">
+    <h3>6. Il manque un argument</h3>
+    <pre><code>#include &lt;ALPHABET&gt;
+#include &lt;bande&gt;
+
+int main() {
+  bande(2, 5, ALPHABET[0]);
+  while (true) { image(); }
+}</code></pre>
+    <p class="fichier">Le compilateur répond</p>
+    <p class="message">principal.cpp, ligne 5 : « bande » prend 4 arguments, et non 3</p>
+    <p><strong>Pourquoi :</strong> <code>bande()</code> en attend quatre : la colonne, la ligne, la tuile, la longueur. Le compilateur compte, et le dit.</p>
+<p><strong>Ce qu’il faut faire :</strong> Donner les quatre : <code>bande(2, 5, ALPHABET[0], 10);</code></p>
+  </div>
+</section>
+
+
+<section class="page" id="partie-f">
+  <p class="sur">Partie G</p>
+  <h1>Ce que ça coûte dans la cartouche</h1>
+  <div class="niveau-partie avance">
+    <span class="pastille">●●● avancé</span> <span>on modifie le projet lui-même : prends ton temps</span>
+    <br><b>À lire avant :</b> <a href="#base-0-4">0.4 L’octet, et la place dans la cartouche</a> · <a href="#base-0-5">0.5</a> · <a href="#base-0-6">0.6</a>
+  </div>
+  <p><strong>Chaque programme a été compilé, et sa cartouche mesurée.</strong> Le nombre est la taille du programme compilé, en octets (une cartouche en tient 32 768).</p>
+  <table class="comparer">
+    <thead><tr><th>Le programme</th><th>Octets</th><th>Par rapport au vide</th></tr></thead>
+    <tbody>
+      <tr><td>Le programme vide : aucun #include, rien à l’écran.</td><td><b>71</b></td><td>—</td></tr>
+      <tr><td><code>#include &lt;bande&gt;</code> écrit, mais bande() jamais appelée.</td><td><b>71</b></td><td>—</td></tr>
+      <tr><td>Avec dix <code>poser()</code> écrits à la main (dix A).</td><td><b>229</b></td><td>+ 158</td></tr>
+      <tr><td>Un appel à <code>bande()</code> (les mêmes dix A).</td><td><b>911</b></td><td>+ 840</td></tr>
+      <tr><td>Trois appels à <code>bande()</code>.</td><td><b>949</b></td><td>+ 878</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Ce que montre le tableau :</strong></p>
+  <ul><li><strong>Une ligne <code>#include</code> seule ne coûte rien</strong> : 71 octets, comme le programme vide. Le compilateur ne grave une fonction que si elle est <strong>appelée</strong>.</li><li><strong>Les appels suivants ne coûtent que quelques octets</strong> (38 octets pour deux appels de plus) : la fonction est gravée <strong>une fois</strong>, et chaque appel ne fait que lui donner ses quatre nombres.</li><li><strong>Mais un seul appel à <code>bande()</code> coûte bien plus que dix <code>poser()</code></strong> (911 octets contre 229). Ce n’est pas la faute de <code>bande()</code> : le détail ci-dessous l’explique.</li></ul>
+  <h2>Le détail : où partent les octets</h2>
+  <p><strong>Le compilateur sait dire ce qu’il a gravé, morceau par morceau.</strong> Voici, pour les deux programmes qui posent dix A, la liste qu’il donne :</p>
+  <div class="deux">
+    <div>
+      <p class="fichier">Avec dix <code>poser()</code> écrits à la main (dix A). — 229 octets</p>
+      <table class="includes"><tbody>
+        <tr><td><b>49</b></td><td><code>démarrage</code></td><td>la mise en route de la console</td></tr><tr><td><b>67</b></td><td><code>main()</code></td><td>ta fonction</td></tr><tr><td><b>8</b></td><td><code>VBlank</code></td><td>compte les images, 60 fois par seconde</td></tr><tr><td><b>28</b></td><td><code>AttendreImage</code></td><td>attend l’image suivante</td></tr><tr><td><b>16</b></td><td><code>AttendreVBlank</code></td><td>attend que l’écran soit libre</td></tr><tr><td><b>31</b></td><td><code>CopierTuiles</code></td><td>copie les lettres et les dessins en mémoire vidéo</td></tr><tr><td><b>14</b></td><td><code>EffacerCarte</code></td><td>vide les deux cartes de l’écran</td></tr><tr><td><b>16</b></td><td><code>Tuiles</code></td><td>1 lettre sur 43</td></tr>
+      </tbody></table></div><div>
+      <p class="fichier">Un appel à <code>bande()</code> (les mêmes dix A). — 911 octets</p>
+      <table class="includes"><tbody>
+        <tr><td><b>49</b></td><td><code>démarrage</code></td><td>la mise en route de la console</td></tr><tr><td><b>38</b></td><td><code>bande()</code></td><td>une fonction fournie par le langage</td></tr><tr><td><b>26</b></td><td><code>main()</code></td><td>ta fonction</td></tr><tr><td><b>8</b></td><td><code>VBlank</code></td><td>compte les images, 60 fois par seconde</td></tr><tr><td><b>28</b></td><td><code>AttendreImage</code></td><td>attend l’image suivante</td></tr><tr><td><b>16</b></td><td><code>AttendreVBlank</code></td><td>attend que l’écran soit libre</td></tr><tr><td><b>10</b></td><td><code>AdresseCase</code></td><td>trouve l’adresse d’une case de l’écran</td></tr><tr><td><b>18</b></td><td><code>CopierTuiles</code></td><td>copie les lettres et les dessins en mémoire vidéo</td></tr><tr><td><b>14</b></td><td><code>EffacerCarte</code></td><td>vide les deux cartes de l’écran</td></tr><tr><td><b>704</b></td><td><code>Tuiles</code></td><td>la police entière</td></tr>
+      </tbody></table></div>
+  </div>
+  <p><strong>Comment lire ces deux listes.</strong> Chaque ligne est un morceau gravé dans la cartouche : sa taille en octets, son nom, et son rôle. Les morceaux qu’on retrouve dans <strong>tous</strong> les programmes :</p>
+  <ul><li><code>démarrage</code> : ce que la console fait à l’allumage, avant d’appeler <code>main()</code> (préparer l’écran, la mémoire).</li><li><code>main()</code> : <strong>ta</strong> fonction, traduite. Elle est plus courte avec <code>bande()</code> : un seul appel au lieu de dix.</li><li><code>VBlank</code>, <code>AttendreImage</code>, <code>AttendreVBlank</code> : la mesure du temps. La console dessine l’écran 60 fois par seconde ; <code>image()</code> attend le dessin suivant.</li><li><code>CopierTuiles</code>, <code>EffacerCarte</code> : copier les dessins des tuiles dans la mémoire de l’écran, et vider l’écran au départ.</li><li><code>AdresseCase</code> : la petite routine qui calcule où, dans la mémoire de l’écran, se trouve la case (colonne, ligne). <code>poser()</code> s’en sert.</li><li><code>Tuiles</code> : les <strong>dessins</strong> gravés, 16 octets par tuile (section 0.5).</li></ul>
+  <p><strong><code>bande()</code> elle-même ne pèse que 38 octets.</strong> La différence est dans la ligne <code>Tuiles</code> : 16 octets d’un côté, 704 de l’autre.</p>
+<p><strong>Pourquoi.</strong> Avec <code>poser(2, 5, ALPHABET[0])</code>, la lettre est <strong>écrite en clair</strong> : le compilateur voit qu’on ne pose que des A, et ne grave <strong>que le dessin du A</strong> (16 octets : une tuile de 8 × 8 pixels). Avec <code>bande(2, 5, ALPHABET[0], 10)</code>, la lettre entre dans <code>bande()</code> par un <strong>paramètre</strong>, <code>tuile</code>, qui est une <strong>variable</strong> : à l’intérieur de la fonction, le compilateur ne peut plus savoir quelle lettre sera posée. Par prudence, il grave <strong>toute la police</strong>.</p>
+<p><strong>Ce qu’il faut en retenir.</strong> Ce coût est celui de la <strong>police</strong>, pas de la fonction : il est payé <strong>une seule fois</strong>, dès qu’une tuile passe par une variable quelque part dans le programme — les appels suivants ne le repaient pas. C’est vrai aussi quand la tuile est un dessin à toi (une <code>Tuile</code>) : la police est gravée quand même, car le compilateur ne peut pas savoir ce que contiendra la variable.</p>
+<p><strong>Le bon réflexe :</strong> une fonction de la console qui reçoit une tuile en paramètre est pratique, mais pas gratuite. Si un programme doit tenir dans très peu de place, écrire les <code>poser()</code> en clair reste le plus économe.</p>
+</section>
+
+
+<section class="page" id="partie-g">
+  <p class="sur">Partie H</p>
+  <h1>Les questions qu’on se pose</h1>
+  <div class="niveau-partie moyen">
+    <span class="pastille">●● intermédiaire</span> <span>il faut avoir lu ce qui est cité, et avoir essayé</span>
+    <br><b>À lire avant :</b> <a href="#partie-a">partie A — Les deux sortes d’#include</a> · <a href="#partie-d">partie E</a>
+  </div>
+  <dl class="faq">
+    <dt>Faut-il mettre <code>.cpp</code> ou <code>.h</code> à mon fichier voisin ?</dt><dd>Les deux marchent dans l’atelier : le nom n’est qu’un nom. L’habitude du C : un <code>.h</code> (« header ») pour des déclarations — des variables, des constantes, des dessins ; un <code>.cpp</code> pour des fonctions.</dd>
+    <dt>Où dois-je écrire la ligne <code>#include "outils.cpp"</code> ?</dt><dd>L’habitude : en haut, avec les autres <code>#include</code>. Pour des <strong>fonctions</strong>, l’ordre ne compte pas : le compilateur relève toutes les fonctions du programme avant de les traduire, donc <code>main()</code> peut appeler une fonction collée plus bas. Pour des <strong>variables globales</strong> et des <strong>dessins</strong>, l’ordre compte : ils doivent être versés <strong>avant</strong> la fonction qui s’en sert.</dd>
+    <dt>Un fichier voisin peut-il en inclure un autre ?</dt><dd>Oui : <code>outils.cpp</code> peut écrire <code>#include "dessins.h"</code>. Le collage se fait de proche en proche. Un fichier inclus deux fois n’est collé qu’une fois, et deux fichiers qui s’incluent l’un l’autre ne font pas tourner la console en rond.</dd>
+    <dt>Si j’écris <code>#include &lt;bande&gt;</code> deux fois, ou dans deux fichiers ?</dt><dd>Aucun problème : la fonction n’est gravée qu’une fois. Une ligne en double ne coûte rien.</dd>
+    <dt>J’ai écrit une fonction qui porte le nom d’une fonction de la console. Laquelle sert ?</dt><dd>La tienne. Le compilateur n’ajoute une fonction de la console que si le programme n’en a pas écrit une du même nom (leçon « Ta fonction passe avant celle de la console »). C’est pratique pour essayer une variante.</dd>
+    <dt>Ma fonction de console peut-elle se servir d’autres fonctions de la console ?</dt><dd>Oui, comme <code>bande()</code> se sert de <code>poser()</code>, et sans écrire leurs <code>#include</code> dans sa source. Le programme, lui, n’a à écrire que <code>#include &lt;bande&gt;</code>.</dd>
+    <dt>Ma fonction de console peut-elle rendre une valeur ?</dt><dd>Oui : au lieu de <code>void</code>, écris <code>uint8_t</code>, et termine par <code>return …;</code>. <code>deplace_x()</code> en est un exemple : elle rend la colonne où la tuile s’est arrêtée.</dd>
+    <dt>Peut-elle avoir ses propres variables globales ?</dt><dd>Oui : la source peut déclarer des variables au-dessus de la fonction, dans le même texte. Choisis-leur un nom qui commence par celui de la fonction (<code>pile_compte</code>) pour ne pas gêner celles du programme.</dd>
+    <dt>J’ai modifié le compilateur et rien ne change dans l’atelier.</dt><dd>Le navigateur garde l’ancienne version en mémoire. <strong>Ctrl+F5</strong> l’oblige à tout relire. Si cela ne suffit pas, ferme l’onglet et rouvre l’atelier.</dd>
+    <dt>L’atelier ne compile plus rien du tout depuis ma modification.</dt><dd>Une faute de JavaScript dans un des trois fichiers (souvent une virgule ou un accent grave oublié). <strong>F12</strong>, onglet <strong>Console</strong> : le message donne le fichier et la ligne. Au pire, <code>git diff</code> montre ce que tu as changé, et <code>git checkout -- compilateur/emetteur.js</code> revient en arrière.</dd>
+    <dt>Mes changements seront-ils perdus si je mets le projet à jour ?</dt><dd>Ils sont dans les fichiers du projet, comme le reste. Fais un <code>git commit</code> après chaque fonction ajoutée : tu gardes une trace, et tu peux revenir en arrière.</dd>
+  </dl>
+</section>
+
+
+<section class="page" id="partie-h">
+  <p class="sur">Partie I</p>
+  <h1>L’aide-mémoire, à garder sous les yeux</h1>
+  <div class="niveau-partie moyen">
+    <span class="pastille">●● intermédiaire</span> <span>il faut avoir lu ce qui est cité, et avoir essayé</span>
+    <br><b>À lire avant :</b> <a href="#partie-d">partie E — La recette : ajouter ta fonction à la console</a>
+  </div>
+  <table class="comparer">
+    <thead><tr><th>Je veux…</th><th>J’écris…</th><th>Où</th></tr></thead>
+    <tbody>
+      <tr><td>me servir d’une fonction de la console</td><td><code>#include &lt;nom&gt;</code></td><td>en haut du programme</td></tr>
+      <tr><td>ranger mes fonctions à part</td><td><code>#include "outils.cpp"</code></td><td>en haut de <code>principal.cpp</code> ; l’onglet par « + fichier »</td></tr>
+      <tr><td>ajouter le code d’une fonction à la console</td><td><code>const SOURCE_NOM = `…`</code> + <code>nom: SOURCE_NOM,</code></td><td><code>compilateur/emetteur.js</code></td></tr>
+      <tr><td>rendre <code>#include &lt;nom&gt;</code> valable</td><td><code>nom: 'ce qu’elle fait',</code></td><td><code>compilateur/inclusion.js</code></td></tr>
+      <tr><td>que l’éditeur la propose</td><td><code>nom: { args: […], dit: '…' },</code></td><td><code>aide-fonctions.js</code></td></tr>
+      <tr><td>lui donner sa leçon</td><td><code>// ---- #include &lt;nom&gt; : … ----</code></td><td><code>tuto/lecons.js</code></td></tr>
+      <tr><td>tout vérifier</td><td><code>npm run verifier</code></td><td>une fenêtre dans le dossier du projet</td></tr>
+    </tbody>
+  </table>
+  <h2>À cocher, pour chaque fonction ajoutée</h2>
+  <ul class="cocher"><li>La fonction marche dans mon programme (ou dans <code>outils.cpp</code>).</li><li>Son nom est libre (absent de la partie J) et écrit pareil partout.</li><li><code>compilateur/emetteur.js</code> : <code>const SOURCE_…</code> ajoutée, sans <code>#include</code> dedans, l’accent grave fermé.</li><li><code>compilateur/emetteur.js</code> : une ligne <code>nom: SOURCE_…,</code> dans <code>FONCTIONS_EN_C</code>, avec sa virgule.</li><li><code>compilateur/inclusion.js</code> : une ligne <code>nom: 'ce qu’elle fait',</code> dans <code>BIBLIOTHEQUES</code>.</li><li><code>aide-fonctions.js</code> : une ligne <code>nom: { args: […], dit: '…' },</code> dans <code>FONCTIONS</code> (facultatif).</li><li>Ctrl+F5 dans l’atelier ; ma version retirée d’<code>outils.cpp</code> ; <code>#include &lt;nom&gt;</code> écrit ; ça marche.</li><li>Sans la ligne <code>#include &lt;nom&gt;</code>, le compilateur refuse : la règle est en place.</li><li><code>npm run verifier</code> : tout est vert.</li><li>Sa leçon dans <code>tuto/lecons.js</code>, programme commençant par <code>// ---- #include &lt;nom&gt; : … ----</code>.</li><li><code>git commit</code>.</li></ul>
+</section>
+
+
+<section class="page" id="partie-i">
+  <p class="sur">Partie J</p>
+  <h1>Tous les #include de la console</h1>
+  <div class="niveau-partie debutant">
+    <span class="pastille">● débutant</span> <span>aucune connaissance demandée en dehors de ce qui est cité</span>
+    
+  </div>
+  <p><strong>Les 78 noms qu’on peut écrire entre chevrons aujourd’hui</strong>, lus dans <code>compilateur/inclusion.js</code>. Un nouveau nom doit être <strong>absent</strong> de cette liste.</p>
+  <table class="includes">
+    <thead><tr><th>#include</th><th>Ce qu’il apporte</th></tr></thead>
+    <tbody>
+      <tr><td><code>#include &lt;texte&gt;</code></td><td>écrit un texte à l’écran</td></tr>
+      <tr><td><code>#include &lt;textS&gt;</code></td><td>écrit un texte qui passe à la ligne tout seul</td></tr>
+      <tr><td><code>#include &lt;texteGrand&gt;</code></td><td>écrit un texte agrandi, de 1 à 20 fois</td></tr>
+      <tr><td><code>#include &lt;texteGrandS&gt;</code></td><td>écrit un texte agrandi qui passe à la ligne</td></tr>
+      <tr><td><code>#include &lt;texteCouleur&gt;</code></td><td>écrit un mot dans une palette de couleur</td></tr>
+      <tr><td><code>#include &lt;nombre&gt;</code></td><td>écrit un nombre en chiffres</td></tr>
+      <tr><td><code>#include &lt;effacer&gt;</code></td><td>efface des cases, ou tout le fond</td></tr>
+      <tr><td><code>#include &lt;poser&gt;</code></td><td>pose une tuile sur une case du fond</td></tr>
+      <tr><td><code>#include &lt;poserS&gt;</code></td><td>pose une tuile, et passe à la ligne au bord</td></tr>
+      <tr><td><code>#include &lt;bande&gt;</code></td><td>pose la même tuile plusieurs fois, de gauche à droite</td></tr>
+      <tr><td><code>#include &lt;lire&gt;</code></td><td>lit la tuile posée sur une case</td></tr>
+      <tr><td><code>#include &lt;changerDessin&gt;</code></td><td>change le dessin d’une tuile partout à la fois</td></tr>
+      <tr><td><code>#include &lt;defiler&gt;</code></td><td>fait glisser tout le fond</td></tr>
+      <tr><td><code>#include &lt;ecran&gt;</code></td><td>éteint ou rallume l’écran</td></tr>
+      <tr><td><code>#include &lt;panneau&gt;</code></td><td>montre le panneau, à une place choisie</td></tr>
+      <tr><td><code>#include &lt;cacherPanneau&gt;</code></td><td>cache le panneau</td></tr>
+      <tr><td><code>#include &lt;effacerPanneau&gt;</code></td><td>efface des cases du panneau, ou tout le panneau</td></tr>
+      <tr><td><code>#include &lt;textePanneau&gt;</code></td><td>écrit un texte sur le panneau</td></tr>
+      <tr><td><code>#include &lt;nombrePanneau&gt;</code></td><td>écrit un nombre sur le panneau</td></tr>
+      <tr><td><code>#include &lt;poserPanneau&gt;</code></td><td>pose une tuile sur le panneau</td></tr>
+      <tr><td><code>#include &lt;lirePanneau&gt;</code></td><td>lit une tuile du panneau</td></tr>
+      <tr><td><code>#include &lt;ALPHABET&gt;</code></td><td>les lettres de la police : ALPHABET[0] est le A</td></tr>
+      <tr><td><code>#include &lt;ALPHABET_GRAS&gt;</code></td><td>l’alphabet en gras : ALPHABET_GRAS[0] est le A gras</td></tr>
+      <tr><td><code>#include &lt;ALPHABET_TITRE&gt;</code></td><td>l’alphabet des titres : lettres épaisses, avec une ombre ; ALPHABET_TITRE[0] est le A</td></tr>
+      <tr><td><code>#include &lt;texteTitre&gt;</code></td><td>écrit un mot en GROSSES lettres de titre (taille 2, 3 ou 4 cases de côté)</td></tr>
+      <tr><td><code>#include &lt;texteManga&gt;</code></td><td>écrit un mot en lettres de titre MANGA : penchées, coins coupés, une trame (taille 2, 3 ou 4)</td></tr>
+      <tr><td><code>#include &lt;Tuile&gt;</code></td><td>un dessin de 8 × 8 pixels</td></tr>
+      <tr><td><code>#include &lt;Perso&gt;</code></td><td>un personnage : un dessin de 16 × 16 ou de 32 × 32 pixels</td></tr>
+      <tr><td><code>#include &lt;Grand&gt;</code></td><td>un autre nom pour un Perso de 32 × 32 pixels</td></tr>
+      <tr><td><code>#include &lt;Mot&gt;</code></td><td>un texte et sa place, sous un seul nom</td></tr>
+      <tr><td><code>#include &lt;sprite&gt;</code></td><td>place un lutin de 8 × 8 au pixel près</td></tr>
+      <tr><td><code>#include &lt;sprite16&gt;</code></td><td>place un lutin de 16 × 16 au pixel près</td></tr>
+      <tr><td><code>#include &lt;sprite32&gt;</code></td><td>place un grand personnage de 32 × 32 au pixel près</td></tr>
+      <tr><td><code>#include &lt;cacher&gt;</code></td><td>cache un lutin</td></tr>
+      <tr><td><code>#include &lt;cacher16&gt;</code></td><td>cache un lutin de 16 × 16</td></tr>
+      <tr><td><code>#include &lt;cacher32&gt;</code></td><td>cache un grand personnage de 32 × 32</td></tr>
+      <tr><td><code>#include &lt;couleurFond&gt;</code></td><td>choisit une couleur d’une palette du fond</td></tr>
+      <tr><td><code>#include &lt;couleurTexte&gt;</code></td><td>choisit la couleur des lettres</td></tr>
+      <tr><td><code>#include &lt;couleurLutin&gt;</code></td><td>choisit une couleur d’une palette des lutins</td></tr>
+      <tr><td><code>#include &lt;teindre&gt;</code></td><td>met une case du fond dans une palette</td></tr>
+      <tr><td><code>#include &lt;teindrePanneau&gt;</code></td><td>met une case du panneau dans une palette</td></tr>
+      <tr><td><code>#include &lt;teindreLutin&gt;</code></td><td>met un lutin dans une palette</td></tr>
+      <tr><td><code>#include &lt;paletteFond&gt;</code></td><td>choisit les quatre nuances du fond</td></tr>
+      <tr><td><code>#include &lt;paletteLutins&gt;</code></td><td>choisit les quatre nuances des lutins</td></tr>
+      <tr><td><code>#include &lt;deplace_x&gt;</code></td><td>fait avancer une tuile sur sa ligne</td></tr>
+      <tr><td><code>#include &lt;deplace_y&gt;</code></td><td>fait avancer une tuile sur sa colonne</td></tr>
+      <tr><td><code>#include &lt;deplace&gt;</code></td><td>fait avancer une tuile sur les deux axes</td></tr>
+      <tr><td><code>#include &lt;va_a&gt;</code></td><td>mène une tuile jusqu’à une case</td></tr>
+      <tr><td><code>#include &lt;un_pas&gt;</code></td><td>fait faire un seul pas à une tuile</td></tr>
+      <tr><td><code>#include &lt;vitesse&gt;</code></td><td>règle la vitesse des déplacements</td></tr>
+      <tr><td><code>#include &lt;deplace_croix&gt;</code></td><td>une tuile qui suit la croix, case par case</td></tr>
+      <tr><td><code>#include &lt;glisse_croix&gt;</code></td><td>un lutin qui suit la croix, au pixel près</td></tr>
+      <tr><td><code>#include &lt;carre&gt;</code></td><td>une tuile qui tourne en carré</td></tr>
+      <tr><td><code>#include &lt;Carre&gt;</code></td><td>les sept réglages d’un carré sous un seul nom</td></tr>
+      <tr><td><code>#include &lt;losange&gt;</code></td><td>une tuile qui tourne en losange</td></tr>
+      <tr><td><code>#include &lt;rectangle&gt;</code></td><td>une tuile qui tourne en rectangle</td></tr>
+      <tr><td><code>#include &lt;spirale&gt;</code></td><td>une tuile qui tourne en spirale</td></tr>
+      <tr><td><code>#include &lt;aller_retour&gt;</code></td><td>une tuile qui va et revient</td></tr>
+      <tr><td><code>#include &lt;tourne_carre&gt;</code></td><td>une tuile qui tourne en carré sans arrêter le jeu</td></tr>
+      <tr><td><code>#include &lt;defile&gt;</code></td><td>une tuile qui file sur sa ligne sans arrêter le jeu</td></tr>
+      <tr><td><code>#include &lt;chaque&gt;</code></td><td>répond 1 toutes les n millisecondes</td></tr>
+      <tr><td><code>#include &lt;attendre&gt;</code></td><td>attend des secondes entières</td></tr>
+      <tr><td><code>#include &lt;bouton&gt;</code></td><td>lit un bouton de la manette</td></tr>
+      <tr><td><code>#include &lt;hasard&gt;</code></td><td>tire un nombre au hasard</td></tr>
+      <tr><td><code>#include &lt;semer&gt;</code></td><td>choisit le départ du hasard</td></tr>
+      <tr><td><code>#include &lt;note&gt;</code></td><td>joue une note</td></tr>
+      <tr><td><code>#include &lt;bruit&gt;</code></td><td>joue un bruit</td></tr>
+      <tr><td><code>#include &lt;silence&gt;</code></td><td>fait taire une voix</td></tr>
+      <tr><td><code>#include &lt;volumeSon&gt;</code></td><td>règle le volume général</td></tr>
+      <tr><td><code>#include &lt;Air&gt;</code></td><td>un air de musique, note par note</td></tr>
+      <tr><td><code>#include &lt;jouer&gt;</code></td><td>joue un air tout seul</td></tr>
+      <tr><td><code>#include &lt;airFini&gt;</code></td><td>dit si un air est fini</td></tr>
+      <tr><td><code>#include &lt;sauver&gt;</code></td><td>garde un nombre dans la cartouche, même éteinte</td></tr>
+      <tr><td><code>#include &lt;sauvegarde&gt;</code></td><td>relit un nombre gardé dans la cartouche</td></tr>
+      <tr><td><code>#include &lt;multiplier&gt;</code></td><td>a * b, quand les deux se calculent</td></tr>
+      <tr><td><code>#include &lt;diviser&gt;</code></td><td>a / b, sauf par 1, 2, 4, 8, 16… écrits en clair</td></tr>
+      <tr><td><code>#include &lt;reste&gt;</code></td><td>a % b, sauf par 1, 2, 4, 8, 16… écrits en clair</td></tr>
+      <tr><td><code>#include &lt;decaler&gt;</code></td><td>a &lt;&lt; b et a &gt;&gt; b, quand b se calcule</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="page" id="partie-lexique">
+  <p class="sur">Partie K</p>
+  <h1>Le lexique : chaque mot technique</h1>
+  <div class="niveau-partie debutant">
+    <span class="pastille">● débutant</span> <span>aucune connaissance demandée en dehors de ce qui est cité</span>
+    
+  </div>
+  <p><strong>Les 50 mots techniques du document</strong>, par ordre alphabétique. La dernière colonne renvoie là où le mot est expliqué en détail (cliquable).</p>
+  <table class="lexique"><tbody>
+    <tr><td>accent grave</td><td>Le signe ` (AltGr+7). En JavaScript, il entoure un texte qui peut tenir sur plusieurs lignes.</td><td><a href="#partie-js">partie D</a></td></tr>
+    <tr><td>accolades</td><td>Les signes { et }. Elles regroupent des ordres (C++) ou les éléments d’un objet (JavaScript).</td><td><a href="#base-0-8">0.8</a></td></tr>
+    <tr><td>ALPHABET</td><td>Le tableau des tuiles de la police : ALPHABET[0] est le A, ALPHABET[1] le B…</td><td><a href="#base-0-5">0.5</a></td></tr>
+    <tr><td>appel</td><td>Le moment où l’on fait le geste d’une fonction : bande(2, 5, ALPHABET[0], 10);</td><td><a href="#base-0-6">0.6</a></td></tr>
+    <tr><td>argument</td><td>La valeur donnée à un paramètre au moment de l’appel : dans bande(2, …), 2 est un argument.</td><td><a href="#base-0-6">0.6</a></td></tr>
+    <tr><td>BIBLIOTHEQUES</td><td>La liste, dans compilateur/inclusion.js, de tous les noms qu’on peut écrire entre chevrons.</td><td><a href="#partie-d">partie E</a></td></tr>
+    <tr><td>bit</td><td>Un interrupteur qui vaut 0 ou 1. Huit bits font un octet.</td><td><a href="#base-0-4">0.4</a></td></tr>
+    <tr><td>boucle</td><td>Des ordres répétés. La boucle for les répète en comptant.</td><td><a href="#base-0-7">0.7</a></td></tr>
+    <tr><td>cartouche</td><td>Le fichier .gb fabriqué par le compilateur : tout le jeu, en nombres. 32 768 octets au plus.</td><td><a href="#base-0-3">0.3</a></td></tr>
+    <tr><td>case</td><td>Un carré de 8 × 8 pixels de l’écran, désigné par sa colonne (0 à 19) et sa ligne (0 à 17).</td><td><a href="#base-0-5">0.5</a></td></tr>
+    <tr><td>chemin</td><td>Où trouver un fichier, dossier par dossier : compilateur/inclusion.js.</td><td><a href="#base-0-2">0.2</a></td></tr>
+    <tr><td>chevrons</td><td>Les signes &lt; et &gt;. Autour d’un nom dans #include, ils désignent une fonction de la console.</td><td><a href="#partie-a">partie A</a></td></tr>
+    <tr><td>commentaire</td><td>Une explication pour l’humain, ignorée par la machine : après // ou entre /* et */.</td><td><a href="#base-0-8">0.8</a></td></tr>
+    <tr><td>compilateur</td><td>Le traducteur qui transforme ton C++ en nombres pour le processeur.</td><td><a href="#base-0-3">0.3</a></td></tr>
+    <tr><td>console (fonction de la)</td><td>Une fonction écrite par le projet (poser, texte, bande…), qu’on demande par #include &lt;nom&gt;.</td><td><a href="#partie-a">partie A</a></td></tr>
+    <tr><td>const</td><td>En JavaScript : donner un nom fixe à une valeur.</td><td><a href="#partie-js">partie D</a></td></tr>
+    <tr><td>corps</td><td>Les ordres d’une fonction ou d’une boucle, entre accolades.</td><td><a href="#base-0-6">0.6</a></td></tr>
+    <tr><td>deLaConsole</td><td>La marque que le compilateur pose sur les fonctions qu’il ajoute lui-même : elles n’ont rien à inclure.</td><td><a href="#partie-b">partie B</a></td></tr>
+    <tr><td>dossier</td><td>Une boîte qui contient des fichiers et d’autres dossiers.</td><td><a href="#base-0-2">0.2</a></td></tr>
+    <tr><td>éditeur de texte</td><td>Un programme qui ouvre et enregistre un fichier tel quel (Bloc-notes, Visual Studio Code). Pas Word.</td><td><a href="#base-0-10">0.10</a></td></tr>
+    <tr><td>émulateur</td><td>Une Game Boy imitée par l’ordinateur : il lance la cartouche.</td><td><a href="#base-0-3">0.3</a></td></tr>
+    <tr><td>expression régulière</td><td>Un motif qui reconnaît la forme d’un texte, comme un pochoir.</td><td><a href="#partie-b">partie B</a></td></tr>
+    <tr><td>extension</td><td>La fin du nom d’un fichier, après le point : .cpp, .js, .pdf.</td><td><a href="#base-0-2">0.2</a></td></tr>
+    <tr><td>fichier</td><td>Un document rangé sur l’ordinateur. Dans l’atelier, un onglet de l’éditeur.</td><td><a href="#base-0-2">0.2</a></td></tr>
+    <tr><td>fichier voisin</td><td>Un fichier à toi, à côté de principal.cpp, qu’on colle par #include "nom".</td><td><a href="#partie-a">partie A</a></td></tr>
+    <tr><td>fonction</td><td>Un geste auquel on a donné un nom, pour le refaire sans le réécrire.</td><td><a href="#base-0-6">0.6</a></td></tr>
+    <tr><td>FONCTIONS_EN_C</td><td>L’objet, dans compilateur/emetteur.js, qui relie le nom de chaque fonction de la console écrite en C++ à sa source.</td><td><a href="#partie-d">partie E</a></td></tr>
+    <tr><td>for</td><td>La boucle qui compte : for (départ ; tant que ; après chaque tour).</td><td><a href="#base-0-7">0.7</a></td></tr>
+    <tr><td>git</td><td>Le programme qui photographie le projet, pour pouvoir revenir en arrière.</td><td><a href="#base-0-12">0.12</a></td></tr>
+    <tr><td>guillemets</td><td>Le signe ". Autour d’un nom dans #include, ils désignent un fichier à toi.</td><td><a href="#partie-a">partie A</a></td></tr>
+    <tr><td>#include</td><td>La ligne qui dit « ce programme a besoin de quelque chose qui n’est pas écrit ici ».</td><td><a href="#partie-a">partie A</a></td></tr>
+    <tr><td>JavaScript</td><td>Le langage de l’atelier et du compilateur, que les navigateurs savent faire tourner.</td><td><a href="#partie-js">partie D</a></td></tr>
+    <tr><td>main()</td><td>La fonction par laquelle tout programme commence.</td><td><a href="#base-0-6">0.6</a></td></tr>
+    <tr><td>node</td><td>Le programme qui fait tourner du JavaScript dans une fenêtre de commande.</td><td><a href="#base-0-11">0.11</a></td></tr>
+    <tr><td>objet</td><td>En JavaScript : une liste de « nom: valeur, » entre accolades.</td><td><a href="#partie-js">partie D</a></td></tr>
+    <tr><td>octet</td><td>Une case de mémoire qui retient un nombre de 0 à 255.</td><td><a href="#base-0-4">0.4</a></td></tr>
+    <tr><td>paramètre</td><td>La case nommée, dans la définition d’une fonction, que l’appel remplit.</td><td><a href="#base-0-6">0.6</a></td></tr>
+    <tr><td>pixel</td><td>Un point de l’écran. L’écran en a 160 × 144.</td><td><a href="#base-0-5">0.5</a></td></tr>
+    <tr><td>point-virgule</td><td>Le signe ; qui termine un ordre en C++.</td><td><a href="#base-0-8">0.8</a></td></tr>
+    <tr><td>police</td><td>L’ensemble des tuiles des lettres et des chiffres.</td><td><a href="#base-0-5">0.5</a></td></tr>
+    <tr><td>principal.cpp</td><td>Le fichier principal du programme, celui par lequel la compilation commence.</td><td><a href="#base-0-9">0.9</a></td></tr>
+    <tr><td>processeur</td><td>La puce de la Game Boy qui exécute les ordres, un par un.</td><td><a href="#base-0-3">0.3</a></td></tr>
+    <tr><td>return</td><td>L’ordre qui rend une valeur et termine la fonction.</td><td><a href="#base-0-6">0.6</a></td></tr>
+    <tr><td>source</td><td>Le texte d’un programme, tel qu’on l’écrit. SOURCE_BANDE est la source de bande().</td><td><a href="#partie-d">partie E</a></td></tr>
+    <tr><td>tableau</td><td>Une liste de valeurs rangées à la suite ; on désigne chacune par sa place entre crochets.</td><td><a href="#base-0-5">0.5</a></td></tr>
+    <tr><td>terminal</td><td>La fenêtre de commande, où l’on tape des ordres au clavier.</td><td><a href="#base-0-11">0.11</a></td></tr>
+    <tr><td>tuile</td><td>Le dessin d’une case : 8 × 8 pixels, 16 octets.</td><td><a href="#base-0-5">0.5</a></td></tr>
+    <tr><td>type</td><td>Le genre de valeur qu’une case retient. Ici presque toujours uint8_t.</td><td><a href="#base-0-6">0.6</a></td></tr>
+    <tr><td>uint8_t</td><td>Le type « octet » : un nombre entier de 0 à 255.</td><td><a href="#base-0-4">0.4</a></td></tr>
+    <tr><td>void</td><td>« Vide » : la fonction ne rend rien.</td><td><a href="#base-0-6">0.6</a></td></tr>
+  </tbody></table>
+</section>
+</body>
+</html>

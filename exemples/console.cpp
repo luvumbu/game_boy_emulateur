@@ -16,7 +16,7 @@
  */
 
 #include <Tuile>          // un dessin de 8 × 8 pixels
-#include <Perso>          // un dessin de 16 × 16 pixels, pour un lutin
+#include <Perso>          // un personnage : un dessin de 16 × 16 ou de 32 × 32 pixels
 #include <poser>          // pose une tuile sur une case du fond
 #include <ecran>          // éteint ou rallume l’écran
 #include <textePanneau>   // écrit un texte sur le panneau

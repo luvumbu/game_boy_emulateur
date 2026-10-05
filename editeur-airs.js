@@ -713,6 +713,13 @@ export function installer({ bande, atelier, lireSource, ecrireSource, surChangem
       if (choisi && !airChoisi()) { stopper(); choisi = null }
       rafraichirTout()
     },
+    /* Ouvrir un air par son nom (l'onglet « Tout le jeu »). */
+    choisir(nom) {
+      stopper()
+      choisi = nom
+      if (!airChoisi()) choisi = null
+      rafraichirTout()
+    },
     arreter: stopper,
   }
 }
