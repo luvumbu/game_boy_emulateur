@@ -5576,9 +5576,43 @@ void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
 }
 `
 
+/*
+ * poserDevant(colonne, ligne, tuile, palette) : pose une tuile ET la fait
+ * passer devant les lutins (Game Boy Color).
+ *
+ *   poserDevant(12, 8, BUISSON, 2);   le buisson, en palette 2, devant le héros
+ *
+ * Un raccourci, rien de plus : les deux lignes qu'on écrivait à la main,
+ * poser() puis teindre(…, palette | DEVANT), sous un seul nom. Le dessin
+ * devant / derrière, c'est la console qui le fait, en dessinant l'écran : la
+ * fonction ne vérifie rien, et ne coûte que lorsqu'on l'appelle — une fois,
+ * en posant le décor.
+ */
+const SOURCE_POSER_DEVANT = `
+void poserDevant(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t palette) {
+  poser(colonne, ligne, tuile);                // la tuile, comme d'habitude,
+  teindre(colonne, ligne, palette | DEVANT);   // sa palette, et DEVANT les lutins
+}
+`
+
+/*
+ * spriteDerriere(numero, x, y, tuile) : sprite(), mais DERRIÈRE le décor.
+ *
+ *   spriteDerriere(0, x, 72, HEROS);   comme sprite(0, x, 72, HEROS, DERRIERE)
+ *
+ * Même idée : un nom pour ne plus avoir à retenir le 5e argument. Elle coûte
+ * le prix d'un sprite(), plus l'aller-retour de l'appel.
+ */
+const SOURCE_SPRITE_DERRIERE = `
+void spriteDerriere(uint8_t numero, uint8_t x, uint8_t y, uint8_t tuile) {
+  sprite(numero, x, y, tuile, DERRIERE);       // le 5e argument, écrit une fois pour toutes
+}
+`
+
 /** Les fonctions de la console écrites en C : leur nom, et leur texte. */
 const FONCTIONS_EN_C = {
   bande: SOURCE_BANDE,
+  poserDevant: SOURCE_POSER_DEVANT, spriteDerriere: SOURCE_SPRITE_DERRIERE,
   chaque_minuteur: SOURCE_CHAQUE,
   tourne_carre: SOURCE_TOURNE_CARRE, defile: SOURCE_DEFILE,
   deplace_croix: SOURCE_DEPLACE_CROIX, glisse_croix: SOURCE_GLISSE_CROIX,
@@ -5779,11 +5813,14 @@ function preparerLesFormes(programme, siennes) {
 }
 
 /*
- * texteGrand(x, y, "TEXTE", taille) : un texte AGRANDI, de 1 à 20 fois.
+ * texteGrand(x, y, "TEXTE", taille) : un texte AGRANDI. La taille va de 0 à 10 :
+ * 0 est la lettre normale, et chaque cran l'agrandit d'une fois de plus.
  *
- *   texteGrand(0, 0, "A", 3);      un A trois fois plus grand : 3 × 3 cases
+ *   texteGrand(0, 0, "A", 0);      un A normal : 1 case
+ *   texteGrand(0, 0, "A", 2);      un A trois fois plus grand : 3 × 3 cases
  *
- * Chaque pixel de la police devient un carré de taille × taille pixels : les
+ * Chaque pixel de la police devient un carré de (taille + 1) × (taille + 1)
+ * pixels : les
  * proportions sont gardées, et rien n'est dessiné à la main. Le compilateur
  * CALCULE les tuiles de la lettre agrandie, avant le jeu — d'où la règle :
  * le texte et la taille s'écrivent en clair. Seules les tuiles de ce texte, à
@@ -5811,7 +5848,7 @@ function preparerLesTextesGrands(programme, siennes) {
    * texteGrandS(x, y, "TEXTE", taille) : texteGrand qui VA À LA LIGNE, comme
    * textS pour les petites lettres. Les lettres qui ne tiennent plus dans la
    * largeur (20 cases) repartent en colonne 0, une rangée de lettres plus bas
-   * (taille cases). Si le texte dépasse le BAS de l'écran (18 cases), c'est
+   * (taille + 1 cases). Si le texte dépasse le BAS de l'écran (18 cases), c'est
    * une erreur, qui dit combien de lignes il faudrait.
    *
    * Le découpage se fait avant le jeu : x et y s'écrivent donc en clair, comme
@@ -5823,10 +5860,11 @@ function preparerLesTextesGrands(programme, siennes) {
     if (appel.arguments.length !== 4 || [x, y, taille].some((a) => a?.genre !== 'nombre') || texte?.genre !== 'texte') {
       throw new Error(
         `ligne ${noeud.ligne} : texteGrandS(x, y, "TEXTE", taille) veut tout écrit en clair — la place, le texte et la taille : ` +
-          'comme texteGrandS(0, 0, "BONJOUR", 3). Le découpage en lignes se fait avant le jeu',
+          'comme texteGrandS(0, 0, "BONJOUR", 2). Le découpage en lignes se fait avant le jeu',
       )
     }
-    const n = taille.valeur
+    if (taille.valeur < 0 || taille.valeur > 10) throw new Error(`ligne ${noeud.ligne} : texteGrandS : la taille va de 0 à 10 ; ${taille.valeur} est hors de ces limites`)
+    const n = taille.valeur + 1                      // la taille 0 est la lettre normale : 1 case
     const lignes = [{ colonne: x.valeur, lettres: '' }]
     let colonne = x.valeur
     for (const lettre of texte.valeur) {
@@ -5842,7 +5880,7 @@ function preparerLesTextesGrands(programme, siennes) {
     const bas = y.valeur + lignes.length * n
     if (bas > 18) {
       throw new Error(
-        `ligne ${noeud.ligne} : texteGrandS : « ${texte.valeur} » à la taille ${n} demande ${lignes.length} ligne(s) de ${n} cases, ` +
+        `ligne ${noeud.ligne} : texteGrandS : « ${texte.valeur} » à la taille ${taille.valeur} demande ${lignes.length} ligne(s) de ${n} cases, ` +
           `jusqu'à la case ${bas} ; l'écran n'en a que 18 — un texte plus court, plus petit, ou plus haut`,
       )
     }
@@ -5869,13 +5907,13 @@ function preparerLesTextesGrands(programme, siennes) {
       if (appel.arguments.length !== 4 || texte?.genre !== 'texte' || taille?.genre !== 'nombre') {
         throw new Error(
           `ligne ${noeud.ligne} : texteGrand(x, y, "TEXTE", taille) veut un texte entre guillemets et une taille ` +
-            'écrite en clair, de 1 à 20 : comme texteGrand(0, 0, "A", 3). Les deux sont calculés avant le jeu',
+            'écrite en clair, de 0 à 10 : comme texteGrand(0, 0, "A", 2). Les deux sont calculés avant le jeu',
         )
       }
-      /* 20 au plus : une lettre fait 7 pixels de haut, l'écran 144 ; 7 × 20 =
-         140, elle tient encore entière. Au-delà, elle dépasserait de l'écran. */
-      const n = taille.valeur
-      if (n < 1 || n > 20) throw new Error(`ligne ${noeud.ligne} : texteGrand agrandit de 1 à 20 fois ; ${n} est hors de ces limites (au-delà, la lettre dépasse de l'écran)`)
+      /* La taille va de 0 (la lettre normale) à 10 (11 fois plus grande : une
+         lettre de 7 pixels en fait alors 77, un peu plus de la moitié de l'écran). */
+      if (taille.valeur < 0 || taille.valeur > 10) throw new Error(`ligne ${noeud.ligne} : texteGrand : la taille va de 0 à 10 ; ${taille.valeur} est hors de ces limites`)
+      const n = taille.valeur + 1                           // combien de fois plus grand : 0 → 1 fois
       const lettres = [...texte.valeur]
       const pixels = lettres.map((c) => {
         const p = pixelsDe(c)
@@ -5889,7 +5927,7 @@ function preparerLesTextesGrands(programme, siennes) {
       }
       /* Le pixel (px, py) du grand dessin vient du pixel (px / n, py / n) de la
          police. Une table PAR RANGÉE de cases : un octet ne compte que jusqu'à
-         255, et 20 × 20 cases en font 400 ; une rangée n'en a jamais plus de 255. */
+         255, et une longue rangée peut en demander davantage ; une rangée n'en a jamais plus de 255. */
       const rangees = []
       for (let tr = 0; tr < hauteur; tr++) {
         const table = []
@@ -6007,6 +6045,57 @@ function rangerLaPosition(noeud, siennes) {
 }
 
 /*
+ * poserDevant et spriteDerriere, déroulés SUR PLACE : un raccourci ne doit
+ * rien coûter de plus que les lignes qu'il remplace.
+ *
+ *   poserDevant(12, 8, BUISSON, 2);    devient  poser(12, 8, BUISSON);
+ *                                               teindre(12, 8, 2 | DEVANT);
+ *   spriteDerriere(0, x, 72, HEROS);   devient  sprite(0, x, 72, HEROS, DERRIERE);
+ *
+ * Exactement les octets qu'on aurait écrits à la main. Appeler la vraie
+ * fonction (sa version en C, plus bas) coûtait plusieurs centaines d'octets :
+ * ranger quatre arguments, puis un poser(), un teindre() ou un sprite() qui
+ * ne connaissent plus rien d'avance et doivent tout calculer pendant le jeu.
+ *
+ * poserDevant lit deux fois la colonne et la ligne. Si l'une d'elles change
+ * quelque chose en se lisant (« c++ », un appel), on ne déroule pas : la
+ * fonction en C est alors appelée, et chaque argument n'est lu qu'une fois.
+ * Les #include ont été relevés avant (voir inclusionsEmployees) : la ligne
+ * « #include <poserDevant> » reste demandée, et poser() ni teindre() ne le
+ * sont pas en plus.
+ */
+const RACCOURCIS = new Set(['poserDevant', 'spriteDerriere'])
+const AGIT = new Set(['appel', 'appelMethode', 'incrementer', 'affecter'])
+const agit = (n) => Boolean(n) && typeof n === 'object' &&
+  (AGIT.has(n.genre) || Object.values(n).some((v) => (Array.isArray(v) ? v.some(agit) : agit(v))))
+
+function deroulerLesRaccourcis(noeud, siennes) {
+  if (Array.isArray(noeud)) { noeud.forEach((n) => deroulerLesRaccourcis(n, siennes)); return }
+  if (!noeud || typeof noeud !== 'object') return
+  const appel = noeud.valeur
+  if (noeud.genre === 'expression' && appel?.genre === 'appel' && RACCOURCIS.has(appel.nom) &&
+      !siennes.has(appel.nom) && appel.arguments.length === 4) {
+    const ligne = noeud.ligne
+    const [a, b, c, d] = appel.arguments
+    const constante = (nom) => ({ genre: 'variable', nom, ligne })
+    if (appel.nom === 'spriteDerriere') {
+      Object.assign(appel, { nom: 'sprite', arguments: [a, b, c, d, constante('DERRIERE')] })
+      return
+    }
+    if (agit(a) || agit(b)) return                          // lus deux fois : on laisse la fonction en C
+    const ligneDe = (nom, args) => ({ genre: 'expression', valeur: { genre: 'appel', nom, arguments: args, ligne }, ligne })
+    const lignes = [
+      ligneDe('poser', [a, b, c]),
+      ligneDe('teindre', [structuredClone(a), structuredClone(b), { genre: 'calcul', operateur: '|', gauche: d, droite: constante('DEVANT'), ligne }]),
+    ]
+    for (const cle of Object.keys(noeud)) delete noeud[cle]
+    Object.assign(noeud, { genre: 'bloc', corps: lignes, ligne })
+    return
+  }
+  for (const v of Object.values(noeud)) deroulerLesRaccourcis(v, siennes)
+}
+
+/*
  * ALPHABET_GRAS : l'alphabet en gras, de A à Z, à côté d'ALPHABET (qui ne
  * change pas). « ALPHABET_GRAS[0] » est le A gras, « [25] » le Z gras.
  *
@@ -6055,6 +6144,7 @@ function avecLesFonctionsEnC(programme) {
   const vitesseReglee = preparerLesFormes(programme, siennes)
   const textesGrands = preparerLesTextesGrands(programme, siennes)   // les tuiles agrandies et leurs tables
   rangerLaPosition(programme, siennes)
+  deroulerLesRaccourcis(programme, siennes)   // poserDevant, spriteDerriere : sur place
   const ajoutees = []
   for (const [nom, source] of Object.entries(FONCTIONS_EN_C)) {
     if (siennes.has(nom) || !appelle(programme, nom)) continue   // la sienne, ou pas appelée

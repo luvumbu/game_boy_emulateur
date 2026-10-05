@@ -43,7 +43,7 @@ export const BIBLIOTHEQUES = {
   /* écrire et poser sur le fond */
   texte: 'écrit un texte à l’écran',
   textS: 'écrit un texte qui passe à la ligne tout seul',
-  texteGrand: 'écrit un texte agrandi, de 1 à 20 fois',
+  texteGrand: 'écrit un texte agrandi, taille de 0 à 10',
   texteGrandS: 'écrit un texte agrandi qui passe à la ligne',
   texteCouleur: 'écrit un mot dans une palette de couleur',
   nombre: 'écrit un nombre en chiffres',
@@ -51,6 +51,7 @@ export const BIBLIOTHEQUES = {
   poser: 'pose une tuile sur une case du fond',
   poserS: 'pose une tuile, et passe à la ligne au bord',
   bande: 'pose la même tuile plusieurs fois, de gauche à droite',
+  poserDevant: 'pose une tuile qui passe devant les lutins (Game Boy Color)',
   lire: 'lit la tuile posée sur une case',
   changerDessin: 'change le dessin d’une tuile partout à la fois',
   defiler: 'fait glisser tout le fond',
@@ -75,6 +76,7 @@ export const BIBLIOTHEQUES = {
   Mot: 'un texte et sa place, sous un seul nom',
   /* les lutins */
   sprite: 'place un lutin de 8 × 8 au pixel près',
+  spriteDerriere: 'place un lutin de 8 × 8 derrière le décor',
   sprite16: 'place un lutin de 16 × 16 au pixel près',
   sprite32: 'place un grand personnage de 32 × 32 au pixel près',
   cacher: 'cache un lutin',

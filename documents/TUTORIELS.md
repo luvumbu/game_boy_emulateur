@@ -1,6 +1,6 @@
 # Apprendre — le parcours, du plus facile au plus dur
 
-**615 étapes** — leçons, cours et fonctions —, rangées en 26 chapitres. Chacune est un **programme
+**628 étapes** — leçons, cours et fonctions —, rangées en 26 chapitres. Chacune est un **programme
 entier** : le code se colle tel quel dans `http://localhost/gameboy3/`, ou se
 compile en ligne de commande, et il tourne.
 
@@ -47,15 +47,15 @@ avant la première étape qui l’emploie — un `#include` nouveau à la fois.
 | 14 | Les struct : ce qui va ensemble | 90.1 – 94 |
 | 15 | Les quatre nuances : la Game Boy d’origine | 94.1 – 100 |
 | 16 | La couleur : la Game Boy Color | 100.1 – 106 |
-| 17 | Le mouvement : les lutins au pixel près | 106.1 – 110 |
-| 18 | Les collisions : se toucher, se cogner | 110.1 – 113 |
+| 17 | Le mouvement : les lutins au pixel près | 106.1 – 110.14 |
+| 18 | Les collisions : se toucher, se cogner | 110.15 – 113 |
 | 19 | Le hasard et le temps | 113.1 – 117 |
 | 20 | Les états du jeu : titre, partie, fin | 117.1 – 120 |
 | 21 | Le son : notes, bruits, airs | 120.1 – 123 |
 | 22 | Le défilement : un monde plus grand que l’écran | 123.1 – 125 |
 | 23 | Un vrai jeu | 125.1 – 134 |
 | 24 | Aller au bout | 134.1 – 143 |
-| 25 | Tes propres #include : ajouter une fonction | 143.1 – 151 |
+| 25 | Tes propres #include : ajouter une fonction | 143.1 – 152 |
 
 | Partie | Chapitre | Étapes |
 |---|---|---|
@@ -71,6 +71,7 @@ avant la première étape qui l’emploie — un `#include` nouveau à la fois.
 | J. Un micro Zelda | 0 | 0.95 – 0.95.1 |
 | K. Une lettre qui tire | 0 | 0.96 – 0.108 |
 | L. Les fonctions de la console, une par une | 0 | 0.109 – 0.113 |
+| A. Devant, derrière | 17 | 110.3 – 110.14 |
 
 ---
 
@@ -201,7 +202,7 @@ int main() {
 
 **Essaie :** écris ton prénom en (0, 17), tout en bas à gauche.
 
-**On retrouve texte dans** — 0.0.1, 0.1, 0.1.1, 0.1.2, 0.3, 0.3.1, 0.3.2, 0.4, 0.4.1, 0.4.2, 0.79, 0.79.1, 0.81, 0.81.1, 0.81.3, 0.82.1, 0.83, 0.83.2, 0.84, 0.88, 0.88.1, 0.88.2, 0.89.2, 0.90, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 0.1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 1.9, 1.10, 1.11, 1.12, 2, 2.1, 2.2, 2.3, 4, 5, 6, 7, 8, 8.1, 9, 10, 11, 12, 12.1, 13, 14, 16, 17, 18, 19, 20, 20.1, 21, 22, 23, 24, 24.1, 25, 26, 27, 28, 29, 30, 31, 32, 33, 33.1, 34, 35, 35.12, 35.15, 35.18, 36, 37, 38, 39, 41, 43, 43.1, 44, 45, 46, 47, 52.1, 53, 54, 55, 56, 57, 58, 59, 59.1, 60, 65, 66, 66.1, 67, 68, 69, 70, 71, 71.1, 72, 73, 75, 77, 78, 78.1, 79, 80, 81, 82, 82.1, 83, 84, 85, 86, 90, 90.1, 91, 92, 93, 94, 94.1, 95, 96, 97, 98, 99, 100, 100.1, 101, 102, 103, 104, 105, 106, 106.1, 107, 108, 109, 110, 110.1, 111, 112, 113, 113.1, 114, 115, 116, 117, 117.1, 118, 119, 120, 120.1, 121, 122, 123, 123.1, 124, 125.1, 126, 127, 128, 129, 133, 134, 134.1, 135, 136, 138, 139, 141, 143, 143.1
+**On retrouve texte dans** — 0.0.1, 0.1, 0.1.1, 0.1.2, 0.3, 0.3.1, 0.3.2, 0.4, 0.4.1, 0.4.2, 0.79, 0.79.1, 0.81, 0.81.1, 0.81.3, 0.82.1, 0.83, 0.83.2, 0.84, 0.88, 0.88.1, 0.88.2, 0.89.2, 0.90, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 0.1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 1.9, 1.10, 1.11, 1.12, 2, 2.1, 2.2, 2.3, 4, 5, 6, 7, 8, 8.1, 9, 10, 11, 12, 12.1, 13, 14, 16, 17, 18, 19, 20, 20.1, 21, 22, 23, 24, 24.1, 25, 26, 27, 28, 29, 30, 31, 32, 33, 33.1, 34, 35, 35.12, 35.15, 35.18, 36, 37, 38, 39, 41, 43, 43.1, 44, 45, 46, 47, 52.1, 53, 54, 55, 56, 57, 58, 59, 59.1, 60, 65, 66, 66.1, 67, 68, 69, 70, 71, 71.1, 72, 73, 75, 77, 78, 78.1, 79, 80, 81, 82, 82.1, 83, 84, 85, 86, 90, 90.1, 91, 92, 93, 94, 94.1, 95, 96, 97, 98, 99, 100, 100.1, 101, 102, 103, 104, 105, 106, 106.1, 107, 108, 109, 110, 110.3, 110.4, 110.5, 110.6, 110.7, 110.8, 110.9, 110.11, 110.13, 110.14, 110.15, 111, 112, 113, 113.1, 114, 115, 116, 117, 117.1, 118, 119, 120, 120.1, 121, 122, 123, 123.1, 124, 125.1, 126, 127, 128, 129, 133, 134, 134.1, 135, 136, 138, 139, 141, 143, 143.1
 
 **Ce qu’on doit voir** — BONJOUR au milieu de l’écran, EN HAUT dans le coin en haut à gauche.  
 **Ce qu’il coûte** — 425 octets de programme, 0 variable.  
@@ -351,7 +352,7 @@ int main() {
 
 **Essaie :** pose un B (la tuile 2) dans chaque coin de l’écran.
 
-**On retrouve poser dans** — 0.2, 0.2.1, 0.2.2, 0.5, 0.5.1, 0.5.2, 0.6, 0.6.1, 0.6.2, 0.7, 0.7.1, 0.7.2, 0.8, 0.8.1, 0.8.2, 0.9, 0.9.1, 0.9.2, 0.12, 0.12.1, 0.12.2, 0.13, 0.13.1, 0.13.2, 0.14, 0.14.1, 0.14.2, 0.15, 0.15.1, 0.15.2, 0.16, 0.16.1, 0.16.2, 0.17, 0.17.1, 0.17.2, 0.30, 0.30.1, 0.30.2, 0.31, 0.31.1, 0.31.2, 0.33, 0.33.1, 0.33.2, 0.65, 0.65.1, 0.65.2, 0.66, 0.66.1, 0.66.2, 0.67, 0.67.1, 0.67.2, 0.68, 0.68.1, 0.68.2, 0.69, 0.69.1, 0.69.2, 0.76.1, 0.76.2, 0.76.3, 0.76.4, 0.76.5, 0.76.6, 0.76.8, 0.77, 0.78, 0.78.1, 0.81, 0.81.1, 0.81.3, 0.82, 0.82.1, 0.83, 0.83.2, 0.85, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93, 0.93.1, 0.93.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.95.1, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 3, 13, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44, 47, 52, 60, 61, 62, 63, 64, 72, 73, 74, 76, 84, 85, 95, 96, 97, 98, 99, 101, 102, 103, 105, 106, 112, 113, 122, 124, 125, 132, 133, 134, 135, 136, 137, 144, 145, 146, 147, 148, 149, 150, 151
+**On retrouve poser dans** — 0.2, 0.2.1, 0.2.2, 0.5, 0.5.1, 0.5.2, 0.6, 0.6.1, 0.6.2, 0.7, 0.7.1, 0.7.2, 0.8, 0.8.1, 0.8.2, 0.9, 0.9.1, 0.9.2, 0.12, 0.12.1, 0.12.2, 0.13, 0.13.1, 0.13.2, 0.14, 0.14.1, 0.14.2, 0.15, 0.15.1, 0.15.2, 0.16, 0.16.1, 0.16.2, 0.17, 0.17.1, 0.17.2, 0.30, 0.30.1, 0.30.2, 0.31, 0.31.1, 0.31.2, 0.33, 0.33.1, 0.33.2, 0.65, 0.65.1, 0.65.2, 0.66, 0.66.1, 0.66.2, 0.67, 0.67.1, 0.67.2, 0.68, 0.68.1, 0.68.2, 0.69, 0.69.1, 0.69.2, 0.76.1, 0.76.2, 0.76.3, 0.76.4, 0.76.5, 0.76.6, 0.76.8, 0.77, 0.78, 0.78.1, 0.81, 0.81.1, 0.81.3, 0.82, 0.82.1, 0.83, 0.83.2, 0.85, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93, 0.93.1, 0.93.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.95.1, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 3, 13, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44, 47, 52, 60, 61, 62, 63, 64, 72, 73, 74, 76, 84, 85, 95, 96, 97, 98, 99, 101, 102, 103, 105, 106, 110.3, 110.4, 110.6, 110.7, 110.8, 110.9, 110.11, 110.13, 110.14, 112, 113, 122, 124, 125, 132, 133, 134, 135, 136, 137, 144, 145, 146, 147, 148, 149, 150, 151, 152
 
 **Ce qu’on doit voir** — Un A au milieu, un Z en haut à gauche.  
 **Ce qu’il coûte** — 206 octets de programme, 0 variable.  
@@ -1263,7 +1264,7 @@ int main() {
 
 **Essaie :** `nombre(4, 10, score, 2);` : deux chiffres seulement.
 
-**On retrouve nombre dans** — 0.20, 0.20.1, 0.20.2, 0.23, 0.23.1, 0.23.2, 0.24, 0.25, 0.26, 0.27, 0.28, 0.29, 0.31, 0.68, 0.68.1, 0.68.2, 0.68.3, 0.69, 0.69.1, 0.69.2, 0.69.3, 0.75, 0.75.1, 0.75.2, 0.76, 0.76.1, 0.76.2, 0.76.3, 0.76.4, 0.76.5, 0.76.6, 0.76.7, 0.76.8, 0.76.10, 0.76.11, 0.76.12, 0.76.13, 0.76.14, 0.79.1, 0.80, 0.80.1, 0.80.2, 0.81, 0.81.1, 0.81.3, 0.82.1, 0.83, 0.83.2, 0.84, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.102, 0.102.1, 0.103, 0.104, 7, 9, 10, 11, 12, 15, 16, 18, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 35.18, 36, 56, 59, 65, 67, 68, 69, 70, 71, 75, 77, 78, 79, 81, 82, 86, 87, 88, 89, 90, 91, 94, 102, 111, 114, 116, 117, 119, 120, 122, 124, 125, 129, 133, 138, 139, 141, 142
+**On retrouve nombre dans** — 0.20, 0.20.1, 0.20.2, 0.23, 0.23.1, 0.23.2, 0.24, 0.25, 0.26, 0.27, 0.28, 0.29, 0.31, 0.68, 0.68.1, 0.68.2, 0.68.3, 0.69, 0.69.1, 0.69.2, 0.69.3, 0.75, 0.75.1, 0.75.2, 0.76, 0.76.1, 0.76.2, 0.76.3, 0.76.4, 0.76.5, 0.76.6, 0.76.7, 0.76.8, 0.76.10, 0.76.11, 0.76.12, 0.76.13, 0.76.14, 0.79.1, 0.80, 0.80.1, 0.80.2, 0.81, 0.81.1, 0.81.3, 0.82.1, 0.83, 0.83.2, 0.84, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.102, 0.102.1, 0.103, 0.104, 7, 9, 10, 11, 12, 15, 16, 18, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 35.18, 36, 56, 59, 65, 67, 68, 69, 70, 71, 75, 77, 78, 79, 81, 82, 86, 87, 88, 89, 90, 91, 94, 102, 110.9, 111, 114, 116, 117, 119, 120, 122, 124, 125, 129, 133, 138, 139, 141, 142
 
 **Ce qu’on doit voir** — 042, puis 42, puis 050, les uns sous les autres.  
 **Ce qu’il coûte** — 394 octets de programme, 1 variable.  
@@ -10032,7 +10033,7 @@ int main() {
 
 **Essaie :** un deuxième `if`, avec `bouton(B)`, qui écrit ailleurs.
 
-**On retrouve bouton dans** — 0.66, 0.66.1, 0.66.2, 0.67, 0.67.1, 0.67.2, 0.68, 0.68.1, 0.68.2, 0.69, 0.69.1, 0.69.2, 0.69.3, 0.70, 0.70.1, 0.70.2, 0.82, 0.82.1, 0.83.2, 0.84, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.1, 0.93.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.95.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 2, 2.1, 2.2, 2.3, 14, 16, 17, 18, 19, 20, 21, 23, 35.16, 35.17, 35.18, 35.19, 44, 45, 47, 48, 49, 51, 52, 53, 54, 55, 57, 70, 81, 82, 84, 85, 89, 91, 94, 97, 98, 100, 102, 106, 107, 108, 109, 110, 111, 112, 113, 114, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 129, 131, 132, 134, 136, 137, 138, 143
+**On retrouve bouton dans** — 0.66, 0.66.1, 0.66.2, 0.67, 0.67.1, 0.67.2, 0.68, 0.68.1, 0.68.2, 0.69, 0.69.1, 0.69.2, 0.69.3, 0.70, 0.70.1, 0.70.2, 0.82, 0.82.1, 0.83.2, 0.84, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.1, 0.93.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.95.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 2, 2.1, 2.2, 2.3, 14, 16, 17, 18, 19, 20, 21, 23, 35.16, 35.17, 35.18, 35.19, 44, 45, 47, 48, 49, 51, 52, 53, 54, 55, 57, 70, 81, 82, 84, 85, 89, 91, 94, 97, 98, 100, 102, 106, 107, 108, 109, 110, 110.8, 110.9, 111, 112, 113, 114, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 129, 131, 132, 134, 136, 137, 138, 143
 
 **Ce qu’on doit voir** — APPUIE SUR A en haut ; APPUYE apparaît au milieu tant qu’on tient le bouton A.  
 **Ce qu’il coûte** — 465 octets de programme, 0 variable.  
@@ -11163,7 +11164,7 @@ int main() {
 
 **Essaie :** fais-le descendre : `y = y + 1;`.
 
-**On retrouve sprite dans** — 0.70, 0.70.1, 0.70.2, 0.108, 43, 45, 46, 48, 49, 50, 51, 83, 85, 99, 100, 104, 106, 107, 108, 109, 110, 111, 112, 113, 122, 124, 125, 127, 128, 131, 132, 134, 136, 137, 140, 143
+**On retrouve sprite dans** — 0.70, 0.70.1, 0.70.2, 0.108, 43, 45, 46, 48, 49, 50, 51, 83, 85, 99, 100, 104, 106, 107, 108, 109, 110, 110.3, 110.4, 110.5, 110.6, 110.7, 110.8, 110.9, 110.11, 110.13, 111, 112, 113, 122, 124, 125, 127, 128, 131, 132, 134, 136, 137, 140, 143, 152
 
 **Ce qu’on doit voir** — Un A qui glisse doucement de gauche à droite, au milieu de l’écran.  
 **Ce qu’il coûte** — 224 octets de programme, 1 variable.  
@@ -14754,17 +14755,17 @@ int main() {
 
 ### 0.86.3. La fonction texteGrand() — un texte agrandi
 
-> #include <texteGrand> : texteGrand(colonne, ligne, "B", 3) écrit un B trois fois plus grand, sans rien dessiner.
+> #include <texteGrand> : texteGrand(colonne, ligne, "B", 2) écrit un B trois fois plus grand, sans rien dessiner.
 
 ```cpp
 // ---- #include <texteGrand> : un texte agrandi ----
-// Un B trois fois plus grand : 3 × 3 cases, à partir de la case (2, 2).
+// Taille 2 : un B trois fois plus grand, 3 × 3 cases, à partir de la case (2, 2).
 // (Le A, ce sera la leçon « Agrandir une lettre », juste après.)
 
 #include <texteGrand>   // texteGrand() : les lettres agrandies
 
 int main() {
-  texteGrand(2, 2, "B", 3);   // colonne 2, ligne 2, le texte, la taille
+  texteGrand(2, 2, "B", 2);   // colonne 2, ligne 2, le texte, la taille
 
   while (true) {
     image();
@@ -14772,15 +14773,15 @@ int main() {
 }
 ```
 
-**Ce qu’elle fait :** `texteGrand(colonne, ligne, "TEXTE", taille)` écrit un texte **agrandi** de 1 à 20 fois. Chaque pixel de la lettre devient un carré de `taille × taille` pixels : une lettre prend `taille × taille` cases.
+**Ce qu’elle fait :** `texteGrand(colonne, ligne, "TEXTE", taille)` écrit un texte **agrandi**. La taille va de **0 à 10** : 0, c’est la lettre normale ; chaque cran l’agrandit une fois de plus (2 → 3 fois plus grand). Une lettre prend `(taille + 1) × (taille + 1)` cases.
 
 **La ligne à écrire : `#include <texteGrand>`.**
 
 **Ses arguments :** la colonne et la ligne du coin en haut à gauche, le texte entre guillemets, la taille. Le texte et la taille **s’écrivent en clair** : le compilateur fabrique les tuiles agrandies avant le jeu.
 
-**Ce qu’elle coûte :** environ **950 octets** pour un A en taille 2 : les tuiles agrandies, la petite fonction qui les pose, et la police.
+**Ce qu’elle coûte :** environ **950 octets** pour un A en taille 1 : les tuiles agrandies, la petite fonction qui les pose, et la police.
 
-**Essaie :** `texteGrand(0, 0, "GO", 5);` : deux lettres de 5 × 5 cases.
+**Essaie :** `texteGrand(0, 0, "GO", 4);` : deux lettres de 5 × 5 cases.
 
 **On retrouve texteGrand dans** — 0.87, 0.87.1, 0.87.2, 0.87.3, 0.87.4, 0.90, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2
 
@@ -14792,17 +14793,17 @@ int main() {
 
 ### 0.87. Agrandir une lettre : texteGrand
 
-> texteGrand(x, y, "A", 3) : le A trois fois plus grand, sans rien dessiner. Chaque pixel devient un carré de 3 × 3 pixels ; les proportions sont gardées.
+> texteGrand(x, y, "A", 2) : le A trois fois plus grand, sans rien dessiner. Chaque pixel devient un carré de 3 × 3 pixels ; les proportions sont gardées.
 
 ```cpp
-#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
 
 int main() {
   // La ligne, morceau par morceau :
   //
-  //   texteGrand(2, 2, "A", 3);
+  //   texteGrand(2, 2, "A", 2);
   //              |  |  |    |
-  //              |  |  |    +-- la TAILLE : 3 fois plus grand (de 1 à 20)
+  //              |  |  |    +-- la TAILLE (de 0 à 10) : 2 → 3 fois plus grand
   //              |  |  +------- le texte, entre guillemets
   //              +--+---------- la case en haut à gauche du grand A : (2, 2)
   //
@@ -14814,7 +14815,7 @@ int main() {
   //   ·█···█··                 ······█████████·········
   //   ·█████··                 ···███·········███······
   //   …                        …
-  texteGrand(2, 2, "A", 3);
+  texteGrand(2, 2, "A", 2);
 
   while (true) {
     image();
@@ -14824,11 +14825,11 @@ int main() {
 
 **Une lettre plus grande, sans la dessiner.** La Game Boy n’a pas de zoom, mais la console peut **calculer** une lettre agrandie à partir de la police : chaque pixel devient un carré.
 
-**Ce qui est nouveau ici : `texteGrand(x, y, "TEXTE", taille)`.** La **taille** va de **1 à 20** : c’est combien de fois plus grand. Avec `3`, chaque pixel de la lettre devient un carré de **3 × 3 pixels**. La lettre garde **exactement ses proportions**.
+**Ce qui est nouveau ici : `texteGrand(x, y, "TEXTE", taille)`.** La **taille** va de **0 à 10**. **0, c’est la lettre normale** ; chaque cran de plus l’agrandit **une fois de plus** : 1 → 2 fois, 2 → 3 fois… 10 → 11 fois. Avec `2`, chaque pixel de la lettre devient un carré de **3 × 3 pixels**. La lettre garde **exactement ses proportions**.
 
-**La place qu’elle prend :** une lettre normale tient dans **1 case** (8 × 8 pixels). Agrandie 3 fois, elle en prend **3 × 3 = 9** (24 × 24 pixels). À la taille *n*, une lettre prend *n* cases de large et *n* de haut.
+**La place qu’elle prend :** une lettre normale (taille 0) tient dans **1 case** (8 × 8 pixels). À la taille 2, elle est 3 fois plus grande et prend **3 × 3 = 9** cases (24 × 24 pixels). À la taille *n*, une lettre prend *n + 1* cases de large et *n + 1* de haut.
 
-**Le texte et la taille s’écrivent en clair** (`"A"`, `3`), comme pour `ms()` : le compilateur fabrique les tuiles agrandies **avant le jeu**, et seulement celles dont le programme a besoin.
+**Le texte et la taille s’écrivent en clair** (`"A"`, `2`), comme pour `ms()` : le compilateur fabrique les tuiles agrandies **avant le jeu**, et seulement celles dont le programme a besoin.
 
 **Ce qu’elle coûte :** quelques tuiles de plus dans la cartouche. Deux tuiles identiques (souvent toutes pleines aux grandes tailles) ne sont fabriquées qu’une fois.
 
@@ -14844,16 +14845,16 @@ int main() {
 
 ### 0.87.1. Agrandir une lettre : texteGrand — toutes les tailles
 
-> Le même A, aux tailles 1, 2, 3 et 4, côte à côte : un seul nombre change d’une ligne à l’autre.
+> Le même A, aux tailles 0, 1, 2 et 3, côte à côte : un seul nombre change d’une ligne à l’autre.
 
 ```cpp
-#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
 
 int main() {
-  texteGrand(0, 0, "A", 1);     // taille 1 : 1 case, comme une lettre normale
-  texteGrand(2, 0, "A", 2);     // taille 2 : 2 × 2 cases
-  texteGrand(5, 0, "A", 3);     // taille 3 : 3 × 3 cases
-  texteGrand(9, 0, "A", 4);     // taille 4 : 4 × 4 cases
+  texteGrand(0, 0, "A", 0);     // taille 0 : 1 case, la lettre normale
+  texteGrand(2, 0, "A", 1);     // taille 1 : 2 × 2 cases
+  texteGrand(5, 0, "A", 2);     // taille 2 : 3 × 3 cases
+  texteGrand(9, 0, "A", 3);     // taille 3 : 4 × 4 cases
 
   while (true) {
     image();
@@ -14861,17 +14862,17 @@ int main() {
 }
 ```
 
-**Quatre lignes, un seul nombre qui change :** la taille, 1, 2, 3, puis 4. On voit le A grandir.
+**Quatre lignes, un seul nombre qui change :** la taille, 0, 1, 2, puis 3. On voit le A grandir.
 
 **Tu choisis la taille, la console s’adapte :** aucune taille n’est dessinée à l’avance. Chaque `texteGrand` fait calculer les tuiles de SA taille.
 
-**La place :** taille 1, 1 case ; taille 2, 2 × 2 ; taille 3, 3 × 3 ; taille 4, 4 × 4. Les colonnes de départ (0, 2, 5, 9) laissent juste la place à chacun.
+**La place :** taille 0, 1 case ; taille 1, 2 × 2 ; taille 2, 3 × 3 ; taille 3, 4 × 4. Toujours **taille + 1** cases de côté. Les colonnes de départ (0, 2, 5, 9) laissent juste la place à chacun.
 
 **Les fonctions de cette leçon — et le tuto de chacune**
 
 - `#include <texteGrand>` → 0.86.3. La fonction texteGrand() — un texte agrandi
 
-**Ce qu’on doit voir** — Quatre A côte à côte, de plus en plus grands : tailles 1, 2, 3 et 4.  
+**Ce qu’on doit voir** — Quatre A côte à côte, de plus en plus grands : tailles 0, 1, 2 et 3.  
 **Ce qu’il coûte** — 1753 octets de programme, 12 variables.  
 **Ce qui est gravé** — `démarrage` (73 o), `texte_grand_0()` (48 o), `texte_grand_1()` (97 o), `texte_grand_2()` (146 o), `texte_grand_3()` (195 o), `main()` (46 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (1024 o), `GRAND_TABLE_0_0_0` (1 o, pour poser()), `GRAND_TABLE_1_0_1` (2 o, pour poser()), `GRAND_TABLE_1_1_2` (2 o, pour poser()), `GRAND_TABLE_2_0_3` (3 o, pour poser()), `GRAND_TABLE_2_1_4` (3 o, pour poser()), `GRAND_TABLE_2_2_5` (3 o, pour poser()), `GRAND_TABLE_3_0_6` (4 o, pour poser()), `GRAND_TABLE_3_1_7` (4 o, pour poser()), `GRAND_TABLE_3_2_8` (4 o, pour poser()), `GRAND_TABLE_3_3_9` (4 o, pour poser()) · appels : `poser()` ×10 (302 o), `texte_grand_0()` ×1 (3 o), `texte_grand_1()` ×1 (3 o), `texte_grand_2()` ×1 (3 o), `texte_grand_3()` ×1 (3 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
 
@@ -14879,14 +14880,14 @@ int main() {
 
 ### 0.87.2. Agrandir une lettre : texteGrand — dix fois
 
-> Le plus grand : texteGrand(5, 4, "A", 10). Un A de 80 × 80 pixels, 10 × 10 cases, la moitié de l’écran.
+> Dix fois plus grand : texteGrand(5, 4, "A", 9). Un A de 80 × 80 pixels, 10 × 10 cases, la moitié de l’écran.
 
 ```cpp
-#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
 
 int main() {
-  // Le A dix fois plus grand : 10 × 10 cases, de (5, 4) à (14, 13).
-  texteGrand(5, 4, "A", 10);
+  // Taille 9 : le A dix fois plus grand, 10 × 10 cases, de (5, 4) à (14, 13).
+  texteGrand(5, 4, "A", 9);
 
   while (true) {
     image();
@@ -14894,9 +14895,9 @@ int main() {
 }
 ```
 
-**La taille la plus grande, 10 :** chaque pixel devient un carré de 10 × 10 pixels. Le A fait **80 × 80 pixels**, soit **10 × 10 cases** : la moitié de la largeur de l’écran (20 cases).
+**La taille 9 :** 9 + 1 = 10 fois plus grand ; chaque pixel devient un carré de 10 × 10 pixels. Le A fait **80 × 80 pixels**, soit **10 × 10 cases** : la moitié de la largeur de l’écran (20 cases).
 
-**La moitié de l’écran :** l’écran fait 20 × 18 cases ; à la taille 10, une lettre en prend 10 × 10. La plus grande taille, 20, remplit l’écran entier : c’est le 0.87.4.
+**La moitié de l’écran :** l’écran fait 20 × 18 cases ; à la taille 9, une lettre en prend 10 × 10. La plus grande taille, 10, est un cran au-dessus : c’est le 0.87.4.
 
 **Ça ne coûte presque rien de plus :** aux grandes tailles, beaucoup de tuiles sont **toutes pleines** ou **toutes vides**. Les tuiles identiques ne sont fabriquées qu’une fois.
 
@@ -14912,14 +14913,14 @@ int main() {
 
 ### 0.87.3. Agrandir une lettre : texteGrand — un mot
 
-> Un mot entier agrandi : texteGrand(3, 7, "JEU", 4). Chaque lettre prend 4 × 4 cases ; le mot, 12 × 4.
+> Un mot entier agrandi : texteGrand(3, 7, "JEU", 3). Chaque lettre prend 4 × 4 cases ; le mot, 12 × 4.
 
 ```cpp
-#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
 
 int main() {
-  // 3 lettres × 4 cases = 12 cases de large, 4 de haut : de (3, 7) à (14, 10).
-  texteGrand(3, 7, "JEU", 4);
+  // Taille 3 : 4 cases par lettre ; 3 lettres × 4 = 12 cases de large, 4 de haut : de (3, 7) à (14, 10).
+  texteGrand(3, 7, "JEU", 3);
 
   while (true) {
     image();
@@ -14929,7 +14930,7 @@ int main() {
 
 **Pas seulement une lettre :** `texteGrand` agrandit un **mot entier**. Les lettres se suivent, chacune agrandie.
 
-**La largeur du mot :** 3 lettres × 4 cases = **12 cases**. Il faut qu’elle tienne dans les 20 colonnes de l’écran : `"BONJOUR"` (7 lettres) tient à la taille 2 (14 cases), pas à la taille 3 (21 cases).
+**La largeur du mot :** à la taille 3, une lettre prend 3 + 1 = 4 cases ; 3 lettres × 4 cases = **12 cases**. Il faut qu’elle tienne dans les 20 colonnes de l’écran : `"BONJOUR"` (7 lettres) tient à la taille 1 (14 cases), pas à la taille 2 (21 cases).
 
 **Un titre de jeu,** c’est exactement ça : un mot en grand, au milieu de l’écran.
 
@@ -14943,18 +14944,18 @@ int main() {
 
 ---
 
-### 0.87.4. Agrandir une lettre : texteGrand — vingt fois
+### 0.87.4. Agrandir une lettre : texteGrand — la plus grande taille, 10
 
-> La plus grande taille : texteGrand(0, 0, "A", 20). Le A remplit tout l’écran, 160 × 140 pixels.
+> La plus grande taille : texteGrand(0, 0, "A", 10). Le A est 11 fois plus grand : 11 × 11 cases, plus de la moitié de l’écran.
 
 ```cpp
-#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
 
 int main() {
-  // La plus grande taille : 20. Le A fait 20 × 20 cases, tout l'écran.
-  //   8 pixels × 20 = 160 : toute la largeur
-  //   7 pixels × 20 = 140 : presque toute la hauteur (144)
-  texteGrand(0, 0, "A", 20);
+  // La plus grande taille : 10. Le A est 11 fois plus grand : 11 × 11 cases.
+  //   8 pixels × 11 = 88 de large
+  //   7 pixels × 11 = 77 de haut
+  texteGrand(0, 0, "A", 10);
 
   while (true) {
     image();
@@ -14962,21 +14963,21 @@ int main() {
 }
 ```
 
-**La taille la plus grande, 20 :** chaque pixel du A devient un carré de 20 × 20 pixels. La lettre fait **160 pixels de large** (toute la largeur de l’écran) et **140 de haut** : elle remplit l’écran.
+**La taille la plus grande, 10 :** 10 + 1 = 11 fois plus grand ; chaque pixel du A devient un carré de 11 × 11 pixels. La lettre prend **11 × 11 cases** (88 × 88 pixels) : plus de la moitié de l’écran.
 
-**Pourquoi 20 au plus :** une lettre de la police fait **7 pixels de haut**, et l’écran **144**. 7 × 20 = 140 : elle tient encore entière. À 21, 7 × 21 = 147 : le bas du A sortirait de l’écran. Le compilateur refuse donc au-delà de 20, et dit pourquoi.
+**Pourquoi 10 au plus :** les tailles vont de 0 à 10, comme une note sur 10. Au-delà, le compilateur refuse, et dit pourquoi : « la taille va de 0 à 10 ».
 
-**En largeur aussi, tout juste :** une case de lettre fait 8 pixels ; 8 × 20 = 160, la largeur exacte de l’écran. Pour tenir, le A géant commence en (0, 0).
+**Pour tenir :** 11 cases de large sur 20, 11 de haut sur 18. Le A géant commence en (0, 0), il reste de la place à droite et en dessous.
 
-**Ça ne coûte presque rien en dessins :** à cette taille, presque toutes les tuiles sont toutes pleines ou toutes vides. Le A géant n’en demande que 9 différentes.
+**Ça ne coûte presque rien en dessins :** à cette taille, beaucoup de tuiles sont toutes pleines ou toutes vides, et les tuiles identiques ne sont fabriquées qu’une fois.
 
 **Les fonctions de cette leçon — et le tuto de chacune**
 
 - `#include <texteGrand>` → 0.86.3. La fonction texteGrand() — un texte agrandi
 
-**Ce qu’on doit voir** — Un A immense, qui remplit tout l’écran.  
-**Ce qu’il coûte** — 2392 octets de programme, 3 variables.  
-**Ce qui est gravé** — `démarrage` (55 o), `texte_grand_0()` (979 o), `main()` (16 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (848 o), `GRAND_TABLE_0_0_0` (20 o, pour poser()), `GRAND_TABLE_0_1_1` (20 o, pour poser()), `GRAND_TABLE_0_2_2` (20 o, pour poser()), `GRAND_TABLE_0_3_3` (20 o, pour poser()), `GRAND_TABLE_0_4_4` (20 o, pour poser()), `GRAND_TABLE_0_5_5` (20 o, pour poser()), `GRAND_TABLE_0_6_6` (20 o, pour poser()), `GRAND_TABLE_0_7_7` (20 o, pour poser()), `GRAND_TABLE_0_8_8` (20 o, pour poser()), `GRAND_TABLE_0_9_9` (20 o, pour poser()), `GRAND_TABLE_0_10_10` (20 o, pour poser()), `GRAND_TABLE_0_11_11` (20 o, pour poser()), `GRAND_TABLE_0_12_12` (20 o, pour poser()), `GRAND_TABLE_0_13_13` (20 o, pour poser()), `GRAND_TABLE_0_14_14` (20 o, pour poser()), `GRAND_TABLE_0_15_15` (20 o, pour poser()), `GRAND_TABLE_0_16_16` (20 o, pour poser()), `GRAND_TABLE_0_17_17` (20 o, pour poser()), `GRAND_TABLE_0_18_18` (20 o, pour poser()), `GRAND_TABLE_0_19_19` (20 o, pour poser()) · appels : `poser()` ×20 (618 o), `texte_grand_0()` ×1 (3 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+**Ce qu’on doit voir** — Un A immense en haut à gauche, sur plus de la moitié de l’écran.  
+**Ce qu’il coûte** — 1912 octets de programme, 3 variables.  
+**Ce qui est gravé** — `démarrage` (55 o), `texte_grand_0()` (538 o), `main()` (16 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (1088 o), `GRAND_TABLE_0_0_0` (11 o, pour poser()), `GRAND_TABLE_0_1_1` (11 o, pour poser()), `GRAND_TABLE_0_2_2` (11 o, pour poser()), `GRAND_TABLE_0_3_3` (11 o, pour poser()), `GRAND_TABLE_0_4_4` (11 o, pour poser()), `GRAND_TABLE_0_5_5` (11 o, pour poser()), `GRAND_TABLE_0_6_6` (11 o, pour poser()), `GRAND_TABLE_0_7_7` (11 o, pour poser()), `GRAND_TABLE_0_8_8` (11 o, pour poser()), `GRAND_TABLE_0_9_9` (11 o, pour poser()), `GRAND_TABLE_0_10_10` (11 o, pour poser()) · appels : `poser()` ×11 (339 o), `texte_grand_0()` ×1 (3 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
 
 ---
 
@@ -14986,13 +14987,13 @@ int main() {
 
 ```cpp
 // ---- #include <texteGrandS> : un grand texte qui va à la ligne ----
-// En taille 3, une lettre prend 3 colonnes : 6 lettres tiennent sur 20 cases.
+// En taille 2, une lettre prend 3 colonnes : 6 lettres tiennent sur 20 cases.
 // La septième, G, repart en colonne 0, trois cases plus bas.
 
 #include <texteGrandS>   // texteGrandS() : agrandi, et qui va à la ligne
 
 int main() {
-  texteGrandS(0, 0, "ABCDEFG", 3);   // ABCDEF sur les lignes 0 à 2, G en (0, 3)
+  texteGrandS(0, 0, "ABCDEFG", 2);   // ABCDEF sur les lignes 0 à 2, G en (0, 3)
 
   while (true) {
     image();
@@ -15000,15 +15001,15 @@ int main() {
 }
 ```
 
-**Ce qu’elle fait :** `texteGrandS(colonne, ligne, "TEXTE", taille)` écrit un texte agrandi qui **va à la ligne** : une lettre qui dépasserait la colonne 19 repart en colonne 0, `taille` cases plus bas.
+**Ce qu’elle fait :** `texteGrandS(colonne, ligne, "TEXTE", taille)` écrit un texte agrandi qui **va à la ligne** : une lettre qui dépasserait la colonne 19 repart en colonne 0, `taille + 1` cases plus bas.
 
 **La ligne à écrire : `#include <texteGrandS>`.**
 
 **Ses arguments :** comme `texteGrand()`, et **tout en clair** — la place aussi : le découpage en lignes se fait avant le jeu. Un texte qui dépasserait le bas de l’écran est refusé.
 
-**Ce qu’elle coûte :** environ **1 000 octets** pour deux lettres en taille 2.
+**Ce qu’elle coûte :** environ **1 000 octets** pour deux lettres en taille 1.
 
-**Essaie :** `texteGrandS(0, 0, "BONJOUR", 4);` : combien de lignes ?
+**Essaie :** `texteGrandS(0, 0, "BONJOUR", 3);` : combien de lignes ?
 
 **On retrouve texteGrandS dans** — 0.87.6
 
@@ -15020,7 +15021,7 @@ int main() {
 
 ### 0.87.6. Agrandir une lettre : texteGrand — aller à la ligne, texteGrandS
 
-> texteGrandS(0, 0, "BONJOUR", 3) : comme texteGrand, mais les lettres qui ne tiennent plus dans la largeur passent à la ligne, comme textS.
+> texteGrandS(0, 0, "BONJOUR", 2) : comme texteGrand, mais les lettres qui ne tiennent plus dans la largeur passent à la ligne, comme textS.
 
 ```cpp
 #include <texteGrandS>   // écrit un texte agrandi qui passe à la ligne
@@ -15028,12 +15029,12 @@ int main() {
 int main() {
   // Comme texteGrand, mais qui VA À LA LIGNE :
   //
-  //   texteGrandS(0, 0, "BONJOUR", 3);
-  //   la taille 3 : 3 cases par lettre ; une ligne de 20 cases en tient 6.
+  //   texteGrandS(0, 0, "BONJOUR", 2);
+  //   la taille 2 : 3 cases par lettre ; une ligne de 20 cases en tient 6.
   //
   //   ligne 1, cases 0 à 2 :   B O N J O U     (6 lettres × 3 = 18 cases)
   //   ligne 2, cases 3 à 5 :   R               (repart en colonne 0)
-  texteGrandS(0, 0, "BONJOUR", 3);
+  texteGrandS(0, 0, "BONJOUR", 2);
 
   while (true) {
     image();
@@ -15041,13 +15042,13 @@ int main() {
 }
 ```
 
-**Avec `texteGrand`, un mot trop long sort de l’écran par la droite.** « BONJOUR » en taille 3 demande 7 × 3 = 21 cases de large ; l’écran n’en a que 20 : le R disparaît.
+**Avec `texteGrand`, un mot trop long sort de l’écran par la droite.** « BONJOUR » en taille 2 (3 cases par lettre) demande 7 × 3 = 21 cases de large ; l’écran n’en a que 20 : le R disparaît.
 
-**Ce qui est nouveau ici : `texteGrandS`,** le `S` de `textS` (le 0.11). Même réglages que `texteGrand`, mais les lettres qui ne tiennent plus **passent à la ligne** : elles reprennent en colonne 0, une rangée de lettres plus bas (3 cases, à la taille 3).
+**Ce qui est nouveau ici : `texteGrandS`,** le `S` de `textS` (le 0.11). Même réglages que `texteGrand`, mais les lettres qui ne tiennent plus **passent à la ligne** : elles reprennent en colonne 0, une rangée de lettres plus bas (3 cases, à la taille 2).
 
-**Le découpage :** à la taille 3, une ligne tient 20 ÷ 3 = 6 lettres (18 cases). « BONJOU » sur la première, « R » sur la deuxième.
+**Le découpage :** à la taille 2, une lettre prend 3 cases ; une ligne en tient 20 ÷ 3 = 6 lettres (18 cases). « BONJOU » sur la première, « R » sur la deuxième.
 
-**Trop haut, c’est une erreur :** l’écran a 18 cases de haut. Si le texte en demande plus (« BONJOUR » en taille 7 : 4 lignes de 7 cases, 28), le compilateur refuse, et dit combien il en faudrait.
+**Trop haut, c’est une erreur :** l’écran a 18 cases de haut. Si le texte en demande plus (« BONJOUR » en taille 6 : 4 lignes de 7 cases, 28), le compilateur refuse, et dit combien il en faudrait.
 
 **Tout s’écrit en clair,** même la place : le découpage en lignes se fait avant le jeu.
 
@@ -15258,7 +15259,7 @@ int main() {
 
 **Essaie :** `couleurFond(0, 0, 0, 0, 31);` : tout l’écran devient bleu.
 
-**On retrouve couleurFond dans** — 0.89, 0.89.2, 0.92, 0.92.1, 0.92.2, 36, 37, 101, 102, 103, 105, 106
+**On retrouve couleurFond dans** — 0.89, 0.89.2, 0.92, 0.92.1, 0.92.2, 36, 37, 101, 102, 103, 105, 106, 110.6, 110.7, 110.9, 110.13, 152
 
 **Ce qu’on doit voir** — Tout l’écran jaune, avec JAUNE écrit au milieu.  
 **Ce qu’il coûte** — 319 octets de programme, 0 variable.  
@@ -15401,7 +15402,7 @@ int main() {
 
 **Essaie :** teins aussi la case (7, 8) : deux lettres en bleu.
 
-**On retrouve teindre dans** — 0.89.2, 0.92, 0.92.1, 0.92.2, 36, 37, 102, 103, 105, 106
+**On retrouve teindre dans** — 0.89.2, 0.92, 0.92.1, 0.92.2, 36, 37, 102, 103, 105, 106, 110.6, 110.7, 110.9, 110.13, 152
 
 **Ce qu’on doit voir** — BLEU, dont seul le B est bleu.  
 **Ce qu’il coûte** — 310 octets de programme, 0 variable.  
@@ -15469,12 +15470,12 @@ int main() {
 
 ```cpp
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 
 int main() {
   couleurTexte(31, 16, 0);          // de l'orange : tout le rouge, la moitié du vert
-  texteGrand(4, 5, "JEU", 4);       // le titre, 4 fois plus grand (le 0.87)
+  texteGrand(4, 5, "JEU", 3);       // le titre, taille 3 : 4 fois plus grand (le 0.87)
   texte(2, 12, "APPUIE SUR START"); // en dessous, en petit : orange aussi
 
   while (true) {
@@ -15509,7 +15510,7 @@ int main() {
 
 ```cpp
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <bouton>         // lit un bouton de la manette
 #include <effacer>        // efface des cases, ou tout le fond
@@ -15519,7 +15520,7 @@ uint8_t ecranTitre = 1;   // sur quel écran on est : 1 = le titre, 0 = l'écran
 int main() {
   // Le titre du 0.90 :
   couleurTexte(31, 16, 0);          // de l'orange
-  texteGrand(4, 5, "JEU", 4);       // le grand titre
+  texteGrand(4, 5, "JEU", 3);       // le grand titre
   texte(2, 12, "APPUIE SUR START"); // la consigne
 
   while (true) {
@@ -15583,7 +15584,7 @@ int main() {
 
 ```cpp
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <bouton>         // lit un bouton de la manette
 #include <effacer>        // efface des cases, ou tout le fond
@@ -15594,7 +15595,7 @@ uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
 
 int main() {
   couleurTexte(31, 16, 0);          // le titre du 0.90, en orange
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -15702,7 +15703,7 @@ int main() {
 
 ```cpp
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <bouton>         // lit un bouton de la manette
 #include <effacer>        // efface des cases, ou tout le fond
@@ -15713,7 +15714,7 @@ uint8_t d = 0;            // la caméra : 0 = elle regarde le début du décor
 
 int main() {
   couleurTexte(31, 16, 0);          // le titre du 0.90, en orange
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -15777,7 +15778,7 @@ int main() {
 ```cpp
 #include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <bouton>         // lit un bouton de la manette
 #include <effacer>        // efface des cases, ou tout le fond
@@ -15788,7 +15789,7 @@ uint8_t p = 0;            // la colonne du bandeau
 
 int main() {
   couleurTexte(31, 16, 0);          // le titre du 0.90, en orange
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -15853,7 +15854,7 @@ int main() {
 
 ```cpp
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <effacer>        // efface des cases, ou tout le fond
@@ -15864,7 +15865,7 @@ uint8_t visible = 1;      // 1 = la consigne est à l'écran, 0 = elle est effac
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");   // au départ, elle est là : visible = 1
 
   while (true) {
@@ -15924,7 +15925,7 @@ int main() {
 > Le 0.90.5, et SELECT qui ramène au titre. Le titre se dessine alors deux fois : on le range dans une fonction, dessinerTitre().
 
 ```cpp
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <effacer>        // efface des cases, ou tout le fond
 #include <couleurTexte>   // choisit la couleur des lettres
@@ -15938,7 +15939,7 @@ uint8_t visible = 1;      // la consigne : 1 = à l'écran, 0 = effacée
 
 // Dessiner le titre : au départ, ET à chaque retour avec SELECT.
 void dessinerTitre() {
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 }
 
@@ -16018,7 +16019,7 @@ int main() {
 // ---- NOUVEAU : une variable pour TROIS écrans ----
 //   ecran = 0 : le TITRE    ecran = 1 : le JEU    ecran = 2 : la FIN
 
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <effacer>        // efface des cases, ou tout le fond
 #include <couleurTexte>   // choisit la couleur des lettres
@@ -16029,7 +16030,7 @@ uint8_t ecran = 0;
 uint8_t visible = 1;      // la consigne du titre : 1 = à l'écran, 0 = effacée
 
 void dessinerTitre() {
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 }
 
@@ -16127,7 +16128,7 @@ int main() {
 ```cpp
 #include <effacer>         // efface des cases, ou tout le fond
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <texte>           // écrit un texte à l’écran
 #include <bouton>          // lit un bouton de la manette
 #include <poser>           // pose une tuile sur une case du fond
@@ -16152,7 +16153,7 @@ void viderEcran() {
 
 int main() {
   couleurTexte(31, 16, 0);            // le titre du 0.90
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -16212,7 +16213,7 @@ int main() {
 ```cpp
 #include <effacer>         // efface des cases, ou tout le fond
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <texte>           // écrit un texte à l’écran
 #include <bouton>          // lit un bouton de la manette
 #include <poser>           // pose une tuile sur une case du fond
@@ -16238,7 +16239,7 @@ void viderEcran() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -16313,7 +16314,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <nombre>          // écrit un nombre en chiffres
@@ -16352,7 +16353,7 @@ void nouvellePartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -16431,7 +16432,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <nombre>          // écrit un nombre en chiffres
@@ -16495,7 +16496,7 @@ void nouvellePartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -16590,7 +16591,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <hasard>          // tire un nombre au hasard
@@ -16655,7 +16656,7 @@ void nouvellePartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -16774,7 +16775,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <hasard>          // tire un nombre au hasard
@@ -16844,7 +16845,7 @@ void nouvellePartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -16973,7 +16974,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <hasard>          // tire un nombre au hasard
@@ -17042,7 +17043,7 @@ void nouvellePartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -17218,7 +17219,7 @@ int main() {
 #include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
 #include <texte>          // écrit un texte à l’écran
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -17289,7 +17290,7 @@ void nouvellePartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -17481,7 +17482,7 @@ int main() {
 #include <texte>          // écrit un texte à l’écran
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -17563,7 +17564,7 @@ void finPartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -17741,7 +17742,7 @@ int main() {
 #include <texte>          // écrit un texte à l’écran
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -17819,7 +17820,7 @@ void finPartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -17997,7 +17998,7 @@ int main() {
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurFond>    // choisit une couleur d’une palette du fond
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -18136,7 +18137,7 @@ void ouvrirMenu() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -18340,7 +18341,7 @@ int main() {
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurFond>    // choisit une couleur d’une palette du fond
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -18482,7 +18483,7 @@ void ouvrirMenu() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -18688,7 +18689,7 @@ int main() {
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurFond>    // choisit une couleur d’une palette du fond
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -18849,7 +18850,7 @@ void ouvrirMenu() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -25713,7 +25714,7 @@ int main() {
 
 **Essaie :** change une rangée en `"########"` : une barre apparaît.
 
-**On retrouve Tuile dans** — 0.108, 3, 34, 35, 36, 37, 38, 40, 41, 42, 43, 45, 46, 48, 49, 50, 51, 52, 61, 72, 73, 74, 83, 84, 85, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 122, 124, 125, 127, 128, 131, 132, 134, 136, 137, 140, 143
+**On retrouve Tuile dans** — 0.108, 3, 34, 35, 36, 37, 38, 40, 41, 42, 43, 45, 46, 48, 49, 50, 51, 52, 61, 72, 73, 74, 83, 84, 85, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 110.3, 110.4, 110.5, 110.6, 110.7, 110.8, 110.9, 110.11, 110.13, 110.14, 111, 112, 113, 122, 124, 125, 127, 128, 131, 132, 134, 136, 137, 140, 143, 152
 
 **Ce qu’on doit voir** — Deux cœurs au milieu de l’écran.  
 **Ce qu’il coûte** — 181 octets de programme, 0 variable.  
@@ -25795,7 +25796,7 @@ int main() {
 
 **Essaie :** fais le A vert : `couleurLutin(0, 3, 0, 31, 0);`.
 
-**On retrouve couleurLutin dans** — 0.108, 104, 106
+**On retrouve couleurLutin dans** — 0.108, 104, 106, 110.6, 110.7, 110.9, 110.13, 152
 
 **Ce qu’on doit voir** — Un A bleu au milieu de l’écran.  
 **Ce qu’il coûte** — 251 octets de programme, 0 variable.  
@@ -25839,7 +25840,7 @@ int main() {
 
 **Essaie :** une palette 2 verte, et un troisième A dedans.
 
-**On retrouve teindreLutin dans** — 0.108, 104, 106
+**On retrouve teindreLutin dans** — 0.108, 104, 106, 110.6, 110.7, 110.9, 110.13, 152
 
 **Ce qu’on doit voir** — Deux A côte à côte : un bleu, un rouge.  
 **Ce qu’il coûte** — 303 octets de programme, 0 variable.  
@@ -28883,7 +28884,7 @@ int main() {
 
 **Essaie :** enlève `ecran(1)` : l’écran reste blanc, le programme continue pourtant.
 
-**On retrouve ecran dans** — 28, 29, 30, 31, 33, 67, 68, 69, 70, 71, 79, 80, 94, 95, 96, 97, 98, 99, 101, 102, 103, 105, 106, 113, 115, 119, 120, 124, 125, 126, 134
+**On retrouve ecran dans** — 28, 29, 30, 31, 33, 67, 68, 69, 70, 71, 79, 80, 94, 95, 96, 97, 98, 99, 101, 102, 103, 105, 106, 110.6, 110.7, 110.9, 110.13, 113, 115, 119, 120, 124, 125, 126, 134
 
 **Ce qu’on doit voir** — Trois lignes pleines de A, apparues d’un seul coup.  
 **Ce qu’il coûte** — 288 octets de programme, 1 variable.  
@@ -33211,7 +33212,7 @@ int main() {
 
 - Un texte qui porte un nom
 
-**Les fonctions qui arrivent :** `#include <panneau>`, `#include <poserPanneau>`, `#include <lirePanneau>`, `#include <textePanneau>`, `#include <teindrePanneau>`, `#include <effacerPanneau>`, `#include <cacherPanneau>`, `#include <paletteFond>`. Chacune sera présentée seule, juste avant la première étape qui l’emploie : jamais deux lignes nouvelles d’un coup.
+**Les fonctions qui arrivent :** `#include <panneau>`, `#include <textePanneau>`, `#include <teindrePanneau>`, `#include <effacerPanneau>`, `#include <cacherPanneau>`, `#include <paletteFond>`. Chacune sera présentée seule, juste avant la première étape qui l’emploie : jamais deux lignes nouvelles d’un coup.
 
 **Comment avancer :** une étape à la fois. Lis l’explication, lance le programme, regarde ce qu’on doit voir, puis fais l’essai proposé. Si quelque chose t’échappe, l’étape d’avant contient la pièce qui manque.
 
@@ -33313,7 +33314,7 @@ int main() {
 
 **Essaie :** `panneau(0, 72);` : le panneau couvre la moitié basse de l’écran.
 
-**On retrouve panneau dans** — 61, 130
+**On retrouve panneau dans** — 61, 110.3, 130
 
 **Ce qu’on doit voir** — LE FOND RESTE en haut ; en bas, une bande vide : le panneau, qui cache le texte de la ligne 16.  
 **Ce qu’il coûte** — 514 octets de programme, 0 variable.  
@@ -33321,87 +33322,7 @@ int main() {
 
 ---
 
-### 60.2. La fonction poserPanneau() — une tuile dans le panneau
-
-> #include <poserPanneau> : poserPanneau(colonne, ligne, tuile) pose une tuile dans le panneau.
-
-```cpp
-// ---- #include <poserPanneau> : une tuile dans le panneau ----
-
-#include <poserPanneau>   // poserPanneau() : une tuile dans le panneau
-#include <ALPHABET>
-#include <panneau>
-
-int main() {
-  poserPanneau(0, 0, ALPHABET[1]);   // un B dans la première case du panneau
-  panneau(0, 128);
-
-  while (true) {
-    image();
-  }
-}
-```
-
-**Ce qu’elle fait :** `poserPanneau(colonne, ligne, tuile)` pose une tuile **dans le panneau** : un cœur par vie, une icône.
-
-**La ligne à écrire : `#include <poserPanneau>`.**
-
-**Ses arguments :** comme `poser()`.
-
-**Ce qu’elle coûte :** environ **120 octets** la première fois.
-
-**Essaie :** pose trois cœurs avec une boucle `for`.
-
-**Ce qu’on doit voir** — Un B tout à gauche de la bande du bas.  
-**Ce qu’il coûte** — 190 octets de programme, 0 variable.  
-**Ce qui est gravé** — `démarrage` (49 o), `main()` (28 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `CopierTuiles` (31 o), `EffacerCarte` (14 o), `Tuiles` (16 o) · appels : `panneau()` ×1 (15 o), `poserPanneau()` ×1 (6 o), `image()` ×1 (3 o) · lettres : B · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
-
----
-
-### 60.3. La fonction lirePanneau() — lire une case du panneau
-
-> #include <lirePanneau> : lirePanneau(colonne, ligne) rend la tuile posée dans cette case du panneau.
-
-```cpp
-// ---- #include <lirePanneau> : lire une case du panneau ----
-
-#include <poserPanneau>
-#include <ALPHABET>
-#include <panneau>
-#include <lirePanneau>   // lirePanneau() : la tuile d'une case du panneau
-#include <nombre>
-
-uint8_t t = 0;
-
-int main() {
-  poserPanneau(2, 0, ALPHABET[2]);   // un C : la tuile 3
-  panneau(0, 128);
-  t = lirePanneau(2, 0);             // t reçoit 3
-  nombre(2, 4, t);                   // et on l'écrit sur le fond : 003
-
-  while (true) {
-    image();
-  }
-}
-```
-
-**Ce qu’elle fait :** comme `lire()`, mais **dans le panneau** : la tuile d’une de ses cases, 0 si elle est vide.
-
-**La ligne à écrire : `#include <lirePanneau>`.**
-
-**Ses arguments :** la colonne et la ligne, depuis le coin du panneau.
-
-**Ce qu’elle coûte :** environ **90 octets** la première fois.
-
-**Essaie :** lis la case (5, 0), vide : `t` vaut 0.
-
-**Ce qu’on doit voir** — Un C dans le panneau, et 003 écrit sur le fond : son numéro.  
-**Ce qu’il coûte** — 423 octets de programme, 1 variable.  
-**Ce qui est gravé** — `démarrage` (52 o), `main()` (44 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireNombre` (33 o, pour nombre()), `CopierTuiles` (40 o), `EffacerCarte` (14 o), `Tuiles` (176 o) · appels : `panneau()` ×1 (15 o), `nombre()` ×1 (10 o), `poserPanneau()` ×1 (6 o), `lirePanneau()` ×1 (4 o), `image()` ×1 (3 o) · lettres : C0123456789 · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
-
----
-
-### 60.4. La fonction textePanneau() — écrire dans le panneau
+### 60.2. La fonction textePanneau() — écrire dans le panneau
 
 > #include <textePanneau> : textePanneau(colonne, ligne, "MOT") écrit dans le panneau, comme texte() sur le fond.
 
@@ -33434,7 +33355,7 @@ int main() {
 
 **Essaie :** écris sur la ligne 1 du panneau : elle tombe sur la dernière ligne de l’écran.
 
-**On retrouve textePanneau dans** — 61, 130
+**On retrouve textePanneau dans** — 61, 110.3, 130
 
 **Ce qu’on doit voir** — LE FOND en haut, LE PANNEAU dans la bande du bas.  
 **Ce qu’il coûte** — 409 octets de programme, 0 variable.  
@@ -33442,7 +33363,7 @@ int main() {
 
 ---
 
-### 60.5. La fonction teindrePanneau() — une case du panneau dans une palette
+### 60.3. La fonction teindrePanneau() — une case du panneau dans une palette
 
 > #include <teindrePanneau> : teindrePanneau(colonne, ligne, palette) teint une case du panneau (Game Boy Color).
 
@@ -33482,7 +33403,7 @@ int main() {
 
 ---
 
-### 60.6. La fonction effacerPanneau() — effacer dans le panneau
+### 60.4. La fonction effacerPanneau() — effacer dans le panneau
 
 > #include <effacerPanneau> : effacerPanneau(colonne, ligne, quoi) efface un mot du panneau ; sans argument, tout le panneau.
 
@@ -33522,7 +33443,7 @@ int main() {
 
 ---
 
-### 60.7. La fonction cacherPanneau() — ôter le panneau
+### 60.5. La fonction cacherPanneau() — ôter le panneau
 
 > #include <cacherPanneau> : cacherPanneau() ôte le panneau de l’écran, sans rien perdre de ce qui y est écrit.
 
@@ -33563,7 +33484,7 @@ int main() {
 
 ---
 
-### 60.8. La fonction paletteFond() — les quatre nuances du fond
+### 60.6. La fonction paletteFond() — les quatre nuances du fond
 
 > #include <paletteFond> : paletteFond(n0, n1, n2, n3) choisit quelle nuance de gris chaque teinte du fond prend (Game Boy d’origine).
 
@@ -33672,10 +33593,10 @@ Il n’y a que **deux cartes de fond** dans la console : le décor prend la prem
 
 - `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
 - `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
-- `#include <textePanneau>` → 60.4. La fonction textePanneau() — écrire dans le panneau
+- `#include <textePanneau>` → 60.2. La fonction textePanneau() — écrire dans le panneau
 - `#include <panneau>` → 60.1. La fonction panneau() — montrer le panneau
 - `#include <defiler>` → 0.90.3. La fonction defiler() — faire glisser le fond
-- `#include <paletteFond>` → 60.8. La fonction paletteFond() — les quatre nuances du fond
+- `#include <paletteFond>` → 60.6. La fonction paletteFond() — les quatre nuances du fond
 
 **Ce qu’on doit voir** — Le sol glisse ; « SCORE 00 » reste collé en bas, et les nuances changent.  
 **Ce qu’il coûte** — 533 octets de programme, 4 variables.  
@@ -36493,7 +36414,7 @@ C’est la clé de tous les effets de la leçon suivante : on ne redessine rien,
 - `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
 - `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
 - `#include <bouton>` → 0.65.5. La fonction bouton() — lire la manette
-- `#include <paletteFond>` → 60.8. La fonction paletteFond() — les quatre nuances du fond
+- `#include <paletteFond>` → 60.6. La fonction paletteFond() — les quatre nuances du fond
 
 **Ce qu’on doit voir** — Quatre bandes ; A les inverse (et le texte avec), B n’en garde que deux nuances.  
 **Ce qu’il coûte** — 630 octets de programme, 1 variable.  
@@ -36584,7 +36505,7 @@ Le **fondu au blanc** est le même avec des tables qui vont vers 0 : c’est l�
 - `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
 - `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
 - `#include <bouton>` → 0.65.5. La fonction bouton() — lire la manette
-- `#include <paletteFond>` → 60.8. La fonction paletteFond() — les quatre nuances du fond
+- `#include <paletteFond>` → 60.6. La fonction paletteFond() — les quatre nuances du fond
 
 **Ce qu’on doit voir** — A : l’écran s’assombrit en quatre pas jusqu’au noir complet. B : il revient.  
 **Ce qu’il coûte** — 773 octets de programme, 4 variables.  
@@ -37419,7 +37340,7 @@ Une vraie **Game Boy Advance** lit aussi les cartouches `.gbc`, en couleur.
 
 ### 106.1. Chapitre 17 — Le mouvement : les lutins au pixel près : ce qui vient
 
-> L’entrée du chapitre 17 : ce qu’on a vu jusqu’ici, et ce que ses 4 étapes vont ajouter, une à la fois.
+> L’entrée du chapitre 17 : ce qu’on a vu jusqu’ici, et ce que ses 14 étapes vont ajouter, une à la fois.
 
 ```cpp
 // ---- Chapitre 17 : Le mouvement : les lutins au pixel près ----
@@ -37439,7 +37360,7 @@ int main() {
 
 **D’où l’on vient.** Le chapitre 16, « La couleur : la Game Boy Color », vient de se terminer. Tout ce qu’il a montré reste valable : on s’en sert à partir d’ici sans le réexpliquer.
 
-**Ce que ce chapitre apporte : Le mouvement : les lutins au pixel près.** Il compte 4 étapes, dont 4 venues du cours :
+**Ce que ce chapitre apporte : Le mouvement : les lutins au pixel près.** Il compte 14 étapes, dont 14 venues du cours :
 
 - Au pixel près : le lutin glisse
 
@@ -37449,7 +37370,25 @@ int main() {
 
 - Regarder à gauche ou à droite : le miroir
 
-**Aucune fonction nouvelle ici :** ce chapitre n’emploie que des fonctions déjà présentées. Tout l’effort porte sur la façon d’écrire le programme.
+- Qui passe devant ? Les trois couches de l’écran
+
+- Devant, derrière : le tuyau, DERRIERE
+
+- Devant, derrière : deux lutins qui se croisent
+
+- Devant, derrière : le buisson, teindre(…, DEVANT)
+
+- Devant, derrière : le bateau passe sous le pont
+
+- Devant, derrière : à toi de choisir, avec A
+
+- Devant, derrière : cache-toi du garde
+
+- Devant, derrière : le buisson sur Game Boy normale, devant puis derrière
+
+- … et 2 autres.
+
+**Les fonctions qui arrivent :** `#include <poserPanneau>`, `#include <lirePanneau>`, `#include <spriteDerriere>`, `#include <poserDevant>`. Chacune sera présentée seule, juste avant la première étape qui l’emploie : jamais deux lignes nouvelles d’un coup.
 
 **Comment avancer :** une étape à la fois. Lis l’explication, lance le programme, regarde ce qu’on doit voir, puis fais l’essai proposé. Si quelque chose t’échappe, l’étape d’avant contient la pièce qui manque.
 
@@ -37810,9 +37749,1329 @@ Le retournement ne coûte rien : c’est un bit dans les quatre octets qui décr
 
 ---
 
+### 110.1. La fonction poserPanneau() — une tuile dans le panneau
+
+> #include <poserPanneau> : poserPanneau(colonne, ligne, tuile) pose une tuile dans le panneau.
+
+```cpp
+// ---- #include <poserPanneau> : une tuile dans le panneau ----
+
+#include <poserPanneau>   // poserPanneau() : une tuile dans le panneau
+#include <ALPHABET>
+#include <panneau>
+
+int main() {
+  poserPanneau(0, 0, ALPHABET[1]);   // un B dans la première case du panneau
+  panneau(0, 128);
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce qu’elle fait :** `poserPanneau(colonne, ligne, tuile)` pose une tuile **dans le panneau** : un cœur par vie, une icône.
+
+**La ligne à écrire : `#include <poserPanneau>`.**
+
+**Ses arguments :** comme `poser()`.
+
+**Ce qu’elle coûte :** environ **120 octets** la première fois.
+
+**Essaie :** pose trois cœurs avec une boucle `for`.
+
+**On retrouve poserPanneau dans** — 110.3
+
+**Ce qu’on doit voir** — Un B tout à gauche de la bande du bas.  
+**Ce qu’il coûte** — 190 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (49 o), `main()` (28 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `CopierTuiles` (31 o), `EffacerCarte` (14 o), `Tuiles` (16 o) · appels : `panneau()` ×1 (15 o), `poserPanneau()` ×1 (6 o), `image()` ×1 (3 o) · lettres : B · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 110.2. La fonction lirePanneau() — lire une case du panneau
+
+> #include <lirePanneau> : lirePanneau(colonne, ligne) rend la tuile posée dans cette case du panneau.
+
+```cpp
+// ---- #include <lirePanneau> : lire une case du panneau ----
+
+#include <poserPanneau>
+#include <ALPHABET>
+#include <panneau>
+#include <lirePanneau>   // lirePanneau() : la tuile d'une case du panneau
+#include <nombre>
+
+uint8_t t = 0;
+
+int main() {
+  poserPanneau(2, 0, ALPHABET[2]);   // un C : la tuile 3
+  panneau(0, 128);
+  t = lirePanneau(2, 0);             // t reçoit 3
+  nombre(2, 4, t);                   // et on l'écrit sur le fond : 003
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce qu’elle fait :** comme `lire()`, mais **dans le panneau** : la tuile d’une de ses cases, 0 si elle est vide.
+
+**La ligne à écrire : `#include <lirePanneau>`.**
+
+**Ses arguments :** la colonne et la ligne, depuis le coin du panneau.
+
+**Ce qu’elle coûte :** environ **90 octets** la première fois.
+
+**Essaie :** lis la case (5, 0), vide : `t` vaut 0.
+
+**Ce qu’on doit voir** — Un C dans le panneau, et 003 écrit sur le fond : son numéro.  
+**Ce qu’il coûte** — 423 octets de programme, 1 variable.  
+**Ce qui est gravé** — `démarrage` (52 o), `main()` (44 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireNombre` (33 o, pour nombre()), `CopierTuiles` (40 o), `EffacerCarte` (14 o), `Tuiles` (176 o) · appels : `panneau()` ×1 (15 o), `nombre()` ×1 (10 o), `poserPanneau()` ×1 (6 o), `lirePanneau()` ×1 (4 o), `image()` ×1 (3 o) · lettres : C0123456789 · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### Partie A — Devant, derrière
+
+### 110.3. Qui passe devant ? Les trois couches de l’écran
+
+> Un héros traverse un mur, puis le panneau : il passe devant les deux. L’écran est fait de trois couches, toujours dans le même ordre.
+
+```cpp
+// CE PROGRAMME : un héros traverse l'écran tout seul, de gauche à droite.
+// Il passe sur un MUR (le décor), puis sur une colonne grise à droite (le PANNEAU).
+// Regarde bien : il passe DEVANT les deux.
+//
+// Ce qui est nouveau : rien à écrire, tout à REGARDER.
+// L'écran de la Game Boy est fait de TROIS COUCHES, toujours dans le même ordre :
+//
+//        toi, tu regardes d'ici
+//               |
+//               v
+//   3. les LUTINS    sprite()                          <- tout devant
+//   2. le PANNEAU    panneau(), poserPanneau(), textePanneau()
+//   1. le DÉCOR      poser(), texte()                  <- tout au fond
+//
+// L'ordre des lignes du programme ne compte pas : chaque chose va dans SA
+// couche, et la console empile toujours les couches dans cet ordre-là.
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <poser>          // pose une tuile sur une case du fond (le DÉCOR)
+#include <texte>          // écrit un texte à l’écran (le DÉCOR aussi)
+#include <poserPanneau>   // pose une tuile dans le PANNEAU
+#include <textePanneau>   // écrit un texte dans le PANNEAU
+#include <panneau>        // montre le panneau, à une place choisie
+#include <sprite>         // place un LUTIN de 8 × 8 au pixel près
+
+Tuile BRIQUE = {                  // Le mur : des joints en 3 (sombres), des briques en 1 (claires).
+  "33333333",
+  "11131111",
+  "11131111",
+  "33333333",
+  "13111113",
+  "13111113",
+  "33333333",
+  "11131111",
+};
+
+Tuile GRIS = {                    // Le fond du panneau : du gris (2), piqué de clair (1).
+  "22222222",
+  "22122212",
+  "22222222",
+  "21222122",
+  "22222222",
+  "22122212",
+  "22222222",
+  "21222122",
+};
+
+Tuile HEROS = {                   // Le héros. Les points (.) sont TRANSPARENTS chez un lutin.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+int main() {                      // Le jeu commence ici.
+
+  // ---- 1. LE DÉCOR (tout au fond) : un mur, colonnes 9 et 10, lignes 7 à 11.
+  for (uint8_t l = 7; l < 12; l++) {   // Pour chaque ligne l, de 7 à 11 :
+    poser(9, l, BRIQUE);               //   une brique en colonne 9,
+    poser(10, l, BRIQUE);              //   une autre en colonne 10.
+  }
+  texte(1, 1, "QUI EST DEVANT");       // Le texte aussi est dans le décor.
+
+  // ---- 2. LE PANNEAU (au milieu) : rempli de gris, avec SCORE en haut.
+  // On le remplit d'abord : 5 colonnes (0 à 4) sur 18 lignes (0 à 17).
+  for (uint8_t l = 0; l < 18; l++) {
+    for (uint8_t c = 0; c < 5; c++) {
+      poserPanneau(c, l, GRIS);        // Les colonnes du PANNEAU, pas celles de l'écran.
+    }
+  }
+  textePanneau(0, 1, "SCORE");         // Colonne 0 du panneau, ligne 1.
+  panneau(120, 0);                     // On le montre : à partir du pixel 120 (la colonne 15)
+                                       // et du pixel 0 en hauteur. Il couvre tout le côté droit.
+
+  // ---- 3. LE LUTIN (tout devant) : le héros, qui avance tout seul.
+  uint8_t x = 0;                       // Sa place, en pixels, de gauche à droite.
+
+  while (true) {                       // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;        // Une image sur 2 : un pixel de plus vers la droite.
+    if (x > 152) x = 0;                // Sorti à droite ? Il repart de la gauche.
+
+    sprite(0, x, 72, HEROS);           // Ligne de pixels 72 : à la hauteur du mur (ligne 9).
+  }
+}
+```
+
+**Une question que tout jeu se pose :** quand deux choses sont au même endroit de l’écran, laquelle voit-on ? Le héros devant le mur, ou le mur devant le héros ?
+
+**La réponse de la Game Boy : trois couches, empilées comme des feuilles transparentes.** Tout au fond, le **décor** (ce que posent `poser()` et `texte()`). Par-dessus, le **panneau** (`panneau()`, `textePanneau()`, `poserPanneau()`, le chapitre 9). Tout devant, les **lutins** (`sprite()`).
+
+**Ce qui est nouveau ici : rien à apprendre, tout à regarder.** Le programme pose les trois éléments : un mur de briques au milieu (le décor), une colonne grise à droite avec « SCORE » (le panneau, placé au pixel 120), et un héros qui traverse l’écran tout seul (un lutin). Le héros passe **devant le mur**, puis **devant le panneau**.
+
+**L’ordre des lignes ne compte pas.** On pourrait poser le mur APRÈS le premier `sprite()` : il resterait derrière. Ce n’est pas « le dernier dessiné gagne », comme sur une feuille de papier : chaque chose est rangée dans SA couche, et la console empile toujours les couches dans le même ordre.
+
+**Le panneau, au pixel 120 :** `panneau(120, 0)` le pose à partir du pixel 120 en largeur (la colonne 15) et du pixel 0 en hauteur. Il couvre alors tout ce qui est à droite et en dessous : les colonnes 15 à 19, du haut en bas. Le décor, sous lui, ne se voit plus.
+
+**À toi :** déplace le mur (colonnes 3 et 4 par exemple) et regarde : le héros passe toujours devant. Les leçons suivantes montrent comment changer cet ordre.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <poserPanneau>` → 110.1. La fonction poserPanneau() — une tuile dans le panneau
+- `#include <textePanneau>` → 60.2. La fonction textePanneau() — écrire dans le panneau
+- `#include <panneau>` → 60.1. La fonction panneau() — montrer le panneau
+- `#include <sprite>` → 0.69.4. La fonction sprite() — un lutin au pixel près
+
+**Ce qu’on doit voir** — Un mur de briques au milieu, une colonne grise « SCORE » à droite. Un petit héros traverse l’écran : il passe devant le mur, puis devant le panneau.  
+**Ce qu’il coûte** — 730 octets de programme, 3 variables.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (188 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `AdresseCase` (10 o, pour poser(), poserPanneau()), `EcrireTexte` (10 o, pour texte(), textePanneau()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (256 o), `DonneesTransfert` (10 o), `"QUI EST DEVANT"` (14 o, pour texte()), `"SCORE"` (5 o, pour textePanneau()) · appels : `poser()` ×2 (24 o), `sprite()` ×1 (23 o), `panneau()` ×1 (15 o), `poserPanneau()` ×1 (13 o), `texte()` ×1 (11 o), `textePanneau()` ×1 (11 o), `image()` ×1 (6 o), `images()` ×1 (2 o) · lettres : ACDEINOQRSTUV · pas gravé : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 110.4. Devant, derrière : le tuyau, DERRIERE
+
+> sprite(0, x, y, HEROS, DERRIERE) : le décor passe devant le lutin. Le héros entre dans un tuyau et ressort de l’autre côté.
+
+```cpp
+// CE PROGRAMME : un héros avance tout seul et ENTRE dans un tuyau couché :
+// il disparaît dedans, et ressort de l'autre côté.
+//
+// Ce qui est nouveau : DERRIERE, le 5e argument de sprite() (la place de MIROIR_X).
+//   sprite(0, x, y, HEROS);             le héros DEVANT le décor (comme d'habitude)
+//   sprite(0, x, y, HEROS, DERRIERE);   le héros DERRIÈRE le décor
+//
+// Attention : le décor ne cache le lutin que là où il est DESSINÉ (1, 2 ou 3).
+// Là où le décor est vide (0), on voit toujours le lutin.
+
+#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <poser>    // pose une tuile sur une case du fond
+#include <texte>    // écrit un texte à l’écran
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+
+Tuile TUYAU = {                   // Un morceau de tuyau couché : AUCUN 0, il est tout plein.
+  "33333333",                     //   le bord du haut, sombre
+  "11111111",                     //   un reflet clair
+  "22222222",
+  "22222222",                     //   le corps, gris
+  "22222222",
+  "22222222",
+  "21212121",                     //   l'ombre du bas
+  "33333333",                     //   le bord du bas
+};
+
+Tuile HEROS = {                   // Le héros : les points (.) sont transparents.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+int main() {                          // Le jeu commence ici.
+  texte(1, 1, "LE TUYAU");
+
+  // Le tuyau : colonnes 8 à 12, ligne 9 (les pixels 64 à 103, en largeur).
+  for (uint8_t c = 8; c < 13; c++) {
+    poser(c, 9, TUYAU);
+  }
+
+  uint8_t x = 0;                      // La place du héros, en pixels.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;       // Un pixel toutes les 2 images.
+    if (x > 152) x = 0;               // Sorti à droite : il repart de la gauche.
+
+    // Ligne de pixels 72 = ligne 9 × 8 : pile à la hauteur du tuyau.
+    sprite(0, x, 72, HEROS, DERRIERE);   // DERRIERE : le tuyau passe devant lui.
+  }
+}
+```
+
+**Un héros qui entre dans un tuyau** doit disparaître DEDANS, et pas glisser par-dessus. Il faut que le tuyau passe devant lui.
+
+**Ce qui est nouveau ici : `DERRIERE`, le 5e argument de `sprite()`.** On l’a déjà rencontré avec `MIROIR_X` (le miroir) : c’est la même place. `sprite(0, x, 72, HEROS, DERRIERE)` range ce lutin **derrière le décor**.
+
+**Mais pas derrière tout le décor !** Le décor ne cache le lutin que là où il est **dessiné**, avec les indices 1, 2 ou 3. Là où le décor est **vide** (l’indice 0, le fond clair de l’écran), le lutin reste visible. C’est pour ça qu’on voit le héros avant et après le tuyau : là, il n’y a que du vide.
+
+**Le tuyau est tout plein :** ses tuiles n’ont aucun 0. Le héros y disparaît donc entièrement. Si le tuyau avait des trous (des 0), on verrait le héros à travers.
+
+**DERRIERE passe aussi derrière le panneau,** là où le panneau est dessiné : pour la console, le panneau est un second décor.
+
+**À toi :** ôte `DERRIERE` (garde `sprite(0, x, 72, HEROS);`) : le héros passe par-dessus le tuyau, comme dans la leçon d’avant.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite>` → 0.69.4. La fonction sprite() — un lutin au pixel près
+
+**Ce qu’on doit voir** — Un tuyau couché au milieu de l’écran. Le héros arrive de la gauche, disparaît dans le tuyau, et ressort à droite.  
+**Ce qu’il coûte** — 506 octets de programme, 2 variables.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (103 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `AdresseCase` (10 o, pour poser()), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (128 o), `DonneesTransfert` (10 o), `"LE TUYAU"` (8 o, pour texte()) · appels : `sprite()` ×1 (24 o), `poser()` ×1 (13 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `images()` ×1 (2 o) · lettres : AELTUY · pas gravé : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 110.5. Devant, derrière : deux lutins qui se croisent
+
+> Une souris passe devant un chat : entre deux lutins, c’est le plus à GAUCHE qui passe devant ; à égalité, le plus petit numéro.
+
+```cpp
+// CE PROGRAMME : une souris (claire) avance et croise un chat (sombre) immobile.
+// Regarde qui passe devant au moment où ils se chevauchent.
+//
+// Ce qui est nouveau : deux LUTINS au même endroit. La règle de la console :
+//   1. le plus à GAUCHE (le plus petit x) passe devant ;
+//   2. à x égal, le plus petit NUMÉRO (1er argument de sprite) passe devant.
+//
+//   souris x = 72, chat x = 76   ->  la souris est plus à gauche : DEVANT
+//   souris x = 76, chat x = 76   ->  égalité : le numéro 0 (le chat) DEVANT
+//   souris x = 80, chat x = 76   ->  le chat est plus à gauche : DEVANT
+
+#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <texte>    // écrit un texte à l’écran
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+
+Tuile CHAT = {                    // Le chat : tout sombre (#). Deux oreilles en haut.
+  "#.....#.",
+  "##...##.",
+  "#######.",
+  "########",
+  "########",
+  "########",
+  ".######.",
+  ".#....#.",
+};
+
+Tuile SOURIS = {                  // La souris : toute claire (-). Une queue à gauche.
+  "........",
+  "....--..",
+  "..-----.",
+  "--------",
+  "--------",
+  ".------.",
+  "..-..-..",
+  "........",
+};
+
+int main() {                          // Le jeu commence ici.
+  texte(1, 1, "LE CHAT ET LA SOURIS");
+
+  sprite(0, 76, 72, CHAT);            // Le CHAT : lutin numéro 0, immobile au pixel 76.
+
+  uint8_t x = 0;                      // La place de la souris.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    if (images() % 4 == 0) x++;       // Lentement : un pixel toutes les 4 images.
+    if (x > 152) x = 0;
+
+    sprite(1, x, 72, SOURIS);         // La SOURIS : lutin numéro 1.
+  }
+}
+```
+
+**Deux lutins au même endroit :** ils sont tous les deux dans la couche des lutins. Qui gagne ? La console a sa règle à elle, et elle surprend.
+
+**La règle de la Game Boy :** entre deux lutins qui se chevauchent, c’est **le plus à gauche** (le plus petit `x`) qui passe devant. S’ils ont **le même `x`**, c’est **le plus petit numéro** (le 1er argument de `sprite()`) qui gagne.
+
+**Ce qui est nouveau ici : deux lutins qui se touchent.** Le chat (`sprite(0, …)`, tout sombre) ne bouge pas, au pixel 76. La souris (`sprite(1, …)`, toute claire) arrive de la gauche.
+
+**Déroulons :** souris au pixel 72, chat au 76 : la souris est plus à gauche, **elle passe devant**. Souris au 76 : même `x`, le numéro 0 (le chat) gagne. Souris au 80 : le chat est maintenant le plus à gauche, **il passe devant**. La souris semble passer « derrière » le chat en le dépassant !
+
+**Ce qu’on en retient :** le numéro seul ne suffit pas à mettre un héros devant tout le monde. Dans un vrai jeu, on évite que deux personnages importants se chevauchent longtemps, ou bien on accepte ce petit « saut ».
+
+**À toi :** échange les numéros (le chat en 1, la souris en 0). À `x` égal, c’est maintenant la souris qui gagne. Ailleurs, rien ne change : c’est toujours le plus à gauche.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite>` → 0.69.4. La fonction sprite() — un lutin au pixel près
+
+**Ce qu’on doit voir** — Un chat sombre immobile au milieu ; une souris claire arrive de la gauche, passe devant lui, puis semble passer derrière quand elle le dépasse.  
+**Ce qu’il coûte** — 596 octets de programme, 1 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (93 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (208 o), `DonneesTransfert` (10 o), `"LE CHAT ET LA S…"` (20 o, pour texte()) · appels : `sprite()` ×2 (46 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `images()` ×1 (2 o) · lettres : ACEHILORSTU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 110.6. Devant, derrière : le buisson, teindre(…, DEVANT)
+
+> Sur Game Boy Color, une case du décor peut passer devant les lutins : teindre(c, l, 2 | DEVANT). Deux buissons pareils : le héros passe devant le premier, derrière le second.
+
+```cpp
+// CE PROGRAMME (Game Boy Color) : deux buissons PAREILS. Le héros avance tout
+// seul : il passe DEVANT le premier, et DERRIÈRE le second.
+//
+// Ce qui est nouveau : DEVANT, avec teindre().
+//   teindre(c, l, 2);            la case prend la palette 2 (comme au chapitre 16)
+//   teindre(c, l, 2 | DEVANT);   palette 2 ET la case passe devant les lutins
+// La barre | réunit les deux réglages : 2 | DEVANT = 2 + 128 = 130.
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurLutin>   // choisit une couleur d’une palette des lutins
+#include <ecran>          // éteint ou rallume l’écran
+#include <poser>          // pose une tuile sur une case du fond
+#include <teindre>        // met une case du fond dans une palette
+#include <texte>          // écrit un texte à l’écran
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <teindreLutin>   // met un lutin dans une palette
+
+Tuile BUISSON = {                 // Une touffe de feuilles : AUCUN 0, elle est toute pleine.
+  "11222211",                     //   (des coins en 0 laisseraient un trou là où deux
+  "12233221",                     //    touffes se touchent : on y verrait le héros)
+  "22333322",
+  "23333332",
+  "23333332",
+  "22333322",
+  "12233221",
+  "11222211",
+};
+
+Tuile HEROS = {                   // 0 transparent, 1 clair, 2 moyen, 3 contour.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};
+
+int main() {                              // Le jeu commence ici.
+  couleurFond(0, 0, 20, 28, 31);          // palette 0 : le ciel (indice 0)...
+  couleurFond(0, 3,  2,  4, 12);          // ... et le texte (indice 3)
+  couleurFond(2, 0, 20, 28, 31);          // palette 2 : le ciel entre les feuilles,
+  couleurFond(2, 1, 16, 30,  8);          //   vert clair,
+  couleurFond(2, 2,  6, 22,  4);          //   vert,
+  couleurFond(2, 3,  0, 10,  2);          //   vert sombre.
+  couleurLutin(0, 1, 31, 28, 20);         // le héros : rose clair,
+  couleurLutin(0, 2, 31,  4,  2);         //   rouge,
+  couleurLutin(0, 3, 10,  0,  0);         //   contour très sombre.
+
+  ecran(0);                               // Dessin écran éteint.
+  texte(1, 1, "DEUX BUISSONS");
+  for (uint8_t l = 8; l < 10; l++) {      // Lignes 8 et 9 :
+    for (uint8_t c = 4; c < 6; c++) {     //   buisson 1, colonnes 4 et 5 :
+      poser(c, l, BUISSON);
+      teindre(c, l, 2);                   //     palette 2, c'est tout.
+    }
+    for (uint8_t c = 12; c < 14; c++) {   //   buisson 2, colonnes 12 et 13 :
+      poser(c, l, BUISSON);
+      teindre(c, l, 2 | DEVANT);          //     palette 2, ET devant les lutins.
+    }
+  }
+  ecran(1);                               // On rallume.
+
+  uint8_t x = 0;                          // La place du héros, en pixels.
+
+  while (true) {                          // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;           // Un pixel toutes les 2 images.
+    if (x > 152) x = 0;
+
+    sprite(0, x, 68, HEROS);              // Pixel 68 : au milieu des buissons (lignes 8 et 9).
+    teindreLutin(0, 0);                   // Après sprite() : sa palette (chapitre 16).
+  }
+}
+```
+
+**`DERRIERE` cache le héros derrière TOUT le décor.** Souvent, on veut l’inverse : le héros devant l’herbe, mais derrière **un** buisson. Il faut alors marquer **les cases** qui passent devant, pas le lutin.
+
+**Ce qui est nouveau ici : `DEVANT`, avec `teindre()` (Game Boy Color).** `teindre(12, 8, 2 | DEVANT)` met la case (12, 8) en palette 2 **et** la fait passer devant les lutins. La barre `|` réunit les deux réglages en un seul nombre : la palette dans les bits du bas, `DEVANT` dans le bit du haut (128). 2 | 128 = 130.
+
+**La preuve par deux :** les deux buissons ont le **même dessin** et la **même palette**. Seul le second a `DEVANT`. Le héros passe devant le premier, derrière le second.
+
+**La même règle que pour DERRIERE :** la case ne cache le lutin que là où elle est **dessinée** (1, 2 ou 3). C’est pourquoi le buisson n’a **aucun 0** : avec des coins vides, deux touffes côte à côte laisseraient un petit trou entre elles, et l’on verrait un morceau du héros y rester figé pendant qu’il passe derrière.
+
+**Pourquoi la Color seulement ?** Sur la Game Boy d’origine, il n’y a qu’une carte du décor, sans place pour ce réglage. La Color a une **seconde carte** (celle des palettes, le chapitre 16) : c’est là que se range `DEVANT`.
+
+**À toi :** ajoute `| DEVANT` au premier buisson aussi : le héros passe derrière les deux.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+- `#include <couleurFond>` → 0.88.3. La fonction couleurFond() — une couleur du décor
+- `#include <couleurLutin>` → 0.107.4. La fonction couleurLutin() — une couleur des personnages
+- `#include <ecran>` → 27.1. La fonction ecran() — éteindre et rallumer l’écran
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+- `#include <teindre>` → 0.89.1. La fonction teindre() — une case dans une palette
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite>` → 0.69.4. La fonction sprite() — un lutin au pixel près
+- `#include <teindreLutin>` → 0.107.5. La fonction teindreLutin() — un lutin dans une palette
+
+**Ce qu’on doit voir** — Deux buissons verts identiques. Le héros rouge passe devant celui de gauche, et disparaît derrière celui de droite.  
+**Ce qu’il coûte** — 820 octets de programme, 3 variables.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (346 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o, pour ecran()), `AttendreAcces` (12 o), `AdresseCase` (10 o, pour poser(), teindre()), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (176 o), `DonneesTransfert` (10 o), `"DEUX BUISSONS"` (13 o, pour texte()) · appels : `couleurFond()` ×6 (72 o), `teindre()` ×2 (48 o), `couleurLutin()` ×3 (36 o), `poser()` ×2 (26 o), `sprite()` ×1 (23 o), `ecran()` ×2 (21 o), `teindreLutin()` ×1 (16 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `images()` ×1 (2 o) · lettres : BDEINOSUX · pas gravé : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 110.7. Devant, derrière : le bateau passe sous le pont
+
+> Une rivière, un pont marqué DEVANT : le bateau glisse sur l’eau, passe sous le pont, et ressort de l’autre côté.
+
+```cpp
+// CE PROGRAMME (Game Boy Color) : un bateau descend la rivière tout seul. Il
+// glisse SUR l'eau, et passe SOUS le pont.
+//
+// Rien de nouveau dans les fonctions : c'est teindre(..., DEVANT) de la leçon
+// d'avant. Ce qui est nouveau, c'est de choisir QUELLES cases passent devant :
+//   l'eau  : teindre(c, l, 1)            -> derrière le bateau
+//   le pont : teindre(c, l, 3 | DEVANT)  -> devant le bateau
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurLutin>   // choisit une couleur d’une palette des lutins
+#include <ecran>          // éteint ou rallume l’écran
+#include <poser>          // pose une tuile sur une case du fond
+#include <teindre>        // met une case du fond dans une palette
+#include <texte>          // écrit un texte à l’écran
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <teindreLutin>   // met un lutin dans une palette
+
+Tuile EAU = {                     // Des vaguelettes : 1 clair, 2 foncé. Aucun 0.
+  "11111111",
+  "12211221",
+  "22222222",
+  "22122212",
+  "22222222",
+  "11111111",
+  "21122112",
+  "22222222",
+};
+
+Tuile PLANCHE = {                 // Les planches du pont : aucun 0, tout est plein.
+  "33333333",
+  "12222221",
+  "12222221",
+  "33333333",
+  "12222221",
+  "12222221",
+  "33333333",
+  "12222221",
+};
+
+Tuile BATEAU = {                  // Une voile en haut, une coque en bas. 0 = transparent.
+  "00030000",
+  "00033000",
+  "00033300",
+  "00030000",
+  "33333333",
+  "32222223",
+  "03222230",
+  "00333300",
+};
+
+int main() {                              // Le jeu commence ici.
+  couleurFond(0, 0, 20, 28, 31);          // palette 0 : le ciel, et le texte
+  couleurFond(0, 3,  2,  4, 12);
+  couleurFond(1, 1, 16, 24, 31);          // palette 1 : l'eau, bleu clair...
+  couleurFond(1, 2,  4, 10, 26);          //   ... et bleu foncé
+  couleurFond(3, 1, 26, 18, 10);          // palette 3 : le bois, clair,
+  couleurFond(3, 2, 18, 10,  4);          //   moyen,
+  couleurFond(3, 3,  8,  4,  2);          //   sombre.
+  couleurLutin(0, 1, 31, 31, 31);         // le bateau : blanc,
+  couleurLutin(0, 2, 31, 20,  0);         //   orange,
+  couleurLutin(0, 3,  8,  4,  0);         //   brun très sombre.
+
+  ecran(0);                               // Dessin écran éteint.
+  texte(1, 1, "SOUS LE PONT");
+
+  // La rivière : lignes 8 à 11, toute la largeur.
+  for (uint8_t l = 8; l < 12; l++) {
+    for (uint8_t c = 0; c < 20; c++) {
+      poser(c, l, EAU);
+      teindre(c, l, 1);                   // palette 1, SANS DEVANT : derrière le bateau
+    }
+  }
+  // Le pont : colonnes 9 et 10, lignes 7 à 12 (il dépasse sur les deux rives).
+  for (uint8_t l = 7; l < 13; l++) {
+    for (uint8_t c = 9; c < 11; c++) {
+      poser(c, l, PLANCHE);               // remplace l'eau sur ces cases
+      teindre(c, l, 3 | DEVANT);          // palette 3, ET devant le bateau
+    }
+  }
+  ecran(1);                               // On rallume.
+
+  uint8_t x = 0;                          // La place du bateau, en pixels.
+
+  while (true) {                          // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;           // Le courant : un pixel toutes les 2 images.
+    if (x > 152) x = 0;
+
+    sprite(0, x, 76, BATEAU);             // Pixel 76 : au milieu de la rivière.
+    teindreLutin(0, 0);
+  }
+}
+```
+
+**La même idée, un autre décor :** une rivière qui traverse l’écran, et un pont qui l’enjambe. Le bateau doit passer **sur** l’eau, mais **sous** le pont.
+
+**Rien de nouveau dans les fonctions :** `teindre(c, l, 3 | DEVANT)` sur les cases du pont, `teindre(c, l, 1)` sur celles de l’eau. Ce qui est nouveau, c’est l’idée : **seules les cases du pont** passent devant. L’eau, elle, reste derrière le bateau.
+
+**Le pont est tout plein** (aucun 0 dans sa tuile) : le bateau y disparaît entièrement. L’eau aussi est toute pleine, mais elle n’a pas `DEVANT` : le bateau reste par-dessus.
+
+**On pense en couches de dessin, pas en lignes de code :** le pont est posé APRÈS l’eau, sur les mêmes cases. Une case ne garde qu’une tuile : là où passe le pont, la tuile PLANCHE remplace la tuile EAU.
+
+**À toi :** construis un second pont, colonnes 15 et 16. Puis enlève `| DEVANT` du premier : le bateau passe par-dessus, comme s’il volait.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+- `#include <couleurFond>` → 0.88.3. La fonction couleurFond() — une couleur du décor
+- `#include <couleurLutin>` → 0.107.4. La fonction couleurLutin() — une couleur des personnages
+- `#include <ecran>` → 27.1. La fonction ecran() — éteindre et rallumer l’écran
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+- `#include <teindre>` → 0.89.1. La fonction teindre() — une case dans une palette
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite>` → 0.69.4. La fonction sprite() — un lutin au pixel près
+- `#include <teindreLutin>` → 0.107.5. La fonction teindreLutin() — un lutin dans une palette
+
+**Ce qu’on doit voir** — Une rivière bleue, un pont de bois qui la traverse. Un petit bateau orange glisse sur l’eau, disparaît sous le pont, puis ressort.  
+**Ce qu’il coûte** — 822 octets de programme, 3 variables.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (376 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o, pour ecran()), `AttendreAcces` (12 o), `AdresseCase` (10 o, pour poser(), teindre()), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (176 o), `DonneesTransfert` (10 o), `"SOUS LE PONT"` (12 o, pour texte()) · appels : `couleurFond()` ×7 (84 o), `teindre()` ×2 (48 o), `couleurLutin()` ×3 (36 o), `poser()` ×2 (26 o), `sprite()` ×1 (23 o), `ecran()` ×2 (21 o), `teindreLutin()` ×1 (16 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `images()` ×1 (2 o) · lettres : ELNOPSTU · pas gravé : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 110.8. Devant, derrière : à toi de choisir, avec A
+
+> Le héros se déplace avec les flèches ; A le fait passer devant ou derrière le mur. On voit la différence en direct.
+
+```cpp
+// CE PROGRAMME : les flèches déplacent un héros ; le bouton A le fait passer
+// DEVANT ou DERRIÈRE le mur. En haut, le texte dit où il est.
+//
+// Ce qui est nouveau : le 5e argument de sprite() dans une variable, cote.
+//   cote = 0          -> sprite(0, x, y, HEROS, 0)         : devant
+//   cote = DERRIERE   -> sprite(0, x, y, HEROS, DERRIERE)  : derrière
+// Et « un appui = un changement » : on retient si A était déjà enfoncé.
+
+#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <poser>    // pose une tuile sur une case du fond
+#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+
+Tuile BRIQUE = {                  // Le mur : joints sombres (3), briques claires (1).
+  "33333333",
+  "11131111",
+  "11131111",
+  "33333333",
+  "13111113",
+  "13111113",
+  "33333333",
+  "11131111",
+};
+
+Tuile HEROS = {                   // Le héros : les points (.) sont transparents.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+uint8_t x = 76;         // La place du héros, en pixels : il commence SUR le mur.
+uint8_t y = 72;
+uint8_t cote = 0;       // 0 : devant ; DERRIERE : derrière le décor.
+uint8_t avant = 0;      // A était-il enfoncé à l'image d'avant ? 1 oui, 0 non.
+
+int main() {                              // Le jeu commence ici.
+  // Le mur : colonnes 8 à 11, lignes 6 à 11 (les pixels 64 à 95 sur 48 à 95).
+  for (uint8_t l = 6; l < 12; l++) {
+    for (uint8_t c = 8; c < 12; c++) {
+      poser(c, l, BRIQUE);
+    }
+  }
+  texte(1, 1, "A: DEVANT");               // Le mode, en haut. « DEVANT » est en colonne 4.
+
+  while (true) {                          // La boucle du jeu :
+    image();
+
+    // Les flèches : un pixel par image, sans sortir de l'écran.
+    if (bouton(DROITE) && x < 152) x++;
+    if (bouton(GAUCHE) && x > 0) x--;
+    if (bouton(BAS) && y < 136) y++;
+    if (bouton(HAUT) && y > 16) y--;
+
+    // Le bouton A : on ne bascule que s'il VIENT d'être enfoncé.
+    uint8_t a = bouton(A);                // 1 si A est enfoncé maintenant, 0 sinon.
+    if (a == 1 && avant == 0) {           // enfoncé maintenant, mais pas juste avant :
+      if (cote == 0) {                    //   il était devant ?
+        cote = DERRIERE;                  //     il passe derrière,
+        texte(4, 1, "DERRIERE");
+      } else {                            //   il était derrière ?
+        cote = 0;                         //     il repasse devant.
+        texte(4, 1, "DEVANT  ");          //     (deux espaces : effacer « RE »)
+      }
+    }
+    avant = a;                            // On s'en souvient pour l'image suivante.
+
+    sprite(0, x, y, HEROS, cote);         // Le 5e argument : 0 ou DERRIERE.
+  }
+}
+```
+
+**Cette fois, c’est toi qui décides.** Les quatre flèches déplacent le héros. Le bouton **A** bascule entre « devant » et « derrière ». Va sur le mur, appuie sur A, et regarde-le disparaître.
+
+**Ce qui est nouveau ici : le 5e argument dans une variable.** Comme `regard` pour le miroir, `cote` vaut `0` (devant, tel quel) ou `DERRIERE`. On le passe à `sprite()` à chaque image : `sprite(0, x, y, HEROS, cote)`.
+
+**Un seul appui, un seul changement.** Si on basculait à chaque image où A est enfoncé, le héros clignoterait 60 fois par seconde tant qu’on tient le bouton. On retient donc dans `avant` si A était **déjà** enfoncé à l’image d’avant. On ne bascule que quand A **vient** d’être enfoncé : `a == 1` (enfoncé maintenant) et `avant == 0` (pas juste avant).
+
+**Le texte suit :** en haut de l’écran, « DEVANT » ou « DERRIERE ». Les deux espaces après « DEVANT » effacent les dernières lettres de « DERRIERE », plus long de deux lettres.
+
+**Essaie partout :** sur le mur, derrière ; sur le vide, toujours visible, même en mode DERRIERE. C’est la règle des leçons d’avant, que tu vérifies toi-même.
+
+**À toi :** fais basculer aussi `MIROIR_X` avec le bouton B. Pour les deux à la fois : `sprite(0, x, y, HEROS, cote | regard)`.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <bouton>` → 0.65.5. La fonction bouton() — lire la manette
+- `#include <sprite>` → 0.69.4. La fonction sprite() — un lutin au pixel près
+
+**Ce qu’on doit voir** — Un grand mur de briques, le héros posé dessus. Les flèches le déplacent ; A le fait disparaître derrière le mur, et A encore le ramène devant.  
+**Ce qu’il coûte** — 799 octets de programme, 7 variables.  
+**Ce qui est gravé** — `démarrage` (71 o), `main()` (253 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `AdresseCase` (10 o, pour poser()), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (103 o), `EffacerCarte` (14 o), `LireManette` (37 o, pour bouton()), `Tuiles` (176 o), `DonneesTransfert` (10 o), `"A: DEVANT"` (9 o, pour texte()), `"DERRIERE"` (8 o, pour texte()), `"DEVANT  "` (8 o, pour texte()) · appels : `texte()` ×3 (33 o), `bouton()` ×5 (32 o), `sprite()` ×1 (32 o), `poser()` ×1 (13 o), `image()` ×1 (6 o) · lettres : ADEINRTV: · pas gravé : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, Notes
+
+---
+
+### 110.9. Devant, derrière : cache-toi du garde
+
+> Un petit jeu : traverse l’écran sans te faire voir. Le garde passe en haut ; derrière un arbre marqué DEVANT, il ne te voit pas.
+
+```cpp
+// CE PROGRAMME (Game Boy Color) : un petit jeu de cache-cache.
+//   GAUCHE / DROITE : ton héros (en bas) doit atteindre la droite de l'écran.
+//   Le GARDE fait les cent pas en haut. S'il passe au-dessus de toi pendant que
+//   tu es à découvert : VU, retour au départ.
+//   Derrière un ARBRE (cases DEVANT), tu es caché : il ne te voit pas.
+//
+// Ce qui est nouveau : DEVANT ne change que le DESSIN. Pour le jeu, on calcule
+// aussi, dans le code, si le héros est caché (la variable cache).
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurLutin>   // choisit une couleur d’une palette des lutins
+#include <ecran>          // éteint ou rallume l’écran
+#include <poser>          // pose une tuile sur une case du fond
+#include <teindre>        // met une case du fond dans une palette
+#include <texte>          // écrit un texte à l’écran
+#include <nombre>         // écrit un nombre en chiffres
+#include <bouton>         // lit un bouton de la manette
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <teindreLutin>   // met un lutin dans une palette
+
+Tuile ARBRE = {                   // Du feuillage en haut, un tronc en bas. Aucun 0 : tout plein.
+  "12222221",
+  "22333322",
+  "23333332",
+  "23333332",
+  "22333322",
+  "12222221",
+  "11133111",
+  "11133111",
+};
+
+Tuile HEROS = {                   // Toi : 0 transparent, 1 clair, 2 moyen, 3 contour.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};
+
+Tuile GARDE = {                   // Le garde : un casque, de gros yeux.
+  "03333330",
+  "33333333",
+  "31133113",
+  "31133113",
+  "32222223",
+  "03222230",
+  "03300330",
+  "33000033",
+};
+
+uint8_t x = 8;          // Ta place, en pixels.
+uint8_t g = 150;        // La place du garde.
+uint8_t sens = 0;       // Le garde va : 0 vers la gauche, 1 vers la droite.
+uint8_t vus = 0;        // Combien de fois il t'a vu.
+
+int main() {                              // Le jeu commence ici.
+  couleurFond(0, 0, 20, 28, 31);          // palette 0 : le ciel et le texte
+  couleurFond(0, 3,  2,  4, 12);
+  couleurFond(2, 1,  8, 18,  4);          // palette 2 : l'arbre, vert,
+  couleurFond(2, 2,  4, 26,  6);          //   vert vif,
+  couleurFond(2, 3,  0, 10,  2);          //   vert sombre.
+  couleurLutin(0, 1, 28, 31, 31);         // toi : bleu pâle,
+  couleurLutin(0, 2,  4, 12, 31);         //   bleu,
+  couleurLutin(0, 3,  0,  0, 10);         //   bleu nuit.
+  couleurLutin(1, 1, 31, 31, 31);         // le garde : blanc,
+  couleurLutin(1, 2, 31,  4,  2);         //   rouge,
+  couleurLutin(1, 3, 10,  0,  0);         //   rouge sombre.
+
+  ecran(0);                               // Dessin écran éteint.
+  texte(1, 1, "VUS");
+  // Deux arbres de 2 × 2 cases, lignes 8 et 9 : colonnes 5-6, puis 13-14.
+  for (uint8_t l = 8; l < 10; l++) {
+    poser(5, l, ARBRE);  teindre(5, l, 2 | DEVANT);
+    poser(6, l, ARBRE);  teindre(6, l, 2 | DEVANT);
+    poser(13, l, ARBRE); teindre(13, l, 2 | DEVANT);
+    poser(14, l, ARBRE); teindre(14, l, 2 | DEVANT);
+  }
+  ecran(1);                               // On rallume.
+  nombre(5, 1, vus);
+
+  while (true) {                          // La boucle du jeu :
+    image();
+
+    // Toi : GAUCHE / DROITE.
+    if (bouton(DROITE) && x < 152) x++;
+    if (bouton(GAUCHE) && x > 8) x--;
+
+    // Le garde : un pixel toutes les 2 images, et demi-tour aux bords.
+    if (images() % 2 == 0) {
+      if (sens == 0) {
+        g--;
+        if (g == 0) sens = 1;             // au bord gauche : il repart à droite
+      } else {
+        g++;
+        if (g == 152) sens = 0;           // au bord droit : il repart à gauche
+      }
+    }
+
+    // Caché ? Tout entier derrière un arbre (le héros fait 8 pixels, l'arbre 16).
+    uint8_t cache = 0;
+    if (x >= 40 && x <= 48) cache = 1;    // arbre 1 : pixels 40 à 55
+    if (x >= 104 && x <= 112) cache = 1;  // arbre 2 : pixels 104 à 119
+
+    // L'écart entre le garde et toi, toujours positif.
+    uint8_t ecart = 0;
+    if (g > x) {
+      ecart = g - x;                      // le garde est à droite
+    } else {
+      ecart = x - g;                      // le garde est à gauche (ou pile au-dessus)
+    }
+
+    if (ecart < 12 && cache == 0) {       // Tout près, et à découvert : VU !
+      vus++;
+      nombre(5, 1, vus);
+      x = 8;                              // retour au départ,
+      g = 150;                            // et le garde repart de la droite.
+      sens = 0;
+    }
+
+    if (x >= 150) texte(8, 1, "GAGNE");   // Arrivé à droite !
+
+    sprite(0, x, 68, HEROS);              // Toi, en bas, à la hauteur des arbres.
+    teindreLutin(0, 0);
+    sprite(1, g, 40, GARDE);              // Le garde, en haut.
+    teindreLutin(1, 1);
+  }
+}
+```
+
+**Un petit jeu avec tout ce qu’on vient de voir.** Ton héros part à gauche et doit atteindre la droite. Un garde fait les cent pas en haut de l’écran. S’il passe au-dessus de toi pendant que tu es à découvert, il te voit : retour au départ.
+
+**Les arbres sont des cachettes :** leurs cases ont `DEVANT`. Derrière un arbre, ton héros disparaît, et le garde passe sans te voir.
+
+**Mais la console ne sait pas que tu es caché !** `DEVANT` ne change que le **dessin**. Pour le jeu, il faut le dire aussi dans le code : `cache` vaut 1 si le héros (8 pixels) est **entièrement** derrière un arbre (16 pixels). Le premier arbre va du pixel 40 au 55 : le héros y est caché pour `x` de 40 à 48 (48 + 8 = 56).
+
+**L’écart entre le garde et toi :** `ecart` est la distance, toujours positive. Comme `uint8_t` ne connaît pas les nombres négatifs, on soustrait le plus petit du plus grand : `g - x` si le garde est à droite, `x - g` sinon. Moins de 12 pixels, et pas caché : vu !
+
+**Vu :** le compteur `vus` augmente, le héros repart du pixel 8, et le garde repart de la droite (sinon il te reverrait aussitôt).
+
+**À toi :** ajoute un troisième arbre, ou un second garde, plus rapide, en lutin 2.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+- `#include <couleurFond>` → 0.88.3. La fonction couleurFond() — une couleur du décor
+- `#include <couleurLutin>` → 0.107.4. La fonction couleurLutin() — une couleur des personnages
+- `#include <ecran>` → 27.1. La fonction ecran() — éteindre et rallumer l’écran
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+- `#include <teindre>` → 0.89.1. La fonction teindre() — une case dans une palette
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <nombre>` → 0.8.3. La fonction nombre() — écrire un nombre
+- `#include <bouton>` → 0.65.5. La fonction bouton() — lire la manette
+- `#include <sprite>` → 0.69.4. La fonction sprite() — un lutin au pixel près
+- `#include <teindreLutin>` → 0.107.5. La fonction teindreLutin() — un lutin dans une palette
+
+**Ce qu’on doit voir** — Deux arbres verts, ton héros bleu à gauche, un garde rouge qui va et vient en haut. Derrière un arbre, ton héros disparaît et le garde ne le voit pas ; à découvert, il te renvoie au départ.  
+**Ce qu’il coûte** — 1333 octets de programme, 7 variables.  
+**Ce qui est gravé** — `démarrage` (71 o), `main()` (636 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o, pour ecran()), `AttendreAcces` (12 o), `AdresseCase` (10 o, pour poser(), teindre()), `EcrireTexte` (10 o, pour texte()), `EcrireNombre` (33 o, pour nombre()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `LireManette` (37 o, pour bouton()), `Tuiles` (320 o), `DonneesTransfert` (10 o), `"VUS"` (3 o, pour texte()), `"GAGNE"` (5 o, pour texte()) · appels : `teindre()` ×4 (92 o), `couleurLutin()` ×6 (72 o), `couleurFond()` ×5 (60 o), `poser()` ×4 (48 o), `sprite()` ×2 (46 o), `teindreLutin()` ×2 (33 o), `texte()` ×2 (22 o), `ecran()` ×2 (21 o), `nombre()` ×2 (20 o), `bouton()` ×2 (10 o), `image()` ×1 (6 o), `images()` ×1 (2 o) · lettres : AEGNSUV0123456789 · pas gravé : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, Notes
+
+---
+
+### 110.10. La fonction spriteDerriere() — un lutin derrière le décor
+
+> #include <spriteDerriere> : spriteDerriere(numero, x, y, tuile), c’est sprite(), mais derrière le décor.
+
+```cpp
+// ---- #include <spriteDerriere> : un lutin derrière le décor ----
+// Un mur, et un héros posé dessus avec spriteDerriere() : le mur le cache.
+
+#include <Tuile>
+#include <poser>
+#include <spriteDerriere>   // spriteDerriere() : sprite(), mais derrière le décor
+
+Tuile MUR = {                       // des briques (-), des joints (#) : aucun point
+  "########", "---#----", "---#----", "########",
+  "-#-----#", "-#-----#", "########", "---#----",
+};
+
+Tuile HEROS = {                     // les points (.) sont transparents
+  "..####..", ".#-##-#.", "########", "#.####.#",
+  "########", "..#..#..", ".#....#.", "##....##",
+};
+
+int main() {
+  poser(9, 8, MUR);                  // le mur, case (9, 8)
+  spriteDerriere(0, 72, 64, HEROS);  // le héros, pile sur le mur : derrière lui
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce qu’elle fait :** elle place un lutin comme `sprite()`, mais **derrière le décor**, comme `sprite(numero, x, y, tuile, DERRIERE)`. Plus besoin de retenir le 5e argument.
+
+**La ligne à écrire : `#include <spriteDerriere>`.** Pas besoin d’inclure aussi `sprite`.
+
+**Ses arguments :** le numéro du lutin, `x` et `y` en pixels, la tuile. Le décor ne cache le lutin que là où il est **dessiné** : sur le vide, on voit le lutin.
+
+**Ce qu’elle coûte :** **rien de plus** qu’un `sprite()` : le compilateur la remplace par `sprite(…, DERRIERE)`.
+
+**Essaie :** mets le héros à `x = 40`, sur le vide : il réapparaît.
+
+**On retrouve spriteDerriere dans** — 110.11, 110.14
+
+**Ce qu’on doit voir** — Un mur de briques, seul : le héros est derrière.  
+**Ce qu’il coûte** — 262 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (40 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `EffacerCarte` (14 o), `Tuiles` (32 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×1 (24 o), `poser()` ×1 (6 o), `image()` ×1 (6 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 110.11. Devant, derrière : le buisson sur Game Boy normale, devant puis derrière
+
+> Les deux buissons, sur la Game Boy d’origine : sans DEVANT, c’est le programme qui choisit, selon la place du héros — sprite() à gauche, spriteDerriere() à droite.
+
+```cpp
+// CE PROGRAMME (Game Boy NORMALE, 4 nuances) : les deux buissons. Le héros
+// avance tout seul : il passe DEVANT le premier, puis DERRIÈRE le second.
+//
+// Ce qui est nouveau : faire « devant / derrière » sans DEVANT.
+//   La Game Boy d'origine ne sait pas dire « cette case-ci passe devant ».
+//   Le seul réglage est sur le LUTIN, et il vaut pour TOUT le décor.
+//   Alors on change le lutin de côté SELON SA PLACE, à chaque image :
+//
+//     x < 80   (à gauche, le buisson 1)  ->  sprite()           : devant
+//     x >= 80  (à droite, le buisson 2)  ->  spriteDerriere()   : derrière
+//
+//   80 est au milieu du ciel, entre les deux : le changement ne se voit pas.
+//
+// La leçon suivante fait la même chose sur Game Boy Color, avec poserDevant().
+
+#include <Tuile>            // un dessin de 8 × 8 pixels
+#include <poser>            // pose une tuile sur une case du fond
+#include <texte>            // écrit un texte à l’écran
+#include <sprite>           // place un lutin de 8 × 8 au pixel près (devant)
+#include <spriteDerriere>   // place un lutin derrière le décor
+
+Tuile BUISSON = {                 // Une touffe de feuilles : AUCUN 0, elle est toute pleine.
+  "11222211",                     //   (des coins en 0 laisseraient un trou là où deux
+  "12233221",                     //    touffes se touchent : on y verrait le héros)
+  "22333322",
+  "23333332",
+  "23333332",
+  "22333322",
+  "12233221",
+  "11222211",
+};
+
+Tuile HEROS = {                   // 0 transparent, 1 clair, 2 moyen, 3 contour.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};
+
+int main() {                              // Le jeu commence ici.
+  texte(1, 1, "GAME BOY NORMALE");
+  for (uint8_t l = 8; l < 10; l++) {      // Lignes 8 et 9 :
+    for (uint8_t c = 4; c < 6; c++) {     //   buisson 1, colonnes 4 et 5,
+      poser(c, l, BUISSON);
+    }
+    for (uint8_t c = 12; c < 14; c++) {   //   buisson 2, colonnes 12 et 13.
+      poser(c, l, BUISSON);               //   Le même : c'est le héros qui changera de côté.
+    }
+  }
+
+  uint8_t x = 0;                          // La place du héros, en pixels.
+
+  while (true) {                          // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;           // Un pixel toutes les 2 images.
+    if (x > 152) x = 0;
+
+    // Devant ou derrière : on choisit selon la place du héros.
+    if (x < 80) {                         // à gauche (le buisson 1) :
+      sprite(0, x, 68, HEROS);            //   DEVANT le décor
+    } else {                              // à droite (le buisson 2) :
+      spriteDerriere(0, x, 68, HEROS);    //   DERRIÈRE le décor
+    }
+  }
+}
+```
+
+**Les deux buissons du 110.6, mais sur la Game Boy d’origine,** en quatre nuances de gris. Pas de couleur : ni `couleurFond()`, ni `teindre()`.
+
+**Ce qui est nouveau ici : la limite de la Game Boy normale.** Elle n’a qu’**une** carte pour le décor : rien pour dire « cette case-ci passe devant ». `DEVANT` n’existe pas. Il ne reste qu’un réglage, sur le **lutin** : `spriteDerriere()` (ou `DERRIERE`).
+
+**Le problème :** `DERRIERE` vaut pour **tout** le décor dessiné. Avec `spriteDerriere()` seul, le héros passerait derrière **les deux** buissons. Avec `sprite()` seul, devant les deux.
+
+**L’astuce : changer de côté selon la place.** Le premier buisson est à gauche (pixels 32 à 47), le second à droite (pixels 96 à 111). Entre les deux, il n’y a que le ciel. Alors, à chaque image : si `x < 80`, le héros est posé avec `sprite()` (**devant**) ; sinon, avec `spriteDerriere()` (**derrière**). Il passe devant le premier buisson, puis derrière le second.
+
+**Pourquoi 80 :** c’est au milieu du ciel, entre les deux buissons. Là, devant ou derrière, on voit le héros pareil (le ciel est vide, l’indice 0) : le changement ne se voit pas.
+
+**La différence avec la Color :** ici, c’est **ton programme** qui décide, à chaque image, avec un `if`. Sur la Color (la leçon suivante), c’est **la case** qui le dit, une fois pour toutes, avec `DEVANT` : plus besoin de savoir où sont les buissons.
+
+**Les buissons n’ont aucun 0,** comme au 110.6 : avec des coins vides, deux touffes côte à côte laisseraient un trou, et l’on verrait un morceau du héros y rester figé.
+
+**À toi :** inverse : derrière le premier buisson, devant le second. Il suffit d’échanger les deux lignes du `if`.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite>` → 0.69.4. La fonction sprite() — un lutin au pixel près
+- `#include <spriteDerriere>` → 110.10. La fonction spriteDerriere() — un lutin derrière le décor
+
+**Ce qu’on doit voir** — Deux buissons gris. Le héros passe devant celui de gauche, puis disparaît derrière celui de droite.  
+**Ce qu’il coûte** — 671 octets de programme, 3 variables.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (187 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `AdresseCase` (10 o, pour poser()), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (85 o), `EffacerCarte` (14 o), `Tuiles` (192 o), `DonneesTransfert` (10 o), `"GAME BOY NORMALE"` (16 o, pour texte()) · appels : `sprite()` ×2 (47 o), `poser()` ×2 (26 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `images()` ×1 (2 o) · lettres : ABEGLMNORY · pas gravé : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 110.12. La fonction poserDevant() — une case qui passe devant les lutins
+
+> #include <poserDevant> : poserDevant(colonne, ligne, tuile, palette) pose une tuile ET la fait passer devant les personnages (Game Boy Color).
+
+```cpp
+// ---- #include <poserDevant> : une case qui passe devant les lutins ----
+// Un mur posé avec poserDevant(). Le héros 0, posé dessus, disparaît derrière ;
+// le héros 1, à côté, se voit.
+
+#include <Tuile>
+#include <couleurFond>
+#include <sprite>
+#include <poserDevant>   // poserDevant() : poser + teindre(…, DEVANT), en une ligne
+
+Tuile MUR = {                    // des briques (1), des joints (3) : aucun 0
+  "33333333", "11131111", "11131111", "33333333",
+  "13111113", "13111113", "33333333", "11131111",
+};
+
+Tuile HEROS = {                  // 0 = transparent
+  "00333300", "03222230", "32122123", "32222223",
+  "03222230", "00333300", "03300330", "33000033",
+};
+
+int main() {
+  couleurFond(2, 1, 26, 12, 6);  // palette 2 : la brique
+  couleurFond(2, 3, 10, 4, 2);   //   et ses joints
+  poserDevant(9, 8, MUR, 2);     // le mur, case (9, 8), palette 2, DEVANT les lutins
+
+  sprite(0, 72, 64, HEROS);      // sur le mur (72 = 9 × 8, 64 = 8 × 8) : caché
+  sprite(1, 40, 64, HEROS);      // à côté : visible
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Ce qu’elle fait :** elle pose une tuile, comme `poser()`, et la met dans une palette **en la faisant passer devant les lutins**, comme `teindre(colonne, ligne, palette | DEVANT)`. Deux lignes en une.
+
+**La ligne à écrire : `#include <poserDevant>`.** Pas besoin d’inclure aussi `poser` ni `teindre` : la console s’en charge.
+
+**Ses arguments :** la colonne, la ligne, la tuile, la palette (0 à 7). Comme pour `teindre()`, la case ne cache le lutin que là où elle est **dessinée** (1, 2 ou 3) : ses 0 laissent voir le lutin.
+
+**Ce qu’elle coûte :** **rien de plus** que `poser()` suivi de `teindre()`. Le compilateur remplace la ligne par ces deux-là, mot pour mot : la cartouche a exactement les mêmes octets.
+
+**Essaie :** pose le héros 1 sur le mur, lui aussi (`sprite(1, 72, 64, HEROS)`) : il disparaît.
+
+**On retrouve poserDevant dans** — 110.13
+
+**Ce qu’on doit voir** — Un mur de briques et un héros à sa gauche. L’autre héros, posé sur le mur, ne se voit pas.  
+**Ce qu’il coûte** — 325 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (103 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (31 o), `EffacerCarte` (14 o), `Tuiles` (32 o), `DonneesTransfert` (10 o) · appels : `sprite()` ×2 (46 o), `couleurFond()` ×2 (24 o), `teindre()` ×1 (17 o), `poser()` ×1 (6 o), `image()` ×1 (6 o) · lettres : aucune · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 110.13. Devant, derrière : le buisson sur Game Boy Color, poserDevant()
+
+> Les deux buissons du 110.6, mais le second posé en UNE ligne : poserDevant(c, l, BUISSON, 2). Même écran, mêmes octets, moins à écrire.
+
+```cpp
+// CE PROGRAMME (Game Boy Color) : les deux buissons du 110.6. Le second est
+// posé en UNE ligne avec poserDevant() ; l'écran ne change pas.
+//
+// Ce qui est nouveau : poserDevant(colonne, ligne, tuile, palette).
+//
+//   AVANT (2 lignes)                        MAINTENANT (1 ligne)
+//   poser(c, l, BUISSON);                   poserDevant(c, l, BUISSON, 2);
+//   teindre(c, l, 2 | DEVANT);
+//
+// Le compilateur remplace la ligne de droite par les deux de gauche : la
+// cartouche a les mêmes octets. Rien n'est vérifié pendant le jeu : c'est la
+// console qui dessine la case devant le héros, toute seule.
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurLutin>   // choisit une couleur d’une palette des lutins
+#include <ecran>          // éteint ou rallume l’écran
+#include <poser>          // pose une tuile sur une case du fond
+#include <teindre>        // met une case du fond dans une palette
+#include <poserDevant>    // pose une tuile qui passe devant les lutins
+#include <texte>          // écrit un texte à l’écran
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <teindreLutin>   // met un lutin dans une palette
+
+Tuile BUISSON = {                 // Une touffe de feuilles : AUCUN 0, elle est toute pleine.
+  "11222211",                     //   (des coins en 0 laisseraient un trou là où deux
+  "12233221",                     //    touffes se touchent : on y verrait le héros)
+  "22333322",
+  "23333332",
+  "23333332",
+  "22333322",
+  "12233221",
+  "11222211",
+};
+
+Tuile HEROS = {                   // 0 transparent, 1 clair, 2 moyen, 3 contour.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};
+
+int main() {                              // Le jeu commence ici.
+  couleurFond(0, 0, 20, 28, 31);          // palette 0 : le ciel et le texte
+  couleurFond(0, 3,  2,  4, 12);
+  couleurFond(2, 0, 20, 28, 31);          // palette 2 : le ciel entre les feuilles,
+  couleurFond(2, 1, 16, 30,  8);          //   vert clair,
+  couleurFond(2, 2,  6, 22,  4);          //   vert,
+  couleurFond(2, 3,  0, 10,  2);          //   vert sombre.
+  couleurLutin(0, 1, 31, 28, 20);         // le héros : rose clair,
+  couleurLutin(0, 2, 31,  4,  2);         //   rouge,
+  couleurLutin(0, 3, 10,  0,  0);         //   contour très sombre.
+
+  ecran(0);                               // Dessin écran éteint.
+  texte(1, 1, "EN UNE LIGNE");
+  for (uint8_t l = 8; l < 10; l++) {      // Lignes 8 et 9 :
+    for (uint8_t c = 4; c < 6; c++) {     //   buisson 1, l'ancienne façon :
+      poser(c, l, BUISSON);
+      teindre(c, l, 2);                   //     palette 2, sans DEVANT.
+    }
+    for (uint8_t c = 12; c < 14; c++) {   //   buisson 2, la nouvelle façon :
+      poserDevant(c, l, BUISSON, 2);      //     posé, palette 2, DEVANT : une ligne.
+    }
+  }
+  ecran(1);                               // On rallume.
+
+  uint8_t x = 0;                          // La place du héros, en pixels.
+
+  while (true) {                          // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;           // Un pixel toutes les 2 images.
+    if (x > 152) x = 0;
+
+    sprite(0, x, 68, HEROS);
+    teindreLutin(0, 0);
+  }
+}
+```
+
+**Le programme des deux buissons (le 110.6), avec un seul changement :** le second buisson n’est plus posé avec deux lignes, `poser()` puis `teindre(…, 2 | DEVANT)`, mais avec **une seule**, `poserDevant()`.
+
+**Ce qui est nouveau ici : `poserDevant(colonne, ligne, tuile, palette)`,** une fonction de la console. Elle fait les deux gestes d’un coup : poser la tuile, et la mettre dans sa palette **devant** les lutins. C’est un peu comme une classe en HTML : on dit « devant » en posant la case, et on n’y pense plus.
+
+**Elle est légère, et même gratuite :** le compilateur la **remplace** par les deux lignes qu’on écrivait avant. La cartouche a exactement les mêmes octets qu’au 110.6. Et ensuite, pendant le jeu, rien n’est vérifié : c’est la console qui dessine la case devant le héros, toute seule, en dessinant l’écran.
+
+**Le même écran qu’à la leçon d’avant (Game Boy normale), mais autrement :** là, le programme changeait le héros de côté avec un `if`, selon sa place. Ici, grâce à `DEVANT`, c’est **la case** qui le dit : le héros n’a plus rien à savoir.
+
+**Le premier buisson garde l’ancienne façon,** `poser()` puis `teindre(…, 2)`, sans `DEVANT`. On compare les deux d’un coup d’œil.
+
+**À toi :** pose le premier buisson avec `poserDevant()`, lui aussi. Le héros passe derrière les deux, et `#include <teindre>` ne sert plus à rien : tu peux l’enlever.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+- `#include <couleurFond>` → 0.88.3. La fonction couleurFond() — une couleur du décor
+- `#include <couleurLutin>` → 0.107.4. La fonction couleurLutin() — une couleur des personnages
+- `#include <ecran>` → 27.1. La fonction ecran() — éteindre et rallumer l’écran
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+- `#include <teindre>` → 0.89.1. La fonction teindre() — une case dans une palette
+- `#include <poserDevant>` → 110.12. La fonction poserDevant() — une case qui passe devant les lutins
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite>` → 0.69.4. La fonction sprite() — un lutin au pixel près
+- `#include <teindreLutin>` → 0.107.5. La fonction teindreLutin() — un lutin dans une palette
+
+**Ce qu’on doit voir** — Le même écran qu’au 110.6 : le héros passe devant le buisson de gauche, derrière celui de droite.  
+**Ce qu’il coûte** — 762 octets de programme, 3 variables.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (346 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o, pour ecran()), `AttendreAcces` (12 o), `AdresseCase` (10 o, pour poser(), teindre()), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (85 o), `EffacerCarte` (14 o), `Tuiles` (128 o), `DonneesTransfert` (10 o), `"EN UNE LIGNE"` (12 o, pour texte()) · appels : `couleurFond()` ×6 (72 o), `teindre()` ×2 (48 o), `couleurLutin()` ×3 (36 o), `poser()` ×2 (26 o), `sprite()` ×1 (23 o), `ecran()` ×2 (21 o), `teindreLutin()` ×1 (16 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `images()` ×1 (2 o) · lettres : EGILNU · pas gravé : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 110.14. Devant, derrière : le tuyau en une ligne, spriteDerriere()
+
+> Le tuyau du 110.4, avec spriteDerriere(0, x, 72, HEROS) : plus de 5e argument à retenir.
+
+```cpp
+// CE PROGRAMME : le tuyau du 110.4. Le héros y entre et ressort de l'autre côté.
+//
+// Ce qui est nouveau : spriteDerriere(numero, x, y, tuile).
+//
+//   AVANT                                   MAINTENANT
+//   sprite(0, x, 72, HEROS, DERRIERE);      spriteDerriere(0, x, 72, HEROS);
+//
+// Le compilateur remplace la ligne de droite par celle de gauche : même prix.
+
+#include <Tuile>            // un dessin de 8 × 8 pixels
+#include <poser>            // pose une tuile sur une case du fond
+#include <texte>            // écrit un texte à l’écran
+#include <spriteDerriere>   // place un lutin derrière le décor
+
+Tuile TUYAU = {                   // Un morceau de tuyau couché : AUCUN 0, il est tout plein.
+  "33333333",
+  "11111111",
+  "22222222",
+  "22222222",
+  "22222222",
+  "22222222",
+  "21212121",
+  "33333333",
+};
+
+Tuile HEROS = {                   // Le héros : les points (.) sont transparents.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+int main() {                          // Le jeu commence ici.
+  texte(1, 1, "LE TUYAU");
+
+  for (uint8_t c = 8; c < 13; c++) {  // Le tuyau : colonnes 8 à 12, ligne 9.
+    poser(c, 9, TUYAU);
+  }
+
+  uint8_t x = 0;                      // La place du héros, en pixels.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;       // Un pixel toutes les 2 images.
+    if (x > 152) x = 0;
+
+    spriteDerriere(0, x, 72, HEROS);  // Le héros, derrière le décor : une ligne, sans 5e argument.
+  }
+}
+```
+
+**Le programme du tuyau (le 110.4), avec un seul changement :** `sprite(0, x, 72, HEROS, DERRIERE)` devient `spriteDerriere(0, x, 72, HEROS)`.
+
+**Ce qui est nouveau ici : `spriteDerriere(numero, x, y, tuile)`,** une fonction de la console. Le nom dit ce qu’elle fait : on n’a plus à se souvenir que `DERRIERE` se met en 5e position.
+
+**Le même prix qu’un `sprite()` :** le compilateur la remplace par `sprite(…, DERRIERE)`. On peut l’appeler à chaque image, dans la boucle du jeu, sans rien alourdir.
+
+**Et pour le repasser devant ?** On rappelle `sprite()` tout court, sans 5e argument : chaque appel range le lutin de nouveau, avec ce qu’on lui donne.
+
+**À toi :** fais-le passer devant le tuyau à l’aller, derrière au retour. Une variable `sens` et un `if` suffisent : `if (sens == 0) sprite(…); else spriteDerriere(…);`.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <spriteDerriere>` → 110.10. La fonction spriteDerriere() — un lutin derrière le décor
+
+**Ce qu’on doit voir** — Le même écran qu’au 110.4 : le héros disparaît dans le tuyau et ressort à droite.  
+**Ce qu’il coûte** — 506 octets de programme, 2 variables.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (103 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `AdresseCase` (10 o, pour poser()), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (128 o), `DonneesTransfert` (10 o), `"LE TUYAU"` (8 o, pour texte()) · appels : `sprite()` ×1 (24 o), `poser()` ×1 (13 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `images()` ×1 (2 o) · lettres : AELTUY · pas gravé : AvancerAirs, AttendreFinVBlank, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
 ## Chapitre 18 — Les collisions : se toucher, se cogner
 
-### 110.1. Chapitre 18 — Les collisions : se toucher, se cogner : ce qui vient
+### 110.15. Chapitre 18 — Les collisions : se toucher, se cogner : ce qui vient
 
 > L’entrée du chapitre 18 : ce qu’on a vu jusqu’ici, et ce que ses 3 étapes vont ajouter, une à la fois.
 
@@ -40106,7 +41365,7 @@ Deux détails qui se paient cher si on les oublie. Le compteur `depuis` plutôt 
 **Les fonctions de cette leçon — et le tuto de chacune**
 
 - `#include <panneau>` → 60.1. La fonction panneau() — montrer le panneau
-- `#include <textePanneau>` → 60.4. La fonction textePanneau() — écrire dans le panneau
+- `#include <textePanneau>` → 60.2. La fonction textePanneau() — écrire dans le panneau
 - `#include <nombrePanneau>` → 129.1. La fonction nombrePanneau() — un nombre dans le panneau
 - `#include <defiler>` → 0.90.3. La fonction defiler() — faire glisser le fond
 
@@ -41100,7 +42359,7 @@ Le reste est déjà connu : `aAvant` pour agir **au front** — un seul basculem
 
 ### 143.1. Chapitre 25 — Tes propres #include : ajouter une fonction : ce qui vient
 
-> L’entrée du chapitre 25 : ce qu’on a vu jusqu’ici, et ce que ses 8 étapes vont ajouter, une à la fois.
+> L’entrée du chapitre 25 : ce qu’on a vu jusqu’ici, et ce que ses 9 étapes vont ajouter, une à la fois.
 
 ```cpp
 // ---- Chapitre 25 : Tes propres #include : ajouter une fonction ----
@@ -41120,7 +42379,7 @@ int main() {
 
 **D’où l’on vient.** Le chapitre 24, « Aller au bout », vient de se terminer. Tout ce qu’il a montré reste valable : on s’en sert à partir d’ici sans le réexpliquer.
 
-**Ce que ce chapitre apporte : Tes propres #include : ajouter une fonction.** Il compte 8 étapes, dont 8 venues du cours :
+**Ce que ce chapitre apporte : Tes propres #include : ajouter une fonction.** Il compte 9 étapes, dont 9 venues du cours :
 
 - Une fonction à toi : bande()
 
@@ -41137,6 +42396,8 @@ int main() {
 - Ta fonction passe avant celle de la console
 
 - À toi : ajouter ta propre fonction de la console, pas à pas
+
+- Un raccourci à toi : écrire poserDevant() soi-même
 
 **Les fonctions qui arrivent :** `#include <bande>`. Chacune sera présentée seule, juste avant la première étape qui l’emploie : jamais deux lignes nouvelles d’un coup.
 
@@ -41718,6 +42979,114 @@ int main() {
 **Ce qu’on doit voir** — Un cadre de X au milieu de l’écran : colonnes 3 à 16, lignes 3 à 12, vide à l’intérieur.  
 **Ce qu’il coûte** — 1010 octets de programme, 10 variables.  
 **Ce qui est gravé** — `démarrage` (49 o), `bande()` (38 o), `pile()` (42 o), `main()` (83 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser()), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (704 o) · appels : `poser()` ×2 (38 o), `bande()` ×2 (38 o), `pile()` ×2 (38 o), `image()` ×1 (3 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+
+---
+
+### 152. Un raccourci à toi : écrire poserDevant() soi-même
+
+> poserDevant() de la console tient en deux lignes : on l’écrit soi-même, dans outils.cpp. Et l’on découvre pourquoi celle de la console est plus légère.
+
+`outils.cpp`
+
+```cpp
+// outils.cpp : MES fonctions.
+
+#include <poser>     // poserDevant() se sert de poser()…
+#include <teindre>   // … et de teindre()
+
+// poserDevant(colonne, ligne, tuile, palette) : MA version, en deux lignes.
+// Même nom que celle de la console : c'est la mienne qui sert.
+//   poserDevant(12, 8, BUISSON, 2) → la touffe en (12, 8), palette 2, devant.
+void poserDevant(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t palette) {
+  poser(colonne, ligne, tuile);                // 1. la tuile, sur sa case
+  teindre(colonne, ligne, palette | DEVANT);   // 2. sa palette, ET devant les lutins
+}
+```
+
+`principal.cpp`
+
+```cpp
+// Le buisson DEVANT, avec MA poserDevant(), écrite dans outils.cpp.
+// Pas de « #include <poserDevant> » : ma fonction vient d'outils.cpp.
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurLutin>   // choisit une couleur d’une palette des lutins
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <teindreLutin>   // met un lutin dans une palette
+#include "outils.cpp"     // MA poserDevant()
+
+Tuile BUISSON = {                 // Une touffe de feuilles : AUCUN 0, elle est toute pleine.
+  "11222211",                     //   (des coins en 0 laisseraient un trou là où deux
+  "12233221",                     //    touffes se touchent : on y verrait le héros)
+  "22333322",
+  "23333332",
+  "23333332",
+  "22333322",
+  "12233221",
+  "11222211",
+};
+
+Tuile HEROS = {                   // 0 transparent, 1 clair, 2 moyen, 3 contour.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};
+
+int main() {
+  couleurFond(2, 1, 16, 30,  8);  // palette 2 : les verts du buisson
+  couleurFond(2, 2,  6, 22,  4);
+  couleurFond(2, 3,  0, 10,  2);
+  couleurLutin(0, 2, 31,  4,  2); // le héros : rouge
+  couleurLutin(0, 3, 10,  0,  0);
+
+  // Un buisson de 2 × 2 cases, colonnes 12-13, lignes 8-9 : quatre appels.
+  poserDevant(12, 8, BUISSON, 2);
+  poserDevant(13, 8, BUISSON, 2);
+  poserDevant(12, 9, BUISSON, 2);
+  poserDevant(13, 9, BUISSON, 2);
+
+  sprite(0, 96, 68, HEROS);       // le héros, dans le buisson : caché
+  teindreLutin(0, 0);
+  sprite(1, 40, 68, HEROS);       // un autre, à découvert : visible
+  teindreLutin(1, 0);
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Une fonction « raccourci », c’est juste un nom donné à des gestes qu’on sait déjà faire.** `poserDevant()` (le 110.10) pose une tuile, puis la teint `| DEVANT`. Ici, on l’écrit **soi-même**, dans `outils.cpp`, comme `bande()` et `pile()`.
+
+**Lis-la :** quatre paramètres, deux lignes. `poser(colonne, ligne, tuile)` pose la tuile ; `teindre(colonne, ligne, palette | DEVANT)` choisit sa palette et la fait passer devant les lutins.
+
+**Elle porte le même nom que celle de la console :** c’est donc **la tienne** qui sert (le 15.7). Le programme n’écrit pas `#include <poserDevant>` : il n’en a pas besoin. Il inclut `poser` et `teindre`, dont TA fonction se sert.
+
+**La différence de poids :** ta version est une vraie fonction. À chaque appel, le programme range quatre nombres, saute dans la fonction, et `poser()` et `teindre()` ne savent plus rien d’avance (la case, la tuile) : elles calculent tout pendant le jeu. Celle de la console, elle, n’est **pas une vraie fonction** : le compilateur **recopie ses deux lignes à la place de l’appel**, avec les vrais nombres. Le résultat est le même à l’écran ; la cartouche de la console est plus petite.
+
+**Alors, la tienne ne sert à rien ?** Si : elle est à toi, tu peux la changer. Une version qui pose **deux** cases d’un coup (un buisson de 2 de large), une autre qui choisit toute seule la palette… La console ne fera jamais ce que ton jeu a en tête.
+
+**À toi :** ajoute dans `outils.cpp` un `buissonDevant(colonne, ligne)` qui appelle quatre fois `poserDevant()` pour un buisson de 2 × 2 cases.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+- `#include <couleurFond>` → 0.88.3. La fonction couleurFond() — une couleur du décor
+- `#include <couleurLutin>` → 0.107.4. La fonction couleurLutin() — une couleur des personnages
+- `#include <sprite>` → 0.69.4. La fonction sprite() — un lutin au pixel près
+- `#include <teindreLutin>` → 0.107.5. La fonction teindreLutin() — un lutin dans une palette
+- `#include <poser>` → 0.1.3. La fonction poser() — poser une tuile
+- `#include <teindre>` → 0.89.1. La fonction teindre() — une case dans une palette
+
+**Ce qu’on doit voir** — Un buisson vert, et un héros rouge à gauche. Le second héros, dans le buisson, est caché.  
+**Ce qu’il coûte** — 1187 octets de programme, 4 variables.  
+**Ce qui est gravé** — `démarrage` (57 o), `poserDevant()` (40 o), `main()` (224 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser(), teindre()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (736 o), `DonneesTransfert` (10 o) · appels : `poserDevant()` ×4 (76 o), `sprite()` ×2 (46 o), `couleurFond()` ×3 (36 o), `teindreLutin()` ×2 (32 o), `teindre()` ×1 (26 o), `couleurLutin()` ×2 (24 o), `poser()` ×1 (13 o), `image()` ×1 (6 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
 
 ---
 

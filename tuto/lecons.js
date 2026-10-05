@@ -12517,22 +12517,22 @@ int main() {
   {
     titre: 'Agrandir une lettre : texteGrand',
     difficulte: 0,
-    idee: 'texteGrand(x, y, "A", 3) : le A trois fois plus grand, sans rien dessiner. Chaque pixel devient un carré de 3 × 3 pixels ; les proportions sont gardées.',
+    idee: 'texteGrand(x, y, "A", 2) : le A trois fois plus grand, sans rien dessiner. Chaque pixel devient un carré de 3 × 3 pixels ; les proportions sont gardées.',
     texte: [
       '**Une lettre plus grande, sans la dessiner.** La Game Boy n’a pas de zoom, mais la console peut **calculer** une lettre agrandie à partir de la police : chaque pixel devient un carré.',
-      '**Ce qui est nouveau ici : `texteGrand(x, y, "TEXTE", taille)`.** La **taille** va de **1 à 20** : c’est combien de fois plus grand. Avec `3`, chaque pixel de la lettre devient un carré de **3 × 3 pixels**. La lettre garde **exactement ses proportions**.',
-      '**La place qu’elle prend :** une lettre normale tient dans **1 case** (8 × 8 pixels). Agrandie 3 fois, elle en prend **3 × 3 = 9** (24 × 24 pixels). À la taille *n*, une lettre prend *n* cases de large et *n* de haut.',
-      '**Le texte et la taille s’écrivent en clair** (`"A"`, `3`), comme pour `ms()` : le compilateur fabrique les tuiles agrandies **avant le jeu**, et seulement celles dont le programme a besoin.',
+      '**Ce qui est nouveau ici : `texteGrand(x, y, "TEXTE", taille)`.** La **taille** va de **0 à 10**. **0, c’est la lettre normale** ; chaque cran de plus l’agrandit **une fois de plus** : 1 → 2 fois, 2 → 3 fois… 10 → 11 fois. Avec `2`, chaque pixel de la lettre devient un carré de **3 × 3 pixels**. La lettre garde **exactement ses proportions**.',
+      '**La place qu’elle prend :** une lettre normale (taille 0) tient dans **1 case** (8 × 8 pixels). À la taille 2, elle est 3 fois plus grande et prend **3 × 3 = 9** cases (24 × 24 pixels). À la taille *n*, une lettre prend *n + 1* cases de large et *n + 1* de haut.',
+      '**Le texte et la taille s’écrivent en clair** (`"A"`, `2`), comme pour `ms()` : le compilateur fabrique les tuiles agrandies **avant le jeu**, et seulement celles dont le programme a besoin.',
       '**Ce qu’elle coûte :** quelques tuiles de plus dans la cartouche. Deux tuiles identiques (souvent toutes pleines aux grandes tailles) ne sont fabriquées qu’une fois.',
     ],
-    code: `#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+    code: `#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
 
 int main() {
   // La ligne, morceau par morceau :
   //
-  //   texteGrand(2, 2, "A", 3);
+  //   texteGrand(2, 2, "A", 2);
   //              |  |  |    |
-  //              |  |  |    +-- la TAILLE : 3 fois plus grand (de 1 à 20)
+  //              |  |  |    +-- la TAILLE (de 0 à 10) : 2 → 3 fois plus grand
   //              |  |  +------- le texte, entre guillemets
   //              +--+---------- la case en haut à gauche du grand A : (2, 2)
   //
@@ -12544,7 +12544,7 @@ int main() {
   //   ·█···█··                 ······█████████·········
   //   ·█████··                 ···███·········███······
   //   …                        …
-  texteGrand(2, 2, "A", 3);
+  texteGrand(2, 2, "A", 2);
 
   while (true) {
     image();
@@ -12565,31 +12565,31 @@ int main() {
     titre: 'Agrandir une lettre : texteGrand — toutes les tailles',
     difficulte: 0,
     suite: true,
-    idee: 'Le même A, aux tailles 1, 2, 3 et 4, côte à côte : un seul nombre change d’une ligne à l’autre.',
+    idee: 'Le même A, aux tailles 0, 1, 2 et 3, côte à côte : un seul nombre change d’une ligne à l’autre.',
     texte: [
-      '**Quatre lignes, un seul nombre qui change :** la taille, 1, 2, 3, puis 4. On voit le A grandir.',
+      '**Quatre lignes, un seul nombre qui change :** la taille, 0, 1, 2, puis 3. On voit le A grandir.',
       '**Tu choisis la taille, la console s’adapte :** aucune taille n’est dessinée à l’avance. Chaque `texteGrand` fait calculer les tuiles de SA taille.',
-      '**La place :** taille 1, 1 case ; taille 2, 2 × 2 ; taille 3, 3 × 3 ; taille 4, 4 × 4. Les colonnes de départ (0, 2, 5, 9) laissent juste la place à chacun.',
+      '**La place :** taille 0, 1 case ; taille 1, 2 × 2 ; taille 2, 3 × 3 ; taille 3, 4 × 4. Toujours **taille + 1** cases de côté. Les colonnes de départ (0, 2, 5, 9) laissent juste la place à chacun.',
     ],
-    code: `#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+    code: `#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
 
 int main() {
-  texteGrand(0, 0, "A", 1);     // taille 1 : 1 case, comme une lettre normale
-  texteGrand(2, 0, "A", 2);     // taille 2 : 2 × 2 cases
-  texteGrand(5, 0, "A", 3);     // taille 3 : 3 × 3 cases
-  texteGrand(9, 0, "A", 4);     // taille 4 : 4 × 4 cases
+  texteGrand(0, 0, "A", 0);     // taille 0 : 1 case, la lettre normale
+  texteGrand(2, 0, "A", 1);     // taille 1 : 2 × 2 cases
+  texteGrand(5, 0, "A", 2);     // taille 2 : 3 × 3 cases
+  texteGrand(9, 0, "A", 3);     // taille 3 : 4 × 4 cases
 
   while (true) {
     image();
   }
 }
 `,
-    aVoir: 'Quatre A côte à côte, de plus en plus grands : tailles 1, 2, 3 et 4.',
+    aVoir: 'Quatre A côte à côte, de plus en plus grands : tailles 0, 1, 2 et 3.',
     controle: (c) => {
       c.avancer(10)
       return [
-        ['taille 1 : une case', (() => { let n = 0; for (let j = 0; j < 1; j++) for (let i = 0; i < 1; i++) if (c.lire(i, j) !== 0) n++; return n })() === 1],
-        ['taille 4 : dans ses 4 × 4 cases', (() => { let n = 0; for (let j = 0; j < 4; j++) for (let i = 9; i < 13; i++) if (c.lire(i, j) !== 0) n++; return n })() >= 10],
+        ['taille 0 : une case', (() => { let n = 0; for (let j = 0; j < 1; j++) for (let i = 0; i < 1; i++) if (c.lire(i, j) !== 0) n++; return n })() === 1],
+        ['taille 3 : dans ses 4 × 4 cases', (() => { let n = 0; for (let j = 0; j < 4; j++) for (let i = 9; i < 13; i++) if (c.lire(i, j) !== 0) n++; return n })() >= 10],
         ['chacun plus grand que le précédent', (() => { let n = 0; for (let j = 0; j < 2; j++) for (let i = 2; i < 4; i++) if (c.lire(i, j) !== 0) n++; return n })() < (() => { let n = 0; for (let j = 0; j < 3; j++) for (let i = 5; i < 8; i++) if (c.lire(i, j) !== 0) n++; return n })() && (() => { let n = 0; for (let j = 0; j < 3; j++) for (let i = 5; i < 8; i++) if (c.lire(i, j) !== 0) n++; return n })() < (() => { let n = 0; for (let j = 0; j < 4; j++) for (let i = 9; i < 13; i++) if (c.lire(i, j) !== 0) n++; return n })()],
       ]
     },
@@ -12599,17 +12599,17 @@ int main() {
     titre: 'Agrandir une lettre : texteGrand — dix fois',
     difficulte: 0,
     suite: true,
-    idee: 'Le plus grand : texteGrand(5, 4, "A", 10). Un A de 80 × 80 pixels, 10 × 10 cases, la moitié de l’écran.',
+    idee: 'Dix fois plus grand : texteGrand(5, 4, "A", 9). Un A de 80 × 80 pixels, 10 × 10 cases, la moitié de l’écran.',
     texte: [
-      '**La taille la plus grande, 10 :** chaque pixel devient un carré de 10 × 10 pixels. Le A fait **80 × 80 pixels**, soit **10 × 10 cases** : la moitié de la largeur de l’écran (20 cases).',
-      '**La moitié de l’écran :** l’écran fait 20 × 18 cases ; à la taille 10, une lettre en prend 10 × 10. La plus grande taille, 20, remplit l’écran entier : c’est le 0.87.4.',
+      '**La taille 9 :** 9 + 1 = 10 fois plus grand ; chaque pixel devient un carré de 10 × 10 pixels. Le A fait **80 × 80 pixels**, soit **10 × 10 cases** : la moitié de la largeur de l’écran (20 cases).',
+      '**La moitié de l’écran :** l’écran fait 20 × 18 cases ; à la taille 9, une lettre en prend 10 × 10. La plus grande taille, 10, est un cran au-dessus : c’est le 0.87.4.',
       '**Ça ne coûte presque rien de plus :** aux grandes tailles, beaucoup de tuiles sont **toutes pleines** ou **toutes vides**. Les tuiles identiques ne sont fabriquées qu’une fois.',
     ],
-    code: `#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+    code: `#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
 
 int main() {
-  // Le A dix fois plus grand : 10 × 10 cases, de (5, 4) à (14, 13).
-  texteGrand(5, 4, "A", 10);
+  // Taille 9 : le A dix fois plus grand, 10 × 10 cases, de (5, 4) à (14, 13).
+  texteGrand(5, 4, "A", 9);
 
   while (true) {
     image();
@@ -12630,17 +12630,17 @@ int main() {
     titre: 'Agrandir une lettre : texteGrand — un mot',
     difficulte: 0,
     suite: true,
-    idee: 'Un mot entier agrandi : texteGrand(3, 7, "JEU", 4). Chaque lettre prend 4 × 4 cases ; le mot, 12 × 4.',
+    idee: 'Un mot entier agrandi : texteGrand(3, 7, "JEU", 3). Chaque lettre prend 4 × 4 cases ; le mot, 12 × 4.',
     texte: [
       '**Pas seulement une lettre :** `texteGrand` agrandit un **mot entier**. Les lettres se suivent, chacune agrandie.',
-      '**La largeur du mot :** 3 lettres × 4 cases = **12 cases**. Il faut qu’elle tienne dans les 20 colonnes de l’écran : `"BONJOUR"` (7 lettres) tient à la taille 2 (14 cases), pas à la taille 3 (21 cases).',
+      '**La largeur du mot :** à la taille 3, une lettre prend 3 + 1 = 4 cases ; 3 lettres × 4 cases = **12 cases**. Il faut qu’elle tienne dans les 20 colonnes de l’écran : `"BONJOUR"` (7 lettres) tient à la taille 1 (14 cases), pas à la taille 2 (21 cases).',
       '**Un titre de jeu,** c’est exactement ça : un mot en grand, au milieu de l’écran.',
     ],
-    code: `#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+    code: `#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
 
 int main() {
-  // 3 lettres × 4 cases = 12 cases de large, 4 de haut : de (3, 7) à (14, 10).
-  texteGrand(3, 7, "JEU", 4);
+  // Taille 3 : 4 cases par lettre ; 3 lettres × 4 = 12 cases de large, 4 de haut : de (3, 7) à (14, 10).
+  texteGrand(3, 7, "JEU", 3);
 
   while (true) {
     image();
@@ -12658,35 +12658,38 @@ int main() {
   },
 
   {
-    titre: 'Agrandir une lettre : texteGrand — vingt fois',
+    titre: 'Agrandir une lettre : texteGrand — la plus grande taille, 10',
     difficulte: 0,
     suite: true,
-    idee: 'La plus grande taille : texteGrand(0, 0, "A", 20). Le A remplit tout l’écran, 160 × 140 pixels.',
+    idee: 'La plus grande taille : texteGrand(0, 0, "A", 10). Le A est 11 fois plus grand : 11 × 11 cases, plus de la moitié de l’écran.',
     texte: [
-      '**La taille la plus grande, 20 :** chaque pixel du A devient un carré de 20 × 20 pixels. La lettre fait **160 pixels de large** (toute la largeur de l’écran) et **140 de haut** : elle remplit l’écran.',
-      '**Pourquoi 20 au plus :** une lettre de la police fait **7 pixels de haut**, et l’écran **144**. 7 × 20 = 140 : elle tient encore entière. À 21, 7 × 21 = 147 : le bas du A sortirait de l’écran. Le compilateur refuse donc au-delà de 20, et dit pourquoi.',
-      '**En largeur aussi, tout juste :** une case de lettre fait 8 pixels ; 8 × 20 = 160, la largeur exacte de l’écran. Pour tenir, le A géant commence en (0, 0).',
-      '**Ça ne coûte presque rien en dessins :** à cette taille, presque toutes les tuiles sont toutes pleines ou toutes vides. Le A géant n’en demande que 9 différentes.',
+      '**La taille la plus grande, 10 :** 10 + 1 = 11 fois plus grand ; chaque pixel du A devient un carré de 11 × 11 pixels. La lettre prend **11 × 11 cases** (88 × 88 pixels) : plus de la moitié de l’écran.',
+      '**Pourquoi 10 au plus :** les tailles vont de 0 à 10, comme une note sur 10. Au-delà, le compilateur refuse, et dit pourquoi : « la taille va de 0 à 10 ».',
+      '**Pour tenir :** 11 cases de large sur 20, 11 de haut sur 18. Le A géant commence en (0, 0), il reste de la place à droite et en dessous.',
+      '**Ça ne coûte presque rien en dessins :** à cette taille, beaucoup de tuiles sont toutes pleines ou toutes vides, et les tuiles identiques ne sont fabriquées qu’une fois.',
     ],
-    code: `#include <texteGrand>   // écrit un texte agrandi, de 1 à 20 fois
+    code: `#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
 
 int main() {
-  // La plus grande taille : 20. Le A fait 20 × 20 cases, tout l'écran.
-  //   8 pixels × 20 = 160 : toute la largeur
-  //   7 pixels × 20 = 140 : presque toute la hauteur (144)
-  texteGrand(0, 0, "A", 20);
+  // La plus grande taille : 10. Le A est 11 fois plus grand : 11 × 11 cases.
+  //   8 pixels × 11 = 88 de large
+  //   7 pixels × 11 = 77 de haut
+  texteGrand(0, 0, "A", 10);
 
   while (true) {
     image();
   }
 }
 `,
-    aVoir: 'Un A immense, qui remplit tout l’écran.',
+    aVoir: 'Un A immense en haut à gauche, sur plus de la moitié de l’écran.',
     controle: (c) => {
       c.avancer(10)
-      let n = 0
-      for (let j = 0; j < 18; j++) for (let i = 0; i < 20; i++) if (c.lire(i, j) !== 0) n++
-      return [['le A géant occupe une grande part de l’écran', n >= 100, ` (${n} cases pleines)`]]
+      let n = 0, dehors = 0
+      for (let j = 0; j < 18; j++) for (let i = 0; i < 20; i++) if (c.lire(i, j) !== 0) { if (i < 11 && j < 11) n++; else dehors++ }
+      return [
+        ['le A géant remplit une bonne part de ses 11 × 11 cases', n >= 40, ` (${n} cases pleines)`],
+        ['il ne déborde pas', dehors === 0],
+      ]
     },
   },
 
@@ -12694,12 +12697,12 @@ int main() {
     titre: 'Agrandir une lettre : texteGrand — aller à la ligne, texteGrandS',
     difficulte: 0,
     suite: true,
-    idee: 'texteGrandS(0, 0, "BONJOUR", 3) : comme texteGrand, mais les lettres qui ne tiennent plus dans la largeur passent à la ligne, comme textS.',
+    idee: 'texteGrandS(0, 0, "BONJOUR", 2) : comme texteGrand, mais les lettres qui ne tiennent plus dans la largeur passent à la ligne, comme textS.',
     texte: [
-      '**Avec `texteGrand`, un mot trop long sort de l’écran par la droite.** « BONJOUR » en taille 3 demande 7 × 3 = 21 cases de large ; l’écran n’en a que 20 : le R disparaît.',
-      '**Ce qui est nouveau ici : `texteGrandS`,** le `S` de `textS` (le 0.11). Même réglages que `texteGrand`, mais les lettres qui ne tiennent plus **passent à la ligne** : elles reprennent en colonne 0, une rangée de lettres plus bas (3 cases, à la taille 3).',
-      '**Le découpage :** à la taille 3, une ligne tient 20 ÷ 3 = 6 lettres (18 cases). « BONJOU » sur la première, « R » sur la deuxième.',
-      '**Trop haut, c’est une erreur :** l’écran a 18 cases de haut. Si le texte en demande plus (« BONJOUR » en taille 7 : 4 lignes de 7 cases, 28), le compilateur refuse, et dit combien il en faudrait.',
+      '**Avec `texteGrand`, un mot trop long sort de l’écran par la droite.** « BONJOUR » en taille 2 (3 cases par lettre) demande 7 × 3 = 21 cases de large ; l’écran n’en a que 20 : le R disparaît.',
+      '**Ce qui est nouveau ici : `texteGrandS`,** le `S` de `textS` (le 0.11). Même réglages que `texteGrand`, mais les lettres qui ne tiennent plus **passent à la ligne** : elles reprennent en colonne 0, une rangée de lettres plus bas (3 cases, à la taille 2).',
+      '**Le découpage :** à la taille 2, une lettre prend 3 cases ; une ligne en tient 20 ÷ 3 = 6 lettres (18 cases). « BONJOU » sur la première, « R » sur la deuxième.',
+      '**Trop haut, c’est une erreur :** l’écran a 18 cases de haut. Si le texte en demande plus (« BONJOUR » en taille 6 : 4 lignes de 7 cases, 28), le compilateur refuse, et dit combien il en faudrait.',
       '**Tout s’écrit en clair,** même la place : le découpage en lignes se fait avant le jeu.',
     ],
     code: `#include <texteGrandS>   // écrit un texte agrandi qui passe à la ligne
@@ -12707,12 +12710,12 @@ int main() {
 int main() {
   // Comme texteGrand, mais qui VA À LA LIGNE :
   //
-  //   texteGrandS(0, 0, "BONJOUR", 3);
-  //   la taille 3 : 3 cases par lettre ; une ligne de 20 cases en tient 6.
+  //   texteGrandS(0, 0, "BONJOUR", 2);
+  //   la taille 2 : 3 cases par lettre ; une ligne de 20 cases en tient 6.
   //
   //   ligne 1, cases 0 à 2 :   B O N J O U     (6 lettres × 3 = 18 cases)
   //   ligne 2, cases 3 à 5 :   R               (repart en colonne 0)
-  texteGrandS(0, 0, "BONJOUR", 3);
+  texteGrandS(0, 0, "BONJOUR", 2);
 
   while (true) {
     image();
@@ -12965,12 +12968,12 @@ int main() {
       '**C’est un écran titre :** un mot en grand et en couleur, au milieu. Il ne reste qu’à écrire en dessous « APPUIE SUR START ».',
     ],
     code: `#include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 
 int main() {
   couleurTexte(31, 16, 0);          // de l'orange : tout le rouge, la moitié du vert
-  texteGrand(4, 5, "JEU", 4);       // le titre, 4 fois plus grand (le 0.87)
+  texteGrand(4, 5, "JEU", 3);       // le titre, taille 3 : 4 fois plus grand (le 0.87)
   texte(2, 12, "APPUIE SUR START"); // en dessous, en petit : orange aussi
 
   while (true) {
@@ -13007,7 +13010,7 @@ int main() {
       '**La couleur reste :** `couleurTexte` a réglé l’encre de toutes les lettres ; le nouvel écran est orange aussi.',
     ],
     code: `#include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <bouton>         // lit un bouton de la manette
 #include <effacer>        // efface des cases, ou tout le fond
@@ -13017,7 +13020,7 @@ uint8_t ecranTitre = 1;   // sur quel écran on est : 1 = le titre, 0 = l'écran
 int main() {
   // Le titre du 0.90 :
   couleurTexte(31, 16, 0);          // de l'orange
-  texteGrand(4, 5, "JEU", 4);       // le grand titre
+  texteGrand(4, 5, "JEU", 3);       // le grand titre
   texte(2, 12, "APPUIE SUR START"); // la consigne
 
   while (true) {
@@ -13079,7 +13082,7 @@ int main() {
       '**Le B, pas un A :** « C EST PARTI » contient déjà un A ; un B se distingue mieux.',
     ],
     code: `#include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <bouton>         // lit un bouton de la manette
 #include <effacer>        // efface des cases, ou tout le fond
@@ -13090,7 +13093,7 @@ uint8_t ecranTitre = 1;   // 1 = le titre, 0 = l'écran d'après
 
 int main() {
   couleurTexte(31, 16, 0);          // le titre du 0.90, en orange
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -13148,7 +13151,7 @@ int main() {
       '**60 images par seconde, un pixel chaque fois :** le texte traverse l’écran (160 pixels) en moins de 3 secondes, tout en douceur.',
     ],
     code: `#include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <bouton>         // lit un bouton de la manette
 #include <effacer>        // efface des cases, ou tout le fond
@@ -13159,7 +13162,7 @@ uint8_t d = 0;            // la caméra : 0 = elle regarde le début du décor
 
 int main() {
   couleurTexte(31, 16, 0);          // le titre du 0.90, en orange
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -13221,7 +13224,7 @@ int main() {
     ],
     code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <bouton>         // lit un bouton de la manette
 #include <effacer>        // efface des cases, ou tout le fond
@@ -13232,7 +13235,7 @@ uint8_t p = 0;            // la colonne du bandeau
 
 int main() {
   couleurTexte(31, 16, 0);          // le titre du 0.90, en orange
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -13293,7 +13296,7 @@ int main() {
       '**Seulement sur le titre :** `ecranTitre == 1 && chaque(500)`. Après START, la consigne ne revient plus.',
     ],
     code: `#include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <effacer>        // efface des cases, ou tout le fond
@@ -13304,7 +13307,7 @@ uint8_t visible = 1;      // 1 = la consigne est à l'écran, 0 = elle est effac
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");   // au départ, elle est là : visible = 1
 
   while (true) {
@@ -13362,7 +13365,7 @@ int main() {
       '**`void`** veut dire que la fonction ne rend rien : elle **fait** quelque chose (elle dessine, elle efface), c’est tout.',
       '**Au retour, `visible` repasse à 1 :** dessinerTitre() vient d’écrire la consigne, elle est donc à l’écran.',
     ],
-    code: `#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+    code: `#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <effacer>        // efface des cases, ou tout le fond
 #include <couleurTexte>   // choisit la couleur des lettres
@@ -13376,7 +13379,7 @@ uint8_t visible = 1;      // la consigne : 1 = à l'écran, 0 = effacée
 
 // Dessiner le titre : au départ, ET à chaque retour avec SELECT.
 void dessinerTitre() {
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 }
 
@@ -13455,7 +13458,7 @@ int main() {
     code: `// ---- NOUVEAU : une variable pour TROIS écrans ----
 //   ecran = 0 : le TITRE    ecran = 1 : le JEU    ecran = 2 : la FIN
 
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <texte>          // écrit un texte à l’écran
 #include <effacer>        // efface des cases, ou tout le fond
 #include <couleurTexte>   // choisit la couleur des lettres
@@ -13466,7 +13469,7 @@ uint8_t ecran = 0;
 uint8_t visible = 1;      // la consigne du titre : 1 = à l'écran, 0 = effacée
 
 void dessinerTitre() {
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 }
 
@@ -13561,7 +13564,7 @@ int main() {
     ],
     code: `#include <effacer>         // efface des cases, ou tout le fond
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <texte>           // écrit un texte à l’écran
 #include <bouton>          // lit un bouton de la manette
 #include <poser>           // pose une tuile sur une case du fond
@@ -13586,7 +13589,7 @@ void viderEcran() {
 
 int main() {
   couleurTexte(31, 16, 0);            // le titre du 0.90
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -13641,7 +13644,7 @@ int main() {
     ],
     code: `#include <effacer>         // efface des cases, ou tout le fond
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <texte>           // écrit un texte à l’écran
 #include <bouton>          // lit un bouton de la manette
 #include <poser>           // pose une tuile sur une case du fond
@@ -13667,7 +13670,7 @@ void viderEcran() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -13735,7 +13738,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <nombre>          // écrit un nombre en chiffres
@@ -13774,7 +13777,7 @@ void nouvellePartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -13848,7 +13851,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <nombre>          // écrit un nombre en chiffres
@@ -13912,7 +13915,7 @@ void nouvellePartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -14006,7 +14009,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <hasard>          // tire un nombre au hasard
@@ -14071,7 +14074,7 @@ void nouvellePartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -14180,7 +14183,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <hasard>          // tire un nombre au hasard
@@ -14250,7 +14253,7 @@ void nouvellePartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -14384,7 +14387,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <hasard>          // tire un nombre au hasard
@@ -14453,7 +14456,7 @@ void nouvellePartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -14616,7 +14619,7 @@ int main() {
 #include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
 #include <texte>          // écrit un texte à l’écran
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -14687,7 +14690,7 @@ void nouvellePartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -14867,7 +14870,7 @@ int main() {
 #include <texte>          // écrit un texte à l’écran
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -14949,7 +14952,7 @@ void finPartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -15122,7 +15125,7 @@ int main() {
 #include <texte>          // écrit un texte à l’écran
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -15200,7 +15203,7 @@ void finPartie() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -15373,7 +15376,7 @@ int main() {
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurFond>    // choisit une couleur d’une palette du fond
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -15512,7 +15515,7 @@ void ouvrirMenu() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -15718,7 +15721,7 @@ int main() {
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurFond>    // choisit une couleur d’une palette du fond
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -15860,7 +15863,7 @@ void ouvrirMenu() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -16053,7 +16056,7 @@ int main() {
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurFond>    // choisit une couleur d’une palette du fond
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, de 1 à 20 fois
+#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -16214,7 +16217,7 @@ void ouvrirMenu() {
 
 int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {
@@ -23363,22 +23366,22 @@ int main() {
   {
     titre: 'La fonction texteGrand() — un texte agrandi',
     difficulte: 0,
-    idee: '#include <texteGrand> : texteGrand(colonne, ligne, "B", 3) écrit un B trois fois plus grand, sans rien dessiner.',
+    idee: '#include <texteGrand> : texteGrand(colonne, ligne, "B", 2) écrit un B trois fois plus grand, sans rien dessiner.',
     texte: [
-      '**Ce qu’elle fait :** `texteGrand(colonne, ligne, "TEXTE", taille)` écrit un texte **agrandi** de 1 à 20 fois. Chaque pixel de la lettre devient un carré de `taille × taille` pixels : une lettre prend `taille × taille` cases.',
+      '**Ce qu’elle fait :** `texteGrand(colonne, ligne, "TEXTE", taille)` écrit un texte **agrandi**. La taille va de **0 à 10** : 0, c’est la lettre normale ; chaque cran l’agrandit une fois de plus (2 → 3 fois plus grand). Une lettre prend `(taille + 1) × (taille + 1)` cases.',
       '**La ligne à écrire : `#include <texteGrand>`.**',
       '**Ses arguments :** la colonne et la ligne du coin en haut à gauche, le texte entre guillemets, la taille. Le texte et la taille **s’écrivent en clair** : le compilateur fabrique les tuiles agrandies avant le jeu.',
-      '**Ce qu’elle coûte :** environ **950 octets** pour un A en taille 2 : les tuiles agrandies, la petite fonction qui les pose, et la police.',
-      '**Essaie :** `texteGrand(0, 0, "GO", 5);` : deux lettres de 5 × 5 cases.',
+      '**Ce qu’elle coûte :** environ **950 octets** pour un A en taille 1 : les tuiles agrandies, la petite fonction qui les pose, et la police.',
+      '**Essaie :** `texteGrand(0, 0, "GO", 4);` : deux lettres de 5 × 5 cases.',
     ],
     code: `// ---- #include <texteGrand> : un texte agrandi ----
-// Un B trois fois plus grand : 3 × 3 cases, à partir de la case (2, 2).
+// Taille 2 : un B trois fois plus grand, 3 × 3 cases, à partir de la case (2, 2).
 // (Le A, ce sera la leçon « Agrandir une lettre », juste après.)
 
 #include <texteGrand>   // texteGrand() : les lettres agrandies
 
 int main() {
-  texteGrand(2, 2, "B", 3);   // colonne 2, ligne 2, le texte, la taille
+  texteGrand(2, 2, "B", 2);   // colonne 2, ligne 2, le texte, la taille
 
   while (true) {
     image();
@@ -23401,20 +23404,20 @@ int main() {
     difficulte: 0,
     idee: '#include <texteGrandS> : comme texteGrand(), mais les lettres qui ne tiennent plus repartent à gauche, une rangée de lettres plus bas.',
     texte: [
-      '**Ce qu’elle fait :** `texteGrandS(colonne, ligne, "TEXTE", taille)` écrit un texte agrandi qui **va à la ligne** : une lettre qui dépasserait la colonne 19 repart en colonne 0, `taille` cases plus bas.',
+      '**Ce qu’elle fait :** `texteGrandS(colonne, ligne, "TEXTE", taille)` écrit un texte agrandi qui **va à la ligne** : une lettre qui dépasserait la colonne 19 repart en colonne 0, `taille + 1` cases plus bas.',
       '**La ligne à écrire : `#include <texteGrandS>`.**',
       '**Ses arguments :** comme `texteGrand()`, et **tout en clair** — la place aussi : le découpage en lignes se fait avant le jeu. Un texte qui dépasserait le bas de l’écran est refusé.',
-      '**Ce qu’elle coûte :** environ **1 000 octets** pour deux lettres en taille 2.',
-      '**Essaie :** `texteGrandS(0, 0, "BONJOUR", 4);` : combien de lignes ?',
+      '**Ce qu’elle coûte :** environ **1 000 octets** pour deux lettres en taille 1.',
+      '**Essaie :** `texteGrandS(0, 0, "BONJOUR", 3);` : combien de lignes ?',
     ],
     code: `// ---- #include <texteGrandS> : un grand texte qui va à la ligne ----
-// En taille 3, une lettre prend 3 colonnes : 6 lettres tiennent sur 20 cases.
+// En taille 2, une lettre prend 3 colonnes : 6 lettres tiennent sur 20 cases.
 // La septième, G, repart en colonne 0, trois cases plus bas.
 
 #include <texteGrandS>   // texteGrandS() : agrandi, et qui va à la ligne
 
 int main() {
-  texteGrandS(0, 0, "ABCDEFG", 3);   // ABCDEF sur les lignes 0 à 2, G en (0, 3)
+  texteGrandS(0, 0, "ABCDEFG", 2);   // ABCDEF sur les lignes 0 à 2, G en (0, 3)
 
   while (true) {
     image();
@@ -25141,6 +25144,105 @@ int main() {
         ['la case du L reste dans la palette 0', paletteDe(7, 8) === 0],
       ]
     },
+  },
+
+  {
+    titre: 'La fonction poserDevant() — une case qui passe devant les lutins',
+    difficulte: 0,
+    idee: '#include <poserDevant> : poserDevant(colonne, ligne, tuile, palette) pose une tuile ET la fait passer devant les personnages (Game Boy Color).',
+    texte: [
+      '**Ce qu’elle fait :** elle pose une tuile, comme `poser()`, et la met dans une palette **en la faisant passer devant les lutins**, comme `teindre(colonne, ligne, palette | DEVANT)`. Deux lignes en une.',
+      '**La ligne à écrire : `#include <poserDevant>`.** Pas besoin d’inclure aussi `poser` ni `teindre` : la console s’en charge.',
+      '**Ses arguments :** la colonne, la ligne, la tuile, la palette (0 à 7). Comme pour `teindre()`, la case ne cache le lutin que là où elle est **dessinée** (1, 2 ou 3) : ses 0 laissent voir le lutin.',
+      '**Ce qu’elle coûte :** **rien de plus** que `poser()` suivi de `teindre()`. Le compilateur remplace la ligne par ces deux-là, mot pour mot : la cartouche a exactement les mêmes octets.',
+      '**Essaie :** pose le héros 1 sur le mur, lui aussi (`sprite(1, 72, 64, HEROS)`) : il disparaît.',
+    ],
+    code: `// ---- #include <poserDevant> : une case qui passe devant les lutins ----
+// Un mur posé avec poserDevant(). Le héros 0, posé dessus, disparaît derrière ;
+// le héros 1, à côté, se voit.
+
+#include <Tuile>
+#include <couleurFond>
+#include <sprite>
+#include <poserDevant>   // poserDevant() : poser + teindre(…, DEVANT), en une ligne
+
+Tuile MUR = {                    // des briques (1), des joints (3) : aucun 0
+  "33333333", "11131111", "11131111", "33333333",
+  "13111113", "13111113", "33333333", "11131111",
+};
+
+Tuile HEROS = {                  // 0 = transparent
+  "00333300", "03222230", "32122123", "32222223",
+  "03222230", "00333300", "03300330", "33000033",
+};
+
+int main() {
+  couleurFond(2, 1, 26, 12, 6);  // palette 2 : la brique
+  couleurFond(2, 3, 10, 4, 2);   //   et ses joints
+  poserDevant(9, 8, MUR, 2);     // le mur, case (9, 8), palette 2, DEVANT les lutins
+
+  sprite(0, 72, 64, HEROS);      // sur le mur (72 = 9 × 8, 64 = 8 × 8) : caché
+  sprite(1, 40, 64, HEROS);      // à côté : visible
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un mur de briques et un héros à sa gauche. L’autre héros, posé sur le mur, ne se voit pas.',
+    controle: (c) => {
+      const reglage = c.gb.ppu.vram[0x2000 + 0x1800 + 8 * 32 + 9]
+      const v = c.gb.ppu.couleurs[66 * 160 + 76]
+      const pixel = `${v & 31}/${v >> 5 & 31}/${v >> 10 & 31}`
+      return [
+        ['la case (9, 8) : palette 2, et DEVANT', reglage === (2 | 0x80), ` (${reglage})`],
+        ['sur le mur, on voit la brique, pas le héros', pixel === '26/12/6', ` (${pixel})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction spriteDerriere() — un lutin derrière le décor',
+    difficulte: 0,
+    idee: '#include <spriteDerriere> : spriteDerriere(numero, x, y, tuile), c’est sprite(), mais derrière le décor.',
+    texte: [
+      '**Ce qu’elle fait :** elle place un lutin comme `sprite()`, mais **derrière le décor**, comme `sprite(numero, x, y, tuile, DERRIERE)`. Plus besoin de retenir le 5e argument.',
+      '**La ligne à écrire : `#include <spriteDerriere>`.** Pas besoin d’inclure aussi `sprite`.',
+      '**Ses arguments :** le numéro du lutin, `x` et `y` en pixels, la tuile. Le décor ne cache le lutin que là où il est **dessiné** : sur le vide, on voit le lutin.',
+      '**Ce qu’elle coûte :** **rien de plus** qu’un `sprite()` : le compilateur la remplace par `sprite(…, DERRIERE)`.',
+      '**Essaie :** mets le héros à `x = 40`, sur le vide : il réapparaît.',
+    ],
+    code: `// ---- #include <spriteDerriere> : un lutin derrière le décor ----
+// Un mur, et un héros posé dessus avec spriteDerriere() : le mur le cache.
+
+#include <Tuile>
+#include <poser>
+#include <spriteDerriere>   // spriteDerriere() : sprite(), mais derrière le décor
+
+Tuile MUR = {                       // des briques (-), des joints (#) : aucun point
+  "########", "---#----", "---#----", "########",
+  "-#-----#", "-#-----#", "########", "---#----",
+};
+
+Tuile HEROS = {                     // les points (.) sont transparents
+  "..####..", ".#-##-#.", "########", "#.####.#",
+  "########", "..#..#..", ".#....#.", "##....##",
+};
+
+int main() {
+  poser(9, 8, MUR);                  // le mur, case (9, 8)
+  spriteDerriere(0, 72, 64, HEROS);  // le héros, pile sur le mur : derrière lui
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un mur de briques, seul : le héros est derrière.',
+    controle: (c) => [
+      ['le lutin porte DERRIERE', (c.gb.mmu.read(0xfe03) & 0x80) === 0x80],
+      ['on voit la brique, pas le héros', c.gb.framebuffer[66 * 160 + 76] === 1, ` (nuance ${c.gb.framebuffer[66 * 160 + 76]})`],
+    ],
   },
 
   {

@@ -3752,6 +3752,1109 @@ int main() {                  // Le jeu commence ici.
       ]
     },
   },
+  /* ------------------------------------------------ 9 — devant, derrière */
+
+  {
+    titre: 'Qui passe devant ? Les trois couches de l’écran',
+    difficulte: 9,
+    provenance: 'cours',
+    suite: true,
+    partie: 'Devant, derrière',
+    idee: 'Un héros traverse un mur, puis le panneau : il passe devant les deux. L’écran est fait de trois couches, toujours dans le même ordre.',
+    texte: [
+      '**Une question que tout jeu se pose :** quand deux choses sont au même endroit de l’écran, laquelle voit-on ? Le héros devant le mur, ou le mur devant le héros ?',
+      '**La réponse de la Game Boy : trois couches, empilées comme des feuilles transparentes.** Tout au fond, le **décor** (ce que posent `poser()` et `texte()`). Par-dessus, le **panneau** (`panneau()`, `textePanneau()`, `poserPanneau()`, le chapitre 9). Tout devant, les **lutins** (`sprite()`).',
+      '**Ce qui est nouveau ici : rien à apprendre, tout à regarder.** Le programme pose les trois éléments : un mur de briques au milieu (le décor), une colonne grise à droite avec « SCORE » (le panneau, placé au pixel 120), et un héros qui traverse l’écran tout seul (un lutin). Le héros passe **devant le mur**, puis **devant le panneau**.',
+      '**L’ordre des lignes ne compte pas.** On pourrait poser le mur APRÈS le premier `sprite()` : il resterait derrière. Ce n’est pas « le dernier dessiné gagne », comme sur une feuille de papier : chaque chose est rangée dans SA couche, et la console empile toujours les couches dans le même ordre.',
+      '**Le panneau, au pixel 120 :** `panneau(120, 0)` le pose à partir du pixel 120 en largeur (la colonne 15) et du pixel 0 en hauteur. Il couvre alors tout ce qui est à droite et en dessous : les colonnes 15 à 19, du haut en bas. Le décor, sous lui, ne se voit plus.',
+      '**À toi :** déplace le mur (colonnes 3 et 4 par exemple) et regarde : le héros passe toujours devant. Les leçons suivantes montrent comment changer cet ordre.',
+    ],
+    code: `// CE PROGRAMME : un héros traverse l'écran tout seul, de gauche à droite.
+// Il passe sur un MUR (le décor), puis sur une colonne grise à droite (le PANNEAU).
+// Regarde bien : il passe DEVANT les deux.
+//
+// Ce qui est nouveau : rien à écrire, tout à REGARDER.
+// L'écran de la Game Boy est fait de TROIS COUCHES, toujours dans le même ordre :
+//
+//        toi, tu regardes d'ici
+//               |
+//               v
+//   3. les LUTINS    sprite()                          <- tout devant
+//   2. le PANNEAU    panneau(), poserPanneau(), textePanneau()
+//   1. le DÉCOR      poser(), texte()                  <- tout au fond
+//
+// L'ordre des lignes du programme ne compte pas : chaque chose va dans SA
+// couche, et la console empile toujours les couches dans cet ordre-là.
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <poser>          // pose une tuile sur une case du fond (le DÉCOR)
+#include <texte>          // écrit un texte à l’écran (le DÉCOR aussi)
+#include <poserPanneau>   // pose une tuile dans le PANNEAU
+#include <textePanneau>   // écrit un texte dans le PANNEAU
+#include <panneau>        // montre le panneau, à une place choisie
+#include <sprite>         // place un LUTIN de 8 × 8 au pixel près
+
+Tuile BRIQUE = {                  // Le mur : des joints en 3 (sombres), des briques en 1 (claires).
+  "33333333",
+  "11131111",
+  "11131111",
+  "33333333",
+  "13111113",
+  "13111113",
+  "33333333",
+  "11131111",
+};
+
+Tuile GRIS = {                    // Le fond du panneau : du gris (2), piqué de clair (1).
+  "22222222",
+  "22122212",
+  "22222222",
+  "21222122",
+  "22222222",
+  "22122212",
+  "22222222",
+  "21222122",
+};
+
+Tuile HEROS = {                   // Le héros. Les points (.) sont TRANSPARENTS chez un lutin.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+int main() {                      // Le jeu commence ici.
+
+  // ---- 1. LE DÉCOR (tout au fond) : un mur, colonnes 9 et 10, lignes 7 à 11.
+  for (uint8_t l = 7; l < 12; l++) {   // Pour chaque ligne l, de 7 à 11 :
+    poser(9, l, BRIQUE);               //   une brique en colonne 9,
+    poser(10, l, BRIQUE);              //   une autre en colonne 10.
+  }
+  texte(1, 1, "QUI EST DEVANT");       // Le texte aussi est dans le décor.
+
+  // ---- 2. LE PANNEAU (au milieu) : rempli de gris, avec SCORE en haut.
+  // On le remplit d'abord : 5 colonnes (0 à 4) sur 18 lignes (0 à 17).
+  for (uint8_t l = 0; l < 18; l++) {
+    for (uint8_t c = 0; c < 5; c++) {
+      poserPanneau(c, l, GRIS);        // Les colonnes du PANNEAU, pas celles de l'écran.
+    }
+  }
+  textePanneau(0, 1, "SCORE");         // Colonne 0 du panneau, ligne 1.
+  panneau(120, 0);                     // On le montre : à partir du pixel 120 (la colonne 15)
+                                       // et du pixel 0 en hauteur. Il couvre tout le côté droit.
+
+  // ---- 3. LE LUTIN (tout devant) : le héros, qui avance tout seul.
+  uint8_t x = 0;                       // Sa place, en pixels, de gauche à droite.
+
+  while (true) {                       // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;        // Une image sur 2 : un pixel de plus vers la droite.
+    if (x > 152) x = 0;                // Sorti à droite ? Il repart de la gauche.
+
+    sprite(0, x, 72, HEROS);           // Ligne de pixels 72 : à la hauteur du mur (ligne 9).
+  }
+}
+`,
+    aVoir: 'Un mur de briques au milieu, une colonne grise « SCORE » à droite. Un petit héros traverse l’écran : il passe devant le mur, puis devant le panneau.',
+    controle: (c) => {
+      attendre(c, () => c.lutin(0).x < 50)
+      const mur = nuance(c, 76, 74)        // une brique claire, sans le héros dessus
+      const gris = nuance(c, 128, 74)      // le gris du panneau, sans le héros
+      attendre(c, () => c.lutin(0).x === 72)
+      const surLeMur = nuance(c, 76, 74)
+      attendre(c, () => c.lutin(0).x === 124)
+      const surLePanneau = nuance(c, 128, 74)
+      return [
+        ['le mur est dans le décor, le panneau à droite', mur === 1 && gris === 2, ` (${mur}, ${gris})`],
+        ['le héros passe DEVANT le mur', surLeMur === 3, ` (nuance ${surLeMur})`],
+        ['le héros passe DEVANT le panneau', surLePanneau === 3, ` (nuance ${surLePanneau})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Devant, derrière : le tuyau, DERRIERE',
+    difficulte: 9,
+    provenance: 'cours',
+    suite: true,
+    idee: 'sprite(0, x, y, HEROS, DERRIERE) : le décor passe devant le lutin. Le héros entre dans un tuyau et ressort de l’autre côté.',
+    texte: [
+      '**Un héros qui entre dans un tuyau** doit disparaître DEDANS, et pas glisser par-dessus. Il faut que le tuyau passe devant lui.',
+      '**Ce qui est nouveau ici : `DERRIERE`, le 5e argument de `sprite()`.** On l’a déjà rencontré avec `MIROIR_X` (le miroir) : c’est la même place. `sprite(0, x, 72, HEROS, DERRIERE)` range ce lutin **derrière le décor**.',
+      '**Mais pas derrière tout le décor !** Le décor ne cache le lutin que là où il est **dessiné**, avec les indices 1, 2 ou 3. Là où le décor est **vide** (l’indice 0, le fond clair de l’écran), le lutin reste visible. C’est pour ça qu’on voit le héros avant et après le tuyau : là, il n’y a que du vide.',
+      '**Le tuyau est tout plein :** ses tuiles n’ont aucun 0. Le héros y disparaît donc entièrement. Si le tuyau avait des trous (des 0), on verrait le héros à travers.',
+      '**DERRIERE passe aussi derrière le panneau,** là où le panneau est dessiné : pour la console, le panneau est un second décor.',
+      '**À toi :** ôte `DERRIERE` (garde `sprite(0, x, 72, HEROS);`) : le héros passe par-dessus le tuyau, comme dans la leçon d’avant.',
+    ],
+    code: `// CE PROGRAMME : un héros avance tout seul et ENTRE dans un tuyau couché :
+// il disparaît dedans, et ressort de l'autre côté.
+//
+// Ce qui est nouveau : DERRIERE, le 5e argument de sprite() (la place de MIROIR_X).
+//   sprite(0, x, y, HEROS);             le héros DEVANT le décor (comme d'habitude)
+//   sprite(0, x, y, HEROS, DERRIERE);   le héros DERRIÈRE le décor
+//
+// Attention : le décor ne cache le lutin que là où il est DESSINÉ (1, 2 ou 3).
+// Là où le décor est vide (0), on voit toujours le lutin.
+
+#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <poser>    // pose une tuile sur une case du fond
+#include <texte>    // écrit un texte à l’écran
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+
+Tuile TUYAU = {                   // Un morceau de tuyau couché : AUCUN 0, il est tout plein.
+  "33333333",                     //   le bord du haut, sombre
+  "11111111",                     //   un reflet clair
+  "22222222",
+  "22222222",                     //   le corps, gris
+  "22222222",
+  "22222222",
+  "21212121",                     //   l'ombre du bas
+  "33333333",                     //   le bord du bas
+};
+
+Tuile HEROS = {                   // Le héros : les points (.) sont transparents.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+int main() {                          // Le jeu commence ici.
+  texte(1, 1, "LE TUYAU");
+
+  // Le tuyau : colonnes 8 à 12, ligne 9 (les pixels 64 à 103, en largeur).
+  for (uint8_t c = 8; c < 13; c++) {
+    poser(c, 9, TUYAU);
+  }
+
+  uint8_t x = 0;                      // La place du héros, en pixels.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;       // Un pixel toutes les 2 images.
+    if (x > 152) x = 0;               // Sorti à droite : il repart de la gauche.
+
+    // Ligne de pixels 72 = ligne 9 × 8 : pile à la hauteur du tuyau.
+    sprite(0, x, 72, HEROS, DERRIERE);   // DERRIERE : le tuyau passe devant lui.
+  }
+}
+`,
+    aVoir: 'Un tuyau couché au milieu de l’écran. Le héros arrive de la gauche, disparaît dans le tuyau, et ressort à droite.',
+    controle: (c) => {
+      attendre(c, () => c.lutin(0).x === 20)
+      const dehors = nuance(c, 24, 74)
+      const tuyau = nuance(c, 92, 75)       // le corps du tuyau, sans le héros
+      attendre(c, () => c.lutin(0).x === 88)
+      const dedans = nuance(c, 92, 75)
+      attendre(c, () => c.lutin(0).x === 120)
+      const ressorti = nuance(c, 124, 74)
+      return [
+        ['avant le tuyau, sur le vide, on voit le héros', dehors === 3, ` (nuance ${dehors})`],
+        ['dans le tuyau, il a disparu : on voit le tuyau', dedans === tuyau && tuyau === 2, ` (${dedans})`],
+        ['il ressort de l’autre côté', ressorti === 3],
+        ['le lutin porte bien DERRIERE', (c.gb.mmu.read(0xfe03) & 0x80) === 0x80],
+      ]
+    },
+  },
+
+  {
+    titre: 'Devant, derrière : deux lutins qui se croisent',
+    difficulte: 9,
+    provenance: 'cours',
+    suite: true,
+    idee: 'Une souris passe devant un chat : entre deux lutins, c’est le plus à GAUCHE qui passe devant ; à égalité, le plus petit numéro.',
+    texte: [
+      '**Deux lutins au même endroit :** ils sont tous les deux dans la couche des lutins. Qui gagne ? La console a sa règle à elle, et elle surprend.',
+      '**La règle de la Game Boy :** entre deux lutins qui se chevauchent, c’est **le plus à gauche** (le plus petit `x`) qui passe devant. S’ils ont **le même `x`**, c’est **le plus petit numéro** (le 1er argument de `sprite()`) qui gagne.',
+      '**Ce qui est nouveau ici : deux lutins qui se touchent.** Le chat (`sprite(0, …)`, tout sombre) ne bouge pas, au pixel 76. La souris (`sprite(1, …)`, toute claire) arrive de la gauche.',
+      '**Déroulons :** souris au pixel 72, chat au 76 : la souris est plus à gauche, **elle passe devant**. Souris au 76 : même `x`, le numéro 0 (le chat) gagne. Souris au 80 : le chat est maintenant le plus à gauche, **il passe devant**. La souris semble passer « derrière » le chat en le dépassant !',
+      '**Ce qu’on en retient :** le numéro seul ne suffit pas à mettre un héros devant tout le monde. Dans un vrai jeu, on évite que deux personnages importants se chevauchent longtemps, ou bien on accepte ce petit « saut ».',
+      '**À toi :** échange les numéros (le chat en 1, la souris en 0). À `x` égal, c’est maintenant la souris qui gagne. Ailleurs, rien ne change : c’est toujours le plus à gauche.',
+    ],
+    code: `// CE PROGRAMME : une souris (claire) avance et croise un chat (sombre) immobile.
+// Regarde qui passe devant au moment où ils se chevauchent.
+//
+// Ce qui est nouveau : deux LUTINS au même endroit. La règle de la console :
+//   1. le plus à GAUCHE (le plus petit x) passe devant ;
+//   2. à x égal, le plus petit NUMÉRO (1er argument de sprite) passe devant.
+//
+//   souris x = 72, chat x = 76   ->  la souris est plus à gauche : DEVANT
+//   souris x = 76, chat x = 76   ->  égalité : le numéro 0 (le chat) DEVANT
+//   souris x = 80, chat x = 76   ->  le chat est plus à gauche : DEVANT
+
+#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <texte>    // écrit un texte à l’écran
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+
+Tuile CHAT = {                    // Le chat : tout sombre (#). Deux oreilles en haut.
+  "#.....#.",
+  "##...##.",
+  "#######.",
+  "########",
+  "########",
+  "########",
+  ".######.",
+  ".#....#.",
+};
+
+Tuile SOURIS = {                  // La souris : toute claire (-). Une queue à gauche.
+  "........",
+  "....--..",
+  "..-----.",
+  "--------",
+  "--------",
+  ".------.",
+  "..-..-..",
+  "........",
+};
+
+int main() {                          // Le jeu commence ici.
+  texte(1, 1, "LE CHAT ET LA SOURIS");
+
+  sprite(0, 76, 72, CHAT);            // Le CHAT : lutin numéro 0, immobile au pixel 76.
+
+  uint8_t x = 0;                      // La place de la souris.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    if (images() % 4 == 0) x++;       // Lentement : un pixel toutes les 4 images.
+    if (x > 152) x = 0;
+
+    sprite(1, x, 72, SOURIS);         // La SOURIS : lutin numéro 1.
+  }
+}
+`,
+    aVoir: 'Un chat sombre immobile au milieu ; une souris claire arrive de la gauche, passe devant lui, puis semble passer derrière quand elle le dépasse.',
+    controle: (c) => {
+      attendre(c, () => c.lutin(1).x === 72)
+      const avant = nuance(c, 78, 75)       // là où les deux se chevauchent
+      attendre(c, () => c.lutin(1).x === 76)
+      const egal = nuance(c, 79, 75)
+      attendre(c, () => c.lutin(1).x === 80)
+      const apres = nuance(c, 81, 75)
+      return [
+        ['souris plus à gauche : la souris (claire) devant', avant === 1, ` (nuance ${avant})`],
+        ['même x : le numéro 0, le chat (sombre), devant', egal === 3, ` (nuance ${egal})`],
+        ['chat plus à gauche : le chat devant', apres === 3, ` (nuance ${apres})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Devant, derrière : le buisson, teindre(…, DEVANT)',
+    difficulte: 9,
+    provenance: 'cours',
+    suite: true,
+    idee: 'Sur Game Boy Color, une case du décor peut passer devant les lutins : teindre(c, l, 2 | DEVANT). Deux buissons pareils : le héros passe devant le premier, derrière le second.',
+    texte: [
+      '**`DERRIERE` cache le héros derrière TOUT le décor.** Souvent, on veut l’inverse : le héros devant l’herbe, mais derrière **un** buisson. Il faut alors marquer **les cases** qui passent devant, pas le lutin.',
+      '**Ce qui est nouveau ici : `DEVANT`, avec `teindre()` (Game Boy Color).** `teindre(12, 8, 2 | DEVANT)` met la case (12, 8) en palette 2 **et** la fait passer devant les lutins. La barre `|` réunit les deux réglages en un seul nombre : la palette dans les bits du bas, `DEVANT` dans le bit du haut (128). 2 | 128 = 130.',
+      '**La preuve par deux :** les deux buissons ont le **même dessin** et la **même palette**. Seul le second a `DEVANT`. Le héros passe devant le premier, derrière le second.',
+      '**La même règle que pour DERRIERE :** la case ne cache le lutin que là où elle est **dessinée** (1, 2 ou 3). C’est pourquoi le buisson n’a **aucun 0** : avec des coins vides, deux touffes côte à côte laisseraient un petit trou entre elles, et l’on verrait un morceau du héros y rester figé pendant qu’il passe derrière.',
+      '**Pourquoi la Color seulement ?** Sur la Game Boy d’origine, il n’y a qu’une carte du décor, sans place pour ce réglage. La Color a une **seconde carte** (celle des palettes, le chapitre 16) : c’est là que se range `DEVANT`.',
+      '**À toi :** ajoute `| DEVANT` au premier buisson aussi : le héros passe derrière les deux.',
+    ],
+    code: `// CE PROGRAMME (Game Boy Color) : deux buissons PAREILS. Le héros avance tout
+// seul : il passe DEVANT le premier, et DERRIÈRE le second.
+//
+// Ce qui est nouveau : DEVANT, avec teindre().
+//   teindre(c, l, 2);            la case prend la palette 2 (comme au chapitre 16)
+//   teindre(c, l, 2 | DEVANT);   palette 2 ET la case passe devant les lutins
+// La barre | réunit les deux réglages : 2 | DEVANT = 2 + 128 = 130.
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurLutin>   // choisit une couleur d’une palette des lutins
+#include <ecran>          // éteint ou rallume l’écran
+#include <poser>          // pose une tuile sur une case du fond
+#include <teindre>        // met une case du fond dans une palette
+#include <texte>          // écrit un texte à l’écran
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <teindreLutin>   // met un lutin dans une palette
+
+Tuile BUISSON = {                 // Une touffe de feuilles : AUCUN 0, elle est toute pleine.
+  "11222211",                     //   (des coins en 0 laisseraient un trou là où deux
+  "12233221",                     //    touffes se touchent : on y verrait le héros)
+  "22333322",
+  "23333332",
+  "23333332",
+  "22333322",
+  "12233221",
+  "11222211",
+};
+
+Tuile HEROS = {                   // 0 transparent, 1 clair, 2 moyen, 3 contour.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};
+
+int main() {                              // Le jeu commence ici.
+  couleurFond(0, 0, 20, 28, 31);          // palette 0 : le ciel (indice 0)...
+  couleurFond(0, 3,  2,  4, 12);          // ... et le texte (indice 3)
+  couleurFond(2, 0, 20, 28, 31);          // palette 2 : le ciel entre les feuilles,
+  couleurFond(2, 1, 16, 30,  8);          //   vert clair,
+  couleurFond(2, 2,  6, 22,  4);          //   vert,
+  couleurFond(2, 3,  0, 10,  2);          //   vert sombre.
+  couleurLutin(0, 1, 31, 28, 20);         // le héros : rose clair,
+  couleurLutin(0, 2, 31,  4,  2);         //   rouge,
+  couleurLutin(0, 3, 10,  0,  0);         //   contour très sombre.
+
+  ecran(0);                               // Dessin écran éteint.
+  texte(1, 1, "DEUX BUISSONS");
+  for (uint8_t l = 8; l < 10; l++) {      // Lignes 8 et 9 :
+    for (uint8_t c = 4; c < 6; c++) {     //   buisson 1, colonnes 4 et 5 :
+      poser(c, l, BUISSON);
+      teindre(c, l, 2);                   //     palette 2, c'est tout.
+    }
+    for (uint8_t c = 12; c < 14; c++) {   //   buisson 2, colonnes 12 et 13 :
+      poser(c, l, BUISSON);
+      teindre(c, l, 2 | DEVANT);          //     palette 2, ET devant les lutins.
+    }
+  }
+  ecran(1);                               // On rallume.
+
+  uint8_t x = 0;                          // La place du héros, en pixels.
+
+  while (true) {                          // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;           // Un pixel toutes les 2 images.
+    if (x > 152) x = 0;
+
+    sprite(0, x, 68, HEROS);              // Pixel 68 : au milieu des buissons (lignes 8 et 9).
+    teindreLutin(0, 0);                   // Après sprite() : sa palette (chapitre 16).
+  }
+}
+`,
+    aVoir: 'Deux buissons verts identiques. Le héros rouge passe devant celui de gauche, et disparaît derrière celui de droite.',
+    controle: (c) => {
+      attendre(c, () => c.lutin(0).x === 32)
+      const premier = couleur(c, 35, 71)
+      attendre(c, () => c.lutin(0).x === 96)
+      const second = couleur(c, 99, 71)
+      return [
+        ['la cartouche est en couleur', c.gb.ppu.couleur === true],
+        ['buisson 1 : le héros (rouge) est devant', premier === '31/4/2', ` (${premier})`],
+        ['buisson 2, DEVANT : on voit le buisson (vert)', second === '6/22/4', ` (${second})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Devant, derrière : le bateau passe sous le pont',
+    difficulte: 9,
+    provenance: 'cours',
+    suite: true,
+    idee: 'Une rivière, un pont marqué DEVANT : le bateau glisse sur l’eau, passe sous le pont, et ressort de l’autre côté.',
+    texte: [
+      '**La même idée, un autre décor :** une rivière qui traverse l’écran, et un pont qui l’enjambe. Le bateau doit passer **sur** l’eau, mais **sous** le pont.',
+      '**Rien de nouveau dans les fonctions :** `teindre(c, l, 3 | DEVANT)` sur les cases du pont, `teindre(c, l, 1)` sur celles de l’eau. Ce qui est nouveau, c’est l’idée : **seules les cases du pont** passent devant. L’eau, elle, reste derrière le bateau.',
+      '**Le pont est tout plein** (aucun 0 dans sa tuile) : le bateau y disparaît entièrement. L’eau aussi est toute pleine, mais elle n’a pas `DEVANT` : le bateau reste par-dessus.',
+      '**On pense en couches de dessin, pas en lignes de code :** le pont est posé APRÈS l’eau, sur les mêmes cases. Une case ne garde qu’une tuile : là où passe le pont, la tuile PLANCHE remplace la tuile EAU.',
+      '**À toi :** construis un second pont, colonnes 15 et 16. Puis enlève `| DEVANT` du premier : le bateau passe par-dessus, comme s’il volait.',
+    ],
+    code: `// CE PROGRAMME (Game Boy Color) : un bateau descend la rivière tout seul. Il
+// glisse SUR l'eau, et passe SOUS le pont.
+//
+// Rien de nouveau dans les fonctions : c'est teindre(..., DEVANT) de la leçon
+// d'avant. Ce qui est nouveau, c'est de choisir QUELLES cases passent devant :
+//   l'eau  : teindre(c, l, 1)            -> derrière le bateau
+//   le pont : teindre(c, l, 3 | DEVANT)  -> devant le bateau
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurLutin>   // choisit une couleur d’une palette des lutins
+#include <ecran>          // éteint ou rallume l’écran
+#include <poser>          // pose une tuile sur une case du fond
+#include <teindre>        // met une case du fond dans une palette
+#include <texte>          // écrit un texte à l’écran
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <teindreLutin>   // met un lutin dans une palette
+
+Tuile EAU = {                     // Des vaguelettes : 1 clair, 2 foncé. Aucun 0.
+  "11111111",
+  "12211221",
+  "22222222",
+  "22122212",
+  "22222222",
+  "11111111",
+  "21122112",
+  "22222222",
+};
+
+Tuile PLANCHE = {                 // Les planches du pont : aucun 0, tout est plein.
+  "33333333",
+  "12222221",
+  "12222221",
+  "33333333",
+  "12222221",
+  "12222221",
+  "33333333",
+  "12222221",
+};
+
+Tuile BATEAU = {                  // Une voile en haut, une coque en bas. 0 = transparent.
+  "00030000",
+  "00033000",
+  "00033300",
+  "00030000",
+  "33333333",
+  "32222223",
+  "03222230",
+  "00333300",
+};
+
+int main() {                              // Le jeu commence ici.
+  couleurFond(0, 0, 20, 28, 31);          // palette 0 : le ciel, et le texte
+  couleurFond(0, 3,  2,  4, 12);
+  couleurFond(1, 1, 16, 24, 31);          // palette 1 : l'eau, bleu clair...
+  couleurFond(1, 2,  4, 10, 26);          //   ... et bleu foncé
+  couleurFond(3, 1, 26, 18, 10);          // palette 3 : le bois, clair,
+  couleurFond(3, 2, 18, 10,  4);          //   moyen,
+  couleurFond(3, 3,  8,  4,  2);          //   sombre.
+  couleurLutin(0, 1, 31, 31, 31);         // le bateau : blanc,
+  couleurLutin(0, 2, 31, 20,  0);         //   orange,
+  couleurLutin(0, 3,  8,  4,  0);         //   brun très sombre.
+
+  ecran(0);                               // Dessin écran éteint.
+  texte(1, 1, "SOUS LE PONT");
+
+  // La rivière : lignes 8 à 11, toute la largeur.
+  for (uint8_t l = 8; l < 12; l++) {
+    for (uint8_t c = 0; c < 20; c++) {
+      poser(c, l, EAU);
+      teindre(c, l, 1);                   // palette 1, SANS DEVANT : derrière le bateau
+    }
+  }
+  // Le pont : colonnes 9 et 10, lignes 7 à 12 (il dépasse sur les deux rives).
+  for (uint8_t l = 7; l < 13; l++) {
+    for (uint8_t c = 9; c < 11; c++) {
+      poser(c, l, PLANCHE);               // remplace l'eau sur ces cases
+      teindre(c, l, 3 | DEVANT);          // palette 3, ET devant le bateau
+    }
+  }
+  ecran(1);                               // On rallume.
+
+  uint8_t x = 0;                          // La place du bateau, en pixels.
+
+  while (true) {                          // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;           // Le courant : un pixel toutes les 2 images.
+    if (x > 152) x = 0;
+
+    sprite(0, x, 76, BATEAU);             // Pixel 76 : au milieu de la rivière.
+    teindreLutin(0, 0);
+  }
+}
+`,
+    aVoir: 'Une rivière bleue, un pont de bois qui la traverse. Un petit bateau orange glisse sur l’eau, disparaît sous le pont, puis ressort.',
+    controle: (c) => {
+      attendre(c, () => c.lutin(0).x === 40)
+      const surLEau = couleur(c, 43, 81)
+      attendre(c, () => c.lutin(0).x === 72)
+      const sousLePont = couleur(c, 75, 81)
+      attendre(c, () => c.lutin(0).x === 100)
+      const ressorti = couleur(c, 103, 81)
+      return [
+        ['sur l’eau, on voit le bateau (orange)', surLEau === '31/20/0', ` (${surLEau})`],
+        ['sous le pont, on voit le bois', sousLePont === '18/10/4', ` (${sousLePont})`],
+        ['il ressort de l’autre côté', ressorti === '31/20/0', ` (${ressorti})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Devant, derrière : à toi de choisir, avec A',
+    difficulte: 9,
+    provenance: 'cours',
+    suite: true,
+    idee: 'Le héros se déplace avec les flèches ; A le fait passer devant ou derrière le mur. On voit la différence en direct.',
+    texte: [
+      '**Cette fois, c’est toi qui décides.** Les quatre flèches déplacent le héros. Le bouton **A** bascule entre « devant » et « derrière ». Va sur le mur, appuie sur A, et regarde-le disparaître.',
+      '**Ce qui est nouveau ici : le 5e argument dans une variable.** Comme `regard` pour le miroir, `cote` vaut `0` (devant, tel quel) ou `DERRIERE`. On le passe à `sprite()` à chaque image : `sprite(0, x, y, HEROS, cote)`.',
+      '**Un seul appui, un seul changement.** Si on basculait à chaque image où A est enfoncé, le héros clignoterait 60 fois par seconde tant qu’on tient le bouton. On retient donc dans `avant` si A était **déjà** enfoncé à l’image d’avant. On ne bascule que quand A **vient** d’être enfoncé : `a == 1` (enfoncé maintenant) et `avant == 0` (pas juste avant).',
+      '**Le texte suit :** en haut de l’écran, « DEVANT » ou « DERRIERE ». Les deux espaces après « DEVANT » effacent les dernières lettres de « DERRIERE », plus long de deux lettres.',
+      '**Essaie partout :** sur le mur, derrière ; sur le vide, toujours visible, même en mode DERRIERE. C’est la règle des leçons d’avant, que tu vérifies toi-même.',
+      '**À toi :** fais basculer aussi `MIROIR_X` avec le bouton B. Pour les deux à la fois : `sprite(0, x, y, HEROS, cote | regard)`.',
+    ],
+    code: `// CE PROGRAMME : les flèches déplacent un héros ; le bouton A le fait passer
+// DEVANT ou DERRIÈRE le mur. En haut, le texte dit où il est.
+//
+// Ce qui est nouveau : le 5e argument de sprite() dans une variable, cote.
+//   cote = 0          -> sprite(0, x, y, HEROS, 0)         : devant
+//   cote = DERRIERE   -> sprite(0, x, y, HEROS, DERRIERE)  : derrière
+// Et « un appui = un changement » : on retient si A était déjà enfoncé.
+
+#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <poser>    // pose une tuile sur une case du fond
+#include <texte>    // écrit un texte à l’écran
+#include <bouton>   // lit un bouton de la manette
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+
+Tuile BRIQUE = {                  // Le mur : joints sombres (3), briques claires (1).
+  "33333333",
+  "11131111",
+  "11131111",
+  "33333333",
+  "13111113",
+  "13111113",
+  "33333333",
+  "11131111",
+};
+
+Tuile HEROS = {                   // Le héros : les points (.) sont transparents.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+uint8_t x = 76;         // La place du héros, en pixels : il commence SUR le mur.
+uint8_t y = 72;
+uint8_t cote = 0;       // 0 : devant ; DERRIERE : derrière le décor.
+uint8_t avant = 0;      // A était-il enfoncé à l'image d'avant ? 1 oui, 0 non.
+
+int main() {                              // Le jeu commence ici.
+  // Le mur : colonnes 8 à 11, lignes 6 à 11 (les pixels 64 à 95 sur 48 à 95).
+  for (uint8_t l = 6; l < 12; l++) {
+    for (uint8_t c = 8; c < 12; c++) {
+      poser(c, l, BRIQUE);
+    }
+  }
+  texte(1, 1, "A: DEVANT");               // Le mode, en haut. « DEVANT » est en colonne 4.
+
+  while (true) {                          // La boucle du jeu :
+    image();
+
+    // Les flèches : un pixel par image, sans sortir de l'écran.
+    if (bouton(DROITE) && x < 152) x++;
+    if (bouton(GAUCHE) && x > 0) x--;
+    if (bouton(BAS) && y < 136) y++;
+    if (bouton(HAUT) && y > 16) y--;
+
+    // Le bouton A : on ne bascule que s'il VIENT d'être enfoncé.
+    uint8_t a = bouton(A);                // 1 si A est enfoncé maintenant, 0 sinon.
+    if (a == 1 && avant == 0) {           // enfoncé maintenant, mais pas juste avant :
+      if (cote == 0) {                    //   il était devant ?
+        cote = DERRIERE;                  //     il passe derrière,
+        texte(4, 1, "DERRIERE");
+      } else {                            //   il était derrière ?
+        cote = 0;                         //     il repasse devant.
+        texte(4, 1, "DEVANT  ");          //     (deux espaces : effacer « RE »)
+      }
+    }
+    avant = a;                            // On s'en souvient pour l'image suivante.
+
+    sprite(0, x, y, HEROS, cote);         // Le 5e argument : 0 ou DERRIERE.
+  }
+}
+`,
+    aVoir: 'Un grand mur de briques, le héros posé dessus. Les flèches le déplacent ; A le fait disparaître derrière le mur, et A encore le ramène devant.',
+    controle: (c) => {
+      const murSeul = nuance(c, 68, 74)      // la même brique, là où le héros n'est pas
+      const auDebut = nuance(c, 76, 74)
+      c.presser('a', 4)
+      const apresA = nuance(c, 76, 74)
+      const texteDerriere = net(c.mot(4, 1, 8))
+      const coteApresA = c.variable('cote')
+      c.presser('a', 4)
+      const apresAA = nuance(c, 76, 74)
+      const x0 = c.lutin(0).x
+      c.presser('right', 10)
+      return [
+        ['au départ, le héros est devant le mur', auDebut === 3 && murSeul === 1, ` (${auDebut})`],
+        ['A : il passe derrière, on voit la brique', apresA === murSeul && coteApresA === 128, ` (${apresA})`],
+        ['et le texte dit DERRIERE', texteDerriere === 'DERRIERE', ` (${texteDerriere})`],
+        ['A encore : il repasse devant', apresAA === 3 && net(c.mot(4, 1, 8)) === 'DEVANT'],
+        ['DROITE le déplace toujours', c.lutin(0).x > x0, ` (${x0} puis ${c.lutin(0).x})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Devant, derrière : cache-toi du garde',
+    difficulte: 9,
+    provenance: 'cours',
+    suite: true,
+    idee: 'Un petit jeu : traverse l’écran sans te faire voir. Le garde passe en haut ; derrière un arbre marqué DEVANT, il ne te voit pas.',
+    texte: [
+      '**Un petit jeu avec tout ce qu’on vient de voir.** Ton héros part à gauche et doit atteindre la droite. Un garde fait les cent pas en haut de l’écran. S’il passe au-dessus de toi pendant que tu es à découvert, il te voit : retour au départ.',
+      '**Les arbres sont des cachettes :** leurs cases ont `DEVANT`. Derrière un arbre, ton héros disparaît, et le garde passe sans te voir.',
+      '**Mais la console ne sait pas que tu es caché !** `DEVANT` ne change que le **dessin**. Pour le jeu, il faut le dire aussi dans le code : `cache` vaut 1 si le héros (8 pixels) est **entièrement** derrière un arbre (16 pixels). Le premier arbre va du pixel 40 au 55 : le héros y est caché pour `x` de 40 à 48 (48 + 8 = 56).',
+      '**L’écart entre le garde et toi :** `ecart` est la distance, toujours positive. Comme `uint8_t` ne connaît pas les nombres négatifs, on soustrait le plus petit du plus grand : `g - x` si le garde est à droite, `x - g` sinon. Moins de 12 pixels, et pas caché : vu !',
+      '**Vu :** le compteur `vus` augmente, le héros repart du pixel 8, et le garde repart de la droite (sinon il te reverrait aussitôt).',
+      '**À toi :** ajoute un troisième arbre, ou un second garde, plus rapide, en lutin 2.',
+    ],
+    code: `// CE PROGRAMME (Game Boy Color) : un petit jeu de cache-cache.
+//   GAUCHE / DROITE : ton héros (en bas) doit atteindre la droite de l'écran.
+//   Le GARDE fait les cent pas en haut. S'il passe au-dessus de toi pendant que
+//   tu es à découvert : VU, retour au départ.
+//   Derrière un ARBRE (cases DEVANT), tu es caché : il ne te voit pas.
+//
+// Ce qui est nouveau : DEVANT ne change que le DESSIN. Pour le jeu, on calcule
+// aussi, dans le code, si le héros est caché (la variable cache).
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurLutin>   // choisit une couleur d’une palette des lutins
+#include <ecran>          // éteint ou rallume l’écran
+#include <poser>          // pose une tuile sur une case du fond
+#include <teindre>        // met une case du fond dans une palette
+#include <texte>          // écrit un texte à l’écran
+#include <nombre>         // écrit un nombre en chiffres
+#include <bouton>         // lit un bouton de la manette
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <teindreLutin>   // met un lutin dans une palette
+
+Tuile ARBRE = {                   // Du feuillage en haut, un tronc en bas. Aucun 0 : tout plein.
+  "12222221",
+  "22333322",
+  "23333332",
+  "23333332",
+  "22333322",
+  "12222221",
+  "11133111",
+  "11133111",
+};
+
+Tuile HEROS = {                   // Toi : 0 transparent, 1 clair, 2 moyen, 3 contour.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};
+
+Tuile GARDE = {                   // Le garde : un casque, de gros yeux.
+  "03333330",
+  "33333333",
+  "31133113",
+  "31133113",
+  "32222223",
+  "03222230",
+  "03300330",
+  "33000033",
+};
+
+uint8_t x = 8;          // Ta place, en pixels.
+uint8_t g = 150;        // La place du garde.
+uint8_t sens = 0;       // Le garde va : 0 vers la gauche, 1 vers la droite.
+uint8_t vus = 0;        // Combien de fois il t'a vu.
+
+int main() {                              // Le jeu commence ici.
+  couleurFond(0, 0, 20, 28, 31);          // palette 0 : le ciel et le texte
+  couleurFond(0, 3,  2,  4, 12);
+  couleurFond(2, 1,  8, 18,  4);          // palette 2 : l'arbre, vert,
+  couleurFond(2, 2,  4, 26,  6);          //   vert vif,
+  couleurFond(2, 3,  0, 10,  2);          //   vert sombre.
+  couleurLutin(0, 1, 28, 31, 31);         // toi : bleu pâle,
+  couleurLutin(0, 2,  4, 12, 31);         //   bleu,
+  couleurLutin(0, 3,  0,  0, 10);         //   bleu nuit.
+  couleurLutin(1, 1, 31, 31, 31);         // le garde : blanc,
+  couleurLutin(1, 2, 31,  4,  2);         //   rouge,
+  couleurLutin(1, 3, 10,  0,  0);         //   rouge sombre.
+
+  ecran(0);                               // Dessin écran éteint.
+  texte(1, 1, "VUS");
+  // Deux arbres de 2 × 2 cases, lignes 8 et 9 : colonnes 5-6, puis 13-14.
+  for (uint8_t l = 8; l < 10; l++) {
+    poser(5, l, ARBRE);  teindre(5, l, 2 | DEVANT);
+    poser(6, l, ARBRE);  teindre(6, l, 2 | DEVANT);
+    poser(13, l, ARBRE); teindre(13, l, 2 | DEVANT);
+    poser(14, l, ARBRE); teindre(14, l, 2 | DEVANT);
+  }
+  ecran(1);                               // On rallume.
+  nombre(5, 1, vus);
+
+  while (true) {                          // La boucle du jeu :
+    image();
+
+    // Toi : GAUCHE / DROITE.
+    if (bouton(DROITE) && x < 152) x++;
+    if (bouton(GAUCHE) && x > 8) x--;
+
+    // Le garde : un pixel toutes les 2 images, et demi-tour aux bords.
+    if (images() % 2 == 0) {
+      if (sens == 0) {
+        g--;
+        if (g == 0) sens = 1;             // au bord gauche : il repart à droite
+      } else {
+        g++;
+        if (g == 152) sens = 0;           // au bord droit : il repart à gauche
+      }
+    }
+
+    // Caché ? Tout entier derrière un arbre (le héros fait 8 pixels, l'arbre 16).
+    uint8_t cache = 0;
+    if (x >= 40 && x <= 48) cache = 1;    // arbre 1 : pixels 40 à 55
+    if (x >= 104 && x <= 112) cache = 1;  // arbre 2 : pixels 104 à 119
+
+    // L'écart entre le garde et toi, toujours positif.
+    uint8_t ecart = 0;
+    if (g > x) {
+      ecart = g - x;                      // le garde est à droite
+    } else {
+      ecart = x - g;                      // le garde est à gauche (ou pile au-dessus)
+    }
+
+    if (ecart < 12 && cache == 0) {       // Tout près, et à découvert : VU !
+      vus++;
+      nombre(5, 1, vus);
+      x = 8;                              // retour au départ,
+      g = 150;                            // et le garde repart de la droite.
+      sens = 0;
+    }
+
+    if (x >= 150) texte(8, 1, "GAGNE");   // Arrivé à droite !
+
+    sprite(0, x, 68, HEROS);              // Toi, en bas, à la hauteur des arbres.
+    teindreLutin(0, 0);
+    sprite(1, g, 40, GARDE);              // Le garde, en haut.
+    teindreLutin(1, 1);
+  }
+}
+`,
+    aVoir: 'Deux arbres verts, ton héros bleu à gauche, un garde rouge qui va et vient en haut. Derrière un arbre, ton héros disparaît et le garde ne le voit pas ; à découvert, il te renvoie au départ.',
+    controle: (c) => {
+      attendre(c, () => c.variable('vus') > 0, 1200)
+      const vuADecouvert = c.variable('vus')
+      const auDepart = c.lutin(0).x
+      tenir(c, 'right', () => c.lutin(0).x >= 44)
+      const xCache = c.lutin(0).x
+      const avant = c.variable('vus')
+      const cachePixel = couleur(c, xCache + 3, 71)
+      const arbrePixel = couleur(c, xCache + 3 + 64, 71)   // le même point du second arbre
+      c.avancer(700)
+      return [
+        ['à découvert, le garde te voit', vuADecouvert >= 1 && auDepart === 8, ` (vus ${vuADecouvert})`],
+        ['derrière l’arbre, on voit l’arbre, pas toi', xCache >= 40 && xCache <= 48 && cachePixel === arbrePixel, ` (x ${xCache} : ${cachePixel})`],
+        ['caché, le garde passe sans te voir', c.variable('vus') === avant && c.lutin(0).x === xCache, ` (vus ${avant} puis ${c.variable('vus')})`],
+      ]
+    },
+  },
+  {
+    titre: 'Devant, derrière : le buisson sur Game Boy normale, devant puis derrière',
+    difficulte: 9,
+    provenance: 'cours',
+    suite: true,
+    idee: 'Les deux buissons, sur la Game Boy d’origine : sans DEVANT, c’est le programme qui choisit, selon la place du héros — sprite() à gauche, spriteDerriere() à droite.',
+    texte: [
+      '**Les deux buissons du 110.6, mais sur la Game Boy d’origine,** en quatre nuances de gris. Pas de couleur : ni `couleurFond()`, ni `teindre()`.',
+      '**Ce qui est nouveau ici : la limite de la Game Boy normale.** Elle n’a qu’**une** carte pour le décor : rien pour dire « cette case-ci passe devant ». `DEVANT` n’existe pas. Il ne reste qu’un réglage, sur le **lutin** : `spriteDerriere()` (ou `DERRIERE`).',
+      '**Le problème :** `DERRIERE` vaut pour **tout** le décor dessiné. Avec `spriteDerriere()` seul, le héros passerait derrière **les deux** buissons. Avec `sprite()` seul, devant les deux.',
+      '**L’astuce : changer de côté selon la place.** Le premier buisson est à gauche (pixels 32 à 47), le second à droite (pixels 96 à 111). Entre les deux, il n’y a que le ciel. Alors, à chaque image : si `x < 80`, le héros est posé avec `sprite()` (**devant**) ; sinon, avec `spriteDerriere()` (**derrière**). Il passe devant le premier buisson, puis derrière le second.',
+      '**Pourquoi 80 :** c’est au milieu du ciel, entre les deux buissons. Là, devant ou derrière, on voit le héros pareil (le ciel est vide, l’indice 0) : le changement ne se voit pas.',
+      '**La différence avec la Color :** ici, c’est **ton programme** qui décide, à chaque image, avec un `if`. Sur la Color (la leçon suivante), c’est **la case** qui le dit, une fois pour toutes, avec `DEVANT` : plus besoin de savoir où sont les buissons.',
+      '**Les buissons n’ont aucun 0,** comme au 110.6 : avec des coins vides, deux touffes côte à côte laisseraient un trou, et l’on verrait un morceau du héros y rester figé.',
+      '**À toi :** inverse : derrière le premier buisson, devant le second. Il suffit d’échanger les deux lignes du `if`.',
+    ],
+    code: `// CE PROGRAMME (Game Boy NORMALE, 4 nuances) : les deux buissons. Le héros
+// avance tout seul : il passe DEVANT le premier, puis DERRIÈRE le second.
+//
+// Ce qui est nouveau : faire « devant / derrière » sans DEVANT.
+//   La Game Boy d'origine ne sait pas dire « cette case-ci passe devant ».
+//   Le seul réglage est sur le LUTIN, et il vaut pour TOUT le décor.
+//   Alors on change le lutin de côté SELON SA PLACE, à chaque image :
+//
+//     x < 80   (à gauche, le buisson 1)  ->  sprite()           : devant
+//     x >= 80  (à droite, le buisson 2)  ->  spriteDerriere()   : derrière
+//
+//   80 est au milieu du ciel, entre les deux : le changement ne se voit pas.
+//
+// La leçon suivante fait la même chose sur Game Boy Color, avec poserDevant().
+
+#include <Tuile>            // un dessin de 8 × 8 pixels
+#include <poser>            // pose une tuile sur une case du fond
+#include <texte>            // écrit un texte à l’écran
+#include <sprite>           // place un lutin de 8 × 8 au pixel près (devant)
+#include <spriteDerriere>   // place un lutin derrière le décor
+
+Tuile BUISSON = {                 // Une touffe de feuilles : AUCUN 0, elle est toute pleine.
+  "11222211",                     //   (des coins en 0 laisseraient un trou là où deux
+  "12233221",                     //    touffes se touchent : on y verrait le héros)
+  "22333322",
+  "23333332",
+  "23333332",
+  "22333322",
+  "12233221",
+  "11222211",
+};
+
+Tuile HEROS = {                   // 0 transparent, 1 clair, 2 moyen, 3 contour.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};
+
+int main() {                              // Le jeu commence ici.
+  texte(1, 1, "GAME BOY NORMALE");
+  for (uint8_t l = 8; l < 10; l++) {      // Lignes 8 et 9 :
+    for (uint8_t c = 4; c < 6; c++) {     //   buisson 1, colonnes 4 et 5,
+      poser(c, l, BUISSON);
+    }
+    for (uint8_t c = 12; c < 14; c++) {   //   buisson 2, colonnes 12 et 13.
+      poser(c, l, BUISSON);               //   Le même : c'est le héros qui changera de côté.
+    }
+  }
+
+  uint8_t x = 0;                          // La place du héros, en pixels.
+
+  while (true) {                          // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;           // Un pixel toutes les 2 images.
+    if (x > 152) x = 0;
+
+    // Devant ou derrière : on choisit selon la place du héros.
+    if (x < 80) {                         // à gauche (le buisson 1) :
+      sprite(0, x, 68, HEROS);            //   DEVANT le décor
+    } else {                              // à droite (le buisson 2) :
+      spriteDerriere(0, x, 68, HEROS);    //   DERRIÈRE le décor
+    }
+  }
+}
+`,
+    aVoir: 'Deux buissons gris. Le héros passe devant celui de gauche, puis disparaît derrière celui de droite.',
+    controle: (c) => {
+      attendre(c, () => c.lutin(0).x === 32)
+      const premier = nuance(c, 32, 71)     // le contour du héros (3), ou le buisson (1)
+      attendre(c, () => c.lutin(0).x === 72)
+      const entreLesDeux = nuance(c, 72, 71)
+      attendre(c, () => c.lutin(0).x === 96)
+      const second = nuance(c, 96, 71)
+      return [
+        ['la cartouche est en 4 nuances, sans couleur', c.gb.ppu.couleur === false],
+        ['buisson 1 : le héros est devant', premier === 3, ` (nuance ${premier})`],
+        ['entre les deux, sur le ciel, on le voit', entreLesDeux === 3, ` (nuance ${entreLesDeux})`],
+        ['buisson 2 : le héros est derrière', second === 1, ` (nuance ${second})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Devant, derrière : le buisson sur Game Boy Color, poserDevant()',
+    difficulte: 9,
+    provenance: 'cours',
+    suite: true,
+    idee: 'Les deux buissons du 110.6, mais le second posé en UNE ligne : poserDevant(c, l, BUISSON, 2). Même écran, mêmes octets, moins à écrire.',
+    texte: [
+      '**Le programme des deux buissons (le 110.6), avec un seul changement :** le second buisson n’est plus posé avec deux lignes, `poser()` puis `teindre(…, 2 | DEVANT)`, mais avec **une seule**, `poserDevant()`.',
+      '**Ce qui est nouveau ici : `poserDevant(colonne, ligne, tuile, palette)`,** une fonction de la console. Elle fait les deux gestes d’un coup : poser la tuile, et la mettre dans sa palette **devant** les lutins. C’est un peu comme une classe en HTML : on dit « devant » en posant la case, et on n’y pense plus.',
+      '**Elle est légère, et même gratuite :** le compilateur la **remplace** par les deux lignes qu’on écrivait avant. La cartouche a exactement les mêmes octets qu’au 110.6. Et ensuite, pendant le jeu, rien n’est vérifié : c’est la console qui dessine la case devant le héros, toute seule, en dessinant l’écran.',
+      '**Le même écran qu’à la leçon d’avant (Game Boy normale), mais autrement :** là, le programme changeait le héros de côté avec un `if`, selon sa place. Ici, grâce à `DEVANT`, c’est **la case** qui le dit : le héros n’a plus rien à savoir.',
+      '**Le premier buisson garde l’ancienne façon,** `poser()` puis `teindre(…, 2)`, sans `DEVANT`. On compare les deux d’un coup d’œil.',
+      '**À toi :** pose le premier buisson avec `poserDevant()`, lui aussi. Le héros passe derrière les deux, et `#include <teindre>` ne sert plus à rien : tu peux l’enlever.',
+    ],
+    code: `// CE PROGRAMME (Game Boy Color) : les deux buissons du 110.6. Le second est
+// posé en UNE ligne avec poserDevant() ; l'écran ne change pas.
+//
+// Ce qui est nouveau : poserDevant(colonne, ligne, tuile, palette).
+//
+//   AVANT (2 lignes)                        MAINTENANT (1 ligne)
+//   poser(c, l, BUISSON);                   poserDevant(c, l, BUISSON, 2);
+//   teindre(c, l, 2 | DEVANT);
+//
+// Le compilateur remplace la ligne de droite par les deux de gauche : la
+// cartouche a les mêmes octets. Rien n'est vérifié pendant le jeu : c'est la
+// console qui dessine la case devant le héros, toute seule.
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurLutin>   // choisit une couleur d’une palette des lutins
+#include <ecran>          // éteint ou rallume l’écran
+#include <poser>          // pose une tuile sur une case du fond
+#include <teindre>        // met une case du fond dans une palette
+#include <poserDevant>    // pose une tuile qui passe devant les lutins
+#include <texte>          // écrit un texte à l’écran
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <teindreLutin>   // met un lutin dans une palette
+
+Tuile BUISSON = {                 // Une touffe de feuilles : AUCUN 0, elle est toute pleine.
+  "11222211",                     //   (des coins en 0 laisseraient un trou là où deux
+  "12233221",                     //    touffes se touchent : on y verrait le héros)
+  "22333322",
+  "23333332",
+  "23333332",
+  "22333322",
+  "12233221",
+  "11222211",
+};
+
+Tuile HEROS = {                   // 0 transparent, 1 clair, 2 moyen, 3 contour.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};
+
+int main() {                              // Le jeu commence ici.
+  couleurFond(0, 0, 20, 28, 31);          // palette 0 : le ciel et le texte
+  couleurFond(0, 3,  2,  4, 12);
+  couleurFond(2, 0, 20, 28, 31);          // palette 2 : le ciel entre les feuilles,
+  couleurFond(2, 1, 16, 30,  8);          //   vert clair,
+  couleurFond(2, 2,  6, 22,  4);          //   vert,
+  couleurFond(2, 3,  0, 10,  2);          //   vert sombre.
+  couleurLutin(0, 1, 31, 28, 20);         // le héros : rose clair,
+  couleurLutin(0, 2, 31,  4,  2);         //   rouge,
+  couleurLutin(0, 3, 10,  0,  0);         //   contour très sombre.
+
+  ecran(0);                               // Dessin écran éteint.
+  texte(1, 1, "EN UNE LIGNE");
+  for (uint8_t l = 8; l < 10; l++) {      // Lignes 8 et 9 :
+    for (uint8_t c = 4; c < 6; c++) {     //   buisson 1, l'ancienne façon :
+      poser(c, l, BUISSON);
+      teindre(c, l, 2);                   //     palette 2, sans DEVANT.
+    }
+    for (uint8_t c = 12; c < 14; c++) {   //   buisson 2, la nouvelle façon :
+      poserDevant(c, l, BUISSON, 2);      //     posé, palette 2, DEVANT : une ligne.
+    }
+  }
+  ecran(1);                               // On rallume.
+
+  uint8_t x = 0;                          // La place du héros, en pixels.
+
+  while (true) {                          // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;           // Un pixel toutes les 2 images.
+    if (x > 152) x = 0;
+
+    sprite(0, x, 68, HEROS);
+    teindreLutin(0, 0);
+  }
+}
+`,
+    aVoir: 'Le même écran qu’au 110.6 : le héros passe devant le buisson de gauche, derrière celui de droite.',
+    controle: (c) => {
+      attendre(c, () => c.lutin(0).x === 32)
+      const premier = couleur(c, 35, 71)
+      attendre(c, () => c.lutin(0).x === 96)
+      const second = couleur(c, 99, 71)
+      const reglage = c.gb.ppu.vram[0x2000 + 0x1800 + 8 * 32 + 12]
+      return [
+        ['buisson 1 : le héros (rouge) est devant', premier === '31/4/2', ` (${premier})`],
+        ['buisson 2, poserDevant : on voit le buisson (vert)', second === '6/22/4', ` (${second})`],
+        ['la case (12, 8) : palette 2 et DEVANT, comme avec teindre', reglage === (2 | 0x80), ` (${reglage})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Devant, derrière : le tuyau en une ligne, spriteDerriere()',
+    difficulte: 9,
+    provenance: 'cours',
+    suite: true,
+    idee: 'Le tuyau du 110.4, avec spriteDerriere(0, x, 72, HEROS) : plus de 5e argument à retenir.',
+    texte: [
+      '**Le programme du tuyau (le 110.4), avec un seul changement :** `sprite(0, x, 72, HEROS, DERRIERE)` devient `spriteDerriere(0, x, 72, HEROS)`.',
+      '**Ce qui est nouveau ici : `spriteDerriere(numero, x, y, tuile)`,** une fonction de la console. Le nom dit ce qu’elle fait : on n’a plus à se souvenir que `DERRIERE` se met en 5e position.',
+      '**Le même prix qu’un `sprite()` :** le compilateur la remplace par `sprite(…, DERRIERE)`. On peut l’appeler à chaque image, dans la boucle du jeu, sans rien alourdir.',
+      '**Et pour le repasser devant ?** On rappelle `sprite()` tout court, sans 5e argument : chaque appel range le lutin de nouveau, avec ce qu’on lui donne.',
+      '**À toi :** fais-le passer devant le tuyau à l’aller, derrière au retour. Une variable `sens` et un `if` suffisent : `if (sens == 0) sprite(…); else spriteDerriere(…);`.',
+    ],
+    code: `// CE PROGRAMME : le tuyau du 110.4. Le héros y entre et ressort de l'autre côté.
+//
+// Ce qui est nouveau : spriteDerriere(numero, x, y, tuile).
+//
+//   AVANT                                   MAINTENANT
+//   sprite(0, x, 72, HEROS, DERRIERE);      spriteDerriere(0, x, 72, HEROS);
+//
+// Le compilateur remplace la ligne de droite par celle de gauche : même prix.
+
+#include <Tuile>            // un dessin de 8 × 8 pixels
+#include <poser>            // pose une tuile sur une case du fond
+#include <texte>            // écrit un texte à l’écran
+#include <spriteDerriere>   // place un lutin derrière le décor
+
+Tuile TUYAU = {                   // Un morceau de tuyau couché : AUCUN 0, il est tout plein.
+  "33333333",
+  "11111111",
+  "22222222",
+  "22222222",
+  "22222222",
+  "22222222",
+  "21212121",
+  "33333333",
+};
+
+Tuile HEROS = {                   // Le héros : les points (.) sont transparents.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+int main() {                          // Le jeu commence ici.
+  texte(1, 1, "LE TUYAU");
+
+  for (uint8_t c = 8; c < 13; c++) {  // Le tuyau : colonnes 8 à 12, ligne 9.
+    poser(c, 9, TUYAU);
+  }
+
+  uint8_t x = 0;                      // La place du héros, en pixels.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    if (images() % 2 == 0) x++;       // Un pixel toutes les 2 images.
+    if (x > 152) x = 0;
+
+    spriteDerriere(0, x, 72, HEROS);  // Le héros, derrière le décor : une ligne, sans 5e argument.
+  }
+}
+`,
+    aVoir: 'Le même écran qu’au 110.4 : le héros disparaît dans le tuyau et ressort à droite.',
+    controle: (c) => {
+      attendre(c, () => c.lutin(0).x === 20)
+      const dehors = nuance(c, 24, 74)
+      attendre(c, () => c.lutin(0).x === 88)
+      const dedans = nuance(c, 92, 75)
+      return [
+        ['sur le vide, on voit le héros', dehors === 3, ` (nuance ${dehors})`],
+        ['dans le tuyau, on voit le tuyau', dedans === 2, ` (nuance ${dedans})`],
+        ['le lutin porte bien DERRIERE', (c.gb.mmu.read(0xfe03) & 0x80) === 0x80],
+      ]
+    },
+  },
+
   /* ================================================ 10 — les collisions */
 
   {
@@ -5676,5 +6779,101 @@ int main() {
       ['le bas : quatorze X', c.mot(3, 12, 14) === 'XXXXXXXXXXXXXX'],
       ['les côtés : un X à chaque bout, rien entre les deux', c.mot(3, 7, 1) === 'X' && c.mot(16, 7, 1) === 'X' && !c.mot(4, 7, 12).includes('X')],
     ],
+  },
+
+  {
+    titre: 'Un raccourci à toi : écrire poserDevant() soi-même',
+    difficulte: 15,
+    provenance: 'cours',
+    idee: 'poserDevant() de la console tient en deux lignes : on l’écrit soi-même, dans outils.cpp. Et l’on découvre pourquoi celle de la console est plus légère.',
+    texte: [
+      '**Une fonction « raccourci », c’est juste un nom donné à des gestes qu’on sait déjà faire.** `poserDevant()` (le 110.10) pose une tuile, puis la teint `| DEVANT`. Ici, on l’écrit **soi-même**, dans `outils.cpp`, comme `bande()` et `pile()`.',
+      '**Lis-la :** quatre paramètres, deux lignes. `poser(colonne, ligne, tuile)` pose la tuile ; `teindre(colonne, ligne, palette | DEVANT)` choisit sa palette et la fait passer devant les lutins.',
+      '**Elle porte le même nom que celle de la console :** c’est donc **la tienne** qui sert (le 15.7). Le programme n’écrit pas `#include <poserDevant>` : il n’en a pas besoin. Il inclut `poser` et `teindre`, dont TA fonction se sert.',
+      '**La différence de poids :** ta version est une vraie fonction. À chaque appel, le programme range quatre nombres, saute dans la fonction, et `poser()` et `teindre()` ne savent plus rien d’avance (la case, la tuile) : elles calculent tout pendant le jeu. Celle de la console, elle, n’est **pas une vraie fonction** : le compilateur **recopie ses deux lignes à la place de l’appel**, avec les vrais nombres. Le résultat est le même à l’écran ; la cartouche de la console est plus petite.',
+      '**Alors, la tienne ne sert à rien ?** Si : elle est à toi, tu peux la changer. Une version qui pose **deux** cases d’un coup (un buisson de 2 de large), une autre qui choisit toute seule la palette… La console ne fera jamais ce que ton jeu a en tête.',
+      '**À toi :** ajoute dans `outils.cpp` un `buissonDevant(colonne, ligne)` qui appelle quatre fois `poserDevant()` pour un buisson de 2 × 2 cases.',
+    ],
+    fichiers: {
+      'outils.cpp': `// outils.cpp : MES fonctions.
+
+#include <poser>     // poserDevant() se sert de poser()…
+#include <teindre>   // … et de teindre()
+
+// poserDevant(colonne, ligne, tuile, palette) : MA version, en deux lignes.
+// Même nom que celle de la console : c'est la mienne qui sert.
+//   poserDevant(12, 8, BUISSON, 2) → la touffe en (12, 8), palette 2, devant.
+void poserDevant(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t palette) {
+  poser(colonne, ligne, tuile);                // 1. la tuile, sur sa case
+  teindre(colonne, ligne, palette | DEVANT);   // 2. sa palette, ET devant les lutins
+}
+`,
+    },
+    code: `// Le buisson DEVANT, avec MA poserDevant(), écrite dans outils.cpp.
+// Pas de « #include <poserDevant> » : ma fonction vient d'outils.cpp.
+
+#include <Tuile>          // un dessin de 8 × 8 pixels
+#include <couleurFond>    // choisit une couleur d’une palette du fond
+#include <couleurLutin>   // choisit une couleur d’une palette des lutins
+#include <sprite>         // place un lutin de 8 × 8 au pixel près
+#include <teindreLutin>   // met un lutin dans une palette
+#include "outils.cpp"     // MA poserDevant()
+
+Tuile BUISSON = {                 // Une touffe de feuilles : AUCUN 0, elle est toute pleine.
+  "11222211",                     //   (des coins en 0 laisseraient un trou là où deux
+  "12233221",                     //    touffes se touchent : on y verrait le héros)
+  "22333322",
+  "23333332",
+  "23333332",
+  "22333322",
+  "12233221",
+  "11222211",
+};
+
+Tuile HEROS = {                   // 0 transparent, 1 clair, 2 moyen, 3 contour.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};
+
+int main() {
+  couleurFond(2, 1, 16, 30,  8);  // palette 2 : les verts du buisson
+  couleurFond(2, 2,  6, 22,  4);
+  couleurFond(2, 3,  0, 10,  2);
+  couleurLutin(0, 2, 31,  4,  2); // le héros : rouge
+  couleurLutin(0, 3, 10,  0,  0);
+
+  // Un buisson de 2 × 2 cases, colonnes 12-13, lignes 8-9 : quatre appels.
+  poserDevant(12, 8, BUISSON, 2);
+  poserDevant(13, 8, BUISSON, 2);
+  poserDevant(12, 9, BUISSON, 2);
+  poserDevant(13, 9, BUISSON, 2);
+
+  sprite(0, 96, 68, HEROS);       // le héros, dans le buisson : caché
+  teindreLutin(0, 0);
+  sprite(1, 40, 68, HEROS);       // un autre, à découvert : visible
+  teindreLutin(1, 0);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'Un buisson vert, et un héros rouge à gauche. Le second héros, dans le buisson, est caché.',
+    controle: (c) => {
+      const reglage = c.gb.ppu.vram[0x2000 + 0x1800 + 9 * 32 + 13]
+      const dansLeBuisson = couleur(c, 99, 71)
+      const aDecouvert = couleur(c, 43, 71)
+      return [
+        ['ma poserDevant() a teint la case (13, 9) : palette 2 et DEVANT', reglage === (2 | 0x80), ` (${reglage})`],
+        ['dans le buisson, on voit le buisson (vert)', dansLeBuisson === '6/22/4', ` (${dansLeBuisson})`],
+        ['à découvert, on voit le héros (rouge)', aDecouvert === '31/4/2', ` (${aDecouvert})`],
+      ]
+    },
   },
 ]
