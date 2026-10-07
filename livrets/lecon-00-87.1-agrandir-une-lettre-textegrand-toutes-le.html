@@ -82,19 +82,19 @@
     <span class="niveau">Chapitre 0 — Avant tout</span>
     
     <span class="niveau">Partie G — Les lettres et l’écran titre</span>
-    <span>leçon 0.87.1 sur 143</span>
+    <span>leçon 0.87.1 sur 152</span>
     <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
   </p>
 <h1>0.87.1. Agrandir une lettre : texteGrand — toutes les tailles</h1>
-<p class="idee">Le même A, aux tailles 1, 2, 3 et 4, côte à côte : un seul nombre change d’une ligne à l’autre.</p>
+<p class="idee">Le même A, aux tailles 0, 1, 2 et 3, côte à côte : un seul nombre change d’une ligne à l’autre.</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
-<p><strong>Quatre lignes, un seul nombre qui change :</strong> la taille, 1, 2, 3, puis 4. On voit le A grandir.</p>
+<p><strong>Quatre lignes, un seul nombre qui change :</strong> la taille, 0, 1, 2, puis 3. On voit le A grandir.</p>
 <p><strong>Tu choisis la taille, la console s’adapte :</strong> aucune taille n’est dessinée à l’avance. Chaque <code>texteGrand</code> fait calculer les tuiles de SA taille.</p>
-<p><strong>La place :</strong> taille 1, 1 case ; taille 2, 2 × 2 ; taille 3, 3 × 3 ; taille 4, 4 × 4. Les colonnes de départ (0, 2, 5, 9) laissent juste la place à chacun.</p>
+<p><strong>La place :</strong> taille 0, 1 case ; taille 1, 2 × 2 ; taille 2, 3 × 3 ; taille 3, 4 × 4. Toujours <strong>taille + 1</strong> cases de côté. Les colonnes de départ (0, 2, 5, 9) laissent juste la place à chacun.</p>
 
 <div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
   <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
@@ -146,7 +146,7 @@ Tes fonctions appelées :
 <div class="morceau">
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
-    <pre><code>#include &lt;texteGrand&gt;   // écrit un texte agrandi, de 1 à 20 fois</code></pre>
+    <pre><code>#include &lt;texteGrand&gt;   // écrit un texte agrandi, taille de 0 à 10</code></pre>
   </div>
   <div></div>
 </div>
@@ -155,10 +155,10 @@ Tes fonctions appelées :
   <div>
     <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
     <pre><code>int main() {
-  texteGrand(0, 0, "A", 1);     // taille 1 : 1 case, comme une lettre normale
-  texteGrand(2, 0, "A", 2);     // taille 2 : 2 × 2 cases
-  texteGrand(5, 0, "A", 3);     // taille 3 : 3 × 3 cases
-  texteGrand(9, 0, "A", 4);     // taille 4 : 4 × 4 cases
+  texteGrand(0, 0, "A", 0);     // taille 0 : 1 case, la lettre normale
+  texteGrand(2, 0, "A", 1);     // taille 1 : 2 × 2 cases
+  texteGrand(5, 0, "A", 2);     // taille 2 : 3 × 3 cases
+  texteGrand(9, 0, "A", 3);     // taille 3 : 4 × 4 cases
 
   while (true) {
     image();
@@ -190,7 +190,7 @@ programme.</p>
 
 
 <h2>4. Ce qu’on doit voir</h2>
-<p class="avoir">Quatre A côte à côte, de plus en plus grands : tailles 1, 2, 3 et 4.</p>
+<p class="avoir">Quatre A côte à côte, de plus en plus grands : tailles 0, 1, 2 et 3.</p>
 
 <h2>5. Ce que la console répond</h2>
 <p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
@@ -199,9 +199,9 @@ et voici ce qu’ils ont mesuré.</p>
 
 <ul class="controles">
 
-  <li>taille 1 : une case </li>
+  <li>taille 0 : une case </li>
 
-  <li>taille 4 : dans ses 4 × 4 cases </li>
+  <li>taille 3 : dans ses 4 × 4 cases </li>
 
   <li>chacun plus grand que le précédent </li>
 </ul>

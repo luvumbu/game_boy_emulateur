@@ -427,7 +427,7 @@ try {
   await evaluer(`document.getElementById('reglages-fermer').click()`)
   await patienter(300)
 
-  await evaluer(`[...document.querySelectorAll('#modeles .modele')].find(m => m.textContent.includes('COEUR')).click()`)
+  await evaluer(`[...document.querySelectorAll('#modeles .modele')].find(m => m.querySelector('b').textContent === 'COEUR').click()`)
   await patienter(1100)
 
   controle('réglage décoché : le nom n’est plus demandé',
@@ -461,33 +461,6 @@ try {
 
   const nuancesRom = await evaluer(`new Set(inspecteur.gb.framebuffer).size`)
   controle('la console la joue vraiment', nuancesRom > 1, ` (${nuancesRom} nuances à l’écran)`)
-
-  /* --- la conversion : ce qui peut être tiré d'une cartouche --- */
-
-  await evaluer(`document.getElementById('convertir').click()`)
-  await patienter(900)
-
-  const dit2 = await evaluer(`document.getElementById('etat').textContent`)
-  /* Elle ne rend plus seulement les dessins : le DÉCOR posé à l'écran et les
-     MOTS affichés se relisent tout aussi exactement — un octet par case, à une
-     adresse connue. C'est ce qui fait la différence entre une planche de tuiles
-     et un programme qu'on peut recompiler. */
-  controle('« CONVERSION » tire les dessins, le décor et les mots',
-    dit2.includes('dessins') && dit2.includes('cases de décor') && dit2.includes('mots'),
-    `\n      ${dit2.split('\n')[0]}`)
-
-  /* Et surtout : elle dit ce qu'elle NE PEUT PAS faire. Un bouton qui promet
-     une conversion sans dire où elle s'arrête ferait chercher longtemps. */
-  controle('et elle dit que le code, lui, ne se convertit pas',
-    dit2.includes('ne se convertit pas'))
-
-  const ongletsApres = await evaluer(
-    `[...document.querySelectorAll('#fichiers .fichier')].map(f => f.textContent).join(' ')`)
-  controle('les dessins arrivent dans leur propre fichier',
-    ongletsApres.includes('tuiles-prises.cpp'), ` (${ongletsApres})`)
-
-  const prises = await evaluer(`inspecteurDessins().length`)
-  controle('et l’atelier les montre, prêtes à repeindre', prises > 10, ` (${prises} dessins)`)
 
   await evaluer(`document.getElementById('revenir').click()`)
   await patienter(1200)
@@ -896,9 +869,12 @@ try {
     ` (${faites.map((c) => c.extension + ' ' + (c.drapeau ?? 0).toString(16)).join(', ')})`)
   const boutons = await evaluer(`[
     document.getElementById('telecharger').textContent.trim(),
-    document.getElementById('telecharger-gb').hidden ? '(caché)' : document.getElementById('telecharger-gb').textContent.trim(),
+    String(document.getElementById('telecharger-gb')),
   ]`)
-  controle('un seul fichier est proposé au téléchargement', boutons[0] === '⬇ .gbc' && boutons[1] === '(caché)', ` (${boutons.join('  ')})`)
+  controle('un seul fichier est proposé au téléchargement', boutons[0] === '⬇ .gbc' && boutons[1] === 'null', ` (${boutons.join('  ')})`)
+  /* Sous l'écran, ce que la console fait vraiment. */
+  const mode = await evaluer(`document.getElementById('mode-console').textContent`)
+  controle('sous l’écran : « Game Boy Color »', /Game Boy Color/.test(mode), ` (${mode})`)
 
   controle('l’émulateur rend en couleur',
     (await evaluer(`inspecteur.gb.ppu.couleur`)) === true)
@@ -916,6 +892,8 @@ try {
   controle('l’aperçu retombe à quatre nuances', enNuances <= 4, ` (${enNuances} teintes)`)
   controle('mais la cartouche, elle, n’a pas changé',
     (await evaluer(`inspecteur.rom[0x0143]`)) === 0xc0)
+  const apercu = await evaluer(`document.getElementById('mode-console').textContent`)
+  controle('et le dessous de l’écran dit « Aperçu »', /^👁 Aperçu/.test(apercu), ` (${apercu})`)
 
   await evaluer(`document.getElementById('reglages').click()`)
   await evaluer(`reglages.poser('voirEnNuances', false)`)

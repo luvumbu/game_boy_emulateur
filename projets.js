@@ -122,9 +122,8 @@ export function installer({
       /*
        * Les cartouches — une, ou deux.
        *
-       * « les deux » sur un programme en couleur en fabrique deux : le dossier
-       * garde le « .gbc » ET le « .gb ». Le service efface celle qu’on ne lui
-       * envoie plus : ôter la couleur d’un programme ne doit pas laisser un
+       * Une cartouche, « .gbc » OU « .gb ». Le service efface celle qu’on ne
+       * lui envoie plus : passer un jeu en 4 nuances ne doit pas laisser un
        * « .gbc » d’hier dans le dossier, qu’on croirait à jour.
        */
       const enBase64 = (octets) => {

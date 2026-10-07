@@ -25,7 +25,8 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { basename, extname, dirname, join } from 'node:path'
 import { analyser } from '../compilateur/analyseur.js'
 import { rassembler, traduire } from '../compilateur/inclusion.js'
-import { fabriquerLesCartouches } from '../compilateur/cartouches.js'
+import { fabriquerLaCartouche } from '../compilateur/cartouches.js'
+import { CONSOLES } from '../compilateur/consoles.js'
 
 /*
  * Les options se reconnaissent à leur double tiret, et sont ÔTÉES avant de
@@ -59,9 +60,8 @@ if (!entree) {
   console.error('        --capture [images]     photographie l\'écran à côté du .gb')
   console.error('        --touches A,DROITE,…   appuie dessus avant de photographier')
   console.error('        --grossir N            N pixels de moniteur par pixel de console')
-  console.error('        --console gb|gbc|les-deux   pour quelle console (les-deux par défaut)')
-  console.error('        « les deux » écrit DEUX fichiers si le programme pose des couleurs :')
-  console.error('        nom.gbc (toutes les couleurs) et nom.gb (pas une seule)')
+  console.error('        --console gb|gbc       Game Boy (4 nuances) OU Game Boy Color')
+  console.error('        sans --console, le programme décide : une couleur posée → .gbc, sinon .gb')
   process.exit(1)
 }
 
@@ -74,10 +74,15 @@ const titre = positions[2] ?? nomCourt
 /* Le compilateur ne touche jamais au disque : c'est ici qu'on lui donne les
    fichiers, et ici qu'on refuse ceux qui manquent avec un message lisible. */
 const dossier = dirname(entree)
+/* Chaque fichier lu est retenu : ils seront gravés dans la cartouche, tels
+   qu'ils ont été écrits. */
+const lus = new Map()
 const lire = (nom) => {
   const chemin = nom === basename(entree) || nom === entree ? entree : join(dossier, nom)
   try {
-    return readFileSync(chemin, 'utf8')
+    const texte = readFileSync(chemin, 'utf8')
+    lus.set(nom, texte)
+    return texte
   } catch {
     throw new Error(`fichier introuvable : « ${nom} » (cherché dans ${dossier})`)
   }
@@ -92,27 +97,19 @@ try {
   origine = assemble.origine
   const arbre = analyser(assemble.texte)
   /*
-   * Pour quelle console ?
+   * Pour quelle console ? — « gb » ou « gbc », voir « consoles.js ».
    *
-   * « les-deux » par défaut : la cartouche pose ses couleurs si la console
-   * les a, et démarre quand même sur une Game Boy d'origine. C'est le choix
-   * qui ne prive personne, donc celui qu'on n'a pas à faire.
+   * Sans --console, c'est le programme qui décide : une seule fonction de
+   * couleur, et c'est une cartouche Game Boy Color ; aucune, une Game Boy.
+   * Un ancien « --console les-deux » est refusé, avec ce qu'il faut écrire.
    */
-  const cible = String(options.get('console') ?? 'les-deux')
-  if (!['gb', 'gbc', 'les-deux'].includes(cible)) {
-    throw new Error(`« --console ${cible} » : les consoles sont « gb », « gbc » ou « les-deux »`)
+  const cible = options.has('console') ? String(options.get('console')) : null
+  if (cible !== null && !(cible in CONSOLES)) {
+    throw new Error(`« --console ${cible} » : c'est « gb » (Game Boy, 4 nuances) ou « gbc » (Game Boy Color) — l'un ou l'autre, jamais les deux`)
   }
 
-  /*
-   * UNE cartouche, ou DEUX.
-   *
-   * « les deux » sur un programme qui pose des couleurs écrit maintenant deux
-   * fichiers : « nom.gbc » avec toutes ses couleurs, « nom.gb » sans une seule
-   * instruction de couleur. Le second est plus court, et c'est vraiment ce que
-   * la Game Boy d'origine exécute — non plus un programme en couleur dont elle
-   * ignore poliment la moitié.
-   */
-  cartouches = fabriquerLesCartouches(arbre, titre, cible)
+  /* UNE cartouche, toujours. */
+  cartouches = [fabriquerLaCartouche(arbre, titre, cible, { principal: basename(entree), fichiers: [...lus] })]
   rom = cartouches[0].rom
 
   const premier = cartouches[0]
@@ -131,12 +128,8 @@ try {
 }
 
 /*
- * On écrit CHAQUE cartouche.
- *
- * Une seule le plus souvent ; deux quand « les deux » a séparé la couleur du
- * reste. Les deux fichiers portent le même nom et se distinguent par leur
- * extension — c'est ce qu'attend n'importe quel émulateur, et c'est lisible
- * dans un dossier sans avoir à ouvrir quoi que ce soit.
+ * On écrit la cartouche : « .gb » pour la Game Boy, « .gbc » pour la Color —
+ * l'extension dit la console sans avoir à ouvrir le fichier.
  */
 for (const c of cartouches) writeFileSync(base + c.extension, c.rom)
 
@@ -144,28 +137,14 @@ for (const c of cartouches) writeFileSync(base + c.extension, c.rom)
 const compte = (combien, singulier, pluriel = singulier + 's') =>
   `${combien} ${combien > 1 ? pluriel : singulier}`
 
-const CONSOLES = {
-  0: 'pour Game Boy — quatre nuances',
-  128: 'en COULEUR — et jouable en quatre nuances sur une Game Boy d’origine',
-  192: 'en COULEUR — une Game Boy Color est EXIGÉE',
-}
-
 for (const c of cartouches) {
   console.log(`${base + c.extension}`)
   console.log(`  ${(c.rom.length / 1024).toFixed(0)} Ko de cartouche, ${c.octets.length} octets de programme`)
-  console.log(`  ${CONSOLES[c.couleur] ?? CONSOLES[0]}`)
-}
-
-/*
- * Ce que la séparation a ôté.
- *
- * Un nombre, parce que c'est tout l'objet des deux fichiers : le « .gb » ne
- * porte plus les écritures de couleur qui n'y faisaient rien. Sans ce compte,
- * on aurait deux fichiers sans savoir ce qui les distingue.
- */
-if (cartouches.length === 2) {
-  const ote = cartouches[0].octets.length - cartouches[1].octets.length
-  console.log(`  → ${ote} octets de couleur en moins que le « .gbc » : la Game Boy ne les exécutait pas`)
+  console.log(`  ${CONSOLES[c.pour].etiquette}`)
+  const g = c.rom.sourceGravee
+  console.log(g?.grave
+    ? `  programme C++ gravé dedans : ${g.octets} octets`
+    : `  programme C++ PAS gravé : ${g?.raison ?? 'rien à graver'}`)
 }
 
 console.log(`  ${compte(details.fonctions.size, 'fonction')} : ` + [...details.fonctions.keys()].join(', '))

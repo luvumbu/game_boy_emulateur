@@ -82,20 +82,20 @@
     <span class="niveau">Chapitre 0 — Avant tout</span>
     
     <span class="niveau">Partie G — Les lettres et l’écran titre</span>
-    <span>leçon 0.87 sur 143</span>
+    <span>leçon 0.87 sur 152</span>
     <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
   </p>
 <h1>0.87. Agrandir une lettre : texteGrand</h1>
-<p class="idee">texteGrand(x, y, "A", 3) : le A trois fois plus grand, sans rien dessiner. Chaque pixel devient un carré de 3 × 3 pixels ; les proportions sont gardées.</p>
+<p class="idee">texteGrand(x, y, "A", 2) : le A trois fois plus grand, sans rien dessiner. Chaque pixel devient un carré de 3 × 3 pixels ; les proportions sont gardées.</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
 <p><strong>Une lettre plus grande, sans la dessiner.</strong> La Game Boy n’a pas de zoom, mais la console peut <strong>calculer</strong> une lettre agrandie à partir de la police : chaque pixel devient un carré.</p>
-<p><strong>Ce qui est nouveau ici : <code>texteGrand(x, y, "TEXTE", taille)</code>.</strong> La <strong>taille</strong> va de <strong>1 à 20</strong> : c’est combien de fois plus grand. Avec <code>3</code>, chaque pixel de la lettre devient un carré de <strong>3 × 3 pixels</strong>. La lettre garde <strong>exactement ses proportions</strong>.</p>
-<p><strong>La place qu’elle prend :</strong> une lettre normale tient dans <strong>1 case</strong> (8 × 8 pixels). Agrandie 3 fois, elle en prend <strong>3 × 3 = 9</strong> (24 × 24 pixels). À la taille *n*, une lettre prend *n* cases de large et *n* de haut.</p>
-<p><strong>Le texte et la taille s’écrivent en clair</strong> (<code>"A"</code>, <code>3</code>), comme pour <code>ms()</code> : le compilateur fabrique les tuiles agrandies <strong>avant le jeu</strong>, et seulement celles dont le programme a besoin.</p>
+<p><strong>Ce qui est nouveau ici : <code>texteGrand(x, y, "TEXTE", taille)</code>.</strong> La <strong>taille</strong> va de <strong>0 à 10</strong>. <strong>0, c’est la lettre normale</strong> ; chaque cran de plus l’agrandit <strong>une fois de plus</strong> : 1 → 2 fois, 2 → 3 fois… 10 → 11 fois. Avec <code>2</code>, chaque pixel de la lettre devient un carré de <strong>3 × 3 pixels</strong>. La lettre garde <strong>exactement ses proportions</strong>.</p>
+<p><strong>La place qu’elle prend :</strong> une lettre normale (taille 0) tient dans <strong>1 case</strong> (8 × 8 pixels). À la taille 2, elle est 3 fois plus grande et prend <strong>3 × 3 = 9</strong> cases (24 × 24 pixels). À la taille *n*, une lettre prend *n + 1* cases de large et *n + 1* de haut.</p>
+<p><strong>Le texte et la taille s’écrivent en clair</strong> (<code>"A"</code>, <code>2</code>), comme pour <code>ms()</code> : le compilateur fabrique les tuiles agrandies <strong>avant le jeu</strong>, et seulement celles dont le programme a besoin.</p>
 <p><strong>Ce qu’elle coûte :</strong> quelques tuiles de plus dans la cartouche. Deux tuiles identiques (souvent toutes pleines aux grandes tailles) ne sont fabriquées qu’une fois.</p>
 
 <div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
@@ -135,7 +135,7 @@ Tes fonctions appelées :
 <div class="morceau">
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
-    <pre><code>#include &lt;texteGrand&gt;   // écrit un texte agrandi, de 1 à 20 fois</code></pre>
+    <pre><code>#include &lt;texteGrand&gt;   // écrit un texte agrandi, taille de 0 à 10</code></pre>
   </div>
   <div></div>
 </div>
@@ -146,9 +146,9 @@ Tes fonctions appelées :
     <pre><code>int main() {
   // La ligne, morceau par morceau :
   //
-  //   texteGrand(2, 2, "A", 3);
+  //   texteGrand(2, 2, "A", 2);
   //              |  |  |    |
-  //              |  |  |    +-- la TAILLE : 3 fois plus grand (de 1 à 20)
+  //              |  |  |    +-- la TAILLE (de 0 à 10) : 2 → 3 fois plus grand
   //              |  |  +------- le texte, entre guillemets
   //              +--+---------- la case en haut à gauche du grand A : (2, 2)
   //
@@ -160,7 +160,7 @@ Tes fonctions appelées :
   //   ·█···█··                 ······█████████·········
   //   ·█████··                 ···███·········███······
   //   …                        …
-  texteGrand(2, 2, "A", 3);
+  texteGrand(2, 2, "A", 2);
 
   while (true) {
     image();

@@ -27,7 +27,10 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { LECONS, NIVEAUX, numeros, partieDe, principales } from '../tuto/lecons.js'
+import { LECONS, NIVEAUX, numeros, partieDe, principales, nomDuChapitre } from '../tuto/lecons.js'
+
+/* « Chapitre 6 », ou « Série 2 » pour un chapitre qui est une série à part (voir tuto/parcours.js). */
+const nomDuNiveau = (niveau) => nomDuChapitre(LECONS.find((l) => l.difficulte === niveau) ?? { difficulte: niveau })
 import { inclusionsDe, fonctionDuTuto, tutosDesFonctions, leconsQuiEmploient } from '../tuto/fonctions.js'
 
 const NUMEROS = numeros(LECONS)
@@ -191,7 +194,7 @@ async function photographierLesAteliers() {
    null et l'on n'écrit rien), le numéro, la difficulté et les ateliers. */
 const reperesDe = (lecon, index) => `
   <p class="reperes">
-    <span class="niveau">Chapitre ${lecon.difficulte} — ${echapper(NIVEAUX[lecon.difficulte])}</span>
+    <span class="niveau">${nomDuChapitre(lecon)} — ${echapper(NIVEAUX[lecon.difficulte])}</span>
     ${lecon.provenance === 'cours' ? '<span class="outil">du cours</span>' : ''}
     ${partieDe(LECONS, index) ? `<span class="niveau">Partie ${partieDe(LECONS, index).lettre} — ${echapper(partieDe(LECONS, index).nom)}</span>` : ''}
     <span>leçon ${NUMEROS[index]} sur ${TOTAL}</span>
@@ -323,7 +326,7 @@ la cartouche se refait dans la seconde. C’est le même texte, écrit autrement
 
 <p class="pied">
   ${suivante
-    ? `Ensuite : <strong>${NUMEROS[index + 1]}. ${echapper(suivante.titre)}</strong> — chapitre ${suivante.difficulte} : ${echapper(NIVEAUX[suivante.difficulte])}.`
+    ? `Ensuite : <strong>${NUMEROS[index + 1]}. ${echapper(suivante.titre)}</strong> — ${nomDuChapitre(suivante).toLowerCase()} : ${echapper(NIVEAUX[suivante.difficulte])}.`
     : 'C’est la dernière des ' + TOTAL + ' leçons.'}
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
@@ -341,7 +344,7 @@ function livretComplet(matieres, ateliers) {
   for (const [index, lecon] of LECONS.entries()) {
     if (lecon.difficulte !== niveau) {
       niveau = lecon.difficulte
-      sommaire.push(`<li class="niveau">Chapitre ${niveau} — ${echapper(NIVEAUX[niveau])}</li>`)
+      sommaire.push(`<li class="niveau">${nomDuNiveau(niveau)} — ${echapper(NIVEAUX[niveau])}</li>`)
     }
     // Sur la leçon qui ouvre une partie, son titre dans le sommaire, avec le
     // même style que celui d'un niveau : par exemple « B. Le temps ».

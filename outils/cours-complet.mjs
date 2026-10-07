@@ -42,7 +42,10 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-import { LECONS, NIVEAUX, numeros, partieDe } from '../tuto/lecons.js'
+import { LECONS, NIVEAUX, numeros, partieDe, nomDuChapitre } from '../tuto/lecons.js'
+
+/* « Chapitre 6 », ou « Série 2 » pour un chapitre qui est une série à part (voir tuto/parcours.js). */
+const nomDuNiveau = (niveau) => nomDuChapitre(LECONS.find((l) => l.difficulte === niveau) ?? { difficulte: niveau })
 import { inclusionsDe, fonctionDuTuto, tutosDesFonctions, leconsQuiEmploient } from '../tuto/fonctions.js'
 import { BIBLIOTHEQUES } from '../compilateur/inclusion.js'
 import { STYLE } from '../tuto/style.js'
@@ -212,7 +215,7 @@ function ouvertureDuChapitre(c) {
   const titres = c.places.map((i) => `<li>${lienLecon(i)} ${echapper(LECONS[i].titre)}</li>`)
   return `
 <section class="chapitre-ouverture" id="chapitre-${c.numero}">
-  <p class="sur">Chapitre ${c.numero}</p>
+  <p class="sur">${nomDuNiveau(c.numero)}</p>
   <h1>${echapper(c.nom)}</h1>
   <p class="detail">${c.places.length} leçon${c.places.length > 1 ? 's' : ''},
   de ${NUMEROS[c.places[0]]} à ${NUMEROS[c.places.at(-1)]}.</p>
@@ -271,7 +274,7 @@ function pageDeLecon(lecon, index, matiere) {
   return `
 <article class="lecon" id="lecon-${index}">
   <p class="reperes">
-    <span class="niveau">Chapitre ${lecon.difficulte} — ${echapper(NIVEAUX[lecon.difficulte])}</span>
+    <span class="niveau">${nomDuChapitre(lecon)} — ${echapper(NIVEAUX[lecon.difficulte])}</span>
     ${partie ? `<span class="niveau">Partie ${partie.lettre} — ${echapper(partie.nom)}</span>` : ''}
     ${lecon.provenance === 'cours' ? '<span class="outil">du cours</span>' : ''}
     <span>leçon ${NUMEROS[index]}</span>

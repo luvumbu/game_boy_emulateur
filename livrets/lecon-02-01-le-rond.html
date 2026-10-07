@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 2.01 — Le rond</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Série 2 — Les formes géométriques</span>
+    
+    
+    <span>leçon 2.01 sur 152</span>
+    <span class="jauge" style="--part: 30%">difficulté 3 / 10</span>
+    
+    
+    
+  </p>
+<h1>2.01. Le rond</h1>
+<p class="idee">2.01 : le rond — un cercle. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>Un rond (on dit aussi un cercle)</strong>, c’est une forme sans côté et sans coin. Tous les points du bord sont <strong>à la même distance du centre</strong> : cette distance s’appelle le <strong>rayon</strong>. Deux rayons bout à bout, d’un bord à l’autre en passant par le centre, font le <strong>diamètre</strong>.</p>
+<p><strong>Sur une grille, un rond n’est jamais tout à fait rond</strong> : les pixels sont des petits carrés. On l’approche en marches d’escalier. Regarde les rangées : en haut, 6 pixels de large ; puis 10, 12, 14 ; au milieu, les 16 pixels. Les marches sont plus courtes vers le haut et le bas, plus longues sur les côtés : c’est ce qui donne l’impression d’une courbe.</p>
+<p><strong>Cette série dessine des formes géométriques, une par leçon.</strong> Le programme reste le même d’une leçon à l’autre : seuls changent le dessin et le mot. Tu peux donc te concentrer sur la forme.</p>
+<p><strong>Le dessin est dans son propre fichier</strong>, <code>perso_ROND.cpp</code> (l’onglet à côté de <code>principal.cpp</code>). Il fait <strong>16 × 16 pixels</strong> : 16 rangées de 16 signes. <code>#</code> est le plus sombre (le contour), <code>-</code> est clair (l’intérieur), <code>.</code> est le <strong>transparent</strong> : dans un personnage, on voit le fond de l’écran au travers.</p>
+<p><strong>Pourquoi 16 × 16 et pas 8 × 8 ?</strong> Dans une tuile de 8 pixels, un rond aurait 4 pixels de rayon : il ressemblerait à un carré aux coins cassés. Avec 16 pixels, la courbe se voit.</p>
+<p><strong>Les trois lignes <code>#include</code></strong> : <code>&lt;texte&gt;</code> pour écrire le nom, <code>&lt;sprite16&gt;</code> pour poser un dessin de 16 × 16, <code>&lt;Perso&gt;</code> pour avoir le droit d’écrire un <code>Perso</code>. Puis <code>#include "perso_ROND.cpp"</code> verse le dessin dans le programme (des guillemets, parce que c’est un fichier du projet, pas une fonction de la console).</p>
+<p><strong><code>sprite16(0, 72, 56, ROND)</code></strong> pose le dessin avec les lutins 0, 1, 2 et 3 (un personnage de 16 × 16 en prend quatre). 72 et 56 sont la place du <strong>coin en haut à gauche</strong>, en pixels. L’écran fait 160 pixels de large : (160 − 16) / 2 = 72, c’est le milieu.</p>
+<p><strong><code>texte(8, 10, "ROND")</code></strong> écrit le nom sous la forme. Ici on compte en <strong>cases de 8 pixels</strong> : la ligne 10 est à 80 pixels du haut, juste sous la forme (qui s’arrête à 72).</p>
+<p><strong>La boucle du jeu</strong> ne fait qu’attendre l’image suivante : rien ne bouge, on regarde.</p>
+<p><strong>Essaie :</strong> dans <code>perso_ROND.cpp</code>, remplace tous les <code>-</code> par des <code>+</code> : le rond devient plein et plus foncé.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;sprite16&gt;</code> → <a href="lecon-35-2-la-fonction-sprite16-un-personnage-de-16.html">35.2. La fonction sprite16() — un personnage de 16 × 16</a></li>
+  <li><code>#include &lt;Perso&gt;</code> → <a href="lecon-35-1-perso-dessiner-des-personnages.html">35.1. Perso — dessiner des personnages</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>488 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            57 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              117 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         58 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              128 o  ← CopierTuiles  — 4 lettres sur 43, et 4 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+  "ROND"                4 o  ← texte()  — un texte gravé
+Lettres gravées : DNOR
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+Fonctions du langage appelées :
+  sprite()   × 4    96 o sur place, dans main()
+  texte()    × 1    11 o sur place, dans main()  + EcrireTexte (10 o)
+  image()    × 1     6 o sur place, dans main()  + AttendreImage (28 o)
+  sprite16() × 1     0 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// ---- 2.01 Le rond ----
+// Le rond de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include &lt;texte&gt;                    // texte() : écrire un mot à l'écran
+#include &lt;sprite16&gt;                 // sprite16() : poser un personnage de 16 × 16
+#include &lt;Perso&gt;                    // Perso : un dessin de 16 × 16
+#include "perso_ROND.cpp"           // le dessin, dans son fichier</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  sprite16(0, 72, 56, ROND);             // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(8, 10, "ROND");             // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB2ElEQVR4nO3ZzWnDMACA0Rw7Qo8dsWN0rI6QETpGjz0YSlBMfgqu0ecHH0EKMggeDrF8+vo+K9xp9x1o0wDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxzvKMAvr29Du2/pf+oDL5wfn+9DB2GOA6/SDsy7b3LTysB3dY9gDBjwnD2omzcGDHjOAC8BBjxngJcAA542j0mAAU+eo8o4sJcNfeAlrwvVDHA8wPEAxwMcD3A8wPEAxysA3zi+WP3+cjqMe8cgEeBnx7/TR9ZP3UGBh8/b66cuAvzsT/HlhXfXT10EeJXkb3f29XjqOsDXKoBrwKvG/kXvvwltF+B4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc43g8dP3Q8plPK3wAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Le rond au milieu de l’écran, et ROND écrit dessous.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>la forme est posée au milieu, en (72, 56) <span class="detail"> (72, 56)</span></li>
+
+  <li>ses quatre lutins font un carré de 16 </li>
+
+  <li>son nom est écrit dessous : ROND </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>2.02. Le carré</strong> — série 2 : Les formes géométriques.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

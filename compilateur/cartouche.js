@@ -11,6 +11,8 @@
  * seconde, dès qu'on les a autorisées.
  */
 
+import { graverLeSource } from './source-gravee.js'
+
 /** Le logo, tel que la console le vérifie. Il ne se paraphrase pas. */
 const LOGO = [
   0xce, 0xed, 0x66, 0x66, 0xcc, 0x0d, 0x00, 0x0b, 0x03, 0x73, 0x00, 0x83, 0x00, 0x0c, 0x00, 0x0d,
@@ -23,8 +25,12 @@ const TAILLE = 0x8000
 /**
  * Rend la cartouche complète, prête à écrire sur disque.
  * `code` est le programme compilé, à poser à `base`.
+ *
+ * `source`, s'il est donné — { principal, fichiers } —, est gravé au bout de
+ * la cartouche (voir « source-gravee.js ») ; ce qui en est advenu est noté
+ * sur la cartouche rendue, dans `rom.sourceGravee`.
  */
-export function fabriquer(code, base, titre, vecteurVBlank, couleur = 0) {
+export function fabriquer(code, base, titre, vecteurVBlank, couleur = 0, source = null) {
   const rom = new Uint8Array(TAILLE)
 
   /*
@@ -67,18 +73,17 @@ export function fabriquer(code, base, titre, vecteurVBlank, couleur = 0) {
   for (let i = 0; i < nom.length; i++) rom[0x0134 + i] = nom.charCodeAt(i)
 
   /*
-   * $0143 — le drapeau couleur.
+   * $0143 — pour quelle console.
    *
-   *   $80  la cartouche PROFITE de la couleur, et tourne AUSSI sur une console
-   *        d'origine, en quatre nuances
-   *   $00  une cartouche d'origine
+   *   $00  Game Boy, 4 nuances
+   *   $C0  Game Boy Color
    *
-   * On pose $80 et jamais $C0. Exiger une Game Boy Color n'apporterait rien
-   * ici et priverait le même programme de la moitié des machines : une
-   * cartouche de ce compilateur démarre partout.
+   * Deux valeurs, pas trois : la règle est dans « consoles.js », et c'est le
+   * compilateur qui donne l'octet (« rendu.couleur »). Le $80 des cartouches
+   * du commerce (« profite de la couleur, marche aussi sans ») n'est jamais
+   * écrit ici — l'un OU l'autre.
    */
-  /* « true » reste accepté et vaut $80 : les appels d'avant ne changent pas. */
-  rom[0x0143] = couleur === true ? 0x80 : couleur & 0xff
+  rom[0x0143] = couleur & 0xff
 
   /*
    * Une cartouche à pile, avec sa petite mémoire.
@@ -95,6 +100,10 @@ export function fabriquer(code, base, titre, vecteurVBlank, couleur = 0) {
 
   rom.set(code, base)
 
+  /* Le programme d'origine, dans la place libre — AVANT les sommes, qui
+     comptent toute la cartouche. */
+  const sourceGravee = source ? graverLeSource(rom, base + code.length, source) : null
+
   /* La somme de l'en-tête. Le matériel la vérifie ; elle doit être juste. */
   let somme = 0
   for (let i = 0x0134; i <= 0x014c; i++) somme = (somme - rom[i] - 1) & 0xff
@@ -110,5 +119,6 @@ export function fabriquer(code, base, titre, vecteurVBlank, couleur = 0) {
   rom[0x014e] = (totale >> 8) & 0xff
   rom[0x014f] = totale & 0xff
 
+  if (sourceGravee) rom.sourceGravee = sourceGravee
   return rom
 }

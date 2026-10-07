@@ -82,18 +82,18 @@
     <span class="niveau">Chapitre 0 — Avant tout</span>
     
     <span class="niveau">Partie G — Les lettres et l’écran titre</span>
-    <span>leçon 0.87.2 sur 143</span>
+    <span>leçon 0.87.2 sur 152</span>
     <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
   </p>
 <h1>0.87.2. Agrandir une lettre : texteGrand — dix fois</h1>
-<p class="idee">Le plus grand : texteGrand(5, 4, "A", 10). Un A de 80 × 80 pixels, 10 × 10 cases, la moitié de l’écran.</p>
+<p class="idee">Dix fois plus grand : texteGrand(5, 4, "A", 9). Un A de 80 × 80 pixels, 10 × 10 cases, la moitié de l’écran.</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
-<p><strong>La taille la plus grande, 10 :</strong> chaque pixel devient un carré de 10 × 10 pixels. Le A fait <strong>80 × 80 pixels</strong>, soit <strong>10 × 10 cases</strong> : la moitié de la largeur de l’écran (20 cases).</p>
-<p><strong>La moitié de l’écran :</strong> l’écran fait 20 × 18 cases ; à la taille 10, une lettre en prend 10 × 10. La plus grande taille, 20, remplit l’écran entier : c’est le 0.87.4.</p>
+<p><strong>La taille 9 :</strong> 9 + 1 = 10 fois plus grand ; chaque pixel devient un carré de 10 × 10 pixels. Le A fait <strong>80 × 80 pixels</strong>, soit <strong>10 × 10 cases</strong> : la moitié de la largeur de l’écran (20 cases).</p>
+<p><strong>La moitié de l’écran :</strong> l’écran fait 20 × 18 cases ; à la taille 9, une lettre en prend 10 × 10. La plus grande taille, 10, est un cran au-dessus : c’est le 0.87.4.</p>
 <p><strong>Ça ne coûte presque rien de plus :</strong> aux grandes tailles, beaucoup de tuiles sont <strong>toutes pleines</strong> ou <strong>toutes vides</strong>. Les tuiles identiques ne sont fabriquées qu’une fois.</p>
 
 <div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
@@ -140,7 +140,7 @@ Tes fonctions appelées :
 <div class="morceau">
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
-    <pre><code>#include &lt;texteGrand&gt;   // écrit un texte agrandi, de 1 à 20 fois</code></pre>
+    <pre><code>#include &lt;texteGrand&gt;   // écrit un texte agrandi, taille de 0 à 10</code></pre>
   </div>
   <div></div>
 </div>
@@ -149,8 +149,8 @@ Tes fonctions appelées :
   <div>
     <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
     <pre><code>int main() {
-  // Le A dix fois plus grand : 10 × 10 cases, de (5, 4) à (14, 13).
-  texteGrand(5, 4, "A", 10);
+  // Taille 9 : le A dix fois plus grand, 10 × 10 cases, de (5, 4) à (14, 13).
+  texteGrand(5, 4, "A", 9);
 
   while (true) {
     image();

@@ -147,8 +147,7 @@ export function lireGBR(tampon) {
 /**
  * Le fichier C++ que ces tuiles font.
  *
- * Comme les dessins tirés d'une cartouche (« convertir.js »), elles vont dans
- * LEUR fichier, pas directement dans le programme : on garde celui-ci
+ * Elles vont dans LEUR fichier, pas directement dans le programme : on garde celui-ci
  * lisible, et l'on choisit ensuite lesquelles on en prend.
  */
 export function fichierGBTD(tuiles, ignorees, { titre = 'un fichier .gbr' } = {}) {

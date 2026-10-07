@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 152 — Un raccourci à toi : écrire poserDevant() soi-même</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 25 — Tes propres #include : ajouter une fonction</span>
+    <span class="outil">du cours</span>
+    
+    <span>leçon 152 sur 152</span>
+    <span class="jauge" style="--part: 100%">difficulté 10 / 10</span>
+    
+    
+    
+  </p>
+<h1>152. Un raccourci à toi : écrire poserDevant() soi-même</h1>
+<p class="idee">poserDevant() de la console tient en deux lignes : on l’écrit soi-même, dans outils.cpp. Et l’on découvre pourquoi celle de la console est plus légère.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>Une fonction « raccourci », c’est juste un nom donné à des gestes qu’on sait déjà faire.</strong> <code>poserDevant()</code> (le 110.10) pose une tuile, puis la teint <code>| DEVANT</code>. Ici, on l’écrit <strong>soi-même</strong>, dans <code>outils.cpp</code>, comme <code>bande()</code> et <code>pile()</code>.</p>
+<p><strong>Lis-la :</strong> quatre paramètres, deux lignes. <code>poser(colonne, ligne, tuile)</code> pose la tuile ; <code>teindre(colonne, ligne, palette | DEVANT)</code> choisit sa palette et la fait passer devant les lutins.</p>
+<p><strong>Elle porte le même nom que celle de la console :</strong> c’est donc <strong>la tienne</strong> qui sert (le 15.7). Le programme n’écrit pas <code>#include &lt;poserDevant&gt;</code> : il n’en a pas besoin. Il inclut <code>poser</code> et <code>teindre</code>, dont TA fonction se sert.</p>
+<p><strong>La différence de poids :</strong> ta version est une vraie fonction. À chaque appel, le programme range quatre nombres, saute dans la fonction, et <code>poser()</code> et <code>teindre()</code> ne savent plus rien d’avance (la case, la tuile) : elles calculent tout pendant le jeu. Celle de la console, elle, n’est <strong>pas une vraie fonction</strong> : le compilateur <strong>recopie ses deux lignes à la place de l’appel</strong>, avec les vrais nombres. Le résultat est le même à l’écran ; la cartouche de la console est plus petite.</p>
+<p><strong>Alors, la tienne ne sert à rien ?</strong> Si : elle est à toi, tu peux la changer. Une version qui pose <strong>deux</strong> cases d’un coup (un buisson de 2 de large), une autre qui choisit toute seule la palette… La console ne fera jamais ce que ton jeu a en tête.</p>
+<p><strong>À toi :</strong> ajoute dans <code>outils.cpp</code> un <code>buissonDevant(colonne, ligne)</code> qui appelle quatre fois <code>poserDevant()</code> pour un buisson de 2 × 2 cases.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;Tuile&gt;</code> → <a href="lecon-00-107.2-tuile-dessiner-une-case.html">0.107.2. Tuile — dessiner une case</a></li>
+  <li><code>#include &lt;couleurFond&gt;</code> → <a href="lecon-00-88.3-la-fonction-couleurfond-une-couleur-du-d.html">0.88.3. La fonction couleurFond() — une couleur du décor</a></li>
+  <li><code>#include &lt;couleurLutin&gt;</code> → <a href="lecon-00-107.4-la-fonction-couleurlutin-une-couleur-des.html">0.107.4. La fonction couleurLutin() — une couleur des personnages</a></li>
+  <li><code>#include &lt;sprite&gt;</code> → <a href="lecon-00-69.4-la-fonction-sprite-un-lutin-au-pixel-pre.html">0.69.4. La fonction sprite() — un lutin au pixel près</a></li>
+  <li><code>#include &lt;teindreLutin&gt;</code> → <a href="lecon-00-107.5-la-fonction-teindrelutin-un-lutin-dans-u.html">0.107.5. La fonction teindreLutin() — un lutin dans une palette</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;teindre&gt;</code> → <a href="lecon-00-89.1-la-fonction-teindre-une-case-dans-une-pa.html">0.89.1. La fonction teindre() — une case dans une palette</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1187 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            57 o  ← la console, à l’allumage  — la mise en route de la console
+  poserDevant()        40 o  ← main()  — une fonction fournie par le langage
+  main()              224 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AdresseCase          10 o  ← poser(), teindre()  — trouve l’adresse d’une case de l’écran
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              736 o  ← CopierTuiles  — la police entière, et 2 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+Fonctions du langage appelées :
+  sprite()       × 2    46 o sur place, dans main()
+  couleurFond()  × 3    36 o sur place, dans main()
+  teindreLutin() × 2    32 o sur place, dans main()
+  teindre()      × 1    26 o sur place, dans poserDevant()  + AdresseCase (10 o)
+  couleurLutin() × 2    24 o sur place, dans main()
+  poser()        × 1    13 o sur place, dans poserDevant()  + AdresseCase (10 o)
+  image()        × 1     6 o sur place, dans main()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  poserDevant()  × 4    76 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// Le buisson DEVANT, avec MA poserDevant(), écrite dans outils.cpp.
+// Pas de « #include &lt;poserDevant&gt; » : ma fonction vient d'outils.cpp.
+
+#include &lt;Tuile&gt;          // un dessin de 8 × 8 pixels
+#include &lt;couleurFond&gt;    // choisit une couleur d’une palette du fond
+#include &lt;couleurLutin&gt;   // choisit une couleur d’une palette des lutins
+#include &lt;sprite&gt;         // place un lutin de 8 × 8 au pixel près
+#include &lt;teindreLutin&gt;   // met un lutin dans une palette
+#include "outils.cpp"     // MA poserDevant()</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — BUISSON</p>
+    <pre><code>Tuile BUISSON = {                 // Une touffe de feuilles : AUCUN 0, elle est toute pleine.
+  "11222211",                     //   (des coins en 0 laisseraient un trou là où deux
+  "12233221",                     //    touffes se touchent : on y verrait le héros)
+  "22333322",
+  "23333332",
+  "23333332",
+  "22333322",
+  "12233221",
+  "11222211",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAbElEQVR4nO3XMQ0AIAwFUUYkMCICLWhgRAaykIYEmlISQi/5c++tDWP27UqrJpO0AiBADkCS0zHl7XREQID+A1nlrYiAAHkAWeV1RECAAAECBOgcdI8oaQEC9B/ouUcRECAHIB1RlwcEyAFoASCMd8rHnsVmAAAAAElFTkSuQmCC" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un dessin — HEROS</p>
+    <pre><code>Tuile HEROS = {                   // 0 transparent, 1 clair, 2 moyen, 3 contour.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAfUlEQVR4nO3VsQ2AMBAEQYeUQEgR1EINhJRBWZRACZRBSI4Dn6xHQn8rbeq/yVyu+2w2jFNIylYBBMgAVB+a1yUkhQgIUD6QMr8f2ytlXnlVrwMC5An6LkCAHEC/+1wBATIAKcS+lC1AgBxAUaf77gAClA8UNR9FBAQoHegBTfQxdrUAfpcAAAAASUVORK5CYII=" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  couleurFond(2, 1, 16, 30,  8);  // palette 2 : les verts du buisson
+  couleurFond(2, 2,  6, 22,  4);
+  couleurFond(2, 3,  0, 10,  2);
+  couleurLutin(0, 2, 31,  4,  2); // le héros : rouge
+  couleurLutin(0, 3, 10,  0,  0);
+
+  // Un buisson de 2 × 2 cases, colonnes 12-13, lignes 8-9 : quatre appels.
+  poserDevant(12, 8, BUISSON, 2);
+  poserDevant(13, 8, BUISSON, 2);
+  poserDevant(12, 9, BUISSON, 2);
+  poserDevant(13, 9, BUISSON, 2);
+
+  sprite(0, 96, 68, HEROS);       // le héros, dans le buisson : caché
+  teindreLutin(0, 0);
+  sprite(1, 40, 68, HEROS);       // un autre, à découvert : visible
+  teindreLutin(1, 0);
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB50lEQVR4nO3XsWnDQBiAUZcewaWHyCyZIaXH8FgeISNkjJQpDELINgKFcMrHg1eIq37uQ8fd4ev7k7DD8An4UwLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwn8Irr7XK9Xd4+3if3lVfrwwdeEHjFVPF4Oh9P53nLp+vDB14QeMW84rzlq/XhAy8IvGJRcd7y6frwgRcGB57vzvC9eErg7R6Pu+Hb8cgRvdF9R6aryv1jh41dsjZa/Aq7/Yk9k7b7F0e0wL+y/0uWI3q7edfdNnbJ2uix6D4beybFCRzniI5zyYrzTGLXBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7guB95Te/Jdxye2QAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Un buisson vert, et un héros rouge à gauche. Le second héros, dans le buisson, est caché.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>ma poserDevant() a teint la case (13, 9) : palette 2 et DEVANT <span class="detail"> (130)</span></li>
+
+  <li>dans le buisson, on voit le buisson (vert) <span class="detail"> (6/22/4)</span></li>
+
+  <li>à découvert, on voit le héros (rouge) <span class="detail"> (31/4/2)</span></li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>2.01. Le rond</strong> — série 2 : Les formes géométriques.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

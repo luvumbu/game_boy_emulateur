@@ -60,6 +60,22 @@ const CHAPITRES_DU_PARCOURS = [
 export const CHAPITRES = Object.fromEntries(CHAPITRES_DU_PARCOURS.map(([, , nom], k) => [k, nom]))
 
 /*
+ * Après le parcours, une série à part : « Série 2 — Les formes géométriques »
+ * (tuto/formes.js). Elle prend la place qui suit le dernier chapitre, pour que
+ * tout ce qui range par chapitre la range aussi ; mais ses leçons portent leur
+ * propre numéro (2.01, 2.02…) et s'affichent « Série 2 », pas « Chapitre 26 ».
+ */
+export const CHAPITRE_DES_FORMES = CHAPITRES_DU_PARCOURS.length
+CHAPITRES[CHAPITRE_DES_FORMES] = 'Les formes géométriques'
+
+/* Puis la série 3 — les images (tuto/images.js) : « Série 3 — Les images ». */
+export const CHAPITRE_DES_IMAGES = CHAPITRE_DES_FORMES + 1
+CHAPITRES[CHAPITRE_DES_IMAGES] = 'Les images'
+
+/** « Chapitre 6 », ou « Série 2 » pour une leçon d'une série à part. */
+export const nomDuChapitre = (lecon) => (lecon.serie ? `Série ${lecon.serie}` : `Chapitre ${lecon.difficulte}`)
+
+/*
  * La difficulté, de 1 à 10, qu'affiche la jauge. Une leçon garde la sienne ;
  * un cours prend celle du niveau de leçons dont son chapitre est voisin.
  */

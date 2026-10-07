@@ -82,7 +82,7 @@
     <span class="niveau">Chapitre 0 — Avant tout</span>
     
     <span class="niveau">Partie H — Du titre au snake</span>
-    <span>leçon 0.91.7 sur 143</span>
+    <span>leçon 0.91.7 sur 152</span>
     <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
@@ -183,7 +183,7 @@ Tes fonctions appelées :
 #include &lt;ALPHABET&gt;       // les lettres de la police : ALPHABET[0] est le A
 #include &lt;texte&gt;          // écrit un texte à l’écran
 #include &lt;couleurTexte&gt;   // choisit la couleur des lettres
-#include &lt;texteGrand&gt;     // écrit un texte agrandi, de 1 à 20 fois
+#include &lt;texteGrand&gt;     // écrit un texte agrandi, taille de 0 à 10
 #include &lt;bouton&gt;         // lit un bouton de la manette
 #include &lt;chaque&gt;         // répond 1 toutes les n millisecondes
 #include &lt;hasard&gt;         // tire un nombre au hasard
@@ -362,7 +362,7 @@ Tes fonctions appelées :
     <p class="quoi">17. le point d’entrée : c’est ici que la console arrive</p>
     <pre><code>int main() {
   couleurTexte(31, 16, 0);
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {

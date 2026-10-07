@@ -79,6 +79,7 @@ export const BIBLIOTHEQUES = {
   spriteDerriere: 'place un lutin de 8 × 8 derrière le décor',
   sprite16: 'place un lutin de 16 × 16 au pixel près',
   sprite32: 'place un grand personnage de 32 × 32 au pixel près',
+  spriteTaille: 'place un dessin à la taille qu’on veut, sans limite : dessiné une fois, agrandi par le compilateur',
   cacher: 'cache un lutin',
   cacher16: 'cache un lutin de 16 × 16',
   cacher32: 'cache un grand personnage de 32 × 32',

@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<title>Cours 72 — Une fonction à toi : bande()</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+
+  a { color: var(--vert); }
+  .navigation { display: flex; justify-content: space-between; gap: 12pt; margin-top: 18pt; font-size: 9.5pt; }
+  .sommaire-cours { list-style: none; padding: 0; margin: 0; }
+  .sommaire-cours li { padding: 2pt 0; }
+  .sommaire-cours li.chapitre {
+    color: var(--vert); font-weight: 700; text-transform: uppercase;
+    font-size: 9pt; letter-spacing: .05em; padding-top: 12pt;
+  }
+  .sommaire-cours .numero {
+    display: inline-grid; place-items: center; width: 16pt; height: 16pt; border-radius: 50%;
+    background: var(--vert-clair); color: var(--vert); font-size: 8pt; font-weight: 700; margin-right: 4pt;
+  }
+</style>
+</head>
+<body>
+
+<p class="reperes">
+  <span class="niveau">Chapitre 15 — Tes propres #include : ajouter une fonction</span>
+  <span>leçon 1 sur 9 dans ce chapitre</span>
+  <span>72 sur 80 dans le cours</span>
+</p>
+<h1>72. Une fonction à toi : bande()</h1>
+<p class="idee">Avant de parler d’#include, on écrit une fonction à soi : bande() pose la même tuile plusieurs fois, de gauche à droite.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>Ce chapitre répond à une question : « comment ajouter moi-même un <code>#include</code> ? »</strong> Il y a deux sortes d’<code>#include</code>, et on va les faire toutes les deux, avec <strong>une seule fonction</strong>, du début à la fin : <code>bande()</code>.</p>
+<p><strong>On part de ce qu’on sait déjà faire</strong> (chapitre « Les fonctions : nommer un geste ») : écrire une fonction dans son programme. <code>bande(colonne, ligne, tuile, longueur)</code> pose la tuile <code>longueur</code> fois, une case plus à droite à chaque fois.</p>
+<p><strong>Lis la fonction ligne par ligne :</strong> <code>void</code> dit qu’elle ne rend rien ; entre les parenthèses, ses <strong>quatre paramètres</strong>, quatre cases de mémoire remplies par l’appel. La boucle <code>for</code> compte <code>i</code> de 0 jusqu’à <code>longueur - 1</code>, et pose la tuile en <code>colonne + i</code>.</p>
+<p><strong>Déroulé de <code>bande(2, 5, ALPHABET[0], 10)</code> :</strong> i = 0 → case (2, 5) ; i = 1 → case (3, 5) ; … ; i = 9 → case (11, 5). Puis i = 10 : <code>10 &lt; 10</code> est faux, la boucle s’arrête. Dix A, des colonnes 2 à 11.</p>
+<p><strong>Pour l’instant, aucun <code>#include</code> nouveau :</strong> la fonction est <strong>dans</strong> le programme, elle n’a rien à demander à la console. Elle se sert seulement de <code>poser()</code>, déjà incluse.</p>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>911 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  bande()          38 o  ← main()  — une fonction fournie par le langage
+  main()           26 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AdresseCase      10 o  ← poser()  — trouve l’adresse d’une case de l’écran
+  CopierTuiles     18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          704 o  ← CopierTuiles  — la police entière
+Lettres gravées : toutes (poser() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  poser() × 1    17 o sur place, dans bande()  + AdresseCase (10 o)
+  image() × 1     3 o sur place, dans main()  + AttendreImage (28 o)
+Tes fonctions appelées :
+  bande() × 1    19 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// Une fonction à toi : bande().
+// Elle est écrite ICI, dans le programme : pas besoin d'#include pour elle.
+
+#include &lt;poser&gt;      // pose une tuile sur une case du fond (bande() s'en sert)
+#include &lt;ALPHABET&gt;   // les lettres de la police : ALPHABET[0] est le A
+
+// bande(colonne, ligne, tuile, longueur) : la même tuile, « longueur » fois,
+// de gauche à droite. Exemple : bande(2, 5, ALPHABET[0], 10) → dix A,
+// des colonnes 2 à 11, sur la ligne 5.
+//
+//   void         elle ne rend rien : elle agit, c'est tout
+//   uint8_t ...  ses quatre paramètres : des nombres de 0 à 255</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une fonction — bande()</p>
+    <pre><code>void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
+  // for (départ ; condition ; après chaque tour)
+  //   i = 0 au départ ; on continue tant que i &lt; longueur ; i++ ajoute 1.
+  for (uint8_t i = 0; i &lt; longueur; i++) {
+    poser(colonne + i, ligne, tuile);   // une case plus à droite à chaque tour
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  bande(2, 5, ALPHABET[0], 10);   // l'appel : dix A sur la ligne 5
+
+  while (true) {   // la boucle du jeu
+    image();       // attend l'image suivante (native : pas d'#include)
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABhUlEQVR4nO3ToQ3DQBAAQcOUYOj+q0kJKcPQwMQgyFIU3XqkAa9D91rd8tnfhC1/34CfEjhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LibgV/rdnrIfK47ga//f8J7NIEF/hb4Kj8fzQW7YIEnE1hgJhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjjsAq3hsxAg8T+4AAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Dix A côte à côte sur la ligne 5, des colonnes 2 à 11.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles sont ceux que <code>verification/verifier-cours.mjs</code>
+exige de cette leçon. Ils viennent d’être joués, et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>dix A sur la ligne 5, de la colonne 2 à la 11 </li>
+
+  <li>rien avant la colonne 2 </li>
+
+  <li>et rien après la colonne 11 </li>
+</ul>
+
+<p class="navigation">
+  <span>← <a href="71-une-carte-plus-grande-que-l-ecran-la-cam.html">71. Une carte plus grande que l’écran : la caméra</a></span>
+  <span><a href="index.html">sommaire</a></span>
+  <span><a href="73-la-meme-fonction-trois-fois.html">73. La même fonction, trois fois</a> →</span>
+</p>
+
+<p class="pied">gameboy3 — apprendre à programmer, en écrivant pour la Game Boy</p>
+
+</body>
+</html>

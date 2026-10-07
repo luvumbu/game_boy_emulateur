@@ -12,6 +12,7 @@
  */
 
 import { NUANCES_ECRITES, ALPHABETS } from './compilateur/emetteur.js'
+import { agrandirLisse } from './compilateur/agrandir.js'
 import { poserDansLeProgramme } from './programme.js'
 import { lireCouleurs, ecrireCouleurs, versDiese, palettesMontrees, assurerLesPalettes } from './editeur-couleurs.js'
 import { barrePaint, NOMBRE_DE_PALETTES } from './barre-paint.js'
@@ -135,6 +136,30 @@ export function lireDessins(source) {
 
 /** Le mot qui déclare un dessin de ce côté : Tuile (8), Perso (16 ou 32). */
 export const typeDuDessin = (cote) => (cote >= 16 ? 'Perso' : 'Tuile') // un personnage, 16 × 16 ou 32 × 32
+
+/*
+ * Le zoom d'UN dessin (boutons « 🔍 ×2 » et « 🔍 ÷2 »).
+ *
+ * La console ne sait pas agrandir : un dessin plus grand est un AUTRE dessin,
+ * avec plus de pixels. Ces deux fonctions le fabriquent.
+ *
+ *   ×2 : chaque pixel devient un carré de 2 × 2 — le dessin est le même, avec
+ *        de plus grosses marches.
+ *   ÷2 : chaque carré de 2 × 2 devient un pixel, le plus FONCÉ des quatre —
+ *        ainsi un contour d'un pixel ne disparaît pas. Des détails se perdent,
+ *        forcément : quatre pixels n'en font plus qu'un.
+ */
+export { agrandirLisse }
+
+export const agrandirLeDessin = (rangees) =>
+  rangees.flatMap((r) => { const double = [...r].map((s) => s + s).join(''); return [double, double] })
+
+export const reduireLeDessin = (rangees, nuance, signes) =>
+  Array.from({ length: rangees.length / 2 }, (_, y) =>
+    Array.from({ length: rangees[0].length / 2 }, (_, x) => signes[Math.max(
+      nuance(rangees[2 * y][2 * x]), nuance(rangees[2 * y][2 * x + 1]),
+      nuance(rangees[2 * y + 1][2 * x]), nuance(rangees[2 * y + 1][2 * x + 1]))]).join(''))
+
 
 /** Réécrit une tuile dans le texte, en gardant l'indentation d'origine. */
 export function remplacerDessin(source, dessin, rangees) {
@@ -1611,6 +1636,56 @@ export function installer({
       outil('pipette', '💧 Pipette', 'reprend la couleur d’un pixel, puis revient au crayon'),
       outil('selection', '⬚ Sélectionner et déplacer', 'trace un rectangle dans le dessin, puis attrape-le et glisse-le ailleurs'),
     )
+    /*
+     * « 📐 Agrandir… » : on dessine UNE fois, en petit, et l'on choisit ensuite
+     * la taille qu'on veut, de la taille du dessin à 32. L'algorithme retrouve
+     * la forme (agrandirLisse) au lieu de grossir les pixels : les marches
+     * s'arrondissent, les vrais coins restent pointus. Le résultat est une
+     * COPIE, posée au milieu d'un dessin de 8, 16 ou 32 (les seules tailles que
+     * la console connaît) ; l'original ne change pas.
+     */
+    const panneauAgrandir = document.createElement('div')
+    panneauAgrandir.className = 'rangee tuile-agrandir'
+    panneauAgrandir.hidden = true
+    {
+      const d = dessin
+      const reglette = Object.assign(document.createElement('input'), { type: 'range', min: String(d.cote), max: '32', step: '1', value: String(Math.min(32, d.cote * 2)) })
+      const dit = Object.assign(document.createElement('span'), { className: 'aide' })
+      /* L'aperçu n'est créé qu'à l'ouverture du panneau : fermé, la grille ne
+         porte que ses canevas habituels. */
+      let apercu = null
+      let fait = null
+      const montrer = () => {
+        if (!apercu) {
+          apercu = document.createElement('canvas')
+          apercu.className = 'agrandir-apercu'
+          reglette.after(apercu)
+        }
+        const taille = Number(reglette.value)
+        fait = agrandirLisse(d.rangees, taille, nuanceDe, signesDe(d.rangees))
+        apercu.width = apercu.height = fait.cote
+        peindre(apercu, fait.rangees, fait.cote, peintureDe(d))
+        dit.textContent = `${d.nom} : ${d.cote} × ${d.cote} → ${taille} × ${taille} (×${(taille / d.cote).toFixed(taille % d.cote ? 2 : 0)}), dans un dessin de ${fait.cote} × ${fait.cote}`
+      }
+      reglette.addEventListener('input', montrer)
+      const creer = bouton('✔ Créer la copie', 'écrit le dessin agrandi dans le programme, sous un nouveau nom', async () => {
+        const taille = Number(reglette.value)
+        const pris = projet?.actif() ? projet.noms() : new Set(dessins().map((x) => x.nom))
+        let propose = `${d.nom}_${taille}`
+        for (let k = 2; pris.has(propose); k++) propose = `${d.nom}_${taille}_${k}`
+        const nom = demanderUnNom ? await demanderUnNom({ quoi: `${d.nom} agrandi en ${taille} × ${taille}`, propose, pris }) : propose
+        if (!nom) return
+        if (fait.cote >= 16 && projet?.actif()) projet.creer(nom, fait.cote, fait.rangees)
+        else ecrireSource(ajouterDessin(lireSource(), nom, fait.cote, fait.rangees))
+        choisi = nom
+        barre?.dire(`${nom} : ${d.nom} agrandi en ${taille} × ${taille}. L’original n’a pas changé.`, 'info')
+        surChangement()
+        rafraichirBande()
+        rafraichirGrille()
+      })
+      panneauAgrandir.append(Object.assign(document.createElement('span'), { className: 'aide', textContent: 'Taille voulue :' }), reglette, dit, creer)
+      panneauAgrandir.montrer = montrer
+    }
     const rangeeActions = document.createElement('div')
     rangeeActions.className = 'rangee tuile-outils'
     const surQuoi = () => (outilTuile === 'selection' && zone ? 'la zone choisie' : 'tout le dessin')
@@ -1668,6 +1743,42 @@ export function installer({
         rafraichirBande()
         rafraichirGrille()
       }),
+      /* Le zoom d'UN dessin : ×2 en fait une copie deux fois plus grande, ÷2 deux
+         fois plus petite. L'original ne change pas (voir agrandirLeDessin). */
+      ...[['×2', 2, 'GRAND'], ['÷2', 0.5, 'PETIT']].map(([signe, facteur, suffixe]) => {
+        const cible = dessin.cote * facteur
+        const b = bouton(`🔍 ${signe}`, [8, 16, 32].includes(cible)
+          ? `une copie de ${dessin.nom} en ${cible} × ${cible} : ${facteur > 1 ? 'chaque pixel devient un carré de 2 × 2' : 'chaque carré de 2 × 2 devient un pixel — des détails se perdent'}`
+          : `${dessin.nom} fait déjà ${dessin.cote} × ${dessin.cote} : la console ne connaît que 8, 16 et 32`, async () => {
+          const d = dessinChoisi() ?? dessin
+          if (![8, 16, 32].includes(d.cote * facteur)) return
+          const rangees = facteur > 1 ? agrandirLeDessin(d.rangees) : reduireLeDessin(d.rangees, nuanceDe, signesDe(d.rangees))
+          const pris = projet?.actif() ? projet.noms() : new Set(dessins().map((x) => x.nom))
+          let propose = `${d.nom}_${suffixe}`
+          for (let k = 2; pris.has(propose); k++) propose = `${d.nom}_${suffixe}${k}`
+          const nom = demanderUnNom ? await demanderUnNom({ quoi: `${d.nom} en ${d.cote * facteur} × ${d.cote * facteur}`, propose, pris }) : propose
+          if (!nom) return
+          if (d.cote * facteur >= 16 && projet?.actif()) projet.creer(nom, d.cote * facteur, rangees)
+          else ecrireSource(ajouterDessin(lireSource(), nom, d.cote * facteur, rangees))
+          choisi = nom
+          barre?.dire(`${nom} : ${d.nom} en ${d.cote * facteur} × ${d.cote * facteur}. L’original n’a pas changé.`, 'info')
+          surChangement()
+          rafraichirBande()
+          rafraichirGrille()
+        })
+        b.disabled = ![8, 16, 32].includes(cible)
+        return b
+      }),
+      (() => {
+        const b = bouton('📐 Agrandir…', dessin.cote < 32
+          ? `agrandir ${dessin.nom} à la taille que tu veux, jusqu’à 32 × 32 : la forme est retrouvée, pas les pixels grossis`
+          : `${dessin.nom} fait déjà 32 × 32, la plus grande taille`, () => {
+          panneauAgrandir.hidden = !panneauAgrandir.hidden
+          if (!panneauAgrandir.hidden) panneauAgrandir.montrer()
+        })
+        b.disabled = dessin.cote >= 32
+        return b
+      })(),
       /* Tout effacer : le dessin redevient vide — le n° 0 partout, le fond ou
          le transparent. Il revient avec ↶ : l'historique garde le programme. */
       ...(suppression ? [bouton('🗑 Supprimer', `ôte ${dessin.nom} du programme — seulement s’il n’est utilisé nulle part et pas verrouillé ; ↶ le fait revenir`, () => {
@@ -1748,7 +1859,7 @@ export function installer({
       cote.append(boite)
     }
 
-    grille.append(barre, titre, outils, rangeeOutils, rangeeActions, cadreToile, cote)
+    grille.append(barre, titre, outils, rangeeOutils, rangeeActions, panneauAgrandir, cadreToile, cote)
   }
 
   rafraichirBande()

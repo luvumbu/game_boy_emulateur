@@ -19,7 +19,7 @@ export const RAM_TOTALE = 0xdf00 - 0xc100
 /**
  * L'analyse d'une compilation.
  *
- * `rendu` est ce que rend `compiler()` (ou une cartouche de `fabriquerLesCartouches`) :
+ * `rendu` est ce que rend `compiler()` (ou la cartouche de `fabriquerLaCartouche`) :
  * octets, base, memoire, zones, etiquettes.
  */
 export function analyser(rendu) {

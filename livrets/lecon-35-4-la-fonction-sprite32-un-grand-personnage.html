@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 35.4 — La fonction sprite32() — un grand personnage de 32 × 32</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 6 — Dessiner</span>
+    
+    
+    <span>leçon 35.4 sur 152</span>
+    <span class="jauge" style="--part: 60%">difficulté 6 / 10</span>
+    
+    
+    
+  </p>
+<h1>35.4. La fonction sprite32() — un grand personnage de 32 × 32</h1>
+<p class="idee">#include &lt;sprite32&gt; : sprite32(numero, x, y, PERSO) place un personnage de 32 × 32 — seize lutins en carré — d’un appel ; à côté, un 16 × 16 posé par sprite16(), pour comparer.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>Ce qu’elle fait :</strong> <code>sprite32(numero, x, y, perso)</code> place un personnage de <strong>32 × 32</strong> (un <code>Perso</code> de trente-deux rangées) : les lutins <code>numero</code> à <code>numero + 15</code>, en carré. C’est quatre <code>sprite16()</code> d’un coup, un par quart.</p>
+<p><strong>La ligne à écrire : <code>#include &lt;sprite32&gt;</code>.</strong></p>
+<p><strong>Ses arguments :</strong> comme <code>sprite16()</code> ; le numéro du premier des seize lutins (<strong>24 au plus</strong> : la console n’en a que quarante). Un cinquième, <code>MIROIR_X</code>, le retourne.</p>
+<p><strong>Deux personnages, deux fichiers, à comparer :</strong> <code>perso_BONHOMME.cpp</code> (16 rangées : un 16 × 16) et <code>perso_GEANT.cpp</code> (32 rangées : un 32 × 32). Les deux sont des <code>Perso</code> — la liste <code>personnages.cpp</code> porte <code>#include &lt;Perso&gt;</code> UNE fois pour les deux — : c’est le nombre de rangées qui fait la taille. La source ne fait qu’<strong>appeler</strong> : <code>sprite16(…, BONHOMME)</code> pour l’un, <code>sprite32(…, GEANT)</code> pour l’autre.</p>
+<p><strong>À côté, pour comparer :</strong> BONHOMME, le personnage de 16 × 16 du 35.1, posé par <code>sprite16()</code>. Les deux sont des <code>Perso</code> : seize rangées pour l’un, trente-deux pour l’autre — c’est le nombre de rangées qui fait la taille, et la fonction qui va avec : <code>sprite16()</code> pour un 16 × 16, <code>sprite32()</code> pour un 32 × 32.</p>
+<p><strong>Attention à la place :</strong> seize lutins, c’est beaucoup. Avec un grand personnage, il en reste 24 pour tout le reste du jeu.</p>
+<p><strong>Essaie :</strong> <code>sprite32(0, 64, y, GEANT, MIROIR_X);</code> — GEANT regarde de l’autre côté.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">On retrouve sprite32 dans 3 leçons</p>
+  <p style="margin: 0;"><a href="lecon-02-36-le-grand-rond-32-32.html">2.36</a>, <a href="lecon-02-37-les-trois-tailles-cote-a-cote.html">2.37</a>, <a href="lecon-02-38-grossir-un-dessin-2.html">2.38</a></p>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1024 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            50 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              535 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         31 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  Tuiles              320 o  ← CopierTuiles  — 0 lettre sur 43, et 20 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+Lettres gravées : aucune
+Pas gravé (jamais appelé) : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+Fonctions du langage appelées :
+  sprite()   × 20   512 o sur place, dans main()
+  image()    ×  1     6 o sur place, dans main()  + AttendreImage (28 o)
+  sprite16() ×  5     0 o sur place, dans main()
+  sprite32() ×  1     0 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// ---- #include &lt;sprite32&gt; : un grand personnage de 32 × 32 ----
+// Deux personnages, deux fichiers : perso_GEANT.cpp (32 × 32) et
+// perso_BONHOMME.cpp (16 × 16), inclus par la liste personnages.cpp.
+// Ici, UNE ligne verse la liste, et on ne fait que les APPELER :
+// sprite32() pour le 32 × 32, sprite16() pour le 16 × 16.
+
+#include &lt;sprite32&gt;          // sprite32() : seize lutins en carré
+#include &lt;sprite16&gt;          // sprite16() : quatre lutins en carré
+#include "personnages.cpp"   // la liste : GEANT et BONHOMME</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une variable — y</p>
+    <pre><code>uint8_t y = 0;   // la hauteur de GEANT, en pixels</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  while (true) {
+    image();
+    if (y &lt; 100) y = y + 1;          // GEANT descend, et s'arrête en 100
+    sprite32(0, 64, y, GEANT);       // GEANT    : les lutins 0 à 15
+    sprite16(16, 16, 16, BONHOMME);  // BONHOMME : les lutins 16 à 19, en haut à gauche
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACDUlEQVR4nO3bwWkbURhGUS9TQpYuwrW4BpebElJGllkYjJHIC5aU/83cHLgLLcTHaA7iSQg9/fz1Q+Getl+B/mmA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGO9wDgb9+fP9r+enTRvcCfdbcYX1/AY9sutB/45e31/V68P5gHPun4TIV38EnHZzr9GQx43e3ABzm6AK+7Efg4H08Ar7sL+E9nMODjBHjb+ExN4Je314tue87/C/z5FhzwaxLgjx4DfP14LMDrAAP+2/0FfOTuAr44d7ccw4DXNYFPMT7T6X/wB7wO8LbxmQBvG58J8LbxmQBvG58J8LbxmbLA119z131p/EQBBnzsAK/LAh9/fCbA28ZnArxtfCbA28ZnArxtfCbA28ZnArxtfKYCsL+PloG1DnA8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPF+A2nVI6lFc3RmAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACCUlEQVR4nO3cQUojURhGUYcuoYcuwrW4BpfrElxGDx0IjSRY2El8/8vlwBlkED5SXIpHEZKH979vhD2MfwJ+lcBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAsfdIPDjn6d/xq+HE9cG/lpX4w3dIPDz68tn2s8X45fEV+7gOGdw3OWBz+9dpTd0YeDjuhrv46rA353BAu9D4DiB4zwmxd0m8PlrNiFwnMBxVwU+OXcdwxsSOM4X/nECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHF3H/gnfyZxjfELFPgXGwg8T+BjAo+NryHw2PgaAo+NryHw2PgaAo+Nr9EM/Pz6cuKy9wg8T+BjAgu8N4GPCSzw3gQ+1gx8F+NrCDw2vobAY+NrCDw2vobAY+NrCDw2vobAY+NrZAOfP+Ye+6/xOyKwwHsT+Fg28P7jawg8Nr6GwGPjawg8Nr6GwGPjawg8Nr6GwGPjaxQC+/loOTDHBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOO4DV+0jqa4k0zAAAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>au bout d’une seconde — image 60</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACCElEQVR4nO3bzWkjQRhFUS8dgpcOwrE4Boc7ITgML2dhGIyEG0Y/9ZUuB86iF+Kh5tIUjdDT59cfwp7GvwF3JXCcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHE3CPz88vrP+P1w4trAP+tqvKEbBH77eP9O+30xfkv85AmOcwbHXR74/NlVekMXBj6uq/E+rgr82xks8D4EjhM4zmtS3G0Cn1+zCYHjBI67KvDJuesY3pDAcX7wjxM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMePvDzy+tdjd+gwHdsIPA8gY8JPDa+hsBj42sIPDa+hsBj42sIPDa+RjPw28f7ics+I/A8gY8JLPDeBD4msMB7E/hYM/BDjK8h8Nj4GgKPja8h8Nj4GgKPja8h8Nj4GgKPja+RDXz+mnvsv8YfiMAC703gY9nA+4+vIfDY+BoCj42vIfDY+BoCj42vIfDY+BoCj42vUQjs76PlwBwTOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHj/gIRfSOp8aKu4QAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout de trois secondes — image 180</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Une grande tête de robot (GEANT) qui descend au milieu de l’écran et s’arrête en bas ; le petit bonhomme reste en haut à gauche.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>GEANT est arrivé en y = 100 <span class="detail"> (100)</span></li>
+
+  <li>ses seize lutins font un carré de 32 </li>
+
+  <li>BONHOMME, en 16 × 16, prend les lutins 16 à 19 </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>35.5. La fonction cacher32() — ôter un grand personnage</strong> — chapitre 6 : Dessiner.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

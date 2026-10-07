@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 2.40 — La fonction spriteTaille() — dessiner une fois, choisir la taille</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Série 2 — Les formes géométriques</span>
+    
+    
+    <span>leçon 2.40 sur 152</span>
+    <span class="jauge" style="--part: 30%">difficulté 3 / 10</span>
+    
+    
+    
+  </p>
+<h1>2.40. La fonction spriteTaille() — dessiner une fois, choisir la taille</h1>
+<p class="idee">#include &lt;spriteTaille&gt; : spriteTaille(numero, x, y, DESSIN, taille) pose un dessin à la taille qu’on veut. Le dessin n’est écrit qu’UNE fois, à sa taille standard ; c’est le compilateur qui l’agrandit.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>Dessiner une seule fois.</strong> Le rond est écrit <strong>une seule fois</strong>, dans <code>tuile_ROND.cpp</code>, à sa taille standard : 8 × 8. Il n’y a pas de « grand rond » dans le programme. C’est dans l’appel qu’on dit à quelle taille le montrer.</p>
+<p><strong>La ligne à écrire : <code>#include &lt;spriteTaille&gt;</code>.</strong></p>
+<p><strong>Ses arguments :</strong> <code>spriteTaille(numero, x, y, DESSIN, taille)</code>. <code>numero</code> est le <strong>premier</strong> lutin employé ; <code>x</code> et <code>y</code> le coin en haut à gauche, en pixels ; <code>DESSIN</code> le nom d’une <code>Tuile</code> ou d’un <code>Perso</code> du programme ; <code>taille</code> combien de fois plus grand : <strong>1</strong> sa taille, <strong>2</strong> deux fois, <strong>3</strong> trois fois…</p>
+<p><strong>Ici :</strong> <code>spriteTaille(0, 36, 60, ROND, 1)</code> pose le rond tel qu’il est dessiné (8 × 8) ; <code>spriteTaille(1, 96, 44, ROND, 3)</code> pose <strong>le même rond</strong> trois fois plus grand : 24 × 24.</p>
+<p><strong>Comment le compilateur agrandit.</strong> La console ne sait pas agrandir pendant que le jeu tourne. Le compilateur redessine donc la forme <strong>avant</strong>, à la compilation : il fait le tour du dessin, garde les vrais coins pointus, arrondit les marches d’escalier, puis redessine à la nouvelle taille avec un contour d’un pixel. Le grand rond est <strong>rond</strong>, pas fait de gros pixels.</p>
+<p><strong>Avec combien de lutins ?</strong> La forme agrandie est coupée en carrés de 8 × 8 ; chaque carré qui n’est pas vide prend <strong>un lutin</strong>, à partir de <code>numero</code>. En taille 3, le rond fait 24 × 24 : 3 × 3 = 9 lutins, les numéros 1 à 9. Le premier rond a pris le lutin 0 : les deux ne se chevauchent pas.</p>
+<p><strong>Pas de limite de taille.</strong> La console n’a que 40 lutins, et n’en montre que 10 sur une même ligne. Tant que la forme y tient, elle est faite de lutins : elle passe par-dessus le décor et peut bouger. <strong>Au-delà, elle est dessinée dans le fond de l’écran</strong>, case par case : là, plus de limite. Taille 12, 18, 40, 100… : la forme est toujours affichée. Plus grande que l’écran, on en voit la partie qui tombe dedans.</p>
+<p><strong>Dans le fond, la place s’écrit en clair</strong> (<code>spriteTaille(0, -80, -88, ROND, 40)</code>, par exemple, pour centrer un rond de 320 pixels) : le compilateur doit savoir quelle partie tombe dans l’écran. Elle peut être négative, c’est-à-dire commencer hors de l’écran. Le <code>numero</code> n’y sert pas.</p>
+<p><strong>La taille s’écrit en clair</strong> — <code>3</code>, pas une variable — : c’est le compilateur qui dessine, avant que le jeu ne tourne.</p>
+<p><strong>Si tu modifies le petit rond</strong>, dans <code>tuile_ROND.cpp</code>, toutes les tailles changent ensemble à la compilation suivante : il n’y a qu’un dessin.</p>
+<p><strong>La même logique dans les autres fonctions :</strong> la taille peut aussi s’écrire en dernier argument de <code>sprite(0, 36, 60, ROND, 4)</code>, <code>sprite16(0, 40, 40, HEROS, 3)</code>, <code>sprite32(0, 0, 0, BOSS, 2)</code>, <code>spriteDerriere(0, x, 72, ROND, 4)</code> (derrière le décor) et <code>poser(2, 3, ROND, 5)</code> (toujours dans le fond, colonne et ligne en clair). Pour les trois <code>sprite</code>, seul un nombre de <strong>2 ou plus</strong> est une taille : <code>0</code>, <code>1</code> et <code>MIROIR_X</code>, <code>DERRIERE</code>… gardent leur ancien sens, celui des options.</p>
+<p><strong>Essaie :</strong> change le <code>3</code> en <code>2</code>, puis en <code>4</code>. Puis remplace la seconde ligne par <code>spriteTaille(1, 8, 0, ROND, 18);</code> : un rond de 144 pixels, toute la hauteur de l’écran. Enfin, dessine ta propre forme dans <code>tuile_ROND.cpp</code> (une goutte, une maison) et regarde-la à toutes les tailles.</p>
+
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>825 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            57 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              262 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         94 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              272 o  ← CopierTuiles  — 7 lettres sur 43, et 10 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+  "TAILLE 1"            8 o  ← texte()  — un texte gravé
+  "TAILLE 3"            8 o  ← texte()  — un texte gravé
+Lettres gravées : AEILT13
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+Fonctions du langage appelées :
+  sprite()       × 10   230 o sur place, dans main()
+  texte()        ×  2    22 o sur place, dans main()  + EcrireTexte (10 o)
+  image()        ×  1     6 o sur place, dans main()  + AttendreImage (28 o)
+  spriteTaille() ×  2     0 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// ---- #include &lt;spriteTaille&gt; : dessiner une fois, choisir la taille ----
+// UN seul dessin, ROND (8 × 8). À gauche en taille 1, à droite en taille 3 (24 × 24).
+
+#include &lt;texte&gt;          // texte() : écrire un mot
+#include &lt;spriteTaille&gt;   // spriteTaille() : un dessin à la taille qu'on veut
+#include &lt;Tuile&gt;          // Tuile : un dessin de 8 × 8
+#include "tuile_ROND.cpp" // le rond, dessiné une seule fois</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  spriteTaille(0, 36, 60, ROND, 1);   // taille 1 : 8 × 8, le lutin 0
+  spriteTaille(1, 96, 44, ROND, 3);   // taille 3 : 24 × 24, les lutins 1 à 9
+  texte(1, 10, "TAILLE 1");           // sous celui de gauche
+  texte(10, 10, "TAILLE 3");          // sous celui de droite
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACP0lEQVR4nO3awW0aURRAUS9TQpYuMWWkrJSQElKGl9khhM0M/w/JfK6OdFfA2P+9IyM05u3Px2+Fezv9BPqnAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7gQ337/n7p9MN8GeCZLqg/f/24tKY04LE+u35uKWbAA+3S3jCffmDAAw3prmMM+KEmdBcxBvxQgMtN665gDHg/wPEAlzuoe7ox4J0AxwMcD3A/H7LiAR7e15r/Wds4MODJZeWNTx/wvwJ/uabTVzB9csAPren0FRw5/OK6gJ9w/pV1Ac+M4Cs7Owt6Xd3rKXzpbn87q+0iOYsbHfEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3C8LeDrO+k3N9Pv3WG/9+J7P3/0926f9vFXvsRcc3sYAL533OtHtp+dXsToGBMreIm5Dl7YAZ64qjrXc4A33jqesoiJ96WnAC84l7/gZwIvONfBawGvO9f2ec4B3v5oevPU6OPbhzz+lt6YaxhYLx3geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HON5fAiQh5kcKIOcAAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Le même rond deux fois : petit à gauche (TAILLE 1), trois fois plus grand et bien rond à droite (TAILLE 3).</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>taille 1 : le rond en (36, 60), un seul lutin </li>
+
+  <li>taille 3 : neuf lutins en carré de 24, à partir de (96, 44) <span class="detail"> (lutin 9 en 112, 60)</span></li>
+
+  <li>les deux tailles sont écrites </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>3.01. Le Père Noël</strong> — série 3 : Les images.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

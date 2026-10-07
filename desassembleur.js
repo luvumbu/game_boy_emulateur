@@ -23,7 +23,7 @@
 /* ------------------------------------------------ ce que le matériel porte */
 
 /** Les registres de la page $FF00, ceux qu'un jeu touche vraiment. */
-const REGISTRES = {
+export const REGISTRES = {
   0x00: 'MANETTE', 0x04: 'DIV', 0x05: 'TIMA', 0x06: 'TMA', 0x07: 'TAC',
   0x0f: 'INTERRUPTIONS',
   0x10: 'SON1_BALAYAGE', 0x11: 'SON1_LONGUEUR', 0x12: 'SON1_ENVELOPPE',
@@ -257,7 +257,11 @@ export function desassembler(octets, { depuis = 0, jusqu = octets.length, base =
       rendu = texte.replace('nn', noms.get(adresse) ?? hex4(adresse))
     }
 
-    if (modele === 'e') {
+    if (modele === 'e' && texte.includes('sp')) {
+      /* « add sp, e » et « ld hl, sp + e » : ici « e » est un petit nombre
+         signé ajouté à la pile, pas une adresse où sauter. */
+      rendu = texte.replace(/\be\b/, `${(octets[ou + 1] << 24) >> 24}`)
+    } else if (modele === 'e') {
       const adresse = base + ou + 2 + ((octets[ou + 1] << 24) >> 24)
       rendu = texte.replace(/\be\b/, noms.get(adresse) ?? hex4(adresse))
     }

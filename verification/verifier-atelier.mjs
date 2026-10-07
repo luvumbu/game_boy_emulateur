@@ -601,65 +601,6 @@ const uneSeule = await evaluer(`inspecteur.cartouches`)
   await evaluer(`document.getElementById('projets-fermer').click()`)
   await patienter(300)
 
-  /* --------------- remonter au C++, et tirer ce qui se tire ---------------- */
-
-  /*
-   * Deux boutons, deux promesses, et elles ne sont pas la même.
-   *
-   * « ⇱ Retour au C++ » ne marche que sur une cartouche faite par CE
-   * compilateur : il reconnaît ses formes. « ⚠ CONVERSION » marche sur
-   * n'importe quelle cartouche, et ne rend que ce qui a un format fixe — les
-   * dessins, le décor, les palettes, les mots. Le contrôle éprouve les deux, et
-   * surtout que chacun DIT ce qu'il a pu faire.
-   */
-  await evaluer(`(function () {
-    const l = document.getElementById('exemples')
-    l.value = 'bonjour'
-    l.dispatchEvent(new Event('change'))
-  })()`)
-  await patienter(2600)
-
-  controle('le bouton « Retour au C++ » est là',
-    await evaluer(`!!document.getElementById('retour-cpp')`))
-
-  await evaluer(`document.getElementById('retour-cpp').click()`)
-  await patienter(1500)
-
-  const rapport = await evaluer(`document.getElementById('etat').textContent`)
-  controle('il annonce la part remontée, sans arrondir en sa faveur',
-    /\d+ instructions sur \d+ remontées \(\d+ %\)/.test(rapport), `
-      « ${rapport.split(String.fromCharCode(10))[0]} »`)
-
-  const remonte = await evaluer(`document.getElementById('source').value`)
-  controle('et le programme remonté porte le C++ du programme d’origine',
-    remonte.includes('texte(6, 4, "BONJOUR")') && remonte.includes('while (true)') &&
-    remonte.includes('if (bouton(A))'),
-    `
-      ${remonte.split('*/')[1].trim().split(String.fromCharCode(10)).slice(0, 3).join(' / ')}`)
-
-  controle('il dit franchement que ce n’est pas le programme d’origine',
-    remonte.includes('ce n’est pas le programme d’origine'))
-
-  /* On le recompile DANS LA PAGE : c'est la seule preuve qui vaille. */
-  await evaluer(`document.getElementById('lancer').click()`)
-  await patienter(1200)
-  controle('le programme remonté recompile dans la page',
-    !(await evaluer(`document.getElementById('etat').className`)).includes('erreur'),
-    ` (${await evaluer(`document.getElementById('etat').textContent.split(String.fromCharCode(10))[1]`)})`)
-
-  /* Et la conversion, qui elle ne demande rien à personne. */
-  await evaluer(`document.getElementById('convertir').click()`)
-  await patienter(1500)
-  const tire = await evaluer(`document.getElementById('etat').textContent`)
-  controle('« CONVERSION » rend les dessins, le décor et les mots',
-    tire.includes('dessins') && tire.includes('cases de décor') && tire.includes('mots'),
-    `
-      « ${tire.split(String.fromCharCode(10))[0]} »`)
-
-  const fichierTire = await evaluer(`document.getElementById('source').value`)
-  controle('et ce qu’elle écrit est du C++ complet, pas une liste de dessins',
-    fichierTire.includes('int main() {') && fichierTire.includes('  poser(') && fichierTire.includes('  texte('))
-
   /* ------------- peindre ne change pas l'ÉCRITURE d'un dessin -------------- */
 
   /*

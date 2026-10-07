@@ -2887,6 +2887,7 @@ int main() {                          // Le jeu commence ici.
       'Cinq bits par composante : 32 × 32 × 32 = **32 768 couleurs** au choix. `31, 31, 31` est le blanc, `0, 0, 0` le noir, `31, 0, 0` le rouge pur.',
       'Le texte est dessiné en indice 3 sur un fond d’indice 0 : ici, il prend donc le bleu nuit de la teinte 3 sur le blanc de la teinte 0.',
       '**Dans l’atelier**, la liste en haut à gauche choisit la console, l’une **ou** l’autre : **« En couleur »** (une cartouche `.gbc` pour la Game Boy Color) ou **« Game Boy »** (un `.gb`, les quatre nuances, rien de plus). En « Game Boy », `couleurFond()` est **refusé** — une Game Boy d’origine n’a pas de registre de couleur, et le compilateur préfère le dire.',
+      '**Pour ne jamais deviner**, regarde **sous l’écran** de la console : « 🌈 Game Boy Color — en couleur » ou « 🎮 Game Boy — 4 nuances ». Dans le parcours, personne ne choisit : **le programme décide** — une seule fonction de couleur, et c’est une Game Boy Color.',
       '**À toi :** change les quatre teintes pour faire un dégradé du jaune au rouge.',
     ],
     code: `// CE PROGRAMME (Game Boy Color) : la même bande de 4 indices qu'en nuances,

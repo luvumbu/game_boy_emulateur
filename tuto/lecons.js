@@ -53,6 +53,8 @@ const NIVEAUX_DES_LECONS = {
 
 import { TUTORIELS } from './tutoriels.js'
 import { construireLeParcours, CHAPITRES } from './parcours.js'
+import { LECONS_DES_FORMES } from './formes.js'
+import { LECONS_DES_IMAGES } from './images.js'
 
 /*
  * Les chapitres du PARCOURS — leçons et cours réunis (voir tuto/parcours.js).
@@ -61,6 +63,7 @@ import { construireLeParcours, CHAPITRES } from './parcours.js'
  */
 export const NIVEAUX = CHAPITRES
 export { NIVEAUX_DES_LECONS }
+export { nomDuChapitre } from './parcours.js'
 
 /*
  * Pour les contrôles des leçons de déplacement : suivre des lettres.
@@ -30425,7 +30428,13 @@ int main() {
  * chapitres entremêlés par sujet, et chaque tuto de fonction juste avant la
  * première étape qui l'emploie. Voir tuto/parcours.js.
  */
-export const LECONS = construireLeParcours(ECRITES, TUTORIELS)
+/*
+ * Puis, à part, la série 2 : les formes géométriques, une par leçon, numérotées
+ * 2.01, 2.02… (voir tuto/formes.js). Elles viennent APRÈS tout le parcours :
+ * elles n'emploient que texte(), sprite16() et Perso, déjà présentés.
+ * Puis la série 3 : les images, 3.01, 3.02… (voir tuto/images.js).
+ */
+export const LECONS = [...construireLeParcours(ECRITES, TUTORIELS), ...LECONS_DES_FORMES, ...LECONS_DES_IMAGES]
 
 /**
  * Le numéro qu'on AFFICHE, pour chaque leçon d'une liste.
@@ -30442,6 +30451,9 @@ export function numeros(liste) {
      précédente : après le 0.35 viennent le 0.35.1, le 0.35.2, et le numéro
      suivant reste 0.36 — les renvois « le 0.36 » ne bougent pas. */
   return liste.map((l) => {
+    // Une série à part (les formes : 2.01, 2.02…) porte son numéro elle-même,
+    // sans toucher au compte des autres.
+    if (l.numero) return l.numero
     if (l.difficulte === 0) return l.suite ? `0.${zero - 1}.${++s}` : (s = 0, `0.${zero++}`)
     return l.suite ? `${n}.${++s}` : (s = 0, String(++n))
   })
@@ -30490,4 +30502,4 @@ export function partieDe(liste, index) {
 }
 
 /** Combien de leçons « pleines » : le « sur N » de « leçon 3 sur N ». */
-export const principales = (liste) => liste.filter((l) => !l.suite && l.difficulte !== 0).length
+export const principales = (liste) => liste.filter((l) => !l.suite && l.difficulte !== 0 && !l.serie).length

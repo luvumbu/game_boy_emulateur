@@ -13,6 +13,11 @@
 
 import { demarrer, batir, bulletin } from '../outils/controle.mjs'
 import { GameBoy } from '../emulateur.js'
+import { readFileSync } from 'node:fs'
+import { analyser } from '../compilateur/analyseur.js'
+import { compiler } from '../compilateur/emetteur.js'
+import { fabriquerLaCartouche } from '../compilateur/cartouches.js'
+import { CONSOLES, consoleDeLaCartouche } from '../compilateur/consoles.js'
 
 const b = bulletin('exemples/couleur.cpp')
 
@@ -20,14 +25,15 @@ const b = bulletin('exemples/couleur.cpp')
 
 const bati = batir('exemples/couleur.cpp', 'COULEUR')
 
-/* « couleur » n'est plus un oui-ou-non : c'est l'octet que l'en-tête portera.
-   0 pour une cartouche d'origine, $80 pour « profite de la couleur », $C0 pour
-   « l'exige ». Un booléen ne savait pas distinguer les deux derniers. */
-b.egal('le programme est reconnu « en couleur »', bati.couleur, 0x80)
-b.egal('et sa cible est bien « les deux »', bati.cible, 'les-deux')
-b.egal('le drapeau est gravé en $0143', bati.rom[0x0143], 0x80)
+/* « couleur » est l'octet que l'en-tête portera : $00 (Game Boy) ou $C0
+   (Game Boy Color), et rien d'autre — voir compilateur/consoles.js. Aucune
+   console n'est choisie ici : c'est le programme qui décide, et il pose des
+   couleurs. */
+b.egal('le programme est reconnu « Game Boy Color »', bati.console, 'gbc')
+b.egal('l’octet de l’en-tête est $C0', bati.couleur, 0xc0)
+b.egal('le drapeau est gravé en $0143', bati.rom[0x0143], 0xc0)
 b.verifier('le titre n’a pas mangé le drapeau',
-  bati.rom[0x0142] === 0 || bati.rom[0x0142] !== 0x80,
+  bati.rom[0x0142] === 0 || bati.rom[0x0142] !== 0xc0,
   ` (titre : « ${String.fromCharCode(...bati.rom.slice(0x0134, 0x0143)).replace(/\0/g, '')} »)`)
 
 /*
@@ -84,12 +90,11 @@ b.verifier('elles vont du clair au sombre',
 /* ------------------------------------ et la même cartouche en NOIR ET BLANC */
 
 /*
- * Le point qui fait tout l'intérêt du drapeau $80.
+ * L'émulateur suit l'octet $0143, et lui seul.
  *
- * On reprend les mêmes octets, on efface le drapeau, et l'on redémarre : la
- * console d'origine doit rendre le programme en quatre nuances, sans rien
- * refuser. Une cartouche qui ne marcherait QUE sur une Game Boy Color aurait
- * coûté la moitié des machines pour rien.
+ * On reprend les mêmes octets, on efface le drapeau, et l'on redémarre :
+ * l'émulateur doit passer en quatre nuances et ne rien refuser. C'est ce que
+ * fait une vraie Game Boy d'origine, qui ignore les registres de couleur.
  */
 const dOrigine = Uint8Array.from(bati.rom)
 dOrigine[0x0143] = 0x00
@@ -152,5 +157,50 @@ b.egal('et 56 arrivent À L’ÉCRAN, le plafond du matériel',
 const palettesVues = new Set()
 for (let n = 0; n < 8; n++) palettesVues.add(pp.oam[n * 4 + 3] & 7)
 b.egal('les huit lutins portent huit palettes différentes', palettesVues.size, 8)
+
+/* ------------------------------- la règle des deux consoles, sans exception */
+
+/*
+ * Game Boy OU Game Boy Color — compilateur/consoles.js.
+ *
+ * Il y a eu trois sortes de cartouches ($00, $80, $C0) et une option « les
+ * deux » qui fabriquait deux fichiers : on ne savait plus ce qu'on avait. Ces
+ * contrôles tiennent la règle : deux consoles, deux octets, deux extensions.
+ */
+const SANS = analyser(readFileSync('exemples/minimal.cpp', 'utf8'))
+const AVEC = analyser(readFileSync('exemples/couleur.cpp', 'utf8'))
+
+const seule = fabriquerLaCartouche(SANS, 'MINIMAL')
+b.verifier('sans couleur et sans choix : une cartouche Game Boy',
+  seule.pour === 'gb' && seule.rom[0x0143] === 0x00 && seule.extension === '.gb',
+  ` (${seule.pour}, $${seule.rom[0x0143].toString(16)}, ${seule.extension})`)
+
+const vive = fabriquerLaCartouche(AVEC, 'COULEUR')
+b.verifier('avec couleurs et sans choix : une cartouche Game Boy Color',
+  vive.pour === 'gbc' && vive.rom[0x0143] === 0xc0 && vive.extension === '.gbc',
+  ` (${vive.pour}, $${vive.rom[0x0143].toString(16)}, ${vive.extension})`)
+
+const choisie = fabriquerLaCartouche(SANS, 'MINIMAL', 'gbc')
+b.verifier('« gbc » choisi sans une couleur : Game Boy Color quand même',
+  choisie.pour === 'gbc' && choisie.rom[0x0143] === 0xc0)
+
+const refus = (faire) => { try { faire(); return '' } catch (e) { return e.message } }
+const refusGb = refus(() => fabriquerLaCartouche(AVEC, 'COULEUR', 'gb'))
+b.verifier('« gb » choisi avec une couleur : REFUSÉ, avec la ligne',
+  /ligne \d+ : « couleurFond\(\) » demande une Game Boy Color/.test(refusGb), ` (${refusGb.slice(0, 90)})`)
+
+b.verifier('« les-deux » n’existe plus : refusé par le compilateur',
+  /jamais les deux/.test(refus(() => compiler(AVEC, { cible: 'les-deux' }))))
+b.verifier('ni par la fabrique de cartouche',
+  /jamais les deux/.test(refus(() => fabriquerLaCartouche(AVEC, 'COULEUR', 'les-deux'))))
+
+const octets = new Set([seule, vive, choisie].map((c) => c.rom[0x0143]))
+b.verifier('deux octets possibles en $0143, et seulement deux',
+  [...octets].every((o) => o === CONSOLES.gb.octet || o === CONSOLES.gbc.octet))
+
+/* La lecture d'une cartouche venue d'ailleurs : le bit 7, comme la console. */
+b.egal('une cartouche du commerce à $80 se lit « gbc »', consoleDeLaCartouche(Uint8Array.of(...new Array(0x143).fill(0), 0x80)), 'gbc')
+b.egal('à $C0 aussi', consoleDeLaCartouche(Uint8Array.of(...new Array(0x143).fill(0), 0xc0)), 'gbc')
+b.egal('à $00, « gb »', consoleDeLaCartouche(Uint8Array.of(...new Array(0x143).fill(0), 0x00)), 'gb')
 
 b.fin()

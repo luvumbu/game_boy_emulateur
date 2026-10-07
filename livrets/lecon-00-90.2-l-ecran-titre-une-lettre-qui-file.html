@@ -82,7 +82,7 @@
     <span class="niveau">Chapitre 0 — Avant tout</span>
     
     <span class="niveau">Partie G — Les lettres et l’écran titre</span>
-    <span>leçon 0.90.2 sur 143</span>
+    <span>leçon 0.90.2 sur 152</span>
     <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
@@ -156,7 +156,7 @@ Tes fonctions appelées :
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
     <pre><code>#include &lt;couleurTexte&gt;   // choisit la couleur des lettres
-#include &lt;texteGrand&gt;     // écrit un texte agrandi, de 1 à 20 fois
+#include &lt;texteGrand&gt;     // écrit un texte agrandi, taille de 0 à 10
 #include &lt;texte&gt;          // écrit un texte à l’écran
 #include &lt;bouton&gt;         // lit un bouton de la manette
 #include &lt;effacer&gt;        // efface des cases, ou tout le fond
@@ -179,7 +179,7 @@ Tes fonctions appelées :
     <p class="quoi">3. le point d’entrée : c’est ici que la console arrive</p>
     <pre><code>int main() {
   couleurTexte(31, 16, 0);          // le titre du 0.90, en orange
-  texteGrand(4, 5, "JEU", 4);
+  texteGrand(4, 5, "JEU", 3);
   texte(2, 12, "APPUIE SUR START");
 
   while (true) {

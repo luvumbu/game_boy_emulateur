@@ -82,18 +82,18 @@
     <span class="niveau">Chapitre 0 — Avant tout</span>
     
     <span class="niveau">Partie G — Les lettres et l’écran titre</span>
-    <span>leçon 0.87.3 sur 143</span>
+    <span>leçon 0.87.3 sur 152</span>
     <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
   </p>
 <h1>0.87.3. Agrandir une lettre : texteGrand — un mot</h1>
-<p class="idee">Un mot entier agrandi : texteGrand(3, 7, "JEU", 4). Chaque lettre prend 4 × 4 cases ; le mot, 12 × 4.</p>
+<p class="idee">Un mot entier agrandi : texteGrand(3, 7, "JEU", 3). Chaque lettre prend 4 × 4 cases ; le mot, 12 × 4.</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
 <p><strong>Pas seulement une lettre :</strong> <code>texteGrand</code> agrandit un <strong>mot entier</strong>. Les lettres se suivent, chacune agrandie.</p>
-<p><strong>La largeur du mot :</strong> 3 lettres × 4 cases = <strong>12 cases</strong>. Il faut qu’elle tienne dans les 20 colonnes de l’écran : <code>"BONJOUR"</code> (7 lettres) tient à la taille 2 (14 cases), pas à la taille 3 (21 cases).</p>
+<p><strong>La largeur du mot :</strong> à la taille 3, une lettre prend 3 + 1 = 4 cases ; 3 lettres × 4 cases = <strong>12 cases</strong>. Il faut qu’elle tienne dans les 20 colonnes de l’écran : <code>"BONJOUR"</code> (7 lettres) tient à la taille 1 (14 cases), pas à la taille 2 (21 cases).</p>
 <p><strong>Un titre de jeu,</strong> c’est exactement ça : un mot en grand, au milieu de l’écran.</p>
 
 <div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
@@ -134,7 +134,7 @@ Tes fonctions appelées :
 <div class="morceau">
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
-    <pre><code>#include &lt;texteGrand&gt;   // écrit un texte agrandi, de 1 à 20 fois</code></pre>
+    <pre><code>#include &lt;texteGrand&gt;   // écrit un texte agrandi, taille de 0 à 10</code></pre>
   </div>
   <div></div>
 </div>
@@ -143,8 +143,8 @@ Tes fonctions appelées :
   <div>
     <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
     <pre><code>int main() {
-  // 3 lettres × 4 cases = 12 cases de large, 4 de haut : de (3, 7) à (14, 10).
-  texteGrand(3, 7, "JEU", 4);
+  // Taille 3 : 4 cases par lettre ; 3 lettres × 4 = 12 cases de large, 4 de haut : de (3, 7) à (14, 10).
+  texteGrand(3, 7, "JEU", 3);
 
   while (true) {
     image();
@@ -193,7 +193,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 
 <p class="pied">
-  Ensuite : <strong>0.87.4. Agrandir une lettre : texteGrand — vingt fois</strong> — chapitre 0 : Avant tout.
+  Ensuite : <strong>0.87.4. Agrandir une lettre : texteGrand — la plus grande taille, 10</strong> — chapitre 0 : Avant tout.
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 

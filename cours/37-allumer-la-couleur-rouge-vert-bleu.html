@@ -94,7 +94,7 @@
 <p class="reperes">
   <span class="niveau">Chapitre 8 — La couleur : la Game Boy Color</span>
   <span>leçon 1 sur 6 dans ce chapitre</span>
-  <span>37 sur 61 dans le cours</span>
+  <span>37 sur 80 dans le cours</span>
 </p>
 <h1>37. Allumer la couleur : rouge, vert, bleu</h1>
 <p class="idee">Sur Game Boy Color, chaque indice 0–3 d’une tuile devient une vraie couleur, que tu choisis.</p>
@@ -105,6 +105,7 @@
 <p>Cinq bits par composante : 32 × 32 × 32 = <strong>32 768 couleurs</strong> au choix. <code>31, 31, 31</code> est le blanc, <code>0, 0, 0</code> le noir, <code>31, 0, 0</code> le rouge pur.</p>
 <p>Le texte est dessiné en indice 3 sur un fond d’indice 0 : ici, il prend donc le bleu nuit de la teinte 3 sur le blanc de la teinte 0.</p>
 <p><strong>Dans l’atelier</strong>, la liste en haut à gauche choisit la console, l’une <strong>ou</strong> l’autre : <strong>« En couleur »</strong> (une cartouche <code>.gbc</code> pour la Game Boy Color) ou <strong>« Game Boy »</strong> (un <code>.gb</code>, les quatre nuances, rien de plus). En « Game Boy », <code>couleurFond()</code> est <strong>refusé</strong> — une Game Boy d’origine n’a pas de registre de couleur, et le compilateur préfère le dire.</p>
+<p><strong>Pour ne jamais deviner</strong>, regarde <strong>sous l’écran</strong> de la console : « 🌈 Game Boy Color — en couleur » ou « 🎮 Game Boy — 4 nuances ». Dans le parcours, personne ne choisit : <strong>le programme décide</strong> — une seule fonction de couleur, et c’est une Game Boy Color.</p>
 <p><strong>À toi :</strong> change les quatre teintes pour faire un dégradé du jaune au rouge.</p>
 
 <h2>2. Le programme, morceau par morceau</h2>

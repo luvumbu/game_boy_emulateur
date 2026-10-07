@@ -88,7 +88,7 @@ const TOUCHES = [
 ]
 
 function etapesEnCouleur(lecon) {
-  const { laConsole, gb } = consoleDuProgramme(lecon.code, lecon.titre, false)
+  const { laConsole, gb } = consoleDuProgramme(lecon.code, lecon.titre, false, lecon.fichiers)
   const ecran = () => Buffer.from(gb.ppu.couleurs.buffer.slice(0))
   const etapes = []
   let precedent = null
@@ -116,7 +116,7 @@ function etapesEnCouleur(lecon) {
 
 function matiereDeLaLecon(lecon) {
   const dessins = new Map(lireDessins(lecon.code).map((d) => [d.nom, d]))
-  const { gb, octets, grave } = consoleDuProgramme(lecon.code, lecon.titre)
+  const { gb, octets, grave } = consoleDuProgramme(lecon.code, lecon.titre, true, lecon.fichiers)
 
   return {
     morceaux: decouperLeProgramme(lecon.code, dessins),

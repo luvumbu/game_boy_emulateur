@@ -3062,3 +3062,392 @@ Quatre contrôles (30 images de flèche = 10 pixels environ, arrêts pile à 0
 et à 128, le lutin qui suit). **Vérifié** : `verifier-tuto` (**615 étapes,
 1 724 contrôles**), `verifier-tutoriels`, `verifier-langage`,
 `verifier-tuto-page` — tous verts.
+
+## Plus tard encore : Space Invaders, rangé avec les projets
+
+Le jeu complet était dans `exemples/invaders.cpp` (avec `invaders.gbc` et
+`invaders.png`), ouvert par le menu des exemples (« SPACE INVADERS — le jeu
+entier, en couleur ») et par `npm run invaders`. Il ne figurait pas dans
+**📂 Ouvrir**, qui ne montre que les dossiers de `projets/`.
+
+Il y est maintenant : **`projets/space_invaders/`** — `principal.cpp` (le même
+programme), `space_invaders.gbc` (recompilée, titre « INVADERS »),
+`capture.png`, `projet.json` (console `gbc`).
+
+Ce que fait le jeu : écran titre et record ; 5 rangs × 7 envahisseurs qui
+marchent, descendent au bord et accélèrent avec leur musique à quatre notes ;
+trois sortes d'envahisseurs (30, 20, 10 points) ; le canon (un tir à la fois) ;
+quatre abris qui s'effritent ; trois bombes au plus ; la soucoupe mystère ;
+3 vies, une de plus à 1 500 points ; PAUSE avec START ; le record gardé dans
+la cartouche. 1 200 lignes, 8 455 octets de programme.
+
+Recompiler : `node outils/gb3.mjs projets/space_invaders/principal.cpp
+projets/space_invaders/space_invaders.gbc INVADERS`.
+
+## Plus tard encore : Mario Calcul, une démo qui fait calculer
+
+Un nouveau petit jeu, pour commencer : **`exemples/calcul.cpp`** (360 lignes,
+2 491 octets de programme, cartouche Game Boy `.gb`, titre « CALCUL »).
+
+- Le héros (le personnage de Mario, en `sprite16`) marche avec GAUCHE /
+  DROITE et saute avec A (24 images : 12 pour monter, 12 pour redescendre,
+  2 pixels à chaque fois).
+- **Trois portes « ? »** (colonnes 6, 11 et 16, trop hautes pour être sautées)
+  barrent la route. En touchant une porte, une question s'écrit en haut :
+  `7 + 5 = 0`. HAUT / BAS changent la réponse (0 à 18), A la donne.
+- **Bonne réponse** : la porte disparaît, une étoile de plus, « BRAVO ! ».
+  **Mauvaise** : « NON ESSAIE ENCORE », la même question reste.
+- Les nombres vont de 1 à 9 ; une soustraction échange a et b si a est le plus
+  petit, parce que la console ne connaît pas les nombres négatifs.
+- Toutes les portes ouvertes et le drapeau atteint : « GAGNE ! BRAVO ».
+- La police n'a ni « + » ni « = » : deux tuiles, `PLUS` et `EGAL`, les
+  dessinent. Elle n'a pas non plus la virgule, d'où « NON ESSAIE ENCORE ».
+
+Où le trouver :
+
+- le menu des exemples de l'atelier : « MARIO CALCUL — ouvrir les portes en
+  calculant (démo) » ;
+- **📂 Ouvrir** : le projet **`projets/mario_calcul/`** (`principal.cpp`,
+  `mario_calcul.gb`, `capture.png`, `projet.json`) ;
+- la ligne de commande : `npm run calcul`.
+
+**Vérifié** dans l'émulateur, en captures : l'écran de départ ; une mauvaise
+réponse (« 8 + 2 = 2 » → « NON ESSAIE ENCORE ») ; une partie entière jouée
+par des appuis enregistrés (A puis HAUT, encore et encore, jusqu'à la bonne
+réponse) : une addition et une soustraction (« 7 - 5 ») réussies, les trois
+portes ouvertes, « ETOILES 3 », « GAGNE ! BRAVO ».
+
+Ce qui reste à faire, si l'on veut aller plus loin : un niveau qui défile
+comme `mario.cpp`, des ennemis, des multiplications, un compte de vies.
+
+## Plus tard encore : le programme C++ gravé dans la cartouche
+
+La question revenait : « peut-on retrouver le C++ d'une cartouche ? ». Des
+octets seuls, non — la compilation jette les noms et les commentaires, et
+`retour-cpp.js` ne fait que reconnaître des formes. La seule façon de rendre
+le programme **tel qu'il a été écrit**, c'est de l'avoir gardé.
+
+- **`compilateur/source-gravee.js`** (nouveau) : les fichiers du projet — le
+  principal et ceux qu'il inclut — sont compressés (LZSS, écrit ici, sans
+  dépendance) et gravés au bout de la place libre de la cartouche, derrière
+  une marque de seize octets « SOURCE C++ » en `$7FF0`, avec leur somme. Un
+  octet abîmé, et rien n'est rendu plutôt qu'un programme faux.
+- **`fabriquer()`** prend un sixième argument, `source`, et
+  **`fabriquerLaCartouche()`** un quatrième ; la page et `gb3.mjs` les passent.
+  `gb3.mjs` dit si le programme a été gravé, et sinon pourquoi.
+- **⇱ Retour au C++** cherche d'abord le programme gravé : s'il est là, il
+  remplace les onglets (avec confirmation, ↶ le défait) ; sinon, la
+  reconnaissance d'avant.
+- **`verification/verifier-source-gravee.mjs`** : 37 contrôles — cinq
+  programmes, dont Space Invaders (30 Ko → 11 Ko), relus à la lettre près ;
+  le même écran avec et sans le programme gravé ; un projet en deux fichiers ;
+  rien de rendu sur une cartouche sans marque, abîmée ou trop pleine.
+
+À savoir : qui a la cartouche a le programme. Les `.gb` déjà présents dans
+`exemples/` et `projets/` ont été fabriqués avant, et n'en portent pas tant
+qu'ils ne sont pas refabriqués.
+
+## Plus tard encore : étudier une cartouche venue d'ailleurs (Pokémon Jaune)
+
+Le C++ d'un jeu du commerce n'existe pas. On peut, en revanche, l'étudier
+pièce par pièce et réécrire en C++ ce qu'on a compris. Première passe :
+
+- **`etude/banc.js`** : n'importe quelle cartouche dans l'émulateur du
+  projet, ses touches, et le journal de qui écrit où (instruction et banc) ;
+- **`etude/chercheur.js`** : le chercheur de variables — photographier la
+  mémoire, agir, garder ce qui a « monté de 1 », « baissé », « pas bougé » ;
+- **`etude/idiomes.js`** : dix empreintes communes à toutes les cartouches
+  (manette, transfert des lutins, attente de la ligne 144, ouvrir/fermer la
+  sauvegarde, bancs, recopie, écran, halt), chacune reliée à la routine de
+  notre compilateur et à la fonction C++ du projet ;
+- **`outils/etudier.mjs`** : l'en-tête, les idiomes, et la sauvegarde
+  espionnée pendant un parcours au clavier ;
+- **`etude/jeux/pokemon-jaune.cpp`** : le carnet — le curseur du menu
+  ($CC26, trouvé en cinq essais), le nom du joueur dans la sauvegarde ($A598,
+  banc 1), la routine 01:5E84 qui décide s'il y a une partie et le menu
+  01:5C22 qui la charge, traduits en C++ ; recoupés avec le désassemblage
+  « pret » de Pokémon Rouge/Jaune (wCurrentMenuItem, sPlayerName) ;
+- **`verification/verifier-etude.mjs`** : 9 contrôles sur nos cartouches,
+  où l'on connaît la réponse.
+
+Reste à faire : charger une partie sauvegardée (il faut en avoir une), la
+routine qui écrit la sauvegarde (1C:7E8B), et un panneau dans la page pour
+chercher les variables à la souris.
+
+## Plus tard encore : modifier l'assembleur, et traduire tout un programme en C++
+
+Deux outils généraux, pour n'importe quelle cartouche :
+
+- **Modifier** — `etude/assembleur.js` (du texte aux octets, en reprenant
+  les 988 formes du désassembleur : l'aller-retour est exact),
+  `etude/modifier.js` (recouvrir sans jamais décaler, `nop` de complément,
+  sommes de l'en-tête, IPS) et `outils/modifier.mjs` (voir, remplacer,
+  écrire des octets, partager en IPS, essayer avec une capture). Essai sur
+  Pokémon Jaune : 01:5E99 `jr z` → `jr` — le jeu croit à une sauvegarde,
+  la charge et répond « La sauvegarde est détruite ! », ce qui confirme la
+  lecture du carnet.
+- **Traduire** — `etude/traducteur.js` et `outils/traduire.mjs` : trouver
+  le code (lecture + console qui tourne, jouée au hasard), découper en
+  fonctions, traduire chaque instruction en C++, nommer les adresses
+  (fichier de noms), signaler les idiomes. Les drapeaux ne sont écrits que
+  s'ils sont relus — y compris la retenue rendue au `ret`, un piège trouvé
+  en relisant 01:5E84 et couvert par un contrôle.
+- `etude/banc.js` note désormais les ENTRÉES (où arrivent les appels et
+  les sauts calculés, avec leur banc).
+- `desassembleur.js` : `add sp, e` et `ld hl, sp + e` affichent un nombre
+  signé, plus une adresse ; `REGISTRES` est exporté pour l'assembleur.
+- Contrôles : `verifier-modifier.mjs` (21) et `verifier-traduire.mjs` (19).
+
+Limite dite partout : le C++ traduit se LIT, il ne se recompile pas en
+cartouche ; et il ne contient que le code que la console a pu atteindre
+pendant qu'on la faisait jouer.
+
+## Plus tard encore : le C++ d'une cartouche du dehors, dans la page
+
+- `etude/banc.js` : l'espion sort du banc d'étude — `espionner(gb)` se
+  branche sur n'importe quelle console, la page comprise.
+- La page l'allume à « 📂 Ouvrir un .gb » (et l'éteint à la compilation) :
+  le code joué est noté au fil de la partie.
+- `vue-traduction.js` (nouveau) : dans le MODE MACHINE, pour une cartouche
+  du dehors, deux vues — « 🔎 Assembleur » et « ⇱ C++ — tout le programme » :
+  C++ et assembleur côte à côte, banc, recherche, renommage au double-clic
+  (retenu dans le navigateur, par cartouche), « 🔄 Retraduire »,
+  « ⬇ Télécharger le C++ ».
+- « ⇱ Retour au C++ » sur une cartouche du dehors ouvre cette vue (le
+  programme gravé passe toujours d'abord).
+- `verifier-page.mjs` : trois contrôles — la traduction de `tetris.gb` dans
+  le MODE MACHINE, ses lignes, la recherche d'une adresse avec son
+  assembleur. Le renommage au double-clic n'est pas piloté par le contrôle.
+
+## Plus tard encore : lire des fichiers C++ importés, sans copier-coller
+
+L'utilisateur a voulu copier les 500 000 lignes du C++ de Pokémon : le
+navigateur s'est figé. Désormais :
+
+- `vue-fichiers.js` (nouveau) : MODE MACHINE → « 📄 Lire des fichiers C++ » →
+  « 📄 Importer des fichiers C++ » (un ou plusieurs .cpp / .h). Une visionneuse
+  en lecture seule qui n'écrit que les lignes visibles (hauteur de ligne
+  fixe, une cinquantaine dans la page) : 66 fichiers, 499 885 lignes ouverts en
+  0,3 s. Recherche d'un fichier à l'autre, aller à la ligne, assembleur de la
+  ligne cliquée si la cartouche est ouverte.
+- Le MODE MACHINE a désormais des onglets toujours là : Assembleur, C++ (une
+  cartouche du dehors), Lire des fichiers C++. « 🔎 Voir l'assembleur » ouvre
+  toujours l'onglet Assembleur.
+- `verifier-page.mjs` : trois contrôles — un fichier de 200 000 lignes
+  importé, moins de 300 lignes écrites dans la page, la recherche qui va droit
+  à la ligne.
+
+## Plus tard encore : modifier le jeu en modifiant son C++
+
+L'utilisateur voulait donner le fichier C++ à l'atelier, et que le jeu
+tourne — avec ses changements.
+
+- **Traducteur** : une ligne par instruction, toujours (les `nop` et les
+  tests absorbés par un `if` ont maintenant la leur) ; chaque ligne finit par
+  une empreinte `#CCCCIIII` (C++ / instruction, `empreinte()`), et une
+  instruction d'un autre banc que sa fonction dit son banc (`// 01:414B`).
+- **`etude/reconstruire.js`** (nouveau) : relit tous les fichiers et refait
+  chaque octet ; les lignes inchangées redonnent leurs octets, les lignes
+  changées sont retraduites (C++ → instruction, pour les formes que le
+  traducteur écrit ; un `if` changé change aussi son `cp`/`bit`), ou
+  assemblées (instruction en commentaire), ou recopiées (données). Rien ne se
+  décale ; refus avec fichier et ligne ; fichier manquant détecté.
+  Pokémon Jaune, Space Invaders, Mario, Tetris, le compteur : reconstruits
+  à l'octet près.
+- **`outils/reconstruire.mjs`** (nouveau) : dossier ou fichier unique → .gb.
+- **Page** : dans « 📄 Lire des fichiers C++ », double-clic pour modifier une
+  ligne, « ▶ Reconstruire et lancer » (la cartouche part dans la console
+  par `jouerLaCartouche()`, sortie du chargement d'un .gb), « ⬇ .gb
+  reconstruit », les erreurs et les changements cliquables.
+- Contrôles : `verifier-reconstruire.mjs` (17), et deux de plus dans
+  `verifier-page.mjs`. Essayé à la main dans le navigateur sur Pokémon :
+  `if (a == 0x50) goto L_5EA7;` → `goto L_5EA7;` par double-clic, le jeu
+  reconstruit tourne et dit « La sauvegarde est détruite ! ».
+- Les anciennes traductions (sans empreintes) sont refusées, avec le conseil
+  de les refaire ; celle de Pokémon, à côté du jeu, a été refaite.
+
+## Bilan : ce que la traduction en C++ permet, et ce qu'elle ne permet pas
+
+- **Elle permet** de lire n'importe quelle cartouche en entier, de trouver un
+  endroit précis et de le **modifier** (C++, instruction ou données), puis de
+  reconstruire et lancer le jeu — vérifié de bout en bout dans le navigateur
+  sur Pokémon Jaune.
+- **Elle ne donne pas un C++ lisible comme un programme écrit à la main** :
+  registres, drapeaux, `goto` et noms automatiques. L'utilisateur l'a jugé
+  illisible, à raison : un jeu écrit en assembleur n'a jamais eu de C++, et
+  ses idées ne sont pas dans la cartouche. Retrouver les boucles ou importer
+  une table de noms (`.sym`) aiderait sans changer le fond ; ni l'un ni
+  l'autre n'a été fait.
+- Pour comprendre un jeu connu : les désassemblages relus à la main (pour
+  Pokémon Jaune, *pret/pokeyellow*). Pour un jeu en C++ clair : l'écrire dans
+  l'atelier, en reprenant les dessins avec « ⚠ CONVERSION ».
+- Essai abandonné à la demande de l'utilisateur (« trop lourd ») : Mewtwo à la
+  place de Pikachu au départ. Endroit probable, non vérifié en jouant :
+  `07:4B65` (`ld a, $54` après `ld a, 5`, le niveau).
+
+## Plus tard encore : la traduction en C++ retirée
+
+À la demande de l'utilisateur, l'option qui lisait une cartouche venue
+d'ailleurs et la transformait en C++ est enlevée :
+
+- supprimés : le dossier `etude/` (banc, chercheur, idiomes, assembleur,
+  modifier, traducteur, reconstruire, le carnet de Pokémon Jaune),
+  `vue-traduction.js`, `vue-fichiers.js`, `outils/etudier.mjs`,
+  `traduire.mjs`, `reconstruire.mjs`, `modifier.mjs` et leurs quatre
+  vérifications ;
+- `index.html` : plus d'onglets dans le MODE MACHINE (l'assembleur seul),
+  plus d'espion sur la console ; « ⇱ Retour au C++ » rend le C++ gravé, ou
+  remonte les formes de ce compilateur, comme avant ;
+- gardés : « 📂 Ouvrir un .gb », « ⚠ CONVERSION » (dessins, décor, textes),
+  le C++ gravé dans la cartouche, `analyse-rom.js` et `desassembleur.js`.
+- « ⇱ Retour au C++ » est grisé quand une cartouche venue d’ailleurs tourne :
+  sans la traduction, il n’en retrouvait plus que 10 % (Tetris), illisible.
+  Pour une cartouche compilée ici, il rend toujours le C++ d’origine.
+
+## Plus tard encore : les deux boutons rouges retirés
+
+À la demande de l'utilisateur, le groupe « Avancé » de la console disparaît :
+
+- « ⇱ Retour au C++ » et « ⚠ CONVERSION » sont retirés de la page, avec
+  `retour-cpp.js`, `convertir.js` et `verification/verifier-retour.mjs` ;
+- leurs contrôles dans `verifier-page.mjs` et `verifier-atelier.mjs` aussi ;
+- le programme C++ reste gravé dans les cartouches (`compilateur/source-gravee.js`),
+  mais plus aucun bouton de la page ne le relit.
+
+## Plus tard encore : les formes géométriques, 2.01 le rond, 2.02 le carré…
+
+- `bibliotheque.js` : quinze formes en tête des modèles, 16 × 16, contour plein
+  et intérieur clair — 2.01 ROND, 2.02 CARRE, 2.03 TRIANGLE, 2.04 RECTANGLE,
+  2.05 LOSANGE, 2.06 OVALE, 2.07 TRAPEZE, 2.08 PARALLELOGRAMME, 2.09 PENTAGONE,
+  2.10 HEXAGONE, 2.11 OCTOGONE, 2.12 DEMI_CERCLE, 2.13 ANNEAU, 2.14 CROIX,
+  2.15 ETOILE_5 ;
+- la galerie « 🖼 Les modèles » et la recherche montrent leur numéro ;
+- un clic en fait un dessin du programme, comme les autres modèles.
+
+## Plus tard encore : la série 2, les formes géométriques dans APPRENDRE
+
+- `tuto/formes.js` (nouveau) : quinze leçons, une forme par leçon, de 2.01 Le
+  rond à 2.15 L’étoile. Chacune dit ce qu’est la forme (côtés, coins), comment
+  son dessin est écrit, la pose avec `sprite16()` au milieu de l’écran et
+  écrit son nom dessous. Les dessins viennent de `bibliotheque.js` : les mêmes
+  que la galerie, qui passe aussi à 2.01… 2.15 ;
+- une série à part, après tout le parcours : son groupe s’appelle « Série 2 —
+  Les formes géométriques » (menu, repères, `tuto.html`), ses leçons portent
+  leur numéro (`numero`), et les numéros du parcours ne bougent pas ;
+- aucun `#include` nouveau : texte, sprite16 et Perso sont déjà présentés ;
+- `documents/TUTORIELS.md` régénéré ; livrets PDF pas régénérés.
+
+## Plus tard encore : la série 2 s’allonge, de 2.16 à 2.34
+
+- dix-neuf formes de plus, dans la galerie et dans APPRENDRE : 2.16 quart de
+  cercle, 2.17 triangle rectangle, 2.18 triangle équilatéral, 2.19 cerf-volant,
+  2.20 heptagone ; 2.21 croissant, 2.22 goutte, 2.23 cœur, 2.24 spirale,
+  2.25 vague ; 2.26 flèche, 2.27 étoile à six branches, 2.28 cadre, 2.29 damier,
+  2.30 X ; 2.31 cube, 2.32 pyramide, 2.33 cylindre, 2.34 sphère ;
+- les quatre dernières sont en relief : elles prennent « + » pour l’ombre, et
+  leurs leçons expliquent comment les nuances font voir les faces ;
+- noms pris pour ne pas doubler la galerie : `GRAND_COEUR` (une tuile `COEUR`
+  existe), `CROIX_X`, `ETOILE_6`, `TRIANGLE_EQUILATERAL` ;
+- `verifier-page.mjs` : le contrôle du réglage « nommer » clique le modèle
+  nommé exactement COEUR (il prenait le premier qui contenait le mot, devenu
+  2.23 GRAND_COEUR) ;
+- `documents/TUTORIELS.md` régénéré ; livrets PDF pas régénérés.
+
+## Plus tard encore : les formes en trois tailles, et le zoom d’un dessin
+
+- `bibliotheque.js` : chaque forme de la série 2 a aussi `tailles: { 8, 32 }`,
+  CALCULÉES à partir de la même forme (pas grossies) ; quelques 8 × 8 dessinés
+  à la main (étoiles, cœur, croissant, cube) ;
+- la galerie « 🖼 Les modèles » : « Taille des formes : 8 × 8 · 16 × 16 ·
+  32 × 32 » ; le nom dit la taille (ROND_8, ROND, ROND_32) ;
+- `editeur-tuiles.js` : boutons « 🔍 ×2 » et « 🔍 ÷2 » — une COPIE du dessin
+  ouvert, deux fois plus grande (chaque pixel doublé) ou plus petite (le plus
+  foncé de chaque carré de 2 × 2), nommée NOM_GRAND ou NOM_PETIT ; grisés
+  quand la taille sortirait de 8, 16, 32 (`agrandirLeDessin`, `reduireLeDessin`) ;
+- `tuto/formes.js` : cinq leçons de plus — 2.35 le petit rond (8 × 8, sprite),
+  2.36 le grand rond (32 × 32, sprite32), 2.37 les trois tailles côte à côte,
+  2.38 grossir (×2), 2.39 réduire (÷2) ;
+- `documents/TUTORIELS.md` régénéré ; livrets PDF pas régénérés.
+
+## Plus tard encore : dessiner une fois, agrandir à la taille qu’on veut
+
+- `editeur-tuiles.js` : `agrandirLisse(rangees, taille, nuance, signes)` — on fait
+  le tour de la silhouette, les vrais coins (deux traits d’au moins 2 pixels,
+  dont l’un d’au moins 3) restent pointus et les traits qui les touchent
+  droits ; les marches et les traits entre deux marches sont arrondis
+  (Chaikin, trois fois) ; puis la forme est redessinée à la taille voulue, avec
+  un contour d’un pixel et l’intérieur pris aux nuances d’origine. Un dessin
+  symétrique le reste ;
+- atelier des tuiles : bouton « 📐 Agrandir… » — une réglette (de la taille du
+  dessin à 32), l’aperçu, « ✔ Créer la copie » (NOM_24…) ; la copie est posée
+  au milieu d’un dessin de 8, 16 ou 32, l’original ne change pas. L’aperçu
+  n’est créé qu’à l’ouverture du panneau.
+- `tuto/formes.js` : leçon 2.40 « Dessiner une fois, agrandir comme on veut » — le
+  rond de 8 × 8 et le même agrandi en 24 × 24 par `agrandirLisse` ; le ROND_8 de
+  la galerie redessiné plus rond (l’ancien, presque un losange, donnait un
+  losange une fois agrandi) ; `documents/TUTORIELS.md` régénéré.
+
+## Plus tard encore : spriteTaille(), un dessin à la taille qu’on veut
+
+- `compilateur/agrandir.js` (nouveau) : l’algorithme d’agrandissement, sorti de
+  `editeur-tuiles.js` — `agrandirForme` (la forme à sa taille exacte) et
+  `agrandirLisse` (posée au milieu d’un dessin de 8, 16 ou 32, pour l’atelier) ;
+- `spriteTaille(numero, x, y, DESSIN, taille)` : `#include <spriteTaille>` ; le
+  dessin n’est écrit QU’UNE fois, à sa taille standard ; à la compilation, la forme
+  est agrandie, coupée en carrés de 8 × 8, et chaque carré non vide devient un
+  `sprite` avec son dessin sur place, à partir du lutin `numero`. La taille
+  s’écrit en clair ; refus nommés au-delà de 40 lutins, ou de 10 sur une ligne ;
+  `inclusion.js`, `aide-fonctions.js`, `LISEZMOI.md` ;
+- leçon 2.40 réécrite : c’est le tuto de `#include <spriteTaille>` — un seul
+  `ROND` de 8 × 8, posé en taille 1 et en taille 3.
+- `spriteTaille()` sans limite de taille : en lutins tant qu’ils suffisent, sinon
+  dans le FOND — seule la partie visible (160 × 144) est calculée
+  (`agrandirForme` prend une « fenêtre »), posée case par case avec des `poser`
+  sur place ; x et y en clair, lus sans se ramener à un octet
+  (`constanteEntiere`), négatifs permis ; la taille aussi (300 reste 300). Refus
+  nommé si les tuiles différentes ne tiennent plus. Leçon 2.40 mise à jour.
+- la TAILLE en dernier argument, avec la logique de `spriteTaille()` :
+  `sprite(0, 36, 60, ROND, 4)`, `sprite16(…, HEROS, 3)`, `sprite32(…, BOSS, 2)`,
+  `spriteDerriere(…, ROND, 4)` (chaque lutin derrière le décor) et
+  `poser(2, 3, MUR, 5)` (toujours dans le fond, colonne et ligne en clair). Pour
+  les trois `sprite`, seul un nombre écrit en clair de 2 ou plus est une taille :
+  `0`, `1` (l’ancien « retourné ») et les noms d’options gardent leur sens. La
+  taille est repérée sur le programme ÉCRIT (`deroulerLesRaccourcis`), jamais
+  sur les appels que le compilateur fabrique (`sprite16` → `sprite(…, 0x20)`) ;
+  `aide-fonctions.js`, `LISEZMOI.md`, leçon 2.40.
+
+## Plus tard encore : la série 3, les images — et quatre jeux faits avec
+
+- `bibliotheque.js` : `IMAGES`, dix-sept images de 16 × 16 dessinées une fois —
+  3.01 le Père Noël (style manga), 3.02 le bonhomme de neige, 3.03 le sapin,
+  3.04 le cadeau, 3.05 le renne ; 3.06 le pion et 3.07 la dame (dames) ; 3.08 le
+  roi, 3.09 la reine, 3.10 la tour, 3.11 le fou, 3.12 le cavalier, 3.13 le pion
+  (échecs) ; 3.14 passe, 3.15 inverse, 3.16 +2, 3.17 joker (cartes). Elles sont
+  dans la galerie « 🖼 Les modèles » ;
+- `tuto/images.js` (nouveau) : la série 3 dans APPRENDRE, « Série 3 — Les
+  images », une leçon par image : à sa taille, puis `sprite16(4, 88, 36, NOM, 3)`,
+  trois fois plus grande — la taille en dernier argument ;
+- `compilateur/agrandir.js` : l’intérieur d’une forme agrandie garde les
+  détails sombres qui ne sont pas sur son bord (les yeux, la bouche) ;
+- quatre jeux, dans `exemples/` et le menu des exemples, faits de ces images,
+  en couleur, l’écran titre montrant deux images ×4 avec `poser(…, 4)` :
+  `puissance4.cpp` (le Père Noël contre le bonhomme de neige), `dames.cpp`
+  (prises enchaînées, dames), `echecs.cpp` (les six pièces, « ÉCHEC », on prend
+  le roi pour gagner), `cartes.cpp` (« Couleurs », style UNO, contre la console) ;
+- `verification/verifier-jeux.mjs` (nouveau, dans `npm run verifier`) : une
+  vraie partie de chaque jeu, touche par touche — victoire en colonne et en
+  diagonale, prise aux dames, coup du berger aux échecs, partie de cartes
+  jusqu’au bout sans anomalie ;
+- les documents disent « Série 2 », « Série 3 » (`livret.mjs`,
+  `cours-complet.mjs`, `tutoriels.mjs`) ; `documents/TUTORIELS.md` et tous les
+  livrets PDF régénérés, dans l’ordre du parcours puis des séries.
+- `outils/cours.mjs` : chaque leçon est compilée AVEC ses fichiers (`outils.cpp`
+  au chapitre 15) — l’outil s’arrêtait là ; les 80 livrets du cours sont
+  réimprimés (`--pdf`), avec leurs nouveaux numéros ;
+- la galerie : le choix « Taille des formes » est sorti de la liste `#modeles`
+  (au-dessus de sa recherche), et la recherche lit aussi le numéro (« 2.01 ROND ») ;
+- contrôles adaptés : `verifier-recherche.mjs` (« mario » trouve aussi MARIO
+  CALCUL), `verifier-tutoriels.mjs` (« Série 2 », « Série 3 ») ;
+- toutes les vérifications passent, sauf deux échecs plus anciens : le compte
+  des groupes de leçons dans `verifier-page.mjs`, et `verifier-portage.mjs`, qui
+  cherche le projet voisin `../gameboy2/`.

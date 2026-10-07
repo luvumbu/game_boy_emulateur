@@ -82,91 +82,83 @@
     <span class="niveau">Chapitre 6 — Dessiner</span>
     
     
-    <span>leçon 35.2 sur 143</span>
+    <span>leçon 35.2 sur 152</span>
     <span class="jauge" style="--part: 60%">difficulté 6 / 10</span>
     
     
     
   </p>
 <h1>35.2. La fonction sprite16() — un personnage de 16 × 16</h1>
-<p class="idee">#include &lt;sprite16&gt; : sprite16(numero, x, y, PERSO) place quatre lutins en carré, d’un appel.</p>
+<p class="idee">#include &lt;sprite16&gt; : sprite16(numero, x, y, PERSO) place un personnage de 16 × 16 — quatre lutins en carré — d’un appel. BONHOMME et ROBOT, chacun de son fichier, descendent ensemble.</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
-<p><strong>Ce qu’elle fait :</strong> <code>sprite16(numero, x, y, perso)</code> place un personnage de <strong>16 × 16</strong> : les lutins <code>numero</code> à <code>numero + 3</code>, en carré. Le dessin est un <code>Perso</code>, ou seize rangées écrites sur place.</p>
+<p><strong>Ce qu’elle fait :</strong> <code>sprite16(numero, x, y, perso)</code> place un personnage de <strong>16 × 16</strong> au pixel près : les lutins <code>numero</code> à <code>numero + 3</code>, en carré, par-dessus le fond. Un seul appel, au lieu des quatre <code>poser()</code> du 35.1 — et il peut bouger.</p>
 <p><strong>La ligne à écrire : <code>#include &lt;sprite16&gt;</code>.</strong></p>
-<p><strong>Ses arguments :</strong> comme <code>sprite()</code> ; le numéro du premier des quatre lutins.</p>
-<p><strong>Ce qu’elle coûte :</strong> environ <strong>270 octets</strong> avec son dessin.</p>
-<p><strong>Essaie :</strong> un deuxième personnage avec le numéro 4 : les lutins 4 à 7.</p>
+<p><strong>Ses arguments :</strong> le numéro du <strong>premier</strong> des quatre lutins, x et y (le coin haut-gauche, en pixels), et le <strong>nom</strong> du personnage. Un cinquième, <code>MIROIR_X</code>, le retourne.</p>
+<p><strong>Deux personnages, deux appels, chacun ses lutins :</strong> <code>sprite16(0, 40, y, BONHOMME)</code> prend les lutins 0 à 3 ; <code>sprite16(4, 104, y, ROBOT)</code> les lutins 4 à 7. Le second commence à 4 : un personnage de 16 × 16 occupe <strong>quatre</strong> lutins, il ne faut pas qu’ils se chevauchent.</p>
+<p><strong>Les personnages viennent de leurs fichiers</strong>, ceux du 35.1, sans changement : la liste <code>personnages.cpp</code> les inclut, et <code>principal.cpp</code> la verse d’une ligne.</p>
+<p><strong>Déroulé :</strong> <code>y</code> part de 0 et grandit d’un pixel à chaque image jusqu’à 120 ; à chaque tour, les deux <code>sprite16</code> les reposent à la hauteur <code>y</code> : ils descendent ensemble, et s’arrêtent en bas.</p>
+<p><strong>Ce qu’elle coûte :</strong> environ <strong>270 octets</strong> avec ses dessins.</p>
+<p><strong>Pour un personnage de 32 × 32</strong>, c’est <code>sprite32()</code>, avec seize lutins.</p>
+<p><strong>Essaie :</strong> fais descendre ROBOT moins vite : <code>sprite16(4, 104, y / 2, ROBOT)</code>.</p>
 
 <div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
-  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">On retrouve sprite16 dans 2 leçons</p>
-  <p style="margin: 0;"><a href="lecon-36-integrer-une-carte-dans-son-projet.html">36</a>, <a href="lecon-47-un-personnage-de-seize.html">47</a></p>
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">On retrouve sprite16 dans 64 leçons</p>
+  <p style="margin: 0;"><a href="lecon-35-6-bonhomme-de-son-fichier-a-l-ecran-sprite.html">35.6</a>, <a href="lecon-35-7-un-nouveau-fichier-qui-appelle-bonhomme-.html">35.7</a>, <a href="lecon-35-8-deux-bonhomme-un-seul-dessin-le-modele-c.html">35.8</a>, <a href="lecon-35-9-bonhomme-qui-marche-le-faire-bouger-depu.html">35.9</a>, <a href="lecon-35-10-bonhomme-verrouille-on-s-en-sert-on-ne-l.html">35.10</a>, <a href="lecon-35-12-l-ecran-titre-de-ton-jeu-le-nom-en-gross.html">35.12</a>, <a href="lecon-35-16-un-avion-qui-vole-avion-dans-son-fichier.html">35.16</a>, <a href="lecon-35-17-la-vitesse-de-l-avion-une-variable-vites.html">35.17</a>, <a href="lecon-35-18-changer-de-vitesse-en-vol-a-accelere-b-r.html">35.18</a>, <a href="lecon-35-19-plus-lent-qu-un-pixel-par-image-la-lente.html">35.19</a>, <a href="lecon-36-integrer-une-carte-dans-son-projet.html">36</a>, <a href="lecon-47-un-personnage-de-seize.html">47</a>, <a href="lecon-02-01-le-rond.html">2.01</a>, <a href="lecon-02-02-le-carre.html">2.02</a>, <a href="lecon-02-03-le-triangle.html">2.03</a>, <a href="lecon-02-04-le-rectangle.html">2.04</a>, <a href="lecon-02-05-le-losange.html">2.05</a>, <a href="lecon-02-06-l-ovale.html">2.06</a>, <a href="lecon-02-07-le-trapeze.html">2.07</a>, <a href="lecon-02-08-le-parallelogramme.html">2.08</a>, <a href="lecon-02-09-le-pentagone.html">2.09</a>, <a href="lecon-02-10-l-hexagone.html">2.10</a>, <a href="lecon-02-11-l-octogone.html">2.11</a>, <a href="lecon-02-12-le-demi-cercle.html">2.12</a>, <a href="lecon-02-13-l-anneau.html">2.13</a>, <a href="lecon-02-14-la-croix.html">2.14</a>, <a href="lecon-02-15-l-etoile.html">2.15</a>, <a href="lecon-02-16-le-quart-de-cercle.html">2.16</a>, <a href="lecon-02-17-le-triangle-rectangle.html">2.17</a>, <a href="lecon-02-18-le-triangle-equilateral.html">2.18</a>, <a href="lecon-02-19-le-cerf-volant.html">2.19</a>, <a href="lecon-02-20-l-heptagone.html">2.20</a>, <a href="lecon-02-21-le-croissant.html">2.21</a>, <a href="lecon-02-22-la-goutte.html">2.22</a>, <a href="lecon-02-23-le-c-ur.html">2.23</a>, <a href="lecon-02-24-la-spirale.html">2.24</a>, <a href="lecon-02-25-la-vague.html">2.25</a>, <a href="lecon-02-26-la-fleche.html">2.26</a>, <a href="lecon-02-27-l-etoile-a-six-branches.html">2.27</a>, <a href="lecon-02-28-le-cadre.html">2.28</a>, <a href="lecon-02-29-le-damier.html">2.29</a>, <a href="lecon-02-30-le-x.html">2.30</a>, <a href="lecon-02-31-le-cube.html">2.31</a>, <a href="lecon-02-32-la-pyramide.html">2.32</a>, <a href="lecon-02-33-le-cylindre.html">2.33</a>, <a href="lecon-02-34-la-sphere.html">2.34</a>, <a href="lecon-02-37-les-trois-tailles-cote-a-cote.html">2.37</a>, <a href="lecon-03-01-le-pere-noel.html">3.01</a>, <a href="lecon-03-02-le-bonhomme-de-neige.html">3.02</a>, <a href="lecon-03-03-le-sapin.html">3.03</a>, <a href="lecon-03-04-le-cadeau.html">3.04</a>, <a href="lecon-03-05-le-renne.html">3.05</a>, <a href="lecon-03-06-le-pion-de-dames.html">3.06</a>, <a href="lecon-03-07-la-dame.html">3.07</a>, <a href="lecon-03-08-le-roi.html">3.08</a>, <a href="lecon-03-09-la-reine.html">3.09</a>, <a href="lecon-03-10-la-tour.html">3.10</a>, <a href="lecon-03-11-le-fou.html">3.11</a>, <a href="lecon-03-12-le-cavalier.html">3.12</a>, <a href="lecon-03-13-le-pion-des-echecs.html">3.13</a>, <a href="lecon-03-14-la-carte-passe-ton-tour.html">3.14</a>, <a href="lecon-03-15-la-carte-inverse.html">3.15</a>, <a href="lecon-03-16-la-carte-2.html">3.16</a>, <a href="lecon-03-17-la-carte-joker.html">3.17</a></p>
 </div>
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
-<strong>356 octets</strong> de cartouche.</p>
+<strong>520 octets</strong> de cartouche.</p>
 <p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
 <pre><code>Gravé dans la cartouche :
   démarrage            50 o  ← la console, à l’allumage  — la mise en route de la console
-  main()              123 o  ← démarrage  — ta fonction
+  main()              223 o  ← démarrage  — ta fonction
   VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
   AttendreImage        28 o  ← image()  — attend l’image suivante
   AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
   RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
   InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
   CopierTuiles         31 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
-  Tuiles               64 o  ← CopierTuiles  — 0 lettre sur 43, et 4 tuiles dessinées
+  Tuiles              128 o  ← CopierTuiles  — 0 lettre sur 43, et 8 tuiles dessinées
   DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
 Lettres gravées : aucune
 Pas gravé (jamais appelé) : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
 Fonctions du langage appelées :
-  sprite()   × 4   100 o sur place, dans main()
+  sprite()   × 8   200 o sur place, dans main()
   image()    × 1     6 o sur place, dans main()  + AttendreImage (28 o)
-  sprite16() × 1     0 o sur place, dans main()</code></pre>
+  sprite16() × 2     0 o sur place, dans main()</code></pre>
 
 
 <div class="morceau">
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
     <pre><code>// ---- #include &lt;sprite16&gt; : un personnage de 16 × 16 ----
-// Un bloc 16 × 16, écrit sur place, qui descend d'un pixel par image.
+// BONHOMME et ROBOT (chacun dans son fichier) descendent d'un pixel par image.
 
-#include &lt;sprite16&gt;   // sprite16() : quatre lutins en carré
-#include &lt;Perso&gt;      // le dessin de 16 × 16</code></pre>
+#include &lt;sprite16&gt;          // sprite16() : quatre lutins en carré
+#include "personnages.cpp"   // la liste : BONHOMME et ROBOT</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. un dessin — BLOC</p>
-    <pre><code>Perso BLOC = {
-  "################", "#..............#", "#.############.#", "#.#..........#.#",
-  "#.#.########.#.#", "#.#.#......#.#.#", "#.#.#.####.#.#.#", "#.#.#.#..#.#.#.#",
-  "#.#.#.#..#.#.#.#", "#.#.#.####.#.#.#", "#.#.#......#.#.#", "#.#.########.#.#",
-  "#.#..........#.#", "#.############.#", "#..............#", "################",
-};</code></pre>
-  </div>
-  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAIAAABt+uBvAAAA4UlEQVR4nO3VsQ3DMAxFQZcZIWX2n8YjZIyUHkBAbCiS+REd8EqCEq7h9ni+9KWt/AfhAQIECFAY0PuzLxsgQIAAAQquE6j81k4KECBAgAAFNxGo/B4POeGAAAECBCimYqB2pjZAgAABAgTol9XtzLwAAQIECBCg2UDtTF+AAAECBAhQAlA7U/s6IECAAAECBAgQIECAAK0A1BcgQIAAAQJ0P9C8AAECBAgQoLGrawMECBAgQICur84PECBAgAAFdyvQfwQIECBAgIIbBrROgAABAgQouEtAAgQIEKCUAJ10AJKt6LOWfcmpAAAAAElFTkSuQmCC" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
-</div>
-
-<div class="morceau">
-  <div>
-    <p class="quoi">3. une variable — y</p>
-    <pre><code>uint8_t y = 0;</code></pre>
+    <p class="quoi">2. une variable — y</p>
+    <pre><code>uint8_t y = 0;   // la hauteur des deux personnages, en pixels</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
+    <p class="quoi">3. le point d’entrée : c’est ici que la console arrive</p>
     <pre><code>int main() {
   while (true) {
     image();
-    if (y &lt; 120) y = y + 1;     // il descend, et s'arrête en 120
-    sprite16(0, 72, y, BLOC);   // les lutins 0, 1, 2, 3
+    if (y &lt; 120) y = y + 1;          // ils descendent, et s'arrêtent en 120
+    sprite16(0, 40, y, BONHOMME);    // BONHOMME : les lutins 0, 1, 2, 3
+    sprite16(4, 104, y, ROBOT);      // ROBOT    : les lutins 4, 5, 6, 7
   }
 }</code></pre>
   </div>
@@ -187,17 +179,17 @@ programme.</p>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABp0lEQVR4nO3ZMQqDQBBAUcscIWXuf5ocIcdImWKbQEBNIbLfB6+0GPiM6O7yej8JW06fgEMJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBx2cC3++Mvpw98kHLggx6eSzzwzt0VeD47ywk8q+9ym7sr8Hw2+wk8t99+K7sr8HxWKgpcIPBwrcBe0R0+soarBPabVOOgY+gHdlR5/hBHcNkwlAO7LiwHZhA4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4D9+Kw2SK6L87AAAAAElFTkSuQmCC" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACCklEQVR4nO3Wu20CQQBFUUKX4NBFUAs1UC4lUAahAySEkNZafprh+kg3sBDBmzleezfH00HhNsMX6K0Bjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4EwF/ff9cGj7mgc1LjV04C/Bs97J+9pNfeHcTAW/3uzPt+Yfhk1bOPp4O2/1uu99df375ZPhBJgL+3CcY8NrL+ixdf6LX3tG0byhrxi+d4uYLoxoMPP9b6KfvnwJ46QmY4YLuPctsmwE/O37yhxjwU+PXvEP8a+Dry5rnt379ZsB3XNbNG+nwSWs2A77jsj4O+HrthP99zwF+zfKbwYD/uqN5bueB8bMdAfBrli8BDz/FFMB6X4DjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY73C39b40nq/iqBAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABp0lEQVR4nO3ZMQqDQBBAUcscIWXuf5ocIcdImWKbQEBNIbLfB6+0GPiM6O7yej8JW06fgEMJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBx2cC3++Mvpw98kHLggx6eSzzwzt0VeD47ywk8q+9ym7sr8Hw2+wk8t99+K7sr8HxWKgpcIPBwrcBe0R0+soarBPabVOOgY+gHdlR5/hBHcNkwlAO7LiwHZhA4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4D3nKw2Sw9t7mAAAAAElFTkSuQmCC" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACCklEQVR4nO3Wu20CQQBFUUKX4NBFUAs1UC4lUAahAySEkNZafprh+kg3sBDBmzleezfH00HhNsMX6K0Bjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4EwF/ff9cGj7mgc1LjV04C/Bs97J+9pNfeHcTAW/3uzPt+Yfhk1bOPp4O2/1uu99df375ZPhBJgL+3CcY8NrL+ixdf6LX3tG0byhrxi+d4uYLoxoMPP9b6KfvnwJ46QmY4YLuPctsmwE/O37yhxjwU+PXvEP8a+Dry5rnt379ZsB3XNbNG+nwSWs2A77jsj4O+HrthP99zwF+zfKbwYD/uqN5bueB8bMdAfBrli8BDz/FFMB6X4DjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY73C3pR40lVyq2AAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>au bout d’une seconde — image 60</figcaption>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABp0lEQVR4nO3ZMQqDQBBAUcscIWXuf5ocIcdImWKbQEBNIbLfB6+0GPiM6O7yej8JW06fgEMJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwXDbw7f74y+kDH6Qc+KCH5xIPvHN3BZ7PznICz+q73ObuCjyfzX4Cz+2338ruCjyflYoCFwg8XCuwV3SHj6zhKoH9JtU46Bj6gR1Vnj/EEVw2DOXArgvLgRkEjhM4TuA4geMEjhM4TuC4D3MZw2RErKgCAAAAAElFTkSuQmCC" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACCklEQVR4nO3Wu20CQQBFUUKX4NBFUAs1UC4lUAahAySEkNZafprh+kg3sBDBmzleezfH00HhNsMX6K0Bjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc4HuB4gOMBjgc43kTAX98/l4aPeWDzUmMXzgI8272sn/3kF97dRMDb/e5Me/5h+KSVs4+nw3a/2+53159fPhl+kImAP/cJBrz2sj5L15/otXc07RvKmvFLp7j5wqgGA8//Fvrp+6cAXnoCZrige88y22bAz46f/CEG/NT4Ne8Q/xr4+rLm+a1fvxnwHZd180Y6fNKazYDvuKyPA75eO+F/33OAX7P8ZjDgv+5ontt5YPxsRwD8muVLwMNPMQWw3hfgeIDjAY4HOB7geIDjAY73CzJl40nEm3WTAAAAAElFTkSuQmCC" alt="l’écran">
     <figcaption>au bout de trois secondes — image 180</figcaption>
   </figure>
 </div>
@@ -205,7 +197,7 @@ programme.</p>
 
 
 <h2>4. Ce qu’on doit voir</h2>
-<p class="avoir">Un bloc carré qui descend au milieu de l’écran, et s’arrête en bas.</p>
+<p class="avoir">Le bonhomme et le robot descendent ensemble, côte à côte, et s’arrêtent en bas.</p>
 
 <h2>5. Ce que la console répond</h2>
 <p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
@@ -214,9 +206,13 @@ et voici ce qu’ils ont mesuré.</p>
 
 <ul class="controles">
 
-  <li>le bloc est arrivé en y = 120 <span class="detail"> (120)</span></li>
+  <li>BONHOMME est arrivé en y = 120 <span class="detail"> (40, 120)</span></li>
 
-  <li>les quatre lutins font un carré de 16 </li>
+  <li>ses quatre lutins font un carré de 16 </li>
+
+  <li>ROBOT, lutins 4 à 7, en (104, 120) </li>
+
+  <li>chacun avec ses tuiles </li>
 </ul>
 
 

@@ -77,6 +77,19 @@ export function avecLesInclusions(code, fichiers = {}, { commentaires = true } =
   return [...avant, ...bloc, ...apres].join(finDeLigne)
 }
 
+/**
+ * Les « #include » manquants, écrits TOUT EN HAUT du programme — première
+ * ligne, avant même le commentaire d'ouverture. C'est ce que font la question
+ * « Il manque … : l'ajouter ? » et le bouton rouge, dans l'atelier et le
+ * tuto. Rend { texte, noms } ; `noms` est vide s'il ne manque rien.
+ */
+export function inclusionsEnTete(code, fichiers = {}) {
+  const noms = inclusionsQuiManquent(code, fichiers)
+  if (!noms.length) return { texte: code, noms }
+  const finDeLigne = code.includes('\r\n') ? '\r\n' : '\n'
+  return { texte: lignesDInclusion(noms).join(finDeLigne) + finDeLigne + code, noms }
+}
+
 /*
  * Le test rapide, sur le texte seul : un nom de la console écrit quelque part
  * (« texte(», « Tuile », « ALPHABET »…) sans sa ligne « #include ». Faux

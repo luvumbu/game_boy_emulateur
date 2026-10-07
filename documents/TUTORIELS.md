@@ -1,6 +1,6 @@
 # Apprendre — le parcours, du plus facile au plus dur
 
-**628 étapes** — leçons, cours et fonctions —, rangées en 26 chapitres. Chacune est un **programme
+**685 étapes** — leçons, cours et fonctions —, rangées en 28 chapitres. Chacune est un **programme
 entier** : le code se colle tel quel dans `http://localhost/gameboy3/`, ou se
 compile en ligne de commande, et il tourne.
 
@@ -56,6 +56,8 @@ avant la première étape qui l’emploie — un `#include` nouveau à la fois.
 | 23 | Un vrai jeu | 125.1 – 134 |
 | 24 | Aller au bout | 134.1 – 143 |
 | 25 | Tes propres #include : ajouter une fonction | 143.1 – 152 |
+| Série 2 | Les formes géométriques | 2.01 – 2.40 |
+| Série 3 | Les images | 3.01 – 3.17 |
 
 | Partie | Chapitre | Étapes |
 |---|---|---|
@@ -202,7 +204,7 @@ int main() {
 
 **Essaie :** écris ton prénom en (0, 17), tout en bas à gauche.
 
-**On retrouve texte dans** — 0.0.1, 0.1, 0.1.1, 0.1.2, 0.3, 0.3.1, 0.3.2, 0.4, 0.4.1, 0.4.2, 0.79, 0.79.1, 0.81, 0.81.1, 0.81.3, 0.82.1, 0.83, 0.83.2, 0.84, 0.88, 0.88.1, 0.88.2, 0.89.2, 0.90, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 0.1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 1.9, 1.10, 1.11, 1.12, 2, 2.1, 2.2, 2.3, 4, 5, 6, 7, 8, 8.1, 9, 10, 11, 12, 12.1, 13, 14, 16, 17, 18, 19, 20, 20.1, 21, 22, 23, 24, 24.1, 25, 26, 27, 28, 29, 30, 31, 32, 33, 33.1, 34, 35, 35.12, 35.15, 35.18, 36, 37, 38, 39, 41, 43, 43.1, 44, 45, 46, 47, 52.1, 53, 54, 55, 56, 57, 58, 59, 59.1, 60, 65, 66, 66.1, 67, 68, 69, 70, 71, 71.1, 72, 73, 75, 77, 78, 78.1, 79, 80, 81, 82, 82.1, 83, 84, 85, 86, 90, 90.1, 91, 92, 93, 94, 94.1, 95, 96, 97, 98, 99, 100, 100.1, 101, 102, 103, 104, 105, 106, 106.1, 107, 108, 109, 110, 110.3, 110.4, 110.5, 110.6, 110.7, 110.8, 110.9, 110.11, 110.13, 110.14, 110.15, 111, 112, 113, 113.1, 114, 115, 116, 117, 117.1, 118, 119, 120, 120.1, 121, 122, 123, 123.1, 124, 125.1, 126, 127, 128, 129, 133, 134, 134.1, 135, 136, 138, 139, 141, 143, 143.1
+**On retrouve texte dans** — 0.0.1, 0.1, 0.1.1, 0.1.2, 0.3, 0.3.1, 0.3.2, 0.4, 0.4.1, 0.4.2, 0.79, 0.79.1, 0.81, 0.81.1, 0.81.3, 0.82.1, 0.83, 0.83.2, 0.84, 0.88, 0.88.1, 0.88.2, 0.89.2, 0.90, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 0.1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 1.9, 1.10, 1.11, 1.12, 2, 2.1, 2.2, 2.3, 4, 5, 6, 7, 8, 8.1, 9, 10, 11, 12, 12.1, 13, 14, 16, 17, 18, 19, 20, 20.1, 21, 22, 23, 24, 24.1, 25, 26, 27, 28, 29, 30, 31, 32, 33, 33.1, 34, 35, 35.12, 35.15, 35.18, 36, 37, 38, 39, 41, 43, 43.1, 44, 45, 46, 47, 52.1, 53, 54, 55, 56, 57, 58, 59, 59.1, 60, 65, 66, 66.1, 67, 68, 69, 70, 71, 71.1, 72, 73, 75, 77, 78, 78.1, 79, 80, 81, 82, 82.1, 83, 84, 85, 86, 90, 90.1, 91, 92, 93, 94, 94.1, 95, 96, 97, 98, 99, 100, 100.1, 101, 102, 103, 104, 105, 106, 106.1, 107, 108, 109, 110, 110.3, 110.4, 110.5, 110.6, 110.7, 110.8, 110.9, 110.11, 110.13, 110.14, 110.15, 111, 112, 113, 113.1, 114, 115, 116, 117, 117.1, 118, 119, 120, 120.1, 121, 122, 123, 123.1, 124, 125.1, 126, 127, 128, 129, 133, 134, 134.1, 135, 136, 138, 139, 141, 143, 143.1, 2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17, 2.18, 2.19, 2.20, 2.21, 2.22, 2.23, 2.24, 2.25, 2.26, 2.27, 2.28, 2.29, 2.30, 2.31, 2.32, 2.33, 2.34, 2.35, 2.36, 2.37, 2.38, 2.39, 3.01, 3.02, 3.03, 3.04, 3.05, 3.06, 3.07, 3.08, 3.09, 3.10, 3.11, 3.12, 3.13, 3.14, 3.15, 3.16, 3.17
 
 **Ce qu’on doit voir** — BONJOUR au milieu de l’écran, EN HAUT dans le coin en haut à gauche.  
 **Ce qu’il coûte** — 425 octets de programme, 0 variable.  
@@ -11164,7 +11166,7 @@ int main() {
 
 **Essaie :** fais-le descendre : `y = y + 1;`.
 
-**On retrouve sprite dans** — 0.70, 0.70.1, 0.70.2, 0.108, 43, 45, 46, 48, 49, 50, 51, 83, 85, 99, 100, 104, 106, 107, 108, 109, 110, 110.3, 110.4, 110.5, 110.6, 110.7, 110.8, 110.9, 110.11, 110.13, 111, 112, 113, 122, 124, 125, 127, 128, 131, 132, 134, 136, 137, 140, 143, 152
+**On retrouve sprite dans** — 0.70, 0.70.1, 0.70.2, 0.108, 43, 45, 46, 48, 49, 50, 51, 83, 85, 99, 100, 104, 106, 107, 108, 109, 110, 110.3, 110.4, 110.5, 110.6, 110.7, 110.8, 110.9, 110.11, 110.13, 111, 112, 113, 122, 124, 125, 127, 128, 131, 132, 134, 136, 137, 140, 143, 152, 2.35, 2.37, 2.39
 
 **Ce qu’on doit voir** — Un A qui glisse doucement de gauche à droite, au milieu de l’écran.  
 **Ce qu’il coûte** — 224 octets de programme, 1 variable.  
@@ -25714,7 +25716,7 @@ int main() {
 
 **Essaie :** change une rangée en `"########"` : une barre apparaît.
 
-**On retrouve Tuile dans** — 0.108, 3, 34, 35, 36, 37, 38, 40, 41, 42, 43, 45, 46, 48, 49, 50, 51, 52, 61, 72, 73, 74, 83, 84, 85, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 110.3, 110.4, 110.5, 110.6, 110.7, 110.8, 110.9, 110.11, 110.13, 110.14, 111, 112, 113, 122, 124, 125, 127, 128, 131, 132, 134, 136, 137, 140, 143, 152
+**On retrouve Tuile dans** — 0.108, 3, 34, 35, 36, 37, 38, 40, 41, 42, 43, 45, 46, 48, 49, 50, 51, 52, 61, 72, 73, 74, 83, 84, 85, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 110.3, 110.4, 110.5, 110.6, 110.7, 110.8, 110.9, 110.11, 110.13, 110.14, 111, 112, 113, 122, 124, 125, 127, 128, 131, 132, 134, 136, 137, 140, 143, 152, 2.35, 2.37, 2.39
 
 **Ce qu’on doit voir** — Deux cœurs au milieu de l’écran.  
 **Ce qu’il coûte** — 181 octets de programme, 0 variable.  
@@ -29660,7 +29662,7 @@ int main() {
 
 **Essaie :** dans l’onglet `perso_ROBOT.cpp`, change les yeux de ROBOT (les `+`) : seul ROBOT change. Ou ajoute un troisième personnage : un fichier `perso_…` de plus, et une ligne de plus dans la liste `personnages.cpp` — `principal.cpp` ne change pas.
 
-**On retrouve Perso dans** — 35.6, 35.7, 35.8, 35.9, 35.10, 35.12, 35.16, 35.17, 35.18, 35.19, 36, 47
+**On retrouve Perso dans** — 35.6, 35.7, 35.8, 35.9, 35.10, 35.12, 35.16, 35.17, 35.18, 35.19, 36, 47, 2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17, 2.18, 2.19, 2.20, 2.21, 2.22, 2.23, 2.24, 2.25, 2.26, 2.27, 2.28, 2.29, 2.30, 2.31, 2.32, 2.33, 2.34, 2.36, 2.37, 2.38, 3.01, 3.02, 3.03, 3.04, 3.05, 3.06, 3.07, 3.08, 3.09, 3.10, 3.11, 3.12, 3.13, 3.14, 3.15, 3.16, 3.17
 
 **Ce qu’on doit voir** — Deux personnages sur le fond : le bonhomme à gauche, le robot à droite.  
 **Ce qu’il coûte** — 329 octets de programme, 0 variable.  
@@ -29777,7 +29779,7 @@ int main() {
 
 **Essaie :** fais descendre ROBOT moins vite : `sprite16(4, 104, y / 2, ROBOT)`.
 
-**On retrouve sprite16 dans** — 35.6, 35.7, 35.8, 35.9, 35.10, 35.12, 35.16, 35.17, 35.18, 35.19, 36, 47
+**On retrouve sprite16 dans** — 35.6, 35.7, 35.8, 35.9, 35.10, 35.12, 35.16, 35.17, 35.18, 35.19, 36, 47, 2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17, 2.18, 2.19, 2.20, 2.21, 2.22, 2.23, 2.24, 2.25, 2.26, 2.27, 2.28, 2.29, 2.30, 2.31, 2.32, 2.33, 2.34, 2.37, 3.01, 3.02, 3.03, 3.04, 3.05, 3.06, 3.07, 3.08, 3.09, 3.10, 3.11, 3.12, 3.13, 3.14, 3.15, 3.16, 3.17
 
 **Ce qu’on doit voir** — Le bonhomme et le robot descendent ensemble, côte à côte, et s’arrêtent en bas.  
 **Ce qu’il coûte** — 520 octets de programme, 1 variable.  
@@ -29973,6 +29975,8 @@ int main() {
 **Attention à la place :** seize lutins, c’est beaucoup. Avec un grand personnage, il en reste 24 pour tout le reste du jeu.
 
 **Essaie :** `sprite32(0, 64, y, GEANT, MIROIR_X);` — GEANT regarde de l’autre côté.
+
+**On retrouve sprite32 dans** — 2.36, 2.37, 2.38
 
 **Ce qu’on doit voir** — Une grande tête de robot (GEANT) qui descend au milieu de l’écran et s’arrête en bas ; le petit bonhomme reste en haut à gauche.  
 **Ce qu’il coûte** — 1024 octets de programme, 1 variable.  
@@ -36833,6 +36837,8 @@ Le texte est dessiné en indice 3 sur un fond d’indice 0 : ici, il prend donc 
 
 **Dans l’atelier**, la liste en haut à gauche choisit la console, l’une **ou** l’autre : **« En couleur »** (une cartouche `.gbc` pour la Game Boy Color) ou **« Game Boy »** (un `.gb`, les quatre nuances, rien de plus). En « Game Boy », `couleurFond()` est **refusé** — une Game Boy d’origine n’a pas de registre de couleur, et le compilateur préfère le dire.
 
+**Pour ne jamais deviner**, regarde **sous l’écran** de la console : « 🌈 Game Boy Color — en couleur » ou « 🎮 Game Boy — 4 nuances ». Dans le parcours, personne ne choisit : **le programme décide** — une seule fonction de couleur, et c’est une Game Boy Color.
+
 **À toi :** change les quatre teintes pour faire un dégradé du jaune au rouge.
 
 **Les fonctions de cette leçon — et le tuto de chacune**
@@ -43087,6 +43093,4283 @@ int main() {
 **Ce qu’on doit voir** — Un buisson vert, et un héros rouge à gauche. Le second héros, dans le buisson, est caché.  
 **Ce qu’il coûte** — 1187 octets de programme, 4 variables.  
 **Ce qui est gravé** — `démarrage` (57 o), `poserDevant()` (40 o), `main()` (224 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AdresseCase` (10 o, pour poser(), teindre()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (18 o), `EffacerCarte` (14 o), `Tuiles` (736 o), `DonneesTransfert` (10 o) · appels : `poserDevant()` ×4 (76 o), `sprite()` ×2 (46 o), `couleurFond()` ×3 (36 o), `teindreLutin()` ×2 (32 o), `teindre()` ×1 (26 o), `couleurLutin()` ×2 (24 o), `poser()` ×1 (13 o), `image()` ×1 (6 o) · lettres : toutes (poser() reçoit un numéro calculé) · pas gravé : AvancerAirs, AttendreAcces, AttendreFinVBlank, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+## Série 2 — Les formes géométriques
+
+### 2.01. Le rond
+
+> 2.01 : le rond — un cercle. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_ROND.cpp`
+
+```cpp
+// perso_ROND.cpp : le rond, ROND (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso ROND = {
+  ".....######.....",
+  "...##------##...",
+  "..#----------#..",
+  ".#------------#.",
+  ".#------------#.",
+  "#--------------#",
+  "#--------------#",
+  "#--------------#",
+  "#--------------#",
+  "#--------------#",
+  "#--------------#",
+  ".#------------#.",
+  ".#------------#.",
+  "..#----------#..",
+  "...##------##...",
+  ".....######.....",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.01 Le rond ----
+// Le rond de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_ROND.cpp"           // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, ROND);             // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(8, 10, "ROND");             // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un rond (on dit aussi un cercle)**, c’est une forme sans côté et sans coin. Tous les points du bord sont **à la même distance du centre** : cette distance s’appelle le **rayon**. Deux rayons bout à bout, d’un bord à l’autre en passant par le centre, font le **diamètre**.
+
+**Sur une grille, un rond n’est jamais tout à fait rond** : les pixels sont des petits carrés. On l’approche en marches d’escalier. Regarde les rangées : en haut, 6 pixels de large ; puis 10, 12, 14 ; au milieu, les 16 pixels. Les marches sont plus courtes vers le haut et le bas, plus longues sur les côtés : c’est ce qui donne l’impression d’une courbe.
+
+**Cette série dessine des formes géométriques, une par leçon.** Le programme reste le même d’une leçon à l’autre : seuls changent le dessin et le mot. Tu peux donc te concentrer sur la forme.
+
+**Le dessin est dans son propre fichier**, `perso_ROND.cpp` (l’onglet à côté de `principal.cpp`). Il fait **16 × 16 pixels** : 16 rangées de 16 signes. `#` est le plus sombre (le contour), `-` est clair (l’intérieur), `.` est le **transparent** : dans un personnage, on voit le fond de l’écran au travers.
+
+**Pourquoi 16 × 16 et pas 8 × 8 ?** Dans une tuile de 8 pixels, un rond aurait 4 pixels de rayon : il ressemblerait à un carré aux coins cassés. Avec 16 pixels, la courbe se voit.
+
+**Les trois lignes `#include`** : `<texte>` pour écrire le nom, `<sprite16>` pour poser un dessin de 16 × 16, `<Perso>` pour avoir le droit d’écrire un `Perso`. Puis `#include "perso_ROND.cpp"` verse le dessin dans le programme (des guillemets, parce que c’est un fichier du projet, pas une fonction de la console).
+
+**`sprite16(0, 72, 56, ROND)`** pose le dessin avec les lutins 0, 1, 2 et 3 (un personnage de 16 × 16 en prend quatre). 72 et 56 sont la place du **coin en haut à gauche**, en pixels. L’écran fait 160 pixels de large : (160 − 16) / 2 = 72, c’est le milieu.
+
+**`texte(8, 10, "ROND")`** écrit le nom sous la forme. Ici on compte en **cases de 8 pixels** : la ligne 10 est à 80 pixels du haut, juste sous la forme (qui s’arrête à 72).
+
+**La boucle du jeu** ne fait qu’attendre l’image suivante : rien ne bouge, on regarde.
+
+**Essaie :** dans `perso_ROND.cpp`, remplace tous les `-` par des `+` : le rond devient plein et plus foncé.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le rond au milieu de l’écran, et ROND écrit dessous.  
+**Ce qu’il coûte** — 488 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (58 o), `EffacerCarte` (14 o), `Tuiles` (128 o), `DonneesTransfert` (10 o), `"ROND"` (4 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : DNOR · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.02. Le carré
+
+> 2.02 : le carré — quatre côtés égaux. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_CARRE.cpp`
+
+```cpp
+// perso_CARRE.cpp : le carré, CARRE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso CARRE = {
+  "................",
+  ".##############.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".##############.",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.02 Le carré ----
+// Le carré de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_CARRE.cpp"          // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, CARRE);            // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(7, 10, "CARRE");            // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un carré** a **4 côtés de même longueur** et **4 coins droits** (on dit 4 angles droits : comme le coin d’une feuille de papier).
+
+**Le carré est la forme la plus facile à écrire sur une grille** : le côté du haut est une rangée de `#`, celui du bas aussi ; entre les deux, chaque rangée commence et finit par un `#`. Ici le carré fait 14 pixels de côté : les rangées 1 à 14, les colonnes 1 à 14. La première et la dernière rangée restent vides (`.`), comme une petite marge.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_CARRE.cpp`), le nom `CARRE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** déplace le carré dans un coin de l’écran : `sprite16(0, 0, 0, CARRE);`.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le carré au milieu de l’écran, et CARRE écrit dessous.  
+**Ce qu’il coûte** — 498 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (128 o), `DonneesTransfert` (10 o), `"CARRE"` (5 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : ACER · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.03. Le triangle
+
+> 2.03 : le triangle — trois côtés. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_TRIANGLE.cpp`
+
+```cpp
+// perso_TRIANGLE.cpp : le triangle, TRIANGLE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso TRIANGLE = {
+  "................",
+  "................",
+  ".......##.......",
+  ".......##.......",
+  "......#--#......",
+  "......#--#......",
+  ".....#----#.....",
+  ".....#----#.....",
+  "....#------#....",
+  "...#--------#...",
+  "...#--------#...",
+  "..#----------#..",
+  "..#----------#..",
+  ".#------------#.",
+  ".##############.",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.03 Le triangle ----
+// Le triangle de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_TRIANGLE.cpp"       // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, TRIANGLE);         // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(6, 10, "TRIANGLE");         // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un triangle** a **3 côtés** et **3 coins** (3 angles). Si on additionne ses trois angles, on trouve toujours **180 degrés**, quel que soit le triangle. Celui-ci a deux côtés de même longueur, à gauche et à droite : on dit qu’il est **isocèle**.
+
+**Le triangle s’élargit d’une rangée à l’autre** : la pointe en haut fait 2 pixels, puis toutes les deux rangées il gagne un pixel de chaque côté. Les côtés penchés sont faits de petites marches ; le côté du bas est une rangée pleine de `#`.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_TRIANGLE.cpp`), le nom `TRIANGLE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** retourne le triangle, pointe en bas : recopie les rangées de `perso_TRIANGLE.cpp` dans l’ordre inverse, de la dernière à la première.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le triangle au milieu de l’écran, et TRIANGLE écrit dessous.  
+**Ce qu’il coûte** — 601 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (103 o), `EffacerCarte` (14 o), `Tuiles` (192 o), `DonneesTransfert` (10 o), `"TRIANGLE"` (8 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : AEGILNRT · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.04. Le rectangle
+
+> 2.04 : le rectangle — plus large que haut. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_RECTANGLE.cpp`
+
+```cpp
+// perso_RECTANGLE.cpp : le rectangle, RECTANGLE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso RECTANGLE = {
+  "................",
+  "................",
+  "................",
+  "................",
+  ".##############.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".##############.",
+  "................",
+  "................",
+  "................",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.04 Le rectangle ----
+// Le rectangle de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_RECTANGLE.cpp"      // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, RECTANGLE);        // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(5, 10, "RECTANGLE");        // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un rectangle** a **4 coins droits**, comme le carré, mais ses côtés ne sont pas tous égaux : les côtés **face à face** ont la même longueur. Ici il est **plus large que haut** : 14 pixels de large, 8 de haut. Un carré est un rectangle dont les quatre côtés sont égaux.
+
+**Il s’écrit comme le carré**, avec moins de rangées : une rangée de `#` en haut, une en bas, et entre les deux des rangées qui commencent et finissent par `#`. Les rangées vides (`.`) au-dessus et en dessous le centrent dans les 16 × 16.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_RECTANGLE.cpp`), le nom `RECTANGLE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** compte les rangées du rectangle, puis ajoute-en deux pour qu’il fasse 10 pixels de haut (en prenant deux rangées vides).
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le rectangle au milieu de l’écran, et RECTANGLE écrit dessous.  
+**Ce qu’il coûte** — 602 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (103 o), `EffacerCarte` (14 o), `Tuiles` (192 o), `DonneesTransfert` (10 o), `"RECTANGLE"` (9 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : ACEGLNRT · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.05. Le losange
+
+> 2.05 : le losange — un carré posé sur sa pointe. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_LOSANGE.cpp`
+
+```cpp
+// perso_LOSANGE.cpp : le losange, LOSANGE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso LOSANGE = {
+  "................",
+  ".......##.......",
+  "......#--#......",
+  ".....#----#.....",
+  "....#------#....",
+  "...#--------#...",
+  "..#----------#..",
+  ".#------------#.",
+  ".#------------#.",
+  "..#----------#..",
+  "...#--------#...",
+  "....#------#....",
+  ".....#----#.....",
+  "......#--#......",
+  ".......##.......",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.05 Le losange ----
+// Le losange de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_LOSANGE.cpp"        // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, LOSANGE);          // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(6, 10, "LOSANGE");          // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un losange** a **4 côtés de même longueur**, comme le carré, mais ses coins ne sont pas droits. On le voit souvent **posé sur une pointe**. Ses deux **diagonales** (les traits qui relient les pointes opposées) se croisent au milieu, en faisant un angle droit.
+
+**Le losange grandit puis rapetisse** : un pixel de plus de chaque côté à chaque rangée jusqu’au milieu, puis un de moins jusqu’en bas. La moitié du bas est le reflet de la moitié du haut.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_LOSANGE.cpp`), le nom `LOSANGE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** pose un carré et un losange côte à côte, en recopiant le dessin du carré de la leçon 2.02 et en le montrant avec `sprite16(4, 100, 56, CARRE);`.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le losange au milieu de l’écran, et LOSANGE écrit dessous.  
+**Ce qu’il coûte** — 566 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (85 o), `EffacerCarte` (14 o), `Tuiles` (176 o), `DonneesTransfert` (10 o), `"LOSANGE"` (7 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : AEGLNOS · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.06. L’ovale
+
+> 2.06 : l’ovale — un cercle étiré. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_OVALE.cpp`
+
+```cpp
+// perso_OVALE.cpp : l’ovale, OVALE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso OVALE = {
+  "................",
+  "................",
+  "................",
+  ".....######.....",
+  "...##------##...",
+  ".##----------##.",
+  ".#------------#.",
+  "#--------------#",
+  "#--------------#",
+  ".#------------#.",
+  ".##----------##.",
+  "...##------##...",
+  ".....######.....",
+  "................",
+  "................",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.06 L’ovale ----
+// L’ovale de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_OVALE.cpp"          // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, OVALE);            // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(7, 10, "OVALE");            // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un ovale** est un rond **étiré** : plus large que haut (ou plus haut que large). En géométrie, l’ovale bien régulier s’appelle une **ellipse**. Comme le rond, il n’a ni côté ni coin.
+
+**Il occupe toute la largeur, mais pas toute la hauteur** : 16 pixels de large au milieu, 10 rangées de haut. Ses marches sont plus longues en haut et en bas (le bord y est presque plat) et très courtes sur les côtés (le bord y tourne vite).
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_OVALE.cpp`), le nom `OVALE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** mets l’ovale debout : il faudrait l’écrire avec 16 rangées de haut et 10 pixels de large. Commence par la rangée du haut : `"......####......"`.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — L’ovale au milieu de l’écran, et OVALE écrit dessous.  
+**Ce qu’il coûte** — 523 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (144 o), `DonneesTransfert` (10 o), `"OVALE"` (5 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : AELOV · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.07. Le trapèze
+
+> 2.07 : le trapèze — deux côtés parallèles. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_TRAPEZE.cpp`
+
+```cpp
+// perso_TRAPEZE.cpp : le trapèze, TRAPEZE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso TRAPEZE = {
+  "................",
+  "................",
+  "................",
+  "....########....",
+  "....#------#....",
+  "...#--------#...",
+  "...#--------#...",
+  "...#--------#...",
+  "..#----------#..",
+  "..#----------#..",
+  ".#------------#.",
+  ".#------------#.",
+  ".##############.",
+  "................",
+  "................",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.07 Le trapèze ----
+// Le trapèze de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_TRAPEZE.cpp"        // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, TRAPEZE);          // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(6, 10, "TRAPEZE");          // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un trapèze** a **4 côtés**, dont **deux sont parallèles** : ils vont dans la même direction sans jamais se toucher. Ici ce sont le côté du haut (8 pixels) et le côté du bas (14 pixels). Les deux autres côtés penchent.
+
+**Le haut est plus court que le bas** : la rangée du haut a 8 `#`, celle du bas 14. Entre les deux, chaque côté penché s’écarte d’un pixel toutes les deux rangées environ.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_TRAPEZE.cpp`), le nom `TRAPEZE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** retourne le trapèze (le grand côté en haut) en recopiant ses rangées dans l’ordre inverse.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le trapèze au milieu de l’écran, et TRAPEZE écrit dessous.  
+**Ce qu’il coûte** — 550 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (85 o), `EffacerCarte` (14 o), `Tuiles` (160 o), `DonneesTransfert` (10 o), `"TRAPEZE"` (7 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : AEPRTZ · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.08. Le parallélogramme
+
+> 2.08 : le parallélogramme — un rectangle penché. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_PARALLELOGRAMME.cpp`
+
+```cpp
+// perso_PARALLELOGRAMME.cpp : le parallélogramme, PARALLELOGRAMME (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso PARALLELOGRAMME = {
+  "................",
+  "................",
+  "................",
+  ".....##########.",
+  "....#---------#.",
+  "....#--------#..",
+  "...#---------#..",
+  "...#--------#...",
+  "..#---------#...",
+  "..#--------#....",
+  ".#---------#....",
+  ".##########.....",
+  "................",
+  "................",
+  "................",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.08 Le parallélogramme ----
+// Le parallélogramme de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_PARALLELOGRAMME.cpp" // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, PARALLELOGRAMME);  // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(2, 10, "PARALLELOGRAMME");  // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un parallélogramme** a **4 côtés**, et ses côtés **face à face sont parallèles et de même longueur**. On peut le voir comme un rectangle qu’on aurait poussé sur le côté : il **penche**.
+
+**Chaque rangée est décalée** d’un demi-pixel vers la gauche par rapport à celle du dessus : comme un demi-pixel n’existe pas, le décalage se fait d’un pixel toutes les deux rangées. Le haut et le bas sont deux rangées de `#` de même longueur, l’une décalée par rapport à l’autre.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_PARALLELOGRAMME.cpp`), le nom `PARALLELOGRAMME` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** fais-le pencher de l’autre côté en écrivant chaque rangée à l’envers, de droite à gauche.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le parallélogramme au milieu de l’écran, et PARALLELOGRAMME écrit dessous.  
+**Ce qu’il coûte** — 590 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (85 o), `EffacerCarte` (14 o), `Tuiles` (192 o), `DonneesTransfert` (10 o), `"PARALLELOGRAMME"` (15 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : AEGLMOPR · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.09. Le pentagone
+
+> 2.09 : le pentagone — cinq côtés. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_PENTAGONE.cpp`
+
+```cpp
+// perso_PENTAGONE.cpp : le pentagone, PENTAGONE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso PENTAGONE = {
+  "................",
+  ".......##.......",
+  "......#--#......",
+  "....##----##....",
+  "...#--------#...",
+  "..#----------#..",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  "..#----------#..",
+  "..#----------#..",
+  "..#----------#..",
+  "...#--------#...",
+  "...#--------#...",
+  "...##########...",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.09 Le pentagone ----
+// Le pentagone de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_PENTAGONE.cpp"      // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, PENTAGONE);        // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(5, 10, "PENTAGONE");        // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un pentagone** a **5 côtés** et 5 coins (« penta » veut dire cinq, en grec). Quand ses 5 côtés sont égaux, il est **régulier** : c’est le cas ici, une pointe en haut.
+
+**La pointe en haut, deux côtés qui descendent en s’écartant, deux côtés qui se resserrent un peu, et la base en bas.** Les côtés penchés n’ont pas tous la même pente : c’est ce qui distingue un pentagone d’un losange ou d’un triangle.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_PENTAGONE.cpp`), le nom `PENTAGONE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** compte les côtés sur l’écran de la console : il y en a bien cinq.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le pentagone au milieu de l’écran, et PENTAGONE écrit dessous.  
+**Ce qu’il coûte** — 559 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (176 o), `DonneesTransfert` (10 o), `"PENTAGONE"` (9 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : AEGNOPT · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.10. L’hexagone
+
+> 2.10 : l’hexagone — six côtés. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_HEXAGONE.cpp`
+
+```cpp
+// perso_HEXAGONE.cpp : l’hexagone, HEXAGONE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso HEXAGONE = {
+  "................",
+  "....########....",
+  "...#--------#...",
+  "...#--------#...",
+  "..#----------#..",
+  "..#----------#..",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  "..#----------#..",
+  "..#----------#..",
+  "...#--------#...",
+  "...#--------#...",
+  "....########....",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.10 L’hexagone ----
+// L’hexagone de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_HEXAGONE.cpp"       // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, HEXAGONE);         // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(6, 10, "HEXAGONE");         // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un hexagone** a **6 côtés** et 6 coins (« hexa » veut dire six). Les alvéoles des abeilles sont des hexagones : collés les uns aux autres, ils remplissent tout sans laisser de trou.
+
+**Un côté plat en haut, un en bas, et deux côtés penchés de chaque côté** qui se rejoignent au milieu de la hauteur. La moitié droite est le reflet de la moitié gauche.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_HEXAGONE.cpp`), le nom `HEXAGONE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** pose deux hexagones l’un à côté de l’autre, avec un deuxième `sprite16(4, 88, 56, HEXAGONE);`.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — L’hexagone au milieu de l’écran, et HEXAGONE écrit dessous.  
+**Ce qu’il coûte** — 558 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (176 o), `DonneesTransfert` (10 o), `"HEXAGONE"` (8 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : AEGHNOX · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.11. L’octogone
+
+> 2.11 : l’octogone — huit côtés. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_OCTOGONE.cpp`
+
+```cpp
+// perso_OCTOGONE.cpp : l’octogone, OCTOGONE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso OCTOGONE = {
+  "................",
+  ".....######.....",
+  "....#------#....",
+  "...#--------#...",
+  "..#----------#..",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  "..#----------#..",
+  "...#--------#...",
+  "....#------#....",
+  ".....######.....",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.11 L’octogone ----
+// L’octogone de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_OCTOGONE.cpp"       // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, OCTOGONE);         // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(6, 10, "OCTOGONE");         // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un octogone** a **8 côtés** et 8 coins (« octo » veut dire huit). Le panneau STOP est un octogone.
+
+**Un carré dont on aurait coupé les quatre coins** : un côté plat en haut, en bas, à gauche et à droite, et quatre côtés penchés entre eux. Plus une forme a de côtés, plus elle ressemble à un rond : compare avec le 2.01.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_OCTOGONE.cpp`), le nom `OCTOGONE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** remplis l’octogone avec des `#` à la place des `-` : il devient un panneau plein.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — L’octogone au milieu de l’écran, et OCTOGONE écrit dessous.  
+**Ce qu’il coûte** — 542 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (160 o), `DonneesTransfert` (10 o), `"OCTOGONE"` (8 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : CEGNOT · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.12. Le demi-cercle
+
+> 2.12 : le demi-cercle — la moitié d’un rond. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_DEMI_CERCLE.cpp`
+
+```cpp
+// perso_DEMI_CERCLE.cpp : le demi-cercle, DEMI_CERCLE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso DEMI_CERCLE = {
+  "................",
+  "................",
+  "................",
+  "................",
+  "################",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  "..#----------#..",
+  "..#----------#..",
+  "...##------##...",
+  ".....######.....",
+  "................",
+  "................",
+  "................",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.12 Le demi-cercle ----
+// Le demi-cercle de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_DEMI_CERCLE.cpp"    // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, DEMI_CERCLE);      // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(4, 10, "DEMI CERCLE");      // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un demi-cercle** est **la moitié d’un rond**, coupé en passant par son centre. Il a un côté droit (le **diamètre**) et un bord courbe.
+
+**Le côté droit est la rangée pleine du haut** (16 `#`) ; en dessous, le bord courbe se resserre jusqu’en bas, comme la moitié basse du rond.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_DEMI_CERCLE.cpp`), le nom `DEMI_CERCLE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** fais-en un bol qui s’ouvre vers le bas, en recopiant les rangées dans l’ordre inverse.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le demi-cercle au milieu de l’écran, et DEMI CERCLE écrit dessous.  
+**Ce qu’il coûte** — 552 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (176 o), `DonneesTransfert` (10 o), `"DEMI CERCLE"` (11 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : CDEILMR · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.13. L’anneau
+
+> 2.13 : l’anneau — un rond percé au milieu. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_ANNEAU.cpp`
+
+```cpp
+// perso_ANNEAU.cpp : l’anneau, ANNEAU (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso ANNEAU = {
+  "................",
+  "....########....",
+  "...#--------#...",
+  "..#----------#..",
+  ".#----####----#.",
+  ".#---#....#---#.",
+  ".#--#......#--#.",
+  ".#--#......#--#.",
+  ".#--#......#--#.",
+  ".#--#......#--#.",
+  ".#---#....#---#.",
+  ".#----####----#.",
+  "..#----------#..",
+  "...#--------#...",
+  "....########....",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.13 L’anneau ----
+// L’anneau de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_ANNEAU.cpp"         // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, ANNEAU);           // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(7, 10, "ANNEAU");           // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un anneau** est un rond **percé au milieu** : deux cercles qui ont le même centre, un grand et un petit. La partie colorée est entre les deux.
+
+**Le trou est fait de `.`** : dans un personnage, le `.` est **transparent**. On voit donc le fond de l’écran au travers. Le bord du grand cercle et celui du petit sont des `#` ; entre les deux, des `-`.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_ANNEAU.cpp`), le nom `ANNEAU` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** écris un mot dans le trou : `texte(9, 8, "O");` (la case 9, 8 tombe au milieu de l’anneau). Le fond se voit au travers, le mot aussi.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — L’anneau au milieu de l’écran, et ANNEAU écrit dessous.  
+**Ce qu’il coûte** — 499 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (128 o), `DonneesTransfert` (10 o), `"ANNEAU"` (6 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : AENU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.14. La croix
+
+> 2.14 : la croix — deux barres qui se croisent. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_CROIX.cpp`
+
+```cpp
+// perso_CROIX.cpp : la croix, CROIX (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso CROIX = {
+  "................",
+  ".....######.....",
+  ".....#----#.....",
+  ".....#----#.....",
+  ".....#----#.....",
+  ".####------####.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".####------####.",
+  ".....#----#.....",
+  ".....#----#.....",
+  ".....#----#.....",
+  ".....######.....",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.14 La croix ----
+// La croix de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_CROIX.cpp"          // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, CROIX);            // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(7, 10, "CROIX");            // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Une croix** est faite de **deux barres qui se croisent** au milieu : une debout, une couchée. Son bord a **12 côtés** et 12 coins, tous droits.
+
+**La barre debout fait 6 pixels de large**, du haut en bas ; la barre couchée fait 6 pixels de haut, de gauche à droite. Là où elles se croisent, l’intérieur est commun : pas de trait au milieu.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_CROIX.cpp`), le nom `CROIX` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** change les `-` de la barre du milieu en `+` pour voir où les deux barres se croisent.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La croix au milieu de l’écran, et CROIX écrit dessous.  
+**Ce qu’il coûte** — 523 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (144 o), `DonneesTransfert` (10 o), `"CROIX"` (5 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : CIORX · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.15. L’étoile
+
+> 2.15 : l’étoile — une étoile à cinq branches. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_ETOILE_5.cpp`
+
+```cpp
+// perso_ETOILE_5.cpp : l’étoile, ETOILE_5 (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso ETOILE_5 = {
+  "................",
+  ".......##.......",
+  ".......##.......",
+  "......#--#......",
+  "......#--#......",
+  ".######--######.",
+  ".#------------#.",
+  "..##--------##..",
+  "....#------#....",
+  "....#------#....",
+  "...#---##---#...",
+  "...#--#..#--#...",
+  "..#--#....#--#..",
+  "..#-#......#-#..",
+  "..##........##..",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.15 L’étoile ----
+// L’étoile de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_ETOILE_5.cpp"       // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, ETOILE_5);         // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(7, 10, "ETOILE");           // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Une étoile à cinq branches** a **10 coins** : 5 pointes vers l’extérieur, et 5 creux entre elles. Son bord a donc 10 côtés.
+
+**Une pointe en haut, deux sur les côtés, deux en bas.** Le dessin s’appelle `ETOILE_5` (et pas `ETOILE`) parce qu’une tuile `ETOILE` existe déjà dans la galerie : deux dessins ne peuvent pas porter le même nom.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_ETOILE_5.cpp`), le nom `ETOILE_5` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** fais tomber l’étoile : mets le `sprite16()` dans la boucle, avec une variable `y` qui grandit d’un pixel à chaque image, comme au 35.2.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — L’étoile au milieu de l’écran, et ETOILE écrit dessous.  
+**Ce qu’il coûte** — 524 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (144 o), `DonneesTransfert` (10 o), `"ETOILE"` (6 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : EILOT · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.16. Le quart de cercle
+
+> 2.16 : le quart de cercle — un coin de rond. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_QUART_CERCLE.cpp`
+
+```cpp
+// perso_QUART_CERCLE.cpp : le quart de cercle, QUART_CERCLE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso QUART_CERCLE = {
+  "................",
+  ".####...........",
+  ".#---##.........",
+  ".#-----##.......",
+  ".#-------#......",
+  ".#--------#.....",
+  ".#---------#....",
+  ".#----------#...",
+  ".#----------#...",
+  ".#-----------#..",
+  ".#-----------#..",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".##############.",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.16 Le quart de cercle ----
+// Le quart de cercle de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_QUART_CERCLE.cpp"   // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, QUART_CERCLE);     // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(2, 10, "QUART DE CERCLE");  // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un quart de cercle** est **un rond coupé en quatre** parts égales, comme une pizza. Il a **deux côtés droits** qui se rencontrent en faisant un coin droit (ce coin, c’est le centre du rond), et **un bord courbe**.
+
+**Le coin droit est en bas à gauche** : le côté gauche est une colonne de `#`, le côté du bas une rangée de `#`. Le bord courbe va du haut à gauche jusqu’en bas à droite. Sa longueur, en pixels, est le **rayon** du rond : ici 14.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_QUART_CERCLE.cpp`), le nom `QUART_CERCLE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** pose quatre quarts de cercle pour refaire un rond entier. Il faudrait les tourner : commence par recopier le dessin en écrivant chaque rangée à l’envers, pour obtenir le quart d’en bas à droite.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le quart de cercle au milieu de l’écran, et QUART DE CERCLE écrit dessous.  
+**Ce qu’il coûte** — 597 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (208 o), `DonneesTransfert` (10 o), `"QUART DE CERCLE"` (15 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : ACDELQRTU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.17. Le triangle rectangle
+
+> 2.17 : le triangle rectangle — un coin droit. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_TRIANGLE_RECTANGLE.cpp`
+
+```cpp
+// perso_TRIANGLE_RECTANGLE.cpp : le triangle rectangle, TRIANGLE_RECTANGLE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso TRIANGLE_RECTANGLE = {
+  "................",
+  "................",
+  ".#..............",
+  ".##.............",
+  ".#-#............",
+  ".#--#...........",
+  ".#---#..........",
+  ".#----#.........",
+  ".#-----#........",
+  ".#------#.......",
+  ".#-------#......",
+  ".#--------#.....",
+  ".#---------#....",
+  ".#----------#...",
+  ".#############..",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.17 Le triangle rectangle ----
+// Le triangle rectangle de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_TRIANGLE_RECTANGLE.cpp" // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, TRIANGLE_RECTANGLE); // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(1, 10, "TRIANGLE RECTANGLE"); // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un triangle rectangle** est un triangle qui a **un coin droit** (un angle droit). C’est **la moitié d’un carré** coupé en diagonale. Le grand côté, en face du coin droit, s’appelle l’**hypoténuse**.
+
+**Le coin droit est en bas à gauche.** Chaque rangée a un pixel de plus que celle du dessus : la diagonale (l’hypoténuse) descend d’un pixel vers la droite à chaque rangée. C’est la pente la plus simple à dessiner sur une grille : un pas à droite, un pas en bas.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_TRIANGLE_RECTANGLE.cpp`), le nom `TRIANGLE_RECTANGLE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** avec deux `sprite16()`, pose deux triangles rectangles l’un contre l’autre pour refaire un carré (le second dessiné à l’envers, rangées en ordre inverse et écrites de droite à gauche).
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le triangle rectangle au milieu de l’écran, et TRIANGLE RECTANGLE écrit dessous.  
+**Ce qu’il coûte** — 636 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (112 o), `EffacerCarte` (14 o), `Tuiles` (208 o), `DonneesTransfert` (10 o), `"TRIANGLE RECTAN…"` (18 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : ACEGILNRT · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.18. Le triangle équilatéral
+
+> 2.18 : le triangle équilatéral — trois côtés égaux. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_TRIANGLE_EQUILATERAL.cpp`
+
+```cpp
+// perso_TRIANGLE_EQUILATERAL.cpp : le triangle équilatéral, TRIANGLE_EQUILATERAL (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso TRIANGLE_EQUILATERAL = {
+  "................",
+  "................",
+  "................",
+  ".......##.......",
+  ".......##.......",
+  "......#--#......",
+  "......#--#......",
+  ".....#----#.....",
+  ".....#----#.....",
+  "....#------#....",
+  "...#--------#...",
+  "...#--------#...",
+  "..#----------#..",
+  "..#----------#..",
+  ".##############.",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.18 Le triangle équilatéral ----
+// Le triangle équilatéral de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_TRIANGLE_EQUILATERAL.cpp" // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, TRIANGLE_EQUILATERAL); // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(0, 10, "TRIANGLE EQUILATERAL"); // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un triangle équilatéral** a **3 côtés de même longueur** et donc **3 angles égaux**, de 60 degrés chacun (60 + 60 + 60 = 180). Le triangle du 2.03 n’avait que deux côtés égaux.
+
+**Sa hauteur est un peu plus petite que sa base** : pour une base de 14 pixels, la hauteur fait environ 12 (14 × 0,87). À 16 pixels, la différence avec le 2.03 ne tient qu’en une ou deux rangées : le 2.03 est un peu plus haut, celui-ci un peu plus trapu.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_TRIANGLE_EQUILATERAL.cpp`), le nom `TRIANGLE_EQUILATERAL` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** ouvre le 2.03 et compte ses rangées, puis compte celles-ci : la différence est là.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le triangle équilatéral au milieu de l’écran, et TRIANGLE EQUILATERAL écrit dessous.  
+**Ce qu’il coûte** — 645 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (103 o), `EffacerCarte` (14 o), `Tuiles` (224 o), `DonneesTransfert` (10 o), `"TRIANGLE EQUILA…"` (20 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : AEGILNQRTU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.19. Le cerf-volant
+
+> 2.19 : le cerf-volant — plus long en bas qu’en haut. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_CERF_VOLANT.cpp`
+
+```cpp
+// perso_CERF_VOLANT.cpp : le cerf-volant, CERF_VOLANT (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso CERF_VOLANT = {
+  "................",
+  ".......##.......",
+  ".....##--##.....",
+  "....#------#....",
+  "...#--------#...",
+  ".##----------##.",
+  "..#----------#..",
+  "...#--------#...",
+  "...#--------#...",
+  "....#------#....",
+  ".....#----#.....",
+  ".....#----#.....",
+  "......#--#......",
+  ".......##.......",
+  ".......##.......",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.19 Le cerf-volant ----
+// Le cerf-volant de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_CERF_VOLANT.cpp"    // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, CERF_VOLANT);      // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(4, 10, "CERF VOLANT");      // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un cerf-volant** a **4 côtés**, égaux **deux par deux** : les deux côtés du haut sont courts, les deux du bas sont longs. Il ressemble à un losange, mais il est **plus long en bas qu’en haut**.
+
+**Le point le plus large est en haut**, à la rangée 5 : c’est là que les côtés courts rencontrent les côtés longs. Au-dessus, la forme s’élargit vite ; en dessous, elle se resserre lentement jusqu’à la pointe du bas.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_CERF_VOLANT.cpp`), le nom `CERF_VOLANT` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** ajoute-lui une ficelle avec une deuxième forme : un trait de `#` dans un autre `Perso`, posé juste en dessous avec `sprite16(4, 72, 72, FICELLE);`.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le cerf-volant au milieu de l’écran, et CERF VOLANT écrit dessous.  
+**Ce qu’il coûte** — 636 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (103 o), `EffacerCarte` (14 o), `Tuiles` (224 o), `DonneesTransfert` (10 o), `"CERF VOLANT"` (11 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : ACEFLNORTV · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.20. L’heptagone
+
+> 2.20 : l’heptagone — sept côtés. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_HEPTAGONE.cpp`
+
+```cpp
+// perso_HEPTAGONE.cpp : l’heptagone, HEPTAGONE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso HEPTAGONE = {
+  "................",
+  "......####......",
+  "....##----##....",
+  "..##--------##..",
+  "..#----------#..",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#------------#.",
+  "..#----------#..",
+  "...#--------#...",
+  "....########....",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.20 L’heptagone ----
+// L’heptagone de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_HEPTAGONE.cpp"      // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, HEPTAGONE);        // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(5, 10, "HEPTAGONE");        // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un heptagone** a **7 côtés** et 7 coins (« hepta » veut dire sept). Il manquait entre l’hexagone du 2.10 (6 côtés) et l’octogone du 2.11 (8 côtés).
+
+**Une pointe en haut, et une base plate en bas** : avec un nombre impair de côtés, le haut et le bas ne peuvent pas être pareils. Compare avec le pentagone (2.09, 5 côtés) : l’heptagone est plus rond.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_HEPTAGONE.cpp`), le nom `HEPTAGONE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** compte ses 7 côtés sur l’écran de la console, en partant de la pointe du haut.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — L’heptagone au milieu de l’écran, et HEPTAGONE écrit dessous.  
+**Ce qu’il coûte** — 575 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (192 o), `DonneesTransfert` (10 o), `"HEPTAGONE"` (9 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : AEGHNOPT · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.21. Le croissant
+
+> 2.21 : le croissant — comme une lune. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_CROISSANT.cpp`
+
+```cpp
+// perso_CROISSANT.cpp : le croissant, CROISSANT (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso CROISSANT = {
+  "................",
+  "....######......",
+  "..##---##.......",
+  ".#---##.........",
+  ".#--#...........",
+  "#---#...........",
+  "#--#............",
+  "#--#............",
+  "#--#............",
+  "#--#............",
+  "#---#...........",
+  ".#--#...........",
+  ".#---##.........",
+  "..##---##.......",
+  "....######......",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.21 Le croissant ----
+// Le croissant de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_CROISSANT.cpp"      // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, CROISSANT);        // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(5, 10, "CROISSANT");        // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un croissant** est **un rond dont on a enlevé un autre rond**, décalé sur le côté. C’est la forme de la **lune** quand on n’en voit qu’une partie. Il a deux bords courbes qui se rejoignent en deux pointes.
+
+**Le bord de gauche est celui d’un grand rond**, le bord de droite celui d’un rond qui a mordu dedans. La moitié du bas est le reflet de la moitié du haut : on a écrit 8 rangées, puis on les a recopiées à l’envers.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_CROISSANT.cpp`), le nom `CROISSANT` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** retourne la lune pour qu’elle s’ouvre vers la gauche, en écrivant chaque rangée de droite à gauche.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le croissant au milieu de l’écran, et CROISSANT écrit dessous.  
+**Ce qu’il coûte** — 575 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (192 o), `DonneesTransfert` (10 o), `"CROISSANT"` (9 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : ACINORST · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.22. La goutte
+
+> 2.22 : la goutte — ronde en bas, pointue en haut. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_GOUTTE.cpp`
+
+```cpp
+// perso_GOUTTE.cpp : la goutte, GOUTTE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso GOUTTE = {
+  "................",
+  ".......##.......",
+  ".......##.......",
+  "......#--#......",
+  ".....#----#.....",
+  ".....#----#.....",
+  "....#------#....",
+  "...#--------#...",
+  "...#--------#...",
+  "...#--------#...",
+  "...#--------#...",
+  "...#--------#...",
+  "...#--------#...",
+  "....#------#....",
+  ".....######.....",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.22 La goutte ----
+// La goutte de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_GOUTTE.cpp"         // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, GOUTTE);           // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(7, 10, "GOUTTE");           // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Une goutte** est **ronde en bas et pointue en haut** : un rond surmonté d’un triangle. C’est la forme d’une goutte d’eau qui tombe.
+
+**En haut, une pointe de 2 pixels** qui s’élargit comme un triangle ; **en bas, la moitié d’un rond**. Les deux morceaux se rejoignent sans trait au milieu : un seul contour fait le tour des deux.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_GOUTTE.cpp`), le nom `GOUTTE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** fais tomber la goutte : mets `sprite16()` dans la boucle avec une variable `y` qui grandit d’un pixel par image.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La goutte au milieu de l’écran, et GOUTTE écrit dessous.  
+**Ce qu’il coûte** — 515 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (144 o), `DonneesTransfert` (10 o), `"GOUTTE"` (6 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : EGOTU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.23. Le cœur
+
+> 2.23 : le cœur — deux bosses et une pointe. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_GRAND_COEUR.cpp`
+
+```cpp
+// perso_GRAND_COEUR.cpp : le cœur, GRAND_COEUR (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso GRAND_COEUR = {
+  "................",
+  "..####....####..",
+  ".#----#..#----#.",
+  "#------##------#",
+  "#--------------#",
+  "#--------------#",
+  "#--------------#",
+  ".#------------#.",
+  "..#----------#..",
+  "...#--------#...",
+  "....#------#....",
+  ".....#----#.....",
+  "......#--#......",
+  ".......##.......",
+  "................",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.23 Le cœur ----
+// Le cœur de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_GRAND_COEUR.cpp"    // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, GRAND_COEUR);      // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(7, 10, "COEUR");            // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un cœur** est fait de **deux bosses rondes** en haut et d’**une pointe** en bas. On peut le voir comme deux demi-ronds posés sur un triangle à l’envers.
+
+**Les deux bosses se touchent au milieu**, à la rangée 3, là où le contour fait un creux (`##`). Ensuite la forme se resserre d’un pixel de chaque côté à chaque rangée jusqu’à la pointe. Le dessin s’appelle `GRAND_COEUR` parce qu’une tuile `COEUR` de 8 × 8 existe déjà.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_GRAND_COEUR.cpp`), le nom `GRAND_COEUR` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** fais battre le cœur : dans la boucle, une image sur trente, pose-le, puis cache-le avec `cacher16(0);` (il faut alors `#include <cacher16>`).
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le cœur au milieu de l’écran, et COEUR écrit dessous.  
+**Ce qu’il coûte** — 523 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (144 o), `DonneesTransfert` (10 o), `"COEUR"` (5 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : CEORU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.24. La spirale
+
+> 2.24 : la spirale — un trait qui tourne vers le centre. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_SPIRALE.cpp`
+
+```cpp
+// perso_SPIRALE.cpp : la spirale, SPIRALE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso SPIRALE = {
+  "................",
+  ".##############.",
+  "..............#.",
+  ".############.#.",
+  ".#..........#.#.",
+  ".#.########.#.#.",
+  ".#.#......#.#.#.",
+  ".#.#.####.#.#.#.",
+  ".#.#.#..#.#.#.#.",
+  ".#.#.#....#.#.#.",
+  ".#.#.######.#.#.",
+  ".#.#........#.#.",
+  ".#.##########.#.",
+  ".#............#.",
+  ".##############.",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.24 La spirale ----
+// La spirale de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_SPIRALE.cpp"        // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, SPIRALE);          // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(6, 10, "SPIRALE");          // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Une spirale** est **un trait qui tourne en s’approchant du centre** (ou en s’en éloignant, si on la lit dans l’autre sens). Celle-ci est **carrée** : elle tourne à angle droit.
+
+**Ce n’est pas une surface mais un trait** : il n’y a que des `#` et des `.`, pas de `-`. Le trait part en haut à gauche, va à droite, descend, revient à gauche, remonte… et chaque côté est **2 pixels plus court** que le précédent, pour laisser un couloir vide d’un pixel entre deux tours.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_SPIRALE.cpp`), le nom `SPIRALE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** suis le trait du doigt sur l’écran, depuis le coin en haut à gauche jusqu’au centre. Compte combien de fois il tourne.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La spirale au milieu de l’écran, et SPIRALE écrit dessous.  
+**Ce qu’il coûte** — 566 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (85 o), `EffacerCarte` (14 o), `Tuiles` (176 o), `DonneesTransfert` (10 o), `"SPIRALE"` (7 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : AEILPRS · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.25. La vague
+
+> 2.25 : la vague — une ligne qui monte et descend. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_VAGUE.cpp`
+
+```cpp
+// perso_VAGUE.cpp : la vague, VAGUE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso VAGUE = {
+  "................",
+  "................",
+  "................",
+  "................",
+  "...........##...",
+  "..........#--#..",
+  ".........#----#.",
+  "........#------#",
+  "#......#-------#",
+  "##....#--------#",
+  "#-#..#---------#",
+  "#--##----------#",
+  "#--------------#",
+  "################",
+  "................",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.25 La vague ----
+// La vague de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_VAGUE.cpp"          // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, VAGUE);            // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(7, 10, "VAGUE");            // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Une vague** est **une ligne qui monte et qui descend**, encore et encore. En mathématiques, cette forme s’appelle une **sinusoïde**. Ici, l’eau est sous la ligne.
+
+**Le haut de l’eau descend à gauche et monte à droite** : le creux de la vague est vers la colonne 4, la crête vers la colonne 12. Sous la ligne, tout est rempli de `-` jusqu’au fond, une rangée de `#`.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_VAGUE.cpp`), le nom `VAGUE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** pose trois vagues côte à côte pour faire une mer : `sprite16(4, 88, 56, VAGUE);` puis `sprite16(8, 104, 56, VAGUE);`.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La vague au milieu de l’écran, et VAGUE écrit dessous.  
+**Ce qu’il coûte** — 514 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (144 o), `DonneesTransfert` (10 o), `"VAGUE"` (5 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : AEGUV · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.26. La flèche
+
+> 2.26 : la flèche — un triangle posé sur un rectangle. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_FLECHE.cpp`
+
+```cpp
+// perso_FLECHE.cpp : la flèche, FLECHE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso FLECHE = {
+  "................",
+  ".......##.......",
+  "......#--#......",
+  ".....#----#.....",
+  "....#------#....",
+  "...#--------#...",
+  "..#----------#..",
+  ".####------####.",
+  ".....#----#.....",
+  ".....#----#.....",
+  ".....#----#.....",
+  ".....#----#.....",
+  ".....#----#.....",
+  ".....#----#.....",
+  ".....######.....",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.26 La flèche ----
+// La flèche de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_FLECHE.cpp"         // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, FLECHE);           // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(7, 10, "FLECHE");           // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Une flèche** est faite de **deux formes collées** : un **triangle** (la pointe) posé sur un **rectangle** (la tige). Elle montre une direction : ici, le haut.
+
+**La pointe occupe les rangées 1 à 7**, comme un triangle ; à la rangée 7, elle dépasse la tige de chaque côté. **La tige fait 6 pixels de large**, des rangées 8 à 14. Un seul contour fait le tour des deux morceaux.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_FLECHE.cpp`), le nom `FLECHE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** fais une flèche qui pointe vers le bas en recopiant les rangées dans l’ordre inverse.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La flèche au milieu de l’écran, et FLECHE écrit dessous.  
+**Ce qu’il coûte** — 515 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (144 o), `DonneesTransfert` (10 o), `"FLECHE"` (6 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : CEFHL · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.27. L’étoile à six branches
+
+> 2.27 : l’étoile à six branches — deux triangles croisés. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_ETOILE_6.cpp`
+
+```cpp
+// perso_ETOILE_6.cpp : l’étoile à six branches, ETOILE_6 (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso ETOILE_6 = {
+  "................",
+  ".......##.......",
+  "......#--#......",
+  "......#--#......",
+  ".#####----#####.",
+  "..#----------#..",
+  "...#--------#...",
+  "....#------#....",
+  "....#------#....",
+  "...#--------#...",
+  "..#----------#..",
+  ".#####----#####.",
+  "......#--#......",
+  "......#--#......",
+  ".......##.......",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.27 L’étoile à six branches ----
+// L’étoile à six branches de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_ETOILE_6.cpp"       // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, ETOILE_6);         // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(1, 10, "ETOILE 6 BRANCHES"); // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Une étoile à six branches** est faite de **deux triangles équilatéraux** croisés : l’un pointe vers le haut, l’autre vers le bas. Elle a 6 pointes et 12 côtés.
+
+**Une pointe en haut, une en bas, et deux de chaque côté** (aux rangées 4 et 11). Au milieu, les deux triangles se recouvrent : l’intérieur est commun, sans trait.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_ETOILE_6.cpp`), le nom `ETOILE_6` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** compare avec l’étoile à cinq branches du 2.15 : compte leurs pointes.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — L’étoile à six branches au milieu de l’écran, et ETOILE 6 BRANCHES écrit dessous.  
+**Ce qu’il coûte** — 681 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (272 o), `DonneesTransfert` (10 o), `"ETOILE 6 BRANCH…"` (17 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : ABCEHILNORST6 · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.28. Le cadre
+
+> 2.28 : le cadre — un carré percé au milieu. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_CADRE.cpp`
+
+```cpp
+// perso_CADRE.cpp : le cadre, CADRE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso CADRE = {
+  "................",
+  ".##############.",
+  ".#------------#.",
+  ".#------------#.",
+  ".#---######---#.",
+  ".#--#......#--#.",
+  ".#--#......#--#.",
+  ".#--#......#--#.",
+  ".#--#......#--#.",
+  ".#--#......#--#.",
+  ".#--#......#--#.",
+  ".#---######---#.",
+  ".#------------#.",
+  ".#------------#.",
+  ".##############.",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.28 Le cadre ----
+// Le cadre de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_CADRE.cpp"          // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, CADRE);            // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(7, 10, "CADRE");            // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un cadre** est **un carré percé d’un carré plus petit**, au milieu. Comme l’anneau du 2.13, il a un bord dehors et un bord dedans.
+
+**Le trou est fait de `.`**, transparents : on voit le fond au travers. Le grand carré fait 14 pixels de côté, le trou 6. Entre les deux, une bande de `-` de 3 pixels.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_CADRE.cpp`), le nom `CADRE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** écris une lettre dans le cadre, comme dans un tableau : `texte(9, 8, "A");`.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le cadre au milieu de l’écran, et CADRE écrit dessous.  
+**Ce qu’il coûte** — 505 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (58 o), `EffacerCarte` (14 o), `Tuiles` (144 o), `DonneesTransfert` (10 o), `"CADRE"` (5 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : ACDER · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.29. Le damier
+
+> 2.29 : le damier — un carré sur deux. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_DAMIER.cpp`
+
+```cpp
+// perso_DAMIER.cpp : le damier, DAMIER (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso DAMIER = {
+  "####----####----",
+  "####----####----",
+  "####----####----",
+  "####----####----",
+  "----####----####",
+  "----####----####",
+  "----####----####",
+  "----####----####",
+  "####----####----",
+  "####----####----",
+  "####----####----",
+  "####----####----",
+  "----####----####",
+  "----####----####",
+  "----####----####",
+  "----####----####",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.29 Le damier ----
+// Le damier de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_DAMIER.cpp"         // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, DAMIER);           // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(7, 10, "DAMIER");           // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un damier** est fait de **petits carrés**, un foncé, un clair, un foncé… sur chaque rangée, et décalés d’une rangée à l’autre. C’est le plateau du jeu de dames et des échecs.
+
+**Chaque petit carré fait 4 × 4 pixels**, donc 4 carrés par rangée et 4 rangées de carrés : 16 carrés en tout. Il n’y a pas de contour : les carrés foncés (`#`) et clairs (`-`) se touchent directement.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_DAMIER.cpp`), le nom `DAMIER` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** fais des carrés de 2 × 2 pixels : il faudra 8 carrés par rangée. Commence par la première rangée : `"##--##--##--##--"`.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le damier au milieu de l’écran, et DAMIER écrit dessous.  
+**Ce qu’il coûte** — 540 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (160 o), `DonneesTransfert` (10 o), `"DAMIER"` (6 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : ADEIMR · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.30. Le X
+
+> 2.30 : le x — deux barres en diagonale. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_CROIX_X.cpp`
+
+```cpp
+// perso_CROIX_X.cpp : le x, CROIX_X (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso CROIX_X = {
+  "##............##",
+  "#-#..........#-#",
+  ".#-#........#-#.",
+  "..#-#......#-#..",
+  "...#-#....#-#...",
+  "....#-#..#-#....",
+  ".....#-##-#.....",
+  "......#--#......",
+  "......#--#......",
+  ".....#-##-#.....",
+  "....#-#..#-#....",
+  "...#-#....#-#...",
+  "..#-#......#-#..",
+  ".#-#........#-#.",
+  "#-#..........#-#",
+  "##............##",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.30 Le X ----
+// Le X de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_CROIX_X.cpp"        // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, CROIX_X);          // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(9, 10, "X");                // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un X** est fait de **deux barres en diagonale** qui se croisent au milieu. C’est la croix du 2.14, **tournée d’un huitième de tour** (45 degrés).
+
+**Chaque barre avance d’un pixel vers la droite à chaque rangée**, comme l’hypoténuse du 2.17 : l’une descend vers la droite, l’autre vers la gauche. Le dessin s’appelle `CROIX_X` : un nom d’une seule lettre se confondrait trop facilement avec une variable.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_CROIX_X.cpp`), le nom `CROIX_X` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** pose un X et la croix du 2.14 côte à côte pour voir qu’ils sont la même forme, tournée.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le X au milieu de l’écran, et X écrit dessous.  
+**Ce qu’il coûte** — 419 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (40 o), `EffacerCarte` (14 o), `Tuiles` (80 o), `DonneesTransfert` (10 o), `"X"` (1 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : X · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.31. Le cube
+
+> 2.31 : le cube — un carré en relief. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_CUBE.cpp`
+
+```cpp
+// perso_CUBE.cpp : le cube, CUBE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso CUBE = {
+  "................",
+  "....###########.",
+  "...#---------##.",
+  "..#---------###.",
+  ".##############.",
+  ".#+++++++++####.",
+  ".#+++++++++####.",
+  ".#+++++++++####.",
+  ".#+++++++++####.",
+  ".#+++++++++####.",
+  ".#+++++++++####.",
+  ".#+++++++++####.",
+  ".#+++++++++###..",
+  ".#+++++++++##...",
+  ".###########....",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.31 Le cube ----
+// Le cube de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_CUBE.cpp"           // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, CUBE);             // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(8, 10, "CUBE");             // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un cube** est une forme **en relief** (en trois dimensions) : 6 faces carrées, comme un dé. On n’en voit jamais que trois à la fois, ici **le devant, le dessus et le côté droit**.
+
+**Pour faire croire au relief, chaque face a sa nuance** : le dessus, éclairé, est clair (`-`) ; le devant est moyen (`+`) ; le côté droit, dans l’ombre, est le plus sombre (`#`). Le dessus et le côté sont des **parallélogrammes** (le 2.08) : c’est ce qui donne l’impression de profondeur.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_CUBE.cpp`), le nom `CUBE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** échange les nuances du dessus et du devant (les `-` et les `+`) : la lumière semble alors venir d’ailleurs.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le cube au milieu de l’écran, et CUBE écrit dessous.  
+**Ce qu’il coûte** — 488 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (58 o), `EffacerCarte` (14 o), `Tuiles` (128 o), `DonneesTransfert` (10 o), `"CUBE"` (4 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : BCEU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.32. La pyramide
+
+> 2.32 : la pyramide — un triangle en relief. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_PYRAMIDE.cpp`
+
+```cpp
+// perso_PYRAMIDE.cpp : la pyramide, PYRAMIDE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso PYRAMIDE = {
+  "................",
+  "................",
+  ".......##.......",
+  ".......##.......",
+  "......#-##......",
+  ".....#--##......",
+  ".....#--###.....",
+  "....#----#+#....",
+  "....#----#+#....",
+  "...#-----#++#...",
+  "...#-----#++#...",
+  "..#------##++#..",
+  "..#-------#++#..",
+  ".##############.",
+  "................",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.32 La pyramide ----
+// La pyramide de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_PYRAMIDE.cpp"       // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, PYRAMIDE);         // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(6, 10, "PYRAMIDE");         // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Une pyramide** est une forme en relief qui a une base et des faces en **triangle** qui se rejoignent en une pointe. Celles d’Égypte ont une base carrée : 4 faces en triangle.
+
+**Un triangle coupé par une arête** (un trait de `#`) un peu à droite du milieu : la face de gauche est claire (`-`), éclairée ; la face de droite moyenne (`+`), plus à l’ombre. C’est la différence de nuance qui fait voir deux faces.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_PYRAMIDE.cpp`), le nom `PYRAMIDE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** remplace les `+` par des `-` : sans la différence de nuance, la pyramide redevient un triangle plat.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La pyramide au milieu de l’écran, et PYRAMIDE écrit dessous.  
+**Ce qu’il coûte** — 592 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (192 o), `DonneesTransfert` (10 o), `"PYRAMIDE"` (8 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : ADEIMPRY · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.33. Le cylindre
+
+> 2.33 : le cylindre — un rectangle et un ovale. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_CYLINDRE.cpp`
+
+```cpp
+// perso_CYLINDRE.cpp : le cylindre, CYLINDRE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso CYLINDRE = {
+  "................",
+  "......####......",
+  "...###----###...",
+  "..#----------#..",
+  ".##----------##.",
+  ".#+###----###+#.",
+  ".#++++####++++#.",
+  ".#++++++++++++#.",
+  ".#++++++++++++#.",
+  ".#++++++++++++#.",
+  ".#++++++++++++#.",
+  ".#++++++++++++#.",
+  "..#++++++++++#..",
+  "...###++++###...",
+  "......####......",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.33 Le cylindre ----
+// Le cylindre de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_CYLINDRE.cpp"       // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, CYLINDRE);         // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(6, 10, "CYLINDRE");         // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Un cylindre** est une forme en relief comme une **boîte de conserve** : deux ronds (le dessus et le dessous) reliés par une paroi courbe.
+
+**Le dessus est un ovale** (le 2.06) clair (`-`) : un rond vu de biais paraît aplati. **La paroi est un rectangle** moyen (`+`). En bas, le bord est courbe lui aussi : c’est la moitié de l’ovale du dessous.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_CYLINDRE.cpp`), le nom `CYLINDRE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** fais un verre : remplace les `+` de la paroi par des `.`, transparents.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le cylindre au milieu de l’écran, et CYLINDRE écrit dessous.  
+**Ce qu’il coûte** — 583 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (85 o), `EffacerCarte` (14 o), `Tuiles` (192 o), `DonneesTransfert` (10 o), `"CYLINDRE"` (8 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : CDEILNRY · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.34. La sphère
+
+> 2.34 : la sphère — un rond éclairé. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.
+
+`perso_SPHERE.cpp`
+
+```cpp
+// perso_SPHERE.cpp : la sphère, SPHERE (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « + » moyen : l'ombre.   « - » clair : l'intérieur.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso SPHERE = {
+  ".....######.....",
+  "...##++++++##...",
+  "..#++++++++++#..",
+  ".#++---+++++++#.",
+  ".#+-----++++++#.",
+  "#++-----+++++++#",
+  "#++-----+++++++#",
+  "#+++---++++++++#",
+  "#++++++++++++++#",
+  "#++++++++++++++#",
+  "#++++++++++++++#",
+  ".#++++++++++++#.",
+  ".#++++++++++++#.",
+  "..#++++++++++#..",
+  "...##++++++##...",
+  ".....######.....",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.34 La sphère ----
+// La sphère de 16 × 16 au milieu de l'écran, et son nom dessous.
+
+#include <texte>                    // texte() : écrire un mot à l'écran
+#include <sprite16>                 // sprite16() : poser un personnage de 16 × 16
+#include <Perso>                    // Perso : un dessin de 16 × 16
+#include "perso_SPHERE.cpp"         // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 72, 56, SPHERE);           // les lutins 0 à 3, coin haut-gauche en (72, 56)
+  texte(7, 10, "SPHERE");           // le nom, sous la forme
+
+  while (true) {   // la boucle du jeu : rien ne bouge, on regarde
+    image();
+  }
+}
+```
+
+**Une sphère** est **une boule** : le rond du 2.01, mais en relief. Tous les points de sa surface sont à la même distance du centre.
+
+**Le dessin est celui du 2.01**, rempli de `+` (moyen), avec **une tache claire (`-`) en haut à gauche** : c’est le reflet de la lumière. Le cerveau en conclut que la forme est ronde comme une balle, et pas plate comme un disque.
+
+**Le programme est celui du 2.01** : seuls changent le fichier du dessin (`perso_SPHERE.cpp`), le nom `SPHERE` dans `sprite16()`, et le mot écrit dessous. `#` est le plus sombre, `+` moyen, `-` clair, `.` le transparent.
+
+**Essaie :** déplace la tache claire en bas à droite : la lumière semble venir d’en bas.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La sphère au milieu de l’écran, et SPHERE écrit dessous.  
+**Ce qu’il coûte** — 515 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (117 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (144 o), `DonneesTransfert` (10 o), `"SPHERE"` (6 o, pour texte()) · appels : `sprite()` ×4 (96 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×1 (0 o) · lettres : EHPRS · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.35. Le petit rond : 8 × 8
+
+> Le même rond, dans une tuile de 8 × 8 : Tuile ROND_8, posée avec sprite(). Quatre fois moins de pixels.
+
+`tuile_ROND_8.cpp`
+
+```cpp
+// ROND_8 : le rond en petit (8 × 8) — juste le dessin.
+// « # » le plus sombre : le contour.   « - » clair : l'intérieur.   « . » transparent.
+
+Tuile ROND_8 = {
+  "..####..",
+  ".#----#.",
+  "#------#",
+  "#------#",
+  "#------#",
+  "#------#",
+  ".#----#.",
+  "..####..",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.35 Le petit rond : 8 × 8 ----
+// Le rond dans une tuile de 8 × 8, au milieu de l'écran.
+
+#include <texte>             // texte() : écrire un mot
+#include <sprite>            // sprite() : poser un lutin de 8 × 8
+#include <Tuile>             // Tuile : un dessin de 8 × 8
+#include "tuile_ROND_8.cpp"  // le petit rond, dans son fichier
+
+int main() {
+  sprite(0, 76, 60, ROND_8);   // le lutin 0, en (76, 60)
+  texte(5, 10, "PETIT ROND");  // le nom, sous la forme
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**La console ne sait pas agrandir ni réduire un dessin.** Chaque pixel du dessin donne exactement un pixel à l’écran. Pour un rond plus petit, il faut **un autre dessin**, avec moins de pixels. C’est ce que montrent les leçons 2.35 à 2.39.
+
+**Ici, le rond fait 8 × 8 pixels** : c’est une **tuile**, la plus petite taille. Il s’écrit `Tuile ROND_8 = {…}` avec 8 rangées de 8 signes, dans le fichier `tuile_ROND_8.cpp`. Le `_8` dans le nom dit sa taille.
+
+**Il se pose avec `sprite()`**, qui place un seul lutin de 8 × 8 au pixel près : `sprite(0, 76, 60, ROND_8)`. 76 = (160 − 8) / 2 : le milieu de l’écran. Il faut `#include <sprite>` et `#include <Tuile>`.
+
+**Compare avec le 2.01** : le rond de 16 × 16 avait une vraie courbe. En 8 × 8, il n’a plus que deux marches de chaque côté : on le reconnaît, mais c’est presque un octogone.
+
+**Dans la galerie « 🖼 Les modèles »**, le bouton **8 × 8** en haut donne toutes les formes à cette taille : ROND_8, CARRE_8, et les autres.
+
+**Essaie :** dans `tuile_ROND_8.cpp`, change un `-` en `#` et regarde le pixel changer sur l’écran : en 8 × 8, chaque pixel compte.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite>` → 0.69.4. La fonction sprite() — un lutin au pixel près
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+
+**Ce qu’on doit voir** — Un petit rond de 8 × 8 au milieu de l’écran, et PETIT ROND dessous.  
+**Ce qu’il coûte** — 455 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (44 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (144 o), `DonneesTransfert` (10 o), `"PETIT ROND"` (10 o, pour texte()) · appels : `sprite()` ×1 (23 o), `texte()` ×1 (11 o), `image()` ×1 (6 o) · lettres : DEINOPRT · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.36. Le grand rond : 32 × 32
+
+> Le même rond en 32 × 32 : Perso ROND_32, posé avec sprite32(). Quatre fois plus de pixels, et une courbe bien plus douce.
+
+`perso_ROND_32.cpp`
+
+```cpp
+// ROND_32 : le rond en grand (32 × 32) — juste le dessin.
+// « # » le plus sombre : le contour.   « - » clair : l'intérieur.   « . » transparent.
+
+Perso ROND_32 = {
+  "................................",
+  "...........##########...........",
+  ".........##----------##.........",
+  ".......##--------------##.......",
+  "......#------------------#......",
+  ".....#--------------------#.....",
+  "....#----------------------#....",
+  "...#------------------------#...",
+  "...#------------------------#...",
+  "..#--------------------------#..",
+  "..#--------------------------#..",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  "..#--------------------------#..",
+  "..#--------------------------#..",
+  "...#------------------------#...",
+  "...#------------------------#...",
+  "....#----------------------#....",
+  ".....#--------------------#.....",
+  "......#------------------#......",
+  ".......##--------------##.......",
+  ".........##----------##.........",
+  "...........##########...........",
+  "................................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.36 Le grand rond : 32 × 32 ----
+// Le rond en 32 × 32, au milieu de l'écran.
+
+#include <texte>              // texte() : écrire un mot
+#include <sprite32>           // sprite32() : poser un dessin de 32 × 32
+#include <Perso>              // Perso : un dessin de 16 × 16 ou de 32 × 32
+#include "perso_ROND_32.cpp"  // le grand rond, dans son fichier
+
+int main() {
+  sprite32(0, 64, 40, ROND_32);   // les lutins 0 à 15, coin haut-gauche en (64, 40)
+  texte(5, 11, "GRAND ROND");     // le nom, sous la forme (qui s'arrête à 72)
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le grand rond fait 32 × 32 pixels** : 32 rangées de 32 signes, dans `perso_ROND_32.cpp`. Il s’écrit `Perso ROND_32 = {…}`, comme un personnage de 16 × 16 : c’est le **nombre de rangées** qui dit au compilateur sa taille.
+
+**Il n’est pas grossi : il est redessiné.** Le contour a toujours un seul pixel d’épaisseur, et la courbe a deux fois plus de marches, deux fois plus petites. C’est pour ça qu’il paraît bien plus rond que celui du 2.01.
+
+**Il se pose avec `sprite32()`** : `sprite32(0, 64, 40, ROND_32)` prend **16 lutins** (les numéros 0 à 15), en carré de 4 × 4. 64 = (160 − 32) / 2, le milieu. Il faut `#include <sprite32>`.
+
+**Un grand dessin coûte cher** : 16 lutins sur les 40 de la console, et 16 tuiles. Un écran peut en montrer deux, pas dix.
+
+**Dans la galerie**, le bouton **32 × 32** donne toutes les formes à cette taille : ROND_32, CARRE_32…
+
+**Essaie :** fais-le descendre, avec une variable `y` qui grandit d’un pixel par image, comme au 35.4.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite32>` → 35.4. La fonction sprite32() — un grand personnage de 32 × 32
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Un grand rond de 32 × 32 au milieu de l’écran, et GRAND ROND dessous.  
+**Ce qu’il coûte** — 1024 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (405 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (352 o), `DonneesTransfert` (10 o), `"GRAND ROND"` (10 o, pour texte()) · appels : `sprite()` ×16 (384 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×4 (0 o), `sprite32()` ×1 (0 o) · lettres : ADGNOR · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.37. Les trois tailles côte à côte
+
+> ROND_8, ROND et ROND_32 sur le même écran : trois dessins, trois fonctions, trois tailles.
+
+`tuile_ROND_8.cpp`
+
+```cpp
+// ROND_8 : le rond en petit (8 × 8) — juste le dessin.
+// « # » le plus sombre : le contour.   « - » clair : l'intérieur.   « . » transparent.
+
+Tuile ROND_8 = {
+  "..####..",
+  ".#----#.",
+  "#------#",
+  "#------#",
+  "#------#",
+  "#------#",
+  ".#----#.",
+  "..####..",
+};
+```
+
+`perso_ROND.cpp`
+
+```cpp
+// ROND : le rond (16 × 16) — juste le dessin.
+// « # » le plus sombre : le contour.   « - » clair : l'intérieur.   « . » transparent.
+
+Perso ROND = {
+  ".....######.....",
+  "...##------##...",
+  "..#----------#..",
+  ".#------------#.",
+  ".#------------#.",
+  "#--------------#",
+  "#--------------#",
+  "#--------------#",
+  "#--------------#",
+  "#--------------#",
+  "#--------------#",
+  ".#------------#.",
+  ".#------------#.",
+  "..#----------#..",
+  "...##------##...",
+  ".....######.....",
+};
+```
+
+`perso_ROND_32.cpp`
+
+```cpp
+// ROND_32 : le rond en grand (32 × 32) — juste le dessin.
+// « # » le plus sombre : le contour.   « - » clair : l'intérieur.   « . » transparent.
+
+Perso ROND_32 = {
+  "................................",
+  "...........##########...........",
+  ".........##----------##.........",
+  ".......##--------------##.......",
+  "......#------------------#......",
+  ".....#--------------------#.....",
+  "....#----------------------#....",
+  "...#------------------------#...",
+  "...#------------------------#...",
+  "..#--------------------------#..",
+  "..#--------------------------#..",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  "..#--------------------------#..",
+  "..#--------------------------#..",
+  "...#------------------------#...",
+  "...#------------------------#...",
+  "....#----------------------#....",
+  ".....#--------------------#.....",
+  "......#------------------#......",
+  ".......##--------------##.......",
+  ".........##----------##.........",
+  "...........##########...........",
+  "................................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.37 Les trois tailles côte à côte ----
+// Le même rond en 8 × 8, 16 × 16 et 32 × 32.
+
+#include <texte>              // texte() : écrire un mot
+#include <sprite>             // sprite()   : un dessin de 8 × 8
+#include <sprite16>           // sprite16() : un dessin de 16 × 16
+#include <sprite32>           // sprite32() : un dessin de 32 × 32
+#include <Tuile>              // Tuile : 8 × 8
+#include <Perso>              // Perso : 16 × 16 ou 32 × 32
+#include "tuile_ROND_8.cpp"   // le petit rond
+#include "perso_ROND.cpp"     // le rond du 2.01
+#include "perso_ROND_32.cpp"  // le grand rond
+
+int main() {
+  sprite(0, 24, 60, ROND_8);       // le lutin 0
+  sprite16(1, 56, 56, ROND);       // les lutins 1 à 4
+  sprite32(5, 104, 48, ROND_32);   // les lutins 5 à 20
+  texte(3, 11, "8");               // sous le petit
+  texte(7, 11, "16");              // sous le moyen
+  texte(15, 11, "32");             // sous le grand
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Les trois ronds ensemble**, du plus petit au plus grand : `ROND_8` avec `sprite()`, `ROND` avec `sprite16()`, `ROND_32` avec `sprite32()`. Ce sont **trois dessins différents**, chacun dans son fichier.
+
+**Les lutins ne doivent pas se chevaucher** : le petit prend le lutin 0 ; le moyen les lutins 1 à 4 (il en faut 4) ; le grand les lutins 5 à 20 (il en faut 16). C’est pourquoi on écrit `sprite16(1, …)` et `sprite32(5, …)`.
+
+**La console a une limite** : 10 lutins au plus sur une même ligne de l’écran. Ici, sur les lignes où les trois ronds se trouvent, il y en a 1 + 2 + 4 = 7. Ça passe.
+
+**Le nombre sous chaque rond** dit son côté en pixels : 8, 16, 32. Chaque taille a **deux fois** le côté de la précédente, et **quatre fois** ses pixels (8 × 8 = 64, 16 × 16 = 256, 32 × 32 = 1 024).
+
+**Essaie :** échange les places du petit et du grand rond.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite>` → 0.69.4. La fonction sprite() — un lutin au pixel près
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <sprite32>` → 35.4. La fonction sprite32() — un grand personnage de 32 × 32
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Trois ronds de plus en plus grands, et 8, 16, 32 écrits dessous.  
+**Ce qu’il coûte** — 1206 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (546 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (58 o), `EffacerCarte` (14 o), `Tuiles` (416 o), `DonneesTransfert` (10 o), `"8"` (1 o, pour texte()), `"16"` (2 o, pour texte()), `"32"` (2 o, pour texte()) · appels : `sprite()` ×21 (503 o), `texte()` ×3 (33 o), `image()` ×1 (6 o), `sprite16()` ×5 (0 o), `sprite32()` ×1 (0 o) · lettres : 12368 · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.38. Grossir un dessin : ×2
+
+> Le bouton « 🔍 ×2 » fait d’un dessin de 16 une copie de 32, en doublant chaque pixel. À côté, le rond redessiné en 32 : la différence se voit.
+
+`perso_ROND_GRAND.cpp`
+
+```cpp
+// ROND_GRAND : le rond du 2.01 grossi par ×2 (32 × 32) — juste le dessin.
+// « # » le plus sombre : le contour.   « - » clair : l'intérieur.   « . » transparent.
+
+Perso ROND_GRAND = {
+  "..........############..........",
+  "..........############..........",
+  "......####------------####......",
+  "......####------------####......",
+  "....##--------------------##....",
+  "....##--------------------##....",
+  "..##------------------------##..",
+  "..##------------------------##..",
+  "..##------------------------##..",
+  "..##------------------------##..",
+  "##----------------------------##",
+  "##----------------------------##",
+  "##----------------------------##",
+  "##----------------------------##",
+  "##----------------------------##",
+  "##----------------------------##",
+  "##----------------------------##",
+  "##----------------------------##",
+  "##----------------------------##",
+  "##----------------------------##",
+  "##----------------------------##",
+  "##----------------------------##",
+  "..##------------------------##..",
+  "..##------------------------##..",
+  "..##------------------------##..",
+  "..##------------------------##..",
+  "....##--------------------##....",
+  "....##--------------------##....",
+  "......####------------####......",
+  "......####------------####......",
+  "..........############..........",
+  "..........############..........",
+};
+```
+
+`perso_ROND_32.cpp`
+
+```cpp
+// ROND_32 : le rond redessiné en grand (32 × 32) — juste le dessin.
+// « # » le plus sombre : le contour.   « - » clair : l'intérieur.   « . » transparent.
+
+Perso ROND_32 = {
+  "................................",
+  "...........##########...........",
+  ".........##----------##.........",
+  ".......##--------------##.......",
+  "......#------------------#......",
+  ".....#--------------------#.....",
+  "....#----------------------#....",
+  "...#------------------------#...",
+  "...#------------------------#...",
+  "..#--------------------------#..",
+  "..#--------------------------#..",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  ".#----------------------------#.",
+  "..#--------------------------#..",
+  "..#--------------------------#..",
+  "...#------------------------#...",
+  "...#------------------------#...",
+  "....#----------------------#....",
+  ".....#--------------------#.....",
+  "......#------------------#......",
+  ".......##--------------##.......",
+  ".........##----------##.........",
+  "...........##########...........",
+  "................................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.38 Grossir un dessin : ×2 ----
+// À gauche le rond grossi (chaque pixel doublé), à droite le rond redessiné.
+
+#include <texte>                 // texte() : écrire un mot
+#include <sprite32>              // sprite32() : un dessin de 32 × 32
+#include <Perso>                 // Perso : 16 × 16 ou 32 × 32
+#include "perso_ROND_GRAND.cpp"  // le rond du 2.01, grossi par ×2
+#include "perso_ROND_32.cpp"     // le rond redessiné en 32 × 32
+
+int main() {
+  sprite32(0, 24, 40, ROND_GRAND);   // les lutins 0 à 15
+  sprite32(16, 104, 40, ROND_32);    // les lutins 16 à 31
+  texte(2, 11, "GROSSI");            // sous celui de gauche
+  texte(11, 11, "REDESSINE");        // sous celui de droite
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le zoom d’un dessin.** Dans « ▦ Les tuiles », le bouton **🔍 ×2** fait une **copie** du dessin ouvert, deux fois plus grande : un dessin de 8 devient un dessin de 16, un dessin de 16 devient un dessin de 32. L’original ne change pas.
+
+**Comment il grossit :** chaque pixel devient un **carré de 2 × 2** pixels, de la même nuance. Chaque rangée est écrite deux fois, et chaque signe dans la rangée aussi : `"#-"` devient `"##--"`, deux fois.
+
+**À gauche, `ROND_GRAND`** : le rond du 2.01, grossi par ×2. **À droite, `ROND_32`** : le rond redessiné en 32 × 32 (le 2.36). Ils ont la même taille, mais le grossi a des **marches deux fois plus grosses** et un contour de 2 pixels : il n’a pas plus de détails qu’avant, juste de plus gros pixels.
+
+**Quand se servir de ×2 ?** Pour agrandir **ton propre dessin** sans tout recommencer : la copie grossie est un bon point de départ, qu’on affine ensuite pixel par pixel. Pour les formes de la galerie, prends plutôt la taille 32 × 32 : elles y sont redessinées.
+
+**Essaie :** ouvre `perso_ROND_GRAND.cpp` et arrondis ses marches à la main, en t’aidant du rond de droite.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite32>` → 35.4. La fonction sprite32() — un grand personnage de 32 × 32
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Deux grands ronds : à gauche aux grosses marches (GROSSI), à droite plus lisse (REDESSINE).  
+**Ce qu’il coûte** — 1712 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (800 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (640 o), `DonneesTransfert` (10 o), `"GROSSI"` (6 o, pour texte()), `"REDESSINE"` (9 o, pour texte()) · appels : `sprite()` ×32 (768 o), `texte()` ×2 (22 o), `image()` ×1 (6 o), `sprite16()` ×8 (0 o), `sprite32()` ×2 (0 o) · lettres : DEGINORS · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.39. Réduire un dessin : ÷2
+
+> Le bouton « 🔍 ÷2 » fait d’un dessin de 16 une copie de 8 : chaque carré de 2 × 2 devient un pixel. Des détails se perdent.
+
+`tuile_ROND_PETIT.cpp`
+
+```cpp
+// ROND_PETIT : le rond du 2.01 réduit par ÷2 (8 × 8) — juste le dessin.
+// « # » le plus sombre : le contour.   « - » clair : l'intérieur.   « . » transparent.
+
+Tuile ROND_PETIT = {
+  ".######.",
+  "##----##",
+  "#------#",
+  "#------#",
+  "#------#",
+  "#------#",
+  "##----##",
+  ".######.",
+};
+```
+
+`tuile_ROND_8.cpp`
+
+```cpp
+// ROND_8 : le rond redessiné en petit (8 × 8) — juste le dessin.
+// « # » le plus sombre : le contour.   « - » clair : l'intérieur.   « . » transparent.
+
+Tuile ROND_8 = {
+  "..####..",
+  ".#----#.",
+  "#------#",
+  "#------#",
+  "#------#",
+  "#------#",
+  ".#----#.",
+  "..####..",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 2.39 Réduire un dessin : ÷2 ----
+// À gauche le rond réduit (chaque carré de 2 × 2 devient un pixel), à droite le rond redessiné.
+
+#include <texte>                 // texte() : écrire un mot
+#include <sprite>                // sprite() : un dessin de 8 × 8
+#include <Tuile>                 // Tuile : 8 × 8
+#include "tuile_ROND_PETIT.cpp"  // le rond du 2.01, réduit par ÷2
+#include "tuile_ROND_8.cpp"      // le rond redessiné en 8 × 8
+
+int main() {
+  sprite(0, 36, 60, ROND_PETIT);   // le lutin 0
+  sprite(1, 108, 60, ROND_8);      // le lutin 1
+  texte(2, 10, "REDUIT");          // sous celui de gauche
+  texte(10, 10, "REDESSINE");      // sous celui de droite
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le bouton 🔍 ÷2** fait l’inverse de ×2 : une copie **deux fois plus petite**. Un dessin de 32 devient un dessin de 16, un dessin de 16 devient un dessin de 8.
+
+**Comment il réduit :** le dessin est découpé en **carrés de 2 × 2** pixels, et chaque carré devient **un seul pixel**. Lequel des quatre garder ? Le **plus foncé** : ainsi un contour d’un pixel d’épaisseur ne disparaît pas.
+
+**Quatre pixels n’en font plus qu’un** : des détails se perdent forcément. À gauche, `ROND_PETIT`, le rond du 2.01 réduit ; à droite, `ROND_8`, le rond redessiné en 8 × 8 (le 2.35). Compare-les : le réduit est plus épais, plus foncé.
+
+**Pourquoi la vraie Game Boy n’a pas de zoom :** elle n’a pas le temps de calculer de nouveaux pixels pendant qu’elle dessine l’écran, 60 fois par seconde. Les jeux de l’époque dessinaient donc chaque taille à la main — exactement ce que fait la galerie avec ses trois tailles.
+
+**Essaie :** ouvre `tuile_ROND_PETIT.cpp` et éclaircis-le en changeant quelques `#` en `-`, pour qu’il ressemble au rond de droite.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite>` → 0.69.4. La fonction sprite() — un lutin au pixel près
+- `#include <Tuile>` → 0.107.2. Tuile — dessiner une case
+
+**Ce qu’on doit voir** — Deux petits ronds : à gauche plus foncé (REDUIT), à droite plus fin (REDESSINE).  
+**Ce qu’il coûte** — 501 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (78 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (160 o), `DonneesTransfert` (10 o), `"REDUIT"` (6 o, pour texte()), `"REDESSINE"` (9 o, pour texte()) · appels : `sprite()` ×2 (46 o), `texte()` ×2 (22 o), `image()` ×1 (6 o) · lettres : DEINRSTU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 2.40. La fonction spriteTaille() — dessiner une fois, choisir la taille
+
+> #include <spriteTaille> : spriteTaille(numero, x, y, DESSIN, taille) pose un dessin à la taille qu’on veut. Le dessin n’est écrit qu’UNE fois, à sa taille standard ; c’est le compilateur qui l’agrandit.
+
+`tuile_ROND.cpp`
+
+```cpp
+// ROND : le rond, dessiné UNE fois, à sa taille standard (8 × 8) — juste le dessin.
+// « # » le plus sombre : le contour.   « - » clair : l'intérieur.   « . » transparent.
+
+Tuile ROND = {
+  "..####..",
+  ".#----#.",
+  "#------#",
+  "#------#",
+  "#------#",
+  "#------#",
+  ".#----#.",
+  "..####..",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- #include <spriteTaille> : dessiner une fois, choisir la taille ----
+// UN seul dessin, ROND (8 × 8). À gauche en taille 1, à droite en taille 3 (24 × 24).
+
+#include <texte>          // texte() : écrire un mot
+#include <spriteTaille>   // spriteTaille() : un dessin à la taille qu'on veut
+#include <Tuile>          // Tuile : un dessin de 8 × 8
+#include "tuile_ROND.cpp" // le rond, dessiné une seule fois
+
+int main() {
+  spriteTaille(0, 36, 60, ROND, 1);   // taille 1 : 8 × 8, le lutin 0
+  spriteTaille(1, 96, 44, ROND, 3);   // taille 3 : 24 × 24, les lutins 1 à 9
+  texte(1, 10, "TAILLE 1");           // sous celui de gauche
+  texte(10, 10, "TAILLE 3");          // sous celui de droite
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Dessiner une seule fois.** Le rond est écrit **une seule fois**, dans `tuile_ROND.cpp`, à sa taille standard : 8 × 8. Il n’y a pas de « grand rond » dans le programme. C’est dans l’appel qu’on dit à quelle taille le montrer.
+
+**La ligne à écrire : `#include <spriteTaille>`.**
+
+**Ses arguments :** `spriteTaille(numero, x, y, DESSIN, taille)`. `numero` est le **premier** lutin employé ; `x` et `y` le coin en haut à gauche, en pixels ; `DESSIN` le nom d’une `Tuile` ou d’un `Perso` du programme ; `taille` combien de fois plus grand : **1** sa taille, **2** deux fois, **3** trois fois…
+
+**Ici :** `spriteTaille(0, 36, 60, ROND, 1)` pose le rond tel qu’il est dessiné (8 × 8) ; `spriteTaille(1, 96, 44, ROND, 3)` pose **le même rond** trois fois plus grand : 24 × 24.
+
+**Comment le compilateur agrandit.** La console ne sait pas agrandir pendant que le jeu tourne. Le compilateur redessine donc la forme **avant**, à la compilation : il fait le tour du dessin, garde les vrais coins pointus, arrondit les marches d’escalier, puis redessine à la nouvelle taille avec un contour d’un pixel. Le grand rond est **rond**, pas fait de gros pixels.
+
+**Avec combien de lutins ?** La forme agrandie est coupée en carrés de 8 × 8 ; chaque carré qui n’est pas vide prend **un lutin**, à partir de `numero`. En taille 3, le rond fait 24 × 24 : 3 × 3 = 9 lutins, les numéros 1 à 9. Le premier rond a pris le lutin 0 : les deux ne se chevauchent pas.
+
+**Pas de limite de taille.** La console n’a que 40 lutins, et n’en montre que 10 sur une même ligne. Tant que la forme y tient, elle est faite de lutins : elle passe par-dessus le décor et peut bouger. **Au-delà, elle est dessinée dans le fond de l’écran**, case par case : là, plus de limite. Taille 12, 18, 40, 100… : la forme est toujours affichée. Plus grande que l’écran, on en voit la partie qui tombe dedans.
+
+**Dans le fond, la place s’écrit en clair** (`spriteTaille(0, -80, -88, ROND, 40)`, par exemple, pour centrer un rond de 320 pixels) : le compilateur doit savoir quelle partie tombe dans l’écran. Elle peut être négative, c’est-à-dire commencer hors de l’écran. Le `numero` n’y sert pas.
+
+**La taille s’écrit en clair** — `3`, pas une variable — : c’est le compilateur qui dessine, avant que le jeu ne tourne.
+
+**Si tu modifies le petit rond**, dans `tuile_ROND.cpp`, toutes les tailles changent ensemble à la compilation suivante : il n’y a qu’un dessin.
+
+**La même logique dans les autres fonctions :** la taille peut aussi s’écrire en dernier argument de `sprite(0, 36, 60, ROND, 4)`, `sprite16(0, 40, 40, HEROS, 3)`, `sprite32(0, 0, 0, BOSS, 2)`, `spriteDerriere(0, x, 72, ROND, 4)` (derrière le décor) et `poser(2, 3, ROND, 5)` (toujours dans le fond, colonne et ligne en clair). Pour les trois `sprite`, seul un nombre de **2 ou plus** est une taille : `0`, `1` et `MIROIR_X`, `DERRIERE`… gardent leur ancien sens, celui des options.
+
+**Essaie :** change le `3` en `2`, puis en `4`. Puis remplace la seconde ligne par `spriteTaille(1, 8, 0, ROND, 18);` : un rond de 144 pixels, toute la hauteur de l’écran. Enfin, dessine ta propre forme dans `tuile_ROND.cpp` (une goutte, une maison) et regarde-la à toutes les tailles.
+
+**Ce qu’on doit voir** — Le même rond deux fois : petit à gauche (TAILLE 1), trois fois plus grand et bien rond à droite (TAILLE 3).  
+**Ce qu’il coûte** — 825 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (262 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (272 o), `DonneesTransfert` (10 o), `"TAILLE 1"` (8 o, pour texte()), `"TAILLE 3"` (8 o, pour texte()) · appels : `sprite()` ×10 (230 o), `texte()` ×2 (22 o), `image()` ×1 (6 o), `spriteTaille()` ×2 (0 o) · lettres : AEILT13 · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+## Série 3 — Les images
+
+### 3.01. Le Père Noël
+
+> 3.01 : le père noël — style manga : grands yeux, bonnet, barbe. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_PERE_NOEL.cpp`
+
+```cpp
+// perso_PERE_NOEL.cpp : le père noël (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso PERE_NOEL = {
+  ".........###.##.",
+  ".......##+++#--#",
+  ".....##++++++##.",
+  "....#+++++++++#.",
+  "...#+++++++++++#",
+  "..#------------#",
+  "..#-##------##-#",
+  "..#-##------##-#",
+  "..#-+--------+-#",
+  ".#---##-++-##--#",
+  ".#--#--####--#-#",
+  ".#-------------#",
+  "..#-----------#.",
+  "...#---------#..",
+  "....##-----##...",
+  "......#####.....",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.01 Le Père Noël ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_PERE_NOEL.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, PERE_NOEL);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, PERE_NOEL, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(5, 12, "PERE NOEL");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le Père Noël : style manga : grands yeux, bonnet, barbe.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_PERE_NOEL.cpp`.
+
+**Cette série montre des images, une par leçon**, et les jeux qui s’en servent : Puissance 4, Dames, Échecs, et un jeu de cartes (dans le menu des exemples). Le programme est le même d’une leçon à l’autre : seuls changent le dessin et le nom.
+
+**À gauche, l’image à sa taille** : `sprite16(0, 24, 56, PERE_NOEL)`, les lutins 0 à 3.
+
+**À droite, la même, trois fois plus grande** : `sprite16(4, 88, 36, PERE_NOEL, 3)`. Le **3**, en dernier argument, est la **taille** : le compilateur redessine l’image en 48 × 48 avant que le jeu ne tourne, en gardant les vrais coins pointus et en arrondissant les marches. C’est la logique du 2.40, écrite directement dans `sprite16()`.
+
+**Combien de lutins ?** 48 × 48, c’est 6 × 6 carrés de 8 : 36 lutins au plus (les carrés vides ne comptent pas), à partir du lutin 4. Avec les 4 de la petite image : 40, tout ce que la console a. Plus grand encore, la forme passe d’elle-même dans le fond de l’écran : il n’y a pas de limite de taille.
+
+**Les petits détails** (un œil d’un pixel) restent petits : l’agrandissement suit les formes, il n’invente rien. Plus le dessin de 16 × 16 est net, plus le grand est beau.
+
+**Essaie :** change le `3` en `2`, puis en `5` (elle passe alors dans le fond, et le premier argument ne sert plus). Puis modifie un pixel dans le dessin : les deux tailles changent ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le Père Noël deux fois : petit à gauche, trois fois plus grand à droite, et PERE NOEL dessous.  
+**Ce qu’il coûte** — 1789 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (876 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (656 o), `DonneesTransfert` (10 o), `"PERE NOEL"` (9 o, pour texte()) · appels : `sprite()` ×37 (855 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : ELNOPR · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.02. Le bonhomme de neige
+
+> 3.02 : le bonhomme de neige — un chapeau, une écharpe, deux boules. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_BONHOMME_NEIGE.cpp`
+
+```cpp
+// perso_BONHOMME_NEIGE.cpp : le bonhomme de neige (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso BONHOMME_NEIGE = {
+  ".....######.....",
+  ".....#####+.....",
+  "...##########...",
+  ".....#----#.....",
+  "....#-#--#-#....",
+  "....#--++--#....",
+  ".....#----#.....",
+  "...##++++++##...",
+  "..#-----+#---#..",
+  ".#------+#----#.",
+  ".#-----#------#.",
+  "#------#-------#",
+  "#--------------#",
+  ".#-----#------#.",
+  "..#----------#..",
+  "...##########...",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.02 Le bonhomme de neige ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_BONHOMME_NEIGE.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, BONHOMME_NEIGE);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, BONHOMME_NEIGE, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(1, 12, "BONHOMME DE NEIGE");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le bonhomme de neige : un chapeau, une écharpe, deux boules.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_BONHOMME_NEIGE.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, BONHOMME_NEIGE, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le bonhomme de neige deux fois : petit à gauche, trois fois plus grand à droite, et BONHOMME DE NEIGE dessous.  
+**Ce qu’il coûte** — 1680 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (807 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (608 o), `DonneesTransfert` (10 o), `"BONHOMME DE NEI…"` (17 o, pour texte()) · appels : `sprite()` ×34 (786 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : BDEGHIMNO · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.03. Le sapin
+
+> 3.03 : le sapin — une étoile en haut, trois étages. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_SAPIN.cpp`
+
+```cpp
+// perso_SAPIN.cpp : le sapin (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso SAPIN = {
+  ".......##.......",
+  "......#--#......",
+  ".......##.......",
+  "......#++#......",
+  ".....#++++#.....",
+  "....#++-+++#....",
+  ".....#++++#.....",
+  "....#++++++#....",
+  "...#+++++-++#...",
+  "....#++++++#....",
+  "...#++++++++#...",
+  "..#++-++++++-#..",
+  ".#++++++++++++#.",
+  "..############..",
+  ".......##.......",
+  "......####......",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.03 Le sapin ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_SAPIN.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, SAPIN);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, SAPIN, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(7, 12, "SAPIN");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le sapin : une étoile en haut, trois étages.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_SAPIN.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, SAPIN, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le sapin deux fois : petit à gauche, trois fois plus grand à droite, et SAPIN dessous.  
+**Ce qu’il coûte** — 1521 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (715 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (544 o), `DonneesTransfert` (10 o), `"SAPIN"` (5 o, pour texte()) · appels : `sprite()` ×30 (694 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : AINPS · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.04. Le cadeau
+
+> 3.04 : le cadeau — un paquet et son nœud. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_CADEAU.cpp`
+
+```cpp
+// perso_CADEAU.cpp : le cadeau (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso CADEAU = {
+  "....##....##....",
+  "...#--#..#--#...",
+  "...#---##---#...",
+  "....##-##-##....",
+  ".##############.",
+  ".#-----##-----#.",
+  ".#-----##-----#.",
+  ".##############.",
+  "..#++++##++++#..",
+  "..#++++##++++#..",
+  "..#++++##++++#..",
+  "..#++++##++++#..",
+  "..#++++##++++#..",
+  "..#++++##++++#..",
+  "..############..",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.04 Le cadeau ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_CADEAU.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, CADEAU);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, CADEAU, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(7, 12, "CADEAU");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le cadeau : un paquet et son nœud.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_CADEAU.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, CADEAU, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le cadeau deux fois : petit à gauche, trois fois plus grand à droite, et CADEAU dessous.  
+**Ce qu’il coûte** — 1752 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (899 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (58 o), `EffacerCarte` (14 o), `Tuiles` (608 o), `DonneesTransfert` (10 o), `"CADEAU"` (6 o, pour texte()) · appels : `sprite()` ×38 (878 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : ACDEU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.05. Le renne
+
+> 3.05 : le renne — des bois, un nez rond. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_RENNE.cpp`
+
+```cpp
+// perso_RENNE.cpp : le renne (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso RENNE = {
+  ".#.#........#.#.",
+  ".#.#.#....#.#.#.",
+  "..###......###..",
+  "...#.#....#.#...",
+  "....##....##....",
+  ".....#++++#.....",
+  "....#++++++#....",
+  "...#+-#++#-+#...",
+  "...#+##++##+#...",
+  "...#++++++++#...",
+  "....#++++++#....",
+  "....#++--++#....",
+  ".....#-##-#.....",
+  ".....#-##-#.....",
+  "......#--#......",
+  ".......##.......",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.05 Le renne ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_RENNE.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, RENNE);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, RENNE, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(7, 12, "RENNE");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le renne : des bois, un nez rond.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_RENNE.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, RENNE, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le renne deux fois : petit à gauche, trois fois plus grand à droite, et RENNE dessous.  
+**Ce qu’il coûte** — 1487 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (715 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (58 o), `EffacerCarte` (14 o), `Tuiles` (528 o), `DonneesTransfert` (10 o), `"RENNE"` (5 o, pour texte()) · appels : `sprite()` ×30 (694 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : ENR · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.06. Le pion de dames
+
+> 3.06 : le pion de dames — un jeton rond, vu d’en haut. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_PION.cpp`
+
+```cpp
+// perso_PION.cpp : le pion de dames (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso PION = {
+  "................",
+  ".....######.....",
+  "...##------##...",
+  "..#--++++++--#..",
+  ".#--+------+--#.",
+  ".#-+--++++--+-#.",
+  "#--+-+----+-+--#",
+  "#--+-+----+-+--#",
+  "#--+-+----+-+--#",
+  "#--+-+----+-+--#",
+  ".#-+--++++--+-#.",
+  ".#--+------+--#.",
+  "..#--++++++--#..",
+  "...##------##...",
+  ".....######.....",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.06 Le pion de dames ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_PION.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, PION);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, PION, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(3, 12, "PION DE DAMES");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le pion de dames : un jeton rond, vu d’en haut.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_PION.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, PION, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le pion de dames deux fois : petit à gauche, trois fois plus grand à droite, et PION DE DAMES dessous.  
+**Ce qu’il coûte** — 1843 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (853 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (720 o), `DonneesTransfert` (10 o), `"PION DE DAMES"` (13 o, pour texte()) · appels : `sprite()` ×36 (832 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : ADEIMNOPS · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.07. La dame
+
+> 3.07 : la dame — le pion couronné. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_DAME.cpp`
+
+```cpp
+// perso_DAME.cpp : la dame (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso DAME = {
+  "................",
+  ".....######.....",
+  "...##------##...",
+  "..#----------#..",
+  ".#--#--#--#---#.",
+  ".#--##-##-##--#.",
+  "#---########---#",
+  "#---#++++++#---#",
+  "#---#++++++#---#",
+  "#---########---#",
+  ".#------------#.",
+  ".#------------#.",
+  "..#----------#..",
+  "...##------##...",
+  ".....######.....",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.07 La dame ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_DAME.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, DAME);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, DAME, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(8, 12, "DAME");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**La dame : le pion couronné.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_DAME.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, DAME, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La dame deux fois : petit à gauche, trois fois plus grand à droite, et DAME dessous.  
+**Ce qu’il coûte** — 1704 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (853 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (58 o), `EffacerCarte` (14 o), `Tuiles` (608 o), `DonneesTransfert` (10 o), `"DAME"` (4 o, pour texte()) · appels : `sprite()` ×36 (832 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : ADEM · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.08. Le roi
+
+> 3.08 : le roi — une croix sur la couronne. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_ROI.cpp`
+
+```cpp
+// perso_ROI.cpp : le roi (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso ROI = {
+  ".......##.......",
+  "......####......",
+  ".......##.......",
+  ".....######.....",
+  "....#------#....",
+  "...#--#--#--#...",
+  "...#--------#...",
+  "....#------#....",
+  ".....#----#.....",
+  ".....#----#.....",
+  "....#------#....",
+  "....#------#....",
+  "...#--------#...",
+  "..############..",
+  "..#----------#..",
+  "..############..",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.08 Le roi ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_ROI.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, ROI);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, ROI, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(8, 12, "ROI");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le roi : une croix sur la couronne.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_ROI.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, ROI, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le roi deux fois : petit à gauche, trois fois plus grand à droite, et ROI dessous.  
+**Ce qu’il coûte** — 1405 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (715 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (58 o), `EffacerCarte` (14 o), `Tuiles` (448 o), `DonneesTransfert` (10 o), `"ROI"` (3 o, pour texte()) · appels : `sprite()` ×30 (694 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : IOR · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.09. La reine
+
+> 3.09 : la reine — une couronne à pointes. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_REINE.cpp`
+
+```cpp
+// perso_REINE.cpp : la reine (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso REINE = {
+  "..#....#....#...",
+  "..##..###..##...",
+  "..#-#.#-#.#-#...",
+  "..#--#---#--#...",
+  "...#--------#...",
+  "...#--#--#--#...",
+  "....#------#....",
+  ".....#----#.....",
+  ".....#----#.....",
+  ".....#----#.....",
+  "....#------#....",
+  "....#------#....",
+  "...#--------#...",
+  "..############..",
+  "..#----------#..",
+  "..############..",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.09 La reine ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_REINE.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, REINE);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, REINE, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(7, 12, "REINE");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**La reine : une couronne à pointes.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_REINE.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, REINE, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La reine deux fois : petit à gauche, trois fois plus grand à droite, et REINE dessous.  
+**Ce qu’il coûte** — 1588 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (807 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (528 o), `DonneesTransfert` (10 o), `"REINE"` (5 o, pour texte()) · appels : `sprite()` ×34 (786 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : EINR · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.10. La tour
+
+> 3.10 : la tour — un château et ses créneaux. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_TOUR.cpp`
+
+```cpp
+// perso_TOUR.cpp : la tour (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso TOUR = {
+  "................",
+  "..###.####.###..",
+  "..#-#.#--#.#-#..",
+  "..#-###--###-#..",
+  "..#----------#..",
+  "...##########...",
+  "....#------#....",
+  "....#------#....",
+  "....#------#....",
+  "....#------#....",
+  "....#------#....",
+  "...##########...",
+  "..#----------#..",
+  "..############..",
+  "..#----------#..",
+  "..############..",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.10 La tour ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_TOUR.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, TOUR);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, TOUR, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(8, 12, "TOUR");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**La tour : un château et ses créneaux.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_TOUR.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, TOUR, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La tour deux fois : petit à gauche, trois fois plus grand à droite, et TOUR dessous.  
+**Ce qu’il coûte** — 1640 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (853 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (58 o), `EffacerCarte` (14 o), `Tuiles` (544 o), `DonneesTransfert` (10 o), `"TOUR"` (4 o, pour texte()) · appels : `sprite()` ×36 (832 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : ORTU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.11. Le fou
+
+> 3.11 : le fou — un bonnet pointu fendu. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_FOU.cpp`
+
+```cpp
+// perso_FOU.cpp : le fou (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso FOU = {
+  ".......##.......",
+  "......#--#......",
+  ".......##.......",
+  "......#--#......",
+  ".....#--#-#.....",
+  "....#--#---#....",
+  "....#-#----#....",
+  "....#------#....",
+  ".....#----#.....",
+  "......####......",
+  ".....#----#.....",
+  "....#------#....",
+  "...#--------#...",
+  "..############..",
+  "..#----------#..",
+  "..############..",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.11 Le fou ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_FOU.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, FOU);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, FOU, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(8, 12, "FOU");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le fou : un bonnet pointu fendu.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_FOU.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, FOU, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le fou deux fois : petit à gauche, trois fois plus grand à droite, et FOU dessous.  
+**Ce qu’il coûte** — 1421 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (715 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (58 o), `EffacerCarte` (14 o), `Tuiles` (464 o), `DonneesTransfert` (10 o), `"FOU"` (3 o, pour texte()) · appels : `sprite()` ×30 (694 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : FOU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.12. Le cavalier
+
+> 3.12 : le cavalier — une tête de cheval. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_CAVALIER.cpp`
+
+```cpp
+// perso_CAVALIER.cpp : le cavalier (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso CAVALIER = {
+  "......#.#.......",
+  ".....#-#-##.....",
+  "....#-------#...",
+  "...#--##-----#..",
+  "..#----------#..",
+  ".#-----------#..",
+  "#--------#---#..",
+  "#-#----##----#..",
+  ".#.####.#----#..",
+  ".......#-----#..",
+  "......#------#..",
+  ".....#-------#..",
+  "....#---------#.",
+  "..############..",
+  "..#----------#..",
+  "..############..",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.12 Le cavalier ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_CAVALIER.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, CAVALIER);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, CAVALIER, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(6, 12, "CAVALIER");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le cavalier : une tête de cheval.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_CAVALIER.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, CAVALIER, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le cavalier deux fois : petit à gauche, trois fois plus grand à droite, et CAVALIER dessous.  
+**Ce qu’il coûte** — 1806 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (899 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (624 o), `DonneesTransfert` (10 o), `"CAVALIER"` (8 o, pour texte()) · appels : `sprite()` ×38 (878 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : ACEILRV · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.13. Le pion des échecs
+
+> 3.13 : le pion des échecs — une boule sur un socle. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_PION_ECHECS.cpp`
+
+```cpp
+// perso_PION_ECHECS.cpp : le pion des échecs (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso PION_ECHECS = {
+  "................",
+  "................",
+  "......####......",
+  ".....#----#.....",
+  "....#------#....",
+  "....#------#....",
+  ".....#----#.....",
+  "......#--#......",
+  ".....#----#.....",
+  ".....#----#.....",
+  "....#------#....",
+  "...#--------#...",
+  "...##########...",
+  "..#----------#..",
+  "..############..",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.13 Le pion des échecs ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_PION_ECHECS.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, PION_ECHECS);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, PION_ECHECS, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(2, 12, "PION DES ECHECS");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le pion des échecs : une boule sur un socle.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_PION_ECHECS.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, PION_ECHECS, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le pion des échecs deux fois : petit à gauche, trois fois plus grand à droite, et PION DES ECHECS dessous.  
+**Ce qu’il coûte** — 1538 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (715 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (560 o), `DonneesTransfert` (10 o), `"PION DES ECHECS"` (15 o, pour texte()) · appels : `sprite()` ×30 (694 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : CDEHINOPS · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.14. La carte « passe ton tour »
+
+> 3.14 : la carte « passe ton tour » — un rond barré. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_PASSE.cpp`
+
+```cpp
+// perso_PASSE.cpp : la carte « passe ton tour » (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso PASSE = {
+  "................",
+  ".....######.....",
+  "...##------##...",
+  "..#----------#..",
+  "..#-------##-#..",
+  ".#-------##---#.",
+  ".#------##----#.",
+  ".#-----##-----#.",
+  ".#----##------#.",
+  ".#---##-------#.",
+  ".#--##--------#.",
+  "..#-#--------#..",
+  "..#----------#..",
+  "...##------##...",
+  ".....######.....",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.14 La carte « passe ton tour » ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_PASSE.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, PASSE);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, PASSE, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(0, 12, "CARTE PASSE TON TOUR");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**La carte « passe ton tour » : un rond barré.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_PASSE.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, PASSE, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La carte « passe ton tour » deux fois : petit à gauche, trois fois plus grand à droite, et CARTE PASSE TON TOUR dessous.  
+**Ce qu’il coûte** — 1802 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (853 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (76 o), `EffacerCarte` (14 o), `Tuiles` (672 o), `DonneesTransfert` (10 o), `"CARTE PASSE TON…"` (20 o, pour texte()) · appels : `sprite()` ×36 (832 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : ACENOPRSTU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.15. La carte « inverse »
+
+> 3.15 : la carte « inverse » — deux flèches qui tournent. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_INVERSE.cpp`
+
+```cpp
+// perso_INVERSE.cpp : la carte « inverse » (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso INVERSE = {
+  "................",
+  "......#.........",
+  "......##........",
+  "..#######.......",
+  ".#------##......",
+  ".#-######.......",
+  ".#-#..##........",
+  ".#-#..#.....#-#.",
+  ".#-#.....#..#-#.",
+  "........##..#-#.",
+  ".......######-#.",
+  "......##------#.",
+  ".......#######..",
+  "........##......",
+  ".........#......",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.15 La carte « inverse » ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_INVERSE.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, INVERSE);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, INVERSE, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(3, 12, "CARTE INVERSE");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**La carte « inverse » : deux flèches qui tournent.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_INVERSE.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, INVERSE, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La carte « inverse » deux fois : petit à gauche, trois fois plus grand à droite, et CARTE INVERSE dessous.  
+**Ce qu’il coûte** — 1471 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (623 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (560 o), `DonneesTransfert` (10 o), `"CARTE INVERSE"` (13 o, pour texte()) · appels : `sprite()` ×26 (602 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : ACEINRSTV · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.16. La carte « +2 »
+
+> 3.16 : la carte « +2 » — deux cartes et un plus. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_PLUS2.cpp`
+
+```cpp
+// perso_PLUS2.cpp : la carte « +2 » (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso PLUS2 = {
+  "................",
+  "................",
+  "..........####..",
+  "...##....##..##.",
+  "...##........##.",
+  ".######.....##..",
+  ".######....##...",
+  "...##.....##....",
+  "...##....##.....",
+  ".........######.",
+  "................",
+  "..############..",
+  "..#----------#..",
+  "..############..",
+  "................",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.16 La carte « +2 » ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_PLUS2.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, PLUS2);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, PLUS2, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(4, 12, "CARTE PLUS 2");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**La carte « +2 » : deux cartes et un plus.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_PLUS2.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, PLUS2, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La carte « +2 » deux fois : petit à gauche, trois fois plus grand à droite, et CARTE PLUS 2 dessous.  
+**Ce qu’il coûte** — 1741 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (830 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (624 o), `DonneesTransfert` (10 o), `"CARTE PLUS 2"` (12 o, pour texte()) · appels : `sprite()` ×35 (809 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : ACELPRSTU2 · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.17. La carte « joker »
+
+> 3.17 : la carte « joker » — quatre couleurs, une étoile. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_JOKER.cpp`
+
+```cpp
+// perso_JOKER.cpp : la carte « joker » (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso JOKER = {
+  "................",
+  ".....######.....",
+  "...##--##++##...",
+  "..#----##++++#..",
+  ".#-----##+++++#.",
+  ".#----####++++#.",
+  "#----##..##+++#.",
+  "#########..####.",
+  "#++++##..##----#",
+  ".#+++####-----#.",
+  ".#++++##------#.",
+  "..#+++##-----#..",
+  "...##+##--##....",
+  ".....######.....",
+  "................",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.17 La carte « joker » ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_JOKER.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, JOKER);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, JOKER, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(4, 12, "CARTE JOKER");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**La carte « joker » : quatre couleurs, une étoile.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_JOKER.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, JOKER, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La carte « joker » deux fois : petit à gauche, trois fois plus grand à droite, et CARTE JOKER dessous.  
+**Ce qu’il coûte** — 1765 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (807 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (672 o), `DonneesTransfert` (10 o), `"CARTE JOKER"` (11 o, pour texte()) · appels : `sprite()` ×34 (786 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : ACEJKORT · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
 
 ---
 

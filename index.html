@@ -183,6 +183,20 @@
 
   .en-pause[hidden] { display: none; }
 
+  /*
+   * Pour quelle console tourne ce qu'on regarde — sous l'écran, toujours.
+   *
+   * Sans elle, un jeu en 4 nuances et un jeu en couleur aux palettes vertes se
+   * ressemblaient trait pour trait : on ne savait pas ce qu'on voyait.
+   */
+  .mode-console {
+    margin: 6px 0 0; text-align: center; font-size: 12px; font-weight: 600;
+    color: #c2cadb; letter-spacing: 0.02em;
+  }
+  .mode-console[data-mode="gbc"] { color: #ffd166; }
+  .mode-console[data-mode="apercu"] { color: #8fd3ff; }
+  .mode-console:empty { display: none; }
+
   .en-pause small {
     font-weight: 400; letter-spacing: 0; font-size: 11.5px; line-height: 1.5;
     color: #c2cadb; max-width: 30ch;
@@ -691,6 +705,17 @@
   }
 
   button.danger:hover:not(:disabled) { background: #612a30; border-color: #ff8b93; }
+  /* La question douce « il manque un #include : l’ajouter ? », sous l’erreur. */
+  .question-include {
+    display: block; margin-top: 10px; padding: 10px 12px; border-radius: 6px;
+    background: var(--panneau-clair); border: 1px solid var(--bord); border-left: 3px solid var(--vert);
+    color: var(--texte); white-space: normal; font-family: inherit;
+  }
+  .question-include code { display: block; margin: 6px 0 8px; white-space: pre; color: var(--vert); }
+  .question-include button { margin-right: 8px; }
+  /* Le message « il faut #include … » : un clic l’ajoute. */
+  .message-ajoutable { cursor: pointer; }
+  .message-ajoutable:hover { text-decoration: underline dotted; }
 
   /* --- une cartouche venue d'ailleurs --- */
 
@@ -730,6 +755,7 @@
      quatre numéros, et c'est ce qu'on veut savoir en choisissant. */
   .modele.perso canvas { border-color: var(--vert-sombre); }
   .modele .taille { color: var(--vert); font-size: 9px; }
+  .tailles-formes { flex: 1 0 100%; gap: 6px; align-items: center; }
 
   .importer { gap: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--bord); }
   .importer .aide { flex: 1 1 240px; }
@@ -942,6 +968,11 @@
   .versions-liste li span { margin-right: 8px; }
   dialog.versions form input { flex: 1; }
   .tuile-outils { justify-content: flex-start !important; gap: 6px; flex-wrap: wrap; align-items: center; }
+  /* « 📐 Agrandir… » : la réglette, l’aperçu, et le bouton qui crée la copie. */
+  .tuile-agrandir { gap: 8px; flex-wrap: wrap; align-items: center; padding: 6px 0; }
+  .tuile-agrandir[hidden] { display: none; }
+  .tuile-agrandir input[type="range"] { width: 160px; }
+  .agrandir-apercu { width: 96px; height: 96px; image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 4px; background: #0b0d10; }
   .tuile-outils button.choisi { border-color: var(--vert); box-shadow: 0 0 0 2px #9bbc5a55; }
   /* 🎞 L’animation d’une tuile : la frise de ses images, et la pelure d’oignon sur la toile. */
   .tuile-animation { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; padding: 8px; border: 1px solid var(--bord); border-radius: 6px; max-width: 360px; }
@@ -1319,126 +1350,210 @@
   .erreur-texte { color: var(--rouge); }
 
   @media (max-width: 900px) { .corps { grid-template-columns: 1fr; } }
+
+  /* ================================================ la mise en page générale
+   *
+   * L'en-tête tient en DEUX lignes, toujours les mêmes :
+   *   1. la marque, les modes de travail, puis la console (Game Boy ou Color),
+   *      chercher, réglages, didacticiel ;
+   *   2. le projet, les gestes (annuler, refaire, versions, enregistrer), les
+   *      projets — puis, à droite, l'exemple et « Compiler ».
+   * Avant, tout était dans une seule rangée qui passait à la ligne n'importe
+   * où, et « Compiler et lancer » finissait seul sur une troisième ligne.
+   */
+  .entete { flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 10px; padding: 10px 16px 12px; }
+  .entete-haut, .entete-outils { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0; }
+  .entete-outils { padding-top: 10px; border-top: 1px solid var(--bord); }
+
+  /* Les boutons d'un même geste se touchent : on lit un groupe, pas cinq boutons. */
+  .groupe-outils { display: inline-flex; }
+  .groupe-outils > button { border-radius: 0; margin-left: -1px; min-width: 38px; }
+  .groupe-outils > button:first-child { border-radius: 7px 0 0 7px; margin-left: 0; }
+  .groupe-outils > button:last-child { border-radius: 0 7px 7px 0; }
+  .groupe-outils > button:hover:not(:disabled) { position: relative; z-index: 1; }
+
+  /* Mêmes hauteurs pour tout ce qui est sur la barre : boutons et listes. */
+  .entete button:not(.mode):not(.bandeau-projet), .entete select { min-height: 34px; }
+  #tout-chercher, #reglages { min-width: 38px; }
+  .entete #exemples { max-width: 260px; }
+  .entete-outils .recherche { flex: 0 1 170px; }
+  .entete #console-cible { max-width: 270px; }
+
+  /* « Compiler et lancer » : LE bouton de la page, il doit se voir de loin. */
+  #lancer { padding: 7px 18px; font-size: 14.5px; box-shadow: 0 2px 10px #9bbc5a33; }
+  #lancer:hover:not(:disabled) { background: #4a7d55; border-color: #b6d97a; }
+
+  /* On voit où l'on est au clavier (Tab), sans contour au clic de souris. */
+  button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--vert); outline-offset: 2px;
+  }
+
+  /* --- la console : ses commandes, rangées par ce qu'elles font --- */
+  .commandes-console {
+    display: flex; flex-direction: column; gap: 12px; padding: 12px;
+    background: var(--panneau-clair); border: 1px solid var(--bord); border-radius: 10px;
+  }
+  .groupe-console { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .groupe-console > .groupe-titre {
+    flex-basis: 100%; font-size: 10.5px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .09em; color: var(--gris);
+  }
+  .groupe-console > button { padding: 5px 10px; font-size: 13px; background: var(--panneau); }
+  .groupe-console > button:hover:not(:disabled) { background: #2c3140; }
+  .groupe-console > button.danger { background: #4a2226; }
+  .groupe-console #ips { margin-left: auto; }
+
+  /* --- sur un téléphone ou une tablette étroite --- */
+  @media (max-width: 1100px) {
+    .marque p { display: none; }
+  }
+  @media (max-width: 700px) {
+    .entete { padding: 10px 12px; }
+    /* Les modes défilent sur le côté au lieu de sortir de l'écran. */
+    .modes { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+    .modes::-webkit-scrollbar { display: none; }
+    .entete-haut > .pousse, .entete-outils > .pousse { display: none; }
+    .entete .bandeau-projet { flex: 1 1 100%; max-width: none; }
+    .entete #exemples, .entete #console-cible, .entete-outils .recherche { flex: 1 1 100%; max-width: none; min-width: 0; width: 100%; }
+    #lancer { flex: 1 1 100%; }
+  }
 </style>
 </head>
 <body>
 
 <div class="app">
   <header class="entete">
-    <div class="marque">
-      <span>C++</span>
-      <div>
-        <h1>gameboy3</h1>
-        <p>Écrire une cartouche Game Boy en C++</p>
+    <!-- Ligne 1 : qui l’on est, le mode de travail, et pour quelle console. -->
+    <div class="entete-haut">
+      <div class="marque">
+        <span>C++</span>
+        <div>
+          <h1>gameboy3</h1>
+          <p>Écrire une cartouche Game Boy en C++</p>
+        </div>
       </div>
-    </div>
-    <!--
-      Les deux modes, en haut et en grand.
-      Ils étaient un onglet discret sous le champ de texte : personne ne les
-      voyait, et l'atelier de musique passait pour absent. Ce qui change la
-      page entière se commande depuis la page entière.
-    -->
-    <div class="modes" role="tablist" aria-label="Mode de travail">
-      <button type="button" class="mode actif" id="mode-creation" role="tab" aria-selected="true">
-        <b>🎨 MODE CRÉATION</b>
-        <small>dessiner, composer, écrire le code</small>
-      </button>
-      <!-- Le MODE CODE a rejoint la création : un seul mode, où « ⤢ Agrandir le
-           code » donne tout l'écran au programme. Ce bouton reste pour les
-           anciens liens (#code) et les réglages, caché. -->
-      <button type="button" class="mode" id="mode-code" role="tab" aria-selected="false" hidden>
-        <b>⌨ MODE CODE</b>
-        <small>écrire le programme</small>
-      </button>
-      <button type="button" class="mode" id="mode-lecons" role="tab" aria-selected="false">
-        <b>📚 APPRENDRE</b>
-        <small>le parcours : leçons et cours</small>
-      </button>
-      <!-- Le cours a rejoint le parcours : ce bouton reste pour les anciens liens, caché. -->
-      <button type="button" class="mode" id="mode-cours" role="tab" aria-selected="false" hidden>
-        <b>🧠 MODE COURS</b>
-        <small>apprendre à programmer</small>
-      </button>
-      <button type="button" class="mode" id="mode-machine" role="tab" aria-selected="false">
-        <b>🔎 MODE MACHINE</b>
-        <small>ce que la console exécute</small>
-      </button>
-      <!-- Les sources : le même contenu que l'onglet « 📚 Les sources » du mode
-           création, mais ici, aussi visible que les autres modes : plus besoin
-           de deviner qu'il existe. -->
-      <button type="button" class="mode" id="mode-sources" role="tab" aria-selected="false">
-        <b>🔗 LES SOURCES</b>
-        <small>tous les cours et documents</small>
-      </button>
+      <!--
+        Les deux modes, en haut et en grand.
+        Ils étaient un onglet discret sous le champ de texte : personne ne les
+        voyait, et l'atelier de musique passait pour absent. Ce qui change la
+        page entière se commande depuis la page entière.
+      -->
+      <div class="modes" role="tablist" aria-label="Mode de travail">
+        <button type="button" class="mode actif" id="mode-creation" role="tab" aria-selected="true">
+          <b>🎨 MODE CRÉATION</b>
+          <small>dessiner, composer, écrire le code</small>
+        </button>
+        <!-- Le MODE CODE a rejoint la création : un seul mode, où « ⤢ Agrandir le
+             code » donne tout l'écran au programme. Ce bouton reste pour les
+             anciens liens (#code) et les réglages, caché. -->
+        <button type="button" class="mode" id="mode-code" role="tab" aria-selected="false" hidden>
+          <b>⌨ MODE CODE</b>
+          <small>écrire le programme</small>
+        </button>
+        <button type="button" class="mode" id="mode-lecons" role="tab" aria-selected="false">
+          <b>📚 APPRENDRE</b>
+          <small>le parcours : leçons et cours</small>
+        </button>
+        <!-- Le cours a rejoint le parcours : ce bouton reste pour les anciens liens, caché. -->
+        <button type="button" class="mode" id="mode-cours" role="tab" aria-selected="false" hidden>
+          <b>🧠 MODE COURS</b>
+          <small>apprendre à programmer</small>
+        </button>
+        <button type="button" class="mode" id="mode-machine" role="tab" aria-selected="false">
+          <b>🔎 MODE MACHINE</b>
+          <small>ce que la console exécute</small>
+        </button>
+        <!-- Les sources : le même contenu que l'onglet « 📚 Les sources » du mode
+             création, mais ici, aussi visible que les autres modes : plus besoin
+             de deviner qu'il existe. -->
+        <button type="button" class="mode" id="mode-sources" role="tab" aria-selected="false">
+          <b>🔗 LES SOURCES</b>
+          <small>tous les cours et documents</small>
+        </button>
+      </div>
+      <div class="pousse"></div>
+      <!--
+        Pour quelle console ?
+        Le choix est ici, en tête et bien visible, et non enfoui dans les
+        réglages : il change ce que la cartouche EST, pas la façon dont on la
+        regarde. Une couleur posée dans un programme annoncé pour la Game Boy
+        d'origine est refusée à la compilation, avec sa ligne.
+      -->
+      <select id="console-cible" title="pour quelle console la cartouche est faite">
+        <option value="gbc">🌈 En couleur (Game Boy Color)</option>
+        <option value="gb">🎮 Game Boy — 4 nuances, rien de plus</option>
+      </select>
+      <button type="button" id="tout-chercher" title="tout chercher : leçons, cours, exemples, projets, fonctions, réglages, modèles — Ctrl+K">🔎</button>
+      <button type="button" id="reglages" title="les réglages de la page">⚙</button>
+      <button type="button" id="didacticiel" title="apprendre à se servir de tout l’atelier, pas à pas">🎓 Didacticiel</button>
     </div>
 
-    <div class="pousse"></div>
-    <select id="exemples">
-      <option value="minimal">Tuiles — le plus court : une tuile, un appel</option>
-      <option value="ligne">Tuiles — une ligne entière, avec « for »</option>
-      <option value="damier">Tuiles — un damier, deux tuiles qui alternent</option>
-      <option value="lutin">Tuiles — la même, en lutin, au pixel près</option>
-      <option value="perso16">Tuiles — un personnage de seize</option>
-      <option value="surplace">Tuiles — le dessin écrit là où on le pose</option>
-      <option value="nuances">Tuiles — les quatre nuances, et la palette</option>
-      <option value="mario">SUPER MARIO — un niveau entier</option>
-      <option value="tetris">TETRIS — le jeu entier</option>
-      <option value="puits">Le puits qui s'empile</option>
-      <option value="chute">La pesanteur — un objet qui tombe et rebondit</option>
-      <option value="bonjour">Débuter — bonjour</option>
-      <option value="compteur">Débuter — compteur</option>
-      <option value="langage">Tout le langage, en un fichier</option>
-      <option value="console">Toute la console — son, panneau, palettes</option>
-      <option value="musique">Une musique qui joue toute seule</option>
-      <option value="marche">Une marche : mélodie, basse et caisse</option>
-      <option value="couleur">EN COULEUR — ciel, briques, herbe</option>
-      <option value="palettes">EN COULEUR — les huit palettes</option>
-      <option value="sansDessin">Un jeu SANS aucun dessin</option>
-      <option value="decoupe">Un programme sur CINQ fichiers</option>
-      <option value="boutonFront">Lire un bouton — l'instant de l'appui, pas tenu</option>
-      <option value="hasard">Le hasard — un dé relancé à chaque appui</option>
-      <option value="camera">Le décor qui défile — le héros fixe, le monde qui glisse</option>
-      <option value="sauvegardePartie">Se souvenir d'une partie à l'autre</option>
-      <option value="collision">Les collisions — s'arrêter devant un mur</option>
-      <option value="effetSonore">Un bruitage court — pas une musique</option>
-      <option value="vide">Page blanche</option>
-    </select>
-    <!--
-      Pour quelle console ?
-      Le choix est ici, en tête et bien visible, et non enfoui dans les
-      réglages : il change ce que la cartouche EST, pas la façon dont on la
-      regarde. Une couleur posée dans un programme annoncé pour la Game Boy
-      d'origine est refusée à la compilation, avec sa ligne.
-    -->
-    <select id="console-cible" title="pour quelle console la cartouche est faite">
-      <option value="gbc">🌈 En couleur (Game Boy Color)</option>
-      <option value="gb">🎮 Game Boy — 4 nuances, rien de plus</option>
-    </select>
-    <!--
-      OÙ L'ON TRAVAILLE.
-      Le nom du projet ouvert et le chemin de son dossier, en permanence sous
-      les yeux. Travailler une heure dans le mauvais projet est une heure
-      perdue que rien ne rattrape ; un bandeau ne coûte rien.
-    -->
-    <button type="button" class="bandeau-projet" id="bandeau-projet" title="ouvrir le lecteur de projets">
-      <span class="projet-icone">📁</span>
-      <span class="projet-ou">
-        <span class="projet-la" id="projet-nom">aucun projet</span>
-        <span class="projet-chemin" id="projet-chemin"></span>
-      </span>
-      <span class="projet-point" id="projet-point" hidden title="ce qui est à l’écran n’est pas encore sur le disque"></span>
-    </button>
-    <button type="button" id="annuler" disabled title="annuler le dernier geste d’atelier — Ctrl+Z">↶</button>
-    <button type="button" id="refaire" disabled title="refaire le geste annulé — Ctrl+Y">↷</button>
-    <button type="button" id="versions" title="les versions du programme : des photos datées, qu’on peut rouvrir">🕘</button>
-    <button type="button" id="projet-enregistrer" title="écrire le projet dans son dossier">💾</button>
-    <button type="button" id="projets-ouvrir" title="ouvrir un projet du disque">📂 Ouvrir</button>
-    <button type="button" id="nouveau" title="repartir d’un programme vide, sous un nouveau nom">✦ Nouveau</button>
-    <button type="button" id="modeles-jeux" title="un jeu complet tout prêt — aventure, chasse aux pièces, labyrinthe — à jouer puis à changer">🧩 Modèles</button>
-    <button type="button" id="tout-chercher" title="tout chercher : leçons, cours, exemples, projets, fonctions, réglages, modèles — Ctrl+K">🔎</button>
-    <button type="button" id="reglages" title="les réglages de la page">⚙</button>
-    <button type="button" id="didacticiel" title="apprendre à se servir de tout l’atelier, pas à pas">🎓 Didacticiel</button>
-    <button type="button" class="principal" id="lancer">▶ Compiler et lancer</button>
+    <!-- Ligne 2 : le projet, les gestes, puis l’exemple et « Compiler ». -->
+    <div class="entete-outils">
+      <!--
+        OÙ L'ON TRAVAILLE.
+        Le nom du projet ouvert et le chemin de son dossier, en permanence sous
+        les yeux. Travailler une heure dans le mauvais projet est une heure
+        perdue que rien ne rattrape ; un bandeau ne coûte rien.
+      -->
+      <button type="button" class="bandeau-projet" id="bandeau-projet" title="ouvrir le lecteur de projets">
+        <span class="projet-icone">📁</span>
+        <span class="projet-ou">
+          <span class="projet-la" id="projet-nom">aucun projet</span>
+          <span class="projet-chemin" id="projet-chemin"></span>
+        </span>
+        <span class="projet-point" id="projet-point" hidden title="ce qui est à l’écran n’est pas encore sur le disque"></span>
+      </button>
+      <div class="groupe-outils" role="group" aria-label="Annuler, refaire, versions, enregistrer">
+        <button type="button" id="annuler" disabled title="annuler le dernier geste d’atelier — Ctrl+Z">↶</button>
+        <button type="button" id="refaire" disabled title="refaire le geste annulé — Ctrl+Y">↷</button>
+        <button type="button" id="versions" title="les versions du programme : des photos datées, qu’on peut rouvrir">🕘</button>
+        <button type="button" id="projet-enregistrer" title="écrire le projet dans son dossier">💾</button>
+      </div>
+      <div class="groupe-outils" role="group" aria-label="Projets et modèles">
+        <button type="button" id="projets-ouvrir" title="ouvrir un projet du disque">📂 Ouvrir</button>
+        <button type="button" id="nouveau" title="repartir d’un programme vide, sous un nouveau nom">✦ Nouveau</button>
+        <button type="button" id="modeles-jeux" title="un jeu complet tout prêt — aventure, chasse aux pièces, labyrinthe — à jouer puis à changer">🧩 Modèles</button>
+      </div>
+      <div class="pousse"></div>
+      <select id="exemples">
+        <option value="minimal">Tuiles — le plus court : une tuile, un appel</option>
+        <option value="ligne">Tuiles — une ligne entière, avec « for »</option>
+        <option value="damier">Tuiles — un damier, deux tuiles qui alternent</option>
+        <option value="lutin">Tuiles — la même, en lutin, au pixel près</option>
+        <option value="perso16">Tuiles — un personnage de seize</option>
+        <option value="surplace">Tuiles — le dessin écrit là où on le pose</option>
+        <option value="nuances">Tuiles — les quatre nuances, et la palette</option>
+        <option value="mario">SUPER MARIO — un niveau entier</option>
+        <option value="tetris">TETRIS — le jeu entier</option>
+        <option value="invaders">SPACE INVADERS — le jeu entier, en couleur</option>
+        <option value="calcul">MARIO CALCUL — ouvrir les portes en calculant (démo)</option>
+        <option value="puissance4">PUISSANCE 4 — le Père Noël contre le bonhomme de neige</option>
+        <option value="dames">DAMES — les blancs contre les rouges</option>
+        <option value="echecs">ÉCHECS — les blancs contre les noirs</option>
+        <option value="cartes">COULEURS — un jeu de cartes, style UNO, contre la console</option>
+        <option value="puits">Le puits qui s'empile</option>
+        <option value="chute">La pesanteur — un objet qui tombe et rebondit</option>
+        <option value="bonjour">Débuter — bonjour</option>
+        <option value="compteur">Débuter — compteur</option>
+        <option value="langage">Tout le langage, en un fichier</option>
+        <option value="console">Toute la console — son, panneau, palettes</option>
+        <option value="musique">Une musique qui joue toute seule</option>
+        <option value="marche">Une marche : mélodie, basse et caisse</option>
+        <option value="couleur">EN COULEUR — ciel, briques, herbe</option>
+        <option value="palettes">EN COULEUR — les huit palettes</option>
+        <option value="sansDessin">Un jeu SANS aucun dessin</option>
+        <option value="decoupe">Un programme sur CINQ fichiers</option>
+        <option value="boutonFront">Lire un bouton — l'instant de l'appui, pas tenu</option>
+        <option value="hasard">Le hasard — un dé relancé à chaque appui</option>
+        <option value="camera">Le décor qui défile — le héros fixe, le monde qui glisse</option>
+        <option value="sauvegardePartie">Se souvenir d'une partie à l'autre</option>
+        <option value="collision">Les collisions — s'arrêter devant un mur</option>
+        <option value="effetSonore">Un bruitage court — pas une musique</option>
+        <option value="vide">Page blanche</option>
+      </select>
+      <button type="button" class="principal" id="lancer">▶ Compiler et lancer</button>
+    </div>
   </header>
 
       <!--
@@ -1750,28 +1865,37 @@
         <canvas id="ecran" width="160" height="144"></canvas>
         <p class="perime" id="perime" hidden>⟳ Le code a changé — « ▶ Compiler et lancer », ou Ctrl+Entrée</p>
         <p class="en-pause" id="en-pause" hidden></p>
+        <!-- Ce que la console fait VRAIMENT : Game Boy Color en couleur, Game Boy en
+             4 nuances, ou l'aperçu en nuances d'une cartouche couleur. Lu dans
+             l'émulateur, jamais deviné d'après le réglage. -->
+        <p class="mode-console" id="mode-console"></p>
       </div>
-      <div class="rangee">
-        <button type="button" id="pause">⏸ Pause</button>
-        <button type="button" id="reset" title="en mode leçons : remet le code d’origine de la leçon et la relance ; ailleurs : relance la cartouche">⟲ Reset</button>
-        <button type="button" id="stop" title="arrêter, et revenir au tout début de la cartouche — rien ne tourne jusqu’à « Reprendre »">⏹ Stop</button>
-        <button type="button" id="sauver-etat" disabled title="retenir l’état EXACT de la console — processeur, mémoires, écran, son — pour y revenir plus tard">💾 Sauver l’état</button>
-        <button type="button" id="reprendre-etat" disabled title="revenir à l’état retenu, au cycle près">⏏ Reprendre l’état</button>
-        <button type="button" id="son">🔊 Son</button>
-        <button type="button" id="plein-ecran" title="la console seule à l’écran — F ou « Échap » pour revenir">⛶ Plein écran</button>
-        <button type="button" id="telecharger" disabled title="la cartouche, à mettre sur une vraie console">⬇ .gb</button>
-        <!-- Le second fichier n’apparaît que lorsqu’il existe : « les deux » sur un
-             programme en couleur fabrique un « .gbc » et un « .gb ». -->
-        <button type="button" id="telecharger-gb" hidden title="la même chose pour une Game Boy d’origine, sans un octet de couleur">⬇ .gb</button>
-        <button type="button" id="exporter-html" disabled title="une page qui joue toute seule, sans atelier ni serveur — à partager ou déposer n’importe où">🌐 Exporter en HTML</button>
-        <button type="button" id="capture" disabled title="l’écran de la console, en image">📷 Capture</button>
-        <button type="button" id="voir-asm" disabled title="l’assembleur réel du processeur, avec les noms de ton programme">🔎 Voir l’assembleur</button>
-        <button type="button" id="ouvrir-rom" title="faire tourner une cartouche .gb venue d’ailleurs">📂 Ouvrir un .gb</button>
-        <button type="button" id="convertir" class="danger" title="tirer de la cartouche ce qui peut l’être : dessins, décor, palettes, textes">⚠ CONVERSION</button>
-        <button type="button" id="retour-cpp" class="danger" title="remonter du C++ depuis une cartouche compilée ici">⇱ Retour au C++</button>
-        <input type="file" id="fichier-rom" accept=".gb,.gbc" hidden>
-        <button type="button" id="manette-ecran" title="une croix et des boutons A, B, Start, Select à toucher — pour une tablette ou un téléphone">📱 Manette à l’écran</button>
-        <span class="aide" id="ips">—</span>
+      <!-- Les commandes de la console, rangées par ce qu’elles font. -->
+      <div class="commandes-console">
+        <div class="groupe-console" role="group" aria-label="Jouer">
+          <span class="groupe-titre">Jouer</span>
+          <button type="button" id="pause">⏸ Pause</button>
+          <button type="button" id="reset" title="en mode leçons : remet le code d’origine de la leçon et la relance ; ailleurs : relance la cartouche">⟲ Reset</button>
+          <button type="button" id="stop" title="arrêter, et revenir au tout début de la cartouche — rien ne tourne jusqu’à « Reprendre »">⏹ Stop</button>
+          <button type="button" id="son">🔊 Son</button>
+          <button type="button" id="plein-ecran" title="la console seule à l’écran — F ou « Échap » pour revenir">⛶ Plein écran</button>
+          <button type="button" id="manette-ecran" title="une croix et des boutons A, B, Start, Select à toucher — pour une tablette ou un téléphone">📱 Manette à l’écran</button>
+          <span class="aide" id="ips">—</span>
+        </div>
+        <div class="groupe-console" role="group" aria-label="État">
+          <span class="groupe-titre">État</span>
+          <button type="button" id="sauver-etat" disabled title="retenir l’état EXACT de la console — processeur, mémoires, écran, son — pour y revenir plus tard">💾 Sauver l’état</button>
+          <button type="button" id="reprendre-etat" disabled title="revenir à l’état retenu, au cycle près">⏏ Reprendre l’état</button>
+        </div>
+        <div class="groupe-console" role="group" aria-label="Cartouche">
+          <span class="groupe-titre">Cartouche</span>
+          <button type="button" id="telecharger" disabled title="la cartouche, à mettre sur une vraie console : « .gbc » en couleur, « .gb » en 4 nuances">⬇ .gb</button>
+          <button type="button" id="exporter-html" disabled title="une page qui joue toute seule, sans atelier ni serveur — à partager ou déposer n’importe où">🌐 Exporter en HTML</button>
+          <button type="button" id="capture" disabled title="l’écran de la console, en image">📷 Capture</button>
+          <button type="button" id="voir-asm" disabled title="l’assembleur réel du processeur, avec les noms de ton programme">🔎 Voir l’assembleur</button>
+          <button type="button" id="ouvrir-rom" title="faire tourner une cartouche .gb venue d’ailleurs">📂 Ouvrir un .gb</button>
+          <input type="file" id="fichier-rom" accept=".gb,.gbc" hidden>
+        </div>
       </div>
       <div id="manette-tactile" hidden></div>
       <p class="aide">
@@ -1801,9 +1925,11 @@
 import { analyser } from './compilateur/analyseur.js'
 import { compiler } from './compilateur/emetteur.js'
 import { fabriquer } from './compilateur/cartouche.js'
-import { fabriquerLesCartouches } from './compilateur/cartouches.js'
+import { fabriquerLaCartouche } from './compilateur/cartouches.js'
+import { CONSOLES, consoleDeLaCartouche } from './compilateur/consoles.js'
 import { rassembler, traduire, fichiersDemandes } from './compilateur/inclusion.js'
-import { completerLesInclusions, avecLesInclusions } from './compilateur/inclusions-auto.js'
+import { completerLesInclusions, inclusionsEnTete } from './compilateur/inclusions-auto.js'
+import { poserLaQuestion } from './question-include.js'
 import { GameBoy } from './emulateur.js'
 import { installer as installerTuiles } from './editeur-tuiles.js'
 import { installerEditeur } from './editeur-code.js'
@@ -1817,11 +1943,9 @@ import { lireAnimations, ecrireAnimations } from './animations-tuiles.js'
 import { installerLesVersions } from './versions.js'
 import { lireGBR, fichierGBTD } from './importer-gbtd.js'
 import { montrerLaMachine } from './vue-machine.js'
-import { tuilesDeLaMemoire, fichierDeLaCartouche } from './convertir.js'
-import { retourAuCpp } from './retour-cpp.js'
 import { installer as installerProjets } from './projets.js'
 import { BOUTONS, OPTIONS_LUTIN, NOTES } from './compilateur/emetteur.js'
-import { LECONS, NIVEAUX, numeros, partieDe, principales } from './tuto/lecons.js'
+import { LECONS, NIVEAUX, numeros, partieDe, principales, nomDuChapitre } from './tuto/lecons.js'
 import { COURS, CHAPITRES } from './tuto/programmation.js'
 import { enrichir } from './tuto/enrichir.js'
 import { construirePageAutonome } from './exporter-html.js'
@@ -1900,6 +2024,12 @@ const EXEMPLES = {
   chute: 'exemples/chute.cpp',
   mario: 'exemples/mario.cpp',
   tetris: 'exemples/tetris.cpp',
+  invaders: 'exemples/invaders.cpp',
+  calcul: 'exemples/calcul.cpp',
+  puissance4: 'exemples/puissance4.cpp',
+  dames: 'exemples/dames.cpp',
+  echecs: 'exemples/echecs.cpp',
+  cartes: 'exemples/cartes.cpp',
   langage: 'exemples/langage.cpp',
   console: 'exemples/console.cpp',
   musique: 'exemples/musique.cpp',
@@ -2599,8 +2729,8 @@ let fichierCourant = PRINCIPAL
 
 const gb = new GameBoy()
 let romActuelle = null
-/* Les cartouches de la dernière compilation : une, ou deux quand « les deux »
-   a séparé la couleur du reste. La première est celle qui tourne. */
+/* La cartouche de la dernière compilation, dans un tableau d'une case :
+   « .gbc » ou « .gb », jamais les deux. */
 let cartouchesActuelles = []
 let tourne = false
 let boucle = 0
@@ -2834,6 +2964,9 @@ function compilerEtLancer() {
   programmeCompile = empreinteDuProgramme()
   montrerLaPeremption()
 
+  /* Les fichiers qui entrent dans le programme : ils seront gravés dans la
+     cartouche, tels qu'ils ont été écrits. */
+  const lus = new Map()
   let assemble
   try {
     assemble = rassembler((nom) => {
@@ -2843,6 +2976,7 @@ function compilerEtLancer() {
             `${fichiers.size} : ${[...fichiers.keys()].join(', ')}.`,
         )
       }
+      lus.set(nom, fichiers.get(nom))
       return fichiers.get(nom)
     }, PRINCIPAL)
   } catch (erreur) {
@@ -2857,14 +2991,11 @@ function compilerEtLancer() {
     const arbre = analyser(assemble.texte)
 
     /*
-     * UNE cartouche, ou DEUX.
-     *
-     * « les deux » sur un programme qui pose des couleurs en fabrique
-     * maintenant deux : le « .gbc » avec toutes ses couleurs, le « .gb » sans
-     * une seule instruction de couleur. La PREMIÈRE est celle qui tourne dans
-     * la console de la page — la plus riche des deux.
+     * UNE cartouche, pour la console choisie en haut de la page : « .gbc »
+     * en couleur, « .gb » en 4 nuances — voir compilateur/consoles.js.
      */
-    cartouchesActuelles = fabriquerLesCartouches(arbre, titreDeLaCartouche(), REGLAGES.console)
+    cartouchesActuelles = [fabriquerLaCartouche(arbre, titreDeLaCartouche(), REGLAGES.console,
+      { principal: PRINCIPAL, fichiers: [...lus] })]
     const faite = cartouchesActuelles[0]
     const { octets, variables } = faite
     romActuelle = faite.rom
@@ -2900,24 +3031,13 @@ function compilerEtLancer() {
 
     const noms = [...variables.keys()]
 
-    /*
-     * Deux cartouches : le dire, et dire ce qui les distingue.
-     *
-     * Deux fichiers apparaissent au téléchargement ; sans cette ligne, on ne
-     * saurait pas lequel prendre, ni pourquoi il y en a deux. Le nombre
-     * d'octets ôtés est ce que la Game Boy d'origine n'exécutait pas.
-     */
-    const deuxCartouches = cartouchesActuelles.length === 2
-      ? `\ndeux cartouches : « .gbc » en couleur, et « .gb » sans un octet de couleur ` +
-        `(${cartouchesActuelles[0].octets.length - cartouchesActuelles[1].octets.length} de moins)`
-      : ''
-
     $('etat').className = 'etat bon'
     $('etat').textContent = (REGLAGES.detailEtat === 'court'
       ? `32 Ko de cartouche\n${octets.length} octets de programme\n${noms.length} variable${noms.length > 1 ? 's' : ''}`
       : `32 Ko de cartouche\n${octets.length} octets de programme\n` +
         `${noms.length} variable${noms.length > 1 ? 's' : ''}` + (noms.length ? ' : ' + noms.join(', ') : '')
-    ) + deuxCartouches
+    ) + `
+${CONSOLES[faite.pour].etiquette}`
     marquerLEtat(true)
     montrerLAnalyse($('analyse'), analyserLaCartouche(faite), { inclure: inclureDansLaCartouche })
     derniereCompilation = faite
@@ -2952,29 +3072,37 @@ function compilerEtLancer() {
     signalerLaFaute()
     allerALaLigneFautive(message)
     biper()
-    /* Un « #include » manque : un bouton les écrit tous, en tête du programme.
-       La ligne reste à lire dans le code — le bouton ne fait que l'écrire. */
+    /* Un « #include » manque : on DEMANDE tout de suite, sous l'erreur, s'il
+       faut l'écrire tout en haut du code. Si l'on répond non, le bouton
+       rouge reste là pour le faire plus tard. */
     if (message.includes('il faut « #include <')) {
-      const bouton = document.createElement('button')
-      bouton.type = 'button'
-      bouton.className = 'petit'
-      bouton.textContent = '✚ Écrire les #include qui manquent'
-      bouton.style.marginLeft = '8px'
-      bouton.addEventListener('click', () => {
+      const ajouter = () => {
         fichiers.set(fichierCourant, $('source').value)
         const autres = Object.fromEntries([...fichiers].filter(([nom]) => nom !== PRINCIPAL))
-        let texte
+        let rendu
         try {
-          texte = avecLesInclusions(fichiers.get(PRINCIPAL), autres)
+          rendu = inclusionsEnTete(fichiers.get(PRINCIPAL), autres)
         } catch (autre) {
           $('etat').textContent = traduire(autre.message, assemble.origine)
           return
         }
-        if (fichierCourant === PRINCIPAL) poserLeCode(texte, 'atelier', { tel: true })
-        else { fichiers.set(PRINCIPAL, texte); retenirLeProgramme() }
+        if (!rendu.noms.length) return
+        if (fichierCourant === PRINCIPAL) poserLeCode(rendu.texte, 'atelier', { tel: true })
+        else { fichiers.set(PRINCIPAL, rendu.texte); retenirLeProgramme() }
         compilerEtLancer()
-      })
+      }
+      const bouton = document.createElement('button')
+      bouton.type = 'button'
+      bouton.className = 'petit danger'
+      bouton.textContent = '✚ Écrire les #include qui manquent'
+      bouton.style.marginLeft = '8px'
+      bouton.addEventListener('click', ajouter)
       $('etat').append(bouton)
+      /* La question douce, sous l'erreur (voir question-include.js). */
+      const autres = Object.fromEntries([...fichiers].filter(([nom]) => nom !== PRINCIPAL))
+      let noms = []
+      try { ({ noms } = inclusionsEnTete(fichiers.get(PRINCIPAL), autres)) } catch { /* le bouton suffit */ }
+      poserLaQuestion($('etat'), noms, ajouter, bouton)
     }
   }
 }
@@ -3173,9 +3301,35 @@ const huitBits = (cinq) => (cinq << 3) | (cinq >> 2)
  */
 function appliquerLApercu() {
   if (!romActuelle) return
-  const enCouleur = romActuelle[0x0143] === 0x80 || romActuelle[0x0143] === 0xc0
+  const enCouleur = consoleDeLaCartouche(romActuelle) === 'gbc'
   gb.ppu.couleur = enCouleur && !REGLAGES.voirEnNuances
+  montrerLeModeDeLaConsole(enCouleur)
   redessinerLEcran()
+}
+
+/*
+ * Dire, sous l'écran, ce que la console fait vraiment.
+ *
+ * Trois cas, et trois seulement :
+ *   🌈 une cartouche Game Boy Color, affichée en couleur ;
+ *   🎮 une cartouche Game Boy, en 4 nuances ;
+ *   👁 une cartouche Game Boy Color, montrée en 4 nuances par le réglage
+ *      « Voir en quatre nuances » — un APERÇU : la cartouche n'a pas changé.
+ * Lu dans l'émulateur (« gb.ppu.couleur »), pas dans le réglage : c'est ce
+ * qu'on voit qu'il faut nommer.
+ */
+function montrerLeModeDeLaConsole(enCouleur) {
+  const p = $('mode-console')
+  if (gb.ppu.couleur) {
+    p.dataset.mode = 'gbc'
+    p.textContent = CONSOLES.gbc.etiquette
+  } else if (enCouleur) {
+    p.dataset.mode = 'apercu'
+    p.textContent = '👁 Aperçu en 4 nuances d’une cartouche Game Boy Color (réglage « Voir en quatre nuances »)'
+  } else {
+    p.dataset.mode = 'gb'
+    p.textContent = CONSOLES.gb.etiquette
+  }
 }
 
 /**
@@ -3610,13 +3764,12 @@ function telechargerLaCartouche(quelle) {
 }
 
 $('telecharger').addEventListener('click', () => telechargerLaCartouche(0))
-$('telecharger-gb').addEventListener('click', () => telechargerLaCartouche(1))
 
 /*
  * Exporter en HTML : une page qui se joue toute seule.
  *
- * `romActuelle` porte celle qui tourne (le « .gbc » quand il y en a deux) —
- * c'est la même qu'on vient de voir jouer, pas une recompilation à part.
+ * `romActuelle` porte celle qui tourne — c'est la même qu'on vient de voir
+ * jouer, pas une recompilation à part.
  */
 $('exporter-html').addEventListener('click', async () => {
   if (!romActuelle) return
@@ -3637,11 +3790,9 @@ $('exporter-html').addEventListener('click', async () => {
   }
 })
 
-/** Les boutons disent ce qu'ils donnent : « .gb » seul, ou « .gbc » et « .gb ». */
+/** Le bouton dit ce qu'il donne : « .gbc » en couleur, « .gb » en 4 nuances. */
 function montrerLesTelechargements() {
-  const deux = cartouchesActuelles.length === 2
   $('telecharger').textContent = '⬇ ' + (cartouchesActuelles[0]?.extension ?? '.gb')
-  $('telecharger-gb').hidden = !deux
 }
 
 /*
@@ -3656,7 +3807,9 @@ function montrerLesTelechargements() {
  * sont des lunettes posées par-dessus l'écran, pas ce que la console affiche.
  * La palette, elle, est celle du moment — c'est bien ce que l'on voit.
  */
-$('voir-asm').addEventListener('click', () => montrerMode('machine'))
+$('voir-asm').addEventListener('click', () => {
+  montrerMode('machine')
+})
 
 $('capture').addEventListener('click', () => {
   if (!romActuelle) return
@@ -3926,11 +4079,8 @@ window.inspecteur = {
   get gb() { return gb },
   get rom() { return romActuelle },
   /*
-   * Les cartouches de la dernière compilation, vues du dehors.
-   *
-   * « les deux » en fabrique DEUX sur un programme en couleur, et rien à
-   * l’écran ne permettrait de contrôler que la seconde ne porte pas un octet
-   * de couleur : les octets ne sont pas dans le DOM.
+   * La cartouche de la dernière compilation, vue du dehors — toujours UNE :
+   * pour quelle console, son extension, et l’octet $0143 qu’elle porte.
    */
   get cartouches() {
     return cartouchesActuelles.map((c) => ({
@@ -4530,27 +4680,73 @@ const atelierCarte = installerCarte({
  * dans le texte, avec un nom libre. Il n'y a toujours qu'un seul endroit où
  * vivent les dessins — le programme.
  */
+/*
+ * La taille des formes géométriques : 8, 16 ou 32. La console ne sait pas
+ * agrandir un dessin ; chaque forme est donc écrite trois fois (bibliotheque.js,
+ * « tailles »), et l'on choisit ici laquelle on prend. Le nom dit la taille :
+ * ROND_8, ROND, ROND_32.
+ */
+let tailleDesFormes = 16
+
+/** Le modèle tel qu'on le prend, à la taille choisie (les autres ne changent pas). */
+function aLaTaille(modele) {
+  if (!modele.tailles || tailleDesFormes === 16) return modele
+  return {
+    ...modele,
+    nom: `${modele.nom}_${tailleDesFormes}`,
+    cote: tailleDesFormes,
+    type: tailleDesFormes === 8 ? 'Tuile' : 'Perso',
+    rangees: modele.tailles[tailleDesFormes],
+  }
+}
+
 function remplirLaBibliotheque() {
   const zone = $('modeles')
   zone.textContent = ''
 
-  for (const modele of MODELES) {
+  /* Le choix de la taille, au-dessus de la liste (et de sa recherche) : il ne
+     touche que les formes numérotées. Il n'est PAS dans #modeles, qui ne porte
+     que des modèles — c'est elle que la recherche filtre. */
+  let choix = document.getElementById('tailles-formes')
+  if (!choix) {
+    choix = document.createElement('div')
+    choix.id = 'tailles-formes'
+    choix.className = 'rangee tailles-formes'
+    ;(zone.previousElementSibling?.classList.contains('recherche') ? zone.previousElementSibling : zone).before(choix)
+  }
+  choix.textContent = ''
+  choix.append(Object.assign(document.createElement('span'), { className: 'aide', textContent: 'Taille des formes :' }))
+  for (const taille of [8, 16, 32]) {
     const bouton = document.createElement('button')
     bouton.type = 'button'
-    bouton.className = 'modele' + (modele.cote === 16 ? ' perso' : '')
-    bouton.title = `${modele.nom} — ${modele.quoi}. Cliquer l'écrit dans le programme.`
+    bouton.textContent = `${taille} × ${taille}`
+    bouton.dataset.taille = String(taille)
+    bouton.classList.toggle('principal', taille === tailleDesFormes)
+    bouton.title = taille === 16 ? 'la taille d’un personnage' : taille === 8 ? 'une tuile : ROND_8…' : 'un grand personnage : ROND_32…'
+    bouton.addEventListener('click', () => { tailleDesFormes = taille; remplirLaBibliotheque() })
+    choix.append(bouton)
+  }
+
+  for (const original of MODELES) {
+    const modele = aLaTaille(original)
+    const bouton = document.createElement('button')
+    bouton.type = 'button'
+    bouton.className = 'modele' + (modele.cote >= 16 ? ' perso' : '')
+    // le numéro aussi (« 2.01 ROND ») : la recherche de la galerie lit ce texte
+    bouton.title = `${modele.numero ? `${modele.numero} ` : ''}${modele.nom} — ${modele.quoi}. Cliquer l'écrit dans le programme.`
 
     const canevas = document.createElement('canvas')
     canevas.width = modele.cote
     canevas.height = modele.cote
     peindre(canevas, modele.rangees, modele.cote)
 
+    /* Les formes géométriques portent un numéro : « 2.01 ROND », « 2.02 CARRE »… */
     const nom = document.createElement('b')
-    nom.textContent = modele.nom
+    nom.textContent = modele.numero ? `${modele.numero} ${modele.nom}` : modele.nom
 
     const taille = document.createElement('span')
     taille.className = 'taille'
-    taille.textContent = modele.cote === 16 ? '16 × 16 — 4 tuiles' : '8 × 8'
+    taille.textContent = modele.cote === 32 ? '32 × 32 — 16 tuiles' : modele.cote === 16 ? '16 × 16 — 4 tuiles' : '8 × 8'
 
     const quoi = document.createElement('small')
     quoi.textContent = modele.quoi
@@ -5200,9 +5396,8 @@ $('fichier-decoupe').addEventListener('change', async (evenement) => {
 
 /*
  * Un fichier du Game Boy Tile Designer peut porter des dizaines de tuiles, déjà
- * nommées. On ne les verse donc pas une à une dans le programme — comme pour
- * les dessins tirés d'une cartouche (« CONVERSION »), elles arrivent dans LEUR
- * fichier, et l'on choisit ensuite ce qu'on en garde.
+ * nommées. On ne les verse donc pas une à une dans le programme : elles
+ * arrivent dans LEUR fichier, et l'on choisit ensuite ce qu'on en garde.
  */
 const FICHIER_GBTD = 'tuiles-gbtd.cpp'
 
@@ -5279,12 +5474,23 @@ $('fichier-rom').addEventListener('change', async (evenement) => {
     return
   }
 
+  jouerLaCartouche(octets, fichier.name)
+  /* Le champ est vidé pour qu'un même fichier rouvert relance bien. */
+  evenement.target.value = ''
+})
+
+/**
+ * Faire tourner une cartouche venue du dehors : un .gb ouvert.
+ */
+function jouerLaCartouche(octets, nom, autre = '') {
   romActuelle = octets
-  /* Une cartouche venue du dehors n’a pas deux versions : elle est ce qu’elle
-     est, et c’est son en-tête qui dit si elle veut la couleur. */
-  cartouchesActuelles = [{ rom: romActuelle, octets: romActuelle, extension: romActuelle[0x0143] === 0xc0 ? '.gbc' : '.gb' }]
+  /* Une cartouche venue du dehors est ce qu’elle est : c’est son en-tête qui
+     dit si elle veut la couleur — le bit 7 de $0143, comme sur la vraie console
+     ($80 et $C0 sont tous deux « Game Boy Color »). */
+  cartouchesActuelles = [{ rom: romActuelle, octets: romActuelle, extension: CONSOLES[consoleDeLaCartouche(romActuelle)].extension }]
   romDuDehors = true
   gb.loadRom(romActuelle)
+  appliquerLApercu()
   tourne = true
   montrerLaPause()
   $('telecharger').disabled = false
@@ -5306,12 +5512,10 @@ $('fichier-rom').addEventListener('change', async (evenement) => {
 
   $('etat').className = 'etat bon'
   $('etat').textContent =
-    `${fichier.name}\n${(octets.length / 1024) | 0} Ko de cartouche` +
-    (titre ? `\ntitre écrit dans la cartouche : « ${titre} »` : '')
-
-  /* Le champ est vidé pour qu'un même fichier rouvert relance bien. */
-  evenement.target.value = ''
-})
+    `${nom}\n${(octets.length / 1024) | 0} Ko de cartouche` +
+    (titre ? `\ntitre écrit dans la cartouche : « ${titre} »` : '') +
+    (autre ? `\n${autre}` : '')
+}
 
 $('revenir').addEventListener('click', () => {
   romDuDehors = false
@@ -5483,139 +5687,6 @@ function boutonNouveauFichier() {
   return neuf
 }
 
-/* ------------------------------------------------ la conversion */
-
-/*
- * Tirer d'une cartouche ce qui peut l'être.
- *
- * Deux choses que tout le monde confond, et que ce bouton sépare :
- *
- *   LE CODE NE SE CONVERTIT PAS. Le C++ n'entre jamais dans une cartouche ; la
- *   compilation jette les noms, les commentaires, la forme des boucles. Le MODE
- *   MACHINE montre les instructions, et c'est tout ce qu'on peut honnêtement
- *   montrer.
- *
- *   LES DESSINS, SI. Une tuile est un format fixe — seize octets, deux plans de
- *   bits — le même depuis 1989. Ce que la console a en mémoire vidéo se relit
- *   exactement.
- *
- * On lit donc la mémoire vidéo de la console EN TRAIN DE TOURNER, et non les
- * octets de la cartouche : un jeu range ses dessins où il veut, souvent
- * compressés. Une fois lancé, ce qu'il affiche est là, décompressé.
- */
-const FICHIER_DES_PRISES = 'tuiles-prises.cpp'
-
-$('convertir').addEventListener('click', () => {
-  if (!romActuelle) {
-    $('etat').className = 'etat erreur'
-    $('etat').textContent = 'Aucune cartouche ne tourne : il n’y a rien à convertir.'
-    return
-  }
-
-  const tuiles = tuilesDeLaMemoire(gb)
-
-  if (tuiles.length === 0) {
-    $('etat').className = 'etat erreur'
-    $('etat').textContent =
-      'La mémoire vidéo est vide : la cartouche n’a encore rien chargé.\n' +
-      'Laisse-la tourner quelques secondes, puis réessaie.'
-    return
-  }
-
-  /* Les dessins vont dans LEUR fichier, pas dans le programme : on garde le
-     sien lisible, et l'on choisit ensuite ce qu'on en prend. */
-  const tire = fichierDeLaCartouche(gb, { titre: romDuDehors ? 'la cartouche ouverte' : 'ton programme' })
-  fichiers.set(FICHIER_DES_PRISES, tire)
-  ouvrirFichier(FICHIER_DES_PRISES)
-
-  /* Compter par découpage plutôt que par expression régulière : la parenthèse
-     d'un appel est un caractère spécial, et l'échapper dans une chaîne bâtie à
-     la volée est le genre de détail qui casse en silence. */
-  const compter = (quoi) => tire.split('  ' + quoi + '(').length - 1
-
-  $('etat').className = 'etat bon'
-  $('etat').textContent =
-    `${tuiles.length} dessins, ${compter('poser')} cases de décor, ${compter('texte')} mots` +
-    (compter('couleurFond') ? `, ${compter('couleurFond')} teintes` : '') +
-    ` → onglet « ${FICHIER_DES_PRISES} ».\n\n` +
-    'Le PROGRAMME, lui, ne se convertit pas : aucune règle du jeu n’est là.\n' +
-    'Pour une cartouche compilée ici, « ⇱ Retour au C++ » en remonte ce qui\n' +
-    'peut l’être.'
-})
-
-/* ------------------------------------------ remonter au C++ */
-
-/*
- * Reconstruire un programme C++ depuis la cartouche qui tourne.
- *
- * Il faut le dire, et le bouton le dit : **le C++ n'est pas dans la
- * cartouche**. La compilation jette les noms, les commentaires et la forme des
- * boucles ; un `for` et un `while` donnent les mêmes octets. Ce qui se remonte,
- * ce sont les FORMES de ce compilateur-ci — elles sont régulières, et
- * « ld hl, $98c5 / ld de, … / ld b, 7 / call EcrireTexte » ne peut être qu'un
- * `texte(5, 6, "…")` de sept lettres.
- *
- * Sur une cartouche venue d'ailleurs, le compte tombera près de zéro : ses
- * octets n'ont pas été écrits par ce compilateur. C'est « ⚠ CONVERSION » qui
- * rend alors ce qui se rend — les dessins, le décor, les palettes.
- */
-const FICHIER_DU_RETOUR = 'remonte.cpp'
-
-$('retour-cpp').addEventListener('click', () => {
-  if (!romActuelle) {
-    $('etat').className = 'etat erreur'
-    $('etat').textContent = 'Aucune cartouche ne tourne : il n’y a rien à remonter.'
-    return
-  }
-
-  /*
-   * Les NOMS viennent du compilateur, quand la cartouche vient d'ici.
-   *
-   * Sans eux, les variables s'appellent par leur adresse. Ce n'est pas une
-   * paresse du module : les noms ne sont écrits nulle part dans les octets, et
-   * personne ne peut les rendre.
-   */
-  let rendu = null
-  if (!romDuDehors) {
-    try {
-      fichiers.set(fichierCourant, $('source').value)
-      const assemble = rassembler((nom) => fichiers.get(nom) ?? '', PRINCIPAL)
-      rendu = compiler(analyser(assemble.texte))
-    } catch {
-      rendu = null
-    }
-  }
-
-  /* Les dessins donnent leurs NOMS aux numéros de tuile : « poser(4, 6, MUR) »
-     plutôt que « poser(4, 6, 44) ». Ceux du programme d'abord ; à défaut, ceux
-     que la mémoire vidéo porte, sous un nom inventé. */
-  const dessins = rendu
-    ? lireDessins($('source').value)
-    : tuilesDeLaMemoire(gb).map(({ numero, rangees }, i) => ({
-      nom: `PRISE${String(i + 1).padStart(2, '0')}`, numero, cote: 8, rangees,
-    }))
-
-  const octets = rendu ? rendu.octets : [...romActuelle]
-  const base = rendu ? rendu.base : 0
-  const finDuCode = rendu ? (rendu.etiquettes.get('Tuiles') ?? rendu.octets.length) : romActuelle.length
-
-  let sortie
-  try {
-    sortie = retourAuCpp({ octets, base, finDuCode, rendu, dessins })
-  } catch (erreur) {
-    $('etat').className = 'etat erreur'
-    $('etat').textContent = 'La cartouche n’a pas pu être remontée : ' + erreur.message
-    return
-  }
-
-  fichiers.set(FICHIER_DU_RETOUR, sortie.texte)
-  ouvrirFichier(FICHIER_DU_RETOUR)
-
-  $('etat').className = 'etat bon'
-  $('etat').textContent =
-    `${sortie.reconnues} instructions sur ${sortie.total} remontées (${sortie.part} %) → onglet « ${FICHIER_DU_RETOUR} ».`
-})
-
 /* ------------------------------------------------ les projets, sur le disque */
 
 /*
@@ -5691,8 +5762,8 @@ const projets = installerProjets({
     }
   },
 
-  /* Les cartouches à garder dans le dossier : une, ou deux quand « les deux »
-     a séparé la couleur. Chacune sait pour quelle console elle est. */
+  /* La cartouche à garder dans le dossier : elle sait pour quelle console
+     elle est (« gb » ou « gbc »), et le service efface l’autre. */
   cartouches: () => cartouchesActuelles.filter((c) => c.rom && c.pour),
   demanderUnNom,
   dire: (texte, bon) => {
@@ -5751,27 +5822,25 @@ $('voile-projets').addEventListener('click', (e) => {
  * on y chercherait une instruction qui n'existe plus.
  */
 function montrerLaVueMachine() {
-  if (!romActuelle) {
-    montrerLaMachine($('zone-machine'), { rom: null, rendu: null })
+  const corps = $('zone-machine')
+  if (!romActuelle || romDuDehors) {
+    montrerLaMachine(corps, { rom: romActuelle, rendu: null })
     return
   }
 
   /* Une cartouche venue du dehors n'a pas de noms — et une cartouche compilée
      ici en a tous. C'est toute la différence, et la vue le dit. */
   let rendu = null
-  if (!romDuDehors) {
-    try {
-      fichiers.set(fichierCourant, $('source').value)
-      const assemble = rassembler((nom) => fichiers.get(nom) ?? '', PRINCIPAL)
-      rendu = compiler(analyser(assemble.texte))
-    } catch {
-      /* Le programme ne compile pas : on montre au moins la cartouche
-         précédente, telle qu'elle tourne. */
-      rendu = null
-    }
+  try {
+    fichiers.set(fichierCourant, $('source').value)
+    const assemble = rassembler((nom) => fichiers.get(nom) ?? '', PRINCIPAL)
+    rendu = compiler(analyser(assemble.texte))
+  } catch {
+    /* Le programme ne compile pas : on montre au moins la cartouche
+       précédente, telle qu'elle tourne. */
+    rendu = null
   }
-
-  montrerLaMachine($('zone-machine'), { rom: romActuelle, rendu })
+  montrerLaMachine(corps, { rom: romActuelle, rendu })
 }
 
 /* --------------------------------------------------------- les leçons */
@@ -5870,7 +5939,8 @@ function remplirLeChoix() {
       groupe.dataset.cle = cle   // gardée sur le groupe, pour comparer à la leçon suivante
       // Le titre du groupe dans le menu, par exemple :
       // « Niveau 0 — Avant tout · B. Le temps », ou « Niveau 3 — Dessiner ».
-      groupe.label = `${nomDuGroupe} ${lecon.difficulte} — ${groupes[lecon.difficulte]}`
+      // Une série à part (les formes) se titre « Série 2 », pas « Chapitre 26 ».
+      groupe.label = `${lecon.serie ? `Série ${lecon.serie}` : `${nomDuGroupe} ${lecon.difficulte}`} — ${groupes[lecon.difficulte]}`
         + (partie ? ` · ${partie.lettre}. ${partie.nom}` : '')
       choix.append(groupe)
     }
@@ -6067,7 +6137,7 @@ function toutesLesFiches() {
 
   // 🖼 les modèles de dessins : les prendre, comme d'un clic dans « Les modèles »
   for (const modele of MODELES) {
-    liste.push({ genre: '🖼 Modèle', libelle: modele.nom, detail: modele.quoi, texte: fiche(modele.nom, modele.quoi, 'modele dessin'), aller: () => prendreLeModele(modele) })
+    liste.push({ genre: '🖼 Modèle', libelle: modele.numero ? `${modele.numero} ${modele.nom}` : modele.nom, detail: modele.quoi, texte: fiche(modele.nom, modele.quoi, 'modele dessin'), aller: () => prendreLeModele(modele) })
   }
 
   // 🧩 les modèles de jeux : la liste des jeux, filtrée sur celui-ci
@@ -6157,7 +6227,7 @@ function allerALaLecon(index, { garderLeCode = false, defiler = true } = {}) {
   $('lecon-apres-bas').textContent = apres ? `${NUMEROS[index + 1]}. ${apres.titre} ▶` : `✓ Tu es au bout des ${principales(LECONS)}`
   $('lecon-ou').textContent = !apres
     ? 'la dernière leçon : tu as tout vu'
-    : `ensuite — chapitre ${apres.difficulte} : ${NIVEAUX[apres.difficulte]}`
+    : `ensuite — ${nomDuChapitre(apres).toLowerCase()} : ${NIVEAUX[apres.difficulte]}`
 
   $('lecon-titre').textContent = `${NUMEROS[index]}. ${lecon.titre}`
   $('lecon-idee').textContent = lecon.idee
@@ -6173,14 +6243,16 @@ function allerALaLecon(index, { garderLeCode = false, defiler = true } = {}) {
   }
 
   {
-    repere(`Chapitre ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`, 'niveau')
+    repere(`${nomDuChapitre(lecon)} — ${NIVEAUX[lecon.difficulte]}`, 'niveau')
     /* D'où vient l'étape : une leçon, un cours, ou le tuto d'une fonction. */
     if (lecon.provenance === 'cours') repere('🎓 du cours', 'outil')
     // La partie, juste après le niveau : « Partie D — Des formes ». Seul le
     // chapitre 0 en a ; ailleurs partieDe rend null, et rien n'est ajouté.
     const partie = partieDe(LECONS, index)
     if (partie) repere(`Partie ${partie.lettre} — ${partie.nom}`, 'niveau')
-    repere(`leçon ${NUMEROS[index]} sur ${principales(LECONS)}`, '')
+    /* Dans une série à part, on compte dans la série : « leçon 2.03 sur 2.15 ». */
+    const derniere = lecon.serie ? LECONS.findLast((l) => l.serie === lecon.serie).numero : principales(LECONS)
+    repere(`leçon ${NUMEROS[index]} sur ${derniere}`, '')
     /* La jauge : la difficulté de 1 à 10, et non le numéro du chapitre. */
     const niveau = lecon.niveau ?? Math.max(1, Math.min(10, lecon.difficulte))
     repere(`difficulté ${niveau} / 10`, 'difficulte')
@@ -6467,20 +6539,49 @@ document.addEventListener('gameboy3:console', (e) => {
  * ou « autre.cpp, ligne 3 : … » quand la faute est dans un autre fichier : on
  * ne marque alors que si c'est celui qu'on regarde.
  */
+function ligneFautiveDuMessage() {
+  if (!$('etat').className.includes('erreur')) return null
+  const coup = $('etat').textContent.match(/(?:([\w.-]+\.(?:cpp|h|hpp)), )?ligne (\d+)/)
+  if (!coup) return null
+  if (coup[1] && coup[1] !== fichierCourant) return null
+  return Number(coup[2])
+}
 var editeurDeCode = installerEditeur({
   champ: $('source'),
   actif: () => REGLAGES.editeurRiche !== false,
-  ligneFautive: () => {
-    if (!$('etat').className.includes('erreur')) return null
-    const coup = $('etat').textContent.match(/(?:([\w.-]+\.(?:cpp|h|hpp)), )?ligne (\d+)/)
-    if (!coup) return null
-    if (coup[1] && coup[1] !== fichierCourant) return null
-    return Number(coup[2])
-  },
+  ligneFautive: ligneFautiveDuMessage,
   /* Ce que dit la faute, écrit au bout de la ligne fautive, dans le code même. */
   messageFautif: () => ($('etat').textContent.match(/ligne \d+ : ([^\n]*)/)?.[1] ?? '').trim(),
 })
 new MutationObserver(() => editeurDeCode.marquer()).observe($('etat'), { childList: true, characterData: true, subtree: true, attributes: true })
+/*
+ * Le message rouge écrit au bout de la ligne fautive laisse passer les clics :
+ * ils tombent dans le code. Si la faute est un « #include » qui manque, on
+ * fait comme un clic sur le message sous le code — les lignes sont ajoutées
+ * tout en haut (voir question-include.js) :
+ *
+ *   - un simple clic SUR le message rouge, au bout de la ligne ;
+ *   - un double-clic n'importe où sur la ligne fautive.
+ *
+ * Un simple clic sur le code de la ligne, lui, pose le curseur comme
+ * d'habitude : c'est là qu'on clique pour corriger.
+ */
+function ajouterDepuisLeCode() {
+  $('etat').querySelector('.message-ajoutable')?.click()
+}
+$('source').addEventListener('click', (e) => {
+  const bulle = document.querySelector('.editeur-faute-texte')
+  if (!bulle || !bulle.textContent || !$('etat').querySelector('.message-ajoutable')) return
+  const r = bulle.getBoundingClientRect()
+  if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) ajouterDepuisLeCode()
+})
+$('source').addEventListener('dblclick', () => {
+  const faute = ligneFautiveDuMessage()
+  if (!faute) return
+  const champ = $('source')
+  const ligne = champ.value.slice(0, champ.selectionStart).split('\n').length
+  if (ligne === faute) ajouterDepuisLeCode()
+})
 /* Le champ change de taille avec le mode et la poignée : l'éditeur se recale. */
 for (const id of ['mode-creation', 'mode-code', 'mode-lecons', 'mode-cours', 'mode-machine', 'mode-sources']) {
   $(id)?.addEventListener('click', () => requestAnimationFrame(() => editeurDeCode.caler()))

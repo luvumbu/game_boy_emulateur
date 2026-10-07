@@ -82,7 +82,7 @@
     <span class="niveau">Chapitre 6 — Dessiner</span>
     
     
-    <span>leçon 35.3 sur 143</span>
+    <span>leçon 35.3 sur 152</span>
     <span class="jauge" style="--part: 60%">difficulté 6 / 10</span>
     
     
@@ -128,37 +128,25 @@ Fonctions du langage appelées :
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
     <pre><code>// ---- #include &lt;cacher16&gt; : ôter un personnage de 16 × 16 ----
+// BONHOMME est dessiné dans perso_BONHOMME.cpp ; ici, on ne fait que l'appeler.
 
-#include &lt;sprite16&gt;
-#include &lt;cacher16&gt;   // cacher16() : ôter les quatre lutins
-#include &lt;Perso&gt;</code></pre>
+#include &lt;sprite16&gt;          // sprite16() : le poser
+#include &lt;cacher16&gt;          // cacher16() : ôter ses quatre lutins
+#include "personnages.cpp"   // la liste : BONHOMME</code></pre>
   </div>
   <div></div>
 </div>
 
 <div class="morceau">
   <div>
-    <p class="quoi">2. un dessin — BLOC</p>
-    <pre><code>Perso BLOC = {
-  "################", "################", "################", "################",
-  "################", "################", "################", "################",
-  "################", "################", "################", "################",
-  "################", "################", "################", "################",
-};</code></pre>
-  </div>
-  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAIAAABt+uBvAAAApUlEQVR4nO3QMQ0AIBDAwB+RwIh/lThgpcMlFdDcrH30aL4fxAMECBAgQOEAAQIECFA4QIAAAQIUDhAgQIAAhQMECBAgQOEAAQIECFA4QIAAAQIUDhAgQIAAhQMECBAgQOEAAQIECFA4QIAAAQIUDhAgQIAAhQMECBAgQOEAAQIECFA4QIAAAQIUDhAgQIAAhQMECBAgQOEAAQIECFA4QIAAAfrZBaEnAIhm8gXCAAAAAElFTkSuQmCC" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
-</div>
-
-<div class="morceau">
-  <div>
-    <p class="quoi">3. le point d’entrée : c’est ici que la console arrive</p>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
     <pre><code>int main() {
-  sprite16(0, 72, 64, BLOC);
+  sprite16(0, 72, 64, BONHOMME);   // les lutins 0, 1, 2 et 3
 
   while (true) {
     image();
     if (images() == 120) {
-      cacher16(0);            // les lutins 0, 1, 2 et 3
+      cacher16(0);                 // les lutins 0, 1, 2 et 3 s'en vont
     }
   }
 }</code></pre>
@@ -180,7 +168,7 @@ programme.</p>
   </figure>
 
   <figure>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABfUlEQVR4nO3RsQnDABDAQJcZIWX2n8YjZIyUKX4CF8a8ONAAgju+v1PhjscPdGuA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOlwV+vT+Xenz4pgAD3hngCTDgnQGeAAPeGeAJMOCdAZ4AA94Z4Akw4J0BngAD3hngCTBgbQ5wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMcDHA9wPMDxAMf7AxgutdUDclECAAAAAElFTkSuQmCC" alt="l’écran">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABpklEQVR4nO3VsQkCAQxAUUtHsHQIZ3EGx3UEx7C0EEQ8tNPDnwe/SBl4hGwu17PCbVbfQF8NcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QYBb3f7R6sv87OmAD/rjjIeBHw4He+092H1lX7TIGAXHG+g7gjg5e2Oko4Df9adYDwC+N0PBvz3AQYMONG01/toFvByzgc4HuB4I4Bf/u6oNww43gjgyQGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4HiA4wGOBzge4Hg3ZIsbdyVnvsIAAAAASUVORK5CYII=" alt="l’écran">
     <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
   </figure>
 
@@ -193,7 +181,7 @@ programme.</p>
 
 
 <h2>4. Ce qu’on doit voir</h2>
-<p class="avoir">Un carré plein au milieu, qui disparaît au bout de deux secondes.</p>
+<p class="avoir">Le bonhomme au milieu, qui disparaît au bout de deux secondes.</p>
 
 <h2>5. Ce que la console répond</h2>
 <p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
@@ -202,7 +190,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 <ul class="controles">
 
-  <li>au départ, le carré est là </li>
+  <li>au départ, BONHOMME est là </li>
 
   <li>puis ses quatre lutins sont hors de l’écran </li>
 </ul>
@@ -210,7 +198,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 
 <p class="pied">
-  Ensuite : <strong>36. Intégrer une carte dans son projet</strong> — chapitre 6 : Dessiner.
+  Ensuite : <strong>35.4. La fonction sprite32() — un grand personnage de 32 × 32</strong> — chapitre 6 : Dessiner.
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 

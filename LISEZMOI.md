@@ -387,6 +387,8 @@ si on l'**inclut**, par son nom, écrit exactement comme dans le programme.
 | `sprite(n, x, y, tuile)` | **un lutin au pixel près**, hors de la grille du fond. `sprite(n, x, y, t, 1)` le retourne. Le dessin s'écrit ici aussi |
 | `sprite16(n, x, y, tuile)` | **un personnage de seize** : quatre lutins posés en carré, en un appel. Écrit sur place, il prend seize rangées de seize |
 | `sprite32(n, x, y, tuile)` | **un grand personnage de 32 × 32** : seize lutins (n à n + 15, 24 au plus), quatre `sprite16` en un appel. Un cinquième argument `MIROIR_X` le retourne |
+| **la taille en dernier argument** | la même logique dans les autres : `sprite(0, 36, 60, ROND, 4)`, `sprite16(…, HEROS, 3)`, `sprite32(…, BOSS, 2)`, `spriteDerriere(…, ROND, 4)` et `poser(2, 3, MUR, 5)` (dans le fond). Pour `sprite`, `sprite16` et `sprite32`, seul un nombre écrit en clair de 2 ou plus est une taille : `0`, `1` (retourné) et `MIROIR_X`, `DERRIERE`… gardent leur sens |
+| `spriteTaille(n, x, y, DESSIN, taille)` | **un dessin à la taille qu’on veut** : le dessin n’est écrit qu’une fois, à sa taille standard ; `taille` (1, 2, 3…, en clair) dit combien de fois plus grand. Le compilateur redessine la forme (compilateur/agrandir.js : vrais coins pointus, marches arrondies) et la pose avec un lutin par carré de 8 × 8 non vide, à partir de n. **Pas de limite de taille** : quand les lutins ne suffisent plus (40 en tout, 10 sur une ligne), la forme est dessinée dans le fond, seule la partie visible est calculée ; x et y s’écrivent alors en clair, négatifs permis |
 | `cacher(n)` / `cacher16(n)` / `cacher32(n)` | ôte le lutin, les quatre, ou les seize, de l'écran |
 | `defiler(x, y)` | fait glisser le décor. La carte fait 256 pixels et revient toute seule à zéro |
 | `images()` | le nombre d'images écoulées depuis l'allumage — une horloge que le jeu ne peut pas fausser |
@@ -600,6 +602,22 @@ gameboy3/projets/mon_jeux/
   projet.json       le titre gravé, la console visée, la date
 ```
 
+Les projets déjà rangés sur le disque :
+
+```
+gameboy3/projets/
+  mon_mario/        Super Mario (titre MEGA) — cartouche .gb
+  mon_jeu/          un programme neuf (titre MONJEU) — .gbc
+  space_invaders/   Space Invaders entier (titre INVADERS) — .gbc
+  mario_calcul/     Mario Calcul, la démo des calculs (titre CALCUL) — .gb
+```
+
+**Où chercher un jeu ?** Un jeu rangé dans `exemples/` s'ouvre par **le menu
+des exemples** de l'atelier ; un jeu rangé dans `projets/` apparaît dans
+**📂 Ouvrir**. Space Invaders et Mario Calcul sont aux deux endroits : le
+fichier de `exemples/` est la référence, et le dossier de `projets/` en est une
+copie qu'on peut changer sans rien casser.
+
 **Ce qui montre qu'on est au bon endroit** est le point de départ de tout ceci :
 le bandeau, en haut à gauche, porte en permanence le nom du projet ouvert et le
 chemin de son dossier, avec un point dès que ce qui est à l'écran n'est plus ce
@@ -626,47 +644,22 @@ point ni barre oblique, un fichier ne peut être qu'un `.cpp`, une capture doit
 et le chemin final est revérifié avec `realpath`. La moitié de
 `node verification/verifier-projets.mjs` porte sur ces refus.
 
-### Remonter d'une cartouche vers le C++
+### Le programme C++ gravé dans la cartouche
 
-Il faut le dire avant tout, parce que c'est la question que tout le monde
-pose : **le C++ n'est pas dans la cartouche**. La compilation jette les noms,
-les commentaires, les portées et la forme des boucles. Un `for` et un `while`
-donnent les mêmes octets ; un `const` disparaît ; une variable devient une
-adresse. Il n'existe **aucune fonction inverse** — plusieurs programmes
-différents produisent exactement les mêmes octets, et rien dans les octets ne
-dit lequel a été écrit.
+La compilation jette les noms, les commentaires et la forme des boucles : des
+octets seuls, on ne remonte jamais au programme qui a été écrit. Alors toute
+cartouche fabriquée ici — par la page comme par `gb3.mjs` — **porte son
+programme C++ d'origine**, gravé au bout de sa place libre : le principal et
+chaque fichier qu'il inclut, commentaires compris, compressés (LZSS, environ
+deux fois et demie plus petit). Le processeur ne va jamais lire là : le jeu
+tourne exactement pareil. Le format est décrit en tête de
+`compilateur/source-gravee.js`.
 
-Ce qui existe, c'est **reconnaître les formes que ce compilateur produit**.
-Elles sont régulières :
-
-```
-ld hl, $98c5      la case (5, 6)
-ld de, Texte_2    « BONJOUR », gravé plus bas
-ld b, 7           sa longueur
-call EcrireTexte  →  texte(5, 6, "BONJOUR");
-```
-
-Deux boutons, deux promesses, et il ne faut pas les confondre.
-
-| Bouton | Sur quelle cartouche | Ce qu'il rend |
-|---|---|---|
-| **⇱ Retour au C++** | celles **compilées ici** | un programme C++ : dessins, variables, fonctions, `while`, `if`, et les appels reconnus |
-| **⚠ CONVERSION** | **n'importe laquelle**, Mario compris | les dessins, le décor posé en `poser()`, les palettes, et les mots affichés |
-
-**Ce qui n'est pas reconnu est écrit en commentaire**, instruction par
-instruction, avec son adresse — et l'en-tête annonce la part remontée. Rien
-n'est inventé : un programme reconstruit à moitié qui aurait l'air complet
-serait bien pire que pas de programme du tout.
-
-Sur les exemples du dépôt, le compte va de **100 %** (`bonjour`, `minimal`,
-`ligne`) à **13 %** (`couleur`) — les formes de la couleur, du son et des lutins
-ne sont pas encore reconnues, et le fichier produit le dit.
-
-Le contrôle ne relit pas le texte produit : il le **recompile**, fait tourner
-les deux cartouches et compare l'écran. `node verification/verifier-retour.mjs` — quatre
-exemples remontent entiers, recompilent, et **montrent le même écran**. La
-conversion, elle, est éprouvée jusqu'au bout : le fichier tiré de `bonjour.gb`
-recompile et redonne **la même image, pixel par pixel**.
+- Space Invaders (30 Ko de C++) se grave en 11 Ko ; Mario en 4 Ko.
+- Si le programme compressé ne tient pas dans la place libre, il **n'est pas
+  gravé** — `gb3.mjs` le dit.
+- ⚠ **Ce qui est gravé voyage avec la cartouche** : qui a le `.gb` (ou la page
+  exportée en HTML) a le programme.
 
 ### Le dessin écrit là où on le pose
 
@@ -948,6 +941,19 @@ refus trop large est un bogue autant qu'un refus manquant.
 
 ---
 
+## Les séries à part : dessiner une fois, agrandir comme on veut
+
+Après les 26 chapitres du parcours, **📚 APPRENDRE** a deux séries à part, numérotées avec un zéro devant :
+
+| Série | Ce qu’on y trouve | Leçons |
+|---|---|---|
+| **Série 2 — Les formes géométriques** | une forme par leçon (rond, carré… cube, sphère), puis les tailles : 8, 16, 32, ×2, ÷2, et `spriteTaille()` | 2.01 – 2.40 |
+| **Série 3 — Les images** | le Père Noël (style manga), le bonhomme de neige, le sapin, le cadeau, le renne ; les pièces des dames et des échecs ; les symboles des cartes | 3.01 – 3.17 |
+
+**La règle de ces séries** : un dessin s’écrit UNE fois, à sa taille standard, et la taille se choisit au moment de le poser — `sprite(0, 36, 60, ROND, 4)`, `sprite16(4, 88, 36, PERE_NOEL, 3)`, `poser(2, 3, MUR, 5)`, ou `spriteTaille()`. Le compilateur redessine la forme (`compilateur/agrandir.js`) : les vrais coins restent pointus, les marches s’arrondissent, les détails de l’intérieur restent. **Il n’y a pas de limite de taille** : au-delà de ce que les lutins peuvent montrer, la forme passe dans le fond de l’écran. Dans l’atelier, « 📐 Agrandir… » fait la même chose pour un de tes dessins, en copie.
+
+**Quatre jeux** sont faits avec les images de la série 3 (menu des exemples) : Puissance 4, Dames, Échecs et Couleurs (des cartes, style UNO). `node verification/verifier-jeux.mjs` en joue une partie de chacun.
+
 ## Les exemples
 
 | Fichier | Ce que c'est | Lignes | ROM |
@@ -971,6 +977,12 @@ refus trop large est un bogue autant qu'un refus manquant.
 | `exemples/puits.cpp` | un bloc qui tombe et s'empile : le cœur de Tetris | 157 | 2 015 o |
 | `exemples/tetris.cpp` | **Tetris entier** : 7 pièces, 4 rotations, la pièce suivante, les lignes, le compte, la relance | 394 | 4 232 o |
 | `exemples/mario.cpp` | **Super Mario** : un niveau de 120 cases qui défile, pesanteur, saut, pièces, ennemis, drapeau | 641 | 6 006 o |
+| `exemples/puissance4.cpp` | **Puissance 4** : le Père Noël contre le bonhomme de neige, deux joueurs ; les jetons sont deux images de la série 3, l’écran titre les montre ×4 avec `poser(…, 4)` | 348 | 32768 o |
+| `exemples/dames.cpp` | **Dames** 8 × 8 : prises en avant et en arrière, prises enchaînées, pion couronné en dame ; un même dessin pour les deux camps (une palette par case) | 466 | 32768 o |
+| `exemples/echecs.cpp` | **Échecs** : les six pièces et leurs règles, chemin libre, pion de deux cases, promotion, « ÉCHEC » affiché ; on gagne en prenant le roi | 567 | 32768 o |
+| `exemples/cartes.cpp` | **Couleurs**, un jeu de cartes dans le style du UNO, contre la console : passe, inverse, +2, joker (images de la série 3), dos de carte = le cadeau | 838 | 32768 o |
+| `exemples/invaders.cpp` | **Space Invaders entier, en couleur** : 5 × 7 envahisseurs, abris, bombes, soucoupe, 3 vies, record gardé dans la cartouche | 1 200 | 8 455 o |
+| `exemples/calcul.cpp` | **Mario Calcul (démo)** : trois portes « ? » barrent la route, chacune s'ouvre en trouvant le résultat d'une addition ou d'une soustraction | 360 | 2 491 o |
 
 Les nombres sont mesurés en compilant.
 
@@ -987,12 +999,34 @@ Une Game Boy Color a huit palettes de quatre couleurs pour le décor (et huit
 pour les personnages) ; une Game Boy d'origine n'a que **quatre nuances**, et
 **les registres de couleur n'existent pas chez elle**.
 
-Dans la page, on choisit **l'une ou l'autre**, en haut à gauche — jamais les deux :
+Il y a **deux consoles, et seulement deux**. La règle est écrite à un seul
+endroit, `compilateur/consoles.js`, et tout le reste vient la lire :
 
-| choix | fichier | `$0143` | ce qu'il fait |
+| console | fichier | `$0143` | ce qu'il fait |
 |---|---|---|---|
-| **🌈 En couleur** | `mon_jeu.gbc` | `$C0` | toutes les couleurs — une Game Boy Color est exigée |
-| **🎮 Game Boy** | `mon_jeu.gb` | `$00` | les 4 nuances, rien de plus : `couleurFond()`, `teindre()`… sont **refusés** |
+| **🎮 Game Boy** (`gb`) | `mon_jeu.gb` | `$00` | les 4 nuances, rien de plus : `couleurFond()`, `teindre()`… sont **refusés**, avec leur ligne |
+| **🌈 Game Boy Color** (`gbc`) | `mon_jeu.gbc` | `$C0` | toutes les couleurs : 8 palettes de décor, 8 de personnages |
+
+L'un **ou** l'autre, jamais les deux : pas de troisième octet, pas de
+cartouche « couleur qui marche aussi en nuances », pas de second fichier
+fabriqué en cachette.
+
+**Qui choisit ?**
+
+- **Dans l'atelier** : la liste en haut à gauche (et le bouton « Nouveau », qui
+  la demande). Le bouton de téléchargement dit ce qu'il donne : `⬇ .gbc` ou `⬇ .gb`.
+- **Partout ailleurs** — le parcours (`tuto.html`), les contrôles,
+  `gb3.mjs` sans `--console` — **c'est le programme** : une seule fonction de
+  couleur, et c'est une cartouche Game Boy Color ; aucune, une Game Boy.
+
+**Ce qu'on voit** est écrit sous l'écran de la console, dans l'atelier comme
+dans le parcours, lu dans l'émulateur et non deviné :
+
+| sous l'écran | ce que cela veut dire |
+|---|---|
+| 🌈 Game Boy Color — en couleur | une cartouche `.gbc`, affichée en couleur |
+| 🎮 Game Boy — 4 nuances | une cartouche `.gb` |
+| 👁 Aperçu en 4 nuances… | une cartouche `.gbc`, montrée par le réglage *« Voir en quatre nuances »* telle qu'une vieille console l'afficherait — la cartouche, elle, **n'a pas changé** |
 
 Refuser plutôt qu'ignorer : poser des couleurs qui ne feront jamais rien, sans
 le dire, c'est laisser chercher longtemps pourquoi l'écran ne change pas.
@@ -1000,24 +1034,27 @@ le dire, c'est laisser chercher longtemps pourquoi l'écran ne change pas.
 Les couleurs ne changent rien aux **dessins** : une tuile garde ses numéros de
 0 à 3, la palette dit seulement quelle couleur montre chaque numéro. D'où la
 règle d'or du Cours (chapitre 42) : dessiner d'abord en quatre nuances,
-colorier ensuite. Le réglage *« Voir en quatre nuances »* montre une cartouche
-couleur telle qu'une vieille console l'afficherait, **sans la changer**.
+colorier ensuite.
 
-**En ligne de commande seulement**, `--console les-deux` (le défaut de
-`gb3.mjs`) fabrique encore les deux fichiers d'un coup, le `.gb` sans une seule
-instruction de couleur :
+En ligne de commande :
 
 ```bash
-node outils/gb3.mjs exemples/couleur.cpp
-# exemples/couleur.gbc   1923 octets de programme — en COULEUR
-# exemples/couleur.gb    1609 octets de programme — pour Game Boy
+node outils/gb3.mjs exemples/couleur.cpp              # le programme décide → exemples/couleur.gbc
+node outils/gb3.mjs exemples/minimal.cpp              # pas de couleur      → exemples/minimal.gb
+node outils/gb3.mjs exemples/couleur.cpp --console gb # refusé : ligne 40, couleurFond()
 ```
 
-Une seule règle décide, à un seul endroit : `couleurIci()`, dans
+Dans le compilateur, une seule fonction décide : `couleurIci()`, dans
 `compilateur/emetteur.js`. Elle est posée aux seuls appels qui écrivent dans
-les registres de couleur, et répond **émettre**, **omettre** ou **refuser**.
-Les erreurs d'écriture — une palette au-delà de 7, un rouge au-delà de 31 —
-sont contrôlées *avant* cette question.
+les registres de couleur, et répond **émettre** ou **refuser** — jamais
+« ignorer ». Les erreurs d'écriture — une palette au-delà de 7, un rouge
+au-delà de 31 — sont contrôlées *avant* cette question.
+
+*Ce qui a changé le 2026-10-05* : l'ancienne option « les deux » (un `.gbc` et
+un `.gb` sans couleurs, fabriqués ensemble, et l'octet `$80`) a été retirée ;
+`--console les-deux` est refusé avec l'explication. Et le parcours gravait
+`$00` sur toutes ses cartouches et ne dessinait que les nuances : ses leçons de
+couleur s'affichaient en vert. Elles s'affichent maintenant en couleur.
 
 ---
 
@@ -1129,7 +1166,7 @@ pause.
 | **Recompiler pendant que j’écris** | coché | La cartouche se refait dès qu’on s’arrête de taper. Décoché, il faut « Compiler et lancer » — la partie en cours ne repart alors jamais du début. |
 | **Le temps d’arrêt avant de recompiler** | `700 ms` | Trop court, la page compile au milieu d’un mot et n’affiche que des fautes. |
 | **Compiler dès l’ouverture de la page** | coché | Décoché, la console attend « Compiler et lancer » — et elle l’écrit sur son écran plutôt que de rester noire. |
-| **Pour quelle console** | `les-deux` | Le même choix qu’en haut de la page. « Les deux » pose les couleurs si la console les a, et démarre quand même sur une Game Boy d’origine. |
+| **Pour quelle console** | `gbc` | Le même choix qu’en haut de la page : `gbc` (en couleur) ou `gb` (4 nuances) — l’un ou l’autre, jamais les deux. |
 | **La taille d’une capture** | `3` | Un facteur entier : un pixel de console devient N pixels carrés, jamais un flou. |
 | **Le titre gravé dans la cartouche** | `MON JEU` | Onze caractères au plus, en majuscules — c’est ce que la console lit au démarrage. |
 | **Arrêter la console si la compilation échoue** | coché | Décoché, l’ancienne cartouche continue de tourner pendant qu’on corrige. |
@@ -1380,17 +1417,17 @@ Deux actions de plus dans les événements et les acteurs :
 | `importer-image.js` | une image du disque, réduite et ramenée aux quatre nuances : elle devient une tuile du programme |
 | `editeur-airs.js` | la partition : il lit les `Air NOM = {…}`, les réécrit quand on pose une note, et les fait entendre sans compiler |
 | `programme.js` | où poser un morceau dans le programme : à la suite de ses pareils, ou sous l’en-tête — la règle vit ici, pas dans chaque atelier |
-| `compilateur/cartouches.js` | une cartouche, ou DEUX : le « .gbc » avec ses couleurs, le « .gb » sans une seule |
+| `compilateur/consoles.js` | LA règle des deux consoles : Game Boy (`$00`, `.gb`) ou Game Boy Color (`$C0`, `.gbc`), et comment lire une cartouche |
+| `compilateur/cartouches.js` | UNE cartouche : compile pour la console choisie (ou celle que le programme demande) et l’assemble |
 | `tuto.html`, `tuto/` | les quatre-vingts leçons, triées par difficulté de 1 à 10, avec leurs ateliers embarqués — dessin, plan, partition |
 | `traduction.js`, `porter.mjs` | porter un programme gameboy2 vers le C++ |
 | `emulateur.js` | la console émulée, la même dans la page et dans les contrôles |
 | `desassembleur.js` | l'inverse de l'émetteur : des octets aux instructions, avec les noms du programme quand on les a |
 | `desassembler.mjs` | relire une cartouche en ligne de commande |
 | `vue-machine.js` | le listing dans la page — le MODE MACHINE |
-| `convertir.js` | tirer d'une cartouche ce qui peut l'être : dessins, décor, palettes, mots — relus dans la mémoire de la console qui tourne |
 | `projets.php` | **le seul morceau qui tourne côté serveur** : il crée, lit, écrit et supprime les dossiers de `projets/`. Strictement borné — un nom de projet ne peut être que `a-z 0-9 _ -`, un fichier que `nom.cpp`, et le chemin final est revérifié |
 | `projets.js` | le lecteur de projets et le bandeau qui dit où l'on travaille |
-| `retour-cpp.js` | remonter du **C++** depuis une cartouche compilée ici, en reconnaissant les formes de l'émetteur ; ce qu'il ne reconnaît pas, il l'écrit en commentaire |
+| `compilateur/source-gravee.js` | graver le programme C++ d'origine au bout de la cartouche, compressé, et l'y relire à la lettre près |
 | `livret.mjs` | les livrets PDF : il compile chaque leçon, la fait tourner, la photographie et joue ses contrôles |
 | `tuto/console.mjs` | la console d'une leçon — compilée, chargée, prête à être interrogée ; le contrôle et le livret s'en servent |
 | `tuto/etapes.mjs` | une leçon décomposée : son programme en morceaux, son exécution en images, ses contrôles joués |
@@ -1490,6 +1527,7 @@ node verification/verifier-methodes.mjs   # 34 contrôles — les méthodes, dan
 node verification/verifier-console.mjs    # 35 contrôles — le panneau, les palettes, le son, la sauvegarde
 node verification/verifier-airs.mjs       # 32 contrôles — le séquenceur écouté note par note, et l'atelier
 node verification/verifier-desassembleur.mjs # 42 contrôles — relire une cartouche sans se décaler d'un octet
+node verification/verifier-source-gravee.mjs # 37 contrôles — le C++ gravé revient à la lettre près, et le jeu n'a pas changé
 node verification/verifier-refus.mjs      # 44 contrôles — ce qui doit être refusé, et le message
 node verification/verifier-exemples.mjs   # 26 contrôles — bonjour, compteur, le puits, Tetris
 node verification/verifier-tuto.mjs       # 317 contrôles — les quatre-vingts leçons, dans l'ordre de leur difficulté

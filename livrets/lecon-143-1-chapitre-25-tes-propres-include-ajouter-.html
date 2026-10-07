@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 143.1 — Chapitre 25 — Tes propres #include : ajouter une fonction : ce qui vient</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 25 — Tes propres #include : ajouter une fonction</span>
+    
+    
+    <span>leçon 143.1 sur 152</span>
+    <span class="jauge" style="--part: 100%">difficulté 10 / 10</span>
+    
+    
+    
+  </p>
+<h1>143.1. Chapitre 25 — Tes propres #include : ajouter une fonction : ce qui vient</h1>
+<p class="idee">L’entrée du chapitre 25 : ce qu’on a vu jusqu’ici, et ce que ses 9 étapes vont ajouter, une à la fois.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>D’où l’on vient.</strong> Le chapitre 24, « Aller au bout », vient de se terminer. Tout ce qu’il a montré reste valable : on s’en sert à partir d’ici sans le réexpliquer.</p>
+<p><strong>Ce que ce chapitre apporte : Tes propres #include : ajouter une fonction.</strong> Il compte 9 étapes, dont 9 venues du cours :</p>
+<p>- Une fonction à toi : bande()</p>
+<p>- La même fonction, trois fois</p>
+<p>- Ranger sa fonction dans un fichier voisin : #include "outils.cpp"</p>
+<p>- Le fichier voisin écrit ses propres #include &lt;…&gt;</p>
+<p>- Une deuxième fonction dans outils.cpp : pile()</p>
+<p>- bande() devient une fonction de la console : #include &lt;bande&gt;</p>
+<p>- Ta fonction passe avant celle de la console</p>
+<p>- À toi : ajouter ta propre fonction de la console, pas à pas</p>
+<p>- Un raccourci à toi : écrire poserDevant() soi-même</p>
+<p><strong>Les fonctions qui arrivent :</strong> <code>#include &lt;bande&gt;</code>. Chacune sera présentée seule, juste avant la première étape qui l’emploie : jamais deux lignes nouvelles d’un coup.</p>
+<p><strong>Comment avancer :</strong> une étape à la fois. Lis l’explication, lance le programme, regarde ce qu’on doit voir, puis fais l’essai proposé. Si quelque chose t’échappe, l’étape d’avant contient la pièce qui manque.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>458 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage        49 o  ← la console, à l’allumage  — la mise en route de la console
+  main()           29 o  ← démarrage  — ta fonction
+  VBlank            8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage    28 o  ← image()  — attend l’image suivante
+  AttendreVBlank   16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces    12 o  ← EcrireTexte  — attend de pouvoir écrire une case
+  EcrireTexte      10 o  ← texte()  — écrit un texte, lettre par lettre
+  CopierTuiles     94 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte     14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles          176 o  ← CopierTuiles  — 11 lettres sur 43
+  "CHAPITRE 25"    11 o  ← texte()  — un texte gravé
+  "C EST PARTI"    11 o  ← texte()  — un texte gravé
+Lettres gravées : ACEHIPRST25
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, RangerLutins, InstallerTransfert, Hasard, EffacerFond, EffacerPanneau, LireManette, DonneesTransfert, Notes
+Fonctions du langage appelées :
+  texte() × 2    22 o sur place, dans main()  + EcrireTexte (10 o)
+  image() × 1     3 o sur place, dans main()  + AttendreImage (28 o)</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// ---- Chapitre 25 : Tes propres #include : ajouter une fonction ----
+// L'entrée du chapitre : rien de neuf dans ce programme. Il annonce la suite.
+
+#include &lt;texte&gt;   // écrit un texte à l’écran</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  texte(1, 7, "CHAPITRE 25");   // le numéro du chapitre
+  texte(1, 9, "C EST PARTI");
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACR0lEQVR4nO3ZQW6cMABA0SxzhC57/9PkCD1Gl110U6UZYzszk/B50lsgxgLCDwbBy6/fb4S9fPkR8FACxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcdxD49cfPv96t/HB5MP7D9TPj3+1rafzG37W6ne9vFPhWyHst31ozM3K8zcO6d9nOKcwGXj1B3znwYJuxy3c/8OEUOn/ilgKv3gLm687/dC7PvoL39vLvmvk5YGzvqE7n2ffg+VM5CDl46Jt0OJdcIvDqU/RG4KWpe7D9pVl6MP5a92ACBI4TOE7gOIHjBI4TOE7gOIHjdt5kHQ6e/B7wmTdQM8e58f34Wm+yVt/Nzr9Vnv915nge/Zny1Ha+Jq2OF/gL3Tnw0hS6upfVKfde36FP7RlX8HjM3hV8a/3/y6shLxr4M/fg8ZhHB575+rt3PKfwjKfovanyjoHn/7Gu9RRNgMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdwnMBxAscJHCdw3B/ML3dFdMj8MgAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">CHAPITRE 25, puis C EST PARTI.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>le chapitre 25 s’annonce </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>144. Une fonction à toi : bande()</strong> — chapitre 25 : Tes propres #include : ajouter une fonction.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

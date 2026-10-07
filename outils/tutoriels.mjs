@@ -13,7 +13,10 @@
  */
 
 import { writeFileSync } from 'node:fs'
-import { LECONS, NIVEAUX, numeros, partieDe } from '../tuto/lecons.js'
+import { LECONS, NIVEAUX, numeros, partieDe, nomDuChapitre } from '../tuto/lecons.js'
+
+/* « Chapitre 6 », ou « Série 2 » pour un chapitre qui est une série à part (voir tuto/parcours.js). */
+const nomDuNiveau = (niveau) => nomDuChapitre(LECONS.find((l) => l.difficulte === niveau) ?? { difficulte: niveau })
 
 const NUMEROS = numeros(LECONS)
 import { inclusionsDe, fonctionDuTuto, tutosDesFonctions, leconsQuiEmploient } from '../tuto/fonctions.js'
@@ -84,7 +87,8 @@ for (const [numero, nom] of Object.entries(NIVEAUX)) {
   if (!dedans.length) continue
   const premier = NUMEROS[LECONS.indexOf(dedans[0])]
   const dernier = NUMEROS[LECONS.indexOf(dedans[dedans.length - 1])]
-  dire(`| ${numero} | ${nom} | ${premier} – ${dernier} |`)
+  // une série à part s'appelle « Série 2 », pas « 26 »
+  dire(`| ${nomDuNiveau(Number(numero)).replace('Chapitre ', '')} | ${nom} | ${premier} – ${dernier} |`)
 }
 dire('')
 
@@ -122,7 +126,7 @@ let niveauCourant = null
 LECONS.forEach((lecon, i) => {
   if (lecon.difficulte !== niveauCourant) {
     niveauCourant = lecon.difficulte
-    dire(`## Chapitre ${niveauCourant} — ${NIVEAUX[niveauCourant]}`, '')
+    dire(`## ${nomDuNiveau(niveauCourant)} — ${NIVEAUX[niveauCourant]}`, '')
   }
   // Sur la leçon qui ouvre une partie, un titre avant elle :
   // « ### Partie B — Le temps ». Les autres leçons n'ont pas « partie ».

@@ -239,7 +239,9 @@ try {
       return res`)
     b.verifier('leçons : « 0.93 » ne laisse que ses leçons dans le menu', r.lecons === du093.length, ` (${r.lecons})`)
     b.verifier('… Entrée ouvre la première', r.leconOuverte.includes(premiere093), ` (« ${r.leconOuverte} »)`)
-    b.verifier('exemples : « mario » ne laisse que Mario', r.exemples.length === 1 && r.exemples[0] === 'mario', ` (${r.exemples.join(', ')})`)
+    /* « MARIO CALCUL » parle aussi de Mario : il a sa place. Ce qui compte, c'est
+       que Mario soit là, et que les autres jeux soient partis. */
+    b.verifier('exemples : « mario » ne laisse que ce qui parle de Mario', r.exemples.includes('mario') && !r.exemples.includes('tetris') && !r.exemples.includes('dames'), ` (${r.exemples.join(', ')})`)
     b.verifier('modèles de dessins : son nom le retrouve', r.modeles.n >= 1 && r.modeles.n < r.modeles.tous, ` (« ${r.modeles.nom} » : ${r.modeles.n}/${r.modeles.tous})`)
     b.verifier('modèles de jeux : le curseur est dans la recherche, et le nom retrouve le jeu', r.jeuxFocus && r.jeux === 1, ` (${r.jeux})`)
     b.verifier('… le bouton « Fermer » n’est jamais caché par la recherche', r.fermerVisible)

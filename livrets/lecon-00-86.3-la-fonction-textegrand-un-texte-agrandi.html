@@ -82,25 +82,25 @@
     <span class="niveau">Chapitre 0 — Avant tout</span>
     
     <span class="niveau">Partie G — Les lettres et l’écran titre</span>
-    <span>leçon 0.86.3 sur 143</span>
+    <span>leçon 0.86.3 sur 152</span>
     <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
     
     
     
   </p>
 <h1>0.86.3. La fonction texteGrand() — un texte agrandi</h1>
-<p class="idee">#include &lt;texteGrand&gt; : texteGrand(colonne, ligne, "B", 3) écrit un B trois fois plus grand, sans rien dessiner.</p>
+<p class="idee">#include &lt;texteGrand&gt; : texteGrand(colonne, ligne, "B", 2) écrit un B trois fois plus grand, sans rien dessiner.</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
-<p><strong>Ce qu’elle fait :</strong> <code>texteGrand(colonne, ligne, "TEXTE", taille)</code> écrit un texte <strong>agrandi</strong> de 1 à 20 fois. Chaque pixel de la lettre devient un carré de <code>taille × taille</code> pixels : une lettre prend <code>taille × taille</code> cases.</p>
+<p><strong>Ce qu’elle fait :</strong> <code>texteGrand(colonne, ligne, "TEXTE", taille)</code> écrit un texte <strong>agrandi</strong>. La taille va de <strong>0 à 10</strong> : 0, c’est la lettre normale ; chaque cran l’agrandit une fois de plus (2 → 3 fois plus grand). Une lettre prend <code>(taille + 1) × (taille + 1)</code> cases.</p>
 <p><strong>La ligne à écrire : <code>#include &lt;texteGrand&gt;</code>.</strong></p>
 <p><strong>Ses arguments :</strong> la colonne et la ligne du coin en haut à gauche, le texte entre guillemets, la taille. Le texte et la taille <strong>s’écrivent en clair</strong> : le compilateur fabrique les tuiles agrandies avant le jeu.</p>
-<p><strong>Ce qu’elle coûte :</strong> environ <strong>950 octets</strong> pour un A en taille 2 : les tuiles agrandies, la petite fonction qui les pose, et la police.</p>
-<p><strong>Essaie :</strong> <code>texteGrand(0, 0, "GO", 5);</code> : deux lettres de 5 × 5 cases.</p>
+<p><strong>Ce qu’elle coûte :</strong> environ <strong>950 octets</strong> pour un A en taille 1 : les tuiles agrandies, la petite fonction qui les pose, et la police.</p>
+<p><strong>Essaie :</strong> <code>texteGrand(0, 0, "GO", 4);</code> : deux lettres de 5 × 5 cases.</p>
 
 <div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
   <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">On retrouve texteGrand dans 26 leçons</p>
-  <p style="margin: 0;"><a href="lecon-00-87-agrandir-une-lettre-textegrand.html">0.87</a>, <a href="lecon-00-87.1-agrandir-une-lettre-textegrand-toutes-le.html">0.87.1</a>, <a href="lecon-00-87.2-agrandir-une-lettre-textegrand-dix-fois.html">0.87.2</a>, <a href="lecon-00-87.3-agrandir-une-lettre-textegrand-un-mot.html">0.87.3</a>, <a href="lecon-00-87.4-agrandir-une-lettre-textegrand-vingt-foi.html">0.87.4</a>, <a href="lecon-00-90-un-titre-agrandi-en-couleur.html">0.90</a>, <a href="lecon-00-90.1-l-ecran-titre-start-un-autre-ecran.html">0.90.1</a>, <a href="lecon-00-90.2-l-ecran-titre-une-lettre-qui-file.html">0.90.2</a>, <a href="lecon-00-90.4-l-ecran-titre-tout-l-ecran-glisse.html">0.90.4</a>, <a href="lecon-00-90.5-l-ecran-titre-un-bandeau-qui-passe.html">0.90.5</a>, <a href="lecon-00-90.6-l-ecran-titre-la-consigne-qui-clignote.html">0.90.6</a>, <a href="lecon-00-90.7-l-ecran-titre-select-retour-au-titre.html">0.90.7</a>, <a href="lecon-00-90.8-l-ecran-titre-trois-ecrans.html">0.90.8</a>, <a href="lecon-00-91-le-titre-puis-le-jeu.html">0.91</a>, <a href="lecon-00-91.1-le-titre-puis-le-jeu-trente-secondes.html">0.91.1</a>, <a href="lecon-00-91.2-le-titre-puis-le-jeu-le-score-et-rejouer.html">0.91.2</a>, <a href="lecon-00-91.3-le-titre-puis-le-jeu-un-cadre-de-murs-x.html">0.91.3</a>, <a href="lecon-00-91.4-le-titre-puis-le-jeu-la-piece-revient-au.html">0.91.4</a>, <a href="lecon-00-91.5-le-snake-une-queue-qui-suit-le-a.html">0.91.5</a>, <a href="lecon-00-91.6-le-snake-la-queue-grandit-a-chaque-piece.html">0.91.6</a>, <a href="lecon-00-91.7-le-snake-le-a-avance-tout-seul.html">0.91.7</a>, <a href="lecon-00-91.8-le-snake-le-mur-fait-perdre.html">0.91.8</a>, <a href="lecon-00-91.9-le-snake-sans-limite-de-temps.html">0.91.9</a>, <a href="lecon-00-92-le-snake-avec-un-menu-la-couleur-du-serp.html">0.92</a>, <a href="lecon-00-92.1-le-snake-avec-un-menu-le-pas-compte-en-i.html">0.92.1</a>, <a href="lecon-00-92.2-le-snake-avec-un-menu-la-vitesse-qui-mon.html">0.92.2</a></p>
+  <p style="margin: 0;"><a href="lecon-00-87-agrandir-une-lettre-textegrand.html">0.87</a>, <a href="lecon-00-87.1-agrandir-une-lettre-textegrand-toutes-le.html">0.87.1</a>, <a href="lecon-00-87.2-agrandir-une-lettre-textegrand-dix-fois.html">0.87.2</a>, <a href="lecon-00-87.3-agrandir-une-lettre-textegrand-un-mot.html">0.87.3</a>, <a href="lecon-00-87.4-agrandir-une-lettre-textegrand-la-plus-g.html">0.87.4</a>, <a href="lecon-00-90-un-titre-agrandi-en-couleur.html">0.90</a>, <a href="lecon-00-90.1-l-ecran-titre-start-un-autre-ecran.html">0.90.1</a>, <a href="lecon-00-90.2-l-ecran-titre-une-lettre-qui-file.html">0.90.2</a>, <a href="lecon-00-90.4-l-ecran-titre-tout-l-ecran-glisse.html">0.90.4</a>, <a href="lecon-00-90.5-l-ecran-titre-un-bandeau-qui-passe.html">0.90.5</a>, <a href="lecon-00-90.6-l-ecran-titre-la-consigne-qui-clignote.html">0.90.6</a>, <a href="lecon-00-90.7-l-ecran-titre-select-retour-au-titre.html">0.90.7</a>, <a href="lecon-00-90.8-l-ecran-titre-trois-ecrans.html">0.90.8</a>, <a href="lecon-00-91-le-titre-puis-le-jeu.html">0.91</a>, <a href="lecon-00-91.1-le-titre-puis-le-jeu-trente-secondes.html">0.91.1</a>, <a href="lecon-00-91.2-le-titre-puis-le-jeu-le-score-et-rejouer.html">0.91.2</a>, <a href="lecon-00-91.3-le-titre-puis-le-jeu-un-cadre-de-murs-x.html">0.91.3</a>, <a href="lecon-00-91.4-le-titre-puis-le-jeu-la-piece-revient-au.html">0.91.4</a>, <a href="lecon-00-91.5-le-snake-une-queue-qui-suit-le-a.html">0.91.5</a>, <a href="lecon-00-91.6-le-snake-la-queue-grandit-a-chaque-piece.html">0.91.6</a>, <a href="lecon-00-91.7-le-snake-le-a-avance-tout-seul.html">0.91.7</a>, <a href="lecon-00-91.8-le-snake-le-mur-fait-perdre.html">0.91.8</a>, <a href="lecon-00-91.9-le-snake-sans-limite-de-temps.html">0.91.9</a>, <a href="lecon-00-92-le-snake-avec-un-menu-la-couleur-du-serp.html">0.92</a>, <a href="lecon-00-92.1-le-snake-avec-un-menu-le-pas-compte-en-i.html">0.92.1</a>, <a href="lecon-00-92.2-le-snake-avec-un-menu-la-vitesse-qui-mon.html">0.92.2</a></p>
 </div>
 
 <h2>2. Le programme, morceau par morceau</h2>
@@ -134,7 +134,7 @@ Tes fonctions appelées :
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
     <pre><code>// ---- #include &lt;texteGrand&gt; : un texte agrandi ----
-// Un B trois fois plus grand : 3 × 3 cases, à partir de la case (2, 2).
+// Taille 2 : un B trois fois plus grand, 3 × 3 cases, à partir de la case (2, 2).
 // (Le A, ce sera la leçon « Agrandir une lettre », juste après.)
 
 #include &lt;texteGrand&gt;   // texteGrand() : les lettres agrandies</code></pre>
@@ -146,7 +146,7 @@ Tes fonctions appelées :
   <div>
     <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
     <pre><code>int main() {
-  texteGrand(2, 2, "B", 3);   // colonne 2, ligne 2, le texte, la taille
+  texteGrand(2, 2, "B", 2);   // colonne 2, ligne 2, le texte, la taille
 
   while (true) {
     image();

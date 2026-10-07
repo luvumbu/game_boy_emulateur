@@ -28,6 +28,8 @@
 import { numeroDe, octetsDesTuiles, NOMBRE_DE_TUILES, lettresGrasses, lettresTitre, grandeLettreTitre, lettreManga, pixelsDe, ORDRE } from './police.js'
 import { analyser } from './analyseur.js'
 import { BIBLIOTHEQUES } from './inclusion.js'
+import { agrandirForme } from './agrandir.js'
+import { CONSOLES, verifierLaConsole } from './consoles.js'
 
 /* Les guichets du matériel, nommés en français comme dans le reste du projet. */
 const MANETTE = 0x00 // $FF00
@@ -352,24 +354,19 @@ export class Emetteur {
      */
     this.couleur = false
     /*
-     * Pour quelle console ce programme est-il écrit ?
+     * Pour quelle console ce programme est-il écrit ? (voir « consoles.js »)
      *
-     *   'gb'        une Game Boy d'origine — les fonctions de couleur sont REFUSÉES
-     *   'gbc'       une Game Boy Color — elle est exigée
-     *   'les-deux'  la couleur si la console l'a, quatre nuances sinon
+     *   'gb'    une Game Boy — les fonctions de couleur sont REFUSÉES
+     *   'gbc'   une Game Boy Color
+     *   null    personne n'a choisi : c'est LE PROGRAMME qui décide. Une
+     *           seule fonction de couleur, et c'est une Game Boy Color ;
+     *           aucune, et c'est une Game Boy.
      *
      * Refuser plutôt qu'ignorer : une couleur posée dans un programme annoncé
      * pour la Game Boy d'origine ne ferait rien du tout, et l'on chercherait
      * pourquoi. Mieux vaut l'entendre dire à la compilation.
      */
-    this.cible = 'les-deux'
-    /*
-     * Fabrique-t-on la cartouche Game Boy des DEUX ?
-     *
-     * Alors les appels de couleur ne sont ni refusés ni émis : ils sont
-     * OMIS, et le fichier « .gb » ne porte pas un octet de couleur.
-     */
-    this.couleursOmises = false
+    this.cible = null
     this.boucles = [] // les sorties de boucle en cours, pour break et continue
     this.fonctionCourante = null
 
@@ -1019,6 +1016,34 @@ export function constante(n) {
       }
     }
     default: return null
+  }
+}
+
+/**
+ * La même chose, mais SANS se ramener à un octet : -80 reste -80, et 300 reste
+ * 300. Sert à spriteTaille(), dont la taille n'a pas de limite et dont la place
+ * peut tomber hors de l'écran (une forme plus grande que lui, centrée). Rend
+ * `null` si le nombre n'est pas connu dès la compilation.
+ */
+function constanteEntiere(n) {
+  if (!n) return null
+  switch (n.genre) {
+    case 'nombre': return n.valeur
+    case 'variable': return n.symbole && n.symbole.genre === 'constante' ? n.symbole.valeur : null
+    case 'oppose': { const v = constanteEntiere(n.valeur); return v === null ? null : -v }
+    case 'calcul': {
+      const g = constanteEntiere(n.gauche)
+      const d = constanteEntiere(n.droite)
+      if (g === null || d === null) return null
+      switch (n.operateur) {
+        case '+': return g + d
+        case '-': return g - d
+        case '*': return g * d
+        case '/': return d === 0 ? 0 : Math.trunc(g / d)
+        default: return constante(n)
+      }
+    }
+    default: return constante(n)
   }
 }
 
@@ -2763,7 +2788,7 @@ function valeur(e, n) {
 
 const BUILTINS = new Set([
   'texte', 'poser', 'lire', 'image', 'bouton', 'hasard', 'semer', 'ecran',
-  'sprite', 'sprite16', 'sprite32', 'cacher', 'cacher16', 'cacher32', 'defiler', 'texteTitre', 'texteManga',
+  'sprite', 'sprite16', 'sprite32', 'spriteTaille', 'cacher', 'cacher16', 'cacher32', 'defiler', 'texteTitre', 'texteManga',
   'panneau', 'cacherPanneau', 'effacerPanneau', 'poserPanneau', 'lirePanneau', 'textePanneau',
   'effacer', 'textS', 'poserS', 'attendre',
   'couleurFond', 'couleurLutin', 'teindre', 'teindreLutin', 'teindrePanneau',
@@ -2848,67 +2873,41 @@ function aDesEffets(n) {
   return Object.values(n).some((v) => (Array.isArray(v) ? v.some(aDesEffets) : aDesEffets(v)))
 }
 
-/** Un appel de fonction se cache-t-il quelque part dans cette expression ? */
-function contientUnAppel(n) {
-  if (!n || typeof n !== 'object') return false
-  if (n.genre === 'appel') return true
-  return Object.values(n).some((v) => (Array.isArray(v) ? v.some(contientUnAppel) : contientUnAppel(v)))
-}
-
 /*
- * Cette ligne pose une couleur : qu'en fait-on ici ?
+ * Cette ligne pose une couleur : la console visée la permet-elle ?
  *
  * Une seule question, posée aux trois seuls endroits qui écrivent dans les
- * registres de couleur, et trois réponses selon la cartouche qu'on fabrique :
+ * registres de couleur, et deux réponses — la règle de « consoles.js » :
  *
- *   ÉMETTRE   la console visée a la couleur — on écrit les registres.
+ *   ÉMETTRE   la console est la Game Boy Color, choisie ou décidée par le
+ *             programme lui-même : on écrit les registres, et la cartouche
+ *             sera une cartouche Game Boy Color ($C0).
  *
- *   OMETTRE   on fabrique la cartouche Game Boy des DEUX. Ces registres
- *             n'existent pas sur cette console : y écrire n'y ferait rien, et
- *             ces octets n'ont donc rien à faire dans le fichier. C'est tout
- *             l'objet des deux cartouches — le « .gb » n'emporte pas une seule
- *             instruction de couleur, le « .gbc » les a toutes.
+ *   REFUSER   « Game Boy » a été choisie. Ces registres n'existent pas sur
+ *             cette console : poser des couleurs qui ne feront jamais rien,
+ *             sans le dire, c'est laisser chercher longtemps pourquoi l'écran
+ *             ne change pas.
  *
- *   REFUSER   « Game Boy » a été demandée SEULE. Poser des couleurs qui ne
- *             feront jamais rien, sans le dire, c'est laisser chercher
- *             longtemps pourquoi l'écran ne change pas.
+ * Il n'y a pas de troisième réponse : une couleur n'est jamais ignorée en
+ * silence, et jamais ôtée d'une copie de la cartouche.
  *
  * Les erreurs d'écriture — une palette au-delà de 7, un rouge au-delà de 31 —
- * sont contrôlées AVANT cette question, et le restent : les deux cartouches
- * doivent refuser exactement les mêmes programmes, sans quoi « les deux »
- * voudrait dire « celle qui compile ».
+ * sont contrôlées AVANT cette question.
  */
-function couleurIci(e, nom, n) {
-  if (e.couleursOmises) {
-    /*
-     * Un argument qui APPELLE une fonction ne peut pas être omis.
-     *
-     * L'appel disparaîtrait avec la ligne de couleur, et les deux cartouches
-     * ne feraient plus la même chose — l'une jouerait un son, l'autre non.
-     * On le dit, et l'on dit où le mettre.
-     */
-    const fautif = (n.arguments ?? []).findIndex(contientUnAppel)
-    if (fautif >= 0) {
-      throw new Error(
-        `ligne ${n.ligne} : l'argument ${fautif + 1} de « ${nom}() » appelle une fonction. ` +
-          'La cartouche Game Boy ne porte aucune instruction de couleur, et cet appel y ' +
-          'disparaîtrait avec elle : les deux cartouches ne feraient plus la même chose. ' +
-          'Calculer cette valeur dans une variable avant la ligne de couleur.',
-      )
-    }
-    return false
-  }
+/** 'gb' ou 'gbc' : celle qu'on a choisie, sinon celle que le programme demande. */
+function consoleFinale(e) {
+  return e.cible ?? (e.couleur ? 'gbc' : 'gb')
+}
 
+function couleurIci(e, nom, n) {
   if (e.cible === 'gb') {
     throw new Error(
       `ligne ${n.ligne} : « ${nom}() » demande une Game Boy Color, et ce programme ` +
-        'est écrit pour une Game Boy d\'origine (4 nuances). Choisir « En couleur » ' +
+        "est écrit pour une Game Boy d'origine (4 nuances). Choisir « En couleur » " +
         'en haut de la page — ou « --console gbc » en ligne de commande.',
     )
   }
-
   e.couleur = true
-  return true
 }
 
 /** Le texte d'un morceau : entre guillemets, ou le nom d'un « const char » ; null sinon. */
@@ -2940,7 +2939,7 @@ const BESOINS = {
   hasard: ['hasard'],
   note: ['son'], bruit: ['son'], silence: ['son'], volumeSon: ['son'], airFini: ['son'],
   jouer: ['airs', 'son', 'horloge'],
-  sprite: ['lutins'], sprite16: ['lutins'], sprite32: ['lutins'], cacher: ['lutins'], cacher16: ['lutins'], cacher32: ['lutins'],
+  sprite: ['lutins'], sprite16: ['lutins'], sprite32: ['lutins'], spriteTaille: ['lutins'], cacher: ['lutins'], cacher16: ['lutins'], cacher32: ['lutins'],
   couleurLutin: ['lutins'], teindreLutin: ['lutins'], paletteLutins: ['lutins'],
 }
 const SANS_FOND = new Set([...Object.keys(BESOINS), 'semer', 'bouton', 'sauver', 'sauvegarde'])
@@ -3539,7 +3538,7 @@ function appelSansTrace(e, n) {
       }
     })
 
-    if (!couleurIci(e, nom, n)) return
+    couleurIci(e, nom, n)
 
     const [rouge, vert, bleu] = composantes
     const toutesConnues = composantes.every((c) => c !== null)
@@ -3663,7 +3662,7 @@ function appelSansTrace(e, n) {
       throw new Error(`ligne ${n.ligne} : il y a huit palettes, de 0 à 7 — trouvé ${palette & 0x7f}`)
     }
 
-    if (!couleurIci(e, nom, n)) return
+    couleurIci(e, nom, n)
 
     valeur(e, args[2])
     e.ldhDepuisA(BROUILLON2)
@@ -3704,7 +3703,7 @@ function appelSansTrace(e, n) {
       throw new Error(`ligne ${n.ligne} : il y a huit palettes de lutins, de 0 à 7 — trouvé ${palette}`)
     }
 
-    if (!couleurIci(e, nom, n)) return
+    couleurIci(e, nom, n)
 
     valeur(e, args[1])
     e.andN(7)
@@ -3784,6 +3783,45 @@ function appelSansTrace(e, n) {
     e.incDE()
     e.decB()
     e.jrNZ(octet)
+    return
+  }
+
+  /*
+   * La TAILLE en dernier argument — la logique de spriteTaille(), partout :
+   *
+   *   sprite(0, 36, 60, ROND, 4);         sprite16(0, 40, 40, HEROS, 3);
+   *   sprite32(0, 0, 0, BOSS, 2);         spriteDerriere(0, x, 72, ROND, 4);
+   *   poser(2, 3, MUR, 5);                (dans le fond : colonne et ligne en clair)
+   *
+   * Le dessin n'est écrit qu'une fois ; la forme est agrandie à la compilation,
+   * en lutins tant qu'ils suffisent, dans le fond au-delà — sans limite.
+   *
+   * Pour sprite, sprite16 et sprite32, le 5e argument était déjà les OPTIONS :
+   * seul un NOMBRE écrit en clair, 2 ou plus, est une taille. 0, 1 (l'ancien
+   * « retourné ») et les noms MIROIR_X, DERRIERE… gardent leur sens : les
+   * programmes déjà écrits marchent comme avant.
+   */
+  /* Seuls les appels ÉCRITS dans le programme sont marqués (voir
+     marquerLesTailles) : sprite16 se déplie en sprite(…, 0x20), et ce 0x20 —
+     écrit par le compilateur — n'est pas une taille. */
+  if (n.tailleEnDernier) {
+    const enClair = (valeurEntiere) => ({ genre: 'nombre', valeur: valeurEntiere, ligne: n.ligne })
+    let commeSpriteTaille = { ...n, nom: 'spriteTaille', tailleEnDernier: false, ecrit: n.derriere ? 'spriteDerriere' : nom, drapeaux: n.derriere ? 0x80 : 0 }
+    if (nom === 'poser') {
+      const colonne = constanteEntiere(args[0])
+      const ligneDuDessin = constanteEntiere(args[1])
+      if (colonne === null || ligneDuDessin === null) {
+        throw new Error(`ligne ${n.ligne} : avec une taille, poser(colonne, ligne, DESSIN, taille) dessine dans le fond : la colonne et la ligne s'écrivent en clair, comme poser(2, 3, MUR, 5)`)
+      }
+      commeSpriteTaille = { ...commeSpriteTaille, fond: true, arguments: [enClair(0), enClair(colonne * 8), enClair(ligneDuDessin * 8), args[2], args[3]] }
+    }
+    const avant = e.dansLaConsole
+    e.dansLaConsole = true // spriteTaille est employée par la console : pas d'#include <spriteTaille> à écrire
+    try {
+      appel(e, commeSpriteTaille)
+    } finally {
+      e.dansLaConsole = avant
+    }
     return
   }
 
@@ -4024,6 +4062,121 @@ function appelSansTrace(e, n) {
           }
         }
       })
+    } finally {
+      e.dansLaConsole = avant
+    }
+    return
+  }
+
+  /*
+   * Un dessin à la taille qu'on veut — dessiné UNE fois, et sans limite de taille.
+   *
+   *   spriteTaille(1, 96, 40, ROND, 3);    ROND (8 × 8) trois fois plus grand : 24 × 24
+   *   spriteTaille(0, 0, 0, ROND, 40);     320 × 320 : plus grand que l'écran
+   *
+   * Le dessin reste unique dans le programme, à sa taille standard. La forme
+   * agrandie est calculée ICI, à la compilation (compilateur/agrandir.js) :
+   * la console ne sait pas agrandir pendant que le jeu tourne. Puis :
+   *
+   *   EN LUTINS, tant qu'il y en a assez (40 en tout, 10 sur une même ligne) :
+   *   la forme est coupée en carrés de 8 × 8, chaque carré qui n'est pas vide
+   *   devient un « sprite », à partir du lutin « numero ». Elle passe par-dessus
+   *   le décor et peut bouger (x et y peuvent être des variables).
+   *
+   *   DANS LE FOND, au-delà : il n'y a plus de limite de taille. Seule la
+   *   partie qui tombe dans l'écran (160 × 144) est calculée et posée, case par
+   *   case, avec des « poser » ; les cases pareilles (l'intérieur d'un grand
+   *   rond) ne coûtent qu'une tuile. Le compilateur doit alors connaître la
+   *   place : x et y s'écrivent en clair. « numero » ne sert pas.
+   *
+   * La taille s'écrit en clair (1, 2, 3…) : c'est le compilateur qui dessine.
+   * Ces « sprite » et ces « poser » sont écrits par la console : ils ne
+   * demandent ni #include <sprite>, ni <poser>, ni <Tuile>.
+   */
+  if (nom === 'spriteTaille') {
+    // appelée pour sprite(…, 4), poser(…, 5)… : ses messages parlent de ce qui a été écrit
+    const qui = n.ecrit ?? 'spriteTaille'
+    if (args.length !== 5) {
+      throw new Error(`ligne ${n.ligne} : ${qui}(numero, x, y, DESSIN, taille) prend cinq arguments — par exemple ${qui}(0, 64, 40, ROND, 3)`)
+    }
+    const fois = constanteEntiere(args[4])
+    if (fois === null || !Number.isInteger(fois) || fois < 1) {
+      throw new Error(`ligne ${n.ligne} : la taille de ${qui}() s'écrit en clair — 1, 2, 3… —, pas avec une variable : la forme est dessinée par le compilateur, avant que le jeu ne tourne`)
+    }
+    const dessin = args[3].genre === 'variable' ? e.dessins.get(args[3].nom) : null
+    if (!dessin) {
+      throw new Error(`ligne ${n.ligne} : le dessin de ${qui}() est le NOM d'un dessin (une Tuile ou un Perso déclaré dans le programme), comme ${qui}(0, 64, 40, ROND, 3)`)
+    }
+    const cote = dessin.cote * fois
+    // le dessin, écrit en chiffres (0 à 3) : le résultat garde UNE écriture
+    const enChiffres = dessin.rangees.map((r) => [...r].map((s) => NUANCES_ECRITES[s] ?? 0).join(''))
+    const nombre = (valeurEntiere) => ({ genre: 'nombre', valeur: valeurEntiere, ligne: n.ligne })
+    const plus = (noeud, combien) => combien === 0 ? noeud
+      : { genre: 'calcul', operateur: '+', gauche: noeud, droite: nombre(combien), ligne: n.ligne }
+    const surPlace = (morceau) => ({ genre: 'liste', ligne: n.ligne, valeurs: morceau.map((r) => ({ genre: 'texte', valeur: r, ligne: n.ligne })) })
+    const premier = constante(args[0])
+
+    /* En lutins, si la forme y tient : au plus 10 carrés par rangée, 40 en tout. */
+    let carres = null
+    if (cote / 8 <= 10 && !n.fond) {   // poser(…, taille) dessine toujours dans le fond
+      const rangees = agrandirForme(enChiffres, cote, Number, '0123')
+      carres = []
+      for (let cy = 0; cy < cote / 8; cy++) {
+        for (let cx = 0; cx < cote / 8; cx++) {
+          const morceau = rangees.slice(cy * 8, cy * 8 + 8).map((r) => r.slice(cx * 8, cx * 8 + 8))
+          if (!morceau.every((r) => r === '00000000')) carres.push({ cx, cy, morceau })
+        }
+      }
+      if ((premier ?? 0) + carres.length > 40) carres = null
+    }
+
+    const avant = e.dansLaConsole
+    e.dansLaConsole = true // ce que la console écrit ne demande pas d'#include
+    try {
+      if (carres) {
+        carres.forEach(({ cx, cy, morceau }, k) => {
+          appel(e, {
+            genre: 'appel',
+            nom: 'sprite',
+            ligne: n.ligne,
+            arguments: [premier === null ? plus(args[0], k) : nombre(premier + k), plus(args[1], cx * 8), plus(args[2], cy * 8), surPlace(morceau),
+              ...(n.drapeaux ? [nombre(n.drapeaux)] : [])],   // spriteDerriere : chaque lutin derrière le décor
+          })
+        })
+        return
+      }
+
+      /* Dans le fond : plus de limite de taille, seule la partie visible est posée. */
+      const x = constanteEntiere(args[1])
+      const y = constanteEntiere(args[2])
+      if (x === null || y === null) {
+        throw new Error(
+          `ligne ${n.ligne} : en taille ${fois}, « ${args[3].nom} » fait ${cote} × ${cote} pixels : trop pour les lutins, il est donc dessiné dans le fond de l'écran. ` +
+            `Sa place doit alors s'écrire en clair — ${qui}(${args[0].valeur ?? 0}, 0, 0, ${args[3].nom}, ${fois}) —, pas avec une variable.`,
+        )
+      }
+      const gauche = Math.max(0, x), haut = Math.max(0, y)
+      const droite = Math.min(160, x + cote), bas = Math.min(144, y + cote)
+      if (droite <= gauche || bas <= haut) return // entièrement hors de l'écran : rien à poser
+      const vue = agrandirForme(enChiffres, cote, Number, '0123', { x: gauche - x, y: haut - y, largeur: droite - gauche, hauteur: bas - haut })
+      const pixel = (px, py) => (px >= gauche && px < droite && py >= haut && py < bas ? vue[py - haut][px - gauche] : '0')
+      const cases = []
+      for (let ligne = Math.floor(haut / 8); ligne * 8 < bas; ligne++) {
+        for (let colonne = Math.floor(gauche / 8); colonne * 8 < droite; colonne++) {
+          const morceau = Array.from({ length: 8 }, (_, j) => Array.from({ length: 8 }, (_, i) => pixel(colonne * 8 + i, ligne * 8 + j)).join(''))
+          if (!morceau.every((r) => r === '00000000')) cases.push({ colonne, ligne, morceau })
+        }
+      }
+      const differentes = new Set(cases.map((c) => c.morceau.join('|'))).size
+      if (e.prochaineTuile + differentes > 256) {
+        throw new Error(
+          `ligne ${n.ligne} : en taille ${fois}, la partie visible de « ${args[3].nom} » demande ${differentes} tuiles différentes ; ` +
+            `la console n'en a plus que ${256 - e.prochaineTuile} de libres. Un dessin plus simple, ou moins de dessins ailleurs, libère de la place.`,
+        )
+      }
+      for (const { colonne, ligne, morceau } of cases) {
+        appel(e, { genre: 'appel', nom: 'poser', ligne: n.ligne, arguments: [nombre(colonne), nombre(ligne), surPlace(morceau)] })
+      }
     } finally {
       e.dansLaConsole = avant
     }
@@ -6073,12 +6226,31 @@ function deroulerLesRaccourcis(noeud, siennes) {
   if (Array.isArray(noeud)) { noeud.forEach((n) => deroulerLesRaccourcis(n, siennes)); return }
   if (!noeud || typeof noeud !== 'object') return
   const appel = noeud.valeur
+  /* La taille en dernier argument, ÉCRITE par l'utilisateur : sprite, sprite16
+     et sprite32 avec un nombre de 2 ou plus en 5e argument, poser avec un 4e.
+     Marquée ici, sur le programme tel qu'il est écrit, pour ne jamais la
+     confondre avec les options que le compilateur ajoute ensuite. */
+  if (noeud.genre === 'expression' && appel?.genre === 'appel' && !siennes.has(appel.nom)) {
+    const a = appel.arguments
+    if ((['sprite', 'sprite16', 'sprite32'].includes(appel.nom) && a.length === 5 && a[4].genre === 'nombre' && a[4].valeur >= 2) ||
+        (appel.nom === 'poser' && a.length === 4)) appel.tailleEnDernier = true
+  }
   if (noeud.genre === 'expression' && appel?.genre === 'appel' && RACCOURCIS.has(appel.nom) &&
-      !siennes.has(appel.nom) && appel.arguments.length === 4) {
+      !siennes.has(appel.nom) && (appel.arguments.length === 4 || (appel.nom === 'spriteDerriere' && appel.arguments.length === 5))) {
     const ligne = noeud.ligne
     const [a, b, c, d] = appel.arguments
     const constante = (nom) => ({ genre: 'variable', nom, ligne })
     if (appel.nom === 'spriteDerriere') {
+      /* Un 5e argument est une TAILLE (voir « la taille en dernier argument ») :
+         2 ou plus, le dessin agrandi, chaque lutin derrière le décor. */
+      const taille = appel.arguments[4]
+      if (taille && taille.genre === 'nombre' && taille.valeur >= 2) {
+        Object.assign(appel, { nom: 'sprite', arguments: [a, b, c, d, taille], derriere: true, tailleEnDernier: true })
+        return
+      }
+      if (taille && !(taille.genre === 'nombre' && taille.valeur === 1)) {
+        throw new Error(`ligne ${ligne} : la taille de spriteDerriere() s'écrit en clair — 1, 2, 3… —, pas avec une variable : la forme est dessinée par le compilateur, avant que le jeu ne tourne`)
+      }
       Object.assign(appel, { nom: 'sprite', arguments: [a, b, c, d, constante('DERRIERE')] })
       return
     }
@@ -6533,10 +6705,9 @@ function compilerUneFois(programme, options, garder = null, police = null, sans 
   e.releverInclusions = Boolean(options.releverInclusions)
   /* Un « #include » ne grave rien par lui-même : il permet. Ce qui est gravé,
      c'est ce que le programme emploie — une ligne de trop ne coûte rien. */
-  if (options.cible) e.cible = options.cible
-  /* La moitié Game Boy de « les deux » : les couleurs ne sont pas refusées,
-     elles ne sont pas ÉMISES. Voir « couleurIci ». */
-  if (options.couleursOmises) e.couleursOmises = true
+  /* « gb » ou « gbc », et rien d'autre : un ancien « les-deux » est refusé
+     plutôt que compris de travers. */
+  if (options.cible) e.cible = verifierLaConsole(options.cible, 'la cible').cle
   const BASE = 0x0150
 
   const initialisations = resoudreProgramme(e, programme)
@@ -6703,23 +6874,19 @@ function compilerUneFois(programme, options, garder = null, police = null, sans 
     zones: e.zones,
     fonctions: e.signatures,
     /*
-     * Ce que l'en-tête doit annoncer en $0143.
+     * La console de cette cartouche, et l'octet que l'en-tête annonce en $0143.
      *
-     *   0     une cartouche d'origine
-     *   0x80  elle PROFITE de la couleur, et démarre quand même sur une DMG
-     *   0xC0  elle l'EXIGE
-     *
-     * « les-deux » sans une seule couleur posée reste une cartouche d'origine :
-     * annoncer la couleur qu'on n'utilise pas n'apporterait rien.
+     * Choisie (« cible »), ou décidée par le programme : une couleur posée,
+     * et c'est une Game Boy Color. Deux valeurs seulement, $00 ou $C0 — voir
+     * « consoles.js ».
      */
-    couleur: e.cible === 'gb' ? 0 : e.cible === 'gbc' ? 0xc0 : e.couleur ? 0x80 : 0,
+    console: consoleFinale(e),
+    couleur: CONSOLES[consoleFinale(e)].octet,
     /*
-     * Ce programme POSE-T-IL une couleur ? — l’octet ci-dessus ne le dit pas.
+     * Ce programme POSE-T-IL une couleur ? — la console ne le dit pas.
      *
-     * « gbc » grave $C0 même sur un programme qui n’a pas une seule palette,
-     * et « gb » grave 0 sur un programme qui en refuserait. C’est ce drapeau,
-     * et lui seul, qui dit s’il y a quelque chose à séparer en deux
-     * cartouches.
+     * « gbc » choisie grave $C0 même sur un programme qui n'a pas une seule
+     * palette ; l'atelier des couleurs a besoin de savoir s'il y en a.
      */
     poseDesCouleurs: e.couleur,
     cible: e.cible,

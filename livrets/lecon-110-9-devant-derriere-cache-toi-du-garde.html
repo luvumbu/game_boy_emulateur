@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 110.9 — Devant, derrière : cache-toi du garde</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 17 — Le mouvement : les lutins au pixel près</span>
+    <span class="outil">du cours</span>
+    <span class="niveau">Partie A — Devant, derrière</span>
+    <span>leçon 110.9 sur 152</span>
+    <span class="jauge" style="--part: 80%">difficulté 8 / 10</span>
+    
+    
+    
+  </p>
+<h1>110.9. Devant, derrière : cache-toi du garde</h1>
+<p class="idee">Un petit jeu : traverse l’écran sans te faire voir. Le garde passe en haut ; derrière un arbre marqué DEVANT, il ne te voit pas.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>Un petit jeu avec tout ce qu’on vient de voir.</strong> Ton héros part à gauche et doit atteindre la droite. Un garde fait les cent pas en haut de l’écran. S’il passe au-dessus de toi pendant que tu es à découvert, il te voit : retour au départ.</p>
+<p><strong>Les arbres sont des cachettes :</strong> leurs cases ont <code>DEVANT</code>. Derrière un arbre, ton héros disparaît, et le garde passe sans te voir.</p>
+<p><strong>Mais la console ne sait pas que tu es caché !</strong> <code>DEVANT</code> ne change que le <strong>dessin</strong>. Pour le jeu, il faut le dire aussi dans le code : <code>cache</code> vaut 1 si le héros (8 pixels) est <strong>entièrement</strong> derrière un arbre (16 pixels). Le premier arbre va du pixel 40 au 55 : le héros y est caché pour <code>x</code> de 40 à 48 (48 + 8 = 56).</p>
+<p><strong>L’écart entre le garde et toi :</strong> <code>ecart</code> est la distance, toujours positive. Comme <code>uint8_t</code> ne connaît pas les nombres négatifs, on soustrait le plus petit du plus grand : <code>g - x</code> si le garde est à droite, <code>x - g</code> sinon. Moins de 12 pixels, et pas caché : vu !</p>
+<p><strong>Vu :</strong> le compteur <code>vus</code> augmente, le héros repart du pixel 8, et le garde repart de la droite (sinon il te reverrait aussitôt).</p>
+<p><strong>À toi :</strong> ajoute un troisième arbre, ou un second garde, plus rapide, en lutin 2.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;Tuile&gt;</code> → <a href="lecon-00-107.2-tuile-dessiner-une-case.html">0.107.2. Tuile — dessiner une case</a></li>
+  <li><code>#include &lt;couleurFond&gt;</code> → <a href="lecon-00-88.3-la-fonction-couleurfond-une-couleur-du-d.html">0.88.3. La fonction couleurFond() — une couleur du décor</a></li>
+  <li><code>#include &lt;couleurLutin&gt;</code> → <a href="lecon-00-107.4-la-fonction-couleurlutin-une-couleur-des.html">0.107.4. La fonction couleurLutin() — une couleur des personnages</a></li>
+  <li><code>#include &lt;ecran&gt;</code> → <a href="lecon-27-1-la-fonction-ecran-eteindre-et-rallumer-l.html">27.1. La fonction ecran() — éteindre et rallumer l’écran</a></li>
+  <li><code>#include &lt;poser&gt;</code> → <a href="lecon-00-1.3-la-fonction-poser-poser-une-tuile.html">0.1.3. La fonction poser() — poser une tuile</a></li>
+  <li><code>#include &lt;teindre&gt;</code> → <a href="lecon-00-89.1-la-fonction-teindre-une-case-dans-une-pa.html">0.89.1. La fonction teindre() — une case dans une palette</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;nombre&gt;</code> → <a href="lecon-00-8.3-la-fonction-nombre-ecrire-un-nombre.html">0.8.3. La fonction nombre() — écrire un nombre</a></li>
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+  <li><code>#include &lt;sprite&gt;</code> → <a href="lecon-00-69.4-la-fonction-sprite-un-lutin-au-pixel-pre.html">0.69.4. La fonction sprite() — un lutin au pixel près</a></li>
+  <li><code>#include &lt;teindreLutin&gt;</code> → <a href="lecon-00-107.5-la-fonction-teindrelutin-un-lutin-dans-u.html">0.107.5. La fonction teindreLutin() — un lutin dans une palette</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1333 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            71 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              636 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← ecran()  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  AdresseCase          10 o  ← poser(), teindre()  — trouve l’adresse d’une case de l’écran
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre         33 o  ← nombre()  — écrit un nombre en chiffres
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         94 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  LireManette          37 o  ← bouton()  — lit les huit boutons
+  Tuiles              320 o  ← CopierTuiles  — 17 lettres sur 43, et 3 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+  "VUS"                 3 o  ← texte()  — un texte gravé
+  "GAGNE"               5 o  ← texte()  — un texte gravé
+Lettres gravées : AEGNSUV0123456789
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, Notes
+Fonctions du langage appelées :
+  teindre()      × 4    92 o sur place, dans main()  + AdresseCase (10 o)
+  couleurLutin() × 6    72 o sur place, dans main()
+  couleurFond()  × 5    60 o sur place, dans main()
+  poser()        × 4    48 o sur place, dans main()  + AdresseCase (10 o)
+  sprite()       × 2    46 o sur place, dans main()
+  teindreLutin() × 2    33 o sur place, dans main()
+  texte()        × 2    22 o sur place, dans main()  + EcrireTexte (10 o)
+  ecran()        × 2    21 o sur place, dans main()  + AttendreVBlank (16 o)
+  nombre()       × 2    20 o sur place, dans main()  + EcrireNombre (33 o)
+  bouton()       × 2    10 o sur place, dans main()  + LireManette (37 o)
+  image()        × 1     6 o sur place, dans main()  + AttendreImage (28 o)
+  images()       × 1     2 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME (Game Boy Color) : un petit jeu de cache-cache.
+//   GAUCHE / DROITE : ton héros (en bas) doit atteindre la droite de l'écran.
+//   Le GARDE fait les cent pas en haut. S'il passe au-dessus de toi pendant que
+//   tu es à découvert : VU, retour au départ.
+//   Derrière un ARBRE (cases DEVANT), tu es caché : il ne te voit pas.
+//
+// Ce qui est nouveau : DEVANT ne change que le DESSIN. Pour le jeu, on calcule
+// aussi, dans le code, si le héros est caché (la variable cache).
+
+#include &lt;Tuile&gt;          // un dessin de 8 × 8 pixels
+#include &lt;couleurFond&gt;    // choisit une couleur d’une palette du fond
+#include &lt;couleurLutin&gt;   // choisit une couleur d’une palette des lutins
+#include &lt;ecran&gt;          // éteint ou rallume l’écran
+#include &lt;poser&gt;          // pose une tuile sur une case du fond
+#include &lt;teindre&gt;        // met une case du fond dans une palette
+#include &lt;texte&gt;          // écrit un texte à l’écran
+#include &lt;nombre&gt;         // écrit un nombre en chiffres
+#include &lt;bouton&gt;         // lit un bouton de la manette
+#include &lt;sprite&gt;         // place un lutin de 8 × 8 au pixel près
+#include &lt;teindreLutin&gt;   // met un lutin dans une palette</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — ARBRE</p>
+    <pre><code>Tuile ARBRE = {                   // Du feuillage en haut, un tronc en bas. Aucun 0 : tout plein.
+  "12222221",
+  "22333322",
+  "23333332",
+  "23333332",
+  "22333322",
+  "12222221",
+  "11133111",
+  "11133111",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAbUlEQVR4nO3XsQ2AIBRFUUpHsHQIZ3EGS8dwLEez1+YLaAyc5LbwTkNB2o/t0rwun3VfT0BAzYEix4ZxqlJkCwioB1Ct+TwiEBAQEBBQOeg9YmQLCKg90O8+ikBAHYAiRR553s1AQEBAQEAPOwE2D+cq4FWfRAAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un dessin — HEROS</p>
+    <pre><code>Tuile HEROS = {                   // Toi : 0 transparent, 1 clair, 2 moyen, 3 contour.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAfUlEQVR4nO3VsQ2AMBAEQYeUQEgR1EINhJRBWZRACZRBSI4Dn6xHQn8rbeq/yVyu+2w2jFNIylYBBMgAVB+a1yUkhQgIUD6QMr8f2ytlXnlVrwMC5An6LkCAHEC/+1wBATIAKcS+lC1AgBxAUaf77gAClA8UNR9FBAQoHegBTfQxdrUAfpcAAAAASUVORK5CYII=" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. un dessin — GARDE</p>
+    <pre><code>Tuile GARDE = {                   // Le garde : un casque, de gros yeux.
+  "03333330",
+  "33333333",
+  "31133113",
+  "31133113",
+  "32222223",
+  "03222230",
+  "03300330",
+  "33000033",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAd0lEQVR4nO3XsRGAIBBEUUJLILQIa6EGQsqgLEqwBMsgNNfAGzwuOP7Mxrsv3XD185Et7mZ5rwdAgNyBLOclAQRoBVBt5TOS6rEeQIAAAQIE6D/oyMksgACtAJIcxXnzg88VECB3IEmRVg8gQP5AWvNaRECA3IFuTDHxSeJcYKYAAAAASUVORK5CYII=" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une variable — x</p>
+    <pre><code>uint8_t x = 8;          // Ta place, en pixels.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">6. une variable — g</p>
+    <pre><code>uint8_t g = 150;        // La place du garde.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">7. une variable — sens</p>
+    <pre><code>uint8_t sens = 0;       // Le garde va : 0 vers la gauche, 1 vers la droite.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">8. une variable — vus</p>
+    <pre><code>uint8_t vus = 0;        // Combien de fois il t'a vu.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">9. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                              // Le jeu commence ici.
+  couleurFond(0, 0, 20, 28, 31);          // palette 0 : le ciel et le texte
+  couleurFond(0, 3,  2,  4, 12);
+  couleurFond(2, 1,  8, 18,  4);          // palette 2 : l'arbre, vert,
+  couleurFond(2, 2,  4, 26,  6);          //   vert vif,
+  couleurFond(2, 3,  0, 10,  2);          //   vert sombre.
+  couleurLutin(0, 1, 28, 31, 31);         // toi : bleu pâle,
+  couleurLutin(0, 2,  4, 12, 31);         //   bleu,
+  couleurLutin(0, 3,  0,  0, 10);         //   bleu nuit.
+  couleurLutin(1, 1, 31, 31, 31);         // le garde : blanc,
+  couleurLutin(1, 2, 31,  4,  2);         //   rouge,
+  couleurLutin(1, 3, 10,  0,  0);         //   rouge sombre.
+
+  ecran(0);                               // Dessin écran éteint.
+  texte(1, 1, "VUS");
+  // Deux arbres de 2 × 2 cases, lignes 8 et 9 : colonnes 5-6, puis 13-14.
+  for (uint8_t l = 8; l &lt; 10; l++) {
+    poser(5, l, ARBRE);  teindre(5, l, 2 | DEVANT);
+    poser(6, l, ARBRE);  teindre(6, l, 2 | DEVANT);
+    poser(13, l, ARBRE); teindre(13, l, 2 | DEVANT);
+    poser(14, l, ARBRE); teindre(14, l, 2 | DEVANT);
+  }
+  ecran(1);                               // On rallume.
+  nombre(5, 1, vus);
+
+  while (true) {                          // La boucle du jeu :
+    image();
+
+    // Toi : GAUCHE / DROITE.
+    if (bouton(DROITE) &amp;&amp; x &lt; 152) x++;
+    if (bouton(GAUCHE) &amp;&amp; x &gt; 8) x--;
+
+    // Le garde : un pixel toutes les 2 images, et demi-tour aux bords.
+    if (images() % 2 == 0) {
+      if (sens == 0) {
+        g--;
+        if (g == 0) sens = 1;             // au bord gauche : il repart à droite
+      } else {
+        g++;
+        if (g == 152) sens = 0;           // au bord droit : il repart à gauche
+      }
+    }
+
+    // Caché ? Tout entier derrière un arbre (le héros fait 8 pixels, l'arbre 16).
+    uint8_t cache = 0;
+    if (x &gt;= 40 &amp;&amp; x &lt;= 48) cache = 1;    // arbre 1 : pixels 40 à 55
+    if (x &gt;= 104 &amp;&amp; x &lt;= 112) cache = 1;  // arbre 2 : pixels 104 à 119
+
+    // L'écart entre le garde et toi, toujours positif.
+    uint8_t ecart = 0;
+    if (g &gt; x) {
+      ecart = g - x;                      // le garde est à droite
+    } else {
+      ecart = x - g;                      // le garde est à gauche (ou pile au-dessus)
+    }
+
+    if (ecart &lt; 12 &amp;&amp; cache == 0) {       // Tout près, et à découvert : VU !
+      vus++;
+      nombre(5, 1, vus);
+      x = 8;                              // retour au départ,
+      g = 150;                            // et le garde repart de la droite.
+      sens = 0;
+    }
+
+    if (x &gt;= 150) texte(8, 1, "GAGNE");   // Arrivé à droite !
+
+    sprite(0, x, 68, HEROS);              // Toi, en bas, à la hauteur des arbres.
+    teindreLutin(0, 0);
+    sprite(1, g, 40, GARDE);              // Le garde, en haut.
+    teindreLutin(1, 1);
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACiElEQVR4nO3d0W3aUBiA0TxmhDxmiM7SGfqYMTJWRugIHaOPjWTJQgZsnELd++lIRxG5gvDLnyAm2OHp1++fhD0dPgEPJXCcwHECxwkcJ3CcwHFrgZ9fXnddnr6d3XL31668d51r7hl473b/m5+v8Y3+i8CLB+XedVY86in6lvuernb69WvrrLhz4M31xXVOH5RfXmfFxl70xYfLHQPf5TIrtl8mXdyUF5+K9+5C24v+B7wOjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhN4JKfnjtx4hofAwzive0tjgYfxmfP94+3T1HW+vH4rgYchcNzzy+u3H98XBE5ZNLaTVbP4HwcCp1w74379VgLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcYcFfv94Oz/CaDqQ7OL64Vtq0PkPCzwfVTRbHG20WD+86KDzHxn4/Bju860zrx9edND5BY7Pv/2xOg/6oJNRnuJGn3/jg7H2HoV7u1F2Ukaf/2rgqe487nThjo2nbbE4EePUYv3wooPOvxF474kSvQ00+vyeouPz28mKz7/xCH7cR/aO8jJj9PnXfgd/4UyY3gYafX5/qozP782G+PxHBh7iZcbo8wscn98b/nECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3DcH1t22bDFLBXNAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACiUlEQVR4nO3dzU3jUBhAUZaUwJIippapYZaUQVmUMCVMGbMcJEtW5Pw4YeKYd3WkKxSeIvLJRwk2scnTn7+/Fe5p9wm0aYDjAY4HOB7geIDjAY53Cfj55fWm29O3c9c8/Lk737quc90T+Nbt/j8/n/GVfQvgxZPy1nVdaKuX6Gsee7rb4devretCdwZeXV/c5/BJ+eV1XWhlL/rk0+WOwHe5rQutHyad3JQnX4pv3YW2F/2AHAfHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHA/zoDq//eMBVGoAf2rHu1saAH9on5/vH22eT63x7u0cE/NAAx3t+ef3x6+ciwKkWxnayai3+TwHgVOeumt/uEQHHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8XYDfv94Oz47aToJ7eT67ltq0Pl3A57PSJpbnKm0WN9ddND59wQ+Pv/7eOvM67uLDjo/4Pj86x+rs9HlFaO8xI0+/8oHY213Bu8oOymjz38WeNKdx51u3NF42haLizgOW6zvLjro/CvA211kMcoGGn1+L9Hx+e1kxedfeQZvdxXNKIcZo89/6XfwplfRjLKBRp/fnyrj83uzIT7/nsBDHGaMPj/g+Pze8I8HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDjAY4HOB7geIDj/QNor9mwCXdqiQAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout d’une seconde — image 60</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACiUlEQVR4nO3dwU3DMBhA4R4ZgWOHYBZm4NgxOlZHYATG4AiSpSiyEzspMc7/9KQnVKyK/sqnloQm9PL1/WngLsMnsK4JDE9geALDExiewPAEhlcDfnm97rqdvp3a8vBrd967bmsdCbx3u//l52u8sVMAZ0/KvetWqddL9JbHTnebf31u3SodDNxcz+4zf1I+vW6VGnvRi0+XA4EPuW2V2odJi5ty8aV47y60e9H/kMfB8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8GIDz6+l8IqHxQIDl7oal8UGvj9uvyXX6fbwwU6VwPBiA799vGcJnBUYuDRWtyw8sP+4o15g4LUr0IcPdqoCA9uWBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExjeMOD741aeUZVOnFtcH76lgs4/DHg6i2oqO7sqWx8uGnT+kcDlOevl1pnWh4sGnV9g+Pztj9XpdElIlJe46PM3Phir31nHUXZSos+/Cpx0p3HTjQON07bILjyZl60PFw06fwO434UhUTZQ9Pl9iYbP704WfP7GM7jflT9RDjOiz1/7Hdz1yp8oGyj6/P6pEj6/bzbA5x8JHOIwI/r8AsPn9w1/eALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkM7weQWtmwfQbA/AAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout de trois secondes — image 180</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAClUlEQVR4nO3dwU3DMBhA4R4ZgSNDMAszcOwYHasjMAJjcATJkhU5iZ1Ucc3/8qQnVCKU/srXloQm9PL982XgLsMnsK4JDE9geALDExiewPAEhlcDfnl923U7fZvbcvdrP1xZycY1W+pI4L2b/uEH0PCtFqh/AVywrS1/7F5OXq+X6C33nX5s+rW+fPEerd7BwLsYpg+FYp2Ly7ev2XKNvejFp9GBwLtub1+z5dqHSWu7svOX4r270A/sRe9dv3kcDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDA8OPL3Y4pyXRJCB57onNIYD3+7Xv5Jrvj18sGcmMDw48PvnR5HAqArjs+meArj+Hz/wkYHXLlEfPtgzIwObwPwEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMbBny7X+cnTKXz4haXD99SQecfBpxPksoVJ08Vy4eLBp1/JPD8lPT51snLh4sGnV9g+Pztj9XpdMVHlJe46PM3Phir30nFUXZSos+/Cpx087jpxoHGaVsU15VMK5YPFw06fwO433UfUTZQ9Pl9iYbP704WfP7GM7jfhT1RDjOiz1/7Hdz1wp4oGyj6/P6pEj6/bzbA5x8JHOIwI/r8AsPn9w1/eALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkM7xc5EO9YOCqv3AAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout de sept secondes — image 420</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACm0lEQVR4nO3czU3DQBQA4RwpgWOKoBZq4JgyUlZKoATK4AjSSqvV+if2ZqP1m4w0QsGK7Ie/JDjE5vTz+23gTsMnsKcmMDyB4QkMT2B4AsMTGN4a8Nv7edft9G1uy+aX7ryyko1rtlRP4L27vvkBNHyvBeoQwBXb0vK2rbx4z3qJ3rLtdLfy6/ry2S3aep2BdzGUD4VqnbPLt6/ZcneOomefRh2Bd93evmbL3X+btHQoO30p3nsI3XAUvXf95vtgeALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geATg8ooKr3uoCg881dW4jAB8vV3+S6759vDBDpLA8AjAH1+fVQLnwgNPjdUtgwCv/1uPVy488NJ16MMHO0jhgW09geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIY3DPh6u0zPpUqnzM0uH76ngs4/DDifP5Wrzquqlg8XDTr/SODp2erTvZOXDxcNOr/A8Pk7ALddMBLlJS76/I8CN5+THOUgJfr8DwEn3fwjpRsbjdO+qC45KauWDxcNOn8H4LbLRqLsoOjz+xLdDhxifg+yGosyf4dncNt1QVHeZkSf/9Hfwc3XBUXZQdHn90+V8Pn9sAE+/0jgEG8zos8vMHx+P/CHJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDw/gC26+9YweQjugAAAABJRU5ErkJggg==" alt="l’écran après DROITE">
+    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACm0lEQVR4nO3dzU3DQBQA4RwpgSNFUAs1cEwZKSslUAJlcARppZW165+15dX6DSONULCQ8+QvCTaxye3758vA3YZPYF0TGJ7A8ASGJzA8geEJDG8N+OX1bdft9G2u5e6XfnhlJY1rttSZwHs3/eEH0PCtFqhLABdsS8uP3cs/r9dLdMt9px+bfl1fPnuPtt7JwLsYpg+FYp2zy9vXbLmNvejZp9GJwLtut6/ZctuHSUu7svVL8d5d6AN70XvXbx4HwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwwsDPL1swosb2osBXOtq3FgY4Mfz/ldyzbeHD3b9BIYXBvj986NI4JZiANfG6jYWCXj9f3fYbDGAly42Hz7Y9YsBbIcTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHjDgB/Pe32aVTqbbnb58C0VdP5hwPnUqlxxylWxfLho0PlHAtcnstdbJy8fLhp0foHh829/rE6n60SivMRFn3/jg7H6nYocZScl+vyLwEk3j5tunGictkVxNcq0Yvlw0aDzbwD3u1okygaKPr8v0fD53cmCz7/xDO53OVCUw4zo86/9Du56OVCUDRR9fv9UCZ/fNxvg848EDnGYEX1+geHz+4Y/PIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASGJzA8geEJDE9geALDExiewPAEhicwPIHhCQxPYHgCwxMYnsDwBIYnMDyB4QkMT2B4AsMTGJ7A8ASG9wvE7+9Y4psIJQAAAABJRU5ErkJggg==" alt="l’écran après GAUCHE">
+    <figcaption><strong>GAUCHE</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Deux arbres verts, ton héros bleu à gauche, un garde rouge qui va et vient en haut. Derrière un arbre, ton héros disparaît et le garde ne le voit pas ; à découvert, il te renvoie au départ.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>à découvert, le garde te voit <span class="detail"> (vus 1)</span></li>
+
+  <li>derrière l’arbre, on voit l’arbre, pas toi <span class="detail"> (x 45 : 8/18/4)</span></li>
+
+  <li>caché, le garde passe sans te voir <span class="detail"> (vus 1 puis 1)</span></li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>110.10. La fonction spriteDerriere() — un lutin derrière le décor</strong> — chapitre 17 : Le mouvement : les lutins au pixel près.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

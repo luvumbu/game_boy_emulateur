@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 35.19 — Plus lent qu’un pixel par image : la lenteur</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 6 — Dessiner</span>
+    
+    
+    <span>leçon 35.19 sur 152</span>
+    <span class="jauge" style="--part: 30%">difficulté 3 / 10</span>
+    
+    
+    
+  </p>
+<h1>35.19. Plus lent qu’un pixel par image : la lenteur</h1>
+<p class="idee">Pour aller moins vite que 1 pixel par image, l’avion n’avance qu’une image sur « lenteur » : lenteur 3, c’est 20 pixels par seconde, trois fois moins vite que le 35.16.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>Le problème :</strong> au 35.17, <code>vitesse</code> compte des <strong>pixels par image</strong>. Le plus petit pas est <strong>1</strong> — 60 pixels par seconde, l’écran traversé en 2,4 secondes. Encore trop rapide pour piloter tranquillement. Et <code>vitesse = 0.5</code> ne marche pas : un <code>uint8_t</code> ne garde que des <strong>nombres entiers</strong>.</p>
+<p><strong>L’idée : garder le pas d’un pixel, mais ne pas avancer à chaque image.</strong> L’avion avance <strong>une image sur <code>lenteur</code></strong>, et attend pendant les autres. <code>lenteur = 3</code> : il avance à l’image 3, à l’image 6, à l’image 9… — <strong>20 pixels par seconde</strong>, trois fois moins vite. Le vol reste <strong>fluide</strong> : chaque pas fait toujours un seul pixel.</p>
+<p><strong>Ce qui est nouveau ici : un compteur, <code>compte</code>.</strong> À chaque image, <code>compte++</code>. Quand il atteint <code>lenteur</code>, on le remet à 0 et on laisse les flèches faire <strong>un pas</strong>. Le reste du temps, les flèches ne font rien.</p>
+<p><strong>Déroulé avec <code>lenteur = 3</code>, flèche droite tenue :</strong> image 1 — compte = 1, rien ; image 2 — compte = 2, rien ; image 3 — compte = 3 ≥ 3, donc compte = 0 et <strong>px + 1</strong> ; image 4 — compte = 1, rien… Un pixel toutes les trois images.</p>
+<p><strong>Le tableau des lenteurs :</strong> <code>1</code> → 60 pixels par seconde (le 35.16) ; <code>2</code> → 30 ; <strong><code>3</code> → 20</strong> (le réglage de cette leçon) ; <code>4</code> → 15 ; <code>6</code> → 10, très lent. Ici, <strong>plus le nombre est grand, plus l’avion est lent</strong> — c’est le contraire de <code>vitesse</code>.</p>
+<p><strong>Les bords :</strong> le pas est d’un pixel, donc les tests du 35.16 suffisent : <code>px &lt; 144</code>, <code>px &gt; 0</code>, <code>py &lt; 128</code>, <code>py &gt; 0</code>.</p>
+<p><strong>À toi :</strong> essaie <code>lenteur = 2</code>, puis <code>6</code>, et garde celle qui te va. Le nombre se change <strong>en haut du programme</strong>, à un seul endroit.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;sprite16&gt;</code> → <a href="lecon-35-2-la-fonction-sprite16-un-personnage-de-16.html">35.2. La fonction sprite16() — un personnage de 16 × 16</a></li>
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+  <li><code>#include &lt;Perso&gt;</code> → <a href="lecon-35-1-perso-dessiner-des-personnages.html">35.1. Perso — dessiner des personnages</a></li>
+</ul>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>493 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            62 o  ← la console, à l’allumage  — la mise en route de la console
+  main()              211 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         31 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  LireManette          37 o  ← bouton()  — lit les huit boutons
+  Tuiles               64 o  ← CopierTuiles  — 0 lettre sur 43, et 4 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+Lettres gravées : aucune
+Pas gravé (jamais appelé) : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, Notes
+Fonctions du langage appelées :
+  sprite()   × 4   104 o sur place, dans main()
+  bouton()   × 4    20 o sur place, dans main()  + LireManette (37 o)
+  image()    × 1     6 o sur place, dans main()  + AttendreImage (28 o)
+  sprite16() × 1     0 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// Plus lent : l'avion n'avance qu'une image sur « lenteur ».
+
+#include "personnages.cpp"   // la liste : AVION
+#include &lt;sprite16&gt;          // sprite16() : quatre lutins en carré
+#include &lt;bouton&gt;            // bouton() : lit un bouton de la manette</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. une variable — lenteur</p>
+    <pre><code>uint8_t lenteur = 3;   // avance une image sur 3 : 1 = 60 px/s, 2 = 30, 3 = 20, 4 = 15, 6 = 10</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. une variable — compte</p>
+    <pre><code>uint8_t compte = 0;    // les images comptées depuis le dernier pas</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. une variable — px</p>
+    <pre><code>uint8_t px = 72;       // la place de l'avion, en pixels : de 0 à 144…</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">5. une variable — py</p>
+    <pre><code>uint8_t py = 64;       // …et de 0 à 128. Il part du milieu.</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">6. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {
+  while (true) {
+    image();
+
+    compte++;                  // une image de plus
+    if (compte &gt;= lenteur) {   // c'est l'image d'un pas : une sur « lenteur »
+      compte = 0;              // on recommence à compter
+      if (bouton(DROITE) &amp;&amp; px &lt; 144) px++;   // un seul pixel : le vol reste fluide
+      if (bouton(GAUCHE) &amp;&amp; px &gt; 0)   px--;
+      if (bouton(BAS) &amp;&amp; py &lt; 128)    py++;
+      if (bouton(HAUT) &amp;&amp; py &gt; 0)     py--;
+    }
+
+    sprite16(0, px, py, AVION);   // posé à CHAQUE image, même sans pas
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAByklEQVR4nO3WsWnDUBhGUZcaQaWG8CyewWXGyFgeISNkjJQJGIyRwK4UwXkXbvmKHw48vtP3z1fBnQ6/oHYtYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8cYCnuZlmpfDz/jPBgKe5uV8vZyvl6GMxwL+vH38FbBZwHh90XL3efUAHsfYB75zPnSfjUdgloG3rtt4Zhb4Le2K+fCDd0oGXv3D25G1fePFAm9rReMFzLYa0vy3/JwP/GJtjWA8BPCLDj9v73zgwQsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxvsF6uk5F0D7MSgAAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABy0lEQVR4nO3WsWkDURRFQYVbgkIVoVpUg0KX4bJcgktwGQ5tEAihBTnxsjDvwAl/8GDgcw9f358Fd9j9gtq0gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxpsLvBxPy/G0+xlbNxR4OZ7O18v5euGN5wK/f7z9FrBZwHh90XK3eXUHto1nAd8477qPxirzFOC16zqSeQTwn7RPzLsf/I9NAX76h9cja/3GaATwulY0XsBsT0Oa/JYfmwX8Ym2pxuOAX7T7eVs0C3hgAeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4AeMFjBcwXsB4P6XeORcWtL7UAAAAAElFTkSuQmCC" alt="l’écran après DROITE">
+    <figcaption><strong>DROITE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAByklEQVR4nO3WsWnDUBhGUZcaQaWG8CyewWXGyFgeISNkjJQJGIyRwK4UwXkXbvmKHw48vtP3z1fBnQ6/oHYtYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8cYCnuZlmpfDz/jPBgKe5uV8vZyvl6GMxwL+vH38FbBZwHh90XL3efUAHsfYB75zPnSfjUdgloG3rtt4Zhb4Le2K+fCDd0oGXv3D25G1fePFAm9rReMFzLYa0vy3/JwP/GJtjWA8BPCLDj9v73zgwQsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxvsF6uk5F0D7MSgAAAAASUVORK5CYII=" alt="l’écran après GAUCHE">
+    <figcaption><strong>GAUCHE</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAByklEQVR4nO3WsWnDUBhGUZcaQaWG8CyewWXGyFgeISNkjJQJGIyRwK4UwXkXbvmKHw48vtP3z1fBnQ6/oHYtYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8cYCnuZlmpfDz/jPBgKe5uV8vZyvl6GMxwL+vH38FbBZwHh90XL3efUAHsfYB75zPnSfjUdgloG3rtt4Zhb4Le2K+fCDd0oGXv3D25G1fePFAm9rReMFzLYa0vy3/JwP/GJtjWA8BPCLDj9v73zgwQsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxvsFgLE5F63EACMAAAAASUVORK5CYII=" alt="l’écran après HAUT">
+    <figcaption><strong>HAUT</strong> — l’écran a changé</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAByklEQVR4nO3WsWnDUBhGUZcaQaWG8CyewWXGyFgeISNkjJQJGIyRwK4UwXkXbvmKHw48vtP3z1fBnQ6/oHYtYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8QLGCxgvYLyA8cYCnuZlmpfDz/jPBgKe5uV8vZyvl6GMxwL+vH38FbBZwHh90XL3efUAHsfYB75zPnSfjUdgloG3rtt4Zhb4Le2K+fCDd0oGXv3D25G1fePFAm9rReMFzLYa0vy3/JwP/GJtjWA8BPCLDj9v73zgwQsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxgsYL2C8gPECxvsF6uk5F0D7MSgAAAAASUVORK5CYII=" alt="l’écran après BAS">
+    <figcaption><strong>BAS</strong> — l’écran a changé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Le même avion, trois fois moins vite qu’au 35.16 : il glisse doucement, un pixel à la fois, et s’arrête toujours au bord.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>30 images de flèche droite : environ 10 pixels, au lieu de 30 <span class="detail"> (px = 82)</span></li>
+
+  <li>à gauche, il s’arrête pile à 0 </li>
+
+  <li>en bas, pile à 128 </li>
+
+  <li>le lutin suit sa place </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>36. Intégrer une carte dans son projet</strong> — chapitre 6 : Dessiner.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

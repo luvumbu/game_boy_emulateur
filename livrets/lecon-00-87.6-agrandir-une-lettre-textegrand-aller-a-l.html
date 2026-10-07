@@ -82,20 +82,20 @@
     <span class="niveau">Chapitre 0 — Avant tout</span>
     
     <span class="niveau">Partie G — Les lettres et l’écran titre</span>
-    <span>leçon 0.87.6 sur 143</span>
+    <span>leçon 0.87.6 sur 152</span>
     <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
     
   </p>
 <h1>0.87.6. Agrandir une lettre : texteGrand — aller à la ligne, texteGrandS</h1>
-<p class="idee">texteGrandS(0, 0, "BONJOUR", 3) : comme texteGrand, mais les lettres qui ne tiennent plus dans la largeur passent à la ligne, comme textS.</p>
+<p class="idee">texteGrandS(0, 0, "BONJOUR", 2) : comme texteGrand, mais les lettres qui ne tiennent plus dans la largeur passent à la ligne, comme textS.</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
-<p><strong>Avec <code>texteGrand</code>, un mot trop long sort de l’écran par la droite.</strong> « BONJOUR » en taille 3 demande 7 × 3 = 21 cases de large ; l’écran n’en a que 20 : le R disparaît.</p>
-<p><strong>Ce qui est nouveau ici : <code>texteGrandS</code>,</strong> le <code>S</code> de <code>textS</code> (le 0.11). Même réglages que <code>texteGrand</code>, mais les lettres qui ne tiennent plus <strong>passent à la ligne</strong> : elles reprennent en colonne 0, une rangée de lettres plus bas (3 cases, à la taille 3).</p>
-<p><strong>Le découpage :</strong> à la taille 3, une ligne tient 20 ÷ 3 = 6 lettres (18 cases). « BONJOU » sur la première, « R » sur la deuxième.</p>
-<p><strong>Trop haut, c’est une erreur :</strong> l’écran a 18 cases de haut. Si le texte en demande plus (« BONJOUR » en taille 7 : 4 lignes de 7 cases, 28), le compilateur refuse, et dit combien il en faudrait.</p>
+<p><strong>Avec <code>texteGrand</code>, un mot trop long sort de l’écran par la droite.</strong> « BONJOUR » en taille 2 (3 cases par lettre) demande 7 × 3 = 21 cases de large ; l’écran n’en a que 20 : le R disparaît.</p>
+<p><strong>Ce qui est nouveau ici : <code>texteGrandS</code>,</strong> le <code>S</code> de <code>textS</code> (le 0.11). Même réglages que <code>texteGrand</code>, mais les lettres qui ne tiennent plus <strong>passent à la ligne</strong> : elles reprennent en colonne 0, une rangée de lettres plus bas (3 cases, à la taille 2).</p>
+<p><strong>Le découpage :</strong> à la taille 2, une lettre prend 3 cases ; une ligne en tient 20 ÷ 3 = 6 lettres (18 cases). « BONJOU » sur la première, « R » sur la deuxième.</p>
+<p><strong>Trop haut, c’est une erreur :</strong> l’écran a 18 cases de haut. Si le texte en demande plus (« BONJOUR » en taille 6 : 4 lignes de 7 cases, 28), le compilateur refuse, et dit combien il en faudrait.</p>
 <p><strong>Tout s’écrit en clair,</strong> même la place : le découpage en lignes se fait avant le jeu.</p>
 
 <div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
@@ -151,12 +151,12 @@ Tes fonctions appelées :
     <pre><code>int main() {
   // Comme texteGrand, mais qui VA À LA LIGNE :
   //
-  //   texteGrandS(0, 0, "BONJOUR", 3);
-  //   la taille 3 : 3 cases par lettre ; une ligne de 20 cases en tient 6.
+  //   texteGrandS(0, 0, "BONJOUR", 2);
+  //   la taille 2 : 3 cases par lettre ; une ligne de 20 cases en tient 6.
   //
   //   ligne 1, cases 0 à 2 :   B O N J O U     (6 lettres × 3 = 18 cases)
   //   ligne 2, cases 3 à 5 :   R               (repart en colonne 0)
-  texteGrandS(0, 0, "BONJOUR", 3);
+  texteGrandS(0, 0, "BONJOUR", 2);
 
   while (true) {
     image();

@@ -514,7 +514,7 @@ int main() { bande(…); }</code></pre>
     <span class="pastille">●● intermédiaire</span> <span>il faut avoir lu ce qui est cité, et avoir essayé</span>
     <br><b>À lire avant :</b> <a href="#base-0-5">0.5 L’écran : des cases, des tuiles, la police</a> · <a href="#base-0-6">0.6</a> · <a href="#base-0-7">0.7</a> · <a href="#base-0-8">0.8</a> · <a href="#partie-a">partie A</a>
   </div>
-  <p><strong>Dans l’atelier, ce chapitre est le dernier du parcours</strong> (bouton <strong>📚 APPRENDRE</strong>), sous le nom « Tes propres #include : ajouter une fonction ». Dans la page du tutoriel, il commence à la leçon 144 : <code>tuto.html#lecon-603</code>.</p>
+  <p><strong>Dans l’atelier, ce chapitre est le dernier du parcours</strong> (bouton <strong>📚 APPRENDRE</strong>), sous le nom « Tes propres #include : ajouter une fonction ». Dans la page du tutoriel, il commence à la leçon 144 : <code>tuto.html#lecon-619</code>.</p>
 <p><strong>Chaque étape reprend la précédente et ne change qu’une chose.</strong> Les voici toutes, avec leur programme complet (et leurs fichiers voisins), et l’écran qu’elles donnent vraiment.</p>
   
 <article class="lecon">
@@ -913,6 +913,87 @@ int main() {
     <div><p class="fichier">Ce qu’on doit voir</p><p class="avoir">Un cadre de X au milieu de l’écran : colonnes 3 à 16, lignes 3 à 12, vide à l’intérieur.</p></div>
   </div>
 </article>
+<article class="lecon">
+  <p class="reperes"><span class="niveau">leçon 152 du parcours</span></p>
+  <h2 class="titre-lecon">152. Un raccourci à toi : écrire poserDevant() soi-même</h2>
+  <p class="idee">poserDevant() de la console tient en deux lignes : on l’écrit soi-même, dans outils.cpp. Et l’on découvre pourquoi celle de la console est plus légère.</p>
+  <p><strong>Une fonction « raccourci », c’est juste un nom donné à des gestes qu’on sait déjà faire.</strong> <code>poserDevant()</code> (le 110.10) pose une tuile, puis la teint <code>| DEVANT</code>. Ici, on l’écrit <strong>soi-même</strong>, dans <code>outils.cpp</code>, comme <code>bande()</code> et <code>pile()</code>.</p>
+  <p><strong>Lis-la :</strong> quatre paramètres, deux lignes. <code>poser(colonne, ligne, tuile)</code> pose la tuile ; <code>teindre(colonne, ligne, palette | DEVANT)</code> choisit sa palette et la fait passer devant les lutins.</p>
+  <p><strong>Elle porte le même nom que celle de la console :</strong> c’est donc <strong>la tienne</strong> qui sert (le 15.7). Le programme n’écrit pas <code>#include &lt;poserDevant&gt;</code> : il n’en a pas besoin. Il inclut <code>poser</code> et <code>teindre</code>, dont TA fonction se sert.</p>
+  <p><strong>La différence de poids :</strong> ta version est une vraie fonction. À chaque appel, le programme range quatre nombres, saute dans la fonction, et <code>poser()</code> et <code>teindre()</code> ne savent plus rien d’avance (la case, la tuile) : elles calculent tout pendant le jeu. Celle de la console, elle, n’est <strong>pas une vraie fonction</strong> : le compilateur <strong>recopie ses deux lignes à la place de l’appel</strong>, avec les vrais nombres. Le résultat est le même à l’écran ; la cartouche de la console est plus petite.</p>
+  <p><strong>Alors, la tienne ne sert à rien ?</strong> Si : elle est à toi, tu peux la changer. Une version qui pose <strong>deux</strong> cases d’un coup (un buisson de 2 de large), une autre qui choisit toute seule la palette… La console ne fera jamais ce que ton jeu a en tête.</p>
+  <p><strong>À toi :</strong> ajoute dans <code>outils.cpp</code> un <code>buissonDevant(colonne, ligne)</code> qui appelle quatre fois <code>poserDevant()</code> pour un buisson de 2 × 2 cases.</p>
+  <p class="fichier"><code>outils.cpp</code></p><pre><code>// outils.cpp : MES fonctions.
+
+#include &lt;poser&gt;     // poserDevant() se sert de poser()…
+#include &lt;teindre&gt;   // … et de teindre()
+
+// poserDevant(colonne, ligne, tuile, palette) : MA version, en deux lignes.
+// Même nom que celle de la console : c'est la mienne qui sert.
+//   poserDevant(12, 8, BUISSON, 2) → la touffe en (12, 8), palette 2, devant.
+void poserDevant(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t palette) {
+  poser(colonne, ligne, tuile);                // 1. la tuile, sur sa case
+  teindre(colonne, ligne, palette | DEVANT);   // 2. sa palette, ET devant les lutins
+}</code></pre>
+  <p class="fichier"><code>principal.cpp</code></p><pre><code>// Le buisson DEVANT, avec MA poserDevant(), écrite dans outils.cpp.
+// Pas de « #include &lt;poserDevant&gt; » : ma fonction vient d'outils.cpp.
+
+#include &lt;Tuile&gt;          // un dessin de 8 × 8 pixels
+#include &lt;couleurFond&gt;    // choisit une couleur d’une palette du fond
+#include &lt;couleurLutin&gt;   // choisit une couleur d’une palette des lutins
+#include &lt;sprite&gt;         // place un lutin de 8 × 8 au pixel près
+#include &lt;teindreLutin&gt;   // met un lutin dans une palette
+#include "outils.cpp"     // MA poserDevant()
+
+Tuile BUISSON = {                 // Une touffe de feuilles : AUCUN 0, elle est toute pleine.
+  "11222211",                     //   (des coins en 0 laisseraient un trou là où deux
+  "12233221",                     //    touffes se touchent : on y verrait le héros)
+  "22333322",
+  "23333332",
+  "23333332",
+  "22333322",
+  "12233221",
+  "11222211",
+};
+
+Tuile HEROS = {                   // 0 transparent, 1 clair, 2 moyen, 3 contour.
+  "00333300",
+  "03222230",
+  "32122123",
+  "32222223",
+  "03222230",
+  "00333300",
+  "03300330",
+  "33000033",
+};
+
+int main() {
+  couleurFond(2, 1, 16, 30,  8);  // palette 2 : les verts du buisson
+  couleurFond(2, 2,  6, 22,  4);
+  couleurFond(2, 3,  0, 10,  2);
+  couleurLutin(0, 2, 31,  4,  2); // le héros : rouge
+  couleurLutin(0, 3, 10,  0,  0);
+
+  // Un buisson de 2 × 2 cases, colonnes 12-13, lignes 8-9 : quatre appels.
+  poserDevant(12, 8, BUISSON, 2);
+  poserDevant(13, 8, BUISSON, 2);
+  poserDevant(12, 9, BUISSON, 2);
+  poserDevant(13, 9, BUISSON, 2);
+
+  sprite(0, 96, 68, HEROS);       // le héros, dans le buisson : caché
+  teindreLutin(0, 0);
+  sprite(1, 40, 68, HEROS);       // un autre, à découvert : visible
+  teindreLutin(1, 0);
+
+  while (true) {
+    image();
+  }
+}</code></pre>
+  <div class="resultat">
+    <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAAB50lEQVR4nO3XsWnDQBiAUZcewaWHyCyZIaXH8FgeISNkjJQpDELINgKFcMrHg1eIq37uQ8fd4ev7k7DD8An4UwLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwn8Irr7XK9Xd4+3if3lVfrwwdeEHjFVPF4Oh9P53nLp+vDB14QeMW84rzlq/XhAy8IvGJRcd7y6frwgRcGB57vzvC9eErg7R6Pu+Hb8cgRvdF9R6aryv1jh41dsjZa/Aq7/Yk9k7b7F0e0wL+y/0uWI3q7edfdNnbJ2uix6D4beybFCRzniI5zyYrzTGLXBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7guB95Te/Jdxye2QAAAABJRU5ErkJggg==" alt="l’écran de la console"><figcaption>l’écran, dans l’émulateur — 1187 octets</figcaption></figure>
+    <div><p class="fichier">Ce qu’on doit voir</p><p class="avoir">Un buisson vert, et un héros rouge à gauche. Le second héros, dans le buisson, est caché.</p></div>
+  </div>
+</article>
 </section>
 
 <section class="page" id="partie-js">
@@ -1026,8 +1107,8 @@ void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) { … 
 <p>Des lettres, des chiffres, le tiret bas <code>_</code> ; pas d’espace, pas d’accent, pas de chiffre au début. Les majuscules comptent : <code>Pile</code> et <code>pile</code> sont deux noms différents. L’habitude du projet : <code>motsCollesAvecMajuscules</code> (<code>cacherPanneau</code>) ou <code>mots_avec_tiret</code> (<code>deplace_x</code>).</p>
 
   <h2>Étape 3 — Le code : <code>compilateur/emetteur.js</code></h2>
-  <p><strong>Ouvre <code>compilateur/emetteur.js</code></strong> et cherche (Ctrl+F) <code>const SOURCE_BANDE</code> : c’est vers la ligne 5571. Voici, lue dans le fichier, la source de <code>bande()</code> :</p>
-  <p class="fichier"><code>compilateur/emetteur.js, ligne 5571</code></p><pre><code>const SOURCE_BANDE = `
+  <p><strong>Ouvre <code>compilateur/emetteur.js</code></strong> et cherche (Ctrl+F) <code>const SOURCE_BANDE</code> : c’est vers la ligne 5724. Voici, lue dans le fichier, la source de <code>bande()</code> :</p>
+  <p class="fichier"><code>compilateur/emetteur.js, ligne 5724</code></p><pre><code>const SOURCE_BANDE = `
 void bande(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t longueur) {
   for (uint8_t i = 0; i &lt; longueur; i++) {   // longueur fois :
     poser(colonne + i, ligne, tuile);        //   une case de plus vers la droite
@@ -1044,8 +1125,8 @@ void pile(uint8_t colonne, uint8_t ligne, uint8_t tuile, uint8_t hauteur) {
   }
 }
 `</code></pre>
-  <p><strong>Puis inscris-la dans le tableau <code>FONCTIONS_EN_C</code></strong>, juste en dessous (vers la ligne 5580). Voici son début, lu dans le fichier :</p>
-  <p class="fichier"><code>compilateur/emetteur.js, ligne 5580</code></p><pre><code>/** Les fonctions de la console écrites en C : leur nom, et leur texte. */
+  <p><strong>Puis inscris-la dans le tableau <code>FONCTIONS_EN_C</code></strong>, juste en dessous (vers la ligne 5766). Voici son début, lu dans le fichier :</p>
+  <p class="fichier"><code>compilateur/emetteur.js, ligne 5766</code></p><pre><code>/** Les fonctions de la console écrites en C : leur nom, et leur texte. */
 const FONCTIONS_EN_C = {
   bande: SOURCE_BANDE,</code></pre>
   <p>Ajoute une ligne, à côté de celle de <code>bande</code> :</p>
@@ -1063,8 +1144,8 @@ const FONCTIONS_EN_C = {
 <p><strong>La phrase est entre apostrophes droites</strong> <code>'…'</code>. Si ta phrase contient une apostrophe, prends l’apostrophe typographique <code>’</code> (comme dans « l’écran ») : une apostrophe droite fermerait le texte trop tôt.</p>
 
   <h2>Étape 5 — L’aide de l’éditeur : <code>aide-fonctions.js</code></h2>
-  <p><strong>Ouvre <code>aide-fonctions.js</code></strong> (à la racine du projet) et cherche <code>bande: {</code> (ligne 16) :</p>
-  <p class="fichier"><code>aide-fonctions.js, ligne 16</code></p><pre><code>  bande: { args: ['colonne', 'ligne', 'tuile', 'longueur'], dit: 'pose la même tuile « longueur » fois, de gauche à droite : bande(2, 5, ALPHABET[0], 10) écrit dix A sur la ligne 5.' },</code></pre>
+  <p><strong>Ouvre <code>aide-fonctions.js</code></strong> (à la racine du projet) et cherche <code>bande: {</code> (ligne 18) :</p>
+  <p class="fichier"><code>aide-fonctions.js, ligne 18</code></p><pre><code>  bande: { args: ['colonne', 'ligne', 'tuile', 'longueur'], dit: 'pose la même tuile « longueur » fois, de gauche à droite : bande(2, 5, ALPHABET[0], 10) écrit dix A sur la ligne 5.' },</code></pre>
   <p class="fichier"><code>à ajouter dans aide-fonctions.js</code></p><pre><code>  pile: { args: ['colonne', 'ligne', 'tuile', 'hauteur'], dit: 'pose la même tuile « hauteur » fois, vers le bas.' },</code></pre>
   <p><code>args</code> : le nom de chaque argument, dans l’ordre. Pendant que tu tapes <code>pile(3, </code>, l’éditeur montre <code>pile(colonne, ligne, tuile, hauteur)</code> avec l’argument en cours en gras.</p>
 <p><code>dit</code> : la phrase affichée sous la proposition, quand tu tapes « pil… ».</p>
@@ -1081,7 +1162,7 @@ const FONCTIONS_EN_C = {
 <p><strong>Le <code>controle</code></strong> de la leçon dit ce qu’on doit voir à l’écran, et le vérifie dans l’émulateur. Par exemple, pour six D en colonne 15, lignes 4 à 9 : <code>c.mot(15, 4, 1) === 'D'</code>.</p>
 
   <h2>Et pour aller plus loin : les fonctions en assembleur</h2>
-  <p>Certaines fonctions de la console ne sont <strong>pas</strong> écrites en C, mais directement en instructions du processeur : celles qui parlent au matériel (l’écran, le son, la manette). Par exemple <code>cacherPanneau()</code>, vers la ligne 4491 de <code>compilateur/emetteur.js</code> : trois instructions qui éteignent un bit du registre de l’écran.</p>
+  <p>Certaines fonctions de la console ne sont <strong>pas</strong> écrites en C, mais directement en instructions du processeur : celles qui parlent au matériel (l’écran, le son, la manette). Par exemple <code>cacherPanneau()</code>, vers la ligne 4644 de <code>compilateur/emetteur.js</code> : trois instructions qui éteignent un bit du registre de l’écran.</p>
 <p>Les ajouter demande de connaître le processeur de la Game Boy (un cousin du Z80) et ses registres. <strong>Pour tout ce qu’on peut écrire avec les fonctions qui existent déjà, la façon en C de cette recette suffit</strong>, et elle est bien plus sûre.</p>
 </section>
 
@@ -1157,7 +1238,7 @@ int main() {
   while (true) { image(); }
 }</code></pre>
     <p class="fichier">Le compilateur répond</p>
-    <p class="message">principal.cpp, ligne 4 : fonction inconnue « pile ». Celles de la console : texte, poser, lire, image, bouton, hasard, semer, ecran, sprite, sprite16, sprite32, cacher, cacher16, cacher32, defiler, texteTitre, texteManga, panneau, cacherPanneau, effacerPanneau, poserPanneau, lirePanneau, textePanneau, effacer, textS, poserS, attendre, couleurFond, couleurLutin, teindre, teindreLutin, teindrePanneau, paletteFond, paletteLutins, retard, images, note, bruit, silence, volumeSon, jouer, airFini, sauver, sauvegarde, nombre, nombrePanneau, changerDessin. Les vôtres : main</p>
+    <p class="message">principal.cpp, ligne 4 : fonction inconnue « pile ». Celles de la console : texte, poser, lire, image, bouton, hasard, semer, ecran, sprite, sprite16, sprite32, spriteTaille, cacher, cacher16, cacher32, defiler, texteTitre, texteManga, panneau, cacherPanneau, effacerPanneau, poserPanneau, lirePanneau, textePanneau, effacer, textS, poserS, attendre, couleurFond, couleurLutin, teindre, teindreLutin, teindrePanneau, paletteFond, paletteLutins, retard, images, note, bruit, silence, volumeSon, jouer, airFini, sauver, sauvegarde, nombre, nombrePanneau, changerDessin. Les vôtres : main</p>
     <p><strong>Pourquoi :</strong> Ni le programme ni la console n’ont de <code>pile()</code>. Le compilateur donne la liste des fonctions de la console qu’il connaît, puis celles du programme (« les vôtres »).</p>
 <p><strong>Ce qu’il faut faire :</strong> Écrire la fonction (dans le programme ou un fichier voisin), ou l’ajouter à la console.</p>
   </div>
@@ -1274,13 +1355,13 @@ int main() {
     <span class="pastille">● débutant</span> <span>aucune connaissance demandée en dehors de ce qui est cité</span>
     
   </div>
-  <p><strong>Les 78 noms qu’on peut écrire entre chevrons aujourd’hui</strong>, lus dans <code>compilateur/inclusion.js</code>. Un nouveau nom doit être <strong>absent</strong> de cette liste.</p>
+  <p><strong>Les 81 noms qu’on peut écrire entre chevrons aujourd’hui</strong>, lus dans <code>compilateur/inclusion.js</code>. Un nouveau nom doit être <strong>absent</strong> de cette liste.</p>
   <table class="includes">
     <thead><tr><th>#include</th><th>Ce qu’il apporte</th></tr></thead>
     <tbody>
       <tr><td><code>#include &lt;texte&gt;</code></td><td>écrit un texte à l’écran</td></tr>
       <tr><td><code>#include &lt;textS&gt;</code></td><td>écrit un texte qui passe à la ligne tout seul</td></tr>
-      <tr><td><code>#include &lt;texteGrand&gt;</code></td><td>écrit un texte agrandi, de 1 à 20 fois</td></tr>
+      <tr><td><code>#include &lt;texteGrand&gt;</code></td><td>écrit un texte agrandi, taille de 0 à 10</td></tr>
       <tr><td><code>#include &lt;texteGrandS&gt;</code></td><td>écrit un texte agrandi qui passe à la ligne</td></tr>
       <tr><td><code>#include &lt;texteCouleur&gt;</code></td><td>écrit un mot dans une palette de couleur</td></tr>
       <tr><td><code>#include &lt;nombre&gt;</code></td><td>écrit un nombre en chiffres</td></tr>
@@ -1288,6 +1369,7 @@ int main() {
       <tr><td><code>#include &lt;poser&gt;</code></td><td>pose une tuile sur une case du fond</td></tr>
       <tr><td><code>#include &lt;poserS&gt;</code></td><td>pose une tuile, et passe à la ligne au bord</td></tr>
       <tr><td><code>#include &lt;bande&gt;</code></td><td>pose la même tuile plusieurs fois, de gauche à droite</td></tr>
+      <tr><td><code>#include &lt;poserDevant&gt;</code></td><td>pose une tuile qui passe devant les lutins (Game Boy Color)</td></tr>
       <tr><td><code>#include &lt;lire&gt;</code></td><td>lit la tuile posée sur une case</td></tr>
       <tr><td><code>#include &lt;changerDessin&gt;</code></td><td>change le dessin d’une tuile partout à la fois</td></tr>
       <tr><td><code>#include &lt;defiler&gt;</code></td><td>fait glisser tout le fond</td></tr>
@@ -1309,8 +1391,10 @@ int main() {
       <tr><td><code>#include &lt;Grand&gt;</code></td><td>un autre nom pour un Perso de 32 × 32 pixels</td></tr>
       <tr><td><code>#include &lt;Mot&gt;</code></td><td>un texte et sa place, sous un seul nom</td></tr>
       <tr><td><code>#include &lt;sprite&gt;</code></td><td>place un lutin de 8 × 8 au pixel près</td></tr>
+      <tr><td><code>#include &lt;spriteDerriere&gt;</code></td><td>place un lutin de 8 × 8 derrière le décor</td></tr>
       <tr><td><code>#include &lt;sprite16&gt;</code></td><td>place un lutin de 16 × 16 au pixel près</td></tr>
       <tr><td><code>#include &lt;sprite32&gt;</code></td><td>place un grand personnage de 32 × 32 au pixel près</td></tr>
+      <tr><td><code>#include &lt;spriteTaille&gt;</code></td><td>place un dessin à la taille qu’on veut, sans limite : dessiné une fois, agrandi par le compilateur</td></tr>
       <tr><td><code>#include &lt;cacher&gt;</code></td><td>cache un lutin</td></tr>
       <tr><td><code>#include &lt;cacher16&gt;</code></td><td>cache un lutin de 16 × 16</td></tr>
       <tr><td><code>#include &lt;cacher32&gt;</code></td><td>cache un grand personnage de 32 × 32</td></tr>

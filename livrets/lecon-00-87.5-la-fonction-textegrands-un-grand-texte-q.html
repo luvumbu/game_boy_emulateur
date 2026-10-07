@@ -82,7 +82,7 @@
     <span class="niveau">Chapitre 0 — Avant tout</span>
     
     <span class="niveau">Partie G — Les lettres et l’écran titre</span>
-    <span>leçon 0.87.5 sur 143</span>
+    <span>leçon 0.87.5 sur 152</span>
     <span class="jauge" style="--part: 0%">difficulté 0 / 10</span>
     
     
@@ -92,11 +92,11 @@
 <p class="idee">#include &lt;texteGrandS&gt; : comme texteGrand(), mais les lettres qui ne tiennent plus repartent à gauche, une rangée de lettres plus bas.</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
-<p><strong>Ce qu’elle fait :</strong> <code>texteGrandS(colonne, ligne, "TEXTE", taille)</code> écrit un texte agrandi qui <strong>va à la ligne</strong> : une lettre qui dépasserait la colonne 19 repart en colonne 0, <code>taille</code> cases plus bas.</p>
+<p><strong>Ce qu’elle fait :</strong> <code>texteGrandS(colonne, ligne, "TEXTE", taille)</code> écrit un texte agrandi qui <strong>va à la ligne</strong> : une lettre qui dépasserait la colonne 19 repart en colonne 0, <code>taille + 1</code> cases plus bas.</p>
 <p><strong>La ligne à écrire : <code>#include &lt;texteGrandS&gt;</code>.</strong></p>
 <p><strong>Ses arguments :</strong> comme <code>texteGrand()</code>, et <strong>tout en clair</strong> — la place aussi : le découpage en lignes se fait avant le jeu. Un texte qui dépasserait le bas de l’écran est refusé.</p>
-<p><strong>Ce qu’elle coûte :</strong> environ <strong>1 000 octets</strong> pour deux lettres en taille 2.</p>
-<p><strong>Essaie :</strong> <code>texteGrandS(0, 0, "BONJOUR", 4);</code> : combien de lignes ?</p>
+<p><strong>Ce qu’elle coûte :</strong> environ <strong>1 000 octets</strong> pour deux lettres en taille 1.</p>
+<p><strong>Essaie :</strong> <code>texteGrandS(0, 0, "BONJOUR", 3);</code> : combien de lignes ?</p>
 
 <div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
   <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">On retrouve texteGrandS dans 1 leçon</p>
@@ -139,7 +139,7 @@ Tes fonctions appelées :
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
     <pre><code>// ---- #include &lt;texteGrandS&gt; : un grand texte qui va à la ligne ----
-// En taille 3, une lettre prend 3 colonnes : 6 lettres tiennent sur 20 cases.
+// En taille 2, une lettre prend 3 colonnes : 6 lettres tiennent sur 20 cases.
 // La septième, G, repart en colonne 0, trois cases plus bas.
 
 #include &lt;texteGrandS&gt;   // texteGrandS() : agrandi, et qui va à la ligne</code></pre>
@@ -151,7 +151,7 @@ Tes fonctions appelées :
   <div>
     <p class="quoi">2. le point d’entrée : c’est ici que la console arrive</p>
     <pre><code>int main() {
-  texteGrandS(0, 0, "ABCDEFG", 3);   // ABCDEF sur les lignes 0 à 2, G en (0, 3)
+  texteGrandS(0, 0, "ABCDEFG", 2);   // ABCDEF sur les lignes 0 à 2, G en (0, 3)
 
   while (true) {
     image();

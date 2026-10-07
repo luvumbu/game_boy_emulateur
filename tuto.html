@@ -160,6 +160,10 @@
   .console { display: flex; flex-direction: column; gap: 10px; }
   .ecran { background: #0b0d10; border: 1px solid var(--bord); border-radius: 8px; padding: 10px; }
   .ecran canvas { display: block; width: 100%; image-rendering: pixelated; border-radius: 4px; }
+  /* Game Boy ou Game Boy Color : écrit sous l'écran, pour ne jamais avoir à deviner. */
+  .mode-console { margin: 6px 0 0; text-align: center; font-size: 12px; font-weight: 600; color: #c2cadb; }
+  .mode-console[data-mode="gbc"] { color: #ffd166; }
+  .mode-console:empty { display: none; }
   /* En plein écran, la console seule, centrée sur du noir. Le canevas prend
      la taille que lui donne ajusterLePleinEcran : un nombre ENTIER de fois
      160 × 144, pour que chaque pixel de la console garde la même taille. */
@@ -173,6 +177,22 @@
   }
 
   .etat.erreur { background: #3a1f24; border-color: var(--rouge); color: #ffc9cd; }
+  /* Le bouton rouge qui écrit les « #include » manquants, comme dans l'atelier. */
+  button.danger {
+    background: #4a2226; border-color: var(--rouge); color: #ffd2d6; font-weight: 600;
+  }
+  button.danger:hover:not(:disabled) { background: #612a30; border-color: #ff8b93; }
+  /* La question douce « il manque un #include : l’ajouter ? », sous l’erreur. */
+  .question-include {
+    display: block; margin-top: 10px; padding: 10px 12px; border-radius: 6px;
+    background: var(--panneau-clair); border: 1px solid var(--bord); border-left: 3px solid var(--vert);
+    color: var(--texte); white-space: normal; font-family: inherit;
+  }
+  .question-include code { display: block; margin: 6px 0 8px; white-space: pre; color: var(--vert); }
+  .question-include button { margin-right: 8px; }
+  /* Le message « il faut #include … » : un clic l’ajoute. */
+  .message-ajoutable { cursor: pointer; }
+  .message-ajoutable:hover { text-decoration: underline dotted; }
   .etat.bon { border-left: 3px solid var(--vert); }
   /* Ce que la cartouche occupe, et les boutons « Inclure » : comme dans l'atelier. */
   .analyse { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
@@ -331,6 +351,38 @@
   .fonctions-lecon code { min-width: 13em; }
   .fonctions-lecon button { padding: 1px 8px; font-size: 12px; }
   .fonctions-lecon .ailleurs { display: flex; flex-wrap: wrap; gap: 4px; }
+
+  /* ================================================ la mise en page générale
+   *
+   * Le sommaire (628 étapes) défilait avec la page : une fois descendu dans
+   * une leçon, on ne le voyait plus, et sur un téléphone il fallait traverser
+   * TOUTE la liste avant d'arriver à la leçon. Il défile maintenant tout
+   * seul, à côté de la leçon — et, sur un téléphone, en haut, sur une hauteur
+   * limitée.
+   */
+  .sommaire {
+    position: sticky; top: 0; align-self: start;
+    max-height: 100vh; overflow-y: auto; overscroll-behavior: contain;
+    scrollbar-width: thin; scrollbar-color: var(--bord) transparent;
+  }
+
+  /* On voit où l'on est au clavier (Tab), sans contour au clic de souris. */
+  button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible, a:focus-visible {
+    outline: 2px solid var(--vert); outline-offset: 2px;
+  }
+
+  @media (max-width: 1000px) {
+    .sommaire {
+      position: static; max-height: 38vh;
+      border-bottom: 1px solid var(--bord); box-shadow: inset 0 -12px 12px -12px #000a;
+    }
+    .lecon { padding: 18px 16px 32px; }
+  }
+
+  /* Un bloc de code large défile dans son cadre, au lieu d'élargir toute la
+     leçon (le texte sortait alors de l'écran, et la console devenait géante). */
+  .lecon, .travail > * { min-width: 0; }
+  .lecon pre, .lecon textarea { max-width: 100%; overflow-x: auto; }
 </style>
 </head>
 <body>
@@ -386,7 +438,10 @@
         </div>
 
         <div class="console">
-          <div class="ecran"><canvas id="ecran" width="160" height="144"></canvas></div>
+          <div class="ecran"><canvas id="ecran" width="160" height="144"></canvas>
+            <!-- Pour quelle console est la cartouche de cette leçon : le programme
+                 le décide (une couleur posée → Game Boy Color). -->
+            <p class="mode-console" id="mode-console"></p></div>
           <p class="avoir" id="avoir"></p>
           <div class="etat" id="etat"></div>
           <!-- Ce que la cartouche occupe, et ce qu'on peut y inclure. -->
@@ -412,8 +467,9 @@ import { analyser } from './compilateur/analyseur.js'
 import { compiler } from './compilateur/emetteur.js'
 import { analyser as analyserLaCartouche, montrer as montrerLAnalyse } from './analyse-rom.js'
 import { fabriquer } from './compilateur/cartouche.js'
+import { CONSOLES, consoleDeLaCartouche } from './compilateur/consoles.js'
 import { GameBoy } from './emulateur.js'
-import { LECONS, NIVEAUX, numeros, partieDe, principales } from './tuto/lecons.js'
+import { LECONS, NIVEAUX, numeros, partieDe, principales, nomDuChapitre } from './tuto/lecons.js'
 import { inclusionsDe, fonctionDuTuto, tutosDesFonctions, leconsQuiEmploient } from './tuto/fonctions.js'
 import { sommaireCherchable } from './recherche.js'
 const NUMEROS = numeros(LECONS)
@@ -422,6 +478,8 @@ import { installer as installerAirs } from './editeur-airs.js'
 import { installer as installerDessin, lireDessins } from './editeur-tuiles.js'
 import { enrichir } from './tuto/enrichir.js'
 import { assemblerAvec, traduire } from './compilateur/inclusion.js'
+import { inclusionsEnTete } from './compilateur/inclusions-auto.js'
+import { poserLaQuestion } from './question-include.js'
 
 /** Les quatre nuances de l'écran vert d'origine. */
 const NUANCES = [[0xe0, 0xf8, 0xd0], [0x88, 0xc0, 0x70], [0x34, 0x68, 0x56], [0x08, 0x18, 0x20]]
@@ -468,7 +526,7 @@ function dessinerSommaire() {
     if (lecon.difficulte !== LECONS[i - 1]?.difficulte) {
       const entete = document.createElement('li')
       entete.className = 'partie'
-      entete.textContent = `Chapitre ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`
+      entete.textContent = `${nomDuChapitre(lecon)} — ${NIVEAUX[lecon.difficulte]}`
       liste.append(entete)
     }
 
@@ -507,6 +565,17 @@ function dessinerSommaire() {
   /* La liste vient d'être refaite (à chaque leçon ouverte) : on lui réapplique
      la recherche en cours, sinon toutes les leçons réapparaîtraient. */
   recherche.rafraichir()
+
+  /* Le sommaire défile seul (voir la feuille de style) : la leçon ouverte y
+     reste en vue. On ne déplace QUE le sommaire, jamais la page. */
+  const nav = liste.closest('.sommaire')
+  const active = liste.querySelector('li.active')
+  if (nav && active && nav.scrollHeight > nav.clientHeight) {
+    const haut = active.offsetTop - nav.offsetTop
+    if (haut < nav.scrollTop || haut + active.offsetHeight > nav.scrollTop + nav.clientHeight) {
+      nav.scrollTop = haut - nav.clientHeight / 3
+    }
+  }
 }
 
 /* ----------------------------------------------------------------- une leçon */
@@ -607,7 +676,7 @@ function aller(index, { defiler = true } = {}) {
     reperes.append(balise)
   }
 
-  repere(`Chapitre ${lecon.difficulte} — ${NIVEAUX[lecon.difficulte]}`, 'niveau')
+  repere(`${nomDuChapitre(lecon)} — ${NIVEAUX[lecon.difficulte]}`, 'niveau')
   /* D'où vient l'étape : une leçon, un cours, ou le tuto d'une fonction. */
   if (lecon.provenance === 'cours') repere('🎓 du cours', 'outil')
   else if (fonctionDuTuto(lecon)) repere('📖 tuto d’une fonction', 'outil')
@@ -615,7 +684,9 @@ function aller(index, { defiler = true } = {}) {
   // chapitre 0 en a ; ailleurs partieDe rend null, et rien n'est ajouté.
   const partie = partieDe(LECONS, index)
   if (partie) repere(`Partie ${partie.lettre} — ${partie.nom}`, 'niveau')
-  repere(`leçon ${NUMEROS[index]} sur ${principales(LECONS)}`, '')
+  /* Dans une série à part, on compte dans la série : « leçon 2.03 sur 2.15 ». */
+  const derniere = lecon.serie ? LECONS.findLast((l) => l.serie === lecon.serie).numero : principales(LECONS)
+  repere(`leçon ${NUMEROS[index]} sur ${derniere}`, '')
   /* La jauge : la difficulté de 1 à 10, et non le numéro du chapitre. */
   const niveau = lecon.niveau ?? Math.max(1, Math.min(10, lecon.difficulte))
   repere(`difficulté ${niveau} / 10`, 'difficulte')
@@ -817,10 +888,19 @@ function compilerEtLancer() {
   try {
     assemble = assemblerAvec(principal, voisins)
     const rendu = compiler(analyser(assemble.texte))
-    const { octets, base, variables, vecteurVBlank } = rendu
-    romActuelle = fabriquer(octets, base, 'LECON ' + (courante + 1), vecteurVBlank)
+    /*
+     * « couleur » est l'octet $0143 que le compilateur a choisi : $C0 si la
+     * leçon pose une couleur, $00 sinon (voir compilateur/consoles.js).
+     * L'oublier, c'était graver $00 partout — et voir les leçons de couleur
+     * en vert, sans savoir pourquoi.
+     */
+    const { octets, base, variables, vecteurVBlank, couleur } = rendu
+    romActuelle = fabriquer(octets, base, 'LECON ' + (courante + 1), vecteurVBlank, couleur)
 
     gb.loadRom(romActuelle)
+    const pour = consoleDeLaCartouche(romActuelle)
+    $('mode-console').dataset.mode = pour
+    $('mode-console').textContent = CONSOLES[pour].etiquette
     tourne = true
 
     const noms = [...variables.keys()]
@@ -832,9 +912,43 @@ function compilerEtLancer() {
     montrerLAnalyse($('analyse'), analyserLaCartouche(rendu), { inclure: inclureDansLaCartouche })
   } catch (erreur) {
     $('analyse').textContent = ''
+    $('mode-console').textContent = ''
     tourne = false
     $('etat').className = 'etat erreur'
-    $('etat').textContent = assemble ? traduire(erreur.message, assemble.origine) : erreur.message
+    const message = assemble ? traduire(erreur.message, assemble.origine) : erreur.message
+    $('etat').textContent = message
+    /* Un « #include » manque : on DEMANDE tout de suite, sous l'erreur, s'il
+       faut l'écrire tout en haut du code. Si l'on répond non, le bouton
+       rouge reste là pour le faire plus tard. */
+    if (message.includes('il faut « #include <')) {
+      const ajouter = () => {
+        fichiersLecon.set(ouvert, $('source').value)
+        const { [PRINCIPAL]: principal, ...voisins } = Object.fromEntries(fichiersLecon)
+        let rendu
+        try {
+          rendu = inclusionsEnTete(principal, voisins)
+        } catch (autre) {
+          $('etat').textContent = assemble ? traduire(autre.message, assemble.origine) : autre.message
+          return
+        }
+        if (!rendu.noms.length) return
+        fichiersLecon.set(PRINCIPAL, rendu.texte)
+        if (ouvert === PRINCIPAL) $('source').value = rendu.texte
+        compilerEtLancer()
+      }
+      const bouton = document.createElement('button')
+      bouton.type = 'button'
+      bouton.className = 'danger'
+      bouton.textContent = '✚ Écrire les #include qui manquent'
+      bouton.style.marginLeft = '8px'
+      bouton.addEventListener('click', ajouter)
+      $('etat').append(bouton)
+      /* La question douce, sous l'erreur (voir question-include.js). */
+      const { [PRINCIPAL]: principal, ...voisins } = Object.fromEntries(fichiersLecon)
+      let noms = []
+      try { ({ noms } = inclusionsEnTete(principal, voisins)) } catch { /* le bouton suffit */ }
+      poserLaQuestion($('etat'), noms, ajouter, bouton)
+    }
   }
 }
 
@@ -920,12 +1034,30 @@ function tick() {
   gb.runFrame()
   verserLeSon()
 
-  for (let i = 0; i < 160 * 144; i++) {
-    const [r, v, b] = NUANCES[gb.framebuffer[i] & 3]
-    image.data[i * 4] = r
-    image.data[i * 4 + 1] = v
-    image.data[i * 4 + 2] = b
-    image.data[i * 4 + 3] = 255
+  /*
+   * Deux écrans, un seul canevas — comme dans l'atelier.
+   *
+   * Une cartouche Game Boy Color rend des couleurs vraies (BGR555, cinq bits
+   * par composante) ; une cartouche Game Boy, ses 4 nuances. Ne dessiner que
+   * les nuances, c'était montrer les leçons de couleur en vert.
+   */
+  if (gb.ppu.couleur) {
+    const huitBits = (cinq) => (cinq << 3) | (cinq >> 2)
+    for (let i = 0; i < 160 * 144; i++) {
+      const c = gb.ppu.couleurs[i]
+      image.data[i * 4] = huitBits(c & 31)
+      image.data[i * 4 + 1] = huitBits(c >> 5 & 31)
+      image.data[i * 4 + 2] = huitBits(c >> 10 & 31)
+      image.data[i * 4 + 3] = 255
+    }
+  } else {
+    for (let i = 0; i < 160 * 144; i++) {
+      const [r, v, b] = NUANCES[gb.framebuffer[i] & 3]
+      image.data[i * 4] = r
+      image.data[i * 4 + 1] = v
+      image.data[i * 4 + 2] = b
+      image.data[i * 4 + 3] = 255
+    }
   }
 
   ctx.putImageData(image, 0, 0)
