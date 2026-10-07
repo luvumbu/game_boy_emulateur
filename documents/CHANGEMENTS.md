@@ -3462,3 +3462,19 @@ d'ailleurs et la transformait en C++ est enlevée :
 - `exemples/cartes.cpp` : sur l’écran titre, les deux grandes images ont leur
   palette (`P_TITRE`), avec un vrai noir — sur le vert de la table, la teinte 3
   est blanche pour le texte, et le Père Noël y perdait ses yeux.
+
+## Plus tard encore : jouer seul contre la console (des IA)
+
+- Puissance 4, Dames et Échecs : l’écran titre propose « 1 JOUEUR » (par
+  défaut) ou « 2 JOUEURS » (HAUT, BAS, START) ; seul, la console joue le second
+  camp après une demi-seconde de « réflexion » ;
+- Puissance 4 : gagner, sinon bloquer, sinon le centre sans offrir la case du
+  dessus (`gagnerait`, `dangereux`) ;
+- Dames : chaque coup noté de 0 à 255 (100 = ordinaire) — prise, dame, en prise
+  ou non (`enPrise`), avancer ; la prise enchaînée continue avec la même pièce ;
+- Échecs : un coup d’avance, `VALEUR[]` (pion 1 … reine 9), pièce laissée en
+  prise (`attaquee`), roi laissé en échec = pire coup, promotion ; environ une
+  seconde par coup sur la console ;
+- `verifier-jeux.mjs` : les parties à deux choisissent « 2 JOUEURS » ; trois
+  parties contre l’IA (elle bloque au Puissance 4, prend la pièce offerte aux
+  dames, prend la dame offerte en h7 aux échecs) ; les trois projets mis à jour.

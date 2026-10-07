@@ -1,6 +1,7 @@
 // PUISSANCE 4 — le Père Noël contre le bonhomme de neige.
 //
-// Deux joueurs, chacun son tour, sur la même console. On choisit une colonne
+// Seul contre la console (le bonhomme de neige joue tout seul), ou à deux
+// sur la même console : on choisit sur l’écran titre. On choisit une colonne
 // avec GAUCHE et DROITE, on lâche son jeton avec A : il tombe tout en bas de
 // la colonne. Le premier qui en aligne QUATRE — en ligne, en colonne ou en
 // diagonale — a gagné. START rejoue.
@@ -230,6 +231,53 @@ void direLeTour() {
   }
 }
 
+
+// ------------------------------------------------- 1 joueur ou 2 joueurs
+
+uint8_t seul = 1;              // 1 : contre la console ; 0 : à deux sur la même console
+uint8_t attente = 0;           // la console « réfléchit » un peu avant de jouer
+
+void montrerChoix() {
+  if (seul == 1) {
+    texte(4, 13, "# 1 JOUEUR ");
+    texte(4, 15, "  2 JOUEURS");
+  } else {
+    texte(4, 13, "  1 JOUEUR ");
+    texte(4, 15, "# 2 JOUEURS");
+  }
+}
+
+/* HAUT et BAS choisissent, START (ou A) commence. */
+void choisirLesJoueurs() {
+  uint8_t h = 0;
+  uint8_t bb = 0;
+  uint8_t go = 0;
+  uint8_t hAvant = 1;
+  uint8_t bAvant = 1;
+  uint8_t goAvant = 1;
+  montrerChoix();
+  texte(2, 17, "START POUR JOUER");
+  while (true) {
+    image();
+    h = bouton(HAUT);
+    bb = bouton(BAS);
+    go = bouton(START) | bouton(A);
+    if (h == 1 && hAvant == 0) {
+      seul = 1;
+      montrerChoix();
+    }
+    if (bb == 1 && bAvant == 0) {
+      seul = 0;
+      montrerChoix();
+    }
+    if (go == 1 && goAvant == 0) break;
+    hAvant = h;
+    bAvant = bb;
+    goAvant = go;
+  }
+  while (bouton(START) == 1 || bouton(A) == 1) image();
+}
+
 // ------------------------------------------------------------------ le jeu
 
 /* Combien de jetons du joueur, à la suite, en partant de (c, l) dans une
@@ -310,14 +358,69 @@ void titre() {
   poser(1, 4, PERE_NOEL, 4);
   poser(11, 4, BONHOMME_NEIGE, 4);
   texte(9, 7, "VS");
-  texte(2, 14, "APPUIE SUR START");
   ecran(1);
-  while (bouton(START) == 0) {
-    image();
+  choisirLesJoueurs();
+}
+
+/* ------------------------------------------------------------- l’IA
+ *
+ * Le bonhomme de neige, quand on joue seul. Dans l’ordre :
+ *   1. s’il peut aligner quatre, il le fait ;
+ *   2. si le Père Noël va aligner quatre au prochain coup, il bloque ;
+ *   3. sinon, il préfère le centre — et il évite la colonne où son jeton
+ *      offrirait au Père Noël la case juste au-dessus pour gagner.
+ */
+
+/* La case vide la plus basse d’une colonne, ou 255 si elle est pleine. */
+uint8_t ligneLibre(uint8_t c) {
+  uint8_t l = LIGNES;
+  while (l > 0) {
+    l = l - 1;
+    if (grille[l * COLONNES + c] == PERSONNE) return l;
   }
-  while (bouton(START) == 1) {
-    image();
+  return 255;
+}
+
+/* « qui » gagnerait-il en jouant dans la colonne c ? On essaie, puis on remet. */
+uint8_t gagnerait(uint8_t c, uint8_t qui) {
+  uint8_t l = ligneLibre(c);
+  if (l == 255) return 0;
+  uint8_t garde = joueur;
+  joueur = qui;
+  grille[l * COLONNES + c] = qui;
+  uint8_t r = gagne(c, l);
+  grille[l * COLONNES + c] = PERSONNE;
+  joueur = garde;
+  return r;
+}
+
+/* Jouer en c offre-t-il au Père Noël la case du dessus pour gagner ? */
+uint8_t dangereux(uint8_t c) {
+  uint8_t l = ligneLibre(c);
+  if (l == 255 || l == 0) return 0;
+  grille[l * COLONNES + c] = NEIGE;
+  uint8_t r = gagnerait(c, NOEL);
+  grille[l * COLONNES + c] = PERSONNE;
+  return r;
+}
+
+const uint8_t ORDRE[] = { 3, 2, 4, 1, 5, 0, 6 };   // le centre d’abord
+
+uint8_t choisirColonne() {
+  for (uint8_t c = 0; c < COLONNES; c++) {
+    if (gagnerait(c, NEIGE) == 1) return c;            // 1. gagner
   }
+  for (uint8_t c = 0; c < COLONNES; c++) {
+    if (gagnerait(c, NOEL) == 1) return c;             // 2. bloquer
+  }
+  for (uint8_t k = 0; k < COLONNES; k++) {
+    uint8_t c = ORDRE[k];
+    if (ligneLibre(c) != 255 && dangereux(c) == 0) return c;   // 3. le centre, sans danger
+  }
+  for (uint8_t k = 0; k < COLONNES; k++) {
+    if (ligneLibre(ORDRE[k]) != 255) return ORDRE[k];   // tout est dangereux : tant pis
+  }
+  return 3;
 }
 
 int main() {
@@ -330,7 +433,17 @@ int main() {
     droite = bouton(DROITE);
     lacher = bouton(A);
     debut = bouton(START);
-    if (fini == 0) {
+    if (fini == 0 && seul == 1 && joueur == NEIGE) {
+      // le tour de la console : elle « réfléchit » une demi-seconde, puis joue
+      attente = attente + 1;
+      if (attente == 30) {
+        colonne = choisirColonne();
+        montrerJeton();
+        lacherJeton();
+        attente = 0;
+      }
+      montrerJeton();
+    } else if (fini == 0) {
       if (gauche == 1 && gaucheAvant == 0 && colonne > 0) colonne = colonne - 1;
       if (droite == 1 && droiteAvant == 0 && colonne < COLONNES - 1) colonne = colonne + 1;
       if (lacher == 1 && lacherAvant == 0) lacherJeton();

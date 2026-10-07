@@ -1,6 +1,7 @@
 // DAMES — les blancs contre les rouges, sur un damier de 8 × 8.
 //
-// Deux joueurs, chacun son tour. La croix déplace le cadre jaune ; A choisit
+// Seul contre la console (elle joue les rouges), ou à deux : on choisit sur
+// l’écran titre. La croix déplace le cadre jaune ; A choisit
 // une de ses pièces (cadre vert), puis A sur la case où l'aller ; B annule.
 //
 //   - un pion avance d'une case en diagonale, vers l'adversaire ;
@@ -256,6 +257,53 @@ void direLeTour() {
   }
 }
 
+
+// ------------------------------------------------- 1 joueur ou 2 joueurs
+
+uint8_t seul = 1;              // 1 : contre la console ; 0 : à deux sur la même console
+uint8_t attente = 0;           // la console « réfléchit » un peu avant de jouer
+
+void montrerChoix() {
+  if (seul == 1) {
+    texte(4, 13, "# 1 JOUEUR ");
+    texte(4, 15, "  2 JOUEURS");
+  } else {
+    texte(4, 13, "  1 JOUEUR ");
+    texte(4, 15, "# 2 JOUEURS");
+  }
+}
+
+/* HAUT et BAS choisissent, START (ou A) commence. */
+void choisirLesJoueurs() {
+  uint8_t h = 0;
+  uint8_t bb = 0;
+  uint8_t go = 0;
+  uint8_t hAvant = 1;
+  uint8_t bAvant = 1;
+  uint8_t goAvant = 1;
+  montrerChoix();
+  texte(2, 17, "START POUR JOUER");
+  while (true) {
+    image();
+    h = bouton(HAUT);
+    bb = bouton(BAS);
+    go = bouton(START) | bouton(A);
+    if (h == 1 && hAvant == 0) {
+      seul = 1;
+      montrerChoix();
+    }
+    if (bb == 1 && bAvant == 0) {
+      seul = 0;
+      montrerChoix();
+    }
+    if (go == 1 && goAvant == 0) break;
+    hAvant = h;
+    bAvant = bb;
+    goAvant = go;
+  }
+  while (bouton(START) == 1 || bouton(A) == 1) image();
+}
+
 // ------------------------------------------------------------------ les règles
 
 uint8_t camp(uint8_t v) {
@@ -423,10 +471,107 @@ void titre() {
   texte(7, 1, "DAMES");
   poser(1, 4, PION, 4);
   poser(11, 4, DAME, 4);
-  texte(2, 14, "APPUIE SUR START");
   ecran(1);
-  while (bouton(START) == 0) image();
-  while (bouton(START) == 1) image();
+  choisirLesJoueurs();
+}
+
+/* ------------------------------------------------------------- l’IA
+ *
+ * Les rouges, quand on joue seul. Chaque coup possible reçoit une note
+ * (100 : un coup ordinaire) :
+ *   - une prise vaut beaucoup (+60), une prise qui couronne encore plus ;
+ *   - devenir dame : +30 ;
+ *   - arriver sur une case où un blanc pourra le prendre : -40 ;
+ *   - avancer : un peu plus que reculer.
+ * Le meilleur est joué. Au milieu d’une prise, la même pièce continue.
+ */
+
+/* La pièce de « moi » en (c, l) serait-elle prise au coup suivant ? Un
+   adversaire collé en diagonale, et la case d’en face libre. */
+uint8_t enPrise(uint8_t c, uint8_t l, uint8_t moi) {
+  for (uint8_t d = 0; d < 4; d++) {
+    uint8_t dc = 1;
+    uint8_t dl = 1;
+    if (d == 1 || d == 3) dc = 255;
+    if (d >= 2) dl = 255;
+    uint8_t ac = c + dc;
+    uint8_t al = l + dl;
+    uint8_t fc = c - dc;
+    uint8_t fl = l - dl;
+    if (dedans(ac, al) == 1 && dedans(fc, fl) == 1) {
+      uint8_t v = camp(plateau[al * 8 + ac]);
+      if (v != 0 && v != moi && plateau[fl * 8 + fc] == RIEN) return 1;
+    }
+  }
+  return 0;
+}
+
+uint8_t noteDuCoup(uint8_t c0, uint8_t l0, uint8_t c1, uint8_t l1, uint8_t r) {
+  uint8_t note = 100;
+  uint8_t v = plateau[l0 * 8 + c0];
+  if (r == 2) note = note + 60;
+  if (v == PION_ROUGE && l1 == 7) note = note + 30;
+  if (l1 > l0) note = note + 2;
+  // essayer le coup pour voir s’il laisse la pièce en prise
+  plateau[l0 * 8 + c0] = RIEN;
+  plateau[l1 * 8 + c1] = v;
+  uint8_t pris = 0;
+  uint8_t mc = (c0 + c1) / 2;
+  uint8_t ml = (l0 + l1) / 2;
+  if (r == 2) {
+    pris = plateau[ml * 8 + mc];
+    plateau[ml * 8 + mc] = RIEN;
+  }
+  if (enPrise(c1, l1, ROUGES) == 1) note = note - 40;
+  plateau[l1 * 8 + c1] = RIEN;
+  plateau[l0 * 8 + c0] = v;
+  if (r == 2) plateau[ml * 8 + mc] = pris;
+  return note;
+}
+
+void iaJoue() {
+  uint8_t meilleure = 0;
+  uint8_t dc0 = 0;
+  uint8_t dl0 = 0;
+  uint8_t dc1 = 0;
+  uint8_t dl1 = 0;
+  for (uint8_t l0 = 0; l0 < 8; l0++) {
+    for (uint8_t c0 = 0; c0 < 8; c0++) {
+      if (camp(plateau[l0 * 8 + c0]) != ROUGES) continue;
+      if (enchaine == 1 && (c0 != choisieC || l0 != choisieL)) continue;
+      for (uint8_t d = 0; d < 8; d++) {
+        uint8_t pas = 1;
+        if (d >= 4) pas = 2;                   // un pas, ou un saut
+        uint8_t dc = pas;
+        uint8_t dl = pas;
+        if ((d & 1) == 1) dc = 0 - pas;
+        if ((d & 2) == 2) dl = 0 - pas;
+        uint8_t c1 = c0 + dc;
+        uint8_t l1 = l0 + dl;
+        if (dedans(c1, l1) == 0) continue;
+        uint8_t r = coup(c0, l0, c1, l1);
+        if (r == 0) continue;
+        uint8_t n = noteDuCoup(c0, l0, c1, l1, r);
+        if (n > meilleure) {
+          meilleure = n;
+          dc0 = c0;
+          dl0 = l0;
+          dc1 = c1;
+          dl1 = l1;
+        }
+      }
+    }
+  }
+  if (meilleure == 0) {                        // plus aucun coup : les rouges ont perdu
+    rouges = 0;
+    finDuTour();
+    return;
+  }
+  choisieC = dc0;
+  choisieL = dl0;
+  curseurC = dc1;
+  curseurL = dl1;
+  appuyerA();
 }
 
 int main() {
@@ -442,7 +587,14 @@ int main() {
     a = bouton(A);
     b = bouton(B);
     debut = bouton(START);
-    if (fini == 0) {
+    if (fini == 0 && seul == 1 && joueur == ROUGES) {
+      attente = attente + 1;                   // la console réfléchit, puis joue
+      if (attente == 30) {
+        iaJoue();
+        attente = 0;
+      }
+      montrerCadres();
+    } else if (fini == 0) {
       if (haut == 1 && hautAvant == 0 && curseurL > 0) curseurL = curseurL - 1;
       if (bas == 1 && basAvant == 0 && curseurL < 7) curseurL = curseurL + 1;
       if (gauche == 1 && gaucheAvant == 0 && curseurC > 0) curseurC = curseurC - 1;

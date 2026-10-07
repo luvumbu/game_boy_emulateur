@@ -16,8 +16,9 @@ const b = bulletin('les jeux de la série 3')
 
 const TOUCHE = { A: 'a', B: 'b', START: 'start', GAUCHE: 'left', DROITE: 'right', HAUT: 'up', BAS: 'down' }
 
-/** Un jeu, prêt à jouer : appuyer sur une touche, lire une ligne de l'écran, une variable. */
-function ouvrir(chemin) {
+/** Un jeu, prêt à jouer : appuyer sur une touche, lire une ligne de l'écran, une variable.
+    « joueurs » : 1 contre la console (le choix par défaut de l'écran titre), 2 à deux. */
+function ouvrir(chemin, joueurs = 2) {
   const jeu = demarrer(chemin, 30)
   const j = {
     appuyer(nom, fois = 1) {
@@ -31,9 +32,15 @@ function ouvrir(chemin) {
     ligne: (l) => jeu.ecran(0, l, 20).map((v) => ORDRE[v] ?? ' ').join('').trim(),
     v: (nom) => jeu.valeurDe(nom),
   }
+  if (joueurs === 2 && !chemin.includes('cartes')) j.appuyer('BAS')   // « 2 JOUEURS »
   j.appuyer('START')                 // l'écran titre
   j.avancer(10)
   return j
+}
+
+/** Attendre que la console ait joué (au plus quelques secondes). */
+function attendreLaConsole(j, son) {
+  for (let i = 0; i < 400 && j.v('joueur') === son && j.v('fini') === 0; i++) j.avancer(10)
 }
 
 /** Mener le curseur (curseurC, curseurL) sur une case, puis A. */
@@ -108,6 +115,45 @@ const deplacer = (j, c0, l0, c1, l1) => { viser(j, c0, l0); viser(j, c1, l1); j.
   deplacer(j, 0, 1, 0, 2)
   deplacer(j, 5, 1, 4, 0)
   b.verifier('échecs : la dame prend le roi, les blancs gagnent', j.v('fini') === 1 && j.ligne(17) === 'LES BLANCS GAGNENT')
+}
+
+/* ------------------------------------------------------- contre la console */
+{
+  // Puissance 4 : le Père Noël empile trois jetons en colonne 0 ; la console doit bloquer
+  const j = ouvrir('exemples/puissance4.cpp', 1)
+  b.egal('IA puissance 4 : seul contre la console, par défaut', j.v('seul'), 1)
+  for (let k = 0; k < 3; k++) {
+    while (j.v('colonne') > 0) j.appuyer('GAUCHE')
+    j.appuyer('A'); j.avancer(4)
+    attendreLaConsole(j, 2)
+  }
+  b.egal('IA puissance 4 : trois jetons du Père Noël en colonne 0 — elle bloque en 0', j.v('colonne'), 0)
+  while (j.v('colonne') > 0) j.appuyer('GAUCHE')
+  j.appuyer('A'); j.avancer(4)
+  b.egal('IA puissance 4 : le quatrième ne gagne plus', j.v('fini'), 0)
+}
+{
+  // Dames : un blanc avance, puis s'offre ; la console le prend
+  const j = ouvrir('exemples/dames.cpp', 1)
+  deplacer(j, 2, 5, 3, 4)
+  attendreLaConsole(j, 2)
+  b.egal('IA dames : la console répond, la main revient aux blancs', j.v('joueur'), 1)
+  deplacer(j, 3, 4, 4, 3)
+  attendreLaConsole(j, 2)
+  b.egal('IA dames : un blanc offert, elle le prend — 11 blancs', j.v('blancs'), 11)
+}
+{
+  // Échecs : e4, Dh5, puis la dame se jette en h7, défendue par la tour : la console la prend
+  const j = ouvrir('exemples/echecs.cpp', 1)
+  deplacer(j, 4, 6, 4, 4)
+  attendreLaConsole(j, 2)
+  b.egal('IA échecs : la console répond à e4', j.v('joueur'), 1)
+  deplacer(j, 3, 7, 7, 3)
+  attendreLaConsole(j, 2)
+  deplacer(j, 7, 3, 7, 1)
+  attendreLaConsole(j, 2)
+  b.verifier('IA échecs : la dame offerte en h7, la tour la prend', j.v('curseurC') === 7 && j.v('curseurL') === 1 && j.v('joueur') === 1,
+    ` (la console a joué en ${j.v('curseurC')}, ${j.v('curseurL')})`)
 }
 
 /* ------------------------------------------------------- Couleurs (cartes) */

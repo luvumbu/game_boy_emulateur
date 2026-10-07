@@ -956,7 +956,16 @@ Après les 26 chapitres du parcours, **📚 APPRENDRE** a deux séries à part, 
 
 **La règle de ces séries** : un dessin s’écrit UNE fois, à sa taille standard, et la taille se choisit au moment de le poser — `sprite(0, 36, 60, ROND, 4)`, `sprite16(4, 88, 36, PERE_NOEL, 3)`, `poser(2, 3, MUR, 5)`, ou `spriteTaille()`. Le compilateur redessine la forme (`compilateur/agrandir.js`) : les vrais coins restent pointus, les marches s’arrondissent, les détails de l’intérieur restent. **Il n’y a pas de limite de taille** : au-delà de ce que les lutins peuvent montrer, la forme passe dans le fond de l’écran. Dans l’atelier, « 📐 Agrandir… » fait la même chose pour un de tes dessins, en copie.
 
-**Quatre jeux** sont faits avec les images de la série 3 (menu des exemples) : Puissance 4, Dames, Échecs et Couleurs (des cartes, style UNO). `node verification/verifier-jeux.mjs` en joue une partie de chacun.
+**Quatre jeux** sont faits avec les images de la série 3 (menu des exemples, et `projets/`) : Puissance 4, Dames, Échecs et Couleurs (des cartes, style UNO). On y joue **seul contre la console** (une IA) ou **à deux** : on choisit sur l’écran titre (HAUT, BAS, START).
+
+| Jeu | Ce que fait l’IA |
+|---|---|
+| Puissance 4 | gagne si elle peut, bloque ton alignement de quatre, préfère le centre, évite de t’offrir la case du dessus |
+| Dames | note chaque coup : une prise (+60), devenir dame (+30), ne pas finir en prise (-40), avancer ; elle enchaîne les prises |
+| Échecs | niveau débutant, un coup d’avance : prend la pièce qui vaut le plus, ne laisse pas ses pièces en prise, ne laisse jamais son roi en échec, fait des reines |
+| Couleurs | joue la première carte qui va, garde ses jokers pour la fin, choisit la couleur qu’elle a le plus |
+
+`node verification/verifier-jeux.mjs` en joue des parties, à deux et contre l’IA.
 
 ## Les exemples
 
