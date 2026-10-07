@@ -156,6 +156,32 @@ const deplacer = (j, c0, l0, c1, l1) => { viser(j, c0, l0); viser(j, c1, l1); j.
     ` (la console a joué en ${j.v('curseurC')}, ${j.v('curseurL')})`)
 }
 
+/* --------------------------------------------------- Flash le hérisson */
+{
+  // pas de choix de joueurs : START, puis on court à droite en sautant toutes les 45 images
+  const jeu = demarrer('exemples/herisson.cpp', 30)
+  jeu.gb.setButton('start', true); jeu.avancer(4); jeu.gb.setButton('start', false); jeu.avancer(10)
+  let elanMax = 0, anneauxMax = 0, ressort = false, vieePerdue = false
+  const vies = jeu.valeurDe('vies')
+  jeu.gb.setButton('right', true)
+  for (let t = 0; t < 4000 && jeu.valeurDe('fini') === 0; t++) {
+    if (t % 45 === 0) jeu.gb.setButton('a', true)
+    if (t % 45 === 6) jeu.gb.setButton('a', false)
+    jeu.avancer(1)
+    elanMax = Math.max(elanMax, jeu.valeurDe('elan'))
+    anneauxMax = Math.max(anneauxMax, jeu.valeurDe('anneaux'))
+    if (jeu.valeurDe('hVY') === 16 - 13) ressort = true
+    if (jeu.valeurDe('vies') < vies) vieePerdue = true
+  }
+  jeu.gb.setButton('right', false); jeu.avancer(10)
+  b.egal('hérisson : l’élan monte jusqu’au maximum (3 pixels par image)', elanMax, 3)
+  b.verifier('hérisson : les anneaux se ramassent', anneauxMax > 0, ` (${anneauxMax} au plus)`)
+  b.verifier('hérisson : un ressort l’envoie très haut', ressort)
+  b.verifier('hérisson : tomber dans un trou coûte une vie', vieePerdue)
+  b.egal('hérisson : le panneau termine la course', jeu.valeurDe('fini'), 1)
+  b.verifier('hérisson : l’écran de fin dit BRAVO', jeu.ecran(7, 3, 5).map((v) => ORDRE[v]).join('') === 'BRAVO')
+}
+
 /* ------------------------------------------------------- Couleurs (cartes) */
 {
   const j = ouvrir('exemples/cartes.cpp')

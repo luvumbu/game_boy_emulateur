@@ -3482,3 +3482,19 @@ d'ailleurs et la transformait en C++ est enlevée :
 ## Plus tard encore : le jeu de cartes dit pourquoi
 
 - `exemples/cartes.cpp` : une carte refusée explique ce qu’il faudrait (« IL FAUT ROUGE / OU 7 OU JOKER ») ; « AUCUNE NE VA : B » quand rien ne va ; ce que joue la console est écrit, avec son effet (« TU PIOCHES 2 CARTES », « TU PASSES TON TOUR », la couleur du joker) ; tes cartes spéciales aussi (« TU REJOUES »). Les règles étaient justes : contrôlées carte par carte sur 6 parties, aucune anomalie.
+
+## Plus tard encore : Flash le hérisson
+
+- `exemples/herisson.cpp` (et `projets/flash_le_herisson/`) : un jeu de
+  plateformes rapide, dans l’esprit des jeux de hérisson bleu des années 90,
+  avec un héros à nous (pas celui de SEGA). Le moteur de Mario (défilement,
+  gravité, collisions), plus l’élan (jusqu’à 3 pixels par image, il glisse
+  quand on lâche), le saut en boule qui détruit les coccinelles, les anneaux
+  perdus quand on est touché, les ressorts, les pics, trois vies, un point de
+  reprise à mi-parcours, le panneau d’arrivée, le temps ;
+- images 3.18 le hérisson, 3.19 le hérisson en boule, 3.20 la coccinelle robot
+  (bibliotheque.js, leçons de la série 3) ; l’écran titre montre le hérisson ×4 ;
+- le niveau (160 colonnes) est calculé par un petit programme et écrit en
+  tableaux dans le jeu : HAUTEURS, OBJETS, LIGNES_OBJET, COCCINELLES ;
+- `verifier-jeux.mjs` : une course entière — élan, anneaux, ressort, vie perdue
+  dans un trou, arrivée, « BRAVO ».

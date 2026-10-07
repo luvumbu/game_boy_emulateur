@@ -1,6 +1,6 @@
 # Apprendre — le parcours, du plus facile au plus dur
 
-**685 étapes** — leçons, cours et fonctions —, rangées en 28 chapitres. Chacune est un **programme
+**688 étapes** — leçons, cours et fonctions —, rangées en 28 chapitres. Chacune est un **programme
 entier** : le code se colle tel quel dans `http://localhost/gameboy3/`, ou se
 compile en ligne de commande, et il tourne.
 
@@ -57,7 +57,7 @@ avant la première étape qui l’emploie — un `#include` nouveau à la fois.
 | 24 | Aller au bout | 134.1 – 143 |
 | 25 | Tes propres #include : ajouter une fonction | 143.1 – 152 |
 | Série 2 | Les formes géométriques | 2.01 – 2.40 |
-| Série 3 | Les images | 3.01 – 3.17 |
+| Série 3 | Les images | 3.01 – 3.20 |
 
 | Partie | Chapitre | Étapes |
 |---|---|---|
@@ -204,7 +204,7 @@ int main() {
 
 **Essaie :** écris ton prénom en (0, 17), tout en bas à gauche.
 
-**On retrouve texte dans** — 0.0.1, 0.1, 0.1.1, 0.1.2, 0.3, 0.3.1, 0.3.2, 0.4, 0.4.1, 0.4.2, 0.79, 0.79.1, 0.81, 0.81.1, 0.81.3, 0.82.1, 0.83, 0.83.2, 0.84, 0.88, 0.88.1, 0.88.2, 0.89.2, 0.90, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 0.1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 1.9, 1.10, 1.11, 1.12, 2, 2.1, 2.2, 2.3, 4, 5, 6, 7, 8, 8.1, 9, 10, 11, 12, 12.1, 13, 14, 16, 17, 18, 19, 20, 20.1, 21, 22, 23, 24, 24.1, 25, 26, 27, 28, 29, 30, 31, 32, 33, 33.1, 34, 35, 35.12, 35.15, 35.18, 36, 37, 38, 39, 41, 43, 43.1, 44, 45, 46, 47, 52.1, 53, 54, 55, 56, 57, 58, 59, 59.1, 60, 65, 66, 66.1, 67, 68, 69, 70, 71, 71.1, 72, 73, 75, 77, 78, 78.1, 79, 80, 81, 82, 82.1, 83, 84, 85, 86, 90, 90.1, 91, 92, 93, 94, 94.1, 95, 96, 97, 98, 99, 100, 100.1, 101, 102, 103, 104, 105, 106, 106.1, 107, 108, 109, 110, 110.3, 110.4, 110.5, 110.6, 110.7, 110.8, 110.9, 110.11, 110.13, 110.14, 110.15, 111, 112, 113, 113.1, 114, 115, 116, 117, 117.1, 118, 119, 120, 120.1, 121, 122, 123, 123.1, 124, 125.1, 126, 127, 128, 129, 133, 134, 134.1, 135, 136, 138, 139, 141, 143, 143.1, 2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17, 2.18, 2.19, 2.20, 2.21, 2.22, 2.23, 2.24, 2.25, 2.26, 2.27, 2.28, 2.29, 2.30, 2.31, 2.32, 2.33, 2.34, 2.35, 2.36, 2.37, 2.38, 2.39, 3.01, 3.02, 3.03, 3.04, 3.05, 3.06, 3.07, 3.08, 3.09, 3.10, 3.11, 3.12, 3.13, 3.14, 3.15, 3.16, 3.17
+**On retrouve texte dans** — 0.0.1, 0.1, 0.1.1, 0.1.2, 0.3, 0.3.1, 0.3.2, 0.4, 0.4.1, 0.4.2, 0.79, 0.79.1, 0.81, 0.81.1, 0.81.3, 0.82.1, 0.83, 0.83.2, 0.84, 0.88, 0.88.1, 0.88.2, 0.89.2, 0.90, 0.90.1, 0.90.2, 0.90.4, 0.90.5, 0.90.6, 0.90.7, 0.90.8, 0.91, 0.91.1, 0.91.2, 0.91.3, 0.91.4, 0.91.5, 0.91.6, 0.91.7, 0.91.8, 0.91.9, 0.92, 0.92.1, 0.92.2, 0.93.3, 0.93.4, 0.93.5, 0.93.6, 0.93.7, 0.93.8, 0.93.9, 0.94, 0.94.1, 0.95, 0.96, 0.96.1, 0.97, 0.97.1, 0.98, 0.98.1, 0.99, 0.99.1, 0.100, 0.100.1, 0.101, 0.101.1, 0.102, 0.102.1, 0.103, 0.104, 0.105, 0.105.1, 0.106, 0.107, 0.107.1, 0.108, 0.1, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 1.9, 1.10, 1.11, 1.12, 2, 2.1, 2.2, 2.3, 4, 5, 6, 7, 8, 8.1, 9, 10, 11, 12, 12.1, 13, 14, 16, 17, 18, 19, 20, 20.1, 21, 22, 23, 24, 24.1, 25, 26, 27, 28, 29, 30, 31, 32, 33, 33.1, 34, 35, 35.12, 35.15, 35.18, 36, 37, 38, 39, 41, 43, 43.1, 44, 45, 46, 47, 52.1, 53, 54, 55, 56, 57, 58, 59, 59.1, 60, 65, 66, 66.1, 67, 68, 69, 70, 71, 71.1, 72, 73, 75, 77, 78, 78.1, 79, 80, 81, 82, 82.1, 83, 84, 85, 86, 90, 90.1, 91, 92, 93, 94, 94.1, 95, 96, 97, 98, 99, 100, 100.1, 101, 102, 103, 104, 105, 106, 106.1, 107, 108, 109, 110, 110.3, 110.4, 110.5, 110.6, 110.7, 110.8, 110.9, 110.11, 110.13, 110.14, 110.15, 111, 112, 113, 113.1, 114, 115, 116, 117, 117.1, 118, 119, 120, 120.1, 121, 122, 123, 123.1, 124, 125.1, 126, 127, 128, 129, 133, 134, 134.1, 135, 136, 138, 139, 141, 143, 143.1, 2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17, 2.18, 2.19, 2.20, 2.21, 2.22, 2.23, 2.24, 2.25, 2.26, 2.27, 2.28, 2.29, 2.30, 2.31, 2.32, 2.33, 2.34, 2.35, 2.36, 2.37, 2.38, 2.39, 3.01, 3.02, 3.03, 3.04, 3.05, 3.06, 3.07, 3.08, 3.09, 3.10, 3.11, 3.12, 3.13, 3.14, 3.15, 3.16, 3.17, 3.18, 3.19, 3.20
 
 **Ce qu’on doit voir** — BONJOUR au milieu de l’écran, EN HAUT dans le coin en haut à gauche.  
 **Ce qu’il coûte** — 425 octets de programme, 0 variable.  
@@ -29662,7 +29662,7 @@ int main() {
 
 **Essaie :** dans l’onglet `perso_ROBOT.cpp`, change les yeux de ROBOT (les `+`) : seul ROBOT change. Ou ajoute un troisième personnage : un fichier `perso_…` de plus, et une ligne de plus dans la liste `personnages.cpp` — `principal.cpp` ne change pas.
 
-**On retrouve Perso dans** — 35.6, 35.7, 35.8, 35.9, 35.10, 35.12, 35.16, 35.17, 35.18, 35.19, 36, 47, 2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17, 2.18, 2.19, 2.20, 2.21, 2.22, 2.23, 2.24, 2.25, 2.26, 2.27, 2.28, 2.29, 2.30, 2.31, 2.32, 2.33, 2.34, 2.36, 2.37, 2.38, 3.01, 3.02, 3.03, 3.04, 3.05, 3.06, 3.07, 3.08, 3.09, 3.10, 3.11, 3.12, 3.13, 3.14, 3.15, 3.16, 3.17
+**On retrouve Perso dans** — 35.6, 35.7, 35.8, 35.9, 35.10, 35.12, 35.16, 35.17, 35.18, 35.19, 36, 47, 2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17, 2.18, 2.19, 2.20, 2.21, 2.22, 2.23, 2.24, 2.25, 2.26, 2.27, 2.28, 2.29, 2.30, 2.31, 2.32, 2.33, 2.34, 2.36, 2.37, 2.38, 3.01, 3.02, 3.03, 3.04, 3.05, 3.06, 3.07, 3.08, 3.09, 3.10, 3.11, 3.12, 3.13, 3.14, 3.15, 3.16, 3.17, 3.18, 3.19, 3.20
 
 **Ce qu’on doit voir** — Deux personnages sur le fond : le bonhomme à gauche, le robot à droite.  
 **Ce qu’il coûte** — 329 octets de programme, 0 variable.  
@@ -29779,7 +29779,7 @@ int main() {
 
 **Essaie :** fais descendre ROBOT moins vite : `sprite16(4, 104, y / 2, ROBOT)`.
 
-**On retrouve sprite16 dans** — 35.6, 35.7, 35.8, 35.9, 35.10, 35.12, 35.16, 35.17, 35.18, 35.19, 36, 47, 2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17, 2.18, 2.19, 2.20, 2.21, 2.22, 2.23, 2.24, 2.25, 2.26, 2.27, 2.28, 2.29, 2.30, 2.31, 2.32, 2.33, 2.34, 2.37, 3.01, 3.02, 3.03, 3.04, 3.05, 3.06, 3.07, 3.08, 3.09, 3.10, 3.11, 3.12, 3.13, 3.14, 3.15, 3.16, 3.17
+**On retrouve sprite16 dans** — 35.6, 35.7, 35.8, 35.9, 35.10, 35.12, 35.16, 35.17, 35.18, 35.19, 36, 47, 2.01, 2.02, 2.03, 2.04, 2.05, 2.06, 2.07, 2.08, 2.09, 2.10, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17, 2.18, 2.19, 2.20, 2.21, 2.22, 2.23, 2.24, 2.25, 2.26, 2.27, 2.28, 2.29, 2.30, 2.31, 2.32, 2.33, 2.34, 2.37, 3.01, 3.02, 3.03, 3.04, 3.05, 3.06, 3.07, 3.08, 3.09, 3.10, 3.11, 3.12, 3.13, 3.14, 3.15, 3.16, 3.17, 3.18, 3.19, 3.20
 
 **Ce qu’on doit voir** — Le bonhomme et le robot descendent ensemble, côte à côte, et s’arrêtent en bas.  
 **Ce qu’il coûte** — 520 octets de programme, 1 variable.  
@@ -47370,6 +47370,219 @@ int main() {
 **Ce qu’on doit voir** — La carte « joker » deux fois : petit à gauche, trois fois plus grand à droite, et CARTE JOKER dessous.  
 **Ce qu’il coûte** — 1765 octets de programme, 0 variable.  
 **Ce qui est gravé** — `démarrage` (57 o), `main()` (807 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (672 o), `DonneesTransfert` (10 o), `"CARTE JOKER"` (11 o, pour texte()) · appels : `sprite()` ×34 (786 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : ACEJKORT · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.18. Le hérisson
+
+> 3.18 : le hérisson — un héros bleu qui court vite. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_HERISSON.cpp`
+
+```cpp
+// perso_HERISSON.cpp : le hérisson (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso HERISSON = {
+  ".......#####....",
+  ".....##+++++#...",
+  "...##++++++++#..",
+  "#####+++++-#-#..",
+  ".##++++++-#--#..",
+  "...#++++--#--##.",
+  "..###++++-----#.",
+  ".####++++----#..",
+  "...#++++++###...",
+  "....#++-----#...",
+  "....#+------#...",
+  ".....#+-----#...",
+  "......##+##.....",
+  ".....#--#--#....",
+  "....###..###....",
+  "...####..####...",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.18 Le hérisson ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_HERISSON.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, HERISSON);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, HERISSON, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(6, 12, "HERISSON");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le hérisson : un héros bleu qui court vite.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_HERISSON.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, HERISSON, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le hérisson deux fois : petit à gauche, trois fois plus grand à droite, et HERISSON dessous.  
+**Ce qu’il coûte** — 1703 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (807 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (67 o), `EffacerCarte` (14 o), `Tuiles` (640 o), `DonneesTransfert` (10 o), `"HERISSON"` (8 o, pour texte()) · appels : `sprite()` ×34 (786 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : EHINORS · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.19. Le hérisson en boule
+
+> 3.19 : le hérisson en boule — il saute en tournant. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_HERISSON_BOULE.cpp`
+
+```cpp
+// perso_HERISSON_BOULE.cpp : le hérisson en boule (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso HERISSON_BOULE = {
+  ".....######.....",
+  "...##++++++##...",
+  "..#+++#+++++##..",
+  ".#+++#++++++++#.",
+  ".#++#++++#+++-#.",
+  "#++#++++#+++---#",
+  "#+#++++#+++----#",
+  "#+#+++#+++-----#",
+  "#++++#+++------#",
+  "#+++#+++-------#",
+  "#++++++-------+#",
+  ".#+++++------+#.",
+  ".#++++++----++#.",
+  "..##+++++++++#..",
+  "...##+++++++#...",
+  ".....######.....",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.19 Le hérisson en boule ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_HERISSON_BOULE.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, HERISSON_BOULE);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, HERISSON_BOULE, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(1, 12, "HERISSON EN BOULE");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**Le hérisson en boule : il saute en tournant.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_HERISSON_BOULE.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, HERISSON_BOULE, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — Le hérisson en boule deux fois : petit à gauche, trois fois plus grand à droite, et HERISSON EN BOULE dessous.  
+**Ce qu’il coûte** — 2037 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (945 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (800 o), `DonneesTransfert` (10 o), `"HERISSON EN BOU…"` (17 o, pour texte()) · appels : `sprite()` ×40 (924 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : BEHILNORSU · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+
+---
+
+### 3.20. La coccinelle robot
+
+> 3.20 : la coccinelle robot — l’ennemi : on lui saute dessus en boule. Dessiné une fois en 16 × 16, montré à sa taille puis trois fois plus grand avec sprite16(…, 3).
+
+`perso_COCCINELLE.cpp`
+
+```cpp
+// perso_COCCINELLE.cpp : la coccinelle robot (16 × 16) — juste le dessin, écrit UNE fois.
+// « # » le plus sombre : le contour.   « + » moyen.   « - » clair.
+// « . » le plus clair : dans un personnage, c'est le TRANSPARENT (on voit le fond).
+
+Perso COCCINELLE = {
+  "................",
+  "......####......",
+  "....##++++##....",
+  "...#+##++##+#...",
+  "..#++##++##++#..",
+  "..#++++++++++#..",
+  ".#+##++++++##+#.",
+  ".#+##++++++##+#.",
+  ".#++++++++++++#.",
+  ".##############.",
+  ".#-##------##-#.",
+  "..#----------#..",
+  "...##########...",
+  "....#..##..#....",
+  "...##..##..##...",
+  "................",
+};
+```
+
+`principal.cpp`
+
+```cpp
+// ---- 3.20 La coccinelle robot ----
+// Dessiné UNE fois, en 16 × 16. À gauche à sa taille, à droite trois fois plus grand.
+
+#include <texte>                // texte() : écrire un mot
+#include <sprite16>             // sprite16() : poser un dessin de 16 × 16 — et l'agrandir
+#include <Perso>                // Perso : un dessin de 16 × 16
+#include "perso_COCCINELLE.cpp"  // le dessin, dans son fichier
+
+int main() {
+  sprite16(0, 24, 56, COCCINELLE);      // taille 1 : les lutins 0 à 3
+  sprite16(4, 88, 36, COCCINELLE, 3);   // taille 3 : 48 × 48, à partir du lutin 4
+  texte(2, 12, "COCCINELLE ROBOT");
+
+  while (true) {
+    image();
+  }
+}
+```
+
+**La coccinelle robot : l’ennemi : on lui saute dessus en boule.** Une image de 16 × 16, dessinée **une seule fois**, dans `perso_COCCINELLE.cpp`.
+
+**Le programme est celui du 3.01** : seuls changent le fichier du dessin et le nom. `sprite16(4, 88, 36, COCCINELLE, 3)` la montre trois fois plus grande.
+
+**Essaie :** change le `3` en `2` ; ou modifie le dessin, et regarde les deux tailles changer ensemble.
+
+**Les fonctions de cette leçon — et le tuto de chacune**
+
+- `#include <texte>` → 0.0.2. La fonction texte() — écrire un mot
+- `#include <sprite16>` → 35.2. La fonction sprite16() — un personnage de 16 × 16
+- `#include <Perso>` → 35.1. Perso — dessiner des personnages
+
+**Ce qu’on doit voir** — La coccinelle robot deux fois : petit à gauche, trois fois plus grand à droite, et COCCINELLE ROBOT dessous.  
+**Ce qu’il coûte** — 1800 octets de programme, 0 variable.  
+**Ce qui est gravé** — `démarrage` (57 o), `main()` (853 o), `VBlank` (8 o), `AttendreImage` (28 o, pour image()), `AttendreVBlank` (16 o), `AttendreAcces` (12 o), `EcrireTexte` (10 o, pour texte()), `RangerLutins` (11 o), `InstallerTransfert` (15 o), `CopierTuiles` (94 o), `EffacerCarte` (14 o), `Tuiles` (656 o), `DonneesTransfert` (10 o), `"COCCINELLE ROBOT"` (16 o, pour texte()) · appels : `sprite()` ×36 (832 o), `texte()` ×1 (11 o), `image()` ×1 (6 o), `sprite16()` ×2 (0 o), `spriteTaille()` ×1 (0 o) · lettres : BCEILNORT · pas gravé : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
 
 ---
 

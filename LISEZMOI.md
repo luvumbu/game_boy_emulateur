@@ -614,6 +614,7 @@ gameboy3/projets/
   dames/            les Dames, blancs contre rouges (titre DAMES) — .gbc
   echecs/           les Échecs, blancs contre noirs (titre ECHECS) — .gbc
   couleurs/         Couleurs, un jeu de cartes style UNO (titre COULEURS) — .gbc
+  flash_le_herisson/ Flash le hérisson, plateformes (titre FLASH) — .gbc
 ```
 
 **Où chercher un jeu ?** Un jeu rangé dans `exemples/` s'ouvre par **le menu
@@ -956,7 +957,7 @@ Après les 26 chapitres du parcours, **📚 APPRENDRE** a deux séries à part, 
 
 **La règle de ces séries** : un dessin s’écrit UNE fois, à sa taille standard, et la taille se choisit au moment de le poser — `sprite(0, 36, 60, ROND, 4)`, `sprite16(4, 88, 36, PERE_NOEL, 3)`, `poser(2, 3, MUR, 5)`, ou `spriteTaille()`. Le compilateur redessine la forme (`compilateur/agrandir.js`) : les vrais coins restent pointus, les marches s’arrondissent, les détails de l’intérieur restent. **Il n’y a pas de limite de taille** : au-delà de ce que les lutins peuvent montrer, la forme passe dans le fond de l’écran. Dans l’atelier, « 📐 Agrandir… » fait la même chose pour un de tes dessins, en copie.
 
-**Quatre jeux** sont faits avec les images de la série 3 (menu des exemples, et `projets/`) : Puissance 4, Dames, Échecs et Couleurs (des cartes, style UNO). On y joue **seul contre la console** (une IA) ou **à deux** : on choisit sur l’écran titre (HAUT, BAS, START).
+**Cinq jeux** sont faits avec les images de la série 3 (menu des exemples, et `projets/`) : Puissance 4, Dames, Échecs, Couleurs (des cartes, style UNO) et Flash le hérisson (plateformes). Aux quatre premiers, on joue **seul contre la console** (une IA) ou **à deux** : on choisit sur l’écran titre (HAUT, BAS, START).
 
 | Jeu | Ce que fait l’IA |
 |---|---|
@@ -994,6 +995,7 @@ Après les 26 chapitres du parcours, **📚 APPRENDRE** a deux séries à part, 
 | `exemples/dames.cpp` | **Dames** 8 × 8 : prises en avant et en arrière, prises enchaînées, pion couronné en dame ; un même dessin pour les deux camps (une palette par case) | 466 | 32768 o |
 | `exemples/echecs.cpp` | **Échecs** : les six pièces et leurs règles, chemin libre, pion de deux cases, promotion, « ÉCHEC » affiché ; on gagne en prenant le roi | 567 | 32768 o |
 | `exemples/cartes.cpp` | **Couleurs**, un jeu de cartes dans le style du UNO, contre la console : passe, inverse, +2, joker (images de la série 3), dos de carte = le cadeau | 838 | 32768 o |
+| `exemples/herisson.cpp` | **Flash le hérisson**, un jeu de plateformes rapide : l’élan, le saut en boule, les anneaux, les ressorts, les pics, trois coccinelles, trois vies, un niveau de 160 colonnes qui défile ; le moteur de Mario | 841 | 32768 o |
 | `exemples/invaders.cpp` | **Space Invaders entier, en couleur** : 5 × 7 envahisseurs, abris, bombes, soucoupe, 3 vies, record gardé dans la cartouche | 1 200 | 8 455 o |
 | `exemples/calcul.cpp` | **Mario Calcul (démo)** : trois portes « ? » barrent la route, chacune s'ouvre en trouvant le résultat d'une addition ou d'une soustraction | 360 | 2 491 o |
 
