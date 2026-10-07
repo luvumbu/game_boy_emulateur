@@ -610,6 +610,10 @@ gameboy3/projets/
   mon_jeu/          un programme neuf (titre MONJEU) — .gbc
   space_invaders/   Space Invaders entier (titre INVADERS) — .gbc
   mario_calcul/     Mario Calcul, la démo des calculs (titre CALCUL) — .gb
+  puissance_4/      Puissance 4, le Père Noël contre le bonhomme de neige (titre PUISSANCE 4) — .gbc
+  dames/            les Dames, blancs contre rouges (titre DAMES) — .gbc
+  echecs/           les Échecs, blancs contre noirs (titre ECHECS) — .gbc
+  couleurs/         Couleurs, un jeu de cartes style UNO (titre COULEURS) — .gbc
 ```
 
 **Où chercher un jeu ?** Un jeu rangé dans `exemples/` s'ouvre par **le menu

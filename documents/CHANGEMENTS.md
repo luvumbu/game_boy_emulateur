@@ -3451,3 +3451,14 @@ d'ailleurs et la transformait en C++ est enlevée :
 - toutes les vérifications passent, sauf deux échecs plus anciens : le compte
   des groupes de leçons dans `verifier-page.mjs`, et `verifier-portage.mjs`, qui
   cherche le projet voisin `../gameboy2/`.
+
+## Plus tard encore : les quatre jeux, rangés aussi dans projets/
+
+- `projets/puissance_4/`, `projets/dames/`, `projets/echecs/`, `projets/couleurs/`,
+  sur le modèle de `space_invaders/` : `principal.cpp` (le même que dans
+  `exemples/`), `projet.json` (titre, console « gbc »), la cartouche `.gbc` et
+  `capture.png` (l’écran titre, par `gb3.mjs --capture 30 --grossir 3`). Ils
+  apparaissent dans « 📂 Ouvrir », s’ouvrent et compilent ;
+- `exemples/cartes.cpp` : sur l’écran titre, les deux grandes images ont leur
+  palette (`P_TITRE`), avec un vrai noir — sur le vert de la table, la teinte 3
+  est blanche pour le texte, et le Père Noël y perdait ses yeux.
