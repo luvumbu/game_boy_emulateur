@@ -5,6 +5,12 @@
 // DROITE choisissent la carte, A la pose, B pioche (et passe la main). Le
 // premier qui n'a plus de cartes a gagné.
 //
+// Le jeu dit toujours POURQUOI : une carte qui ne va pas est refusée, et le
+// bas de l'écran dit ce qu'il faudrait (« IL FAUT ROUGE, OU 7, OU JOKER ») ;
+// si aucune carte ne va, il le dit (« AUCUNE NE VA : B ») ; et ce que la
+// console vient de jouer est écrit, avec ce que ça te fait (« TU PIOCHES 2
+// CARTES », « TU PASSES TON TOUR »).
+//
 //   - PASSE et INVERSE : l'autre passe son tour, tu rejoues ;
 //   - +2 : l'autre pioche deux cartes et passe son tour ;
 //   - JOKER : il se pose sur tout, et tu choisis la couleur (GAUCHE, DROITE, A).
@@ -599,6 +605,21 @@ void dire(uint8_t quoi) {
   if (quoi == 4) texte(0, 15, " TU GAGNES          ");
   if (quoi == 5) texte(0, 15, " LA CONSOLE GAGNE   ");
   if (quoi == 6) texte(0, 15, " PLUS QU UNE CARTE  ");
+  if (quoi == 7) texte(0, 15, " AUCUNE NE VA : B   ");
+}
+
+/* Les lignes 16 et 17 : ce qui vient de se passer, et pourquoi. */
+void effacerInfo() {
+  texte(0, 16, "                    ");
+  texte(0, 17, "                    ");
+}
+
+void ecrireValeur(uint8_t c, uint8_t l, uint8_t v) {
+  if (v <= 9) nombre(c, l, v, 1);
+  if (v == V_PASSE) texte(c, l, "PASSE");
+  if (v == V_INVERSE) texte(c, l, "INVERSE");
+  if (v == V_PLUS2) texte(c, l, "PLUS 2");
+  if (v == V_JOKER) texte(c, l, "JOKER");
 }
 
 // ------------------------------------------------------------------ les cartes
@@ -671,14 +692,19 @@ void verifierFin() {
     fini = 1;
     dire(5);
   }
-  if (fini == 1) texte(3, 17, "START REJOUE");
+  if (fini == 1) {
+    effacerInfo();
+    texte(3, 17, "START REJOUE");
+  }
 }
 
 void passerA(uint8_t qui) {
   tour = qui;
   attente = 0;
   if (qui == TOI) {
-    if (miennes == 1) {
+    if (uneQuiVa() == 0) {
+      dire(7);                            // aucune carte ne va : il faut piocher
+    } else if (miennes == 1) {
       dire(6);
     } else {
       dire(0);
@@ -688,11 +714,50 @@ void passerA(uint8_t qui) {
   }
 }
 
+/* Une carte refusée : on dit ce qu’il faudrait — la couleur demandée, ou la
+   même valeur que la carte du dessus, ou un joker. */
+void expliquerRefus() {
+  dire(2);
+  effacerInfo();
+  texte(1, 16, "IL FAUT");
+  ecrireCouleur(9, 16, couleur);
+  if ((dessus & 15) == V_JOKER) {
+    texte(1, 17, "OU UN JOKER");
+  } else {
+    texte(1, 17, "OU");
+    ecrireValeur(4, 17, dessus & 15);
+    texte(12, 17, "OU JOKER");
+  }
+}
+
+/* Ta main a-t-elle au moins une carte qui va ? */
+uint8_t uneQuiVa() {
+  for (uint8_t i = 0; i < miennes; i++) {
+    if (jouable(mienne[i]) == 1) return 1;
+  }
+  return 0;
+}
+
+/* Ce que la console vient de poser, et ce que ça te fait. */
+void annoncerConsole(uint8_t carte) {
+  uint8_t v = carte & 15;
+  effacerInfo();
+  texte(1, 16, "CONSOLE :");
+  ecrireValeur(11, 16, v);
+  if (v <= 9) ecrireCouleur(13, 16, carte / 16);
+  if (v == V_PASSE || v == V_INVERSE) texte(1, 17, "TU PASSES TON TOUR");
+  if (v == V_PLUS2) texte(1, 17, "TU PIOCHES 2 CARTES");
+  if (v == V_JOKER) {
+    texte(1, 17, "COULEUR :");
+    ecrireCouleur(11, 17, couleur);
+  }
+}
+
 /* Tu poses la carte choisie. */
 void poserMienne() {
   uint8_t carte = mienne[choix];
   if (jouable(carte) == 0) {
-    dire(2);
+    expliquerRefus();
     return;
   }
   for (uint8_t i = choix; i + 1 < miennes; i++) mienne[i] = mienne[i + 1];
@@ -702,12 +767,18 @@ void poserMienne() {
   couleur = carte / 16;
   uint8_t rejoue = effet(carte, TOI);
   verifierFin();
+  if (fini == 0) effacerInfo();
   if (fini == 0 && (carte & 15) == V_JOKER) {
     choisirCouleur = 1;                   // tu choisis la couleur avant la suite
     couleur = couleurPreferee(TOI);
     dire(3);
+    texte(1, 16, "GAUCHE DROITE ET A");
   } else if (fini == 0) {
     if (rejoue == 1) {
+      // ta carte spéciale : la console passe son tour, tu rejoues
+      ecrireValeur(1, 16, carte & 15);
+      if ((carte & 15) == V_PLUS2) texte(8, 16, "POUR ELLE");
+      texte(1, 17, "TU REJOUES");
       passerA(TOI);
     } else {
       passerA(CONSOLE);
@@ -730,6 +801,8 @@ void consoleJoue() {
   if (trouvee == RIEN) {
     piocherPour(CONSOLE);
     dessinerSienne();
+    effacerInfo();
+    texte(1, 16, "CONSOLE : PIOCHE");
     passerA(TOI);
     return;
   }
@@ -740,6 +813,7 @@ void consoleJoue() {
   couleur = carte / 16;
   if ((carte & 15) == V_JOKER) couleur = couleurPreferee(CONSOLE);
   uint8_t rejoue = effet(carte, CONSOLE);
+  annoncerConsole(carte);
   verifierFin();
   dessinerMilieu();
   dessinerSienne();
@@ -814,6 +888,7 @@ int main() {
       if (a == 1 && aAvant == 0) {
         choisirCouleur = 0;
         dessinerMilieu();
+        effacerInfo();
         passerA(CONSOLE);
       }
     } else if (tour == TOI) {
@@ -829,6 +904,8 @@ int main() {
       if (b == 1 && bAvant == 0) {
         piocherPour(TOI);
         dessinerMienne();
+        effacerInfo();
+        texte(1, 16, "TU AS PIOCHE");
         passerA(CONSOLE);
       }
     } else {

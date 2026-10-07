@@ -3478,3 +3478,7 @@ d'ailleurs et la transformait en C++ est enlevée :
 - `verifier-jeux.mjs` : les parties à deux choisissent « 2 JOUEURS » ; trois
   parties contre l’IA (elle bloque au Puissance 4, prend la pièce offerte aux
   dames, prend la dame offerte en h7 aux échecs) ; les trois projets mis à jour.
+
+## Plus tard encore : le jeu de cartes dit pourquoi
+
+- `exemples/cartes.cpp` : une carte refusée explique ce qu’il faudrait (« IL FAUT ROUGE / OU 7 OU JOKER ») ; « AUCUNE NE VA : B » quand rien ne va ; ce que joue la console est écrit, avec son effet (« TU PIOCHES 2 CARTES », « TU PASSES TON TOUR », la couleur du joker) ; tes cartes spéciales aussi (« TU REJOUES »). Les règles étaient justes : contrôlées carte par carte sur 6 parties, aucune anomalie.
