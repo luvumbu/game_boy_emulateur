@@ -28,6 +28,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { LECONS, NIVEAUX, numeros, partieDe, principales, nomDuChapitre } from '../tuto/lecons.js'
+import { encadreDebutant, basesEnHtml, lexiqueEnHtml } from './debutant.mjs'   // pour qui n’a jamais programmé
 
 /* « Chapitre 6 », ou « Série 2 » pour un chapitre qui est une série à part (voir tuto/parcours.js). */
 const nomDuNiveau = (niveau) => nomDuChapitre(LECONS.find((l) => l.difficulte === niveau) ?? { difficulte: niveau })
@@ -262,6 +263,7 @@ ${reperesDe(lecon, index)}
 <h2>1. Ce qu’il faut comprendre</h2>
 ${lecon.texte.map((p) => `<p>${enrichir(p)}</p>`).join('\n')}
 ${encadreDesFonctions(index, false)}
+${encadreDebutant(lecon)}
 
 <h2>2. Le programme, morceau par morceau</h2>
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
@@ -369,6 +371,7 @@ function livretComplet(matieres, ateliers) {
 
   ${lecon.texte.map((p) => `<p>${enrichir(p)}</p>`).join('\n  ')}
   ${encadreDesFonctions(index, true)}
+  ${encadreDebutant(lecon)}
 
   <div class="deux">
     <div>
@@ -447,7 +450,12 @@ function livretComplet(matieres, ateliers) {
   <ol>${sommaire.join('\n')}</ol>
 </div>
 
+<h1 style="break-before: page;">Les bases — si tu n’as jamais programmé</h1>
+${basesEnHtml()}
+
 ${lecons}
+
+${lexiqueEnHtml('h1')}
 
 </body>
 </html>

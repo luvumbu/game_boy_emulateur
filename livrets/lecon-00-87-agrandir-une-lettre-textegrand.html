@@ -82,7 +82,7 @@
     <span class="niveau">Chapitre 0 — Avant tout</span>
     
     <span class="niveau">Partie G — Les lettres et l’écran titre</span>
-    <span>leçon 0.87 sur 152</span>
+    <span>leçon 0.87 sur 153</span>
     <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
@@ -93,7 +93,7 @@
 
 <h2>1. Ce qu’il faut comprendre</h2>
 <p><strong>Une lettre plus grande, sans la dessiner.</strong> La Game Boy n’a pas de zoom, mais la console peut <strong>calculer</strong> une lettre agrandie à partir de la police : chaque pixel devient un carré.</p>
-<p><strong>Ce qui est nouveau ici : <code>texteGrand(x, y, "TEXTE", taille)</code>.</strong> La <strong>taille</strong> va de <strong>0 à 10</strong>. <strong>0, c’est la lettre normale</strong> ; chaque cran de plus l’agrandit <strong>une fois de plus</strong> : 1 → 2 fois, 2 → 3 fois… 10 → 11 fois. Avec <code>2</code>, chaque pixel de la lettre devient un carré de <strong>3 × 3 pixels</strong>. La lettre garde <strong>exactement ses proportions</strong>.</p>
+<p><strong>Ce qui est nouveau ici : <code>texteGrand(x, y, "TEXTE", taille)</code>.</strong> La <strong>taille</strong> commence à <strong>0</strong>, et n’a <strong>pas de limite</strong>. <strong>0, c’est la lettre normale</strong> ; chaque cran de plus l’agrandit <strong>une fois de plus</strong> : 1 → 2 fois, 2 → 3 fois… 10 → 11 fois, 30 → 31 fois. Avec <code>2</code>, chaque pixel de la lettre devient un carré de <strong>3 × 3 pixels</strong>. La lettre garde <strong>exactement ses proportions</strong>.</p>
 <p><strong>La place qu’elle prend :</strong> une lettre normale (taille 0) tient dans <strong>1 case</strong> (8 × 8 pixels). À la taille 2, elle est 3 fois plus grande et prend <strong>3 × 3 = 9</strong> cases (24 × 24 pixels). À la taille *n*, une lettre prend *n + 1* cases de large et *n + 1* de haut.</p>
 <p><strong>Le texte et la taille s’écrivent en clair</strong> (<code>"A"</code>, <code>2</code>), comme pour <code>ms()</code> : le compilateur fabrique les tuiles agrandies <strong>avant le jeu</strong>, et seulement celles dont le programme a besoin.</p>
 <p><strong>Ce qu’elle coûte :</strong> quelques tuiles de plus dans la cartouche. Deux tuiles identiques (souvent toutes pleines aux grandes tailles) ne sont fabriquées qu’une fois.</p>
@@ -103,6 +103,52 @@
   <ul style="margin: 0; padding-left: 14pt;">
   <li><code>#include &lt;texteGrand&gt;</code> → <a href="lecon-00-86.3-la-fonction-textegrand-un-texte-agrandi.html">0.86.3. La fonction texteGrand() — un texte agrandi</a></li>
 </ul>
+</div>
+
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">📖 Les mots de cette leçon — si tu débutes</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+    <li style="margin: 2pt 0;"><strong>accolades { }</strong> — Elles entourent un bloc : les lignes qui vont ensemble (le corps d’une fonction, d’une boucle, d’un « if »). Chaque « { » a son « } ».</li>
+    <li style="margin: 2pt 0;"><strong>argument</strong> — Une valeur donnée à une fonction quand on l’appelle, entre ses parenthèses : dans texte(5, 8, "SALUT"), 5, 8 et "SALUT" sont les arguments.</li>
+    <li style="margin: 2pt 0;"><strong>bloc</strong> — Un groupe de lignes entre accolades { }, qui s’exécutent ensemble.</li>
+    <li style="margin: 2pt 0;"><strong>booléen (vrai / faux)</strong> — Le résultat d’une condition : vrai (1) ou faux (0). « true » veut dire vrai, « false » faux.</li>
+    <li style="margin: 2pt 0;"><strong>boucle</strong> — Des instructions qui se répètent : « while » (tant que…) ou « for » (pour un compteur qui va de… à…).</li>
+    <li style="margin: 2pt 0;"><strong>boucle du jeu</strong> — « while (true) { image(); … } » : ce qui se répète 60 fois par seconde, sans fin, pendant tout le jeu.</li>
+    <li style="margin: 2pt 0;"><strong>chaîne de caractères (texte)</strong> — Des lettres entre guillemets, "COMME CECI" : un texte pris tel quel. La police de la console n’a que des majuscules, sans accents.</li>
+    <li style="margin: 2pt 0;"><strong>commentaire (//)</strong> — Tout ce qui suit « // » jusqu’au bout de la ligne : une phrase pour l’humain, que la console ignore.</li>
+    <li style="margin: 2pt 0;"><strong>condition</strong> — Une question dont la réponse est vrai ou faux : « score &gt; 10 », « bouton(A) ». On la teste avec « if » ou « while ».</li>
+    <li style="margin: 2pt 0;"><strong>image()</strong> — Attend l’image suivante. La console en montre 60 par seconde : c’est ce qui règle la vitesse d’un jeu.</li>
+    <li style="margin: 2pt 0;"><strong>#include</strong> — En haut du programme : « #include &lt;texte&gt; » demande la fonction texte() à la console ; « #include "fichier.cpp" » verse un de tes fichiers à cet endroit.</li>
+    <li style="margin: 2pt 0;"><strong>instruction</strong> — Un ordre donné à la console, terminé par un point-virgule : « texte(1, 1, "OK"); ».</li>
+    <li style="margin: 2pt 0;"><strong>main</strong> — « int main() { … } » : là où le programme commence. La console exécute d’abord la première ligne de main.</li>
+    <li style="margin: 2pt 0;"><strong>point-virgule (;)</strong> — Il termine une instruction, comme le point termine une phrase.</li>
+    <li style="margin: 2pt 0;"><strong>while (tant que)</strong> — Répète un bloc tant qu’une condition est vraie.</li>
+  </ul>
+</div>
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid; break-inside: auto;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">🔍 Le programme, ligne par ligne — chaque ligne dite en français</p>
+  <table style="width: 100%; border-collapse: collapse; table-layout: fixed;"><tbody>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;texteGrand&gt;   // écrit un texte agrandi, sans limite de taille</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « texteGrand » (ce que c’est : écrit un texte agrandi, sans limite de taille). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « écrit un texte agrandi, sans limite de taille ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">int main() {</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Le début du programme : la console commence ici, par la première ligne qui suit.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// La ligne, morceau par morceau :</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« La ligne, morceau par morceau : »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   texteGrand(2, 2, "A", 2);</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« texteGrand(2, 2, "A", 2); »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//              |  |  |    |</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« |  |  |    | »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//              |  |  |    +-- la TAILLE (0 ou plus, sans limite) : 2 → 3 fois plus grand</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« |  |  |    +-- la TAILLE (0 ou plus, sans limite) : 2 → 3 fois plus grand »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//              |  |  +------- le texte, entre guillemets</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« |  |  +------- le texte, entre guillemets »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//              +--+---------- la case en haut à gauche du grand A : (2, 2)</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« +--+---------- la case en haut à gauche du grand A : (2, 2) »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// Chaque pixel du A devient un carré de 3 × 3 pixels :</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« Chaque pixel du A devient un carré de 3 × 3 pixels : »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   le A normal (8 × 8)      le A × 3 (24 × 24 pixels = 3 × 3 cases)</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« le A normal (8 × 8)      le A × 3 (24 × 24 pixels = 3 × 3 cases) »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   ··███···                 ······█████████·········</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« ··███···                 ······█████████········· »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   ·█···█··                 ······█████████·········</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« ·█···█··                 ······█████████········· »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   ·█···█··                 ······█████████·········</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« ·█···█··                 ······█████████········· »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   ·█████··                 ···███·········███······</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« ·█████··                 ···███·········███······ »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   …                        …</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« …                        … »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">texteGrand(2, 2, "A", 2);</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Appel de la fonction texteGrand de la console, avec les arguments 2, 2, "A", 2. Ce qu’elle fait : écrit un texte AGRANDI, taille 0 ou plus, SANS LIMITE (0 : la lettre normale ; 10 : 11 fois plus grande ; ce qui dépasse de l’écran est coupé), sans rien dessiner : chaque pixel devient un carré de (taille + 1) × (taille + 1). Une lettre prend (taille + 1) × (taille + 1) cases. Le texte et la taille s’écrivent en clair : texteGrand(2, 2, "A", 2).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">while (true) {</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">La boucle du jeu : tout ce qui est entre les accolades recommence sans fin, 60 fois par seconde avec image().</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">image();</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Attendre l’image suivante : la console en montre 60 par seconde. C’est ce qui règle la vitesse du jeu.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+  </tbody></table>
 </div>
 
 <h2>2. Le programme, morceau par morceau</h2>
@@ -135,7 +181,7 @@ Tes fonctions appelées :
 <div class="morceau">
   <div>
     <p class="quoi">1. ce que le programme raconte de lui-même</p>
-    <pre><code>#include &lt;texteGrand&gt;   // écrit un texte agrandi, taille de 0 à 10</code></pre>
+    <pre><code>#include &lt;texteGrand&gt;   // écrit un texte agrandi, sans limite de taille</code></pre>
   </div>
   <div></div>
 </div>
@@ -148,7 +194,7 @@ Tes fonctions appelées :
   //
   //   texteGrand(2, 2, "A", 2);
   //              |  |  |    |
-  //              |  |  |    +-- la TAILLE (de 0 à 10) : 2 → 3 fois plus grand
+  //              |  |  |    +-- la TAILLE (0 ou plus, sans limite) : 2 → 3 fois plus grand
   //              |  |  +------- le texte, entre guillemets
   //              +--+---------- la case en haut à gauche du grand A : (2, 2)
   //

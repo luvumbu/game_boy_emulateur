@@ -1021,7 +1021,7 @@ int main() {                        // Le jeu commence ici.
     provenance: 'tutoriel',
     idee: 'Accélérer, c’est une variable de plus.',
     texte: [
-      'Un objet qui accélère, c’est une **vitesse** qui monte. Tout ce qui suit — le saut, la pesanteur — n’est que cela, avec un signe en plus.',
+      'Un objet qui accélère, c’est une **vitesse** qui monte. Tout ce qui suit — le saut, la gravité — n’est que cela, avec un signe en plus.',
       'Elle ne montera pourtant **jamais jusqu’à 5** : plus le caillou va vite, plus tôt il touche le bas, et la chute suivante repart à 1. Le plafond écrit dans le code n’est pas celui qu’on observe — c’est le genre d’écart qu’on ne voit qu’en faisant tourner.',
       '**Pourquoi `depuis` et non `images() % 20 == 0`.** Les deux paraissent équivalents, et ils ne le sont pas. Tester un multiple suppose que la boucle tourne **exactement une fois par image** ; dès que le corps s’alourdit, un tour franchit deux images d’un coup, le multiple est enjambé, et l’accélération n’arrive jamais.',
       'Un compteur incrémenté à chaque tour et comparé avec `>=` ne peut pas rater son échéance. C’est la forme à prendre par défaut.',
@@ -1080,20 +1080,20 @@ int main() {                    // Le jeu commence ici.
   },
 
   {
-    titre: 'Sauter, sans pesanteur',
+    titre: 'Sauter, sans gravité',
     difficulte: 4,
     provenance: 'tutoriel',
     idee: 'Compter les images qui restent à monter, plutôt qu’une vitesse signée.',
     texte: [
       'Le front sert enfin : sans lui, garder `A` enfoncé relancerait le saut à chaque image, et le personnage collerait au plafond.',
       '`montee` compte les images qui restent à monter. C’est plus simple qu’une vraie vitesse signée — et sur une machine **sans nombres négatifs**, plus simple veut dire plus juste.',
-      'La leçon « La pesanteur et le saut » reprend la même idée avec une vraie accélération.',
+      'La leçon « La gravité et le saut » reprend la même idée avec une vraie accélération.',
     ],
     code: `// CE PROGRAMME : A fait sauter le héros ; il monte, puis redescend jusqu'au sol.
 //
 // « montee » compte les images de montée qui restent. Tant qu'il en reste,
 // on monte de 2 pixels ; ensuite, on redescend de 2 pixels jusqu'au sol.
-// (Pas de pesanteur ici : la vitesse ne change pas.)
+// (Pas de gravité ici : la vitesse ne change pas.)
 
 #include <Tuile>    // un dessin de 8 × 8 pixels
 #include <bouton>   // lit un bouton de la manette

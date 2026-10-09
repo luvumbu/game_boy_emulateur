@@ -82,7 +82,7 @@
     <span class="niveau">Chapitre 0 — Avant tout</span>
     
     <span class="niveau">Partie G — Les lettres et l’écran titre</span>
-    <span>leçon 0.87.6 sur 152</span>
+    <span>leçon 0.87.6 sur 153</span>
     <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
@@ -95,7 +95,7 @@
 <p><strong>Avec <code>texteGrand</code>, un mot trop long sort de l’écran par la droite.</strong> « BONJOUR » en taille 2 (3 cases par lettre) demande 7 × 3 = 21 cases de large ; l’écran n’en a que 20 : le R disparaît.</p>
 <p><strong>Ce qui est nouveau ici : <code>texteGrandS</code>,</strong> le <code>S</code> de <code>textS</code> (le 0.11). Même réglages que <code>texteGrand</code>, mais les lettres qui ne tiennent plus <strong>passent à la ligne</strong> : elles reprennent en colonne 0, une rangée de lettres plus bas (3 cases, à la taille 2).</p>
 <p><strong>Le découpage :</strong> à la taille 2, une lettre prend 3 cases ; une ligne en tient 20 ÷ 3 = 6 lettres (18 cases). « BONJOU » sur la première, « R » sur la deuxième.</p>
-<p><strong>Trop haut, c’est une erreur :</strong> l’écran a 18 cases de haut. Si le texte en demande plus (« BONJOUR » en taille 6 : 4 lignes de 7 cases, 28), le compilateur refuse, et dit combien il en faudrait.</p>
+<p><strong>Trop haut ? Coupé, pas refusé :</strong> l’écran a 18 cases de haut. Si le texte en demande plus (« BONJOUR » en taille 6 : 4 lignes de 7 cases, 28), ce qui dépasse en bas est <strong>coupé</strong> : il n’y a pas de limite de taille.</p>
 <p><strong>Tout s’écrit en clair,</strong> même la place : le découpage en lignes se fait avant le jeu.</p>
 
 <div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
@@ -103,6 +103,44 @@
   <ul style="margin: 0; padding-left: 14pt;">
   <li><code>#include &lt;texteGrandS&gt;</code> → <a href="lecon-00-87.5-la-fonction-textegrands-un-grand-texte-q.html">0.87.5. La fonction texteGrandS() — un grand texte qui va à la ligne</a></li>
 </ul>
+</div>
+
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">📖 Les mots de cette leçon — si tu débutes</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+    <li style="margin: 2pt 0;"><strong>accolades { }</strong> — Elles entourent un bloc : les lignes qui vont ensemble (le corps d’une fonction, d’une boucle, d’un « if »). Chaque « { » a son « } ».</li>
+    <li style="margin: 2pt 0;"><strong>argument</strong> — Une valeur donnée à une fonction quand on l’appelle, entre ses parenthèses : dans texte(5, 8, "SALUT"), 5, 8 et "SALUT" sont les arguments.</li>
+    <li style="margin: 2pt 0;"><strong>bloc</strong> — Un groupe de lignes entre accolades { }, qui s’exécutent ensemble.</li>
+    <li style="margin: 2pt 0;"><strong>booléen (vrai / faux)</strong> — Le résultat d’une condition : vrai (1) ou faux (0). « true » veut dire vrai, « false » faux.</li>
+    <li style="margin: 2pt 0;"><strong>boucle</strong> — Des instructions qui se répètent : « while » (tant que…) ou « for » (pour un compteur qui va de… à…).</li>
+    <li style="margin: 2pt 0;"><strong>boucle du jeu</strong> — « while (true) { image(); … } » : ce qui se répète 60 fois par seconde, sans fin, pendant tout le jeu.</li>
+    <li style="margin: 2pt 0;"><strong>chaîne de caractères (texte)</strong> — Des lettres entre guillemets, "COMME CECI" : un texte pris tel quel. La police de la console n’a que des majuscules, sans accents.</li>
+    <li style="margin: 2pt 0;"><strong>commentaire (//)</strong> — Tout ce qui suit « // » jusqu’au bout de la ligne : une phrase pour l’humain, que la console ignore.</li>
+    <li style="margin: 2pt 0;"><strong>condition</strong> — Une question dont la réponse est vrai ou faux : « score &gt; 10 », « bouton(A) ». On la teste avec « if » ou « while ».</li>
+    <li style="margin: 2pt 0;"><strong>image()</strong> — Attend l’image suivante. La console en montre 60 par seconde : c’est ce qui règle la vitesse d’un jeu.</li>
+    <li style="margin: 2pt 0;"><strong>#include</strong> — En haut du programme : « #include &lt;texte&gt; » demande la fonction texte() à la console ; « #include "fichier.cpp" » verse un de tes fichiers à cet endroit.</li>
+    <li style="margin: 2pt 0;"><strong>instruction</strong> — Un ordre donné à la console, terminé par un point-virgule : « texte(1, 1, "OK"); ».</li>
+    <li style="margin: 2pt 0;"><strong>main</strong> — « int main() { … } » : là où le programme commence. La console exécute d’abord la première ligne de main.</li>
+    <li style="margin: 2pt 0;"><strong>point-virgule (;)</strong> — Il termine une instruction, comme le point termine une phrase.</li>
+    <li style="margin: 2pt 0;"><strong>while (tant que)</strong> — Répète un bloc tant qu’une condition est vraie.</li>
+  </ul>
+</div>
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid; break-inside: auto;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">🔍 Le programme, ligne par ligne — chaque ligne dite en français</p>
+  <table style="width: 100%; border-collapse: collapse; table-layout: fixed;"><tbody>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;texteGrandS&gt;   // écrit un texte agrandi qui passe à la ligne</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « texteGrandS » (ce que c’est : écrit un texte agrandi qui passe à la ligne). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « écrit un texte agrandi qui passe à la ligne ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">int main() {</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Le début du programme : la console commence ici, par la première ligne qui suit.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// Comme texteGrand, mais qui VA À LA LIGNE :</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« Comme texteGrand, mais qui VA À LA LIGNE : »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   texteGrandS(0, 0, "BONJOUR", 2);</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« texteGrandS(0, 0, "BONJOUR", 2); »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   la taille 2 : 3 cases par lettre ; une ligne de 20 cases en tient 6.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« la taille 2 : 3 cases par lettre ; une ligne de 20 cases en tient 6. »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   ligne 1, cases 0 à 2 :   B O N J O U     (6 lettres × 3 = 18 cases)</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« ligne 1, cases 0 à 2 :   B O N J O U     (6 lettres × 3 = 18 cases) »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   ligne 2, cases 3 à 5 :   R               (repart en colonne 0)</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« ligne 2, cases 3 à 5 :   R               (repart en colonne 0) »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">texteGrandS(0, 0, "BONJOUR", 2);</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Appel de la fonction texteGrandS de la console, avec les arguments 0, 0, "BONJOUR", 2. Ce qu’elle fait : comme texteGrand, mais qui VA À LA LIGNE : les lettres qui ne tiennent plus dans la largeur repartent en colonne 0, une rangée de lettres plus bas, comme textS. Ce qui dépasse le bas est coupé. Taille sans limite. Tout en clair : texteGrandS(0, 0, "BONJOUR", 2).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">while (true) {</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">La boucle du jeu : tout ce qui est entre les accolades recommence sans fin, 60 fois par seconde avec image().</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">image();</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Attendre l’image suivante : la console en montre 60 par seconde. C’est ce qui règle la vitesse du jeu.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+  </tbody></table>
 </div>
 
 <h2>2. Le programme, morceau par morceau</h2>
@@ -207,7 +245,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 
 <p class="pied">
-  Ensuite : <strong>0.87.7. La fonction couleurTexte() — la couleur des lettres</strong> — chapitre 0 : Avant tout.
+  Ensuite : <strong>0.87.7. Écrire en grand avec texte() : la taille en 4e argument</strong> — chapitre 0 : Avant tout.
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 

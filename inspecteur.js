@@ -12,7 +12,16 @@
  *
  * On ne fait que LIRE. L'inspecteur ne change pas un octet : regarder une
  * console ne doit pas changer ce qu'elle fait.
+ *
+ * Et l'on peut PRENDRE : « 📸 Capturer les lutins à l'écran » (vue Lutins)
+ * relit les personnages que la console montre — ceux de ton jeu, ou d'une
+ * cartouche .gb ouverte —, et « ➕ Dans mes dessins » les range dans ton
+ * programme (capturer-lutins.js). Dans la vue Tuiles, un clic sur une tuile
+ * fait de même pour elle seule. C'est la page qui donne le nom et range le
+ * dessin (« ajouterUnDessin »).
  */
+
+import { capturerLesLutins, pixelsDUneTuile } from './capturer-lutins.js'
 
 const hex = (n, chiffres = 2) => n.toString(16).toUpperCase().padStart(chiffres, '0')
 const bin = (n) => n.toString(2).padStart(8, '0')
@@ -30,7 +39,63 @@ const REGIONS = [
 /** Les quatre nuances, pour dessiner la mémoire vidéo. */
 const NUANCES = ['#e0f8d0', '#88c070', '#346856', '#081820']
 
-export function installer({ zone, gb, variables = () => new Map(), zones = () => new Map() }) {
+/** Un dessin (rangées de chiffres 0 à 3) peint dans un petit canevas, 0 en damier : le transparent. */
+function apercu(rangees, cote, zoom = 4) {
+  const toile = document.createElement('canvas')
+  toile.width = cote
+  toile.height = cote
+  toile.style.width = toile.style.height = cote * zoom + 'px'
+  toile.style.imageRendering = 'pixelated'
+  const ctx = toile.getContext('2d')
+  rangees.forEach((r, y) => [...r].forEach((c, x) => {
+    ctx.fillStyle = c === '0' ? ((x + y) % 2 ? '#ccc' : '#eee') : NUANCES[Number(c)]
+    ctx.fillRect(x, y, 1, 1)
+  }))
+  return toile
+}
+
+/**
+ * Capturer MAINTENANT les lutins à l'écran, et les montrer dans « prises » :
+ * un aperçu par personnage, et « ➕ Dans mes dessins ». Servi par la vue
+ * Lutins de l'inspecteur ET par le bouton « 📸 Capturer les lutins » sous la
+ * console : les deux montrent la même chose.
+ */
+export function montrerLesCaptures(prises, laConsole, ajouterUnDessin, { dessins: dejaPris = null, ajouterTout = null } = {}) {
+  const element = (balise, classe, texte) => {
+    const e = document.createElement(balise)
+    if (classe) e.className = classe
+    if (texte !== undefined) e.textContent = texte
+    return e
+  }
+  prises.textContent = ''
+  prises.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;margin:8px 0'
+  // « dejaPris » : une liste ramassée pendant le jeu (la capture continue) ; sinon, l'écran de maintenant
+  const dessins = dejaPris ?? capturerLesLutins(laConsole)
+  if (!dessins.length) {
+    prises.append(element('p', 'aide', 'Aucun lutin à l’écran en ce moment. Mets le jeu là où le personnage se voit, puis recommence (la pause ⏸ aide).'))
+    return
+  }
+  if (ajouterTout && dessins.length > 1) {
+    const tout = element('button', 'petit principal', `➕ Tout dans mes dessins (${dessins.length})`)
+    tout.type = 'button'
+    tout.style.flexBasis = '100%'
+    tout.addEventListener('click', () => ajouterTout(dessins))
+    prises.append(tout)
+  }
+  dessins.forEach((d, k) => {
+    const carte = element('div')
+    carte.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;border:1px solid var(--bord);border-radius:6px'
+    const ajouter = element('button', 'petit', '➕ Dans mes dessins')
+    ajouter.type = 'button'
+    ajouter.addEventListener('click', () => ajouterUnDessin({ cote: d.cote, rangees: d.rangees, propose: (d.cote === 8 ? 'LUTIN' : 'PERSO') + (k + 1) }))
+    carte.append(apercu(d.rangees, d.cote, d.cote === 32 ? 2 : 4),
+      element('span', 'aide', `${d.cote} × ${d.cote} · ${d.lutins} lutin${d.lutins > 1 ? 's' : ''}${d.coupe ? ' · coupé à 32' : ''}`), ajouter)
+    prises.append(carte)
+  })
+  prises.append(element('p', 'aide', 'Les dessins d’un jeu appartiennent à ses auteurs : capture-les pour apprendre et t’entraîner, pas pour publier le jeu d’un autre.'))
+}
+
+export function installer({ zone, gb, variables = () => new Map(), zones = () => new Map(), ajouterUnDessin = null }) {
   let vue = 'memoire'
   let adresse = 0xc100
   let format = 'hex'
@@ -170,8 +235,21 @@ export function installer({ zone, gb, variables = () => new Map(), zones = () =>
       const toile = element('canvas', 'inspecteur-tuiles')
       toile.width = 128
       toile.height = 192
-      const dit = element('p', 'aide', 'Les 384 tuiles de la mémoire vidéo ($8000–$97FF), seize par rangée — en nuances brutes, avant palette.')
+      const dit = element('p', 'aide', 'Les 384 tuiles de la mémoire vidéo ($8000–$97FF), seize par rangée — en nuances brutes, avant palette.'
+        + (ajouterUnDessin ? ' Clique une tuile pour la mettre dans tes dessins.' : ''))
       contenu.append(dit, toile)
+      if (ajouterUnDessin) {
+        toile.style.cursor = 'copy'
+        toile.title = 'clique une tuile : elle va dans tes dessins'
+        toile.addEventListener('click', (e) => {
+          const boite = toile.getBoundingClientRect()
+          const tx = Math.floor((e.clientX - boite.left) / boite.width * 16)
+          const ty = Math.floor((e.clientY - boite.top) / boite.height * 24)
+          const numero = ty * 16 + tx
+          const rangees = pixelsDUneTuile(gb().ppu.vram, numero).map((r) => r.join(''))
+          ajouterUnDessin({ cote: 8, rangees, propose: 'TUILE' + numero })
+        })
+      }
       const ctx = toile.getContext('2d')
       rafraichir = () => {
         const vram = gb().ppu.vram
@@ -198,6 +276,18 @@ export function installer({ zone, gb, variables = () => new Map(), zones = () =>
 
     if (vue === 'lutins') {
       const table = element('table', 'inspecteur-table')
+      if (ajouterUnDessin) {
+        /* Capturer : les personnages à l'écran, MAINTENANT (le jeu peut être en
+           pause, ou tourner : on prend l'image du moment). */
+        const barre = element('div', 'rangee')
+        const bouton = element('button', 'petit', '📸 Capturer les lutins à l’écran')
+        bouton.type = 'button'
+        bouton.title = 'relit les personnages que la console montre en ce moment, et propose de les mettre dans tes dessins'
+        const prises = element('div', 'inspecteur-captures')
+        bouton.addEventListener('click', () => montrerLesCaptures(prises, gb(), ajouterUnDessin))
+        barre.append(bouton)
+        contenu.append(barre, prises)
+      }
       contenu.append(table)
       rafraichir = () => {
         const oam = gb().ppu.oam

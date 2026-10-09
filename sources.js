@@ -21,6 +21,11 @@
 /* Les documents uniques : un titre, ce qu'il contient, et ses fichiers. */
 const DOCUMENTS = [
   {
+    titre: 'Comment marche gameboy3 — la documentation technique',
+    dit: 'Pour qui découvre le code : les bases depuis zéro, le dossier fichier par fichier, un vrai programme suivi à travers le compilateur jusqu’à l’écran, les leçons, les vérifications, ajouter un jeu, git — et un lexique.',
+    fichiers: [['PDF', 'documents/doc-technique.pdf'], ['page', 'documents/doc-technique.html']],
+  },
+  {
     titre: 'Le cours complet',
     dit: 'Tout le parcours, dans l’ordre de « Apprendre » : les chapitres, chaque leçon, chaque #include.',
     fichiers: [['PDF', 'documents/cours-complet.pdf'], ['page', 'documents/cours-complet.html']],

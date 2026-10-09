@@ -4015,10 +4015,10 @@ function appelSansTrace(e, n) {
     }
     const taille = args.length === 4 ? constante(args[3]) : 3
     if (taille === null) {
-      throw new Error(`ligne ${n.ligne} : la taille de ${nom}() s'écrit en clair — 2, 3 ou 4 —, pas avec une variable : les lettres sont dessinées par le compilateur, avant que le jeu ne tourne`)
+      throw new Error(`ligne ${n.ligne} : la taille de ${nom}() s'écrit en clair — 2, 3, 4… sans limite —, pas avec une variable : les lettres sont dessinées par le compilateur, avant que le jeu ne tourne`)
     }
-    if (![2, 3, 4].includes(taille)) {
-      throw new Error(`ligne ${n.ligne} : la taille de ${nom}() est 2, 3 ou 4 (le nombre de cases de côté d'une lettre), pas ${taille}`)
+    if (!Number.isInteger(taille) || taille < 2) {
+      throw new Error(`ligne ${n.ligne} : la taille de ${nom}() est le nombre de cases de côté d'une lettre : 2 au moins (en dessous, le contour mangerait la lettre), puis 3, 4, 5… sans limite — pas ${taille}`)
     }
     if (args[2].genre !== 'texte') {
       throw new Error(`ligne ${n.ligne} : le mot de ${nom}() s'écrit en clair, entre guillemets — comme ${nom}(1, 2, "SUPER")`)
@@ -4026,15 +4026,11 @@ function appelSansTrace(e, n) {
     const mot = args[2].valeur
     const colonne = constante(args[0])
     const ligneDuMot = constante(args[1])
-    if (colonne !== null && colonne + mot.length * taille > 20) {
-      throw new Error(
-        `ligne ${n.ligne} : « ${mot} » fait ${mot.length} caractères × ${taille} colonnes = ${mot.length * taille} colonnes, à partir de la colonne ${colonne} ; ` +
-          `l'écran n'en a que 20. Écrire le titre sur deux lignes, avec deux ${nom}(), ou plus petit.`,
-      )
-    }
-    if (ligneDuMot !== null && ligneDuMot + taille > 18) {
-      throw new Error(`ligne ${n.ligne} : en taille ${taille}, une lettre de titre fait ${taille} lignes ; à partir de la ligne ${ligneDuMot}, elle sortirait de l'écran (18 lignes)`)
-    }
+    /* Pas de limite de taille : un mot plus grand que l'écran est COUPÉ au
+       bord, comme spriteTaille dans le fond. Quand la place est écrite en
+       clair, seules les cases qui tombent dans l'écran (20 × 18) sont
+       dessinées et posées ; les lettres entièrement dehors ne coûtent rien. */
+    const seVoit = (c, l) => (colonne === null || (c >= 0 && c < 20)) && (ligneDuMot === null || (l >= 0 && l < 18))
     const nombre = (valeurEntiere) => ({ genre: 'nombre', valeur: valeurEntiere, ligne: n.ligne })
     const plus = (noeud, combien) => combien === 0 ? noeud
       : { genre: 'calcul', operateur: '+', gauche: noeud, droite: nombre(combien), ligne: n.ligne }
@@ -4043,10 +4039,13 @@ function appelSansTrace(e, n) {
     try {
       ;[...mot].forEach((caractere, k) => {
         if (caractere === ' ') return
+        const dehors = colonne !== null && (colonne + k * taille >= 20 || colonne + (k + 1) * taille <= 0)
+        if (dehors) return // la lettre entière tombe hors de l'écran : rien à dessiner
         const lettre = dessiner(caractere, k % 2 === 1, taille)
         if (!lettre) throw new Error(`ligne ${n.ligne} : « ${caractere} » n'a pas de lettre de titre (A à Z, 0 à 9, et ! ? . - : # |)`)
         for (let ty = 0; ty < taille; ty++) {
           for (let tx = 0; tx < taille; tx++) {
+            if (!seVoit((colonne ?? 0) + k * taille + tx, (ligneDuMot ?? 0) + ty)) continue // hors de l'écran : coupé
             const rangees = lettre.slice(ty * 8, ty * 8 + 8).map((r) => r.slice(tx * 8, tx * 8 + 8))
             if (rangees.every((r) => r === '00000000')) continue // une case vide : rien à poser
             appel(e, {
@@ -5762,10 +5761,500 @@ void spriteDerriere(uint8_t numero, uint8_t x, uint8_t y, uint8_t tuile) {
 }
 `
 
+/*
+ * avancer(x, vitesse) : fait avancer une place « x » vers la droite, à
+ * « vitesse » PIXELS PAR SECONDE, et rend la nouvelle place.
+ *
+ *   x = avancer(x, 30);   30 pixels par seconde : l'écran traversé en 5 secondes
+ *
+ * L'élève ne règle QUE la vitesse : la fluidité, c'est la console qui s'en
+ * occupe. La console montre 60 images par seconde. À chaque image, la
+ * vitesse s'ajoute à un petit compteur caché ; chaque fois qu'il atteint 60,
+ * la place avance d'un pixel, et le compteur repart de ce qui dépasse.
+ *   - jusqu'à 60, la place n'avance JAMAIS de plus d'un pixel par image : le
+ *     lutin glisse, il ne saute pas ;
+ *   - les pixels sont RÉPARTIS régulièrement : à 30, un pixel une image sur
+ *     deux ; à 20, une sur trois ; à 45, trois images sur quatre, bien
+ *     étalées (c'est le compteur qui les étale, pas un « % » fixe) ;
+ *   - au-delà de 60, il faut bien 2 pixels (ou plus) par image : un écran à
+ *     60 images par seconde ne peut pas faire mieux.
+ * Le temps compte les images RÉELLEMENT passées, comme chaque() : une boucle
+ * lente ne ralentit pas le lutin. Huit images au plus d'un coup : après une
+ * longue pause (un menu, un écran noir), le lutin ne saute pas à l'autre bout.
+ * Au-delà de 152 — la dernière place où un lutin de 8 pixels tient entier
+ * dans l'écran (160 pixels de large) —, la place repart à 0.
+ *
+ * RECULER : une vitesse NÉGATIVE. x = avancer(x, -30); va vers la gauche, à
+ * 30 pixels par seconde, avec la même douceur ; sorti à gauche (sous 0), il
+ * repart de la droite (152). Un octet ne connaît pas le signe : -30 arrive
+ * ici comme 226 (256 - 30). Tout ce qui dépasse 127 est donc un recul, de
+ * 256 - vitesse pixels par seconde. La vitesse va ainsi de -127 à 127 : un
+ * peu plus de 2 pixels par image dans chaque sens.
+ *
+ * VERS LE BAS (ou le haut) : avancer_y(y, vitesse). La même chose sur la
+ * hauteur : y descend à une vitesse positive, monte à une vitesse négative,
+ * et le bord est 136 — la dernière place où un lutin de 8 pixels tient
+ * entier dans l'écran (144 pixels de haut).
+ *
+ * S'ARRÊTER : un 3e réglage, facultatif, « jusqua ». x = avancer(x, 30, 100);
+ * avance jusqu'au pixel 100, puis s'y arrête — au lieu de repartir au bord.
+ * Dans les deux sens : avancer(x, -30, 20) recule jusqu'au pixel 20. Une
+ * place qu'on a dépassée est retrouvée après un tour (le bord fait revenir
+ * le lutin de l'autre côté). Sans 3e réglage, la console passe 255 : « pas
+ * d'arrêt » (aucune place de l'écran ne vaut 255).
+ *
+ * Chaque « avancer(…) » et « avancer_y(…) » écrit dans le programme a son
+ * propre compteur : le compilateur le réécrit en
+ * « avancer_pas(k, x, vitesse, bord, jusqua) », avec k son numéro (0, 1, 2…
+ * dans l'ordre du programme). L'élève n'a rien à numéroter. Huit au plus.
+ *
+ * Pas de calcul qui déborde : le compteur reste sous 60, et l'on compare
+ * « compteur >= 60 - reste » au lieu d'additionner d'abord : la somme ne
+ * peut jamais dépasser un octet, quelle que soit la vitesse.
+ */
+const SOURCE_AVANCER_VA = `
+uint8_t avancer_parti[8];
+uint8_t avancer_image[8];
+uint8_t avancer_compteur[8];
+uint8_t avancer_va(uint8_t numero, uint8_t x, uint8_t combien, uint8_t recule, uint8_t bord, uint8_t jusqua) {
+  uint8_t maintenant = images();
+  if (avancer_parti[numero] == 0) {          // le premier appel : le compteur part de zéro
+    avancer_parti[numero] = 1;
+    avancer_image[numero] = maintenant;
+    avancer_compteur[numero] = 0;
+    return x;
+  }
+  uint8_t passees = maintenant - avancer_image[numero];   // les images passées depuis la dernière fois
+  avancer_image[numero] = maintenant;
+  if (passees > 8) passees = 8;              // après une longue pause : pas de grand saut
+  uint8_t place = x;
+  uint8_t compteur = avancer_compteur[numero];
+  for (uint8_t i = 0; i < passees; i++) {    // pour chaque image passée :
+    uint8_t pixels = 0;                      //   de combien bouger à cette image
+    uint8_t reste = combien;
+    while (reste >= 60) {                    //   les pixels entiers (au-delà de 60 par seconde)
+      pixels++;
+      reste = reste - 60;
+    }
+    if (compteur >= 60 - reste) {            //   le compteur atteint 60 : un pixel de plus
+      compteur = compteur - (60 - reste);
+      pixels++;
+    } else {
+      compteur = compteur + reste;
+    }
+    if (place == jusqua) pixels = 0;         //   arrivé : il ne bouge plus
+    if (recule) {
+      if (place > jusqua && place - jusqua <= pixels) place = jusqua;   //   il atteint l'arrêt
+      else if (place < pixels) place = bord; //   sorti à gauche (ou en haut) : il repart de l'autre bord
+      else place = place - pixels;
+    } else {
+      if (place < jusqua && jusqua - place <= pixels) place = jusqua;   //   il atteint l'arrêt
+      else {
+        place = place + pixels;
+        if (bord != 0 && place > bord) place = 0;   //   sorti à droite (ou en bas) : il repart de 0
+      }
+    }
+  }
+  avancer_compteur[numero] = compteur;
+  return place;
+}
+`
+
+/* avancer_pas : la vitesse avec son signe (au-dessus de 127, un recul), puis avancer_va. */
+const SOURCE_AVANCER = `
+uint8_t avancer_pas(uint8_t numero, uint8_t x, uint8_t vitesse, uint8_t bord, uint8_t jusqua) {
+  uint8_t recule = 0;                        // une vitesse négative : on va vers la gauche
+  uint8_t combien = vitesse;                 // la vitesse, sans son signe
+  if (vitesse > 127) {                       // -30 arrive comme 226 :
+    recule = 1;
+    combien = 0 - vitesse;                   //   256 - 226 = 30 pixels par seconde, à gauche
+  }
+  if (bord == 0) {                           // suivre(), navette() : vers « jusqua », dans le bon sens
+    recule = 0;                              //   le signe ne compte pas : c'est la place visée qui décide
+    if (jusqua < x) recule = 1;
+  }
+  return avancer_va(numero, x, combien, recule, bord, jusqua);
+}
+`
+
+/*
+ * marcher(numero, x, y, PAS1, PAS2) : un lutin qui MARCHE — il alterne deux
+ * dessins (les jambes d'un côté, puis de l'autre).
+ *
+ *   x = avancer(x, vitesse);
+ *   marcher(0, x, 72, HEROS1, HEROS2);
+ *
+ * Le dessin change tous les 4 pixels PARCOURUS, et non toutes les N images :
+ * c'est donc la vitesse qui règle les jambes, toute seule. Plus il va vite,
+ * plus elles bougent vite ; à l'arrêt, elles ne bougent plus. L'élève n'a
+ * rien d'autre à régler. x et y comptent tous deux : il marche aussi en
+ * montant ou en descendant (avancer_y).
+ *
+ * Et il se TOURNE tout seul : allé à gauche, il regarde à gauche (le dessin
+ * retourné, MIROIR_X) ; à droite, à droite. Le dessin se fait donc
+ * regardant à droite. Un saut de plus de 32 pixels est un passage de bord,
+ * pas un demi-tour : il ne se retourne pas.
+ */
+const SOURCE_MARCHER = `
+uint8_t marcher_avant[40];
+uint8_t marcher_gauche[40];
+void marcher(uint8_t numero, uint8_t x, uint8_t y, uint8_t pas1, uint8_t pas2) {
+  uint8_t avant = marcher_avant[numero];     // sa place à l'appel d'avant
+  if (x < avant) {                           // il est allé à gauche : il regarde à gauche…
+    if (avant - x < 32) marcher_gauche[numero] = 1;
+  }
+  if (x > avant) {                           // …à droite : il regarde à droite
+    if (x - avant < 32) marcher_gauche[numero] = 0;
+  }                                          // (un grand bond, c'est le bord : pas un demi-tour)
+  marcher_avant[numero] = x;
+  uint8_t miroir = 0;
+  if (marcher_gauche[numero]) miroir = 32;   // MIROIR_X : le dessin retourné
+  uint8_t parcouru = x + y;                  // où il en est de son chemin
+  if ((parcouru / 4) % 2 == 0) {             // tous les 4 pixels, on change de jambe
+    sprite(numero, x, y, pas1, miroir);
+  } else {
+    sprite(numero, x, y, pas2, miroir);
+  }
+}
+`
+
+/*
+ * sauter(y, hauteur, sol) : un saut, avec la gravité. À appeler à chaque
+ * image : y = sauter(y, 40, 104);
+ *
+ * sauter(y, hauteur, sol, gravité) : la même, avec la gravité réglée
+ * (4 sans rien dire : la gravité normale). La hauteur reste le plus haut
+ * qu'il peut aller ; la gravité dit seulement À QUELLE ALLURE : 1 est
+ * très faible (il flotte, comme sur la Lune), 2 faible, 4 normale, 8 forte,
+ * 16 très forte. 0 compte comme 1, plus de 32 comme 32. Pour sauter PLUS
+ * HAUT, c'est « hauteur » qu'on monte ; une gravité faible rend ce grand
+ * saut lent et doux. Il ne monte jamais plus haut que « hauteur »
+ * au-dessus du sol.
+ *
+ * Au sol (y à « sol »), le bouton A lance le saut ; le lutin monte, ralentit,
+ * s'arrête en l'air, puis retombe de plus en plus vite, et se pose sur
+ * « sol ». L'élève ne règle que la hauteur.
+ *
+ * PLUS ON TIENT A, PLUS IL SAUTE HAUT : A tenu jusqu'en haut, il monte de
+ * « hauteur » pixels (le plus haut possible) ; A lâché pendant la montée, la
+ * gravité tire trois fois plus fort et le saut s'arrête plus tôt. Une
+ * petite pression : un petit bond. Comme dans les jeux de plateformes. Au-dessus
+ * du sol sans avoir sauté (il est tombé d'une plateforme, « sol » a changé),
+ * il tombe tout seul.
+ *
+ * Le calcul, en trente-deuxièmes de pixel : la gravité ôte « gravité » à
+ * la vitesse à chaque image. La vitesse de départ est la plus petite qui
+ * monte assez haut (g + 2g + 3g + … ≥ 32 × hauteur, g la gravité) : on la
+ * cherche en comptant, sans multiplication, et sans dépasser un octet — la
+ * vitesse reste sous 224 (7 pixels par image), pour que le reste plus la
+ * vitesse tienne encore dans un octet. Avec une gravité très forte, un grand
+ * saut est donc coupé (gravité 32 : 28 pixels au plus ; 16 : 52 ; 8 : plus
+ * de 100) ; il n'est jamais refusé. Chaque sauter() a ses trois
+ * octets (numérotés par le compilateur, comme avancer()) ; huit au plus.
+ */
+const SOURCE_SAUTER = `
+uint8_t sauter_etat[8];
+uint8_t sauter_vitesse[8];
+uint8_t sauter_reste[8];
+uint8_t sauter_pas(uint8_t numero, uint8_t y, uint8_t hauteur, uint8_t sol, uint8_t g) {
+  uint8_t etat = sauter_etat[numero];        // 0 au sol (ou qui tombe), 1 monte, 2 retombe
+  uint8_t v = sauter_vitesse[numero];        // la vitesse, en 32es de pixel par image
+  uint8_t f = sauter_reste[numero];          // les 32es pas encore faits
+  if (g == 0) g = 1;                         // la gravité : 1 au moins…
+  if (g > 32) g = 32;                        // …et 32 au plus
+  if (etat == 0 && y >= sol) {               // au sol :
+    y = sol;
+    v = 0;
+    f = 0;
+    if (bouton(A)) {                         //   A lance le saut
+      uint8_t monte = 0;
+      uint8_t morceaux = 0;
+      while (monte < hauteur && v <= 224 - g) { //   la vitesse qui monte d'au moins « hauteur »
+        v = v + g;
+        morceaux = morceaux + v;
+        while (morceaux >= 32) {
+          morceaux = morceaux - 32;
+          monte++;
+        }
+      }
+      etat = 1;
+    }
+  }
+  if (etat == 1) {                           // il monte, de moins en moins vite
+    uint8_t sommet = 0;                      //   jamais plus haut que « hauteur » au-dessus du sol :
+    if (sol > hauteur) sommet = sol - hauteur; //   l'élan, arrondi, monterait un peu trop
+    f = f + v;
+    while (f >= 32) {
+      f = f - 32;
+      if (y > sommet) y--;
+    }
+    if (v > g) v = v - g;                    //   la gravité
+    else v = 0;
+    if (bouton(A) == 0) {                    //   A lâché pendant la montée : la gravité
+      if (v > g + g) v = v - g - g;          //   tire trois fois plus fort, le saut s'arrête plus tôt
+      else v = 0;
+    }
+    if (v == 0) etat = 2;                    //   en haut : il retombe
+  } else if (etat == 2 || y < sol) {         // il tombe, de plus en plus vite
+    if (v < 160) v = v + g;                  //   (5 pixels par image environ, au plus)
+    f = f + v;
+    while (f >= 32) {
+      f = f - 32;
+      y++;
+    }
+    if (y >= sol) {                          //   il touche le sol : il s'y pose
+      y = sol;
+      v = 0;
+      f = 0;
+      etat = 0;
+    }
+  }
+  sauter_etat[numero] = etat;
+  sauter_vitesse[numero] = v;
+  sauter_reste[numero] = f;
+  return y;
+}
+`
+
+/*
+ * gaucheDroite(x, vitesse) et hautBas(y, vitesse) : la MANETTE fait bouger
+ * le héros, en douceur, à « vitesse » pixels par seconde — et il ne sort pas
+ * de l'écran.
+ *
+ *   x = gaucheDroite(x, 60);   DROITE : vers la droite ; GAUCHE : vers la gauche
+ *   y = hautBas(y, 60);        BAS : vers le bas ; HAUT : vers le haut
+ *
+ * L'élève ne règle que la vitesse : la console lit les boutons, choisit le
+ * sens, et s'arrête au bord (0 d'un côté, 152 ou 136 de l'autre). Elle passe
+ * par avancer_va, avec la place visée au bord : la même douceur, aucun
+ * pixel de trop. Sans bouton, la vitesse est 0 : il ne bouge pas, mais son
+ * compteur continue de compter les images (pas de saut à la reprise).
+ *
+ * Le SENS vient du bouton, pas du signe : la vitesse est donnée telle quelle,
+ * de 0 à 255. (Avec avancer_pas, tout ce qui dépasse 127 serait lu comme un
+ * recul : à 200, DROITE ferait aller à gauche.)
+ */
+const SOURCE_MANETTE = `
+uint8_t manette_pas(uint8_t numero, uint8_t x, uint8_t vitesse, uint8_t bord, uint8_t verticale) {
+  uint8_t vers = 0;                          // 0 : aucun bouton ; 1 : vers le bord ; 2 : vers 0
+  if (verticale) {
+    if (bouton(BAS)) vers = 1;
+    if (bouton(HAUT)) vers = 2;
+  } else {
+    if (bouton(DROITE)) vers = 1;
+    if (bouton(GAUCHE)) vers = 2;
+  }
+  if (vers == 1) return avancer_va(numero, x, vitesse, 0, bord, bord);     // jusqu'au bord, pas plus
+  if (vers == 2) return avancer_va(numero, x, vitesse, 1, bord, 0);        // jusqu'à 0, pas moins
+  return avancer_va(numero, x, 0, 0, bord, 255);                           // immobile, l'horloge tourne
+}
+`
+
+/*
+ * navette(x, vitesse, de, a) : un aller-retour sans fin entre deux places,
+ * en douceur — un garde qui fait sa ronde, une plateforme qui va et vient.
+ *   x = navette(x, 30, 20, 120);
+ * Elle se sert d'avancer_pas (le mode « vers une place », bord 0) et retient
+ * son sens : arrivée au but, elle repart vers l'autre.
+ */
+const SOURCE_NAVETTE = `
+uint8_t navette_sens[8];
+uint8_t navette_pas(uint8_t numero, uint8_t x, uint8_t vitesse, uint8_t de, uint8_t a) {
+  uint8_t but = a;                           // à l'aller, vers « a »
+  if (navette_sens[numero]) but = de;        // au retour, vers « de »
+  uint8_t place = avancer_pas(numero, x, vitesse, 0, but);
+  if (place == but) navette_sens[numero] = 1 - navette_sens[numero];   // arrivé : demi-tour
+  return place;
+}
+`
+
+/*
+ * touche(x1, y1, x2, y2) : deux lutins de 8 × 8 se touchent-ils ? Rend 1 si
+ * leurs carrés se chevauchent, 0 sinon : if (touche(x, y, ex, ey)) { … }
+ * Ils se touchent quand l'écart est de moins de 8 pixels sur les deux axes.
+ */
+const SOURCE_TOUCHE = `
+uint8_t touche(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
+  uint8_t dx = x1 - x2;                      // l'écart sur la largeur, toujours positif
+  if (x2 > x1) dx = x2 - x1;
+  uint8_t dy = y1 - y2;                      // et sur la hauteur
+  if (y2 > y1) dy = y2 - y1;
+  if (dx < 8) {
+    if (dy < 8) return 1;                    // moins de 8 sur les deux : ils se chevauchent
+  }
+  return 0;
+}
+`
+
+/*
+ * toucheDecor(x, y) : y a-t-il du décor au pixel (x, y) ? Rend 1 si la case
+ * du fond sous ce pixel porte une tuile (pas la case vide, 0) :
+ *   if (toucheDecor(x + 4, y + 8)) { … }   // sous les pieds : un sol
+ * Le fond est lu tel qu'il est posé, sans tenir compte de defiler().
+ */
+const SOURCE_TOUCHE_DECOR = `
+uint8_t toucheDecor(uint8_t x, uint8_t y) {
+  if (lire(x / 8, y / 8) != 0) return 1;     // la case du fond sous ce pixel
+  return 0;
+}
+`
+
+/*
+ * clignoter(numero, x, y, tuile, fois) : comme sprite(), mais le lutin
+ * clignote « fois » fois par seconde — après un coup, pour dire « je suis
+ * invincible un moment ». fois à 0 : il ne clignote pas.
+ */
+const SOURCE_CLIGNOTER = `
+void clignoter(uint8_t numero, uint8_t x, uint8_t y, uint8_t tuile, uint8_t fois) {
+  if (fois == 0) {                           // 0 : visible, tout simplement
+    sprite(numero, x, y, tuile);
+    return;
+  }
+  uint8_t demi = 30 / fois;                  // une demi-période, en images
+  if (demi == 0) demi = 1;
+  if ((images() / demi) % 2 == 0) {
+    sprite(numero, x, y, tuile);             // visible…
+  } else {
+    cacher(numero);                          // …puis caché
+  }
+}
+`
+
+/*
+ * trembler(force) : l'écran tremble — une explosion, un choc. À appeler à
+ * chaque image : trembler(4) au moment du choc (et tant qu'il dure),
+ * trembler(0) le reste du temps. Après le dernier trembler(4), la secousse
+ * continue une demi-seconde en se calmant, puis le décor revient à sa place
+ * (defiler(0, 0)). Au calme, trembler(0) ne touche à rien : un jeu qui fait
+ * défiler son décor n'est pas dérangé.
+ */
+const SOURCE_TREMBLER = `
+uint8_t trembler_reste;
+uint8_t trembler_force;
+void trembler(uint8_t force) {
+  if (force > 0) {                           // un choc : la secousse (re)commence
+    trembler_force = force;
+    trembler_reste = 30;                     //   une demi-seconde
+  }
+  if (trembler_reste == 0) return;           // au calme : rien à faire
+  trembler_reste--;
+  if (trembler_reste == 0) {                 // fini : le décor revient à sa place
+    defiler(0, 0);
+    return;
+  }
+  uint8_t d = trembler_force;
+  if (trembler_reste < 10) d = d / 2;        // elle se calme sur la fin
+  if (d == 0) d = 1;
+  uint8_t tour = images() % 4;               // droite, bas, gauche, haut : un petit tour
+  if (tour == 0) defiler(d, 0);
+  if (tour == 1) defiler(0, d);
+  if (tour == 2) defiler(0 - d, 0);
+  if (tour == 3) defiler(0, 0 - d);
+}
+`
+
+/*
+ * fonduNoir(images) et fonduRetour(images) : l'écran s'assombrit jusqu'au
+ * noir, ou revient du noir — entre deux niveaux, avant le titre. Quatre
+ * étapes de nuances, « images » images chacune (8 : une demi-seconde en
+ * tout). Le programme attend que ce soit fini. Pour la Game Boy d'origine
+ * (les quatre nuances) : le fond et les deux palettes des lutins.
+ * fonduRetour remet les nuances d'origine (0, 1, 2, 3).
+ */
+const SOURCE_FONDU_NUANCES = `
+void fondu_nuances(uint8_t a, uint8_t b, uint8_t c, uint8_t d, uint8_t combien) {
+  paletteFond(a, b, c, d);
+  paletteLutins(0, a, b, c, d);
+  paletteLutins(1, a, b, c, d);
+  for (uint8_t i = 0; i < combien; i++) {    // on laisse voir cette étape
+    image();
+  }
+}
+`
+const SOURCE_FONDU_NOIR = `
+void fonduNoir(uint8_t combien) {
+  fondu_nuances(1, 2, 3, 3, combien);        // un cran plus sombre…
+  fondu_nuances(2, 3, 3, 3, combien);
+  fondu_nuances(3, 3, 3, 3, combien);        // …jusqu'au noir
+}
+`
+const SOURCE_FONDU_RETOUR = `
+void fonduRetour(uint8_t combien) {
+  fondu_nuances(2, 3, 3, 3, combien);        // du noir…
+  fondu_nuances(1, 2, 3, 3, combien);
+  fondu_nuances(0, 1, 2, 3, combien);        // …aux nuances d'origine
+}
+`
+
+/*
+ * compteARebours(secondes) : un chrono qui descend tout seul. Rend les
+ * secondes qui restent, et 0 quand c'est fini :
+ *   reste = compteARebours(60);
+ *   nombre(16, 0, reste, 2);
+ *   if (reste == 0) { … le temps est écoulé … }
+ * Il part au premier appel, et compte les images vraiment passées (60 font
+ * une seconde) : une boucle lente ne le ralentit pas. Chacun a son compteur,
+ * numéroté par le compilateur ; huit au plus.
+ */
+const SOURCE_COMPTE = `
+uint8_t compte_parti[8];
+uint8_t compte_reste[8];
+uint8_t compte_image[8];
+uint8_t compte_images[8];
+uint8_t compte_pas(uint8_t numero, uint8_t secondes) {
+  uint8_t maintenant = images();
+  if (compte_parti[numero] == 0) {           // le premier appel : le chrono part
+    compte_parti[numero] = 1;
+    compte_reste[numero] = secondes;
+    compte_image[numero] = maintenant;
+    compte_images[numero] = 0;
+    return secondes;
+  }
+  uint8_t passees = maintenant - compte_image[numero];
+  compte_image[numero] = maintenant;
+  for (uint8_t i = 0; i < passees; i++) {    // chaque image passée
+    compte_images[numero]++;
+    if (compte_images[numero] >= 60) {       // 60 images : une seconde de moins
+      compte_images[numero] = 0;
+      if (compte_reste[numero] > 0) compte_reste[numero]--;
+    }
+  }
+  return compte_reste[numero];
+}
+`
+
+/*
+ * meilleurScore(score) : le record, gardé dans la cartouche même console
+ * éteinte. Rend le meilleur score connu ; si « score » le bat, il devient
+ * le record (et il est sauvé) :
+ *   record = meilleurScore(score);
+ * Deux cases de la mémoire de sauvegarde : la 254 garde le record, la 255
+ * une marque (90) qui dit « le record est écrit » — une cartouche neuve
+ * contient n'importe quoi, et l'on ne veut pas lire un faux record.
+ */
+const SOURCE_MEILLEUR = `
+uint8_t meilleurScore(uint8_t score) {
+  if (sauvegarde(255) != 90) {               // une cartouche neuve : pas encore de record
+    sauver(254, 0);
+    sauver(255, 90);
+  }
+  uint8_t record = sauvegarde(254);
+  if (score > record) {                      // battu : le nouveau record est sauvé
+    sauver(254, score);
+    record = score;
+  }
+  return record;
+}
+`
+
 /** Les fonctions de la console écrites en C : leur nom, et leur texte. */
 const FONCTIONS_EN_C = {
   bande: SOURCE_BANDE,
   poserDevant: SOURCE_POSER_DEVANT, spriteDerriere: SOURCE_SPRITE_DERRIERE,
+  avancer_va: SOURCE_AVANCER_VA, avancer_pas: SOURCE_AVANCER, marcher: SOURCE_MARCHER,
+  sauter_pas: SOURCE_SAUTER, navette_pas: SOURCE_NAVETTE, manette_pas: SOURCE_MANETTE, touche: SOURCE_TOUCHE, toucheDecor: SOURCE_TOUCHE_DECOR,
+  clignoter: SOURCE_CLIGNOTER, trembler: SOURCE_TREMBLER, fondu_nuances: SOURCE_FONDU_NUANCES, fonduNoir: SOURCE_FONDU_NOIR, fonduRetour: SOURCE_FONDU_RETOUR,
+  compte_pas: SOURCE_COMPTE, meilleurScore: SOURCE_MEILLEUR,
   chaque_minuteur: SOURCE_CHAQUE,
   tourne_carre: SOURCE_TOURNE_CARRE, defile: SOURCE_DEFILE,
   deplace_croix: SOURCE_DEPLACE_CROIX, glisse_croix: SOURCE_GLISSE_CROIX,
@@ -5828,6 +6317,9 @@ function preparerLesFormes(programme, siennes) {
   const carres = new Map()           // le nom d'un Carre → ses sept réglages
   let vitesseReglee = false
   let chaques = 0                    // les chaque() déjà numérotés
+  let avancers = 0                   // les avancer() déjà numérotés
+  let sauts = 0                      // les sauter() déjà numérotés
+  let comptes = 0                    // les compteARebours() déjà numérotés
 
   /* 1. On relève les « Carre nom = { … }; », et on les retire du programme. */
   const relever = (noeud) => {
@@ -5935,6 +6427,73 @@ function preparerLesFormes(programme, siennes) {
       return
     }
 
+    /* « avancer(x, 30) » devient « avancer_pas(k, x, 30) » : son numéro
+       caché, celui de son compteur (voir SOURCE_AVANCER). */
+    /* suivre(x, cible, vitesse) : avancer_pas en mode « vers une place » (bord 0). */
+    if (noeud.genre === 'appel' && noeud.nom === 'suivre' && !siennes.has('suivre')) {
+      if (noeud.arguments.length !== 3) throw new Error(`ligne ${noeud.ligne} : suivre(x, cible, vitesse) veut trois réglages : la place, la place visée, la vitesse en pixels par seconde — comme ex = suivre(ex, x, 20);`)
+      if (avancers >= 8) throw new Error(`ligne ${noeud.ligne} : huit avancer(), avancer_y(), suivre() et navette() au plus dans un programme`)
+      const nombre = (valeur) => ({ genre: 'nombre', valeur, ligne: noeud.ligne })
+      const [place, cible, vitesse] = noeud.arguments
+      noeud.nom = 'avancer_pas'
+      noeud.arguments = [nombre(avancers++), place, vitesse, nombre(0), cible]
+      for (const v of noeud.arguments) preparer(v)
+      return
+    }
+    /* gaucheDroite(x, vitesse), hautBas(y, vitesse) : la manette, par avancer_pas. */
+    if (noeud.genre === 'appel' && (noeud.nom === 'gaucheDroite' || noeud.nom === 'hautBas') && !siennes.has(noeud.nom)) {
+      const verticale = noeud.nom === 'hautBas'
+      if (noeud.arguments.length !== 2) throw new Error(`ligne ${noeud.ligne} : ${noeud.nom}(${verticale ? 'y' : 'x'}, vitesse) veut deux réglages : la place, et la vitesse en pixels par seconde — comme ${verticale ? 'y' : 'x'} = ${noeud.nom}(${verticale ? 'y' : 'x'}, 60);`)
+      if (avancers >= 8) throw new Error(`ligne ${noeud.ligne} : huit avancer(), avancer_y(), suivre(), navette(), gaucheDroite() et hautBas() au plus dans un programme`)
+      const nombre = (valeur) => ({ genre: 'nombre', valeur, ligne: noeud.ligne })
+      noeud.nom = 'manette_pas'
+      noeud.arguments = [nombre(avancers++), ...noeud.arguments, nombre(verticale ? 136 : 152), nombre(verticale ? 1 : 0)]
+      for (const v of noeud.arguments) preparer(v)
+      return
+    }
+    /* navette(x, vitesse, de, a) : son numéro, partagé avec avancer() (elle s'en sert). */
+    if (noeud.genre === 'appel' && noeud.nom === 'navette' && !siennes.has('navette')) {
+      if (noeud.arguments.length !== 4) throw new Error(`ligne ${noeud.ligne} : navette(x, vitesse, de, a) veut quatre réglages : la place, la vitesse, et les deux places entre lesquelles aller et venir — comme x = navette(x, 30, 20, 120);`)
+      if (avancers >= 8) throw new Error(`ligne ${noeud.ligne} : huit avancer(), avancer_y(), suivre() et navette() au plus dans un programme`)
+      noeud.nom = 'navette_pas'
+      noeud.arguments = [{ genre: 'nombre', valeur: avancers++, ligne: noeud.ligne }, ...noeud.arguments]
+      for (const v of noeud.arguments) preparer(v)
+      return
+    }
+    /* sauter(y, hauteur, sol) et compteARebours(secondes) : leur numéro caché. */
+    if (noeud.genre === 'appel' && noeud.nom === 'sauter' && !siennes.has('sauter')) {
+      if (noeud.arguments.length !== 3 && noeud.arguments.length !== 4) throw new Error(`ligne ${noeud.ligne} : sauter(y, hauteur, sol) veut trois réglages : la hauteur du lutin, la hauteur du saut en pixels, et la hauteur du sol — comme y = sauter(y, 40, 104); — et, si tu veux, un quatrième : la gravité (4 normale, 1 très faible), comme y = sauter(y, 40, 104, 2);`)
+      if (noeud.arguments.length === 3) noeud.arguments.push({ genre: 'nombre', valeur: 4, ligne: noeud.ligne })   // la gravité : 4 (normale) sans rien dire
+      if (sauts >= 8) throw new Error(`ligne ${noeud.ligne} : huit sauter() au plus dans un programme`)
+      noeud.nom = 'sauter_pas'
+      noeud.arguments = [{ genre: 'nombre', valeur: sauts++, ligne: noeud.ligne }, ...noeud.arguments]
+      for (const v of noeud.arguments) preparer(v)
+      return
+    }
+    if (noeud.genre === 'appel' && noeud.nom === 'compteARebours' && !siennes.has('compteARebours')) {
+      if (noeud.arguments.length !== 1) throw new Error(`ligne ${noeud.ligne} : compteARebours(secondes) veut un réglage : le nombre de secondes, comme reste = compteARebours(60);`)
+      if (comptes >= 8) throw new Error(`ligne ${noeud.ligne} : huit compteARebours() au plus dans un programme`)
+      noeud.nom = 'compte_pas'
+      noeud.arguments = [{ genre: 'nombre', valeur: comptes++, ligne: noeud.ligne }, ...noeud.arguments]
+      for (const v of noeud.arguments) preparer(v)
+      return
+    }
+
+    const BORDS = { avancer: 152, avancer_y: 136 }   // la dernière place où un lutin de 8 tient dans l'écran
+    if (noeud.genre === 'appel' && noeud.nom in BORDS && !siennes.has(noeud.nom)) {
+      const quoi = noeud.nom === 'avancer' ? 'x' : 'y'
+      if (noeud.arguments.length !== 2 && noeud.arguments.length !== 3) {
+        throw new Error(`ligne ${noeud.ligne} : ${noeud.nom}(${quoi}, vitesse) veut deux réglages — la place, et la vitesse en pixels par seconde —, et un 3e pour s'arrêter : ${quoi} = ${noeud.nom}(${quoi}, 30); ou ${quoi} = ${noeud.nom}(${quoi}, 30, 100);`)
+      }
+      if (avancers >= 8) throw new Error(`ligne ${noeud.ligne} : huit avancer() et avancer_y() au plus dans un programme`)
+      const nombre = (valeur) => ({ genre: 'nombre', valeur, ligne: noeud.ligne })
+      const [place, vitesse, jusqua = nombre(255)] = noeud.arguments   // 255 : pas d'arrêt
+      noeud.nom = 'avancer_pas'
+      noeud.arguments = [nombre(avancers++), place, vitesse, nombre(BORDS[quoi === 'x' ? 'avancer' : 'avancer_y']), jusqua]
+      for (const v of noeud.arguments) preparer(v)
+      return
+    }
+
     if (noeud.genre === 'appel' && noeud.nom in FORMES && !siennes.has(noeud.nom)) {
       const forme = FORMES[noeud.nom]
       const args = noeud.arguments
@@ -5966,8 +6525,13 @@ function preparerLesFormes(programme, siennes) {
 }
 
 /*
- * texteGrand(x, y, "TEXTE", taille) : un texte AGRANDI. La taille va de 0 à 10 :
+ * texteGrand(x, y, "TEXTE", taille) : un texte AGRANDI, SANS LIMITE de taille :
  * 0 est la lettre normale, et chaque cran l'agrandit d'une fois de plus.
+ * (texte(x, y, "TEXTE", taille) y mène aussi, en comptant 1 pour la normale.)
+ *
+ * Plus grand que l'écran ? Comme spriteTaille, seule la partie qui peut se
+ * voir est fabriquée : le fond de la console a 32 × 32 cases, et ce qui
+ * dépasserait n'existe nulle part — on le coupe, sans erreur.
  *
  *   texteGrand(0, 0, "A", 0);      un A normal : 1 case
  *   texteGrand(0, 0, "A", 2);      un A trois fois plus grand : 3 × 3 cases
@@ -6016,12 +6580,14 @@ function preparerLesTextesGrands(programme, siennes) {
           'comme texteGrandS(0, 0, "BONJOUR", 2). Le découpage en lignes se fait avant le jeu',
       )
     }
-    if (taille.valeur < 0 || taille.valeur > 10) throw new Error(`ligne ${noeud.ligne} : texteGrandS : la taille va de 0 à 10 ; ${taille.valeur} est hors de ces limites`)
+    if (taille.valeur < 0) throw new Error(`ligne ${noeud.ligne} : texteGrandS : la taille commence à 0 (la lettre normale) ; ${taille.valeur} ne va pas`)
     const n = taille.valeur + 1                      // la taille 0 est la lettre normale : 1 case
     const lignes = [{ colonne: x.valeur, lettres: '' }]
     let colonne = x.valeur
     for (const lettre of texte.valeur) {
-      if (colonne + n > 20) {                        // plus de place sur la ligne : on passe à la suivante,
+      // (une ligne encore vide garde sa lettre, même plus large que l'écran :
+      //  elle est coupée au bord, au lieu de tomber sous l'écran)
+      if (colonne + n > 20 && lignes.at(-1).lettres) {   // plus de place sur la ligne : on passe à la suivante,
         colonne = 0                                  // en colonne 0, comme textS
         lignes.push({ colonne, lettres: '' })
       }
@@ -6029,43 +6595,229 @@ function preparerLesTextesGrands(programme, siennes) {
       colonne += n
     }
     /* Une première ligne restée vide (la première lettre ne tenait pas dès la
-       colonne de départ) compte quand même : la suite commence en dessous. */
-    const bas = y.valeur + lignes.length * n
-    if (bas > 18) {
-      throw new Error(
-        `ligne ${noeud.ligne} : texteGrandS : « ${texte.valeur} » à la taille ${taille.valeur} demande ${lignes.length} ligne(s) de ${n} cases, ` +
-          `jusqu'à la case ${bas} ; l'écran n'en a que 18 — un texte plus court, plus petit, ou plus haut`,
-      )
-    }
+       colonne de départ) compte quand même : la suite commence en dessous.
+       Pas de limite : les lignes qui tombent sous le fond de la console (32
+       cases) ne se verraient nulle part — elles ne sont pas fabriquées. */
     const nombre = (valeur) => ({ genre: 'nombre', valeur, ligne: noeud.ligne })
-    const appels = lignes.map((l, i) => l.lettres && ({
+    const appels = lignes.map((l, i) => l.lettres && y.valeur + i * n < 32 && ({
       genre: 'expression', ligne: noeud.ligne,
       valeur: { genre: 'appel', nom: 'texteGrand', ligne: noeud.ligne, arguments: [nombre(l.colonne), nombre(y.valeur + i * n), { genre: 'texte', valeur: l.lettres, ligne: noeud.ligne }, taille] },
     })).filter(Boolean)
     for (const cle of Object.keys(noeud)) delete noeud[cle]
-    Object.assign(noeud, { genre: 'bloc', corps: appels, ligne: appels[0].ligne })
+    Object.assign(noeud, { genre: 'bloc', corps: appels, ligne: appels[0]?.ligne ?? noeud.ligne })
+  }
+
+  /*
+   * texte() et textS() avec une TAILLE en 4e argument — la même règle que
+   * sprite(…, 4) et poser(…, 5) : 1 la taille normale, 2 deux fois plus
+   * grand, 3 trois fois… sans limite.
+   *
+   *   texte(2, 2, "SUPER", 3);    devient   texteGrand(2, 2, "SUPER", 2);
+   *   textS(0, 0, "BONJOUR", 2);  devient   texteGrandS(0, 0, "BONJOUR", 1);
+   *
+   * texteGrand compte autrement (0 la lettre normale) : on retire 1. Taille 1 :
+   * le 4e argument est simplement ôté, c'est le texte ordinaire. Le texte et
+   * la taille s'écrivent en clair : les grandes lettres sont calculées avant
+   * le jeu. Seul « #include <texte> » (ou <textS>) est demandé : le relevé des
+   * #include se fait avant cette réécriture.
+   */
+  const tailleDuTexte = (noeud) => {
+    const appel = noeud.valeur
+    // textePanneau : un texteGrand marqué « panneau », qui pose avec poserPanneau
+    const versGrand = { texte: 'texteGrand', textS: 'texteGrandS', textePanneau: 'texteGrand' }[appel.nom]
+    if (!versGrand || appel.arguments.length !== 4 || siennes.has(appel.nom)) return
+    const [, , mot, taille] = appel.arguments
+    if (mot?.genre !== 'texte') {
+      throw new Error(`ligne ${noeud.ligne} : avec une taille, le texte de ${appel.nom}() s'écrit en clair, entre guillemets — comme ${appel.nom}(2, 2, "SUPER", 3)`)
+    }
+    const fois = taille?.genre === 'nombre' ? taille.valeur : null
+
+    /*
+     * Une taille CALCULÉE — une variable, un calcul : texte(2, 2, "GO", t);
+     * Pour un titre qui grossit, ou une taille choisie au menu.
+     *
+     * Les grandes lettres se calculent avant le jeu : le compilateur les
+     * fabrique donc TOUTES à l'avance, de 1 jusqu'à la plus grande taille
+     * où le mot tient entier dans l'écran (20 cases de large, 18 de haut),
+     * et la ligne devient une suite de « if » qui choisit la bonne :
+     *
+     *   texte(2, 2, "GO", t);   devient   if (t >= 10) texteGrand(2, 2, "GO", 9);
+     *                                     else if (t >= 9) texteGrand(2, 2, "GO", 8);
+     *                                     …
+     *                                     else texte(2, 2, "GO");
+     *
+     * Au-delà, la plus grande taille est gardée. (Une taille écrite en
+     * clair, elle, n'a aucune limite.) Chaque taille coûte ses dessins : un
+     * mot court en a peu, un long en demande davantage.
+     */
+    if (fois === null && appel.nom !== 'textS') {
+      const lettres = [...mot.valeur].length || 1
+      const plusGrande = Math.max(1, Math.min(Math.floor(20 / lettres), 18))
+      const ici = noeud.ligne
+      const nombre = (valeur) => ({ genre: 'nombre', valeur, ligne: ici })
+      const ecrire = (s) => {
+        const a = { genre: 'appel', ligne: ici, nom: s === 1 ? appel.nom : 'texteGrand',
+          arguments: [structuredClone(appel.arguments[0]), structuredClone(appel.arguments[1]), structuredClone(mot), ...(s === 1 ? [] : [nombre(s - 1)])] }
+        if (s > 1 && appel.nom === 'textePanneau') a.panneau = true
+        return { genre: 'expression', valeur: a, ligne: ici }
+      }
+      let chaine = [ecrire(1)]
+      for (let s = 2; s <= plusGrande; s++) {
+        chaine = [{ genre: 'si', ligne: ici, condition: { genre: 'comparer', operateur: '>=', gauche: structuredClone(taille), droite: nombre(s), ligne: ici }, alors: [ecrire(s)], sinon: chaine }]
+      }
+      for (const cle of Object.keys(noeud)) delete noeud[cle]
+      Object.assign(noeud, chaine[0])
+      return true   // remplacée : à préparer de nouveau
+    }
+    if (fois === null || !Number.isInteger(fois) || fois < 1) {
+      throw new Error(`ligne ${noeud.ligne} : la taille de ${appel.nom}() s'écrit en clair — 1, 2, 3… sans limite —, comme ${appel.nom}(2, 2, "SUPER", 3) : les grandes lettres sont calculées avant le jeu`)
+    }
+    if (fois === 1) { appel.arguments = appel.arguments.slice(0, 3); return }   // la taille normale
+    if (appel.nom === 'textePanneau') appel.panneau = true
+    appel.nom = versGrand
+    appel.arguments = [...appel.arguments.slice(0, 3), { ...taille, valeur: fois - 1 }]
   }
 
   const preparer = (noeud) => {
     if (Array.isArray(noeud)) { noeud.forEach(preparer); return }
     if (!noeud || typeof noeud !== 'object') return
     const appel = noeud.valeur
+    if (noeud.genre === 'expression' && appel?.genre === 'appel' && tailleDuTexte(noeud)) {
+      for (const v of Object.values(noeud)) preparer(v)   // la suite de « if » : chaque taille, préparée
+      return
+    }
     if (noeud.genre === 'expression' && appel?.genre === 'appel' && appel.nom === 'texteGrandS') {
       decouper(noeud)                    // devient un bloc de texteGrand, un par ligne…
       preparer(noeud.corps)              // …que l'on prépare aussitôt
       return
     }
+    /*
+     * nombre(colonne, ligne, valeur, chiffres, taille) : un NOMBRE en grand.
+     * Le 5e argument est la taille, sans limite, comme pour texte() : 1
+     * normal, 2 deux fois plus grand… (nombrePanneau : de même, dans le
+     * panneau). La valeur, elle, change pendant le jeu : on ne peut pas
+     * fabriquer le nombre à l'avance. On fabrique donc les DIX CHIFFRES à
+     * cette taille, une fois, et une petite fonction pose, pour chaque place,
+     * le chiffre qu'il faut. Une table par rangée de chaque chiffre (un octet
+     * ne compte que jusqu'à 255). Coupé au fond de la console (32 cases),
+     * comme texteGrand : pas de limite de taille.
+     */
+    if (noeud.genre === 'expression' && appel?.genre === 'appel' && (appel.nom === 'nombre' || appel.nom === 'nombrePanneau')
+      && appel.arguments.length === 5 && !siennes.has(appel.nom)) {
+      const [x, y, combien, chiffresEcrits, taille] = appel.arguments
+      const fois = taille?.genre === 'nombre' ? taille.valeur : null
+      if (fois === null || !Number.isInteger(fois) || fois < 1) {
+        throw new Error(`ligne ${noeud.ligne} : la taille de ${appel.nom}() — le 5e argument — s'écrit en clair : 1, 2, 3… sans limite, comme ${appel.nom}(2, 2, score, 3, 4)`)
+      }
+      if (chiffresEcrits?.genre !== 'nombre' || chiffresEcrits.valeur < 1 || chiffresEcrits.valeur > 3) {
+        throw new Error(`ligne ${noeud.ligne} : avec une taille, le nombre de chiffres de ${appel.nom}() s'écrit en clair, de 1 à 3 : ${appel.nom}(2, 2, score, 3, 4)`)
+      }
+      if (fois === 1) { appel.arguments = appel.arguments.slice(0, 4); return }   // la taille normale
+      const n = fois
+      const ch = chiffresEcrits.valeur
+      const poserIci = appel.nom === 'nombrePanneau' ? 'poserPanneau' : 'poser'
+      const depuis = (a) => (a?.genre === 'nombre' && a.valeur >= 0 ? a.valeur : 0)
+      const hauteur = Math.min(n, 32 - Math.min(31, depuis(y)))
+      /* Les dix chiffres agrandis : rangée par rangée, case par case. */
+      const tableDe = (d, tr, largeur) => {
+        const p = pixelsDe(String(d))
+        const table = []
+        for (let tc = 0; tc < largeur; tc++) {
+          let chiffres = ''
+          for (let py = 0; py < 8; py++) for (let px = 0; px < 8; px++) {
+            chiffres += p[Math.floor((tr * 8 + py) / n)][Math.floor((tc * 8 + px) / n)]
+          }
+          table.push(tuileDe(chiffres))
+        }
+        return table
+      }
+      /* Chaque place (centaines, dizaines, unités) a sa colonne, connue avant
+         le jeu ; celles qui tombent hors du fond (32 cases) sont ôtées. */
+      const places = []
+      for (let p = 0; p < ch; p++) {
+        const decalage = p * n
+        if (depuis(x) + decalage >= 32) break
+        places.push({ p, decalage, largeur: Math.min(n, 32 - depuis(x) - decalage) })
+      }
+      const largeurMax = Math.max(...places.map((l) => l.largeur))
+      const tables = []
+      for (let d = 0; d < 10; d++) for (let r = 0; r < hauteur; r++) {
+        tables.push(`const uint8_t GN_${k}_${d}_${r}[] = { ${tableDe(d, r, largeurMax).join(', ')} };`)
+      }
+      const chiffreDe = (d) => `  if (d == ${d}) {
+${Array.from({ length: hauteur }, (_, r) => `    for (uint8_t c = 0; c < largeur; c++) {
+      ${poserIci}(colonne + c, nombre_y_${k} + ${r}, GN_${k}_${d}_${r}[c]);
+    }`).join('\n')}
+  }`
+      // la valeur de chaque place : centaines, dizaines, unités (selon le nombre de chiffres)
+      const valeurDe = (p) => {
+        const rang = ch - 1 - p                     // 2 : centaines, 1 : dizaines, 0 : unités
+        return rang === 2 ? `nombre_v_${k} / 100` : rang === 1 ? `(nombre_v_${k} / 10) % 10` : `nombre_v_${k} % 10`
+      }
+      sources.push(`uint8_t nombre_x_${k} = 0;
+uint8_t nombre_y_${k} = 0;
+uint8_t nombre_v_${k} = 0;
+${tables.join('\n')}
+void nombre_chiffre_${k}(uint8_t d, uint8_t colonne, uint8_t largeur) {
+${Array.from({ length: 10 }, (_, d) => chiffreDe(d)).join('\n')}
+}
+void nombre_grand_${k}() {
+${places.map(({ p, decalage, largeur }) => `  nombre_chiffre_${k}(${valeurDe(p)}, nombre_x_${k} + ${decalage}, ${largeur});`).join('\n')}
+}
+`)
+      const ranger = (nom, valeur) => ({ genre: 'affecter', cible: { genre: 'variable', nom, ligne: noeud.ligne }, operateur: '=', valeur, ligne: noeud.ligne })
+      const lignes = [
+        ranger(`nombre_x_${k}`, x),
+        ranger(`nombre_y_${k}`, y),
+        ranger(`nombre_v_${k}`, combien),
+        { genre: 'expression', valeur: { genre: 'appel', nom: `nombre_grand_${k}`, arguments: [], ligne: noeud.ligne }, ligne: noeud.ligne },
+      ]
+      for (const cle of Object.keys(noeud)) delete noeud[cle]
+      Object.assign(noeud, { genre: 'bloc', corps: lignes, ligne: lignes[0].ligne })
+      k++
+      return
+    }
+
+    /*
+     * texteLent(colonne, ligne, "TEXTE", vitesse) : le texte s'écrit lettre
+     * par lettre, « vitesse » lettres par seconde, comme une machine à écrire
+     * — pour un dialogue. Le programme attend la fin. Au bord droit, la
+     * suite passe à la ligne (comme textS). Devient une petite fonction : une
+     * lettre, quelques images d'attente, la lettre suivante…
+     */
+    if (noeud.genre === 'expression' && appel?.genre === 'appel' && appel.nom === 'texteLent' && !siennes.has('texteLent')) {
+      const [x, y, mot, vitesse] = appel.arguments
+      if (appel.arguments.length !== 4 || [x, y, vitesse].some((a) => a?.genre !== 'nombre') || mot?.genre !== 'texte') {
+        throw new Error(`ligne ${noeud.ligne} : texteLent(colonne, ligne, "TEXTE", vitesse) veut tout écrit en clair — la place, le texte, et la vitesse en lettres par seconde : texteLent(1, 14, "BONJOUR", 15)`)
+      }
+      if (vitesse.valeur < 1) throw new Error(`ligne ${noeud.ligne} : la vitesse de texteLent() est en lettres par seconde : 1 au moins (15 : une lettre toutes les 4 images)`)
+      const attente = Math.max(1, Math.round(60 / vitesse.valeur))   // les images entre deux lettres
+      let colonne = x.valeur, ligne = y.valeur
+      const corps = []
+      for (const lettre of mot.valeur) {
+        if (colonne > 19) { colonne = 0; ligne++ }               // au bord : à la ligne, comme textS
+        if (ligne > 17) break                                     // sous l'écran : la suite ne se verrait pas
+        if (lettre !== ' ') corps.push(`  texte(${colonne}, ${ligne}, ${JSON.stringify(lettre)});`)
+        corps.push(`  for (uint8_t i = 0; i < ${attente}; i++) { image(); }`)
+        colonne++
+      }
+      sources.push(`void texte_lent_${k}() {\n${corps.join('\n')}\n}\n`)
+      for (const cle of Object.keys(noeud)) delete noeud[cle]
+      Object.assign(noeud, { genre: 'expression', valeur: { genre: 'appel', nom: `texte_lent_${k}`, arguments: [], ligne: appel.ligne }, ligne: appel.ligne })
+      k++
+      return
+    }
+
     if (noeud.genre === 'expression' && appel?.genre === 'appel' && appel.nom === 'texteGrand') {
       const [x, y, texte, taille] = appel.arguments
       if (appel.arguments.length !== 4 || texte?.genre !== 'texte' || taille?.genre !== 'nombre') {
         throw new Error(
           `ligne ${noeud.ligne} : texteGrand(x, y, "TEXTE", taille) veut un texte entre guillemets et une taille ` +
-            'écrite en clair, de 0 à 10 : comme texteGrand(0, 0, "A", 2). Les deux sont calculés avant le jeu',
+            'écrite en clair, 0 ou plus, sans limite : comme texteGrand(0, 0, "A", 2). Les deux sont calculés avant le jeu',
         )
       }
-      /* La taille va de 0 (la lettre normale) à 10 (11 fois plus grande : une
-         lettre de 7 pixels en fait alors 77, un peu plus de la moitié de l'écran). */
-      if (taille.valeur < 0 || taille.valeur > 10) throw new Error(`ligne ${noeud.ligne} : texteGrand : la taille va de 0 à 10 ; ${taille.valeur} est hors de ces limites`)
+      /* La taille part de 0 (la lettre normale), sans limite vers le haut. */
+      if (taille.valeur < 0) throw new Error(`ligne ${noeud.ligne} : texteGrand : la taille commence à 0 (la lettre normale) ; ${taille.valeur} ne va pas`)
       const n = taille.valeur + 1                           // combien de fois plus grand : 0 → 1 fois
       const lettres = [...texte.valeur]
       const pixels = lettres.map((c) => {
@@ -6073,11 +6825,12 @@ function preparerLesTextesGrands(programme, siennes) {
         if (!p) throw new Error(`ligne ${noeud.ligne} : texteGrand ne connaît pas le caractère « ${c} »`)
         return p
       })
-      const largeur = lettres.length * n                    // en cases
-      const hauteur = n
-      if (largeur > 255) {
-        throw new Error(`ligne ${noeud.ligne} : texteGrand : ${largeur} cases de large, c'est trop (255 au plus) — un texte plus court, ou plus petit`)
-      }
+      /* La place prise, en cases — coupée au fond de la console (32 × 32
+         cases, depuis la place de départ si elle est écrite en clair) : ce
+         qui dépasserait ne se verrait nulle part. Plus de limite de taille. */
+      const depuis = (a) => (a?.genre === 'nombre' && a.valeur >= 0 ? a.valeur : 0)
+      const largeur = Math.min(lettres.length * n, 32 - Math.min(31, depuis(x)))
+      const hauteur = Math.min(n, 32 - Math.min(31, depuis(y)))
       /* Le pixel (px, py) du grand dessin vient du pixel (px / n, py / n) de la
          police. Une table PAR RANGÉE de cases : un octet ne compte que jusqu'à
          255, et une longue rangée peut en demander davantage ; une rangée n'en a jamais plus de 255. */
@@ -6103,7 +6856,7 @@ uint8_t grand_y_${k} = 0;
 ${rangees.map((t, r) => `const uint8_t GRAND_TABLE_${k}_${r}[] = { ${t.join(', ')} };`).join('\n')}
 void texte_grand_${k}() {
 ${rangees.map((t, r) => `  for (uint8_t c = 0; c < ${largeur}; c++) {
-    poser(grand_x_${k} + c, grand_y_${k} + ${r}, GRAND_TABLE_${k}_${r}[c]);
+    ${appel.panneau ? 'poserPanneau' : 'poser'}(grand_x_${k} + c, grand_y_${k} + ${r}, GRAND_TABLE_${k}_${r}[c]);
   }`).join('\n')}
 }
 `)
@@ -6312,16 +7065,29 @@ function appelle(noeud, nom) {
  * la sienne qui compte.
  */
 function avecLesFonctionsEnC(programme) {
-  const siennes = new Set(programme.filter((n) => n.genre === 'fonction').map((n) => n.nom))
+  // ses fonctions, et les méthodes de ses struct (« Ennemi::avancer » s'appelle aussi « avancer ») :
+  // un nom que le programme a écrit lui-même n'est pas celui de la console
+  const siennes = new Set(programme.filter((n) => n.genre === 'fonction').flatMap((n) => [n.nom, n.methode].filter(Boolean)))
   const vitesseReglee = preparerLesFormes(programme, siennes)
   const textesGrands = preparerLesTextesGrands(programme, siennes)   // les tuiles agrandies et leurs tables
   rangerLaPosition(programme, siennes)
   deroulerLesRaccourcis(programme, siennes)   // poserDevant, spriteDerriere : sur place
   const ajoutees = []
-  for (const [nom, source] of Object.entries(FONCTIONS_EN_C)) {
-    if (siennes.has(nom) || !appelle(programme, nom)) continue   // la sienne, ou pas appelée
-    ajoutees.push(...analyser(source))
+  /* Celles que le programme appelle, ET celles qu'elles appellent à leur tour
+     (navette_pas se sert d'avancer_pas…) : on cherche jusqu'à ne plus rien
+     trouver de neuf. Puis on les ajoute dans l'ordre de FONCTIONS_EN_C. */
+  const voulues = new Set()
+  const analysees = new Map()
+  const chercher = (arbre) => {
+    for (const nom of Object.keys(FONCTIONS_EN_C)) {
+      if (voulues.has(nom) || siennes.has(nom) || !appelle(arbre, nom)) continue   // déjà là, la sienne, ou pas appelée
+      voulues.add(nom)
+      analysees.set(nom, analyser(FONCTIONS_EN_C[nom]))
+      chercher(analysees.get(nom))
+    }
   }
+  chercher(programme)
+  for (const nom of Object.keys(FONCTIONS_EN_C)) if (voulues.has(nom)) ajoutees.push(...analysees.get(nom))
   /* Les deux variables des déplacements (la ligne rendue, la durée d'un pas),
      UNE fois, si l'un des déplacements est là — ou si vitesse() a été réglée. */
   const deplacements = ['deplace_x', 'deplace_y', 'deplace', 'va_a', 'un_pas', 'deplace_croix', 'glisse_croix']
@@ -6356,7 +7122,9 @@ function avecLesFonctionsEnC(programme) {
 const TYPES_A_INCLURE = new Set(['Tuile', 'Perso', 'Grand', 'Mot', 'Carre', 'Air'])
 
 function inclusionsEmployees(programme) {
-  const siennes = new Set(programme.filter((n) => n.genre === 'fonction').map((n) => n.nom))
+  // ses fonctions, et les méthodes de ses struct (« Ennemi::avancer » s'appelle aussi « avancer ») :
+  // un nom que le programme a écrit lui-même n'est pas celui de la console
+  const siennes = new Set(programme.filter((n) => n.genre === 'fonction').flatMap((n) => [n.nom, n.methode].filter(Boolean)))
   const sesGlobales = new Set(programme.filter((n) => n.genre === 'declarer').map((n) => n.nom))
   const vues = new Map()
   const noter = (nom, ligne) => { if (!vues.has(nom)) vues.set(nom, { nom, ligne }) }

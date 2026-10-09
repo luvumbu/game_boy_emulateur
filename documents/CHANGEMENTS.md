@@ -3498,3 +3498,263 @@ d'ailleurs et la transformait en C++ est enlevée :
   tableaux dans le jeu : HAUTEURS, OBJETS, LIGNES_OBJET, COCCINELLES ;
 - `verifier-jeux.mjs` : une course entière — élan, anneaux, ressort, vie perdue
   dans un trou, arrivée, « BRAVO ».
+
+## Plus tard encore : des documents pour qui n’a jamais programmé
+
+- `outils/debutant.mjs` (nouveau) : « Les bases » (seize parties depuis zéro :
+  ce qu’est un programme, la Game Boy, le compilateur, l’atelier, lire une ligne,
+  les coordonnées, les variables, la boucle du jeu, if, for, les fonctions,
+  #include, les dessins, les erreurs), un lexique de plus de cinquante mots, et
+  deux encadrés FABRIQUÉS pour chaque leçon : « Les mots de cette leçon » et
+  « Le programme, ligne par ligne » — chaque ligne dite en français (plus de
+  21 000 lignes du parcours expliquées, une quinzaine seulement en termes
+  généraux) ;
+- les PDF : le cours complet et le tutoriel commencent par « Les bases » et
+  finissent par le lexique ; chaque leçon (livrets, cours) a ses deux encadrés ;
+  la fiche « passer d’un écran à l’autre » aussi (et elle suit enfin
+  `effacer()`, devenue une fonction de la console) ;
+- `outils/doc-technique.mjs` (nouveau, `npm run doc-technique`) :
+  `documents/doc-technique.pdf`, « Comment marche gameboy3 » — les bases, le
+  dossier fichier par fichier (lu dans le dossier), `exemples/bonjour.cpp` suivi
+  à travers chaque étape (le vrai arbre, les vraies instructions, les vrais
+  octets, le vrai écran), le compilateur, l’atelier, les leçons, les
+  vérifications, ajouter un jeu / une leçon / une image / une fonction, git, et
+  un lexique de plus de soixante-dix mots ; dans « 🔗 LES SOURCES » et en tête
+  de LISEZMOI.md.
+
+## Plus tard encore : chercher une leçon, et ne régler que la vitesse
+
+**La recherche.** Le champ « 🔎 leçon… » montre ce qu’il trouve dans une liste,
+SOUS le champ, pendant qu’on tape — un menu déroulant fermé ne laissait rien
+voir. Flèches ↑ ↓, Entrée ou un clic ouvrent la leçon ; Échap ferme la liste.
+La ponctuation sépare les mots (`motsDe`, recherche.js) : on peut coller la
+phrase entière d’un cours, « 0.1. Afficher la lettre A — de base, ailleurs »,
+et la leçon dont le titre contient la phrase vient en tête. Le champ des
+exemples a la même liste. (Les projets et les modèles sont des grilles : leur
+recherche montre déjà ce qu’elle garde.)
+
+**Bouger : l’élève ne règle que la vitesse.** Plus de `images() % 2`, plus de
+« toutes les N images » : la fluidité, c’est la console qui s’en occupe.
+
+| Fonction | Ce qu’elle fait |
+|---|---|
+| `x = avancer(x, vitesse);` | avance à « vitesse » **pixels par seconde**, de -127 à 127 ; négative, recule ; au bord, repart de l’autre côté |
+| `x = avancer(x, 30, 100);` | un 3e réglage : s’arrête au pixel 100 |
+| `y = avancer_y(y, vitesse);` | la même chose sur la hauteur (bord 136) |
+| `marcher(0, x, y, PAS1, PAS2);` | alterne deux dessins tous les 4 pixels **parcourus** : la vitesse règle les jambes |
+
+Un compteur caché par appel (le compilateur réécrit `avancer(…)` en
+`avancer_pas(k, x, vitesse, bord, jusqua)`, comme `chaque()`) : à chaque image,
+la vitesse s’y ajoute, et un pixel est fait chaque fois qu’il atteint 60. Jusqu’à
+60, jamais plus d’un pixel par image ; à 45, trois images sur quatre, bien
+réparties. Le temps compte les images vraiment passées. Un octet n’a pas de
+signe : -30 arrive comme 226, et tout ce qui dépasse 127 est un recul.
+
+**`avancer()` et `deplace_x()`** ne font pas la même chose : `deplace_x()` bouge
+une **tuile du fond**, **case par case** (sauts de 8 pixels), un nombre de pas
+choisi, et le programme **attend** qu’elle ait fini ; `avancer()` bouge un
+**lutin**, **au pixel**, sans fin (ou jusqu’à une place), à appeler à chaque
+image dans la boucle du jeu. Seul un lutin passe DERRIÈRE le décor.
+
+**La taille, sans limite, partout.**
+
+| Fonction | Avant | Maintenant |
+|---|---|---|
+| `texte(x, y, "MOT", taille)`, `textS`, `textePanneau` | pas de taille | 1 normal, 2, 3… sans limite |
+| `nombre(x, y, v, chiffres, taille)`, `nombrePanneau` | pas de taille | un 5e argument, sans limite |
+| `texteGrand`, `texteGrandS` | 0 à 10, refusé hors de l’écran | sans limite, coupé au bord |
+| `texteTitre`, `texteManga` | 2, 3 ou 4 | 2 et plus, sans limite, coupé au bord |
+
+Ce qui dépasse de l’écran (ou du fond de 32 × 32 cases) est **coupé, jamais
+refusé**, comme pour une image géante : seule la partie qui se voit est
+fabriquée. Au-delà de 4, les lettres de titre et manga calculent leurs mesures
+(`mesuresDeTitre`, `mesuresManga`, police.js) : le même dessin, en plus grand ;
+2, 3 et 4 n’ont pas bougé. Une **taille dans une variable** marche aussi pour
+`texte()` et `textePanneau()` : le compilateur fabrique toutes les tailles à
+l’avance, jusqu’à la plus grande où le mot tient entier dans l’écran. Restent les
+256 dessins de la console : un titre géant peut les remplir, et le compilateur
+le dit.
+
+**Un nom écrit par le programme passe avant celui de la console** : une
+`struct` qui a sa méthode `avancer()` ne se fait plus demander
+`#include <avancer>` (les noms des méthodes comptent dans « siennes »).
+
+**Les leçons.** Nouveaux tutos d’#include : `avancer()` (110.5), `avancer_y()`,
+`marcher()`. Le cours : le tuyau (110.6) et le chat et la souris (110.10) avancent
+avec `avancer(x, vitesse)` ; le tuyau se pose avec `bande()` ; « Reculer : une
+vitesse négative » et « S’arrêter à une place » sont nouveaux. Le chapitre 0 :
+« Écrire en grand avec texte() », « Un score en grand », « Un titre qui grossit » ;
+la 35.14 « Un titre géant ». Une vingtaine de textes qui annonçaient « 0 à 10 » ou
+« 2, 3 ou 4 » sont corrigés (la 0.87.4 devient « la taille 10, et sans limite »).
+
+## Plus tard encore : douze fonctions pour faire un vrai jeu
+
+Toujours la même règle : **un seul réglage simple, la console fait le reste.**
+Chacune s’inclut par son nom, et a son tuto dans le parcours.
+
+| Fonction | Ce qu’elle fait |
+|---|---|
+| `y = sauter(y, 40, 104);` | au sol, A lance un saut de 40 pixels ; il ralentit, retombe de plus en plus vite, se pose sur 104 |
+| `ex = suivre(ex, x, 20);` | rapproche ex de x, à 20 pixels par seconde, et s’y arrête |
+| `x = navette(x, 30, 20, 120);` | un aller-retour sans fin entre 20 et 120 |
+| `marcher(…)` | se tourne aussi tout seul du côté où il va (MIROIR_X) |
+| `touche(x1, y1, x2, y2)` | 1 si deux lutins de 8 × 8 se chevauchent |
+| `toucheDecor(x, y)` | 1 s’il y a une tuile posée sous ce pixel |
+| `clignoter(n, x, y, T, 6)` | comme sprite(), mais il clignote 6 fois par seconde |
+| `trembler(4)` / `trembler(0)` | l’écran tremble au choc, se calme en une demi-seconde, revient en place |
+| `fonduNoir(8)`, `fonduRetour(8)` | l’écran s’assombrit jusqu’au noir, ou en revient (nuances) |
+| `texteLent(1, 14, "BONJOUR", 15)` | lettre par lettre, 15 lettres par seconde |
+| `reste = compteARebours(60);` | un chrono qui descend, 0 quand c’est fini |
+| `record = meilleurScore(score);` | le record, gardé dans la cartouche (cases 254 et 255 de la sauvegarde) |
+
+Le saut calcule son élan en huitièmes de pixel, sans multiplication ni
+dépassement d’octet : la vitesse de départ est la plus petite qui monte assez
+haut, la pesanteur en ôte un huitième à chaque image. `suivre()` et `navette()`
+se servent d’`avancer_pas` dans un mode « vers une place » (bord 0) ; pour
+cela, le compilateur ajoute désormais aussi les fonctions de la console dont
+une autre a besoin (il cherche jusqu’à ne plus rien trouver de neuf).
+
+## Plus tard encore : le chapitre 26, « Le héros bouge : gauche, droite, sauter »
+
+Un chapitre entier pour faire bouger un héros comme dans un vrai jeu — ajouté
+**à la fin** du parcours (cours, chapitre 16 ; parcours, chapitre 26), pour
+qu’aucune leçon existante ne change de numéro. Une chose nouvelle par leçon :
+
+| Leçon | Ce qu’elle ajoute |
+|---|---|
+| 153 | `x = gaucheDroite(x, 60);` — la manette, à gauche et à droite, sans sortir de l’écran |
+| 153.1 | `marcher()` — les jambes, et le héros qui se tourne tout seul |
+| 153.2 | courir avec B : la vitesse dans une variable |
+| 153.3 | sauter avec A : `y = sauter(y, 40, 104);` |
+| 153.4 | une plateforme : le sol dans une variable (72 au-dessus d’elle, 104 ailleurs) |
+| 153.5 | se cogner à un mur : `toucheDecor()` devant soi, la vitesse à 0 |
+| 153.6 | `y = hautBas(y, 60);` — monter et descendre |
+| 153.7 | les quatre directions : un héros vu de dessus |
+| 153.8 | tout ensemble : un petit niveau, une pièce, un score |
+
+Deux fonctions de plus, où l’on ne règle que la vitesse : `gaucheDroite(x, v)`
+et `hautBas(y, v)` lisent la manette elles-mêmes et s’arrêtent aux bords (par
+`avancer_pas`, la place visée au bord : aucun pixel de trop ; sans bouton, la
+vitesse est 0 mais l’horloge tourne, pas de saut à la reprise).
+
+**Le saut se dose :** plus on tient A, plus le héros monte. A tenu jusqu’en haut :
+« hauteur » pixels ; A lâché pendant la montée, la pesanteur tire trois fois
+plus fort. Mesuré : 1 image d’appui → 16 pixels, 6 → 25, 15 → 36, 25 et plus → 40.
+
+Les tutos de `sauter()`, `touche()` et `toucheDecor()` étaient rangés au hasard
+(le parcours accroche un tuto que rien n’emploie après ce dont il se sert) : ils
+ont maintenant de vraies leçons — « Sauter : sauter() » (110.11),
+« La console a déjà touche() » (113.2), « Un mur devant soi, en une ligne »
+(113.4) —, et se rangent juste avant.
+
+## Plus tard encore : capturer les lutins d’un jeu
+
+On pouvait déjà ouvrir une cartouche venue d’ailleurs (« 📂 Ouvrir un .gb ») et
+regarder dans l’inspecteur ses tuiles et sa table de lutins. On peut maintenant
+**prendre** ses dessins :
+
+- inspecteur, vue « Lutins (OAM) », **📸 Capturer les lutins à l’écran** : les
+  personnages que la console montre en ce moment, chacun en aperçu, avec
+  **➕ Dans mes dessins** — un nom est demandé, et le dessin rejoint le
+  programme ;
+- vue « Tuiles (VRAM) » : un clic sur une tuile la prend, elle seule.
+
+`capturer-lutins.js` refait ce que fait l’écran : chaque lutin visible, sa tuile
+(8 × 8, ou 8 × 16 selon le bit 2 de $FF40, dans la bonne banque de VRAM sur
+Game Boy Color), retournée comme à l’écran ; les lutins qui se **touchent** forment
+un seul personnage (un héros de 16 × 16 est fait de quatre lutins) ; chacun
+devient un dessin de 8, 16 ou 32 pixels de côté, centré, sans doublon. Les
+chiffres restent ceux de la tuile (0 transparent) : le dessin prend la palette
+du programme. Une cartouche du dehors continue de tourner pendant qu’on capture.
+
+Une phrase le rappelle sous le bouton : les dessins d’un jeu appartiennent à
+ses auteurs — on les capture pour apprendre et s’entraîner.
+
+Et sans ouvrir l’inspecteur : un bouton **📸 Capturer les lutins** sous
+« ⛶ Plein écran », dans le panneau JOUER de la console — la même capture
+(`montrerLesCaptures`, inspecteur.js), montrée juste dessous.
+
+Puis les **autres éléments** de l’écran, sous « 📸 Capturer les lutins » :
+
+| Bouton | Ce qu’il prend | Où ça va |
+|---|---|---|
+| 🧱 Le décor | les 20 × 18 cases visibles, défilement compris | une carte (« La carte ») : `DECOR();` l’affiche |
+| 🪟 Le panneau | le panneau du jeu (score, vies, dialogue), s’il est allumé | une carte, à sa place à l’écran |
+| 🎨 Les couleurs | les 8 palettes du fond et les 8 des lutins (Game Boy Color) | les couleurs du programme (`couleurFond`, `couleurLutin`) |
+| 🧩 Tout l’écran | les lutins (en aperçus), le décor, le panneau, les couleurs | tout ce qui précède |
+
+Le décor est relu comme l’écran le dessine (`capturerLeDecor`, `capturerLePanneau`,
+`capturerLesCouleurs`, capturer-lutins.js) : la carte $9800 ou $9C00, les tuiles
+en adressage signé ou non, et sur Game Boy Color la palette, la banque, les
+miroirs et « devant les lutins » de chaque case. Sur Game Boy d’origine, les
+pixels passent par les nuances du jeu (BGP) : l’écran recréé ressemble à
+l’original. Vérifié : le décor capturé est identique pixel pour pixel à l’écran
+(hors lutins) sur mario, camera-defilement (défilement de 223) et ecrans ; le
+panneau aussi ; les couleurs capturées sont exactement celles du programme.
+En 4 nuances, les palettes des cases ne sont pas écrites (« teindre » serait
+refusé), et un jeu en 4 nuances n’a pas de couleurs à prendre : la page le dit.
+
+Et un second bouton, **🎞 Capturer pendant que je joue** : un clic lance la
+récolte, on joue, un second clic l’arrête. L’écran est relu dix fois par seconde,
+et chaque dessin NOUVEAU est gardé — les pas de la marche, le saut, les ennemis qui
+arrivent ; un personnage vu dans les deux sens ne compte qu’une fois. Au plus 64.
+La récolte se montre comme une capture, avec **➕ Tout dans mes dessins** : un seul
+nom demandé (CAPTURE), et les dessins deviennent CAPTURE1, CAPTURE2… Essayé sur
+mario.gb : six dessins en quelques secondes (Mario, Mario qui saute, la pièce,
+le score fait de lutins).
+
+## Plus tard encore : le Pou sauteur
+
+Un jeu de plus dans `exemples/pou.cpp` (et `projets/le_pou_sauteur/`, et le menu
+des exemples) : **tu es un pou**, et tu sautes de tête en tête pour donner des
+poux à tout le monde.
+
+- quatre passants vont et viennent dans la rue, chacun sa portion et sa vitesse
+  (`navette()`) : deux enfants, deux adultes — leur tête est plus haute, il faut
+  doser le saut (`sauter()`, plus on tient A, plus il monte) ;
+- le pou se pose sur une tête parce que le **sol** de `sauter()` change : au-dessus
+  d’une tête, le sol, c’est elle ; posé, il est emporté par la personne ;
+- une tête touchée : un point, et la personne se gratte ; elle guérit au bout de
+  huit secondes. Les quatre en même temps : gagné, vingt points de bonus ;
+- tomber dans la rue : une vie de moins (trois), et le pou réapparaît sur un
+  **refuge** — une tête qui n’attrape rien tant qu’il ne l’a pas quittée (sans
+  cela, tomber rapportait un point) ;
+- soixante secondes (`chaque(1000)` : un chrono qui repart à chaque partie), le
+  record gardé dans la cartouche (`meilleurScore()`).
+
+Réglé en jouant : à 50 pixels par seconde en l’air, le pou ne rattrapait jamais
+une tête qui s’éloigne ; à 90, une partie se gagnait en quatre secondes ; 70.
+`verifier-jeux.mjs` joue une partie entière (un joueur qui vise la tête saine la
+plus proche) : le titre, le pou emporté, des têtes infectées, la fin, le record,
+et la chute qui coûte une vie.
+
+## Plus tard encore : la gravité et la hauteur max du saut, en variables
+
+`sauter()` prend maintenant un quatrième réglage : **la gravité**. Le mot
+« pesanteur » a été remplacé par « gravité » partout (leçons, aide, éditeurs,
+exemple `chute.cpp`, qui affiche GRAVITE, sans accent, faute d’accents dans la police).
+
+Dans toutes les leçons où le héros saute (chapitre 9 « Sauter », 153.3, 153.4,
+153.5, 153.8, tuto `#include <sauter>`) et dans le Pou sauteur, les deux
+réglages du saut sont des variables visibles :
+
+    uint8_t hauteurMax = 40;   // la hauteur max du saut, en pixels
+    uint8_t gravite = 4;       // 4 normale, 2 faible, 1 très faible, 8 forte
+    y = sauter(y, hauteurMax, 104, gravite);
+
+| Réglage | Ce qu’il fait |
+|---|---|
+| `hauteurMax` | le plus haut qu’il peut aller (A tenu jusqu’en haut) ; jamais dépassé |
+| `gravite` | l’allure seulement : faible, le saut est lent et doux ; forte, il est rapide |
+
+Mesuré, saut de 40 pixels : gravité 1 → 101 images, 2 → 71, 4 → 50 (les sauts
+d’avant), 8 → 36. Hauteur 64 et gravité 2 : 90 images.
+
+- La gravité se compte en trente-deuxièmes de pixel par image (avant : en
+  huitièmes) ; 4 donne exactement les sauts d’avant. Sans quatrième réglage,
+  `sauter(y, 40, 104)` prend 4.
+- L’élan de départ, arrondi, montait un peu trop (45 au lieu de 40 avec une
+  gravité forte) : la montée s’arrête maintenant à « hauteur » au-dessus du sol.
+- Limites : jamais plus haut que le haut de l’écran (sol à 104 → 104 au plus) ;
+  l’élan ne dépasse pas 7 pixels par image, donc une gravité très forte coupe
+  un grand saut (32 → 28 pixels, 16 → 52). Coupé, jamais refusé.

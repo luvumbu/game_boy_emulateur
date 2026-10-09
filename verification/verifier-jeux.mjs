@@ -4,7 +4,7 @@
  *   node verification/verifier-jeux.mjs
  *
  * Puissance 4, Dames, Échecs et Couleurs (un jeu de cartes dans le style du
- * UNO), dans exemples/. On ne relit pas le code : on compile chaque jeu, on le
+ * UNO), dans exemples/ — et Flash le hérisson, et le Pou sauteur. On ne relit pas le code : on compile chaque jeu, on le
  * fait tourner dans l'émulateur du projet, on appuie sur de vraies touches, et
  * on lit l'écran et les variables — une vraie partie, coup par coup.
  */
@@ -180,6 +180,55 @@ const deplacer = (j, c0, l0, c1, l1) => { viser(j, c0, l0); viser(j, c1, l1); j.
   b.verifier('hérisson : tomber dans un trou coûte une vie', vieePerdue)
   b.egal('hérisson : le panneau termine la course', jeu.valeurDe('fini'), 1)
   b.verifier('hérisson : l’écran de fin dit BRAVO', jeu.ecran(7, 3, 5).map((v) => ORDRE[v]).join('') === 'BRAVO')
+}
+
+/* ------------------------------------------------------- Le pou sauteur */
+{
+  const jeu = demarrer('exemples/pou.cpp', 30)
+  const v = (n) => jeu.valeurDe(n), tete = (i) => jeu.caseDe('gx', i), malade = (i) => jeu.caseDe('infecte', i)
+  b.verifier('pou : l’écran titre dit LE POU SAUTEUR', jeu.ecran(3, 7, 14).map((x) => ORDRE[x]).join('') === 'LE POU SAUTEUR')
+  jeu.gb.setButton('start', true); jeu.avancer(4); jeu.gb.setButton('start', false); jeu.avancer(10)
+  b.verifier('pou : START lance la partie, le pou posé sur une tête', v('etat') === 1 && v('sur') === 0 && v('py') === 104)
+  // il est emporté par la personne qui marche
+  const x0 = v('px'); jeu.avancer(60)
+  b.verifier('pou : il est emporté par la personne qui marche', v('px') !== x0 && v('sur') === 0)
+  // un joueur : sur une tête, il saute vers la tête saine la plus proche, et se dirige en l'air
+  let infections = 0, chutes = 0, saut = 0
+  for (let t = 0; t < 6000 && v('etat') === 1; t++) {
+    const sur = v('sur')
+    if (sur < 4) {
+      let cible = -1, mieux = 999
+      for (let j = 0; j < 4; j++) if (j !== sur && !malade(j)) { const d = Math.abs(tete(j) + 8 - (v('px') + 4)); if (d < mieux) { mieux = d; cible = j } }
+      if (cible >= 0 && mieux < 44) {
+        const score = v('score'), vies = v('vies')
+        jeu.gb.setButton('a', true)
+        for (let k = 0; k < 50 && v('etat') === 1; k++) {
+          jeu.avancer(1)
+          if (k === 28) jeu.gb.setButton('a', false)
+          const ecart = tete(cible) + 8 - (v('px') + 4)
+          jeu.gb.setButton('right', ecart > 2); jeu.gb.setButton('left', ecart < -2)
+          if (k > 8 && v('sur') < 4) break
+        }
+        jeu.gb.setButton('a', false); jeu.gb.setButton('right', false); jeu.gb.setButton('left', false)
+        saut++
+        if (v('score') > score) infections++
+        if (v('vies') < vies) chutes++
+        continue
+      }
+    }
+    jeu.avancer(1)
+  }
+  jeu.avancer(10)
+  // les points : un par tête infectée, plus 20 si les quatre ont eu des poux en même temps
+  infections = v('score') - (v('gagne') ? 20 : 0)
+  b.verifier('pou : des sauts réussis donnent des poux (et des points)', infections > 0, ` (${infections} têtes infectées en ${saut} sauts)`)
+  b.verifier('pou : la partie va jusqu’au bout', v('etat') === 2, ` (vies ${v('vies')}, temps ${v('temps')}, gagné ${v('gagne')})`)
+  b.egal('pou : le record est le score de la partie', v('record'), v('score'))
+  // tomber dans la rue coûte une vie
+  jeu.gb.setButton('start', true); jeu.avancer(4); jeu.gb.setButton('start', false); jeu.avancer(10)
+  const vies = v('vies')
+  jeu.gb.setButton('left', true); jeu.gb.setButton('a', true); jeu.avancer(30); jeu.gb.setButton('a', false); jeu.avancer(30); jeu.gb.setButton('left', false); jeu.avancer(30)
+  b.verifier('pou : START rejoue, et tomber dans la rue coûte une vie', vies === 3 && v('vies') < 3, ` (${vies} → ${v('vies')})`)
 }
 
 /* ------------------------------------------------------- Couleurs (cartes) */

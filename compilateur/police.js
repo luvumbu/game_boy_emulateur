@@ -257,8 +257,32 @@ export const TAILLES_DE_TITRE = {
   4: { agrandi: 3, gauche: 2, haut: 2, contour: 2, arrondi: true, saut: 3 },
 }
 
+/*
+ * Au-delà de 4 : PAS DE LIMITE. Les mesures se calculent à partir de la
+ * taille, en suivant celles de 2, 3 et 4 :
+ *   - la lettre grandit de « taille - 1 » fois jusqu'à 4, puis garde un
+ *     cinquième du carré pour le contour, l'ombre et le saut :
+ *     agrandi = taille - ⌈taille / 5⌉ (2 → 1, 3 → 2, 4 → 3, 5 → 4, 8 → 6, 20 → 16) ;
+ *   - le contour s'épaissit avec la lettre (la moitié d'un trait agrandi),
+ *     et la lettre commence juste après lui ;
+ *   - le saut (une lettre sur deux, plus bas) est d'un trait agrandi, sans
+ *     jamais sortir du carré.
+ * Ainsi un titre de 6, 10 ou 30 cases de côté garde le même dessin, en plus
+ * grand. Les tailles 2, 3 et 4 restent celles du tableau : rien ne change
+ * pour les programmes déjà écrits.
+ */
+export function mesuresDeTitre(taille) {
+  if (TAILLES_DE_TITRE[taille]) return TAILLES_DE_TITRE[taille]
+  if (!Number.isInteger(taille) || taille < 2) return null
+  const agrandi = taille - Math.ceil(taille / 5)
+  const libre = 8 * (taille - agrandi)                     // les pixels qui restent autour de la lettre
+  const contour = Math.max(2, Math.round(agrandi / 2))
+  const saut = Math.max(1, Math.min(agrandi, libre - 2 * contour - 2))
+  return { agrandi, gauche: contour, haut: contour, contour, arrondi: true, saut }
+}
+
 export function grandeLettreTitre(caractere, enBas = false, taille = 3) {
-  const t = TAILLES_DE_TITRE[taille]
+  const t = mesuresDeTitre(taille)
   if (!t) return null
   const c = normaliser(caractere)
   if (!ORDRE.includes(c)) return null
@@ -332,8 +356,28 @@ export const TAILLES_MANGA = {
   4: { agrandi: 3, gauche: 1, haut: 2, contour: 2, penche: 6, ombre: 2, saut: 2, trame: true },
 }
 
+/*
+ * Au-delà de 4 : pas de limite non plus, les mesures suivent la taille,
+ * comme mesuresDeTitre :
+ *   - agrandi = taille - ⌈taille / 4⌉ ;
+ *   - la lettre penche toujours autant (environ 4 pixels de la base au
+ *     sommet, à toute taille, mis à l'échelle) : penche = 2 × agrandi ;
+ *   - le contour et l'ombre portée s'épaississent avec la lettre ;
+ *   - le saut reste petit (un tiers de trait), comme aux tailles 3 et 4.
+ */
+export function mesuresManga(taille) {
+  if (TAILLES_MANGA[taille]) return TAILLES_MANGA[taille]
+  if (!Number.isInteger(taille) || taille < 2) return null
+  const agrandi = taille - Math.ceil(taille / 4)
+  const contour = Math.max(2, Math.round(agrandi / 2))
+  return {
+    agrandi, gauche: contour, haut: contour, contour,
+    penche: 2 * agrandi, ombre: contour, saut: Math.max(2, Math.round(agrandi / 3)), trame: true,
+  }
+}
+
 export function lettreManga(caractere, enBas = false, taille = 3) {
-  const t = TAILLES_MANGA[taille]
+  const t = mesuresManga(taille)
   if (!t) return null
   const c = normaliser(caractere)
   if (!ORDRE.includes(c)) return null

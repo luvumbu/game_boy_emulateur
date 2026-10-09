@@ -50,6 +50,7 @@ import { inclusionsDe, fonctionDuTuto, tutosDesFonctions, leconsQuiEmploient } f
 import { BIBLIOTHEQUES } from '../compilateur/inclusion.js'
 import { STYLE } from '../tuto/style.js'
 import { enrichir, echapper } from '../tuto/enrichir.js'
+import { encadreDebutant, basesEnHtml, lexiqueEnHtml } from './debutant.mjs'   // pour qui n’a jamais programmé
 import { consoleDuProgramme } from '../tuto/console.mjs'
 import { imageDeLEcran } from '../tuto/etapes.mjs'
 
@@ -286,6 +287,7 @@ function pageDeLecon(lecon, index, matiere) {
   ${(lecon.texte ?? []).map((p) => `<p>${enrichir(p)}</p>`).join('\n  ')}
 
   ${encadreDesIncludes(lecon, index, matiere)}
+  ${encadreDebutant(lecon)}
 
   ${Object.entries(lecon.fichiers ?? {}).map(([nom, contenu]) => `
   <p class="fichier"><code>${echapper(nom)}</code></p>
@@ -410,9 +412,12 @@ function pageEntiere(matieres) {
 <body>
 ${couverture()}
 ${sommaire()}
+<h1 style="break-before: page;">Les bases — si tu n’as jamais programmé</h1>
+${basesEnHtml()}
 ${tableDesIncludes()}
 ${corps}
 ${indexDesIncludes()}
+${lexiqueEnHtml('h1')}
 </body>
 </html>
 `

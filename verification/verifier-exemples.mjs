@@ -162,12 +162,12 @@ const dit = (jeu, colonne, ligne, texte) =>
   b.egal('chute : A relance depuis le haut', jeu.valeurDe('rebonds'), 0)
   b.verifier('chute : et la balle est repartie du plafond', hauteur() > 80, ` (hauteur ${hauteur()})`)
 
-  /* HAUT et BAS règlent la pesanteur, au front : un appui, un cran. */
-  const pesanteur = jeu.valeurDe('g')
+  /* HAUT et BAS règlent la gravité, au front : un appui, un cran. */
+  const gravite = jeu.valeurDe('g')
   jeu.gb.setButton('up', true)
   jeu.avancer(30)
-  b.egal("chute : HAUT maintenu ne monte la pesanteur que d'un cran",
-    jeu.valeurDe('g'), pesanteur + 1)
+  b.egal("chute : HAUT maintenu ne monte la gravité que d'un cran",
+    jeu.valeurDe('g'), gravite + 1)
   jeu.gb.setButton('up', false)
 
   b.verifier('chute : la console tourne toujours', (jeu.gb.mmu.read(0xff40) & 0x80) !== 0)

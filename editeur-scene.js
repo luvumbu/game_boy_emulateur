@@ -774,7 +774,7 @@ function lignesDuJoueur(nom, scene, poser, monde = { W: 160, H: 144, camera: fal
     ...(plateforme
       ? [
         '',
-        '  /* La pesanteur et le saut. Au sol : la case juste en dessous est un mur (ou le bas de la carte). */',
+        '  /* La gravité et le saut. Au sol : la case juste en dessous est un mur (ou le bas de la carte). */',
         `  uint8_t auSol = ${nom}_joueurY >= ${monde.H - cote} || !${nom}_libre(${nom}_joueurX, ${nom}_joueurY + 1, ${cote});`,
         `  if (bouton(A) && !${nom}_avantSaut && auSol) ${nom}_saut = ${hauteurSaut};   // A : on s'élance`,
         `  ${nom}_avantSaut = bouton(A);`,

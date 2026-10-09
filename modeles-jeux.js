@@ -8,7 +8,7 @@
  * exactement ce qu'on aurait pu poser soi-même, et pouvoir tout y changer.
  *
  * Le moteur des scènes fait des jeux VUS DE DESSUS — on se déplace dans les
- * quatre directions, sans pesanteur. Les modèles sont donc de ce genre-là.
+ * quatre directions, sans gravité. Les modèles sont donc de ce genre-là.
  */
 
 import { ecrireCarte } from './editeur-carte.js'

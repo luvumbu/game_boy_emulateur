@@ -82,7 +82,7 @@
     <span class="niveau">Chapitre 0 — Avant tout</span>
     
     <span class="niveau">Partie A — Écrire des lettres</span>
-    <span>leçon 0.11 sur 152</span>
+    <span>leçon 0.11 sur 153</span>
     <span class="jauge" style="--part: 10%">difficulté 1 / 10</span>
     
     
@@ -101,6 +101,44 @@
   <ul style="margin: 0; padding-left: 14pt;">
   <li><code>#include &lt;textS&gt;</code> → <a href="lecon-00-10.3-la-fonction-texts-un-texte-qui-passe-a-l.html">0.10.3. La fonction textS() — un texte qui passe à la ligne</a></li>
 </ul>
+</div>
+
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">📖 Les mots de cette leçon — si tu débutes</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+    <li style="margin: 2pt 0;"><strong>accolades { }</strong> — Elles entourent un bloc : les lignes qui vont ensemble (le corps d’une fonction, d’une boucle, d’un « if »). Chaque « { » a son « } ».</li>
+    <li style="margin: 2pt 0;"><strong>argument</strong> — Une valeur donnée à une fonction quand on l’appelle, entre ses parenthèses : dans texte(5, 8, "SALUT"), 5, 8 et "SALUT" sont les arguments.</li>
+    <li style="margin: 2pt 0;"><strong>bloc</strong> — Un groupe de lignes entre accolades { }, qui s’exécutent ensemble.</li>
+    <li style="margin: 2pt 0;"><strong>booléen (vrai / faux)</strong> — Le résultat d’une condition : vrai (1) ou faux (0). « true » veut dire vrai, « false » faux.</li>
+    <li style="margin: 2pt 0;"><strong>boucle</strong> — Des instructions qui se répètent : « while » (tant que…) ou « for » (pour un compteur qui va de… à…).</li>
+    <li style="margin: 2pt 0;"><strong>boucle du jeu</strong> — « while (true) { image(); … } » : ce qui se répète 60 fois par seconde, sans fin, pendant tout le jeu.</li>
+    <li style="margin: 2pt 0;"><strong>chaîne de caractères (texte)</strong> — Des lettres entre guillemets, "COMME CECI" : un texte pris tel quel. La police de la console n’a que des majuscules, sans accents.</li>
+    <li style="margin: 2pt 0;"><strong>commentaire (//)</strong> — Tout ce qui suit « // » jusqu’au bout de la ligne : une phrase pour l’humain, que la console ignore.</li>
+    <li style="margin: 2pt 0;"><strong>condition</strong> — Une question dont la réponse est vrai ou faux : « score &gt; 10 », « bouton(A) ». On la teste avec « if » ou « while ».</li>
+    <li style="margin: 2pt 0;"><strong>image()</strong> — Attend l’image suivante. La console en montre 60 par seconde : c’est ce qui règle la vitesse d’un jeu.</li>
+    <li style="margin: 2pt 0;"><strong>#include</strong> — En haut du programme : « #include &lt;texte&gt; » demande la fonction texte() à la console ; « #include "fichier.cpp" » verse un de tes fichiers à cet endroit.</li>
+    <li style="margin: 2pt 0;"><strong>instruction</strong> — Un ordre donné à la console, terminé par un point-virgule : « texte(1, 1, "OK"); ».</li>
+    <li style="margin: 2pt 0;"><strong>main</strong> — « int main() { … } » : là où le programme commence. La console exécute d’abord la première ligne de main.</li>
+    <li style="margin: 2pt 0;"><strong>point-virgule (;)</strong> — Il termine une instruction, comme le point termine une phrase.</li>
+    <li style="margin: 2pt 0;"><strong>while (tant que)</strong> — Répète un bloc tant qu’une condition est vraie.</li>
+  </ul>
+</div>
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid; break-inside: auto;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">🔍 Le programme, ligne par ligne — chaque ligne dite en français</p>
+  <table style="width: 100%; border-collapse: collapse; table-layout: fixed;"><tbody>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;textS&gt;   // écrit un texte qui passe à la ligne tout seul</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « textS » (ce que c’est : écrit un texte qui passe à la ligne tout seul). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « écrit un texte qui passe à la ligne tout seul ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">int main() {                                   // Le programme commence ici.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Le début du programme : la console commence ici, par la première ligne qui suit. (Le commentaire le dit : « Le programme commence ici. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">textS(0, 0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");   // passe à la ligne après T</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Appel de la fonction textS de la console, avec les arguments 0, 0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ". Ce qu’elle fait : comme texte(), mais passe à la ligne tout seul : après la colonne 19, la suite reprend en colonne 0 de la ligne d’en dessous ; après la ligne 17, en haut. Un 4e argument est une TAILLE, sans limite, comme pour texte() : textS(0, 0, "BONJOUR", 2). (Le commentaire le dit : « passe à la ligne après T ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// textS(colonne, ligne, "TEXTE") : comme</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« textS(colonne, ligne, "TEXTE") : comme »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// texte(), mais quand le texte arrive au</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« texte(), mais quand le texte arrive au »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// bord droit (colonne 19), il continue</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« bord droit (colonne 19), il continue »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// tout seul au début de la ligne suivante.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« tout seul au début de la ligne suivante. »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// A à T sur la ligne 0, U à Z sur la ligne 1.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« A à T sur la ligne 0, U à Z sur la ligne 1. »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">while (true) {                               // La boucle de jeu : pour toujours...</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">La boucle du jeu : tout ce qui est entre les accolades recommence sans fin, 60 fois par seconde avec image(). (Le commentaire le dit : « La boucle de jeu : pour toujours... ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">image();                                   // ... attendre l'image suivante.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Attendre l’image suivante : la console en montre 60 par seconde. C’est ce qui règle la vitesse du jeu. (Le commentaire le dit : « ... attendre l'image suivante. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+  </tbody></table>
 </div>
 
 <h2>2. Le programme, morceau par morceau</h2>

@@ -82,20 +82,20 @@
     <span class="niveau">Chapitre 6 — Dessiner</span>
     
     
-    <span>leçon 35.13 sur 152</span>
+    <span>leçon 35.13 sur 153</span>
     <span class="jauge" style="--part: 30%">difficulté 3 / 10</span>
     
     
     
   </p>
 <h1>35.13. Choisir la taille du titre : texteTitre(…, taille)</h1>
-<p class="idee">Un 4e argument, la taille : 2, 3 ou 4 cases de côté par lettre. Le même mot TITRE, dans les trois tailles, l’un sous l’autre.</p>
+<p class="idee">Un 4e argument, la taille : 2, 3, 4… cases de côté par lettre, sans limite. Le même mot TITRE, dans les tailles 2, 3 et 4, l’un sous l’autre.</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
 <p><strong>Ce qui est nouveau ici : un quatrième argument, la taille.</strong> <code>texteTitre(colonne, ligne, "MOT", taille)</code> : la taille est le <strong>nombre de cases de côté</strong> d’une lettre. Sans lui, c’est 3, comme jusqu’ici.</p>
 <p><strong>Les trois tailles :</strong> <strong>2</strong> → une lettre de 16 × 16 pixels (2 colonnes, 2 lignes), <strong>10 lettres</strong> par ligne ; <strong>3</strong> → 24 × 24 pixels, <strong>6 lettres</strong> ; <strong>4</strong> → 32 × 32 pixels, <strong>5 lettres</strong>. Le style ne change pas : rondes, un contour noir, une ombre, et elles sautillent. En taille 2, le contour est plus fin et les coins ne sont pas arrondis : la place manque.</p>
 <p><strong>Le calcul de la place :</strong> une lettre prend « taille » colonnes. TITRE (5 lettres) prend donc 5 × 2 = <strong>10</strong> colonnes en taille 2, 5 × 3 = <strong>15</strong> en taille 3, 5 × 4 = <strong>20</strong> en taille 4 — tout l’écran. Et « taille » lignes : en lignes 0 à 1, puis 3 à 5, puis 8 à 11.</p>
-<p><strong>La taille s’écrit en clair</strong> — <code>2</code>, <code>3</code> ou <code>4</code> —, <strong>jamais avec une variable</strong> : les lettres sont <strong>dessinées par le compilateur</strong>, avant que le jeu ne tourne, donc il doit connaître leur taille en lisant le programme. Avec une variable, ou une taille 5, le compilateur refuse et dit pourquoi.</p>
+<p><strong>La taille s’écrit en clair</strong> — <code>2</code>, <code>3</code>, <code>4</code>… —, <strong>jamais avec une variable</strong> : les lettres sont <strong>dessinées par le compilateur</strong>, avant que le jeu ne tourne, donc il doit connaître leur taille en lisant le programme. Avec une variable, le compilateur refuse et dit pourquoi. <strong>Il n’y a pas de limite de taille</strong> : 5, 8, 20… Un mot plus large que l’écran est coupé au bord.</p>
 <p><strong>Ce qu’il coûte :</strong> chaque taille a ses propres dessins. Le T en taille 2 et le T en taille 4 ne sont pas les mêmes tuiles : un titre dans les trois tailles coûte trois fois. Dans un vrai jeu, on en choisit une.</p>
 <p><strong>À toi :</strong> écris le nom de ton jeu dans la taille qui lui va. Dix lettres ? Taille 2. Un nom court qui doit frapper ? Taille 4.</p>
 
@@ -104,6 +104,45 @@
   <ul style="margin: 0; padding-left: 14pt;">
   <li><code>#include &lt;texteTitre&gt;</code> → <a href="lecon-35-11-la-fonction-textetitre-un-mot-en-grosses.html">35.11. La fonction texteTitre() — un mot en GROSSES lettres de titre</a></li>
 </ul>
+</div>
+
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">📖 Les mots de cette leçon — si tu débutes</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+    <li style="margin: 2pt 0;"><strong>accolades { }</strong> — Elles entourent un bloc : les lignes qui vont ensemble (le corps d’une fonction, d’une boucle, d’un « if »). Chaque « { » a son « } ».</li>
+    <li style="margin: 2pt 0;"><strong>argument</strong> — Une valeur donnée à une fonction quand on l’appelle, entre ses parenthèses : dans texte(5, 8, "SALUT"), 5, 8 et "SALUT" sont les arguments.</li>
+    <li style="margin: 2pt 0;"><strong>bloc</strong> — Un groupe de lignes entre accolades { }, qui s’exécutent ensemble.</li>
+    <li style="margin: 2pt 0;"><strong>booléen (vrai / faux)</strong> — Le résultat d’une condition : vrai (1) ou faux (0). « true » veut dire vrai, « false » faux.</li>
+    <li style="margin: 2pt 0;"><strong>boucle</strong> — Des instructions qui se répètent : « while » (tant que…) ou « for » (pour un compteur qui va de… à…).</li>
+    <li style="margin: 2pt 0;"><strong>boucle du jeu</strong> — « while (true) { image(); … } » : ce qui se répète 60 fois par seconde, sans fin, pendant tout le jeu.</li>
+    <li style="margin: 2pt 0;"><strong>chaîne de caractères (texte)</strong> — Des lettres entre guillemets, "COMME CECI" : un texte pris tel quel. La police de la console n’a que des majuscules, sans accents.</li>
+    <li style="margin: 2pt 0;"><strong>commentaire (//)</strong> — Tout ce qui suit « // » jusqu’au bout de la ligne : une phrase pour l’humain, que la console ignore.</li>
+    <li style="margin: 2pt 0;"><strong>condition</strong> — Une question dont la réponse est vrai ou faux : « score &gt; 10 », « bouton(A) ». On la teste avec « if » ou « while ».</li>
+    <li style="margin: 2pt 0;"><strong>image()</strong> — Attend l’image suivante. La console en montre 60 par seconde : c’est ce qui règle la vitesse d’un jeu.</li>
+    <li style="margin: 2pt 0;"><strong>#include</strong> — En haut du programme : « #include &lt;texte&gt; » demande la fonction texte() à la console ; « #include "fichier.cpp" » verse un de tes fichiers à cet endroit.</li>
+    <li style="margin: 2pt 0;"><strong>instruction</strong> — Un ordre donné à la console, terminé par un point-virgule : « texte(1, 1, "OK"); ».</li>
+    <li style="margin: 2pt 0;"><strong>main</strong> — « int main() { … } » : là où le programme commence. La console exécute d’abord la première ligne de main.</li>
+    <li style="margin: 2pt 0;"><strong>point-virgule (;)</strong> — Il termine une instruction, comme le point termine une phrase.</li>
+    <li style="margin: 2pt 0;"><strong>while (tant que)</strong> — Répète un bloc tant qu’une condition est vraie.</li>
+  </ul>
+</div>
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid; break-inside: auto;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">🔍 Le programme, ligne par ligne — chaque ligne dite en français</p>
+  <table style="width: 100%; border-collapse: collapse; table-layout: fixed;"><tbody>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// Le même mot, TITRE, dans les trois tailles : le 4e argument de texteTitre().</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« Le même mot, TITRE, dans les trois tailles : le 4e argument de texteTitre(). »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;texteTitre&gt;   // texteTitre(colonne, ligne, "MOT", taille)</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « texteTitre » (ce que c’est : écrit un mot en GROSSES lettres de titre (2, 3, 4… cases de côté, sans limite)). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « texteTitre(colonne, ligne, "MOT", taille) ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">int main() {</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Le début du programme : la console commence ici, par la première ligne qui suit.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// taille 2 : chaque lettre fait 2 × 2 cases → colonnes 0 à 9, lignes 0 à 1</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« taille 2 : chaque lettre fait 2 × 2 cases → colonnes 0 à 9, lignes 0 à 1 »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">texteTitre(0, 0, "TITRE", 2);</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Appel de la fonction texteTitre de la console, avec les arguments 0, 0, "TITRE", 2. Ce qu’elle fait : écrit un mot en GROSSES lettres de titre — rondes, contour noir, une ombre, et qui sautillent. La taille (facultative, écrite en clair) est le nombre de cases de côté d’une lettre, SANS LIMITE : 2 (10 lettres par ligne), 3 si on ne la donne pas (6 lettres), 4 (5 lettres), 6, 10… Ce qui dépasse de l’écran est coupé. Seules les lettres du mot vont dans la cartouche.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// sans 4e argument : taille 3, 3 × 3 cases → colonnes 0 à 14, lignes 3 à 5</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« sans 4e argument : taille 3, 3 × 3 cases → colonnes 0 à 14, lignes 3 à 5 »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">texteTitre(0, 3, "TITRE");</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Appel de la fonction texteTitre de la console, avec les arguments 0, 3, "TITRE". Ce qu’elle fait : écrit un mot en GROSSES lettres de titre — rondes, contour noir, une ombre, et qui sautillent. La taille (facultative, écrite en clair) est le nombre de cases de côté d’une lettre, SANS LIMITE : 2 (10 lettres par ligne), 3 si on ne la donne pas (6 lettres), 4 (5 lettres), 6, 10… Ce qui dépasse de l’écran est coupé. Seules les lettres du mot vont dans la cartouche.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// taille 4 : 4 × 4 cases → colonnes 0 à 19 (tout l'écran), lignes 8 à 11</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« taille 4 : 4 × 4 cases → colonnes 0 à 19 (tout l'écran), lignes 8 à 11 »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">texteTitre(0, 8, "TITRE", 4);</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Appel de la fonction texteTitre de la console, avec les arguments 0, 8, "TITRE", 4. Ce qu’elle fait : écrit un mot en GROSSES lettres de titre — rondes, contour noir, une ombre, et qui sautillent. La taille (facultative, écrite en clair) est le nombre de cases de côté d’une lettre, SANS LIMITE : 2 (10 lettres par ligne), 3 si on ne la donne pas (6 lettres), 4 (5 lettres), 6, 10… Ce qui dépasse de l’écran est coupé. Seules les lettres du mot vont dans la cartouche.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">while (true) {</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">La boucle du jeu : tout ce qui est entre les accolades recommence sans fin, 60 fois par seconde avec image().</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">image();</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Attendre l’image suivante : la console en montre 60 par seconde. C’est ce qui règle la vitesse du jeu.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+  </tbody></table>
 </div>
 
 <h2>2. Le programme, morceau par morceau</h2>
@@ -201,7 +240,7 @@ et voici ce qu’ils ont mesuré.</p>
 
 
 <p class="pied">
-  Ensuite : <strong>35.14. La fonction texteManga() — un titre entre manga et dessin animé</strong> — chapitre 6 : Dessiner.
+  Ensuite : <strong>35.14. Un titre géant : texteTitre sans limite de taille</strong> — chapitre 6 : Dessiner.
   &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
 </p>
 

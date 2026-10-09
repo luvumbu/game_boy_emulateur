@@ -30,6 +30,7 @@
     "livret": "node outils/livret.mjs",
     "cours-complet": "node outils/cours-complet.mjs",
     "pdf-include": "node outils/pdf-include.mjs",
+    "doc-technique": "node outils/doc-technique.mjs",
     "tout-le-jeu": "node verification/verifier-tout-le-jeu.mjs",
     "fiche": "node outils/fiche-ecrans.mjs",
     "desassembler": "node outils/desassembler.mjs",

@@ -82,18 +82,18 @@
     <span class="niveau">Chapitre 6 — Dessiner</span>
     
     
-    <span>leçon 33.1 sur 152</span>
+    <span>leçon 33.1 sur 153</span>
     <span class="jauge" style="--part: 30%">difficulté 3 / 10</span>
     
     
     
   </p>
 <h1>33.1. Chapitre 6 — Dessiner : ce qui vient</h1>
-<p class="idee">L’entrée du chapitre 6 : ce qu’on a vu jusqu’ici, et ce que ses 22 étapes vont ajouter, une à la fois.</p>
+<p class="idee">L’entrée du chapitre 6 : ce qu’on a vu jusqu’ici, et ce que ses 23 étapes vont ajouter, une à la fois.</p>
 
 <h2>1. Ce qu’il faut comprendre</h2>
 <p><strong>D’où l’on vient.</strong> Le chapitre 5, « Les boucles : répéter », vient de se terminer. Tout ce qu’il a montré reste valable : on s’en sert à partir d’ici sans le réexpliquer.</p>
-<p><strong>Ce que ce chapitre apporte : Dessiner.</strong> Il compte 22 étapes :</p>
+<p><strong>Ce que ce chapitre apporte : Dessiner.</strong> Il compte 23 étapes :</p>
 <p>- Dessiner sa propre tuile</p>
 <p>- Le dessin écrit là où on le pose</p>
 <p>- BONHOMME, de son fichier à l’écran : sprite16()</p>
@@ -103,10 +103,10 @@
 <p>- BONHOMME verrouillé : on s’en sert, on ne le modifie pas</p>
 <p>- L’écran titre de ton jeu : le nom en GROSSES lettres</p>
 <p>- Choisir la taille du titre : texteTitre(…, taille)</p>
+<p>- Un titre géant : texteTitre sans limite de taille</p>
 <p>- Deux styles pour un titre : dessin animé ou manga</p>
 <p>- Un avion qui vole : AVION dans son fichier, la croix pour le piloter</p>
-<p>- La vitesse de l’avion : une variable, vitesse</p>
-<p>- … et 10 autres.</p>
+<p>- … et 11 autres.</p>
 <p><strong>Les fonctions qui arrivent :</strong> <code>#include &lt;Perso&gt;</code>, <code>#include &lt;sprite16&gt;</code>, <code>#include &lt;cacher16&gt;</code>, <code>#include &lt;sprite32&gt;</code>, <code>#include &lt;cacher32&gt;</code>, <code>#include &lt;texteTitre&gt;</code>, <code>#include &lt;texteManga&gt;</code>. Chacune sera présentée seule, juste avant la première étape qui l’emploie : jamais deux lignes nouvelles d’un coup.</p>
 <p><strong>Comment avancer :</strong> une étape à la fois. Lis l’explication, lance le programme, regarde ce qu’on doit voir, puis fais l’essai proposé. Si quelque chose t’échappe, l’étape d’avant contient la pièce qui manque.</p>
 
@@ -115,6 +115,44 @@
   <ul style="margin: 0; padding-left: 14pt;">
   <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
 </ul>
+</div>
+
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">📖 Les mots de cette leçon — si tu débutes</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+    <li style="margin: 2pt 0;"><strong>accolades { }</strong> — Elles entourent un bloc : les lignes qui vont ensemble (le corps d’une fonction, d’une boucle, d’un « if »). Chaque « { » a son « } ».</li>
+    <li style="margin: 2pt 0;"><strong>argument</strong> — Une valeur donnée à une fonction quand on l’appelle, entre ses parenthèses : dans texte(5, 8, "SALUT"), 5, 8 et "SALUT" sont les arguments.</li>
+    <li style="margin: 2pt 0;"><strong>bloc</strong> — Un groupe de lignes entre accolades { }, qui s’exécutent ensemble.</li>
+    <li style="margin: 2pt 0;"><strong>booléen (vrai / faux)</strong> — Le résultat d’une condition : vrai (1) ou faux (0). « true » veut dire vrai, « false » faux.</li>
+    <li style="margin: 2pt 0;"><strong>boucle</strong> — Des instructions qui se répètent : « while » (tant que…) ou « for » (pour un compteur qui va de… à…).</li>
+    <li style="margin: 2pt 0;"><strong>boucle du jeu</strong> — « while (true) { image(); … } » : ce qui se répète 60 fois par seconde, sans fin, pendant tout le jeu.</li>
+    <li style="margin: 2pt 0;"><strong>chaîne de caractères (texte)</strong> — Des lettres entre guillemets, "COMME CECI" : un texte pris tel quel. La police de la console n’a que des majuscules, sans accents.</li>
+    <li style="margin: 2pt 0;"><strong>commentaire (//)</strong> — Tout ce qui suit « // » jusqu’au bout de la ligne : une phrase pour l’humain, que la console ignore.</li>
+    <li style="margin: 2pt 0;"><strong>condition</strong> — Une question dont la réponse est vrai ou faux : « score &gt; 10 », « bouton(A) ». On la teste avec « if » ou « while ».</li>
+    <li style="margin: 2pt 0;"><strong>coordonnées</strong> — Deux nombres qui disent où : la colonne (vers la droite) puis la ligne (vers le bas), à partir de (0, 0) en haut à gauche.</li>
+    <li style="margin: 2pt 0;"><strong>image()</strong> — Attend l’image suivante. La console en montre 60 par seconde : c’est ce qui règle la vitesse d’un jeu.</li>
+    <li style="margin: 2pt 0;"><strong>#include</strong> — En haut du programme : « #include &lt;texte&gt; » demande la fonction texte() à la console ; « #include "fichier.cpp" » verse un de tes fichiers à cet endroit.</li>
+    <li style="margin: 2pt 0;"><strong>instruction</strong> — Un ordre donné à la console, terminé par un point-virgule : « texte(1, 1, "OK"); ».</li>
+    <li style="margin: 2pt 0;"><strong>main</strong> — « int main() { … } » : là où le programme commence. La console exécute d’abord la première ligne de main.</li>
+    <li style="margin: 2pt 0;"><strong>point-virgule (;)</strong> — Il termine une instruction, comme le point termine une phrase.</li>
+    <li style="margin: 2pt 0;"><strong>texte()</strong> — Écrit des lettres à l’écran, sur la grille de 20 colonnes et 18 lignes : texte(colonne, ligne, "MOT").</li>
+    <li style="margin: 2pt 0;"><strong>while (tant que)</strong> — Répète un bloc tant qu’une condition est vraie.</li>
+  </ul>
+</div>
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid; break-inside: auto;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">🔍 Le programme, ligne par ligne — chaque ligne dite en français</p>
+  <table style="width: 100%; border-collapse: collapse; table-layout: fixed;"><tbody>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// ---- Chapitre 6 : Dessiner ----</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« ---- Chapitre 6 : Dessiner ---- »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// L'entrée du chapitre : rien de neuf dans ce programme. Il annonce la suite.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« L'entrée du chapitre : rien de neuf dans ce programme. Il annonce la suite. »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;texte&gt;   // écrit un texte à l’écran</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « texte » (ce que c’est : écrit un texte à l’écran, à la taille qu’on veut). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « écrit un texte à l’écran ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">int main() {</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Le début du programme : la console commence ici, par la première ligne qui suit.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">texte(1, 7, "CHAPITRE 6");   // le numéro du chapitre</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Appel de la fonction texte de la console, avec les arguments 1, 7, "CHAPITRE 6". Ce qu’elle fait : écrit un texte à l’écran — 20 colonnes, 18 lignes. Un nombre se colle à la suite : "SCORE " + score. Avec un Mot : texte(SALUT). Un 4e argument est une TAILLE, sans limite : 1 normal, 2 deux fois plus grand, 3… — texte(2, 2, "SUPER", 3). Avec une taille, le texte et la taille s’écrivent en clair ; ce qui dépasse de l’écran est coupé. (Le commentaire le dit : « le numéro du chapitre ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">texte(1, 9, "C EST PARTI");</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Appel de la fonction texte de la console, avec les arguments 1, 9, "C EST PARTI". Ce qu’elle fait : écrit un texte à l’écran — 20 colonnes, 18 lignes. Un nombre se colle à la suite : "SCORE " + score. Avec un Mot : texte(SALUT). Un 4e argument est une TAILLE, sans limite : 1 normal, 2 deux fois plus grand, 3… — texte(2, 2, "SUPER", 3). Avec une taille, le texte et la taille s’écrivent en clair ; ce qui dépasse de l’écran est coupé.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">while (true) {</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">La boucle du jeu : tout ce qui est entre les accolades recommence sans fin, 60 fois par seconde avec image().</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">image();</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Attendre l’image suivante : la console en montre 60 par seconde. C’est ce qui règle la vitesse du jeu.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+  </tbody></table>
 </div>
 
 <h2>2. Le programme, morceau par morceau</h2>

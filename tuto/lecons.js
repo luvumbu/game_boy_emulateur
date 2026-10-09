@@ -1647,7 +1647,8 @@ int main() {
       imagesLente = 0;                          // son chronomètre repart de zéro
       lente++;                                  // elle passe à la lettre suivante
       if (lente == sizeof(ALPHABET)) lente = 0; // sizeof(ALPHABET) = 26 :
-                                                // après Z (25), 26 n'existe pas → retour à A (0)
+                                                // après Z (25), 26 n'existe pas :
+                                                // retour à A (0)
     }
 
     // ── LA RAPIDE : elle change toutes les 15 images = 4 fois par seconde ──
@@ -1726,7 +1727,8 @@ int main() {
       imagesLente = 0;                          // son chronomètre repart de zéro
       lente++;                                  // elle passe à la lettre suivante
       if (lente == sizeof(ALPHABET)) lente = 0; // sizeof(ALPHABET) = 26 :
-                                                // après Z (25), 26 n'existe pas → retour à A (0)
+                                                // après Z (25), 26 n'existe pas :
+                                                // retour à A (0)
     }
 
     // ── LA RAPIDE : elle change toutes les 15 images = 4 fois par seconde ──
@@ -1802,7 +1804,8 @@ int main() {
       imagesLente = 0;                          // son chronomètre repart de zéro
       lente++;                                  // elle passe à la lettre suivante
       if (lente == sizeof(ALPHABET)) lente = 0; // sizeof(ALPHABET) = 26 :
-                                                // après Z (25), 26 n'existe pas → retour à A (0)
+                                                // après Z (25), 26 n'existe pas :
+                                                // retour à A (0)
     }
 
     // ── LA RAPIDE : elle change toutes les 15 images = 4 fois par seconde ──
@@ -2026,7 +2029,8 @@ int main() {
 #include <poser>      // pose une tuile sur une case du fond
 
 const uint8_t DUREE_LENTE  = ms(1000);   // la lente change toutes les 1000 ms (1 seconde)
-const uint8_t DUREE_RAPIDE = ms(250);    // la rapide change toutes les 250 ms (4 fois par seconde)
+const uint8_t DUREE_RAPIDE = ms(250);    // la rapide change toutes les 250 ms
+                                         // (4 fois par seconde)
 
 uint8_t lente = 0;          // QUELLE lettre montre la lente : 0 = A … 25 = Z
 uint8_t rapide = 0;         // QUELLE lettre montre la rapide : 0 = A … 25 = Z
@@ -2093,7 +2097,8 @@ int main() {
 #include <poser>      // pose une tuile sur une case du fond
 
 const uint8_t DUREE_LENTE  = ms(1000);   // la lente change toutes les 1000 ms (1 seconde)
-const uint8_t DUREE_RAPIDE = ms(250);    // la rapide change toutes les 250 ms (4 fois par seconde)
+const uint8_t DUREE_RAPIDE = ms(250);    // la rapide change toutes les 250 ms
+                                         // (4 fois par seconde)
 
 uint8_t lente = 0;          // QUELLE lettre montre la lente : 0 = A … 25 = Z
 uint8_t rapide = 0;         // QUELLE lettre montre la rapide : 0 = A … 25 = Z
@@ -2157,7 +2162,8 @@ int main() {
 #include <poser>      // pose une tuile sur une case du fond
 
 const uint8_t DUREE_LENTE  = ms(1000);   // la lente change toutes les 1000 ms (1 seconde)
-const uint8_t DUREE_RAPIDE = ms(250);    // la rapide change toutes les 250 ms (4 fois par seconde)
+const uint8_t DUREE_RAPIDE = ms(250);    // la rapide change toutes les 250 ms
+                                         // (4 fois par seconde)
 
 uint8_t lente = 0;          // QUELLE lettre montre la lente : 0 = A … 25 = Z
 uint8_t rapide = 0;         // QUELLE lettre montre la rapide : 0 = A … 25 = Z
@@ -12523,19 +12529,19 @@ int main() {
     idee: 'texteGrand(x, y, "A", 2) : le A trois fois plus grand, sans rien dessiner. Chaque pixel devient un carré de 3 × 3 pixels ; les proportions sont gardées.',
     texte: [
       '**Une lettre plus grande, sans la dessiner.** La Game Boy n’a pas de zoom, mais la console peut **calculer** une lettre agrandie à partir de la police : chaque pixel devient un carré.',
-      '**Ce qui est nouveau ici : `texteGrand(x, y, "TEXTE", taille)`.** La **taille** va de **0 à 10**. **0, c’est la lettre normale** ; chaque cran de plus l’agrandit **une fois de plus** : 1 → 2 fois, 2 → 3 fois… 10 → 11 fois. Avec `2`, chaque pixel de la lettre devient un carré de **3 × 3 pixels**. La lettre garde **exactement ses proportions**.',
+      '**Ce qui est nouveau ici : `texteGrand(x, y, "TEXTE", taille)`.** La **taille** commence à **0**, et n’a **pas de limite**. **0, c’est la lettre normale** ; chaque cran de plus l’agrandit **une fois de plus** : 1 → 2 fois, 2 → 3 fois… 10 → 11 fois, 30 → 31 fois. Avec `2`, chaque pixel de la lettre devient un carré de **3 × 3 pixels**. La lettre garde **exactement ses proportions**.',
       '**La place qu’elle prend :** une lettre normale (taille 0) tient dans **1 case** (8 × 8 pixels). À la taille 2, elle est 3 fois plus grande et prend **3 × 3 = 9** cases (24 × 24 pixels). À la taille *n*, une lettre prend *n + 1* cases de large et *n + 1* de haut.',
       '**Le texte et la taille s’écrivent en clair** (`"A"`, `2`), comme pour `ms()` : le compilateur fabrique les tuiles agrandies **avant le jeu**, et seulement celles dont le programme a besoin.',
       '**Ce qu’elle coûte :** quelques tuiles de plus dans la cartouche. Deux tuiles identiques (souvent toutes pleines aux grandes tailles) ne sont fabriquées qu’une fois.',
     ],
-    code: `#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
+    code: `#include <texteGrand>   // écrit un texte agrandi, sans limite de taille
 
 int main() {
   // La ligne, morceau par morceau :
   //
   //   texteGrand(2, 2, "A", 2);
   //              |  |  |    |
-  //              |  |  |    +-- la TAILLE (de 0 à 10) : 2 → 3 fois plus grand
+  //              |  |  |    +-- la TAILLE (0 ou plus, sans limite) : 2 → 3 fois plus grand
   //              |  |  +------- le texte, entre guillemets
   //              +--+---------- la case en haut à gauche du grand A : (2, 2)
   //
@@ -12574,7 +12580,7 @@ int main() {
       '**Tu choisis la taille, la console s’adapte :** aucune taille n’est dessinée à l’avance. Chaque `texteGrand` fait calculer les tuiles de SA taille.',
       '**La place :** taille 0, 1 case ; taille 1, 2 × 2 ; taille 2, 3 × 3 ; taille 3, 4 × 4. Toujours **taille + 1** cases de côté. Les colonnes de départ (0, 2, 5, 9) laissent juste la place à chacun.',
     ],
-    code: `#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
+    code: `#include <texteGrand>   // écrit un texte agrandi, sans limite de taille
 
 int main() {
   texteGrand(0, 0, "A", 0);     // taille 0 : 1 case, la lettre normale
@@ -12605,10 +12611,10 @@ int main() {
     idee: 'Dix fois plus grand : texteGrand(5, 4, "A", 9). Un A de 80 × 80 pixels, 10 × 10 cases, la moitié de l’écran.',
     texte: [
       '**La taille 9 :** 9 + 1 = 10 fois plus grand ; chaque pixel devient un carré de 10 × 10 pixels. Le A fait **80 × 80 pixels**, soit **10 × 10 cases** : la moitié de la largeur de l’écran (20 cases).',
-      '**La moitié de l’écran :** l’écran fait 20 × 18 cases ; à la taille 9, une lettre en prend 10 × 10. La plus grande taille, 10, est un cran au-dessus : c’est le 0.87.4.',
+      '**La moitié de l’écran :** l’écran fait 20 × 18 cases ; à la taille 9, une lettre en prend 10 × 10. La taille 10 est un cran au-dessus, et l’on peut aller bien plus loin : c’est le 0.87.4.',
       '**Ça ne coûte presque rien de plus :** aux grandes tailles, beaucoup de tuiles sont **toutes pleines** ou **toutes vides**. Les tuiles identiques ne sont fabriquées qu’une fois.',
     ],
-    code: `#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
+    code: `#include <texteGrand>   // écrit un texte agrandi, sans limite de taille
 
 int main() {
   // Taille 9 : le A dix fois plus grand, 10 × 10 cases, de (5, 4) à (14, 13).
@@ -12639,7 +12645,7 @@ int main() {
       '**La largeur du mot :** à la taille 3, une lettre prend 3 + 1 = 4 cases ; 3 lettres × 4 cases = **12 cases**. Il faut qu’elle tienne dans les 20 colonnes de l’écran : `"BONJOUR"` (7 lettres) tient à la taille 1 (14 cases), pas à la taille 2 (21 cases).',
       '**Un titre de jeu,** c’est exactement ça : un mot en grand, au milieu de l’écran.',
     ],
-    code: `#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
+    code: `#include <texteGrand>   // écrit un texte agrandi, sans limite de taille
 
 int main() {
   // Taille 3 : 4 cases par lettre ; 3 lettres × 4 = 12 cases de large, 4 de haut : de (3, 7) à (14, 10).
@@ -12661,20 +12667,20 @@ int main() {
   },
 
   {
-    titre: 'Agrandir une lettre : texteGrand — la plus grande taille, 10',
+    titre: 'Agrandir une lettre : texteGrand — la taille 10, et sans limite',
     difficulte: 0,
     suite: true,
-    idee: 'La plus grande taille : texteGrand(0, 0, "A", 10). Le A est 11 fois plus grand : 11 × 11 cases, plus de la moitié de l’écran.',
+    idee: 'texteGrand(0, 0, "A", 10) : le A est 11 fois plus grand, 11 × 11 cases, plus de la moitié de l’écran. Et la taille n’a pas de limite : au-delà de l’écran, la lettre est coupée au bord.',
     texte: [
-      '**La taille la plus grande, 10 :** 10 + 1 = 11 fois plus grand ; chaque pixel du A devient un carré de 11 × 11 pixels. La lettre prend **11 × 11 cases** (88 × 88 pixels) : plus de la moitié de l’écran.',
-      '**Pourquoi 10 au plus :** les tailles vont de 0 à 10, comme une note sur 10. Au-delà, le compilateur refuse, et dit pourquoi : « la taille va de 0 à 10 ».',
+      '**La taille 10 :** 10 + 1 = 11 fois plus grand ; chaque pixel du A devient un carré de 11 × 11 pixels. La lettre prend **11 × 11 cases** (88 × 88 pixels) : plus de la moitié de l’écran.',
+      '**Pas de limite de taille :** 15, 30, 100… le compilateur accepte tout. Une lettre plus grande que l’écran est **coupée au bord** : on n’en voit qu’un morceau, comme une image géante (`spriteTaille`). Seule la partie qui peut se voir est fabriquée : une taille énorme ne coûte pas plus cher.',
       '**Pour tenir :** 11 cases de large sur 20, 11 de haut sur 18. Le A géant commence en (0, 0), il reste de la place à droite et en dessous.',
       '**Ça ne coûte presque rien en dessins :** à cette taille, beaucoup de tuiles sont toutes pleines ou toutes vides, et les tuiles identiques ne sont fabriquées qu’une fois.',
     ],
-    code: `#include <texteGrand>   // écrit un texte agrandi, taille de 0 à 10
+    code: `#include <texteGrand>   // écrit un texte agrandi, sans limite de taille
 
 int main() {
-  // La plus grande taille : 10. Le A est 11 fois plus grand : 11 × 11 cases.
+  // La taille 10 : le A est 11 fois plus grand, 11 × 11 cases. (Pas de limite : essaie 30.)
   //   8 pixels × 11 = 88 de large
   //   7 pixels × 11 = 77 de haut
   texteGrand(0, 0, "A", 10);
@@ -12705,7 +12711,7 @@ int main() {
       '**Avec `texteGrand`, un mot trop long sort de l’écran par la droite.** « BONJOUR » en taille 2 (3 cases par lettre) demande 7 × 3 = 21 cases de large ; l’écran n’en a que 20 : le R disparaît.',
       '**Ce qui est nouveau ici : `texteGrandS`,** le `S` de `textS` (le 0.11). Même réglages que `texteGrand`, mais les lettres qui ne tiennent plus **passent à la ligne** : elles reprennent en colonne 0, une rangée de lettres plus bas (3 cases, à la taille 2).',
       '**Le découpage :** à la taille 2, une lettre prend 3 cases ; une ligne en tient 20 ÷ 3 = 6 lettres (18 cases). « BONJOU » sur la première, « R » sur la deuxième.',
-      '**Trop haut, c’est une erreur :** l’écran a 18 cases de haut. Si le texte en demande plus (« BONJOUR » en taille 6 : 4 lignes de 7 cases, 28), le compilateur refuse, et dit combien il en faudrait.',
+      '**Trop haut ? Coupé, pas refusé :** l’écran a 18 cases de haut. Si le texte en demande plus (« BONJOUR » en taille 6 : 4 lignes de 7 cases, 28), ce qui dépasse en bas est **coupé** : il n’y a pas de limite de taille.',
       '**Tout s’écrit en clair,** même la place : le découpage en lignes se fait avant le jeu.',
     ],
     code: `#include <texteGrandS>   // écrit un texte agrandi qui passe à la ligne
@@ -12733,6 +12739,131 @@ int main() {
         ['BONJOU sur la première ligne (cases 0 à 2)', plein(0, 0, 18, 3) > 20],
         ['le R est passé à la ligne, en colonne 0', plein(0, 3, 3, 3) > 2],
         ['rien après le R', plein(3, 3, 17, 3) === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'Écrire en grand avec texte() : la taille en 4e argument',
+    difficulte: 0,
+    suite: true,
+    idee: 'texte(1, 6, "ENORME", 3) : un 4e argument à texte(), la TAILLE. 1 normal, 2 deux fois plus grand, 3 trois fois… sans limite.',
+    texte: [
+      '**Ce qui est nouveau ici : la taille, directement dans `texte()`.** `texte(colonne, ligne, "MOT", taille)` : le 4e argument dit combien de fois plus grand. **1**, c’est la lettre normale ; **2**, deux fois plus grande (2 × 2 cases par lettre) ; **3**, trois fois (3 × 3 cases)…',
+      '**La même règle que les dessins :** `sprite(0, x, y, ROND, 4)`, `poser(2, 3, MUR, 5)`, `texte(1, 6, "ENORME", 3)` — partout, le dernier nombre est la taille, et **1 veut dire « tel quel »**.',
+      '**Pas de limite :** 10, 30, 100… Une lettre plus grande que l’écran est **coupée au bord**, comme une image géante. Seule la partie qui se voit est fabriquée.',
+      '**Sans 4e argument, rien ne change :** `texte(1, 1, "A")` écrit toujours un A normal. Seul `#include <texte>` est demandé.',
+      '**Le texte et la taille s’écrivent en clair** quand on donne une taille : les grandes lettres sont calculées avant le jeu. La place, elle, peut être une variable.',
+      '**À toi :** écris ton prénom en taille 4. Puis essaie `texte(0, 0, "A", 30)` : un A si grand qu’on n’en voit qu’un morceau.',
+    ],
+    code: `#include <texte>    // écrit un texte à l’écran, à la taille qu’on veut
+
+int main() {
+  // texte(colonne, ligne, "MOT", taille) : le 4e argument est la TAILLE.
+  //   1 : la lettre normale (1 case)
+  //   2 : deux fois plus grande (2 × 2 cases par lettre)
+  //   3 : trois fois (3 × 3 cases)… sans limite.
+  texte(1, 1, "PETIT", 1);       // taille 1 : comme texte(1, 1, "PETIT")
+  texte(1, 3, "GRAND", 2);       // 5 lettres × 2 = 10 cases de large
+  texte(1, 6, "ENORME", 3);      // 6 lettres × 3 = 18 cases : presque tout l’écran
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'PETIT en lettres normales, GRAND deux fois plus gros en dessous, et ENORME trois fois plus gros, sur presque toute la largeur.',
+    controle: (c) => {
+      c.avancer(10)
+      const plein = (x, y, l, h) => { let n = 0; for (let j = y; j < y + h; j++) for (let i = x; i < x + l; i++) if (c.lire(i, j) !== 0) n++; return n }
+      return [
+        ['PETIT : une ligne, cinq cases', plein(1, 1, 5, 1) === 5 && plein(1, 2, 19, 1) === 0],
+        ['GRAND : deux cases de haut', plein(1, 3, 10, 2) > 10 && plein(11, 3, 9, 2) === 0],
+        ['ENORME : trois cases de haut, jusqu’à la colonne 18', plein(1, 6, 18, 3) > 30 && plein(16, 6, 3, 3) > 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un score en grand : nombre(…, chiffres, taille)',
+    difficulte: 0,
+    suite: true,
+    idee: 'nombre(1, 4, score, 3, 4) : un 5e argument à nombre(), la TAILLE, sans limite. Le score s’écrit quatre fois plus grand, et change pendant le jeu.',
+    texte: [
+      '**Ce qui est nouveau ici : la taille pour un NOMBRE.** `nombre(colonne, ligne, valeur, chiffres, taille)` : le 4e argument dit combien de chiffres (3), le 5e dit combien de fois plus grand (4). Sans limite, comme pour `texte()`.',
+      '**Le nombre change pendant le jeu :** on ne peut pas le fabriquer à l’avance. La console fabrique donc les **dix chiffres** à cette taille, une fois, et pose à chaque appel ceux qu’il faut.',
+      '**Dans le panneau aussi :** `nombrePanneau(10, 0, vies, 1, 2)` et `textePanneau(0, 0, "VIES", 2)` écrivent en grand dans le panneau.',
+      '**Seul `#include <nombre>` est demandé.** La taille s’écrit en clair ; la valeur, elle, peut être une variable.',
+      '**À toi :** mets la taille à 6 : trois chiffres de 6 cases, 18 colonnes, presque tout l’écran.',
+    ],
+    code: `#include <nombre>   // écrit un nombre ; un 5e argument : la TAILLE
+
+int main() {
+  uint8_t score = 0;                  // le score, qui monte tout seul
+
+  while (true) {
+    image();
+    if (images() % 32 == 0) score++;  // un point toutes les 32 images
+
+    // nombre(colonne, ligne, valeur, chiffres, taille)
+    //   3 chiffres (000 à 255), 4 fois plus grands : 4 × 4 cases chacun
+    nombre(1, 4, score, 3, 4);
+  }
+}
+`,
+    aVoir: 'Un score en très grands chiffres (000, 001, 002…) qui monte tout seul.',
+    controle: (c) => {
+      c.avancer(40)
+      const avant = [...Array(12)].map((_, i) => c.lire(1 + i, 6)).join(',')
+      c.avancer(70)
+      const apres = [...Array(12)].map((_, i) => c.lire(1 + i, 6)).join(',')
+      let haut = 0
+      for (let l = 4; l < 8; l++) if ([...Array(12)].some((_, i) => c.lire(1 + i, l) !== 0)) haut++
+      return [
+        ['les chiffres font 4 cases de haut', haut >= 3, ` (${haut} lignes occupées)`],
+        ['le score change à l’écran', avant !== apres],
+        ['rien au-delà des trois chiffres', [...Array(7)].every((_, i) => c.lire(13 + i, 6) === 0)],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un titre qui grossit : la taille dans une variable',
+    difficulte: 0,
+    suite: true,
+    idee: 'texte(0, 0, "GO", t) : la taille peut être une VARIABLE. Le compilateur fabrique toutes les tailles à l’avance ; le mot grossit pendant le jeu.',
+    texte: [
+      '**Ce qui est nouveau ici : une taille qui change pendant le jeu.** `texte(0, 0, "GO", t);` avec `t` une variable : quand `t` grandit, le mot grandit.',
+      '**Comment c’est possible :** les grandes lettres se calculent avant le jeu. Le compilateur fabrique donc **toutes les tailles** à l’avance — de 1 jusqu’à la plus grande où le mot tient entier dans l’écran —, et choisit la bonne pendant le jeu.',
+      '**La plus grande :** « GO » a 2 lettres ; 20 cases ÷ 2 = taille 10. Au-delà, il garde la taille 10. (Une taille écrite en clair, elle, n’a aucune limite : `texte(0, 0, "GO", 40)`.)',
+      '**Le prix :** chaque taille a ses dessins. Un mot court en coûte peu ; un long mot grossissant en demande davantage.',
+      '**À toi :** fais rapetisser le mot : pars de `t = 10`, et retire 1 toutes les 32 images (sans descendre sous 1).',
+    ],
+    code: `#include <texte>   // écrit un texte ; un 4e argument : la TAILLE
+
+int main() {
+  uint8_t t = 1;                      // la taille du mot : elle va grandir
+
+  while (true) {
+    image();
+    if (images() % 32 == 0) t++;      // un cran de plus toutes les 32 images
+
+    texte(0, 0, "GO", t);             // la taille est une VARIABLE : le mot grossit
+  }
+}
+`,
+    aVoir: 'GO, tout petit en haut à gauche, qui grossit cran par cran jusqu’à remplir l’écran.',
+    controle: (c) => {
+      const largeur = () => { let w = 0; for (let k = 0; k < 20; k++) if (c.lire(k, 0) !== 0 || c.lire(k, 1) !== 0) w = k + 1; return w }
+      c.avancer(40)
+      const debut = largeur()
+      c.avancer(200)
+      const milieu = largeur()
+      c.avancer(400)
+      const fin = largeur()
+      return [
+        ['le mot grossit', debut < milieu && milieu < fin, ` (${debut} → ${milieu} → ${fin} cases)`],
+        ['il s’arrête à la largeur de l’écran', fin <= 20 && fin >= 18],
       ]
     },
   },
@@ -12971,7 +13102,7 @@ int main() {
       '**C’est un écran titre :** un mot en grand et en couleur, au milieu. Il ne reste qu’à écrire en dessous « APPUIE SUR START ».',
     ],
     code: `#include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <texte>          // écrit un texte à l’écran
 
 int main() {
@@ -13013,7 +13144,7 @@ int main() {
       '**La couleur reste :** `couleurTexte` a réglé l’encre de toutes les lettres ; le nouvel écran est orange aussi.',
     ],
     code: `#include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <texte>          // écrit un texte à l’écran
 #include <bouton>         // lit un bouton de la manette
 #include <effacer>        // efface des cases, ou tout le fond
@@ -13085,7 +13216,7 @@ int main() {
       '**Le B, pas un A :** « C EST PARTI » contient déjà un A ; un B se distingue mieux.',
     ],
     code: `#include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <texte>          // écrit un texte à l’écran
 #include <bouton>         // lit un bouton de la manette
 #include <effacer>        // efface des cases, ou tout le fond
@@ -13154,7 +13285,7 @@ int main() {
       '**60 images par seconde, un pixel chaque fois :** le texte traverse l’écran (160 pixels) en moins de 3 secondes, tout en douceur.',
     ],
     code: `#include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <texte>          // écrit un texte à l’écran
 #include <bouton>         // lit un bouton de la manette
 #include <effacer>        // efface des cases, ou tout le fond
@@ -13227,7 +13358,7 @@ int main() {
     ],
     code: `#include <reste>   // a % b, sauf par 1, 2, 4, 8, 16… écrits en clair
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <texte>          // écrit un texte à l’écran
 #include <bouton>         // lit un bouton de la manette
 #include <effacer>        // efface des cases, ou tout le fond
@@ -13299,7 +13430,7 @@ int main() {
       '**Seulement sur le titre :** `ecranTitre == 1 && chaque(500)`. Après START, la consigne ne revient plus.',
     ],
     code: `#include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <texte>          // écrit un texte à l’écran
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <effacer>        // efface des cases, ou tout le fond
@@ -13368,7 +13499,7 @@ int main() {
       '**`void`** veut dire que la fonction ne rend rien : elle **fait** quelque chose (elle dessine, elle efface), c’est tout.',
       '**Au retour, `visible` repasse à 1 :** dessinerTitre() vient d’écrire la consigne, elle est donc à l’écran.',
     ],
-    code: `#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+    code: `#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <texte>          // écrit un texte à l’écran
 #include <effacer>        // efface des cases, ou tout le fond
 #include <couleurTexte>   // choisit la couleur des lettres
@@ -13461,7 +13592,7 @@ int main() {
     code: `// ---- NOUVEAU : une variable pour TROIS écrans ----
 //   ecran = 0 : le TITRE    ecran = 1 : le JEU    ecran = 2 : la FIN
 
-#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <texte>          // écrit un texte à l’écran
 #include <effacer>        // efface des cases, ou tout le fond
 #include <couleurTexte>   // choisit la couleur des lettres
@@ -13567,7 +13698,7 @@ int main() {
     ],
     code: `#include <effacer>         // efface des cases, ou tout le fond
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>      // écrit un texte agrandi, sans limite de taille
 #include <texte>           // écrit un texte à l’écran
 #include <bouton>          // lit un bouton de la manette
 #include <poser>           // pose une tuile sur une case du fond
@@ -13647,7 +13778,7 @@ int main() {
     ],
     code: `#include <effacer>         // efface des cases, ou tout le fond
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>      // écrit un texte agrandi, sans limite de taille
 #include <texte>           // écrit un texte à l’écran
 #include <bouton>          // lit un bouton de la manette
 #include <poser>           // pose une tuile sur une case du fond
@@ -13741,7 +13872,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>      // écrit un texte agrandi, sans limite de taille
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <nombre>          // écrit un nombre en chiffres
@@ -13854,7 +13985,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>      // écrit un texte agrandi, sans limite de taille
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <nombre>          // écrit un nombre en chiffres
@@ -14012,7 +14143,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>      // écrit un texte agrandi, sans limite de taille
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <hasard>          // tire un nombre au hasard
@@ -14186,7 +14317,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>      // écrit un texte agrandi, sans limite de taille
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <hasard>          // tire un nombre au hasard
@@ -14390,7 +14521,7 @@ int main() {
 #include <ALPHABET>        // les lettres de la police : ALPHABET[0] est le A
 #include <texte>           // écrit un texte à l’écran
 #include <couleurTexte>    // choisit la couleur des lettres
-#include <texteGrand>      // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>      // écrit un texte agrandi, sans limite de taille
 #include <bouton>          // lit un bouton de la manette
 #include <deplace_croix>   // une tuile qui suit la croix, case par case
 #include <hasard>          // tire un nombre au hasard
@@ -14622,7 +14753,7 @@ int main() {
 #include <ALPHABET>       // les lettres de la police : ALPHABET[0] est le A
 #include <texte>          // écrit un texte à l’écran
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -14873,7 +15004,7 @@ int main() {
 #include <texte>          // écrit un texte à l’écran
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -15128,7 +15259,7 @@ int main() {
 #include <texte>          // écrit un texte à l’écran
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -15379,7 +15510,7 @@ int main() {
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurFond>    // choisit une couleur d’une palette du fond
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -15724,7 +15855,7 @@ int main() {
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurFond>    // choisit une couleur d’une palette du fond
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -16059,7 +16190,7 @@ int main() {
 #include <nombre>         // écrit un nombre en chiffres
 #include <couleurFond>    // choisit une couleur d’une palette du fond
 #include <couleurTexte>   // choisit la couleur des lettres
-#include <texteGrand>     // écrit un texte agrandi, taille de 0 à 10
+#include <texteGrand>     // écrit un texte agrandi, sans limite de taille
 #include <bouton>         // lit un bouton de la manette
 #include <chaque>         // répond 1 toutes les n millisecondes
 #include <hasard>         // tire un nombre au hasard
@@ -23371,7 +23502,7 @@ int main() {
     difficulte: 0,
     idee: '#include <texteGrand> : texteGrand(colonne, ligne, "B", 2) écrit un B trois fois plus grand, sans rien dessiner.',
     texte: [
-      '**Ce qu’elle fait :** `texteGrand(colonne, ligne, "TEXTE", taille)` écrit un texte **agrandi**. La taille va de **0 à 10** : 0, c’est la lettre normale ; chaque cran l’agrandit une fois de plus (2 → 3 fois plus grand). Une lettre prend `(taille + 1) × (taille + 1)` cases.',
+      '**Ce qu’elle fait :** `texteGrand(colonne, ligne, "TEXTE", taille)` écrit un texte **agrandi**. La taille commence à **0** et n’a **pas de limite** : 0, c’est la lettre normale ; chaque cran l’agrandit une fois de plus (2 → 3 fois plus grand). Ce qui dépasse de l’écran est coupé. Une lettre prend `(taille + 1) × (taille + 1)` cases.',
       '**La ligne à écrire : `#include <texteGrand>`.**',
       '**Ses arguments :** la colonne et la ligne du coin en haut à gauche, le texte entre guillemets, la taille. Le texte et la taille **s’écrivent en clair** : le compilateur fabrique les tuiles agrandies avant le jeu.',
       '**Ce qu’elle coûte :** environ **950 octets** pour un A en taille 1 : les tuiles agrandies, la petite fonction qui les pose, et la police.',
@@ -24264,7 +24395,7 @@ int main() {
     texte: [
       '**Ce que c’est :** un **deuxième style** de lettres de titre, à mi-chemin entre les **titres de manga** et ceux des **dessins animés**. Les lettres sont **penchées** vers la droite, comme si elles fonçaient ; leurs coins sont **coupés en biais** ; le contour noir est **carré**, aux angles vifs ; le **bas** de chaque lettre est en **trame** (un pixel sur deux en gris clair), comme les trames des pages de manga ; une **ombre portée** grise les détache du fond. Et, côté dessin animé, une lettre sur deux est un peu plus bas.',
       '**La ligne à écrire : `#include <texteManga>`.**',
-      '**Comment on l’appelle :** exactement comme `texteTitre()` : `texteManga(colonne, ligne, "MOT")`, et un 4ᵉ argument facultatif pour la taille — 2, 3 (si on ne la donne pas) ou 4 cases de côté par lettre.',
+      '**Comment on l’appelle :** exactement comme `texteTitre()` : `texteManga(colonne, ligne, "MOT")`, et un 4ᵉ argument facultatif pour la taille — 2, 3 (si on ne la donne pas), 4, 6, 10… cases de côté par lettre, sans limite.',
       '**La place :** en taille 3, chaque lettre prend 3 colonnes et 3 lignes. « MANGA » (5 lettres) prend 15 colonnes : en commençant en colonne 2, il va de 2 à 16.',
       '**Ce qu’il coûte :** comme `texteTitre()`, seules **les lettres du mot** vont dans la cartouche. Dans « MANGA », les deux A sont-ils les mêmes tuiles ? Non : le premier A est la lettre 1 (un peu plus bas), le second la lettre 4 (en haut). Ils sont dessinés différemment, donc gravés deux fois.',
       '**Ce sont nos lettres :** calculées à partir de la police de l’atelier (le gras, agrandi, penché, les coins coupés, puis le contour, la trame et l’ombre), sans recopier celles d’aucun manga ni d’aucun jeu.',
@@ -25246,6 +25377,808 @@ int main() {
       ['le lutin porte DERRIERE', (c.gb.mmu.read(0xfe03) & 0x80) === 0x80],
       ['on voit la brique, pas le héros', c.gb.framebuffer[66 * 160 + 76] === 1, ` (nuance ${c.gb.framebuffer[66 * 160 + 76]})`],
     ],
+  },
+
+  {
+    titre: 'La fonction avancer() — faire avancer un lutin à ta vitesse',
+    difficulte: 0,
+    idee: '#include <avancer> : x = avancer(x, vitesse) fait avancer la place x vers la droite, à « vitesse » pixels par seconde, en douceur, et la ramène à 0 au bord droit.',
+    texte: [
+      '**Ce qu’elle fait :** elle prend la place `x` d’un lutin, l’avance vers la droite, et **rend la nouvelle place**. On la range dans la même variable : `x = avancer(x, vitesse);`.',
+      '**La ligne à écrire : `#include <avancer>`.**',
+      '**Ses arguments :** `x`, la place de départ, et `vitesse`, **en pixels par seconde**. C’est le seul réglage : 15 très lent (l’écran en 10 secondes), 30 tranquille (5 secondes), 60 rapide (2,5 secondes), 120 très rapide.',
+      '**La fluidité, c’est la console qui s’en occupe.** Elle montre 60 images par seconde. À chaque image, elle ajoute ta vitesse à un petit compteur caché ; quand il atteint 60, le lutin avance d’**un** pixel. À 30, il avance donc d’un pixel une image sur deux ; à 20, une sur trois ; à 45, trois sur quatre, bien réparties. Jusqu’à 60, il ne fait **jamais** plus d’un pixel par image : il glisse, il ne saute pas.',
+      '**Au-delà de 60,** il faut bien 2 pixels (ou plus) par image : un écran à 60 images par seconde ne peut pas faire mieux.',
+      '**Le bord est déjà prévu :** quand la place dépasse 152 (le bord droit, pour un lutin de 8 pixels), elle repart à 0, à gauche.',
+      '**Reculer : une vitesse négative.** `x = avancer(x, -30);` fait aller le lutin **vers la gauche**, à 30 pixels par seconde, avec la même douceur. Quand il sort à gauche, il repart de la droite. La vitesse va de **-127 à 127**.',
+      '**Deux lutins, deux vitesses :** chaque `avancer()` du programme a son propre compteur. `a = avancer(a, 20);` et `b = avancer(b, 50);` ne se gênent pas.',
+      '**Ce qu’elle coûte :** une petite fonction et trois octets par `avancer()`, gravés seulement si le programme l’appelle.',
+      '**Essaie :** mets `vitesse` à 15, puis à 60, puis à 120. Puis à **-30** : il recule.',
+    ],
+    code: `// ---- #include <avancer> : faire avancer un lutin à ta vitesse ----
+// Un héros traverse l'écran de gauche à droite, et repart de la gauche au bord.
+// Tu ne règles QUE la vitesse : la console s'occupe que ce soit fluide.
+
+#include <Tuile>
+#include <sprite>     // sprite() : un lutin au pixel près
+#include <avancer>    // avancer() : la place, avancée en douceur à ta vitesse
+
+Tuile HEROS = {                     // les points (.) sont transparents
+  "..####..", ".#-##-#.", "########", "#.####.#",
+  "########", "..#..#..", ".#....#.", "##....##",
+};
+
+int main() {
+  uint8_t x = 0;                    // la place du héros, en pixels
+  uint8_t vitesse = 30;             // TA vitesse, en pixels par seconde : l'écran en 5 secondes
+                                    // (négative, comme -30 : il recule, vers la gauche)
+
+  while (true) {
+    image();
+    x = avancer(x, vitesse);        // la place, avancée en douceur ; au bord droit, retour à 0
+    sprite(0, x, 72, HEROS);
+  }
+}
+`,
+    aVoir: 'Un héros qui glisse de gauche à droite, sans à-coups, puis réapparaît à gauche.',
+    controle: (c) => {
+      const places = []
+      for (let i = 0; i < 400; i++) { c.avancer(1); places.push(c.lutin(0).x) }
+      const pas = places.slice(1).map((p, i) => p - places[i])
+      const enAvant = pas.filter((d) => d > 0)
+      // les images où il a bougé : à 30 pixels par seconde, une sur deux, toujours
+      const quand = pas.map((d, i) => (d !== 0 ? i : -1)).filter((i) => i >= 0)
+      const ecarts = new Set(quand.slice(1).map((q, k) => q - quand[k]))
+      return [
+        ['le héros avance', enAvant.length > 10],
+        ['jamais plus d’un pixel par image : il glisse', enAvant.every((d) => d === 1), ` (pas vus : ${[...new Set(enAvant)].join(', ')})`],
+        ['un pixel toutes les 2 images, bien régulier (30 par seconde)', ecarts.size === 1 && ecarts.has(2), ` (écarts : ${[...ecarts].join(', ')})`],
+        ['jamais plus loin que 152', Math.max(...places) <= 152, ` (au plus ${Math.max(...places)})`],
+        ['au bord, il repart de la gauche', pas.some((d) => d < 0) && places.includes(0)],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction avancer_y() — monter et descendre à ta vitesse',
+    difficulte: 0,
+    idee: '#include <avancer_y> : y = avancer_y(y, vitesse) fait descendre la place y à « vitesse » pixels par seconde (négative : monter), en douceur, et la ramène en haut au bord du bas.',
+    texte: [
+      '**Ce qu’elle fait :** la même chose qu’`avancer()`, mais sur la **hauteur**. `y = avancer_y(y, 30);` fait descendre le lutin à 30 pixels par seconde ; `y = avancer_y(y, -30);` le fait monter.',
+      '**La ligne à écrire : `#include <avancer_y>`.**',
+      '**Le bord du bas est 136** (l’écran fait 144 pixels de haut, le lutin 8) : au-delà, il repart de 0, en haut. En montant, sorti en haut, il repart de 136.',
+      '**La même douceur :** jusqu’à 60 (ou -60), jamais plus d’un pixel par image. La console s’en occupe ; toi, tu ne règles que la vitesse.',
+      '**S’arrêter :** comme `avancer()`, un 3e réglage arrête le lutin à une place : `y = avancer_y(y, 30, 100);` descend jusqu’au pixel 100, puis ne bouge plus.',
+      '**Essaie :** fais tomber de la pluie : trois gouttes, trois `avancer_y()` à 40, 60 et 90.',
+    ],
+    code: `// ---- #include <avancer_y> : monter et descendre à ta vitesse ----
+// Un héros descend tout seul, et repart d'en haut quand il sort en bas.
+
+#include <Tuile>
+#include <sprite>      // sprite() : un lutin au pixel près
+#include <avancer_y>   // avancer_y() : la hauteur, avancée en douceur à ta vitesse
+
+Tuile HEROS = {                     // les points (.) sont transparents
+  "..####..", ".#-##-#.", "########", "#.####.#",
+  "########", "..#..#..", ".#....#.", "##....##",
+};
+
+int main() {
+  uint8_t y = 0;                    // la hauteur du héros, en pixels (0 : tout en haut)
+  uint8_t vitesse = 30;             // TA vitesse, en pixels par seconde (négative : il monte)
+
+  while (true) {
+    image();
+    y = avancer_y(y, vitesse);      // il descend en douceur ; en bas (136), retour en haut
+    sprite(0, 76, y, HEROS);
+  }
+}
+`,
+    aVoir: 'Un héros qui descend doucement au milieu de l’écran, puis réapparaît en haut.',
+    controle: (c) => {
+      const places = []
+      for (let i = 0; i < 400; i++) { c.avancer(1); places.push(c.lutin(0).y) }
+      const pas = places.slice(1).map((p, i) => p - places[i])
+      return [
+        ['il descend, un pixel à la fois', pas.filter((d) => d > 0).length > 10 && pas.filter((d) => d > 0).every((d) => d === 1)],
+        ['jamais plus bas que 136', Math.max(...places) <= 136, ` (au plus ${Math.max(...places)})`],
+        ['en bas, il repart d’en haut', pas.some((d) => d < 0) && places.includes(0)],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction marcher() — un lutin qui marche',
+    difficulte: 0,
+    idee: '#include <marcher> : marcher(numero, x, y, PAS1, PAS2) place un lutin qui alterne deux dessins tous les 4 pixels parcourus : la vitesse règle les jambes toute seule.',
+    texte: [
+      '**Ce qu’elle fait :** elle place le lutin comme `sprite()`, mais avec **deux dessins** qu’elle alterne : les jambes d’un côté, puis de l’autre. Le héros a l’air de marcher.',
+      '**La ligne à écrire : `#include <marcher>`.** Pas besoin d’inclure aussi `sprite`.',
+      '**Ses arguments :** le numéro du lutin, `x` et `y` en pixels, puis les deux dessins.',
+      '**Le dessin change tous les 4 pixels PARCOURUS,** pas toutes les N images. C’est donc la vitesse qui règle les jambes, sans rien d’autre à écrire : vite, elles s’agitent ; lentement, elles prennent leur temps ; à l’arrêt, elles s’arrêtent.',
+      '**Avec `avancer()` :** `x = avancer(x, vitesse);` puis `marcher(0, x, 72, HEROS1, HEROS2);` — deux lignes, et le héros marche à ta vitesse.',
+      '**Essaie :** mets la vitesse à 15, puis à 90 : regarde les jambes.',
+    ],
+    code: `// ---- #include <marcher> : un lutin qui marche ----
+// Deux dessins du héros, les jambes écartées puis serrées : marcher() les
+// alterne tous les 4 pixels parcourus. La vitesse règle les jambes.
+
+#include <Tuile>
+#include <avancer>   // avancer() : la place, avancée en douceur à ta vitesse
+#include <marcher>   // marcher() : un lutin qui alterne deux dessins en avançant
+
+Tuile HEROS1 = {                    // les jambes écartées
+  "..####..", ".#-##-#.", "########", "#.####.#",
+  "########", "..#..#..", ".#....#.", "##....##",
+};
+Tuile HEROS2 = {                    // les jambes serrées
+  "..####..", ".#-##-#.", "########", "#.####.#",
+  "########", "..#..#..", "..#..#..", "..##.##.",
+};
+
+int main() {
+  uint8_t x = 0;                    // la place du héros, en pixels
+  uint8_t vitesse = 30;             // TA vitesse, en pixels par seconde
+
+  while (true) {
+    image();
+    x = avancer(x, vitesse);              // il avance en douceur
+    marcher(0, x, 72, HEROS1, HEROS2);    // et ses jambes suivent sa vitesse
+  }
+}
+`,
+    aVoir: 'Un héros qui traverse l’écran en marchant : ses jambes s’écartent et se serrent à chaque petit bout de chemin.',
+    controle: (c) => {
+      const vus = []
+      for (let i = 0; i < 200; i++) { c.avancer(1); vus.push(c.lutin(0)) }
+      const changes = vus.filter((v, i) => i && v.tuile !== vus[i - 1].tuile).map((v) => v.x)
+      const ecarts = new Set(changes.slice(1).map((x, i) => x - changes[i]))
+      return [
+        ['deux dessins qui alternent', new Set(vus.map((v) => v.tuile)).size === 2],
+        ['le dessin change tous les 4 pixels parcourus', ecarts.size === 1 && ecarts.has(4), ` (écarts : ${[...ecarts].join(', ')})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction sauter() — un saut, avec la gravité',
+    difficulte: 0,
+    idee: "#include <sauter> : y = sauter(y, hauteur, sol, gravité) — au sol, A lance le saut ; le lutin monte d’environ « hauteur » pixels, ralentit, et retombe sur « sol ».",
+    texte: [
+      "**Ce qu’elle fait :** un vrai saut. On appuie sur A : le lutin part vite vers le haut, **ralentit**, s’arrête un instant en l’air, puis **retombe de plus en plus vite** et se pose sur le sol. C’est la gravité.",
+      "**La ligne à écrire : `#include <sauter>`.**",
+      "**Ses réglages :** `y`, la hauteur du lutin ; `hauteurMax`, **la hauteur max, celle du plus grand saut, en pixels** — une variable : `uint8_t hauteurMax = 40;` (40 : cinq cases) ; `sol`, la hauteur où il se pose ; `gravite`, **la gravité, la force qui le ramène en bas** — une variable : `uint8_t gravite = 4;` (4 : normale ; 2 : faible, il flotte ; 1 : très faible, la Lune ; 8 : forte). La hauteur ne change pas avec la gravité : seulement l’allure. C’est tout : la console calcule l’élan et la chute.",
+      "**Plus on tient A, plus il saute haut.** A tenu jusqu’en haut : le grand saut, « hauteur » pixels. Une petite tape : un petit bond (une quinzaine de pixels). Entre les deux, tout ce qu’on veut : c’est le joueur qui dose.",
+      "**À appeler à chaque image,** dans la boucle du jeu, et à ranger dans `y` : `y = sauter(y, hauteurMax, 104, gravite);`.",
+      "**Un sol qui change :** si `sol` change (le héros arrive au-dessus d’un trou, d’une plateforme), il tombe tout seul jusqu’au nouveau sol.",
+      "**Avec `avancer()` :** `x = avancer(x, vitesse);` et `y = sauter(y, hauteurMax, 104, gravite);` — il court et il saute.",
+      "**Essaie :** `uint8_t hauteurMax = 80;` : un saut de géant. Puis `uint8_t gravite = 1;` : le même saut de géant, lent, comme sur la Lune.",
+    ],
+    code: `// ---- #include <sauter> : un saut, avec la gravité ----
+// Appuie sur A : le héros saute de 40 pixels, ralentit, et retombe sur le sol.
+
+#include <Tuile>
+#include <sprite>    // sprite() : un lutin au pixel près
+#include <bande>     // bande() : la même tuile, plusieurs fois
+#include <sauter>    // sauter() : un saut avec la gravité
+
+Tuile HEROS = {                     // les points (.) sont transparents
+  "..####..", ".#-##-#.", "########", "#.####.#",
+  "########", "..#..#..", ".#....#.", "##....##",
+};
+Tuile SOL = {                       // un bloc de sol, tout plein
+  "33333333", "32222223", "32222223", "32222223",
+  "32222223", "32222223", "32222223", "33333333",
+};
+
+int main() {
+  bande(0, 14, SOL, 20);            // le sol : la ligne 14 (pixel 112)
+  uint8_t y = 104;                  // le héros, posé sur le sol (112 - 8)
+  uint8_t hauteurMax = 40;          // La hauteur max du saut, en pixels (A tenu jusqu’en haut).
+  uint8_t gravite = 4;              // La gravité : 4 normale, 2 faible, 1 très faible, 8 forte.
+
+  while (true) {
+    image();
+    y = sauter(y, hauteurMax, 104, gravite);   // A : un saut de 40 pixels ; il retombe sur 104
+    sprite(0, 76, y, HEROS);
+  }
+}
+`,
+    aVoir: "Un héros posé sur le sol. Tiens A : il saute haut ; tape A : un petit bond. Il ralentit en haut, et retombe.",
+    controle: (c) => {
+      c.avancer(10)
+      const auSol = c.lutin(0).y
+      c.gb.setButton('a', true); c.avancer(30); c.gb.setButton('a', false)   // A tenu : le grand saut
+      const ys = []
+      for (let i = 0; i < 90; i++) { c.avancer(1); ys.push(c.lutin(0).y) }
+      const haut = Math.min(...ys)
+      return [
+        ['au sol, il attend', auSol === 104],
+        ['A tenu : il monte d’environ 40 pixels', auSol - haut >= 38 && auSol - haut <= 42, ` (monté de ${auSol - haut})`],
+        ['puis il retombe sur le sol', ys.at(-1) === 104],
+        ['A tapé : un saut plus petit', (() => {
+          c.gb.setButton('a', true); c.avancer(1); c.gb.setButton('a', false)
+          const petits = []
+          for (let i = 0; i < 90; i++) { c.avancer(1); petits.push(c.lutin(0).y) }
+          return 104 - Math.min(...petits) < 30
+        })()],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction suivre() — aller vers une place, en douceur',
+    difficulte: 0,
+    idee: "#include <suivre> : ex = suivre(ex, cible, vitesse) rapproche la place ex de « cible », à « vitesse » pixels par seconde, et s’y arrête.",
+    texte: [
+      "**Ce qu’elle fait :** elle rapproche une place d’une autre, **en douceur**, et s’arrête dessus. Avec la place du héros comme cible, l’ennemi **le suit**.",
+      "**La ligne à écrire : `#include <suivre>`.**",
+      "**Ses réglages :** la place à faire bouger, la place visée, la vitesse en pixels par seconde. Le sens, c’est la console qui le choisit : à gauche si la cible est à gauche, à droite sinon.",
+      "**Pour x comme pour y :** `ey = suivre(ey, y, 20);` le rapproche aussi en hauteur.",
+      "**Essaie :** donne-lui une vitesse de 50 : il rattrape le héros bien plus vite.",
+    ],
+    code: `// ---- #include <suivre> : aller vers une place, en douceur ----
+// Le héros fait des allers-retours ; l'ennemi le suit, plus lentement.
+
+#include <Tuile>
+#include <sprite>    // sprite() : un lutin au pixel près
+#include <navette>   // navette() : un aller-retour sans fin
+#include <suivre>    // suivre() : aller vers une place
+
+Tuile HEROS = {                     // les points (.) sont transparents
+  "..####..", ".#-##-#.", "########", "#.####.#",
+  "########", "..#..#..", ".#....#.", "##....##",
+};
+Tuile ENNEMI = {                    // un ennemi tout rond
+  "..####..", ".######.", "##.##.##", "########",
+  "########", ".######.", "..#..#..", ".##..##.",
+};
+
+int main() {
+  uint8_t x = 20;                   // le héros
+  uint8_t ex = 140;                 // l'ennemi
+
+  while (true) {
+    image();
+    x = navette(x, 40, 20, 140);    // le héros va et vient
+    ex = suivre(ex, x, 20);         // l'ennemi le suit, à 20 pixels par seconde
+    sprite(0, x, 72, HEROS);
+    sprite(1, ex, 88, ENNEMI);
+  }
+}
+`,
+    aVoir: "Le héros fait des allers-retours ; l’ennemi, en dessous, le suit sans jamais aller aussi vite.",
+    controle: (c) => {
+      const dist = []
+      for (let i = 0; i < 300; i++) { c.avancer(1); dist.push(Math.abs(c.lutin(0).x - c.lutin(1).x)) }
+      const pas = []
+      for (let i = 0; i < 60; i++) { const a = c.lutin(1).x; c.avancer(1); pas.push(Math.abs(c.lutin(1).x - a)) }
+      return [
+        ['l’ennemi se rapproche du héros', Math.min(...dist.slice(100)) < dist[0], ` (${dist[0]} → ${Math.min(...dist.slice(100))})`],
+        ['jamais plus d’un pixel par image', pas.every((d) => d <= 1)],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction navette() — un aller-retour sans fin',
+    difficulte: 0,
+    idee: "#include <navette> : x = navette(x, vitesse, de, a) va et vient sans fin entre « de » et « a », en douceur.",
+    texte: [
+      "**Ce qu’elle fait :** un aller-retour **sans fin** entre deux places : un garde qui fait sa ronde, une plateforme qui va et vient.",
+      "**La ligne à écrire : `#include <navette>`.**",
+      "**Ses réglages :** la place, la vitesse en pixels par seconde, et les deux places entre lesquelles aller et venir. Arrivé à l’une, il repart vers l’autre : la console retient son sens.",
+      "**Avec `marcher()` :** il se tourne tout seul à chaque demi-tour.",
+      "**Essaie :** une ronde courte, de 60 à 90, à 15 pixels par seconde : un garde qui piétine.",
+    ],
+    code: `// ---- #include <navette> : un aller-retour sans fin ----
+// Un garde fait sa ronde entre le pixel 20 et le pixel 120.
+
+#include <Tuile>
+#include <sprite>    // sprite() : un lutin au pixel près
+#include <navette>   // navette() : un aller-retour sans fin
+
+Tuile ENNEMI = {                    // un ennemi tout rond
+  "..####..", ".######.", "##.##.##", "########",
+  "########", ".######.", "..#..#..", ".##..##.",
+};
+
+int main() {
+  uint8_t x = 20;                   // la place du garde
+
+  while (true) {
+    image();
+    x = navette(x, 40, 20, 120);    // de 20 à 120 et retour, à 40 pixels par seconde
+    sprite(0, x, 72, ENNEMI);
+  }
+}
+`,
+    aVoir: "Un ennemi qui va de gauche à droite, fait demi-tour, revient, et recommence.",
+    controle: (c) => {
+      const xs = []
+      for (let i = 0; i < 600; i++) { c.avancer(1); xs.push(c.lutin(0).x) }
+      return [
+        ['il ne sort pas de sa ronde', Math.min(...xs) >= 20 && Math.max(...xs) <= 120, ` (${Math.min(...xs)} à ${Math.max(...xs)})`],
+        ['il va jusqu’au bout, et revient', xs.includes(120) && xs.lastIndexOf(20) > xs.indexOf(120)],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction touche() — deux lutins se touchent-ils ?',
+    difficulte: 0,
+    idee: "#include <touche> : touche(x1, y1, x2, y2) rend 1 si deux lutins de 8 × 8 se chevauchent, 0 sinon.",
+    texte: [
+      "**Ce qu’elle fait :** elle répond à LA question des jeux : « est-ce que ces deux-là se touchent ? ». Elle rend **1** (oui) ou **0** (non).",
+      "**La ligne à écrire : `#include <touche>`.**",
+      "**Ses réglages :** la place du premier lutin (x1, y1), puis celle du second (x2, y2). Deux carrés de 8 × 8 se touchent quand ils sont à **moins de 8 pixels** l’un de l’autre, en largeur ET en hauteur.",
+      "**Avec un `if` :** `if (touche(x, y, ex, ey)) { … }` — perdre une vie, ramasser une pièce.",
+      "**Essaie :** fais trembler l’écran (`trembler(4)`) quand ils se touchent.",
+    ],
+    code: `// ---- #include <touche> : deux lutins se touchent-ils ? ----
+// Le héros avance vers l'ennemi ; au contact, « TOUCHE ! » s'affiche.
+
+#include <Tuile>
+#include <sprite>    // sprite() : un lutin au pixel près
+#include <texte>     // texte() : écrire à l’écran
+#include <avancer>   // avancer() : la place, avancée à ta vitesse
+#include <touche>    // touche() : se touchent-ils ?
+
+Tuile HEROS = {                     // les points (.) sont transparents
+  "..####..", ".#-##-#.", "########", "#.####.#",
+  "########", "..#..#..", ".#....#.", "##....##",
+};
+Tuile ENNEMI = {                    // un ennemi tout rond
+  "..####..", ".######.", "##.##.##", "########",
+  "########", ".######.", "..#..#..", ".##..##.",
+};
+
+int main() {
+  uint8_t x = 0;                    // le héros, qui avance
+  uint8_t ex = 100;                 // l'ennemi, immobile
+
+  while (true) {
+    image();
+    x = avancer(x, 30);
+    if (touche(x, 72, ex, 72)) {    // ils se touchent :
+      texte(6, 4, "TOUCHE !");
+    } else {
+      texte(6, 4, "        ");      // sinon, on efface
+    }
+    sprite(0, x, 72, HEROS);
+    sprite(1, ex, 72, ENNEMI);
+  }
+}
+`,
+    aVoir: "Le héros avance vers l’ennemi ; tant qu’ils se chevauchent, « TOUCHE ! » s’écrit en haut.",
+    controle: (c) => {
+      let vu = null, pasVu = false
+      for (let i = 0; i < 400; i++) {
+        c.avancer(1)
+        const x = c.lutin(0).x, ecrit = c.lire(6, 4) !== 0
+        if (ecrit && vu === null) vu = x
+        if (!ecrit && x > 60 && x < 90) pasVu = true
+      }
+      return [
+        ['loin de l’ennemi, rien', pasVu],
+        ['au contact, « TOUCHE ! »', vu !== null && vu >= 92 && vu <= 94, ` (dès x = ${vu})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction toucheDecor() — y a-t-il du décor sous ce pixel ?',
+    difficulte: 0,
+    idee: "#include <toucheDecor> : toucheDecor(x, y) rend 1 s’il y a une tuile posée sous le pixel (x, y).",
+    texte: [
+      "**Ce qu’elle fait :** elle regarde le **décor** sous un pixel : y a-t-il une tuile posée là (un mur, un sol) ? Elle rend 1 ou 0.",
+      "**La ligne à écrire : `#include <toucheDecor>`.**",
+      "**Ses réglages :** un pixel, x et y. Pour savoir si le héros a un sol sous les pieds : le pixel juste sous lui, au milieu — `toucheDecor(x + 4, y + 8)`.",
+      "**Un mur devant lui :** `toucheDecor(x + 8, y + 4)` regarde juste à sa droite.",
+      "**Essaie :** fais tomber le héros quand il n’y a plus de sol sous lui.",
+    ],
+    code: `// ---- #include <toucheDecor> : y a-t-il du décor sous ce pixel ? ----
+// Le héros avance vers un mur, et s'arrête devant lui.
+
+#include <Tuile>
+#include <sprite>        // sprite() : un lutin au pixel près
+#include <poser>         // poser() : une tuile sur le fond
+#include <avancer>       // avancer() : la place, avancée à ta vitesse
+#include <toucheDecor>   // toucheDecor() : du décor sous ce pixel ?
+
+Tuile HEROS = {                     // les points (.) sont transparents
+  "..####..", ".#-##-#.", "########", "#.####.#",
+  "########", "..#..#..", ".#....#.", "##....##",
+};
+Tuile SOL = {                       // un bloc de sol, tout plein
+  "33333333", "32222223", "32222223", "32222223",
+  "32222223", "32222223", "32222223", "33333333",
+};
+
+int main() {
+  poser(14, 9, SOL);                  // un mur : la case (14, 9), pixels 112 à 119
+  uint8_t x = 0;
+
+  while (true) {
+    image();
+    if (toucheDecor(x + 8, 76) == 0) {   // rien juste devant lui (à droite) :
+      x = avancer(x, 30);                //   il avance
+    }
+    sprite(0, x, 72, HEROS);
+  }
+}
+`,
+    aVoir: "Le héros avance vers un bloc, et s’arrête juste devant.",
+    controle: (c) => {
+      c.avancer(500)
+      const x = c.lutin(0).x
+      return [['il s’arrête juste devant le mur', x === 104, ` (x = ${x})`]]
+    },
+  },
+
+  {
+    titre: 'La fonction clignoter() — un lutin qui clignote',
+    difficulte: 0,
+    idee: "#include <clignoter> : clignoter(numero, x, y, tuile, fois) — comme sprite(), mais le lutin clignote « fois » fois par seconde.",
+    texte: [
+      "**Ce qu’elle fait :** comme `sprite()`, mais le lutin **apparaît et disparaît** sans arrêt. Dans les jeux, ça veut dire : « je viens d’être touché, je suis invincible un moment ».",
+      "**La ligne à écrire : `#include <clignoter>`.** Pas besoin d’inclure aussi `sprite`.",
+      "**Ses réglages :** ceux de `sprite()`, plus **combien de fois par seconde**. 0 : il ne clignote pas, il est simplement là.",
+      "**Pour un moment seulement :** un compteur d’images, et `if (invincible > 0) clignoter(…, 8); else sprite(…);`.",
+      "**Essaie :** 2 fois par seconde, puis 15.",
+    ],
+    code: `// ---- #include <clignoter> : un lutin qui clignote ----
+
+#include <Tuile>
+#include <clignoter>   // clignoter() : comme sprite(), mais il clignote
+
+Tuile HEROS = {                     // les points (.) sont transparents
+  "..####..", ".#-##-#.", "########", "#.####.#",
+  "########", "..#..#..", ".#....#.", "##....##",
+};
+
+int main() {
+  while (true) {
+    image();
+    clignoter(0, 76, 72, HEROS, 4);   // le héros, qui clignote 4 fois par seconde
+  }
+}
+`,
+    aVoir: "Le héros, au milieu de l’écran, qui apparaît et disparaît quatre fois par seconde.",
+    controle: (c) => {
+      const v = []
+      for (let i = 0; i < 120; i++) { c.avancer(1); v.push(c.gb.mmu.read(0xfe00) !== 0) }
+      let changes = 0
+      v.forEach((b, i) => { if (i && b !== v[i - 1]) changes++ })
+      return [
+        ['il est visible la moitié du temps', v.filter(Boolean).length >= 50 && v.filter(Boolean).length <= 70],
+        ['quatre clignements par seconde', changes >= 14 && changes <= 18, ` (${changes} changements en 2 secondes)`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction trembler() — l’écran qui tremble',
+    difficulte: 0,
+    idee: "#include <trembler> : trembler(4) au moment du choc, trembler(0) à chaque autre image ; l’écran tremble, se calme, et revient en place.",
+    texte: [
+      "**Ce qu’elle fait :** tout l’écran **tremble** — une explosion, un coup, un gros monstre qui tombe. Puis la secousse se calme toute seule, en une demi-seconde.",
+      "**La ligne à écrire : `#include <trembler>`.**",
+      "**Son réglage :** la force, en pixels. **À appeler à chaque image :** `trembler(4)` au moment du choc, `trembler(0)` le reste du temps (c’est ce qui fait durer et calmer la secousse).",
+      "**Au calme, elle ne touche à rien :** un jeu qui fait défiler son décor n’est pas dérangé.",
+      "**Essaie :** une force de 8 : un tremblement de terre.",
+    ],
+    code: `// ---- #include <trembler> : l'écran qui tremble ----
+// Toutes les deux secondes, un BOUM : l'écran tremble, puis se calme.
+
+#include <texte>      // texte() : écrire à l’écran
+#include <trembler>   // trembler() : l’écran qui tremble
+
+int main() {
+  texte(7, 8, "BOUM !");
+
+  while (true) {
+    image();
+    if (images() == 0) {          // toutes les 256 images (un peu plus de 4 secondes) :
+      trembler(4);                //   le choc
+    } else {
+      trembler(0);                //   le reste du temps : la secousse continue, et se calme
+    }
+  }
+}
+`,
+    aVoir: "Le mot BOUM ! qui, de temps en temps, tremble avec tout l’écran, puis se calme.",
+    controle: (c) => {
+      const v = []
+      for (let i = 0; i < 300; i++) { c.avancer(1); v.push(c.gb.mmu.read(0xff43) + c.gb.mmu.read(0xff42)) }
+      return [
+        ['l’écran a tremblé', v.some((d) => d !== 0)],
+        ['puis il est revenu en place', v.at(-1) === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction fonduNoir() — l’écran qui s’assombrit',
+    difficulte: 0,
+    idee: "#include <fonduNoir> : fonduNoir(images) assombrit l’écran jusqu’au noir, en trois étapes de « images » images.",
+    texte: [
+      "**Ce qu’elle fait :** l’écran **s’assombrit** doucement jusqu’au noir — pour finir un niveau, ou avant de changer d’écran.",
+      "**La ligne à écrire : `#include <fonduNoir>`.** Et pour revenir : `fonduRetour()` (sa propre leçon).",
+      "**Son réglage :** combien d’images dure chaque étape. 8 : une demi-seconde en tout ; 20 : plus d’une seconde.",
+      "**Le programme attend la fin du fondu,** puis continue : c’est un moment de passage, rien ne bouge.",
+      "**Pour la Game Boy d’origine** (les quatre nuances) : elle change les nuances du fond et des lutins.",
+    ],
+    code: `// ---- #include <fonduNoir> : l'écran qui s'assombrit ----
+
+#include <texte>       // texte() : écrire à l’écran
+#include <attendre>    // attendre() : une pause, en secondes
+#include <fonduNoir>   // fonduNoir() : jusqu’au noir
+
+int main() {
+  texte(4, 8, "FIN DU NIVEAU");
+  attendre(1);                    // on le lit une seconde…
+  fonduNoir(10);                  // …puis tout s'assombrit, en trois étapes de 10 images
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: "FIN DU NIVEAU, puis l’écran qui s’assombrit en trois temps, jusqu’au noir.",
+    controle: (c) => {
+      const avant = c.gb.mmu.read(0xff47)
+      c.avancer(150)
+      const apres = c.gb.mmu.read(0xff47)
+      return [
+        ['au départ, les nuances d’origine', avant === 0xe4],
+        ['à la fin, tout est noir', apres === 0xff, ` (${apres.toString(2)})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction fonduRetour() — l’écran qui revient du noir',
+    difficulte: 0,
+    idee: "#include <fonduRetour> : fonduRetour(images) ramène l’écran du noir aux nuances d’origine.",
+    texte: [
+      "**Ce qu’elle fait :** l’inverse de `fonduNoir()` : du noir, l’écran **s’éclaire** doucement jusqu’aux nuances d’origine.",
+      "**La ligne à écrire : `#include <fonduRetour>`.**",
+      "**Le passage d’un écran à l’autre :** `fonduNoir(8);` — on efface, on dessine le nouvel écran pendant qu’il est noir — puis `fonduRetour(8);`.",
+      "**Elle remet les nuances d’origine** (0, 1, 2, 3) : si ton jeu en avait choisi d’autres, remets-les après.",
+    ],
+    code: `// ---- #include <fonduRetour> : l'écran qui revient du noir ----
+// Un écran qui s'éteint, change pendant qu'il est noir, et revient.
+
+#include <texte>         // texte() : écrire à l’écran
+#include <attendre>      // attendre() : une pause, en secondes
+#include <effacer>       // effacer() : tout effacer
+#include <fonduNoir>     // fonduNoir() : jusqu’au noir
+#include <fonduRetour>   // fonduRetour() : du noir, retour
+
+int main() {
+  texte(5, 8, "NIVEAU 1");
+  attendre(1);
+  fonduNoir(8);                   // jusqu'au noir…
+  effacer();                      // …on change d'écran pendant qu'il est noir…
+  texte(5, 8, "NIVEAU 2");
+  fonduRetour(8);                 // …et il revient
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: "NIVEAU 1, l’écran qui s’éteint, puis NIVEAU 2 qui apparaît en s’éclairant.",
+    controle: (c) => {
+      c.avancer(200)
+      return [
+        ['les nuances d’origine sont revenues', c.gb.mmu.read(0xff47) === 0xe4],
+        ['le nouvel écran est là', c.lire(12, 8) !== 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction texteLent() — un texte lettre par lettre',
+    difficulte: 0,
+    idee: "#include <texteLent> : texteLent(colonne, ligne, \"TEXTE\", vitesse) écrit le texte lettre par lettre, « vitesse » lettres par seconde.",
+    texte: [
+      "**Ce qu’elle fait :** le texte **s’écrit tout seul**, une lettre après l’autre, comme sur une machine à écrire. C’est ainsi que parlent les personnages des jeux.",
+      "**La ligne à écrire : `#include <texteLent>`.**",
+      "**Ses réglages :** la place, le texte, et la vitesse **en lettres par seconde** (15 : vif ; 5 : lent et solennel). Au bord droit, la suite passe à la ligne.",
+      "**Tout s’écrit en clair,** et le programme attend que la dernière lettre soit écrite avant de continuer.",
+      "**Essaie :** une phrase de deux lignes, à 8 lettres par seconde.",
+    ],
+    code: `// ---- #include <texteLent> : un texte lettre par lettre ----
+
+#include <texteLent>   // texteLent() : comme une machine à écrire
+
+int main() {
+  texteLent(1, 8, "BONJOUR AVENTURIER", 10);   // 10 lettres par seconde
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: "BONJOUR AVENTURIER qui s’écrit lettre par lettre, en presque deux secondes.",
+    controle: (c) => {
+      const compte = () => [...Array(18)].filter((_, i) => c.lire(1 + i, 8) !== 0).length
+      const debut = compte()
+      c.avancer(30)
+      const milieu = compte()
+      c.avancer(150)
+      const fin = compte()
+      return [
+        ['les lettres arrivent une à une', debut < milieu && milieu < fin, ` (${debut} → ${milieu} → ${fin})`],
+        ['tout le texte est écrit', fin === 17],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction compteARebours() — un chrono qui descend',
+    difficulte: 0,
+    idee: "#include <compteARebours> : reste = compteARebours(secondes) rend les secondes qui restent, et 0 quand le temps est écoulé.",
+    texte: [
+      "**Ce qu’elle fait :** un **chrono** qui descend tout seul, seconde par seconde. Elle rend ce qui reste ; à 0, le temps est écoulé.",
+      "**La ligne à écrire : `#include <compteARebours>`.**",
+      "**Son réglage :** le nombre de secondes au départ (jusqu’à 255). Il part au premier appel ; appelle-la à chaque image.",
+      "**Elle compte les vraies images :** même si le jeu ralentit, une seconde reste une seconde.",
+      "**Avec `nombre()` :** on affiche ce qui reste ; avec un `if`, on arrête la partie à 0.",
+    ],
+    code: `// ---- #include <compteARebours> : un chrono qui descend ----
+
+#include <nombre>           // nombre() : écrire un nombre
+#include <texte>            // texte() : écrire à l’écran
+#include <compteARebours>   // compteARebours() : un chrono qui descend
+
+int main() {
+  texte(1, 1, "TEMPS");
+  uint8_t reste = 0;
+
+  while (true) {
+    image();
+    reste = compteARebours(5);      // 5 secondes, qui descendent toutes seules
+    nombre(7, 1, reste, 1);         // ce qui reste
+    if (reste == 0) {
+      texte(5, 8, "FINI !");        // le temps est écoulé
+    }
+  }
+}
+`,
+    aVoir: "TEMPS 5, puis 4, 3, 2, 1, 0 — et FINI ! au milieu de l’écran.",
+    controle: (c) => {
+      const vus = new Set()
+      for (let i = 0; i < 400; i++) { c.avancer(1); vus.add(c.lire(7, 1)) }
+      return [
+        ['six valeurs : de 5 à 0', vus.size === 6, ` (${vus.size})`],
+        ['à 0, « FINI ! »', c.lire(5, 8) !== 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction meilleurScore() — le record, gardé dans la cartouche',
+    difficulte: 0,
+    idee: "#include <meilleurScore> : record = meilleurScore(score) rend le meilleur score, et retient « score » s’il le bat — même console éteinte.",
+    texte: [
+      "**Ce qu’elle fait :** elle garde le **record** dans la cartouche, comme une sauvegarde : on éteint la console, on la rallume, le record est toujours là.",
+      "**La ligne à écrire : `#include <meilleurScore>`.**",
+      "**Son réglage :** le score qu’on vient de faire. Elle rend le record : l’ancien, ou le nouveau si tu l’as battu.",
+      "**Quand l’appeler :** à la fin d’une partie, une fois. (Elle écrit dans la cartouche : inutile de le faire à chaque image.)",
+      "**Une cartouche neuve** commence avec un record de 0.",
+    ],
+    code: `// ---- #include <meilleurScore> : le record, gardé dans la cartouche ----
+
+#include <nombre>          // nombre() : écrire un nombre
+#include <texte>           // texte() : écrire à l’écran
+#include <meilleurScore>   // meilleurScore() : le record
+
+int main() {
+  uint8_t score = 42;                   // le score de cette partie
+  uint8_t record = meilleurScore(score);   // le record (42, s'il n'y en avait pas de meilleur)
+
+  texte(1, 1, "SCORE");
+  nombre(8, 1, score);
+  texte(1, 3, "RECORD");
+  nombre(8, 3, record);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: "SCORE 042 et RECORD 042 — et le record reste, même après avoir éteint la console.",
+    controle: (c) => {
+      c.avancer(5)
+      return [['le record est le score : 042', c.lire(9, 3) === c.lire(9, 1) && c.lire(10, 3) === c.lire(10, 1)]]
+    },
+  },
+
+  {
+    titre: 'La fonction gaucheDroite() — la manette, à gauche et à droite',
+    difficulte: 0,
+    idee: '#include <gaucheDroite> : x = gaucheDroite(x, vitesse) — DROITE fait aller vers la droite, GAUCHE vers la gauche, à « vitesse » pixels par seconde, sans sortir de l’écran.',
+    texte: [
+      '**Ce qu’elle fait :** elle **lit la manette** (GAUCHE et DROITE), choisit le sens, et fait avancer `x` en douceur, à ta vitesse. Sans bouton, il ne bouge pas.',
+      '**La ligne à écrire : `#include <gaucheDroite>`.**',
+      '**Ses réglages :** `x`, la place ; `vitesse`, en pixels par seconde (60 : un pixel à chaque image) — rangée dans une variable, `vitesseX` (X : la largeur), écrite une fois en haut. On range la réponse dans `x`.',
+      '**Elle s’arrête aux bords :** 0 à gauche, 152 à droite. Pas de `if` à écrire.',
+      '**À appeler à chaque image,** même sans bouton : c’est ce qui garde le mouvement régulier.',
+      '**Essaie :** `uint8_t vitesseX = 120;` ; puis 20.',
+    ],
+    code: `// ---- #include <gaucheDroite> : la manette, à gauche et à droite ----
+
+#include <Tuile>
+#include <sprite>        // sprite() : un lutin au pixel près
+#include <gaucheDroite>  // gaucheDroite() : la manette, à gauche et à droite
+
+Tuile HEROS = {                     // les points (.) sont transparents
+  "..####..", ".#-##-#.", "########", "#.####.#",
+  "########", "..#..#..", ".#....#.", "##....##",
+};
+
+int main() {
+  uint8_t x = 76;                   // au milieu de l'écran
+  uint8_t vitesseX = 60;            // sa vitesse, en pixels par seconde : on la change ici
+
+  while (true) {
+    image();
+    x = gaucheDroite(x, vitesseX);  // GAUCHE et DROITE, à vitesseX pixels par seconde
+    sprite(0, x, 72, HEROS);
+  }
+}
+`,
+    aVoir: 'Un héros au milieu ; DROITE et GAUCHE le font glisser, jusqu’aux bords.',
+    controle: (c) => {
+      c.gb.setButton('left', true); c.avancer(300); const bord = c.lutin(0).x; c.gb.setButton('left', false)
+      c.gb.setButton('right', true); c.avancer(30); const repart = c.lutin(0).x; c.gb.setButton('right', false)
+      return [
+        ['GAUCHE : jusqu’au bord, 0', bord === 0],
+        ['DROITE : il repart vers la droite', repart >= 28 && repart <= 31, ` (x = ${repart})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'La fonction hautBas() — la manette, en haut et en bas',
+    difficulte: 0,
+    idee: '#include <hautBas> : y = hautBas(y, vitesse) — BAS fait descendre, HAUT monter, à « vitesse » pixels par seconde, sans sortir de l’écran.',
+    texte: [
+      '**Ce qu’elle fait :** la même chose que `gaucheDroite()`, mais en hauteur : elle lit HAUT et BAS, et fait bouger `y` en douceur.',
+      '**La ligne à écrire : `#include <hautBas>`.**',
+      '**Ses réglages :** `y`, la hauteur ; `vitesse`, en pixels par seconde — rangée dans une variable, `vitesseY` (Y : la hauteur), écrite une fois en haut. Elle s’arrête à 0 en haut et à 136 en bas.',
+      '**Avec `gaucheDroite()` :** les deux ensemble font aller le héros dans les quatre directions — un jeu vu de dessus.',
+    ],
+    code: `// ---- #include <hautBas> : la manette, en haut et en bas ----
+
+#include <Tuile>
+#include <sprite>     // sprite() : un lutin au pixel près
+#include <hautBas>    // hautBas() : la manette, en haut et en bas
+
+Tuile HEROS = {                     // les points (.) sont transparents
+  "..####..", ".#-##-#.", "########", "#.####.#",
+  "########", "..#..#..", ".#....#.", "##....##",
+};
+
+int main() {
+  uint8_t y = 68;                   // au milieu de l'écran
+  uint8_t vitesseY = 60;            // sa vitesse, en pixels par seconde : on la change ici
+
+  while (true) {
+    image();
+    y = hautBas(y, vitesseY);       // HAUT et BAS, à vitesseY pixels par seconde
+    sprite(0, 76, y, HEROS);
+  }
+}
+`,
+    aVoir: 'Un héros au milieu ; BAS et HAUT le font descendre et monter, jusqu’aux bords.',
+    controle: (c) => {
+      c.gb.setButton('down', true); c.avancer(300); const bas = c.lutin(0).y; c.gb.setButton('down', false)
+      return [['BAS : jusqu’en bas, 136', bas === 136]]
+    },
   },
 
   {
@@ -28126,12 +29059,12 @@ int main() {
     titre: "Choisir la taille du titre : texteTitre(…, taille)",
     difficulte: 3,
     suite: true,
-    idee: "Un 4e argument, la taille : 2, 3 ou 4 cases de côté par lettre. Le même mot TITRE, dans les trois tailles, l’un sous l’autre.",
+    idee: "Un 4e argument, la taille : 2, 3, 4… cases de côté par lettre, sans limite. Le même mot TITRE, dans les tailles 2, 3 et 4, l’un sous l’autre.",
     texte: [
       "**Ce qui est nouveau ici : un quatrième argument, la taille.** `texteTitre(colonne, ligne, \"MOT\", taille)` : la taille est le **nombre de cases de côté** d’une lettre. Sans lui, c’est 3, comme jusqu’ici.",
       "**Les trois tailles :** **2** → une lettre de 16 × 16 pixels (2 colonnes, 2 lignes), **10 lettres** par ligne ; **3** → 24 × 24 pixels, **6 lettres** ; **4** → 32 × 32 pixels, **5 lettres**. Le style ne change pas : rondes, un contour noir, une ombre, et elles sautillent. En taille 2, le contour est plus fin et les coins ne sont pas arrondis : la place manque.",
       "**Le calcul de la place :** une lettre prend « taille » colonnes. TITRE (5 lettres) prend donc 5 × 2 = **10** colonnes en taille 2, 5 × 3 = **15** en taille 3, 5 × 4 = **20** en taille 4 — tout l’écran. Et « taille » lignes : en lignes 0 à 1, puis 3 à 5, puis 8 à 11.",
-      "**La taille s’écrit en clair** — `2`, `3` ou `4` —, **jamais avec une variable** : les lettres sont **dessinées par le compilateur**, avant que le jeu ne tourne, donc il doit connaître leur taille en lisant le programme. Avec une variable, ou une taille 5, le compilateur refuse et dit pourquoi.",
+      "**La taille s’écrit en clair** — `2`, `3`, `4`… —, **jamais avec une variable** : les lettres sont **dessinées par le compilateur**, avant que le jeu ne tourne, donc il doit connaître leur taille en lisant le programme. Avec une variable, le compilateur refuse et dit pourquoi. **Il n’y a pas de limite de taille** : 5, 8, 20… Un mot plus large que l’écran est coupé au bord.",
       "**Ce qu’il coûte :** chaque taille a ses propres dessins. Le T en taille 2 et le T en taille 4 ne sont pas les mêmes tuiles : un titre dans les trois tailles coûte trois fois. Dans un vrai jeu, on en choisit une.",
       "**À toi :** écris le nom de ton jeu dans la taille qui lui va. Dix lettres ? Taille 2. Un nom court qui doit frapper ? Taille 4.",
     ],
@@ -28161,6 +29094,44 @@ int main() {
       ['taille 4 : TITRE sur toute la largeur, jusqu’à la colonne 19', c.lire(1, 9) !== 0 && c.lire(18, 9) !== 0],
       ['chaque taille a ses propres dessins', c.lire(1, 0) !== c.lire(1, 4) && c.lire(1, 4) !== c.lire(1, 9), ` (${c.lire(1, 0)}, ${c.lire(1, 4)}, ${c.lire(1, 9)})`],
     ],
+  },
+
+  {
+    titre: 'Un titre géant : texteTitre sans limite de taille',
+    difficulte: 3,
+    suite: true,
+    idee: 'texteTitre(1, 0, "GO", 9) : la taille n’a pas de limite. 9 cases de côté par lettre ; plus grand que l’écran, le mot est coupé au bord.',
+    texte: [
+      '**Ce qui est nouveau ici : une taille au-delà de 4.** `texteTitre(1, 0, "GO", 9)` : chaque lettre fait **9 cases de côté** (72 × 72 pixels). Il n’y a **pas de limite** : 5, 9, 20…',
+      '**Le même style à toute taille :** rondes, un contour noir, une ombre, une lettre sur deux un peu plus bas. Plus la lettre est grande, plus son contour est épais : le dessin grandit d’un bloc.',
+      '**Plus grand que l’écran ? Coupé, pas refusé.** « SUPER » en taille 6 demande 5 × 6 = 30 colonnes ; l’écran n’en a que 20 : on voit SUP, et le reste est coupé au bord. Seules les cases qui se voient sont dessinées.',
+      '**Le prix :** une grande lettre demande beaucoup de cases différentes (le contour, l’ombre). La console n’a que 256 dessins : un titre géant peut les remplir, et le compilateur le dit.',
+      '**À toi :** écris « OK » en taille 10 : deux lettres qui remplissent l’écran.',
+    ],
+    code: `// Un titre GÉANT : la taille de texteTitre() n’a pas de limite.
+
+#include <texteTitre>   // texteTitre(colonne, ligne, "MOT", taille)
+
+int main() {
+  // GO en taille 9 : chaque lettre fait 9 × 9 cases (72 × 72 pixels).
+  //   2 lettres × 9 = 18 colonnes, à partir de la colonne 1 : tout tient.
+  texteTitre(1, 0, "GO", 9);
+
+  while (true) {
+    image();
+  }
+}
+`,
+    aVoir: 'GO en lettres de titre immenses, qui remplissent presque tout l’écran, le O un peu plus bas que le G.',
+    controle: (c) => {
+      c.avancer(10)
+      const plein = (x, y, l, h) => { let n = 0; for (let j = y; j < y + h; j++) for (let i = x; i < x + l; i++) if (c.lire(i, j) !== 0) n++; return n }
+      return [
+        ['le G occupe les colonnes 1 à 9', plein(1, 0, 9, 9) > 40],
+        ['le O occupe les colonnes 10 à 18', plein(10, 0, 9, 10) > 40],
+        ['rien à gauche du mot', plein(0, 0, 1, 18) === 0],
+      ]
+    },
   },
 
   {
@@ -28988,16 +29959,16 @@ int main() {
   {
     titre: 'Un objet qui tombe',
     difficulte: 4,
-    idee: 'La pesanteur, en seizièmes de pixel.',
+    idee: 'La gravité, en seizièmes de pixel.',
     texte: [
-      'Un objet qui tombe ne descend pas à vitesse constante : il **accélère**. Toute la physique tient en deux additions — la pesanteur s’ajoute à la vitesse, la vitesse s’ajoute à la position — et c’est de les faire **dans cet ordre**, à chaque image, qui fabrique la courbe d’une chute.',
+      'Un objet qui tombe ne descend pas à vitesse constante : il **accélère**. Toute la physique tient en deux additions — la gravité s’ajoute à la vitesse, la vitesse s’ajoute à la position — et c’est de les faire **dans cet ordre**, à chaque image, qui fabrique la courbe d’une chute.',
       'Reste un ennui : la console **ne connaît pas la virgule**. Au premier instant, la balle avance de deux seizièmes de pixel — arrondi, cela fait zéro, et elle ne partirait jamais.',
       'On garde donc la position en **deux morceaux** : les pixels dans `y`, et les seizièmes de pixel dans `frac`. Seul `y` est montré ; `frac` est la mémoire de ce qui n’est pas encore un pixel entier, et qui le deviendra.',
       '`frac >> 4` est une division par seize, `frac & 15` en est le reste. Le processeur ne sait pas diviser ; décaler de quatre bits, en revanche, lui coûte un seul tour d’horloge.',
       'La chute dure **trois quarts de seconde**. Une démonstration qui ne se joue qu’une fois ne se voit pas : on compte donc les images passées au sol, et **au bout de quarante la balle est renvoyée en haut**. Elle tombe en boucle, et l’on peut la regarder tomber autant qu’on veut.',
       'La relance remet **les trois** : la hauteur, les seizièmes et la vitesse. Le sol vient de les mettre à zéro une ligne plus haut — mais un départ qui compte sur le ménage fait par quelqu’un d’autre n’est pas un départ, et le jour où l’on relancera d’ailleurs la balle partira du ciel avec la vitesse qu’elle avait en s’écrasant.',
       '`G` vaut 2, et ce nombre est le seul réglage : à 1 la balle flotte comme sur la Lune, à 6 elle tombe comme une enclume. C’est là, et nulle part ailleurs, que se décide ce qu’on ressent.',
-      '**Et 9,81 dans tout ça ?** Elle est dans `G`. Le processeur n’a ni virgule ni mètres : `G` se compte en seizièmes de pixel par image, par image, soit 450 pixels par seconde carrée à soixante images par seconde. Décidez qu’un mètre fait 46 pixels, et ces 450 pixels deviennent **9,81 m/s²** — l’écran mesure alors 3,10 m de haut, et la chute de 2,60 m dure les trois quarts de seconde que la vraie physique annonce. La pesanteur est la bonne ; c’est l’unité qui a changé.',
+      '**Et 9,81 dans tout ça ?** Elle est dans `G`. Le processeur n’a ni virgule ni mètres : `G` se compte en seizièmes de pixel par image, par image, soit 450 pixels par seconde carrée à soixante images par seconde. Décidez qu’un mètre fait 46 pixels, et ces 450 pixels deviennent **9,81 m/s²** — l’écran mesure alors 3,10 m de haut, et la chute de 2,60 m dure les trois quarts de seconde que la vraie physique annonce. La gravité est la bonne ; c’est l’unité qui a changé.',
     ],
     code: `#include <Tuile>    // un dessin de 8 × 8 pixels
 #include <texte>    // écrit un texte à l’écran
@@ -29016,7 +29987,7 @@ Tuile BALLE = {
 
 const uint8_t CIEL = 8;    // le haut de la balle quand on la lâche
 const uint8_t SOL = 128;   // le haut de la balle quand elle touche terre
-const uint8_t G = 2;       // la pesanteur, en seizièmes de pixel par image
+const uint8_t G = 2;       // la gravité, en seizièmes de pixel par image
 const uint8_t ATTENTE = 40; // les images passées au sol avant de recommencer
 
 int main() {
@@ -29089,14 +30060,14 @@ int main() {
   },
 
   {
-    titre: 'La pesanteur et le saut',
+    titre: 'La gravité et le saut',
     difficulte: 9,
     idee: 'Tomber, et retomber.',
     texte: [
       'Le processeur ne connaît **pas les nombres négatifs** : `0 - 1` vaut 255. Une vitesse qui doit monter *et* descendre ne peut donc pas s’écrire directement.',
       'On la décale : `ZEROV` vaut 16, et la vitesse vit autour. **Moins de 16, on monte ; plus de 16, on tombe.** Sans ce décalage, un saut deviendrait une chute de 240 pixels par image.',
       '`const uint8_t ZEROV = 16;` ne coûte rien : la valeur est connue à la compilation, et le compilateur l’écrit directement dans le code. Un `const` n’occupe pas d’octet de mémoire.',
-      'La pesanteur ajoute 1 à chaque image. Sauter, c’est poser une vitesse bien en dessous de 16 : elle remonte d’elle-même, le mouvement s’inverse, et la courbe est celle d’un vrai saut.',
+      'La gravité ajoute 1 à chaque image. Sauter, c’est poser une vitesse bien en dessous de 16 : elle remonte d’elle-même, le mouvement s’inverse, et la courbe est celle d’un vrai saut.',
     ],
     code: `#include <Tuile>    // un dessin de 8 × 8 pixels
 #include <texte>    // écrit un texte à l’écran
@@ -29177,11 +30148,11 @@ int main() {
     difficulte: 9,
     idee: 'Quatre éclats, et trois variables.',
     texte: [
-      'La chute est celle de la leçon du même nom : les pixels dans `y`, les seizièmes dans `frac`, la pesanteur qui s’ajoute à la vitesse. Ce qui change ici, c’est **ce qui arrive au contact**.',
+      'La chute est celle de la leçon du même nom : les pixels dans `y`, les seizièmes dans `frac`, la gravité qui s’ajoute à la vitesse. Ce qui change ici, c’est **ce qui arrive au contact**.',
       'Un objet qui se brise ne disparaît pas : il est **remplacé par ses morceaux**. Au choc, le verre part se cacher et quatre éclats prennent sa place, exactement à l’endroit où il s’est posé.',
       '**Cacher un lutin ne demande aucune fonction** : on l’écrit à 160, hors des 144 lignes de l’écran. Il existe toujours — les quarante existent toujours — on choisit simplement de ne pas le voir. C’est pour cela que les cinq `sprite()` de la fin sont écrits une fois pour toutes, sans un seul `if` : ce sont les variables qui décident qui est visible.',
       '**On ne simule pas quatre éclats.** Une image plus tôt ils étaient un seul objet : ils partent donc ensemble, à la même hauteur, et ne diffèrent que par ce qu’ils prennent de côté. Une seule hauteur `ey`, un seul compteur `t`, et les quatre positions se calculent — `76 - 3 * t`, `76 - t`, `76 + t`, `76 + 3 * t`. **Trois variables au lieu de douze.**',
-      'Leur envol est la vitesse décalée du saut : `ZEROV - 6` les projette vers le haut, la pesanteur les rattrape. Les deux éclats rapides retombent trois fois plus loin que les lents, sans qu’on ait rien à écrire pour ça — même temps de vol, vitesse triple.',
+      'Leur envol est la vitesse décalée du saut : `ZEROV - 6` les projette vers le haut, la gravité les rattrape. Les deux éclats rapides retombent trois fois plus loin que les lents, sans qu’on ait rien à écrire pour ça — même temps de vol, vitesse triple.',
       '`t` n’avance **que tant qu’ils volent**. Posés, il s’arrête, et les éclats restent exactement où ils sont tombés. C’est cette ligne-là, et aucune autre, qui fait la différence entre du verre brisé et quatre morceaux qui glissent à l’infini.',
     ],
     code: `#include <Tuile>    // un dessin de 8 × 8 pixels

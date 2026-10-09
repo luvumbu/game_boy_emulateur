@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 113.2 — La console a déjà touche() : #include &lt;touche&gt;</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 18 — Les collisions : se toucher, se cogner</span>
+    <span class="outil">du cours</span>
+    
+    <span>leçon 113.2 sur 153</span>
+    <span class="jauge" style="--part: 90%">difficulté 9 / 10</span>
+    
+    
+    
+  </p>
+<h1>113.2. La console a déjà touche() : #include &lt;touche&gt;</h1>
+<p class="idee">touche(x1, y1, x2, y2) : la fonction que tu as écrite pour les deux boîtes existe aussi dans la console. Une ligne #include, et plus de fonction à recopier.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>Tu as écrit <code>touche()</code> toi-même</strong> (« Deux boîtes qui se touchent ») : quatre comparaisons, pour savoir si deux carrés de 8 × 8 se chevauchent. Elle sert dans <strong>presque tous les jeux</strong>.</p>
+<p><strong>Ce qui est nouveau ici : la console l’a déjà.</strong> <code>#include &lt;touche&gt;</code>, et <code>touche(x, y, px, py)</code> répond 1 ou 0, comme la tienne. Plus besoin de la recopier dans chaque programme.</p>
+<p><strong>Et si tu gardes la tienne ?</strong> Une fonction écrite dans le programme passe toujours <strong>avant</strong> celle de la console : ta <code>touche()</code> à toi reste la tienne. On n’écrit <code>#include &lt;touche&gt;</code> que pour prendre celle de la console.</p>
+<p><strong>Ici,</strong> le héros marche tout seul vers une pièce ; quand il la touche, le score monte et la pièce va plus loin.</p>
+<p><strong>À toi :</strong> ajoute un ennemi qui fait sa ronde avec <code>navette()</code>, et fais perdre le héros quand <code>touche()</code> dit qu’ils se rencontrent.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;Tuile&gt;</code> → <a href="lecon-00-107.2-tuile-dessiner-une-case.html">0.107.2. Tuile — dessiner une case</a></li>
+  <li><code>#include &lt;sprite&gt;</code> → <a href="lecon-00-69.4-la-fonction-sprite-un-lutin-au-pixel-pre.html">0.69.4. La fonction sprite() — un lutin au pixel près</a></li>
+  <li><code>#include &lt;texte&gt;</code> → <a href="lecon-00-0.2-la-fonction-texte-ecrire-un-mot.html">0.0.2. La fonction texte() — écrire un mot</a></li>
+  <li><code>#include &lt;nombre&gt;</code> → <a href="lecon-00-8.3-la-fonction-nombre-ecrire-un-nombre.html">0.8.3. La fonction nombre() — écrire un nombre</a></li>
+  <li><code>#include &lt;avancer&gt;</code> → <a href="lecon-110-5-la-fonction-avancer-faire-avancer-un-lut.html">110.5. La fonction avancer() — faire avancer un lutin à ta vitesse</a></li>
+  <li><code>#include &lt;touche&gt;</code> → <a href="lecon-113-1-la-fonction-touche-deux-lutins-se-touche.html">113.1. La fonction touche() — deux lutins se touchent-ils ?</a></li>
+</ul>
+</div>
+
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">📖 Les mots de cette leçon — si tu débutes</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+    <li style="margin: 2pt 0;"><strong>accolades { }</strong> — Elles entourent un bloc : les lignes qui vont ensemble (le corps d’une fonction, d’une boucle, d’un « if »). Chaque « { » a son « } ».</li>
+    <li style="margin: 2pt 0;"><strong>affectation (=)</strong> — « x = 5; » : la boîte x prend la valeur 5. Ce n’est pas une égalité : c’est un rangement.</li>
+    <li style="margin: 2pt 0;"><strong>argument</strong> — Une valeur donnée à une fonction quand on l’appelle, entre ses parenthèses : dans texte(5, 8, "SALUT"), 5, 8 et "SALUT" sont les arguments.</li>
+    <li style="margin: 2pt 0;"><strong>bloc</strong> — Un groupe de lignes entre accolades { }, qui s’exécutent ensemble.</li>
+    <li style="margin: 2pt 0;"><strong>booléen (vrai / faux)</strong> — Le résultat d’une condition : vrai (1) ou faux (0). « true » veut dire vrai, « false » faux.</li>
+    <li style="margin: 2pt 0;"><strong>boucle</strong> — Des instructions qui se répètent : « while » (tant que…) ou « for » (pour un compteur qui va de… à…).</li>
+    <li style="margin: 2pt 0;"><strong>boucle du jeu</strong> — « while (true) { image(); … } » : ce qui se répète 60 fois par seconde, sans fin, pendant tout le jeu.</li>
+    <li style="margin: 2pt 0;"><strong>chaîne de caractères (texte)</strong> — Des lettres entre guillemets, "COMME CECI" : un texte pris tel quel. La police de la console n’a que des majuscules, sans accents.</li>
+    <li style="margin: 2pt 0;"><strong>commentaire (//)</strong> — Tout ce qui suit « // » jusqu’au bout de la ligne : une phrase pour l’humain, que la console ignore.</li>
+    <li style="margin: 2pt 0;"><strong>condition</strong> — Une question dont la réponse est vrai ou faux : « score &gt; 10 », « bouton(A) ». On la teste avec « if » ou « while ».</li>
+    <li style="margin: 2pt 0;"><strong>coordonnées</strong> — Deux nombres qui disent où : la colonne (vers la droite) puis la ligne (vers le bas), à partir de (0, 0) en haut à gauche.</li>
+    <li style="margin: 2pt 0;"><strong>if (si)</strong> — Teste une condition : si elle est vraie, on fait le bloc qui suit.</li>
+    <li style="margin: 2pt 0;"><strong>image()</strong> — Attend l’image suivante. La console en montre 60 par seconde : c’est ce qui règle la vitesse d’un jeu.</li>
+    <li style="margin: 2pt 0;"><strong>#include</strong> — En haut du programme : « #include &lt;texte&gt; » demande la fonction texte() à la console ; « #include "fichier.cpp" » verse un de tes fichiers à cet endroit.</li>
+    <li style="margin: 2pt 0;"><strong>incrémenter (++)</strong> — « x++ » ou « x += 1 » : x augmente de 1. « x-- » : x diminue de 1.</li>
+    <li style="margin: 2pt 0;"><strong>instruction</strong> — Un ordre donné à la console, terminé par un point-virgule : « texte(1, 1, "OK"); ».</li>
+    <li style="margin: 2pt 0;"><strong>lutin (sprite)</strong> — Un dessin qui bouge au pixel près, par-dessus le décor : le héros, un ennemi. sprite() en place un de 8 × 8, sprite16() un de 16 × 16. La console en a 40.</li>
+    <li style="margin: 2pt 0;"><strong>main</strong> — « int main() { … } » : là où le programme commence. La console exécute d’abord la première ligne de main.</li>
+    <li style="margin: 2pt 0;"><strong>octet</strong> — Un nombre de 0 à 255 : la plus petite boîte de la mémoire. Une cartouche en a 32 768.</li>
+    <li style="margin: 2pt 0;"><strong>opérateurs de calcul</strong> — + plus, - moins, * fois, / divisé par (sans virgule : 7 / 2 donne 3), % le reste de la division (7 % 2 donne 1).</li>
+    <li style="margin: 2pt 0;"><strong>opérateurs de comparaison</strong> — == égal, != différent, &lt; plus petit, &gt; plus grand, &lt;= plus petit ou égal, &gt;= plus grand ou égal. Le résultat est vrai ou faux.</li>
+    <li style="margin: 2pt 0;"><strong>pixel</strong> — Un tout petit carré de couleur ; l’écran en a 160 de large et 144 de haut.</li>
+    <li style="margin: 2pt 0;"><strong>point-virgule (;)</strong> — Il termine une instruction, comme le point termine une phrase.</li>
+    <li style="margin: 2pt 0;"><strong>texte()</strong> — Écrit des lettres à l’écran, sur la grille de 20 colonnes et 18 lignes : texte(colonne, ligne, "MOT").</li>
+    <li style="margin: 2pt 0;"><strong>Tuile</strong> — Un dessin de 8 × 8 pixels, écrit rangée par rangée avec des signes (. - + #). Le décor en est fait.</li>
+    <li style="margin: 2pt 0;"><strong>uint8_t</strong> — Le genre de nombre de cette console : un entier de 0 à 255 (un octet). Au-delà, il repart à 0.</li>
+    <li style="margin: 2pt 0;"><strong>variable</strong> — Une boîte avec un nom, dans la mémoire, qui retient un nombre qu’on peut lire et changer.</li>
+    <li style="margin: 2pt 0;"><strong>while (tant que)</strong> — Répète un bloc tant qu’une condition est vraie.</li>
+  </ul>
+</div>
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid; break-inside: auto;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">🔍 Le programme, ligne par ligne — chaque ligne dite en français</p>
+  <table style="width: 100%; border-collapse: collapse; table-layout: fixed;"><tbody>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// CE PROGRAMME : le héros marche ; chaque fois qu'il touche la pièce, le score monte.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« CE PROGRAMME : le héros marche ; chaque fois qu'il touche la pièce, le score monte. »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// Ce qui est nouveau : touche(), la fonction de la console.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« Ce qui est nouveau : touche(), la fonction de la console. »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   touche(x1, y1, x2, y2)   1 si les deux carrés de 8 × 8 se chevauchent, 0 sinon</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« touche(x1, y1, x2, y2)   1 si les deux carrés de 8 × 8 se chevauchent, 0 sinon »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// C'est celle que tu avais écrite toi-même : la console l'a déjà.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« C'est celle que tu avais écrite toi-même : la console l'a déjà. »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;Tuile&gt;    // un dessin de 8 × 8 pixels</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « Tuile » (ce que c’est : un dessin de 8 × 8 pixels). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « un dessin de 8 × 8 pixels ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;sprite&gt;   // place un lutin de 8 × 8 au pixel près</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « sprite » (ce que c’est : place un lutin de 8 × 8 au pixel près). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « place un lutin de 8 × 8 au pixel près ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;texte&gt;    // écrit un texte à l’écran</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « texte » (ce que c’est : écrit un texte à l’écran, à la taille qu’on veut). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « écrit un texte à l’écran ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;nombre&gt;   // écrit un nombre</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « nombre » (ce que c’est : écrit un nombre en chiffres). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « écrit un nombre ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;avancer&gt;  // avancer() : la place du héros, avancée à TA vitesse</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « avancer » (ce que c’est : fait avancer une place en douceur, à ta vitesse en pixels par seconde (négative : vers la gauche)). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « avancer() : la place du héros, avancée à TA vitesse ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;touche&gt;   // touche() : deux lutins se touchent-ils ?</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « touche » (ce que c’est : deux lutins de 8 × 8 se touchent-ils ?). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « touche() : deux lutins se touchent-ils ? ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">Tuile HEROS = {                   // Le héros.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Le début d’un dessin appelé HEROS : une tuile de 8 × 8 pixels. Les lignes suivantes en sont les rangées, de haut en bas. (Le commentaire le dit : « Le héros. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">"..####..",</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Les rangées du dessin, une par ligne : chaque signe est un pixel — « . » le plus clair, « - » clair, « + » foncé, « # » le plus foncé (ou les chiffres 0 à 3).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">};</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">La fin du dessin (ou de la liste).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">Tuile PIECE = {                   // Une pièce ronde.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Le début d’un dessin appelé PIECE : une tuile de 8 × 8 pixels. Les lignes suivantes en sont les rangées, de haut en bas. (Le commentaire le dit : « Une pièce ronde. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">"..####..",</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Les rangées du dessin, une par ligne : chaque signe est un pixel — « . » le plus clair, « - » clair, « + » foncé, « # » le plus foncé (ou les chiffres 0 à 3).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">};</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">La fin du dessin (ou de la liste).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">int main() {                          // Le jeu commence ici.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Le début du programme : la console commence ici, par la première ligne qui suit. (Le commentaire le dit : « Le jeu commence ici. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">texte(1, 1, "SCORE");</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Appel de la fonction texte de la console, avec les arguments 1, 1, "SCORE". Ce qu’elle fait : écrit un texte à l’écran — 20 colonnes, 18 lignes. Un nombre se colle à la suite : "SCORE " + score. Avec un Mot : texte(SALUT). Un 4e argument est une TAILLE, sans limite : 1 normal, 2 deux fois plus grand, 3… — texte(2, 2, "SUPER", 3). Avec une taille, le texte et la taille s’écrivent en clair ; ce qui dépasse de l’écran est coupé.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">uint8_t score = 0;</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Une variable : une boîte appelée score, qui retient un nombre de 0 à 255, et qui commence à 0.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">uint8_t x = 0;                      // Le héros.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Une variable : une boîte appelée x, qui retient un nombre de 0 à 255, et qui commence à 0. (Le commentaire le dit : « Le héros. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">uint8_t px = 60;                    // La pièce.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Une variable : une boîte appelée px, qui retient un nombre de 0 à 255, et qui commence à 60. (Le commentaire le dit : « La pièce. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">while (true) {                      // La boucle du jeu :</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">La boucle du jeu : tout ce qui est entre les accolades recommence sans fin, 60 fois par seconde avec image(). (Le commentaire le dit : « La boucle du jeu : ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">image();</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Attendre l’image suivante : la console en montre 60 par seconde. C’est ce qui règle la vitesse du jeu.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">x = avancer(x, 40);               // Le héros marche, à 40 pixels par seconde.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">x prend une nouvelle valeur : avancer(x, 40). (Le commentaire le dit : « Le héros marche, à 40 pixels par seconde. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">if (touche(x, 72, px, 72)) {      // Il touche la pièce :</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Une décision : si touche(x, 72, px, 72), on fait ce qui est entre les accolades. Sinon, on passe. (Le commentaire le dit : « Il touche la pièce : ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">score++;                        //   un point de plus,</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">score augmente de 1. (Le commentaire le dit : « un point de plus, ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">px = px + 50;                   //   et la pièce va plus loin.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">px prend une nouvelle valeur : px + 50. (Le commentaire le dit : « et la pièce va plus loin. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">if (px &gt; 150) px = 20;</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Une décision : si px est plus grand que 150 alors on fait « px = 20 ». Sinon, on passe.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">nombre(7, 1, score);</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Appel de la fonction nombre de la console, avec les arguments 7, 1, score. Ce qu’elle fait : écrit un nombre calculé, en base dix. Le 4e argument dit combien de chiffres (3 par défaut). Un 5e est la TAILLE, sans limite : nombre(2, 2, score, 3, 4) écrit le score quatre fois plus grand.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">sprite(0, x, 72, HEROS);</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Appel de la fonction sprite de la console, avec les arguments 0, x, 72, HEROS. Ce qu’elle fait : un lutin 8 × 8 au pixel près. Le 5e argument le retourne : MIROIR_X, MIROIR_Y, DERRIERE. Un NOMBRE de 2 ou plus en 5e argument est une TAILLE : le dessin agrandi d’autant (le dessin n’est écrit qu’une fois). sprite(0, 36, 60, ROND, 4).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">sprite(1, px, 72, PIECE);</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Appel de la fonction sprite de la console, avec les arguments 1, px, 72, PIECE. Ce qu’elle fait : un lutin 8 × 8 au pixel près. Le 5e argument le retourne : MIROIR_X, MIROIR_Y, DERRIERE. Un NOMBRE de 2 ou plus en 5e argument est une TAILLE : le dessin agrandi d’autant (le dessin n’est écrit qu’une fois). sprite(0, 36, 60, ROND, 4).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+  </tbody></table>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1191 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            57 o  ← la console, à l’allumage  — la mise en route de la console
+  avancer_va()        324 o  ← avancer_pas()  — une fonction fournie par le langage
+  avancer_pas()        75 o  ← main()  — une fonction fournie par le langage
+  touche()             69 o  ← main()  — une fonction fournie par le langage
+  main()              156 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  AttendreAcces        12 o  ← EcrireTexte, EcrireNombre  — attend de pouvoir écrire une case
+  EcrireTexte          10 o  ← texte()  — écrit un texte, lettre par lettre
+  EcrireNombre         33 o  ← nombre()  — écrit un nombre en chiffres
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         76 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  EffacerCarte         14 o  ← démarrage  — vide les deux cartes de l’écran
+  Tuiles              272 o  ← CopierTuiles  — 15 lettres sur 43, et 2 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+  "SCORE"               5 o  ← texte()  — un texte gravé
+Lettres gravées : CEORS0123456789
+Pas gravé (jamais appelé) : AvancerAirs, AttendreFinVBlank, AdresseCase, EffacerCases, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, Hasard, EffacerFond, EffacerPanneau, LireManette, Notes
+Fonctions du langage appelées :
+  sprite()      × 2    46 o sur place, dans main()
+  texte()       × 1    11 o sur place, dans main()  + EcrireTexte (10 o)
+  nombre()      × 1    10 o sur place, dans main()  + EcrireNombre (33 o)
+  image()       × 1     6 o sur place, dans main()  + AttendreImage (28 o)
+  images()      × 1     2 o sur place, dans avancer_va()
+Tes fonctions appelées :
+  avancer_va()  × 1    27 o sur place, dans avancer_pas()
+  avancer_pas() × 1    22 o sur place, dans main()
+  touche()      × 1    19 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : le héros marche ; chaque fois qu'il touche la pièce, le score monte.
+//
+// Ce qui est nouveau : touche(), la fonction de la console.
+//   touche(x1, y1, x2, y2)   1 si les deux carrés de 8 × 8 se chevauchent, 0 sinon
+// C'est celle que tu avais écrite toi-même : la console l'a déjà.
+
+#include &lt;Tuile&gt;    // un dessin de 8 × 8 pixels
+#include &lt;sprite&gt;   // place un lutin de 8 × 8 au pixel près
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;nombre&gt;   // écrit un nombre
+#include &lt;avancer&gt;  // avancer() : la place du héros, avancée à TA vitesse
+#include &lt;touche&gt;   // touche() : deux lutins se touchent-ils ?</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — HEROS</p>
+    <pre><code>Tuile HEROS = {                   // Le héros.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAeUlEQVR4nO3XsQ2AMAxE0ZSMQJkRGYOxGIERMgYlPZGMFQUj+b50rc+viayUdp2vWdY6JZ5dBRAgAVBftB/bI571nilAgBRAnurIAAKkAIo8roAAaYL+DSBA+UDGn814nN9NAQKkABormkUEBCgfyLhzAaA+gAClA93R8clXI4wb5wAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un dessin — PIECE</p>
+    <pre><code>Tuile PIECE = {                   // Une pièce ronde.
+  "..####..",
+  ".#----#.",
+  "#--##--#",
+  "#-#--#-#",
+  "#-#--#-#",
+  "#--##--#",
+  ".#----#.",
+  "..####..",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAcklEQVR4nO3XMQ3AMAxEUY+F0DEQC6OwCiEQAiNjAHToybKUyv7SzXdv8WAbs3/mOFtIlC0DBKgA6F10P1dIFCIgQPlAvnnlyH09gADVBEWNAQIECBAgQLtASlFUDyBA+UC/exQBASoAUoi+KFuAAKUDLU68RSYhqluRAAAAAElFTkSuQmCC" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                          // Le jeu commence ici.
+  texte(1, 1, "SCORE");
+  uint8_t score = 0;
+  uint8_t x = 0;                      // Le héros.
+  uint8_t px = 60;                    // La pièce.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    x = avancer(x, 40);               // Le héros marche, à 40 pixels par seconde.
+    if (touche(x, 72, px, 72)) {      // Il touche la pièce :
+      score++;                        //   un point de plus,
+      px = px + 50;                   //   et la pièce va plus loin.
+      if (px &gt; 150) px = 20;
+    }
+
+    nombre(7, 1, score);
+    sprite(0, x, 72, HEROS);
+    sprite(1, px, 72, PIECE);
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACMUlEQVR4nO3dQUrDQABAUZcewaVH9BgeyyN4BI/hUkEIpbbpxFYTfx48SjqUOuQnk8FN797eXwm7W30G/CqB4wSOEzhO4DiB4wSOuxD4/uFxcnL83OcXfcnJr5qfz5Xj+zEX+Nx5ORy/1fGIv/xbGdcGvlWAEdPnj27KpeO7MrpEXxl40dI9H/jw9WfjuzK6yRq58+bv1JMPyEVzPbwUvl9A4+O7cm3gRceDK8GvzmFvLjyDb7JrHVm67aJXCEyAwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3DcUOClv0/2N7Y5q625HPjzDD6/PH2dx6+D1Sc9zWqykVlt0IJfAN/OHTPVnS47jc+5HPj7Yrj6qZzWkimtwOf84ztY4BGjm6yjg3VZoscNbbJm3q7FJmvQ0BI9P7KW7Twytsw/OuIEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuC4Dyb5HQyDk2pWAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACL0lEQVR4nO3dQWrbQABAUS97hC5zxByjx+oReoQeI8sUDMI4ljKybIt+PXgEZTATka8ZT7Lx6e/HH8JOu98BTyVwnMBxAscJHCdwnMBx3wT+8fNtcnN87vWrJrk51fL9bBw/jqXAc7+Xy/FHXY945c/K2Br4UQFGTK+/WpRrxw9ldIveGHjV1r0c+PLrfeOHMnrIGll5yyv15hvkqnu9fBS+PkDj44eyNfCq68Gd4Kn3cDTfvAc/5NQ6snU7Re8QmACB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4DiB4wSOEzhO4LgdAq/9tLNnz9P26sD/evz6/X6ucr7YMs9E4zkvDXz1YYV3r7+p7vSgaDzn1YG/bq13B75MK/Cc/3gFCzxin0PW1cUdM9iiB+1wyFr4dtU8Dlkjdtiil0fWzubPpGX+0REncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHfQKW/R0MnXEbhQAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout d’une seconde — image 60</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACKUlEQVR4nO3dQUrDQABA0S49gkuP6DE8lkfwCB7DpYIQSpukiU1T+X3wkTCUOM5rpqmbHD6/PhTucPcZ6KYBjgc4HuB4gOMBjgc43gXgp+eXodHxqdevOsnoqebnc+X44zQHPLUux+NbHS9pz9+V6VrgrQCWNLz+5KKcGl8y53xLt+glizUDuWrrngc+/jk/TnfFTdaSK2/+Sh39gFw11+O3wvkbaOqcj6y7AfCq44U7wVZzoHv5M3iTu9YlW/ct7qL/cP5evgfHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDH2wDY08X+8/pcC/wz77f31yHGo+vzq3uX9bkKeNAd/gDGJ+sz2p5z2AD4mBbwyfqcb9GAO0WuYFv0xVU6OdgzN1m37e4PrPY16YZNPbN6zzn4R0c8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMc7xupMSkURVqHCwAAAABJRU5ErkJggg==" alt="l’écran">
+    <figcaption>au bout de trois secondes — image 180</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACLUlEQVR4nO3dQUrDQABAUZcewaVH9BgeyyN4BI/hUkEIRdN0Yppafx88ShhKOsxvpukqd2/vr4Td/fkM2JXAcQLHCRwncJzAcQLHnQh8//A4mR0/9v5VJ5k91fJ81n7u4Pl7lgIfW5TD8XMdD9bd9fxJWwNfMsD0/m9X5ML4jV++K7bojYFXbd3LgQ9fl8dH5pw3epM1cuUtX6mzP5yr5nr4Vfj5BRqf203ZGnjV8eBOsOscbs2J3+BVd60jW/qxrXuPu+iF8dvhf3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3CcwHECxwkcJ3DcGQJ7yOc1L9rWwJ9TfH55mmg8vmhfdfdetE2Bp7rTXDUeWbRZO33cGQIfphV4ZNF+btECd/y/K9gW/bul+3awEzdZf2Djg7JX8Tfp0mYfoH2lWzTXT+A4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjhM4TuA4geMEjvsAlCEh3HeHbm4AAAAASUVORK5CYII=" alt="l’écran">
+    <figcaption>au bout de sept secondes — image 420</figcaption>
+  </figure>
+</div>
+
+
+
+<h2>4. Ce qu’on doit voir</h2>
+<p class="avoir">Le héros marche ; chaque fois qu’il passe sur la pièce, le score monte et la pièce saute plus loin devant lui.</p>
+
+<h2>5. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>la pièce s’est déplacée </li>
+
+  <li>le score a monté </li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>113.3. La fonction toucheDecor() — y a-t-il du décor sous ce pixel ?</strong> — chapitre 18 : Les collisions : se toucher, se cogner.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

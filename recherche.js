@@ -37,9 +37,32 @@ export function normaliser(texte) {
     .toLowerCase()
 }
 
-/** Les mots d'une recherche : « Snake  menu » → ['snake', 'menu']. */
+/**
+ * Les mots d'une recherche : « Snake  menu » → ['snake', 'menu'].
+ *
+ * La ponctuation sépare les mots, comme une espace : on peut donc coller la
+ * PHRASE ENTIÈRE d'un cours, telle que le menu l'affiche, et la retrouver.
+ * « 0.1. Afficher la lettre A — de base, ailleurs » → ['0.1', 'afficher',
+ * 'la', 'lettre', 'a', 'de', 'base', 'ailleurs'].
+ * On garde, dans un mot : les lettres, les chiffres, le point (« 0.93.4 »),
+ * le souligné (« deplace_x ») et l'apostrophe (« l'ecran ») ; un point ou une
+ * apostrophe au bout d'un mot s'en va (« 0.1. » → « 0.1 »).
+ */
 export function motsDe(requete) {
-  return normaliser(requete).split(/\s+/).filter(Boolean)
+  return normaliser(requete)
+    .split(/[^\p{L}\p{N}._']+/u)              // tout le reste (espaces, — , : « » ( ) …) coupe
+    .map((mot) => mot.replace(/^[.']+|[.']+$/g, ''))   // « 0.1. » → « 0.1 », « 'a » → « a »
+    .filter(Boolean)
+}
+
+/**
+ * Une phrase « à plat » pour la comparer à une autre : ses mots (motsDe),
+ * rejoints par une seule espace. phrase('Afficher la lettre A — de base')
+ * → 'afficher la lettre a de base'. Sert à classer en tête les leçons dont
+ * le titre contient la phrase tapée, dans le même ordre.
+ */
+export function phrase(texte) {
+  return motsDe(texte).join(' ')
 }
 
 /* Un mot fait de chiffres et de points (« 12 », « 0.93 », « 0.93.4 ») est un
@@ -127,6 +150,24 @@ const STYLE = `
   .recherche.en-ligne { flex-direction: row; align-items: center; gap: 6px; margin: 0; }
   .recherche.en-ligne input { width: auto; flex: 1 1 140px; min-width: 110px; padding: 5px 8px; }
   .recherche.en-ligne .recherche-compte { white-space: nowrap; }
+  /* La liste des résultats, ouverte sous le champ pendant qu'on tape. */
+  .recherche.avec-resultats { position: relative; }
+  .recherche-resultats {
+    position: absolute; z-index: 30; top: 100%; left: 0; margin-top: 4px;
+    width: max(100%, 460px); max-width: min(640px, calc(100vw - 32px)); max-height: 60vh; overflow-y: auto;
+    padding: 4px; box-sizing: border-box; list-style: none;
+    background: var(--panneau, #1e222a); border: 1px solid var(--bord, #3a3f4b); border-radius: 8px;
+    box-shadow: 0 8px 24px #000a; font-size: 13px;
+  }
+  .recherche-resultats[hidden] { display: none; }
+  .recherche-resultats li { display: flex; flex-direction: column; gap: 1px; padding: 6px 8px; border-radius: 5px; cursor: pointer; }
+  .recherche-resultats li.choisi, .recherche-resultats li:hover { background: var(--panneau-clair, #262a33); }
+  .recherche-resultats li.choisi { outline: 1px solid var(--vert, #8bac0f); }
+  .recherche-resultats .r-titre { color: var(--texte, #e6e6e6); }
+  .recherche-resultats .r-ou { color: var(--gris, #8b93a1); font-size: 11px; }
+  .recherche-resultats mark { background: none; color: var(--vert, #8bac0f); font-weight: 600; }
+  .recherche-resultats li.r-plus { cursor: default; color: var(--gris, #8b93a1); font-size: 11px; }
+  .recherche-resultats li.r-plus:hover { background: none; }
   /* Dans un sommaire, le champ reste en haut quand on fait défiler la liste. */
   .recherche-sommaire { position: sticky; top: 0; z-index: 2; background: var(--panneau, #1e222a); padding: 4px 0; }
 `
@@ -170,16 +211,24 @@ function installerLaTouche() {
  *   ouvrir    appelé sur Entrée : ouvrir le premier résultat
  *   unite     [singulier, pluriel] pour le compteur : ['leçon', 'leçons']
  *   enLigne   true : champ et compteur côte à côte (dans une barre d'outils)
+ *   resultats (facultatif) (mots) → la liste de ce qui est trouvé, à MONTRER
+ *             sous le champ pendant qu'on tape : [{ titre, ou, ouvrir }]
+ *               titre   le texte de la ligne (« 0.1. Afficher la lettre A »)
+ *               ou      une petite ligne dessous (le chapitre, la partie)
+ *               ouvrir  () → ce que fait un clic sur la ligne
+ *             Les flèches ↑ ↓ choisissent une ligne, Entrée l'ouvre, un clic
+ *             aussi ; les mots trouvés sont surlignés dans chaque titre.
+ *             Sans « resultats », pas de liste : seul le filtre agit.
  *
  * Rend { element, champ, rafraichir, vider } : rafraichir() refait le filtre
  * (après que la liste a été redessinée), vider() efface la recherche.
  */
-export function champDeRecherche({ texte, filtrer, ouvrir = null, unite = ['résultat', 'résultats'], enLigne = false, titre = null }) {
+export function champDeRecherche({ texte, filtrer, ouvrir = null, unite = ['résultat', 'résultats'], enLigne = false, titre = null, resultats = null }) {
   poserLeStyle()
   installerLaTouche()
 
   const element = document.createElement('div')
-  element.className = 'recherche' + (enLigne ? ' en-ligne' : '')
+  element.className = 'recherche' + (enLigne ? ' en-ligne' : '') + (resultats ? ' avec-resultats' : '')
 
   const champ = document.createElement('input')
   champ.type = 'search'
@@ -205,11 +254,125 @@ export function champDeRecherche({ texte, filtrer, ouvrir = null, unite = ['rés
       : `${n} ${n > 1 ? unite[1] : unite[0]}`
     compte.classList.toggle('rien', n === 0)
   }
-  const vider = () => { champ.value = ''; rafraichir() }
+  const vider = () => { champ.value = ''; rafraichir(); fermerLaListe() }
 
-  champ.addEventListener('input', rafraichir)
+  /* ---- La liste des résultats, sous le champ (seulement avec « resultats »). */
+  const MONTRES = 80   // au-delà, la liste dit « … et N autres » : mieux vaut préciser la recherche
+  const panneau = document.createElement('ul')
+  panneau.className = 'recherche-resultats'
+  panneau.hidden = true
+  panneau.setAttribute('role', 'listbox')
+  if (resultats) element.append(panneau)
+  // Saisir la barre de défilement de la liste ne doit pas faire perdre le champ (et fermer la liste).
+  panneau.addEventListener('mousedown', (e) => e.preventDefault())
+  let trouves = []    // ce que la liste montre en ce moment
+  let choisi = -1     // la ligne choisie aux flèches (-1 : aucune, Entrée prend la première)
+
+  function fermerLaListe() { panneau.hidden = true; choisi = -1 }
+
+  /* Un titre, avec les mots cherchés surlignés. On compare le texte « à
+     plat » (sans accents) mais on affiche l'original : normaliser() garde la
+     même longueur lettre pour lettre, sauf « œ » et « æ » (deux lettres) —
+     on les compte à part pour ne pas décaler le surlignage. */
+  function surligner(ligne, texteDuTitre, mots) {
+    const plat = [...texteDuTitre].map((c) => normaliser(c)).join('')
+    const depuis = []   // depuis[i] : la place, dans l'original, de la lettre i du texte à plat
+    ;[...texteDuTitre].forEach((c, i) => { for (let k = 0; k < normaliser(c).length; k++) depuis.push(i) })
+    const marque = new Array(texteDuTitre.length).fill(false)
+    for (const mot of mots) {
+      for (let p = plat.indexOf(mot); p >= 0; p = plat.indexOf(mot, p + 1)) {
+        for (let k = p; k < p + mot.length; k++) marque[depuis[k]] = true
+      }
+    }
+    const lettres = [...texteDuTitre]
+    let morceau = ''
+    let enMarque = false
+    const pousser = () => {
+      if (!morceau) return
+      if (enMarque) { const m = document.createElement('mark'); m.textContent = morceau; ligne.append(m) } else ligne.append(morceau)
+      morceau = ''
+    }
+    lettres.forEach((c, i) => {
+      if (marque[i] !== enMarque) { pousser(); enMarque = marque[i] }
+      morceau += c
+    })
+    pousser()
+  }
+
+  function dessinerLaListe(mots) {
+    trouves = resultats(mots)
+    choisi = -1
+    panneau.textContent = ''
+    trouves.slice(0, MONTRES).forEach((r, i) => {
+      const li = document.createElement('li')
+      li.setAttribute('role', 'option')
+      const t = document.createElement('span')
+      t.className = 'r-titre'
+      surligner(t, r.titre, mots)
+      li.append(t)
+      if (r.ou) {
+        const ou = document.createElement('span')
+        ou.className = 'r-ou'
+        ou.textContent = r.ou
+        li.append(ou)
+      }
+      // mousedown, pas click : sinon le champ perd le focus et la liste se ferme avant le clic
+      li.addEventListener('mousedown', (e) => { e.preventDefault(); ouvrirLaLigne(i) })
+      li.addEventListener('mousemove', () => choisir(i, false))
+      panneau.append(li)
+    })
+    if (trouves.length > MONTRES) {
+      const plus = document.createElement('li')
+      plus.className = 'r-plus'
+      plus.textContent = `… et ${trouves.length - MONTRES} autres : ajoute un mot pour préciser`
+      panneau.append(plus)
+    }
+    panneau.hidden = trouves.length === 0
+  }
+
+  function choisir(i, defiler = true) {
+    const lignes = panneau.querySelectorAll('li[role="option"]')
+    if (!lignes.length) return
+    choisi = (i + lignes.length) % lignes.length   // après la dernière, on revient à la première
+    lignes.forEach((li, k) => li.classList.toggle('choisi', k === choisi))
+    if (defiler) lignes[choisi].scrollIntoView({ block: 'nearest' })
+  }
+
+  function ouvrirLaLigne(i) {
+    const r = trouves[i]
+    if (!r) return
+    fermerLaListe()
+    r.ouvrir()
+  }
+
+  /* La liste suit ce qu'on tape, mais seulement quand on est DANS le champ :
+     un rafraîchissement venu d'ailleurs (le menu redessiné) ne l'ouvre pas. */
+  const montrerSiBesoin = () => {
+    if (!resultats) return
+    const mots = motsDe(champ.value)
+    if (!mots.length || document.activeElement !== champ) { fermerLaListe(); return }
+    dessinerLaListe(mots)
+  }
+  if (resultats) {
+    champ.addEventListener('focus', montrerSiBesoin)
+    champ.addEventListener('blur', fermerLaListe)
+  }
+
+  champ.addEventListener('input', () => { rafraichir(); montrerSiBesoin() })
   champ.addEventListener('keydown', (e) => {
+    if (resultats && !panneau.hidden && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      e.preventDefault()
+      choisir(choisi < 0 && e.key === 'ArrowUp' ? -1 : choisi + (e.key === 'ArrowDown' ? 1 : -1))
+      return
+    }
+    if (e.key === 'Enter' && resultats && !panneau.hidden && trouves.length) {
+      e.preventDefault()
+      ouvrirLaLigne(Math.max(choisi, 0))   // la ligne choisie, ou la première
+      return
+    }
     if (e.key === 'Enter' && ouvrir) { e.preventDefault(); ouvrir() }
+    // Échap avec la liste ouverte : on la ferme seulement, la recherche reste.
+    if (e.key === 'Escape' && resultats && !panneau.hidden) { e.preventDefault(); e.stopPropagation(); fermerLaListe(); return }
     // Échap : efface d'abord ; un second Échap (champ déjà vide) quitte le champ.
     if (e.key === 'Escape') {
       if (champ.value) { e.preventDefault(); e.stopPropagation(); vider() } else champ.blur()

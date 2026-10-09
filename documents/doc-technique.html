@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Comment marche gameboy3 — la documentation technique</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+
+  .couverture { min-height: 240mm; display: flex; flex-direction: column; justify-content: center; }
+  .couverture h1 { font-size: 30pt; }
+  .couverture .sous { font-size: 13pt; color: #555; }
+  .partie { break-before: page; }
+  table.dossier { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+  table.dossier td { vertical-align: top; padding: 3pt 5pt; border-bottom: 1px dotted #ccc; }
+  table.dossier td:first-child { white-space: nowrap; }
+  .note { border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 10pt 0; break-inside: avoid; background: #f6faf2; }
+  .note-titre { margin: 0 0 4pt; font-weight: 700; color: #3d6b47; }
+  pre { white-space: pre-wrap; font-size: 8pt; }
+</style>
+</head>
+<body>
+<section class="couverture">
+  <h1>Comment marche gameboy3</h1>
+  <p class="sous">La documentation technique — écrite pour quelqu’un qui découvre le code.<br>
+  Chaque mot nouveau est expliqué, et le lexique, à la fin, les reprend tous.</p>
+  <ol><li><a href="#bases">Les bases — si tu n’as jamais programmé</a></li><li><a href="#dossier">A. Ce que contient le dossier du projet</a></li><li><a href="#chemin">B. Du texte à l’écran : suivre un vrai programme</a></li><li><a href="#compilateur">C. Le compilateur, fichier par fichier</a></li><li><a href="#atelier">D. L’atelier : la page où l’on travaille</a></li><li><a href="#lecons">E. Les leçons et le parcours</a></li><li><a href="#verifications">F. Les vérifications : comment on sait que tout marche</a></li><li><a href="#ajouter">G. Ajouter quelque chose : un jeu, une leçon, une image, une fonction</a></li><li><a href="#git">H. Enregistrer et partager : git</a></li><li><a href="#lexique">Le lexique</a></li></ol>
+</section>
+<section id="bases" class="partie"><h1>Les bases — si tu n’as jamais programmé</h1>
+<p><strong>Ces bases sont les mêmes que celles du cours complet.</strong> Si tu les as déjà lues, passe directement à la partie A.</p>
+
+<section style=" break-inside: auto;">
+  <h2>0. Avant tout : ce document est fait pour toi</h2>
+  <p><strong>Tu n’as jamais programmé ? C’est exactement pour toi.</strong> Ce document ne suppose rien : chaque mot nouveau est expliqué la première fois qu’il apparaît, et il est aussi dans le <strong>lexique</strong>, à la fin, rangé par ordre alphabétique.</p>
+  <p><strong>Comment le lire.</strong> Lis « Les bases » dans l’ordre, une partie à la fois, sans te presser. Ensuite, chaque leçon a deux encadrés pour t’aider : <strong>« Les mots de cette leçon »</strong> (les mots techniques du programme, expliqués) et <strong>« Le programme, ligne par ligne »</strong> (chaque ligne du programme dite en français).</p>
+  <p><strong>Le plus important : essayer.</strong> On n’apprend pas à programmer en lisant seulement, comme on n’apprend pas le vélo dans un livre. Ouvre l’atelier, tape le programme de la leçon, appuie sur « Compiler et lancer », regarde ce qui se passe, puis <strong>change un nombre</strong> et relance. Se tromper fait partie du jeu : la console ne casse jamais.</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>1. Un ordinateur suit des instructions, une à une</h2>
+  <p><strong>Un ordinateur ne réfléchit pas : il obéit.</strong> Il fait exactement ce qu’on lui dit, dans l’ordre, très vite — des millions de fois par seconde — mais sans jamais deviner ce qu’on voulait dire.</p>
+  <p><strong>Comme une recette de cuisine.</strong> « Casser deux œufs. Ajouter le sucre. Mélanger. » Chaque phrase est une <strong>instruction</strong> ; on les fait l’une après l’autre, de la première à la dernière. Un programme, c’est pareil : une liste d’instructions, écrites dans une langue que la machine comprend.</p>
+  <p><strong>Il faut tout dire.</strong> Une personne comprend « mets un peu de sel ». Un ordinateur, non : il faut dire combien, où, et quand. C’est pour ça que le code paraît précis et un peu raide : il ne laisse rien au hasard.</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>2. La Game Boy : une petite console de 1989</h2>
+  <p><strong>La Game Boy</strong> est une console de jeux portable, sortie en 1989. On y glissait une <strong>cartouche</strong> — un petit boîtier de plastique qui contient un jeu. La <strong>Game Boy Color</strong> (1998) est la même console, avec des couleurs.</p>
+  <p><strong>Son écran fait 160 pixels de large et 144 de haut.</strong> Un <strong>pixel</strong> est un tout petit carré de couleur : l’image entière est faite de 160 × 144 = 23 040 de ces carrés, comme une mosaïque.</p>
+  <p><strong>Elle est très lente comparée à un téléphone d’aujourd’hui</strong> — des milliers de fois. C’est ce qui rend la programmation intéressante : chaque calcul compte, et on voit vraiment ce que fait la machine.</p>
+  <p><strong>Tu n’as pas besoin d’une vraie Game Boy.</strong> L’atelier en contient une <strong>imitée</strong> dans le navigateur (on dit un <strong>émulateur</strong>) : elle fait exactement ce que ferait la vraie. La cartouche que tu fabriques marcherait aussi sur une vraie console.</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>3. Un programme, c’est un texte</h2>
+  <p><strong>Un programme s’écrit comme un texte</strong>, avec des lettres, des chiffres et quelques signes : <code>( ) { } ; = " "</code>. Ici, on l’écrit dans le langage <strong>C++</strong> (on dit « C plus plus »), un langage très utilisé pour les jeux vidéo.</p>
+  <p><strong>Un langage de programmation a des règles strictes</strong>, comme l’orthographe, mais plus sévères : un signe oublié et la machine ne comprend plus. Pas de panique : l’atelier dit <strong>où</strong> est l’erreur et <strong>quoi</strong> corriger.</p>
+  <p><strong>Le plus petit programme possible</strong> : il ne fait rien, mais il est juste.</p>
+  <pre><code>int main() {
+  while (true) {
+    image();
+  }
+}</code></pre>
+  <p><code>int main()</code> veut dire « ici commence le programme » ; <code>while (true)</code> veut dire « recommence sans fin » ; <code>image()</code> veut dire « attends l’image suivante ». Les <strong>accolades</strong> <code>{ }</code> entourent ce qui va ensemble. Tout cela est expliqué dans les parties suivantes.</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>4. Le compilateur : le traducteur</h2>
+  <p><strong>La console ne lit pas le C++.</strong> Elle ne comprend que des <strong>nombres</strong> : des suites d’<strong>octets</strong> (un octet est un nombre de 0 à 255). Il faut donc <strong>traduire</strong> le texte en nombres.</p>
+  <p><strong>Le compilateur est ce traducteur.</strong> Quand tu appuies sur « Compiler et lancer », il lit ton programme du début à la fin, vérifie qu’il respecte les règles, puis le transforme en octets — environ 32 000 — qui forment une <strong>cartouche</strong>.</p>
+  <p><strong>S’il trouve une erreur, il s’arrête et le dit</strong> : le numéro de la ligne, et ce qui ne va pas, en français. Par exemple : « ligne 5 : il manque un point-virgule ». C’est normal et utile : il vaut mieux une erreur dite tout de suite qu’un jeu qui fait n’importe quoi.</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>5. L’atelier : là où l’on écrit et où l’on joue</h2>
+  <p><strong>L’atelier est la page où tout se passe</strong> (index.html, ouverte par lancer.bat). À gauche : le <strong>programme</strong>, que tu écris. À droite : la <strong>console</strong>, qui joue la cartouche.</p>
+  <p><strong>Le bouton « ▶ Compiler et lancer »</strong> (ou Ctrl + Entrée) traduit le programme et le lance aussitôt dans la console. En dessous, la page dit ce que la cartouche contient, ou l’erreur s’il y en a une.</p>
+  <p><strong>Les touches du clavier font la manette</strong> : les flèches pour la croix, X pour le bouton A, Z pour B, Entrée pour START.</p>
+  <p><strong>Les modes, en haut</strong> : 🎨 CRÉATION (écrire, dessiner, composer de la musique), 📚 APPRENDRE (les leçons, dans l’ordre), 🔎 MACHINE (ce que la console exécute vraiment), 🔗 LES SOURCES (tous les documents).</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>6. Lire une ligne de code</h2>
+  <p><strong>On lit de haut en bas</strong>, et chaque ligne de gauche à droite — comme un livre. La console exécute les instructions dans cet ordre.</p>
+  <p><strong>Le point-virgule <code>;</code> termine une instruction</strong>, comme le point termine une phrase. L’oublier est l’erreur la plus fréquente ; le compilateur la signale.</p>
+  <p><strong>Les accolades <code>{ }</code> regroupent des lignes</strong> qui vont ensemble : tout ce qui est entre <code>{</code> et <code>}</code> forme un <strong>bloc</strong>. Les lignes d’un bloc sont décalées vers la droite (on dit <strong>indentées</strong>) pour qu’on voie d’un coup d’œil ce qui est dedans. Le décalage n’est que pour l’œil : la console ne le regarde pas.</p>
+  <p><strong>Les commentaires commencent par <code>//</code></strong> : tout ce qui suit, jusqu’au bout de la ligne, est pour l’humain qui lit, et la console l’ignore. Ils expliquent ce que fait le code.</p>
+  <pre><code>texte(1, 2, "BONJOUR");   // écrit BONJOUR en haut à gauche</code></pre>
+  <p><strong>Les majuscules comptent</strong> : <code>score</code> et <code>Score</code> sont deux noms différents. Et les noms n’ont ni espace ni accent : on écrit <code>meilleurScore</code>, pas « meilleur score ».</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>7. Écrire à l’écran : les coordonnées</h2>
+  <p><strong>Pour écrire, il faut dire OÙ.</strong> L’écran est découpé en une grille de <strong>20 colonnes</strong> et <strong>18 lignes</strong> ; chaque case fait 8 × 8 pixels et peut contenir une lettre.</p>
+  <p><strong>La case (0, 0) est en haut à gauche.</strong> La première coordonnée est la <strong>colonne</strong> (vers la droite), la seconde la <strong>ligne</strong> (vers le bas). Attention : on compte à partir de <strong>zéro</strong>, pas de un. La colonne 19 est la dernière à droite, la ligne 17 la dernière en bas.</p>
+  <pre><code>texte(5, 8, "SALUT");   // colonne 5, ligne 8 : à peu près au milieu</code></pre>
+  <p><strong>Des parenthèses après un nom, c’est un appel</strong> : <code>texte(5, 8, "SALUT")</code> demande à la console d’exécuter « texte » avec trois <strong>arguments</strong> — les valeurs entre parenthèses, séparées par des virgules. Le mot entre guillemets <code>"…"</code> est un <strong>texte</strong> tel quel.</p>
+  <p><strong>Au pixel près</strong>, pour ce qui bouge : 160 pixels de large (0 à 159), 144 de haut (0 à 143). Les lutins (les personnages) se placent ainsi.</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>8. Retenir un nombre : la variable</h2>
+  <p><strong>Une variable est une boîte avec un nom</strong>, dans la mémoire de la console, qui retient un nombre. On peut lire ce nombre, et le changer.</p>
+  <pre><code>uint8_t score = 0;   // une boîte « score », qui commence à 0</code></pre>
+  <p><code>uint8_t</code> veut dire « un nombre entier de <strong>0 à 255</strong> » (un <strong>octet</strong>). C’est le seul genre de nombre de cette console. Au-delà de 255, il <strong>repart à 0</strong>, comme le compteur kilométrique d’une vieille voiture qui repasse à zéro.</p>
+  <p><strong>Le signe <code>=</code> veut dire « prend la valeur »</strong>, pas « est égal ». <code>score = score + 1;</code> se lit : « score prend la valeur de score plus un » — il augmente de 1. On l’écrit aussi <code>score++;</code> ou <code>score += 1;</code>.</p>
+  <p><strong>Une constante</strong> (<code>const uint8_t VIES = 3;</code>) est une variable qui ne change jamais : on lui donne un nom pour que le programme se lise mieux. On les écrit souvent en MAJUSCULES.</p>
+  <p><strong>Un tableau</strong> (<code>uint8_t cases[10];</code>) est une rangée de boîtes sous un même nom : <code>cases[0]</code>, <code>cases[1]</code> … <code>cases[9]</code>. Le nombre entre crochets dit <strong>laquelle</strong> ; on commence à 0.</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>9. La boucle du jeu : 60 images par seconde</h2>
+  <p><strong>Un jeu, c’est un dessin animé.</strong> La console montre <strong>60 images par seconde</strong> ; entre deux images, le programme regarde la manette, déplace les personnages, et prépare l’image suivante.</p>
+  <pre><code>while (true) {
+  image();          // attendre l’image suivante
+  // … ce qui se passe à chaque image
+}</code></pre>
+  <p><code>while (true) { … }</code> répète ce qui est entre les accolades <strong>sans jamais s’arrêter</strong> : c’est la <strong>boucle du jeu</strong>. <code>image()</code> attend l’image suivante : sans elle, le programme irait trop vite et tout serait fini avant qu’on voie quoi que ce soit.</p>
+  <p><strong>Ce qui est avant la boucle se fait une seule fois</strong> (préparer l’écran, mettre le score à zéro). Ce qui est dedans se fait 60 fois par seconde.</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>10. Décider : « si… sinon… »</h2>
+  <p><strong><code>if</code> veut dire « si »</strong> : la console teste une <strong>condition</strong> ; si elle est vraie, elle fait ce qui est dans les accolades, sinon elle passe.</p>
+  <pre><code>if (bouton(A)) {        // si le bouton A est enfoncé…
+  texte(1, 1, "BRAVO");  // … écrire BRAVO
+} else {                // sinon…
+  texte(1, 1, "     ");  // … effacer
+}</code></pre>
+  <p><strong>Comparer</strong> : <code>==</code> « est égal à » (deux signes <code>=</code>, pour ne pas confondre avec « prend la valeur »), <code>!=</code> « est différent de », <code>&lt;</code> « plus petit que », <code>&gt;</code> « plus grand que », <code>&lt;=</code> et <code>&gt;=</code> « ou égal ».</p>
+  <p><strong>Combiner</strong> : <code>&amp;&amp;</code> veut dire « et » (les deux doivent être vrais), <code>||</code> veut dire « ou » (l’un des deux suffit), <code>!</code> veut dire « pas ».</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>11. Répéter : les boucles qui comptent</h2>
+  <p><strong><code>for</code> répète un nombre de fois connu.</strong> On lui donne un compteur, une condition pour continuer, et ce qu’on fait au compteur après chaque tour.</p>
+  <pre><code>for (uint8_t i = 0; i &lt; 5; i++) {   // i vaut 0, 1, 2, 3, 4
+  texte(i, 3, "X");                  // un X dans les colonnes 0 à 4
+}</code></pre>
+  <p><strong><code>while (condition)</code> répète tant qu’une condition est vraie</strong> — on ne sait pas d’avance combien de fois. <code>break;</code> sort de la boucle tout de suite.</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>12. Ranger des gestes : les fonctions</h2>
+  <p><strong>Une fonction est un groupe d’instructions qui a un nom.</strong> On l’écrit une fois, puis on la lance autant de fois qu’on veut en écrivant son nom suivi de parenthèses.</p>
+  <pre><code>void effacerLigne(uint8_t ligne) {       // une fonction à nous
+  texte(0, ligne, "                    ");
+}
+
+effacerLigne(4);                          // on la lance pour la ligne 4</code></pre>
+  <p><code>void</code> dit que la fonction <strong>ne rend rien</strong> ; <code>uint8_t nom(…)</code> dit qu’elle <strong>rend un nombre</strong>, avec <code>return</code>. Ce qui est entre les parenthèses de sa définition (<code>uint8_t ligne</code>) sont ses <strong>paramètres</strong> : des boîtes qui reçoivent les valeurs données à l’appel.</p>
+  <p><strong>La console a ses propres fonctions toutes prêtes</strong> : <code>texte</code>, <code>poser</code>, <code>sprite</code>, <code>bouton</code>, <code>image</code>… Ce sont elles qui touchent l’écran, la manette et le son.</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>13. « #include » : demander une fonction de la console</h2>
+  <p><strong>La cartouche est petite</strong> (32 768 octets pour tout le jeu). La console ne met donc dans ta cartouche <strong>que les fonctions que tu demandes</strong>.</p>
+  <pre><code>#include &lt;texte&gt;    // « ce programme se sert de texte() »</code></pre>
+  <p><strong>Une ligne <code>#include &lt;nom&gt;</code> par fonction employée</strong>, en haut du programme. Sans elle, le compilateur refuse et dit laquelle ajouter. Une ligne de trop ne coûte rien.</p>
+  <p><strong><code>#include "fichier.cpp"</code></strong> (avec des guillemets) est différent : il verse <strong>ton propre fichier</strong> à cet endroit, comme si son texte était écrit là. Ça permet de ranger un grand programme en plusieurs onglets.</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>14. Les dessins : pixels, tuiles et lutins</h2>
+  <p><strong>Une tuile est un petit dessin de 8 × 8 pixels.</strong> Le décor (le fond de l’écran) est une grille de tuiles, comme un carrelage. On l’écrit avec des signes, une rangée par ligne :</p>
+  <pre><code>Tuile MUR = {
+  "########",
+  "#++#+++#",
+  …
+};</code></pre>
+  <p><strong>Chaque signe est un pixel</strong> : « . » le plus clair, « - » clair, « + » foncé, « # » le plus foncé. (On peut aussi écrire les chiffres 0, 1, 2, 3.) En couleur, ces quatre nuances deviennent les quatre couleurs d’une <strong>palette</strong>.</p>
+  <p><strong>Un Perso est un dessin de 16 × 16</strong> (ou 32 × 32) : quatre tuiles (ou seize) en carré.</p>
+  <p><strong>Un lutin (en anglais « sprite ») est un dessin qui bouge</strong> librement, au pixel près, par-dessus le décor : le héros, les ennemis, une balle. <code>poser()</code> met une tuile dans le décor ; <code>sprite()</code> place un lutin.</p>
+  <p><strong>Dessiner une fois, agrandir comme on veut</strong> : un nombre en plus à la fin — <code>sprite16(0, 40, 40, HEROS, 3)</code> — montre le dessin trois fois plus grand ; le compilateur le redessine, il n’y a toujours qu’un seul dessin.</p>
+</section>
+
+<section style=" break-inside: auto;">
+  <h2>15. Quand ça ne marche pas : les erreurs</h2>
+  <p><strong>Une erreur n’est pas un échec</strong>, c’est une information. Tous les programmeurs en font, tout le temps.</p>
+  <p><strong>Lis le message</strong> : il donne la <strong>ligne</strong> et la <strong>raison</strong>. Va à cette ligne (le numéro est à gauche du programme) et regarde juste avant aussi : un point-virgule oublié à la ligne 4 est souvent signalé à la ligne 5.</p>
+  <p><strong>Les erreurs les plus courantes</strong> : un <code>;</code> oublié ; une accolade <code>}</code> en trop ou en moins ; un nom mal écrit (<code>Texte</code> au lieu de <code>texte</code>) ; un <code>#include</code> oublié ; un texte sans ses guillemets.</p>
+  <p><strong>Avance par petits pas</strong> : change une seule chose, relance, regarde. Si ça casse, tu sais exactement ce qui a cassé. Et Ctrl + Z annule la dernière modification.</p>
+</section>
+</section>
+<section id="dossier" class="partie"><h1>A. Ce que contient le dossier du projet</h1>
+<p><strong>Le projet est un dossier</strong> (on dit aussi un répertoire) : un classeur dans ton ordinateur, qui contient des <strong>fichiers</strong> et d’autres dossiers. Chaque fichier a un nom et une <strong>extension</strong> — les lettres après le point — qui dit son genre :</p>
+<p>- <code>.cpp</code> : un programme écrit en C++ (les jeux, les exemples) ;</p>
+<p>- <code>.js</code> et <code>.mjs</code> : un programme écrit en <strong>JavaScript</strong>, le langage dans lequel l’atelier, le compilateur et l’émulateur sont écrits ;</p>
+<p>- <code>.html</code> : une page web (l’atelier est une page web, ouverte dans le navigateur) ;</p>
+<p>- <code>.gb</code> et <code>.gbc</code> : une cartouche (le jeu compilé, que la console joue) ;</p>
+<p>- <code>.md</code> : un texte simple (les documents comme LISEZMOI.md) ; <code>.pdf</code> : un document à lire ou imprimer.</p>
+<p><strong>Voici le dossier, tel qu’il est en ce moment.</strong> La deuxième colonne dit à quoi sert chaque élément ; pour un fichier, c’est la première phrase de son propre commentaire, lue dans le fichier lui-même.</p>
+<table class="dossier"><tbody>
+<tr><td><code>aide-fonctions.js</code></td><td>La fiche de chaque fonction de la console : ses arguments, et ce qu'elle fait.</td><td>106 lignes</td></tr>
+<tr><td><code>analyse-rom.js</code></td><td>Ce que la cartouche occupe : la ROM, la mémoire de travail, et ce qui pèse.</td><td>290 lignes</td></tr>
+<tr><td><code>animations-tuiles.js</code></td><td>Les tuiles animées : l'eau qui ondule, le feu qui danse, l'herbe qui plie.</td><td>175 lignes</td></tr>
+<tr><td><code>barre-paint.js</code></td><td>La barre de couleurs, comme dans Paint — avec les HUIT PALETTES du jeu (0 à 7).</td><td>266 lignes</td></tr>
+<tr><td><code>bibliotheque.js</code></td><td>Des dessins tout faits, à prendre.</td><td>3168 lignes</td></tr>
+<tr><td><code>cartouches/</code></td><td>des cartouches du commerce, pour l’émulateur (jamais publiées : droits de Nintendo)</td><td>2 éléments</td></tr>
+<tr><td><code>compilateur/</code></td><td>le compilateur : ce qui transforme ton texte C++ en cartouche</td><td>11 éléments</td></tr>
+<tr><td><code>cours/</code></td><td>un PDF par leçon du cours de programmation</td><td>161 éléments</td></tr>
+<tr><td><code>cours.html</code></td><td>L'ancienne page du cours mène au parcours (tuto.html), et à la même étape :</td><td>41 lignes</td></tr>
+<tr><td><code>demarrer.mjs</code></td><td>Démarrer l'atelier, sur n'importe quel PC — sans XAMPP, sans configuration.</td><td>339 lignes</td></tr>
+<tr><td><code>desassembleur.js</code></td><td>Relire une cartouche : des octets aux instructions.</td><td>306 lignes</td></tr>
+<tr><td><code>documents/</code></td><td>les documents : le cours complet, cette documentation, l’historique des changements</td><td>16 éléments</td></tr>
+<tr><td><code>editeur-airs.js</code></td><td>Écrire une mélodie à la souris, plutôt que de taper des noms de notes.</td><td>726 lignes</td></tr>
+<tr><td><code>editeur-carte.js</code></td><td>Dessiner tout l'écran d'un coup, au pixel — une méga-tuile, par son nom.</td><td>2856 lignes</td></tr>
+<tr><td><code>editeur-code.js</code></td><td>L'éditeur de code, à la manière de VS Code : les numéros de ligne, les</td><td>988 lignes</td></tr>
+<tr><td><code>editeur-couleurs.js</code></td><td>L'atelier des couleurs : huit palettes, à la souris.</td><td>792 lignes</td></tr>
+<tr><td><code>editeur-scene.js</code></td><td>Les scènes jouables : une carte, ses murs, un joueur, des acteurs, des</td><td>1518 lignes</td></tr>
+<tr><td><code>editeur-tuiles.js</code></td><td>Dessiner ses tuiles à la souris, plutôt que de taper des chiffres.</td><td>1885 lignes</td></tr>
+<tr><td><code>emulateur.js</code></td><td>Registres, tels qu'ils ont été écrits.</td><td>1980 lignes</td></tr>
+<tr><td><code>etat-console.js</code></td><td>Sauver l'état de la console, et y revenir — au cycle près.</td><td>71 lignes</td></tr>
+<tr><td><code>exemples/</code></td><td>des programmes tout faits (et leurs cartouches), ouverts par le menu des exemples</td><td>91 éléments</td></tr>
+<tr><td><code>exporter-html.js</code></td><td>Exporter la cartouche courante en une page HTML autonome.</td><td>160 lignes</td></tr>
+<tr><td><code>files/</code></td><td>un dossier du projet</td><td>1 éléments</td></tr>
+<tr><td><code>garde.js</code></td><td>garde.js — dire POURQUOI une page ne démarre pas.</td><td>233 lignes</td></tr>
+<tr><td><code>images/</code></td><td>des captures d’écran de l’atelier</td><td>8 éléments</td></tr>
+<tr><td><code>importer-gbtd.js</code></td><td>Faire entrer les tuiles d'un fichier « .gbr » — celui du logiciel Game Boy</td><td>190 lignes</td></tr>
+<tr><td><code>importer-image.js</code></td><td>Faire entrer une image dans le programme, sous forme de tuile.</td><td>251 lignes</td></tr>
+<tr><td><code>importer-son.js</code></td><td>Importer de la musique : un fichier MIDI, ou un son enregistré (WAV).</td><td>186 lignes</td></tr>
+<tr><td><code>index.html</code></td><td>Ce que les réglages pilotent.</td><td>6973 lignes</td></tr>
+<tr><td><code>inspecteur.js</code></td><td>L'inspecteur : regarder DANS la console pendant qu'elle tourne.</td><td>235 lignes</td></tr>
+<tr><td><code>lancer.bat</code></td><td>—</td><td>84 lignes</td></tr>
+<tr><td><code>livrets/</code></td><td>un PDF par leçon, étape par étape</td><td>1370 éléments</td></tr>
+<tr><td><code>manette.js</code></td><td>Jouer autrement qu'au clavier : une vraie manette, ou l'écran tactile.</td><td>151 lignes</td></tr>
+<tr><td><code>modeles-jeux.js</code></td><td>Les modèles de jeux : un jeu entier, prêt à jouer — et à changer.</td><td>358 lignes</td></tr>
+<tr><td><code>nuancier.js</code></td><td>Une seule palette pour tout, et la console qui suit.</td><td>271 lignes</td></tr>
+<tr><td><code>outils/</code></td><td>des programmes qu’on lance en ligne de commande : compiler, fabriquer les PDF…</td><td>19 éléments</td></tr>
+<tr><td><code>package.json</code></td><td>—</td><td>41 lignes</td></tr>
+<tr><td><code>programme.js</code></td><td>Où poser un morceau dans le programme.</td><td>59 lignes</td></tr>
+<tr><td><code>projets/</code></td><td>tes projets : un dossier par jeu, ouvert par « 📂 Ouvrir »</td><td>8 éléments</td></tr>
+<tr><td><code>projets-serveur.mjs</code></td><td>Les projets, sur le disque — servis par Node, sans PHP.</td><td>278 lignes</td></tr>
+<tr><td><code>projets.js</code></td><td>Les projets, vus de la page : un lecteur, et un bandeau qui dit où l'on est.</td><td>461 lignes</td></tr>
+<tr><td><code>projets.php</code></td><td>Les projets, sur le disque.</td><td>421 lignes</td></tr>
+<tr><td><code>question-include.js</code></td><td>« Il manque un #include : l'ajouter ? » — la question douce.</td><td>94 lignes</td></tr>
+<tr><td><code>ranger-personnages.js</code></td><td>Les personnages, un fichier chacun : le parent et ses enfants.</td><td>262 lignes</td></tr>
+<tr><td><code>recherche-globale.js</code></td><td>Tout chercher, d'un seul endroit : Ctrl+K dans l'atelier.</td><td>175 lignes</td></tr>
+<tr><td><code>recherche-page.js</code></td><td>recherche-page.js — la recherche des pages de documentation.</td><td>128 lignes</td></tr>
+<tr><td><code>recherche.js</code></td><td>Chercher, partout de la même façon.</td><td>347 lignes</td></tr>
+<tr><td><code>sommaire.html</code></td><td>La recherche dans le sommaire : un script ordinaire, qui marche même ouvert par un double-clic.</td><td>165 lignes</td></tr>
+<tr><td><code>sources.js</code></td><td>L'onglet « Les sources » : tous les documents du projet, d'un clic.</td><td>163 lignes</td></tr>
+<tr><td><code>supprimer.js</code></td><td>Supprimer un élément du jeu — seulement s'il ne sert nulle part.</td><td>201 lignes</td></tr>
+<tr><td><code>tout-le-jeu.js</code></td><td>L'onglet « 📦 Tout le jeu » : chaque élément du programme, rangé par groupe.</td><td>444 lignes</td></tr>
+<tr><td><code>tuto/</code></td><td>les leçons du parcours, et les outils qui les font tourner</td><td>12 éléments</td></tr>
+<tr><td><code>tuto.html</code></td><td>--- le sommaire ---</td><td>1218 lignes</td></tr>
+<tr><td><code>tutoriels/</code></td><td>les cartouches et les captures des leçons</td><td>660 éléments</td></tr>
+<tr><td><code>verification/</code></td><td>les vérifications : des programmes qui contrôlent que tout marche</td><td>27 éléments</td></tr>
+<tr><td><code>verrous.js</code></td><td>Verrouiller un dessin : on s'en sert, on ne le modifie plus.</td><td>111 lignes</td></tr>
+<tr><td><code>versions.js</code></td><td>Les versions du programme : des photos datées, qu'on peut rouvrir.</td><td>139 lignes</td></tr>
+<tr><td><code>vue-machine.js</code></td><td>Voir ce que la console exécute vraiment.</td><td>132 lignes</td></tr>
+</tbody></table>
+<div class="note"><p class="note-titre">À retenir</p><p>Trois choses font tout le projet : <strong>l’atelier</strong> (index.html, la page où l’on écrit et où l’on joue), <strong>le compilateur</strong> (le dossier compilateur/, qui traduit le texte en cartouche) et <strong>l’émulateur</strong> (emulateur.js, la Game Boy imitée qui joue la cartouche). Tout le reste les aide : les leçons, les exemples, les outils, les vérifications, les documents.</p></div>
+</section>
+<section id="chemin" class="partie"><h1>B. Du texte à l’écran : suivre un vrai programme</h1>
+<p><strong>Que se passe-t-il quand on appuie sur « Compiler et lancer » ?</strong> On va le voir en suivant un vrai programme, <code>exemples/bonjour.cpp</code>, à travers chaque étape. Tout ce qui est montré ici a été <strong>calculé</strong> par le vrai compilateur et le vrai émulateur au moment où ce document a été fabriqué.</p>
+<p><strong>L’idée générale, comme une chaîne de fabrication</strong> : le texte entre d’un côté ; chaque étape le transforme un peu ; une cartouche sort de l’autre côté, et la console la joue.</p>
+<pre><code>ton texte (.cpp)
+   │  1. rassembler   — verser les fichiers #include "…" au bon endroit
+   ▼
+un seul texte
+   │  2. analyser     — lire les mots et ranger le programme en arbre
+   ▼
+un arbre
+   │  3. compiler     — transformer l’arbre en instructions du processeur
+   ▼
+des instructions (des octets)
+   │  4. fabriquer    — ajouter l’en-tête et les dessins : la cartouche
+   ▼
+une cartouche de 32 768 octets
+   │  5. jouer        — l’émulateur exécute la cartouche, 60 images par seconde
+   ▼
+l’écran</code></pre>
+
+<h2>Le programme de départ</h2>
+<p>Le voici, tel qu’il est dans le fichier :</p>
+<pre><code>// Une cartouche Game Boy, écrite en C++.
+//
+// Ce fichier est du vrai C++ : votre éditeur le colore, et il se lit comme
+// n'importe quel autre. Il n'est pas compilé par g++ — il est traduit en code
+// machine SM83 et gravé dans une cartouche de 32 Ko qui démarre sur une
+// console d'origine.
+//
+//   node gb3.mjs exemples/bonjour.cpp
+
+#include &lt;texte&gt;    // écrit un texte à l’écran
+#include &lt;bouton&gt;   // lit un bouton de la manette
+
+int main() {
+  texte(6, 4, "BONJOUR");
+  texte(3, 8, "APPUIE SUR A");
+
+  uint8_t compte = 0;
+
+  while (true) {
+    image(); // attend l'image suivante : soixante fois par seconde
+
+    if (bouton(A)) {
+      texte(3, 8, "BRAVO       ");
+      compte++;
+    }
+
+    if (bouton(B)) {
+      texte(3, 8, "APPUIE SUR A");
+    }
+  }
+
+  return 0;
+}</code></pre>
+
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid; break-inside: auto;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">🔍 bonjour.cpp, ligne par ligne — chaque ligne dite en français</p>
+  <table style="width: 100%; border-collapse: collapse;"><tbody>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">// Une cartouche Game Boy, écrite en C++.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Un commentaire : une phrase pour celui qui lit (« Une cartouche Game Boy, écrite en C++. »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">// Ce fichier est du vrai C++ : votre éditeur le colore, et il se lit comme</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Un commentaire : une phrase pour celui qui lit (« Ce fichier est du vrai C++ : votre éditeur le colore, et il se lit comme »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">// n'importe quel autre. Il n'est pas compilé par g++ — il est traduit en code</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Un commentaire : une phrase pour celui qui lit (« n'importe quel autre. Il n'est pas compilé par g++ — il est traduit en code »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">// machine SM83 et gravé dans une cartouche de 32 Ko qui démarre sur une</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Un commentaire : une phrase pour celui qui lit (« machine SM83 et gravé dans une cartouche de 32 Ko qui démarre sur une »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">// console d'origine.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Un commentaire : une phrase pour celui qui lit (« console d'origine. »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">//   node gb3.mjs exemples/bonjour.cpp</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Un commentaire : une phrase pour celui qui lit (« node gb3.mjs exemples/bonjour.cpp »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">#include &lt;texte&gt;    // écrit un texte à l’écran</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Demande à la console « texte » (ce que c’est : écrit un texte à l’écran). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « écrit un texte à l’écran ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">#include &lt;bouton&gt;   // lit un bouton de la manette</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Demande à la console « bouton » (ce que c’est : lit un bouton de la manette). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « lit un bouton de la manette ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">int main() {</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Le début du programme : la console commence ici, par la première ligne qui suit.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">texte(6, 4, "BONJOUR");</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Appel de la fonction texte de la console, avec les arguments 6, 4, "BONJOUR". Ce qu’elle fait : écrit un texte à l’écran — 20 colonnes, 18 lignes. Un nombre se colle à la suite : "SCORE " + score. Avec un Mot : texte(SALUT).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">texte(3, 8, "APPUIE SUR A");</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Appel de la fonction texte de la console, avec les arguments 3, 8, "APPUIE SUR A". Ce qu’elle fait : écrit un texte à l’écran — 20 colonnes, 18 lignes. Un nombre se colle à la suite : "SCORE " + score. Avec un Mot : texte(SALUT).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">uint8_t compte = 0;</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Une variable : une boîte appelée compte, qui retient un nombre de 0 à 255, et qui commence à 0.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">while (true) {</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">La boucle du jeu : tout ce qui est entre les accolades recommence sans fin, 60 fois par seconde avec image().</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">image(); // attend l'image suivante : soixante fois par seconde</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Attendre l’image suivante : la console en montre 60 par seconde. C’est ce qui règle la vitesse du jeu. (Le commentaire le dit : « attend l'image suivante : soixante fois par seconde ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">if (bouton(A)) {</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Une décision : si le bouton A est enfoncé, on fait ce qui est entre les accolades. Sinon, on passe.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">texte(3, 8, "BRAVO       ");</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Appel de la fonction texte de la console, avec les arguments 3, 8, "BRAVO       ". Ce qu’elle fait : écrit un texte à l’écran — 20 colonnes, 18 lignes. Un nombre se colle à la suite : "SCORE " + score. Avec un Mot : texte(SALUT).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">compte++;</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">compte augmente de 1.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">if (bouton(B)) {</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Une décision : si le bouton B est enfoncé, on fait ce qui est entre les accolades. Sinon, on passe.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">texte(3, 8, "APPUIE SUR A");</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">Appel de la fonction texte de la console, avec les arguments 3, 8, "APPUIE SUR A". Ce qu’elle fait : écrit un texte à l’écran — 20 colonnes, 18 lignes. Un nombre se colle à la suite : "SCORE " + score. Avec un Mot : texte(SALUT).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">return 0;</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">La fonction s’arrête ici et rend 0 à celui qui l’a appelée.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+  </tbody></table>
+</div>
+
+<h2>Étape 1 — rassembler</h2>
+<p><strong>Un programme peut tenir sur plusieurs fichiers.</strong> Une ligne <code>#include "dessins.cpp"</code> veut dire « verse ici le texte du fichier dessins.cpp ». La première étape fait ces versements, pour obtenir <strong>un seul texte</strong>. (C’est le fichier <code>compilateur/inclusion.js</code>.)</p>
+<p><strong>bonjour.cpp n’a qu’un fichier</strong> : le texte rassemblé fait 34 lignes, et les lignes <code>#include &lt;texte&gt;</code> (avec des chevrons) ne versent rien : elles <strong>demandent</strong> une fonction de la console, et le compilateur s’en souvient pour la suite.</p>
+
+<h2>Étape 2 — analyser : du texte à l’arbre</h2>
+<p><strong>L’analyseur lit le texte mot à mot</strong> (<code>compilateur/analyseur.js</code>). Il reconnaît les mots du langage (<code>int</code>, <code>while</code>, <code>if</code>…), les noms (<code>compte</code>), les nombres, les textes entre guillemets, les signes — et il vérifie l’orthographe du C++ : une parenthèse oubliée, un point-virgule manquant, et il s’arrête en disant la ligne.</p>
+<p><strong>Il range le programme en arbre</strong>, comme un arbre généalogique : le programme contient la fonction main, qui contient des instructions, qui contiennent des appels, qui contiennent des valeurs. Voici le début de main, tel que l’analyseur l’a rangé (abrégé) :</p>
+<pre><code>[
+  {
+    "genre": "expression",
+    "valeur": {
+      "genre": "appel",
+      "nom": "texte",
+      "arguments": [
+        {
+          "genre": "nombre",
+          "valeur": 6,
+          "ligne": 14
+        },
+        {
+          "genre": "nombre",
+          "valeur": 4,
+          "ligne": 14
+        },
+        {
+          "genre": "texte",
+          "valeur": "BONJOUR",
+          "ligne": 14
+        }
+      ]
+    }
+  },
+  {
+    "genre": "expression",
+    "valeur": {
+      "genre": "appel",
+      "nom": "texte",
+      "arguments": [
+        {
+          "genre": "nombre",
+          "valeur": 3,
+          "ligne": 15
+        },
+        {
+          "genre": "nombre",
+          "valeur": 8,
+          "ligne": 15</code></pre>
+<p><strong>Comment le lire</strong> : chaque <code>{ … }</code> est un nœud de l’arbre ; <code>genre</code> dit ce que c’est (un appel, une boucle, une variable…), et les autres champs ses morceaux : <code>nom</code> le nom de la fonction appelée, <code>arguments</code> ce qu’on lui donne, <code>valeur</code> un nombre ou un texte, <code>ligne</code> la ligne du programme d’où vient le morceau — c’est grâce à elle qu’une erreur peut dire « ligne 14 ». Ici, la ligne 14, <code>texte(6, 4, "BONJOUR");</code>, est devenue un appel à « texte » avec trois arguments : les nombres 6 et 4, et le texte BONJOUR.</p>
+<p>L’ordinateur travaille bien mieux sur cet arbre que sur le texte : tout y est déjà rangé et nommé.</p>
+
+<h2>Étape 3 — compiler : de l’arbre aux instructions</h2>
+<p><strong>L’émetteur parcourt l’arbre</strong> (<code>compilateur/emetteur.js</code>) et, pour chaque nœud, écrit les <strong>instructions du processeur</strong> de la Game Boy (il s’appelle SM83). Ces instructions sont très simples : « mets ce nombre dans une case », « ajoute », « saute là-bas », « appelle cette routine ». Une seule ligne de C++ en donne souvent plusieurs.</p>
+<p><strong>Le résultat pour bonjour.cpp</strong> : 561 octets de programme, 1 variable. Voici le début de main, relu par le désassembleur (<code>desassembleur.js</code>) — l’adresse, les octets, l’instruction, et ce qu’elle veut dire :</p>
+<pre><code>
+main() :
+  $0181  21 86 98   ld hl, $9886          
+  $0184  11 56 03   ld de, Texte_2        
+  $0187  06 07      ld b, 7               
+  $0189  cd 0d 02   call ecrire_18        
+  $018c  21 03 99   ld hl, $9903          
+  $018f  11 5d 03   ld de, Texte_3        
+  $0192  06 0c      ld b, 12              
+  $0194  cd 0d 02   call ecrire_18        
+  $0197  af         xor a                 
+  $0198  e0 80      ldh [main.compte], a  
+
+tantque_4 :
+  $019a  cd d5 01   call AttendreImage    ; image()
+  $019d  cd 71 02   call LireManette      ; bouton(…)
+  $01a0  cb 67      bit 4, a              
+  $01a2  ca b5 01   jp z, finsi_7         
+  $01a5  21 03 99   ld hl, $9903          
+  $01a8  11 69 03   ld de, Texte_8        
+  $01ab  06 0c      ld b, 12              
+  $01ad  cd 0d 02   call ecrire_18        
+  $01b0  f0 80      ldh a, [main.compte]  
+  $01b2  3c         inc a                 
+  $01b3  e0 80      ldh [main.compte], a  
+
+finsi_7 :
+  $01b5  cd 71 02   call LireManette      ; bouton(…)
+  $01b8  cb 6f      bit 5, a              
+  $01ba  ca c8 01   jp z, finsi_10        
+  $01bd  21 03 99   ld hl, $9903          
+  $01c0  11 75 03   ld de, Texte_11       </code></pre>
+<p><strong>Comment le lire, colonne par colonne</strong> : d’abord l’<strong>adresse</strong> (<code>$0181</code>…), écrite en hexadécimal — un nombre avec les chiffres 0-9 et A-F — : la place de l’instruction dans la cartouche. Puis les <strong>octets</strong>, la traduction exacte en nombres. Puis l’<strong>instruction</strong>, en assembleur. Enfin, après « ; », ce qu’elle veut dire en C++, quand on le sait.</p>
+<p><strong>Les quatre premières lignes sont <code>texte(6, 4, "BONJOUR");</code></strong> : <code>ld hl, $9886</code> range dans la case « hl » l’adresse de la case de l’écran (colonne 6, ligne 4) ; <code>ld de, Texte_2</code> range l’adresse du mot BONJOUR, gravé plus loin dans la cartouche ; <code>ld b, 7</code> sa longueur, sept lettres ; <code>call ecrire_…</code> appelle la routine qui recopie les lettres à l’écran. Une ligne de C++, quatre instructions.</p>
+<p><strong>Les mots de l’assembleur</strong> : <code>ld</code> « charger » (ranger une valeur quelque part), <code>call</code> « appeler une routine » (puis revenir), <code>jp</code> / <code>jr</code> « sauter » ailleurs, <code>inc</code> « ajouter 1 », <code>xor a</code> « mettre a à zéro », <code>bit</code> « tester un bit ». Les noms comme <code>AttendreImage</code> ou <code>LireManette</code> sont des <strong>routines de la console</strong> : du code tout fait, ajouté parce que le programme a demandé <code>image()</code> et <code>bouton()</code>. <code>tantque_4</code> est le début de la boucle <code>while</code>, et <code>finsi_7</code> la fin d’un <code>if</code> : quand le bouton A n’est pas enfoncé, <code>jp z, finsi_7</code> saute par-dessus ce qu’il y a dedans.</p>
+<p><strong><code>main.compte</code> est la variable <code>compte</code></strong> : le compilateur lui a donné une adresse dans la mémoire, et <code>inc a</code> entre deux <code>ldh</code> est le <code>compte++;</code> du programme.</p>
+
+<h2>Étape 4 — fabriquer la cartouche</h2>
+<p><strong>Une cartouche Game Boy a une forme imposée</strong> (<code>compilateur/cartouche.js</code>) : à l’adresse <code>$0100</code>, un saut vers le programme ; de <code>$0104</code> à <code>$0133</code>, le logo de Nintendo (la console refuse de démarrer sans lui) ; à <code>$0134</code>, le titre du jeu ; puis quelques réglages, et une <strong>somme de contrôle</strong> qui vérifie que rien n’est abîmé. Le programme commence ensuite, en <code>$0150</code>.</p>
+<p><strong>Voici les premiers octets de la cartouche de bonjour</strong>, en hexadécimal. Le titre lu dans l’en-tête : « BONJOUR » ; taille : 32 Ko.</p>
+<pre><code>$0100  00 c3 50 01 ce ed 66 66 cc 0d 00 0b 03 73 00 83
+$0110  00 0c 00 0d 00 08 11 1f 88 89 00 0e dc cc 6e e6
+$0120  dd dd d9 99 bb bb 67 63 6e 0e ec cc dd dc 99 9f
+$0130  bb b9 33 3e 42 4f 4e 4a 4f 55 52 00 00 00 00 00
+$0140  00 00 00 00 00 00 00 03 00 02 00 00 00 c3 d6 5a</code></pre>
+<p><strong>Les dessins</strong> (les lettres de la police, les tuiles du programme) sont gravés après le programme ; la cartouche est complétée jusqu’à 32 768 octets. Dans l’atelier, le bouton « ⬇ .gb » télécharge exactement ce fichier : il marcherait sur une vraie Game Boy.</p>
+
+<h2>Étape 5 — jouer : l’émulateur</h2>
+<p><strong>L’émulateur imite la console, pièce par pièce</strong> (<code>emulateur.js</code>) : le processeur (qui exécute les instructions une à une), la mémoire, l’écran (qui dessine 144 lignes, 60 fois par seconde), la manette et le son. Il ne « devine » rien : il fait exactement ce que ferait la vraie machine avec les mêmes octets.</p>
+<p><strong>Voici l’écran de bonjour, après 30 images</strong> (une demi-seconde), photographié dans l’émulateur :</p>
+<figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAACHklEQVR4nO3cMU7DMABAUUaOwMj9T8MROAYjW4eqSR3qqs7nSV9VMDR1+xSni3n7/vlSuLeXz0BPDXA8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPFWBH7/+Ly09aurwZvH+08ZP8/OfNZvUeCjx5cfbxqMQx46PkUR4KvHnRMCfn1bS+LdD31rFX0c2BI9s+lX2JQr+Iy6ceCtG/Os85yiRYFnfYveWbRnfUtfvBWBNTHA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcDzA8QDHAxwPcLzJwPubccfHbx6PnH9w58HNv5+4+WydzWozgafvKdra0H13ZHyej8z/6OcAGPDywFtL36wlemtkyhI6a4n+wy3jNMCDSOPjz7iCj8756P7g8hV86E2eC3j8hQDff/NH9+8eWhLn/heffwSsBQMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAxwMcD3A8wPEAx/sF6LKRvW+wVVUAAAAASUVORK5CYII=" alt="l’écran de bonjour" style="width: 60%; image-rendering: pixelated;"><figcaption>exemples/bonjour.cpp, dans l’émulateur du projet</figcaption></figure>
+<div class="note"><p class="note-titre">À retenir</p><p>Le texte devient un arbre, l’arbre devient des instructions, les instructions deviennent une cartouche, la cartouche devient un écran. Chaque étape est un fichier du projet, et chacune vérifie son travail : si quelque chose ne va pas, c’est l’étape la plus proche de ton texte qui le dit, avec la ligne.</p></div>
+</section>
+<section id="compilateur" class="partie"><h1>C. Le compilateur, fichier par fichier</h1>
+<p><strong>Le compilateur est un dossier de fichiers JavaScript</strong>, chacun chargé d’un morceau du travail. Tu n’as pas besoin de les lire pour programmer des jeux ; mais si tu veux comprendre ou changer la console elle-même, voici où chercher. La description vient de l’en-tête de chaque fichier.</p>
+<table class="dossier"><tbody>
+<tr><td><code>compilateur/agrandir.js</code></td><td>AGRANDIR UN DESSIN — on le dessine une fois, en petit, et l'on choisit</td><td>183 lignes</td></tr>
+<tr><td><code>compilateur/analyseur.js</code></td><td>Lit du C++ et en fait un arbre.</td><td>936 lignes</td></tr>
+<tr><td><code>compilateur/cartouche.js</code></td><td>Assemble les 32 Ko d'une cartouche autour du code compilé.</td><td>125 lignes</td></tr>
+<tr><td><code>compilateur/cartouches.js</code></td><td>LA cartouche d'un programme — Game Boy OU Game Boy Color, jamais les deux.</td><td>41 lignes</td></tr>
+<tr><td><code>compilateur/consoles.js</code></td><td>Les deux consoles — et rien d'autre.</td><td>75 lignes</td></tr>
+<tr><td><code>compilateur/emetteur.js</code></td><td>L'arbre devient du code machine.</td><td>7791 lignes</td></tr>
+<tr><td><code>compilateur/inclusion.js</code></td><td>Écrire un programme sur plusieurs fichiers.</td><td>237 lignes</td></tr>
+<tr><td><code>compilateur/inclusions-auto.js</code></td><td>Écrire les « #include » qu'un programme emploie sans les avoir écrits.</td><td>122 lignes</td></tr>
+<tr><td><code>compilateur/png.mjs</code></td><td>Écrit une image PNG, sans dépendance.</td><td>66 lignes</td></tr>
+<tr><td><code>compilateur/police.js</code></td><td>La police du compilateur : 43 dessins de 8 × 8, en 2 bits par pixel.</td><td>411 lignes</td></tr>
+<tr><td><code>compilateur/source-gravee.js</code></td><td>Le programme C++ d'origine, gravé DANS la cartouche.</td><td>199 lignes</td></tr>
+</tbody></table>
+<p><strong>Les plus importants</strong> : <code>analyseur.js</code> (le texte → l’arbre), <code>emetteur.js</code> (l’arbre → les instructions, avec toutes les fonctions de la console), <code>inclusion.js</code> (les <code>#include</code>, et la liste <code>BIBLIOTHEQUES</code> de tout ce qu’on peut demander), <code>cartouche.js</code> (la cartouche), <code>agrandir.js</code> (l’agrandissement d’un dessin, pour la taille en dernier argument).</p>
+<p><strong>Pour ajouter ta propre fonction à la console</strong>, un document entier l’explique pas à pas : <code>documents/ajouter-un-include.pdf</code>.</p>
+</section>
+<section id="atelier" class="partie"><h1>D. L’atelier : la page où l’on travaille</h1>
+<p><strong>L’atelier est une page web</strong> : <code>index.html</code>. Pour l’ouvrir, on double-clique sur <code>lancer.bat</code> : il démarre un petit <strong>serveur</strong> sur ton ordinateur (avec Node.js), puis ouvre la page dans le navigateur. (Ouvrir index.html directement d’un double-clic ne marche pas : le navigateur interdit alors à la page de lire les fichiers du projet, et la page le dit.)</p>
+<p><strong>Ce qu’on voit</strong> : à gauche le <strong>programme</strong> (un éditeur de texte qui colore le code et propose les fonctions pendant qu’on tape), à droite la <strong>console</strong> (l’émulateur) avec ses boutons — Pause, Reset, Son, Plein écran, Capture, ⬇ .gb pour télécharger la cartouche.</p>
+<p><strong>Les modes, en haut de la page</strong> :</p>
+<p>- <strong>🎨 CRÉATION</strong> : écrire le programme, et des ateliers à la souris — ▦ Les tuiles (dessiner, avec 📐 Agrandir…), ♪ Les airs (la musique), 🎨 Les couleurs, 🗺 La carte (le décor), 🖼 Les modèles (dessins tout faits : formes, images, personnages) ;</p>
+<p>- <strong>📚 APPRENDRE</strong> : le parcours, leçon par leçon ; chaque leçon met son programme dans l’éditeur et le lance ;</p>
+<p>- <strong>🔎 MACHINE</strong> : les instructions que la console exécute vraiment (le résultat de l’étape 3) ;</p>
+<p>- <strong>🔗 LES SOURCES</strong> : tous les documents, dont celui-ci.</p>
+<p><strong>Les projets</strong> : « ✦ Nouveau » crée un dossier dans <code>projets/</code>, « 📂 Ouvrir » montre les projets du disque. Chaque compilation enregistre le projet ouvert.</p>
+<p><strong>Le code de la page</strong> est surtout dans <code>index.html</code> (près de 7 000 lignes, avec beaucoup de commentaires), aidé de modules : <code>editeur-code.js</code> (l’éditeur), <code>editeur-tuiles.js</code> (le dessin), <code>editeur-airs.js</code> (la musique), <code>projets.js</code> (les projets), <code>recherche.js</code> (la recherche)…</p>
+</section>
+<section id="lecons" class="partie"><h1>E. Les leçons et le parcours</h1>
+<p><strong>Les 688 leçons sont écrites dans des fichiers JavaScript</strong>, dans le dossier <code>tuto/</code> : <code>lecons.js</code> (les leçons du parcours), <code>tutoriels.js</code> (une leçon par fonction de la console), <code>programmation.js</code> (le cours de programmation), <code>formes.js</code> (la série 2) et <code>images.js</code> (la série 3). <code>parcours.js</code> les range dans l’ordre, chapitre par chapitre.</p>
+<p><strong>Une leçon est une fiche</strong>, avec des cases qui ont un nom : son titre, son idée, ses paragraphes d’explication, son programme, ce qu’on doit voir à l’écran, et un <strong>contrôle</strong> — un petit programme qui vérifie que la leçon fait bien ce qu’elle promet. Voici la fiche de la leçon 2.01, abrégée :</p>
+<pre><code>{
+  "titre": "Le rond",
+  "numero": "2.01",
+  "idee": "2.01 : le rond — un cercle. Un dessin de 16 × 16 posé au milieu de l’écran avec sprite16(), son nom dessous.",
+  "texte": [
+    "…"
+  ],
+  "code": "// ---- 2.01 Le rond ----\n// Le rond de 16 × 16 au milieu de l'écran, et son nom dessous.\n\n#include &lt;texte&gt;                    // texte() : écrire un mot à l'écran\n#include &lt;sprite16&gt;                 // sprite16() : poser un personnage de 16 × 16\n#include &lt;Perso&gt;                    // Perso : un dessin de 16 × 16\n…",
+  "aVoir": "Le rond au milieu de l’écran, et ROND écrit dessous.",
+  "controle": "(c) =&gt; { … }"
+}</code></pre>
+<p><strong>Le contrôle est la garantie</strong> : <code>verification/verifier-tuto.mjs</code> compile chaque leçon, la fait tourner dans l’émulateur, et lance son contrôle (par exemple : « le lutin 0 est-il bien en (72, 56) ? »). Si une leçon ne marche plus, la vérification le dit tout de suite.</p>
+<p><strong>Les PDF des leçons sont fabriqués</strong>, pas écrits à la main : <code>outils/livret.mjs</code> (un livret par leçon, et le tutoriel), <code>outils/cours-complet.mjs</code> (le cours complet), <code>outils/cours.mjs</code> (le cours de programmation). Ils compilent chaque programme et photographient l’écran : une image dans un PDF est toujours le vrai écran.</p>
+</section>
+<section id="verifications" class="partie"><h1>F. Les vérifications : comment on sait que tout marche</h1>
+<p><strong>Une vérification est un programme qui en contrôle un autre.</strong> Elle fait ce que ferait une personne patiente : elle compile un programme, le fait tourner dans l’émulateur, appuie sur les boutons, lit l’écran — et compare avec ce qui est attendu. Chaque contrôle s’affiche avec ✓ (bon) ou ✗ (pas bon).</p>
+<p><strong>Pour toutes les lancer d’un coup</strong>, dans une fenêtre de commande ouverte dans le dossier du projet :</p>
+<pre><code>npm run verifier</code></pre>
+<p><strong>Pour en lancer une seule</strong>, par exemple celle des jeux :</p>
+<pre><code>node verification/verifier-jeux.mjs</code></pre>
+<p><strong>Elles sont dans le dossier <code>verification/</code></strong>. Voici chacune, avec la première phrase de sa description :</p>
+<table class="dossier"><tbody>
+<tr><td><code>verifier-airs.mjs</code></td><td>Les airs jouent-ils vraiment ce qui est écrit ?</td></tr>
+<tr><td><code>verifier-atelier-airs.mjs</code></td><td>L'atelier des airs tient-il ses promesses ?</td></tr>
+<tr><td><code>verifier-atelier.mjs</code></td><td>L'atelier de tuiles tient-il ses promesses ?</td></tr>
+<tr><td><code>verifier-console.mjs</code></td><td>Le matériel de la console répond-il vraiment ?</td></tr>
+<tr><td><code>verifier-couleur.mjs</code></td><td>La couleur arrive-t-elle vraiment à l'écran ?</td></tr>
+<tr><td><code>verifier-cours.mjs</code></td><td>Le cours « Apprendre à programmer » : chaque leçon compile-t-elle, et</td></tr>
+<tr><td><code>verifier-desassembleur.mjs</code></td><td>Le désassembleur relit-il vraiment ce que le compilateur a écrit ?</td></tr>
+<tr><td><code>verifier-disponible.mjs</code></td><td>L'atelier est-il disponible, QUELLES QUE SOIENT les conditions ?</td></tr>
+<tr><td><code>verifier-exemples.mjs</code></td><td>Les exemples tournent-ils vraiment sur la console ?</td></tr>
+<tr><td><code>verifier-export.mjs</code></td><td>L'export HTML tourne-t-il vraiment tout seul, sans l'atelier ?</td></tr>
+<tr><td><code>verifier-frappe.mjs</code></td><td>Ce qu'on tape est-il bien ce qui arrive dans le programme ?</td></tr>
+<tr><td><code>verifier-inclusion.mjs</code></td><td>Écrire sur plusieurs fichiers change-t-il quelque chose à la cartouche ?</td></tr>
+<tr><td><code>verifier-jeux.mjs</code></td><td>Les quatre jeux de la série 3 se jouent-ils jusqu'au bout ?</td></tr>
+<tr><td><code>verifier-langage.mjs</code></td><td>Le langage fait-il ce qu'il dit ?</td></tr>
+<tr><td><code>verifier-marche.mjs</code></td><td>La marche joue-t-elle vraiment ?</td></tr>
+<tr><td><code>verifier-methodes.mjs</code></td><td>Les méthodes font-elles ce qu'elles disent ?</td></tr>
+<tr><td><code>verifier-page.mjs</code></td><td>La page tient-elle ses promesses ?</td></tr>
+<tr><td><code>verifier-portage.mjs</code></td><td>Le portage depuis gameboy2 change-t-il quoi que ce soit à l'écran ?</td></tr>
+<tr><td><code>verifier-projets.mjs</code></td><td>Les projets sur le disque : le service tient-il, et refuse-t-il ce qu'il doit ?</td></tr>
+<tr><td><code>verifier-recherche.mjs</code></td><td>Les recherches marchent-elles, partout ?</td></tr>
+<tr><td><code>verifier-refus.mjs</code></td><td>Ce qui doit être refusé l'est-il, et le message dit-il quoi faire ?</td></tr>
+<tr><td><code>verifier-source-gravee.mjs</code></td><td>Le programme C++ gravé dans la cartouche revient-il TEL QUEL ?</td></tr>
+<tr><td><code>verifier-surplace.mjs</code></td><td>Un dessin écrit là où on le pose arrive-t-il vraiment à l'écran ?</td></tr>
+<tr><td><code>verifier-tout-le-jeu.mjs</code></td><td>L'onglet « 📦 Tout le jeu » tient-il ses promesses ?</td></tr>
+<tr><td><code>verifier-tuto-page.mjs</code></td><td>La page du tutoriel tient-elle debout ?</td></tr>
+<tr><td><code>verifier-tuto.mjs</code></td><td>Chaque leçon du tutoriel compile-t-elle, et fait-elle ce qu'elle promet ?</td></tr>
+<tr><td><code>verifier-tutoriels.mjs</code></td><td>`TUTORIELS.md` dit-il encore la vérité ?</td></tr>
+</tbody></table>
+<div class="note"><p class="note-titre">Pourquoi c’est important</p><p>Un projet de cette taille ne peut pas être vérifié à la main à chaque changement. Les vérifications le font en quelques minutes, à chaque fois, sans se lasser : quand on change le compilateur, elles disent tout de suite si une leçon, un jeu ou une page est cassé.</p></div>
+</section>
+<section id="ajouter" class="partie"><h1>G. Ajouter quelque chose : un jeu, une leçon, une image, une fonction</h1>
+<h2>Un jeu</h2>
+<p>1. Écris le programme dans l’atelier (ou dans un fichier <code>exemples/mon-jeu.cpp</code>) et vérifie qu’il compile et qu’il marche.</p>
+<p>2. Pour qu’il soit dans <strong>le menu des exemples</strong> : dans <code>index.html</code>, ajoute une ligne <code>&lt;option value="monjeu"&gt;MON JEU — …&lt;/option&gt;</code> dans la liste <code>id="exemples"</code>, et une ligne <code>monjeu: 'exemples/mon-jeu.cpp',</code> dans la liste <code>EXEMPLES</code>.</p>
+<p>3. Pour qu’il soit dans <strong>📂 Ouvrir</strong> : crée le dossier <code>projets/mon_jeu/</code> avec <code>principal.cpp</code> (le programme), <code>projet.json</code> (son titre), et la cartouche. Le plus simple : ✦ Nouveau dans l’atelier, puis colle ton programme.</p>
+<p>4. Ajoute une partie jouée dans <code>verification/verifier-jeux.mjs</code>, pour qu’on sache toujours qu’il marche.</p>
+<h2>Une leçon</h2>
+<p>1. Dans le fichier de la série qui convient (<code>tuto/lecons.js</code>, <code>tuto/formes.js</code>, <code>tuto/images.js</code>…), ajoute une fiche : titre, idée, texte, code, ce qu’on doit voir, et un contrôle.</p>
+<p>2. Lance <code>node verification/verifier-tuto.mjs</code> : ta leçon est compilée et contrôlée avec toutes les autres.</p>
+<p>3. Régénère les documents : <code>node outils/tutoriels.mjs</code>, puis les PDF (<code>node outils/livret.mjs</code>, <code>node outils/cours-complet.mjs</code>).</p>
+<h2>Une image</h2>
+<p>1. Dans <code>bibliotheque.js</code>, ajoute un dessin à la liste <code>IMAGES</code> : un numéro, un nom en MAJUSCULES, un titre, et 16 rangées de 16 signes (<code>.</code>, <code>-</code>, <code>+</code>, <code>#</code>).</p>
+<p>2. Elle apparaît aussitôt dans 🖼 Les modèles, et une leçon de la série 3 est fabriquée pour elle.</p>
+<h2>Une fonction de la console</h2>
+<p>Tout est expliqué pas à pas, du premier mot au dernier, dans <code>documents/ajouter-un-include.pdf</code> : où écrire la fonction, comment la rendre disponible avec <code>#include</code>, comment l’aide de l’éditeur la propose, et comment la vérifier.</p>
+</section>
+<section id="git" class="partie"><h1>H. Enregistrer et partager : git</h1>
+<p><strong>git garde l’historique du projet</strong>, comme un album de photos : chaque <strong>commit</strong> est une photo du projet entier, avec une phrase qui dit ce qui a changé. On peut toujours revenir à une photo d’avant — rien n’est jamais perdu.</p>
+<p><strong>GitHub</strong> est un site qui garde une copie du projet sur internet. <strong>Pousser</strong> (push), c’est envoyer ses nouvelles photos là-bas : le projet est alors sauvegardé, et d’autres peuvent le voir.</p>
+<p><strong>Les trois commandes de tous les jours</strong>, dans une fenêtre de commande ouverte dans le dossier :</p>
+<pre><code>git status                          # ce qui a changé depuis la dernière photo
+git add -A                          # tout préparer pour la photo
+git commit -m "Ce que j’ai changé"  # prendre la photo, avec sa phrase
+git push                            # l’envoyer sur GitHub</code></pre>
+<p><strong>Ce qui n’est jamais envoyé</strong> est écrit dans le fichier <code>.gitignore</code> : par exemple le dossier <code>cartouches/</code>, qui contient des jeux du commerce (ils appartiennent à Nintendo, on n’a pas le droit de les partager).</p>
+<p><strong>L’historique de ce qui a changé, en phrases</strong> : <code>documents/CHANGEMENTS.md</code>, mis à jour à chaque étape.</p>
+</section>
+<div id="lexique">
+<section style="break-before: page;">
+  <h1>Le lexique : chaque mot, expliqué simplement</h1>
+  <p>Les 76 mots techniques qu’on rencontre dans ce document, par ordre alphabétique.</p>
+  <table style="width: 100%; border-collapse: collapse; font-size: 9.5pt;"><tbody>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">accolades { }</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Elles entourent un bloc : les lignes qui vont ensemble (le corps d’une fonction, d’une boucle, d’un « if »). Chaque « { » a son « } ».</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">affectation (=)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">« x = 5; » : la boîte x prend la valeur 5. Ce n’est pas une égalité : c’est un rangement.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">analyseur</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">La première partie du compilateur : il lit le texte et en fait un arbre (compilateur/analyseur.js).</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">arbre (syntaxique)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Ce que l’analyseur fabrique : le programme rangé comme un arbre généalogique — le programme contient des fonctions, qui contiennent des instructions, qui contiennent des valeurs.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">argument</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Une valeur donnée à une fonction quand on l’appelle, entre ses parenthèses : dans texte(5, 8, "SALUT"), 5, 8 et "SALUT" sont les arguments.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">assembleur</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">La langue du processeur, écrite en mots courts (ld, call, jp…) : chaque mot est une instruction de la machine. Le compilateur traduit le C++ en assembleur, puis en octets.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">bloc</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un groupe de lignes entre accolades { }, qui s’exécutent ensemble.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">booléen (vrai / faux)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Le résultat d’une condition : vrai (1) ou faux (0). « true » veut dire vrai, « false » faux.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">boucle</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Des instructions qui se répètent : « while » (tant que…) ou « for » (pour un compteur qui va de… à…).</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">boucle du jeu</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">« while (true) { image(); … } » : ce qui se répète 60 fois par seconde, sans fin, pendant tout le jeu.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">bouton()</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Une fonction de la console qui dit si un bouton de la manette est enfoncé : 1 oui, 0 non. Les boutons : A, B, HAUT, BAS, GAUCHE, DROITE, START, SELECT.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">break</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Sort tout de suite de la boucle (ou du « switch ») où l’on est.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">C++</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Le langage dans lequel ces programmes sont écrits. Le compilateur de l’atelier en comprend une partie, adaptée à la Game Boy.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">cartouche</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Le boîtier qui contient un jeu ; ici, le fichier .gb (ou .gbc en couleur) que le compilateur fabrique : 32 768 octets.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">chaîne de caractères (texte)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Des lettres entre guillemets, "COMME CECI" : un texte pris tel quel. La police de la console n’a que des majuscules, sans accents.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">commentaire (//)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Tout ce qui suit « // » jusqu’au bout de la ligne : une phrase pour l’humain, que la console ignore.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">commit (git)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Une « photo » enregistrée du projet, avec un message qui dit ce qui a changé. On peut toujours revenir à une photo d’avant.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">compilateur</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Le traducteur qui transforme le texte du programme en octets que la console comprend, et qui signale les erreurs.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">condition</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Une question dont la réponse est vrai ou faux : « score &gt; 10 », « bouton(A) ». On la teste avec « if » ou « while ».</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">console</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">La machine qui joue : ici, la Game Boy (ou Game Boy Color), imitée dans le navigateur par l’émulateur.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">constante (const)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Une valeur qui a un nom et ne change jamais : « const uint8_t VIES = 3; ».</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">continue</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Passe directement au tour suivant de la boucle.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">coordonnées</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Deux nombres qui disent où : la colonne (vers la droite) puis la ligne (vers le bas), à partir de (0, 0) en haut à gauche.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">couleur, palette</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">En couleur (Game Boy Color), chaque dessin a quatre teintes ; une palette dit quelles couleurs. couleurFond() les règle pour le décor, couleurLutin() pour les lutins.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">défilement</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Le décor qui glisse quand le héros avance : defiler(x, y) décale tout le fond.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">dossier</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un classeur dans l’ordinateur, qui contient des fichiers (et d’autres dossiers).</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">else (sinon)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Ce que l’on fait quand la condition du « if » est fausse.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">émetteur</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">La partie du compilateur qui transforme l’arbre en instructions du processeur (compilateur/emetteur.js).</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">émulateur</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un programme qui imite une machine : ici, une Game Boy dans le navigateur.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">fichier</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un document enregistré dans l’ordinateur : un texte, une image, une cartouche… Son nom finit par une extension (.cpp, .js, .gb…) qui dit son genre.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">fonction</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un groupe d’instructions qui a un nom, qu’on lance en écrivant son nom et des parenthèses. Celles de la console (texte, poser…) sont toutes prêtes ; on peut écrire les siennes.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">for</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Une boucle qui compte : « for (uint8_t i = 0; i &lt; 5; i++) » fait 5 tours, i valant 0, 1, 2, 3 puis 4.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">git</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un programme qui garde l’historique du projet, photo après photo, et qui l’envoie sur internet (GitHub) pour le partager et le sauvegarder.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">hasard()</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Une fonction de la console qui rend un nombre au hasard, de 0 à 255.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">hexadécimal</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Une façon d’écrire les nombres avec 16 chiffres : 0 à 9 puis A à F. « $FF » veut dire 255 ; « $0150 » veut dire 336. Pratique pour les octets : un octet s’écrit toujours en deux chiffres.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">HTML</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Le langage des pages web : l’atelier (index.html) est une page HTML, que le navigateur affiche.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">if (si)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Teste une condition : si elle est vraie, on fait le bloc qui suit.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">image()</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Attend l’image suivante. La console en montre 60 par seconde : c’est ce qui règle la vitesse d’un jeu.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">#include</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">En haut du programme : « #include &lt;texte&gt; » demande la fonction texte() à la console ; « #include "fichier.cpp" » verse un de tes fichiers à cet endroit.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">incrémenter (++)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">« x++ » ou « x += 1 » : x augmente de 1. « x-- » : x diminue de 1.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">indice</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Le numéro d’une case dans un tableau, entre crochets : cases[3] est la quatrième case (on compte à partir de 0).</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">instruction</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un ordre donné à la console, terminé par un point-virgule : « texte(1, 1, "OK"); ».</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">JavaScript (.js)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Le langage dans lequel l’atelier, le compilateur et l’émulateur sont écrits. Le navigateur sait l’exécuter.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">lutin (sprite)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un dessin qui bouge au pixel près, par-dessus le décor : le héros, un ennemi. sprite() en place un de 8 × 8, sprite16() un de 16 × 16. La console en a 40.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">main</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">« int main() { … } » : là où le programme commence. La console exécute d’abord la première ligne de main.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">mémoire (RAM)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Là où la console range ses variables pendant le jeu : 8 Ko de cases, effacées quand on l’éteint.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">module</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un fichier .js qui fait une seule chose et qui la prête aux autres (avec « export » et « import »).</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">navigateur</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Le programme qui affiche les pages web : Chrome, Edge, Firefox… L’atelier s’ouvre dedans.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">Node.js</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un programme qui exécute du JavaScript en dehors du navigateur. Il fait tourner le petit serveur de l’atelier, les outils et les vérifications.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">octet</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un nombre de 0 à 255 : la plus petite boîte de la mémoire. Une cartouche en a 32 768.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">opérateurs de calcul</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">+ plus, - moins, * fois, / divisé par (sans virgule : 7 / 2 donne 3), % le reste de la division (7 % 2 donne 1).</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">opérateurs de comparaison</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">== égal, != différent, &lt; plus petit, &gt; plus grand, &lt;= plus petit ou égal, &gt;= plus grand ou égal. Le résultat est vrai ou faux.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">opérateurs logiques</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">&amp;&amp; « et » (les deux doivent être vrais), || « ou » (un seul suffit), ! « pas ».</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">paramètre</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Dans la définition d’une fonction, la boîte qui reçoit une valeur donnée à l’appel : dans « void f(uint8_t x) », x est un paramètre.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">Perso</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un dessin de 16 × 16 pixels (ou 32 × 32) : quatre tuiles en carré (ou seize). « Perso HEROS = { … }; ».</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">pixel</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un tout petit carré de couleur ; l’écran en a 160 de large et 144 de haut.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">point-virgule (;)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Il termine une instruction, comme le point termine une phrase.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">poser()</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Met une tuile dans le décor, sur une case de la grille de 20 × 18 (32 × 32 en tout, avec la partie cachée).</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">processeur</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">La puce qui exécute les instructions, une à une. Celle de la Game Boy s’appelle SM83 et fait environ 4 millions de pas par seconde.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">programme</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">La liste d’instructions qu’on écrit, et que le compilateur traduit en cartouche.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">push (git)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Envoyer ses commits sur internet (GitHub) : le projet y est alors sauvegardé et partagé.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">registre</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Une toute petite case DANS le processeur (a, b, c, h, l…), où il fait ses calculs. Beaucoup plus rapide que la mémoire.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">return</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Termine la fonction et rend une valeur à celui qui l’a appelée.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">ROM</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">La mémoire de la cartouche, qu’on lit sans pouvoir l’écrire : le programme, les dessins, les textes.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">serveur (local)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un petit programme qui « sert » les pages de l’atelier au navigateur. lancer.bat le démarre ; il ne sort pas de ton ordinateur.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">struct</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un modèle qui regroupe plusieurs boîtes sous un nom : « struct Ennemi { uint8_t x; uint8_t y; }; ».</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">switch / case</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Choisir entre plusieurs cas selon la valeur d’une variable, au lieu d’une suite de « if ».</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">tableau</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Une rangée de boîtes sous un même nom : « uint8_t cases[10]; » donne cases[0] à cases[9].</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">taille (agrandir)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un nombre en dernier argument de sprite, sprite16, sprite32, poser… : le dessin, écrit une fois, montré autant de fois plus grand.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">texte()</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Écrit des lettres à l’écran, sur la grille de 20 colonnes et 18 lignes : texte(colonne, ligne, "MOT").</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">Tuile</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un dessin de 8 × 8 pixels, écrit rangée par rangée avec des signes (. - + #). Le décor en est fait.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">uint8_t</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Le genre de nombre de cette console : un entier de 0 à 255 (un octet). Au-delà, il repart à 0.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">variable</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Une boîte avec un nom, dans la mémoire, qui retient un nombre qu’on peut lire et changer.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">vérification</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Un programme qui contrôle qu’un autre marche : il compile, fait tourner, appuie sur les boutons, et compare avec ce qui est attendu. ✓ veut dire « bon », ✗ « pas bon ».</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">void</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Devant une fonction : elle ne rend rien, elle agit seulement.</td></tr>
+<tr style="break-inside: avoid;"><td style="width: 34%; vertical-align: top; padding: 4pt 6pt 4pt 0; border-bottom: 1px dotted #ccc; font-weight: 700;">while (tant que)</td><td style="vertical-align: top; padding: 4pt 0; border-bottom: 1px dotted #ccc;">Répète un bloc tant qu’une condition est vraie.</td></tr>
+</tbody></table>
+</section></div>
+</body>
+</html>

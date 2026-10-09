@@ -55,6 +55,7 @@ export const CHAPITRES = {
   13: 'Le son : notes, bruits, airs',
   14: 'Le défilement : un monde plus grand que l’écran',
   15: 'Tes propres #include : ajouter une fonction',
+  16: 'Le héros bouge : gauche, droite, sauter',
 }
 
 /** La nuance (0 à 3) d'un pixel de l'écran, sur la Game Boy d'origine. */
@@ -3890,7 +3891,10 @@ int main() {                      // Le jeu commence ici.
       '**Mais pas derrière tout le décor !** Le décor ne cache le lutin que là où il est **dessiné**, avec les indices 1, 2 ou 3. Là où le décor est **vide** (l’indice 0, le fond clair de l’écran), le lutin reste visible. C’est pour ça qu’on voit le héros avant et après le tuyau : là, il n’y a que du vide.',
       '**Le tuyau est tout plein :** ses tuiles n’ont aucun 0. Le héros y disparaît donc entièrement. Si le tuyau avait des trous (des 0), on verrait le héros à travers.',
       '**DERRIERE passe aussi derrière le panneau,** là où le panneau est dessiné : pour la console, le panneau est un second décor.',
-      '**À toi :** ôte `DERRIERE` (garde `sprite(0, x, 72, HEROS);`) : le héros passe par-dessus le tuyau, comme dans la leçon d’avant.',
+      '**Le tuyau tient en une ligne : `bande(8, 9, TUYAU, 5);`.** `bande()` est une fonction de la console (`#include <bande>`) : elle pose la même tuile plusieurs fois, de gauche à droite. Ici : colonne 8, ligne 9, la tuile TUYAU, 5 fois — les colonnes 8 à 12. C’est la boucle `for` qu’on écrivait avant (`poser(c, 9, TUYAU)` pour c de 8 à 12), rangée dans la console : on ne l’écrit plus.',
+      '**La vitesse, c’est toi qui la choisis :** `uint8_t vitesse = 30;`, en haut de `main()`, **en pixels par seconde**. À 15 il marche, à 30 il trotte, à 60 il court. C’est le seul réglage : change ce nombre, le reste du programme suit.',
+      '**Le héros avance en une ligne : `x = avancer(x, vitesse);`.** `avancer()` est une fonction de la console (`#include <avancer>`) : elle avance `x` en douceur — jamais plus d’un pixel par image jusqu’à 60 —, et le ramène à 0 quand il sort à droite (après 152). La fluidité, c’est elle qui s’en occupe : toi, tu ne règles que la vitesse.',
+      '**À toi :** ôte `DERRIERE` (garde `sprite(0, x, 72, HEROS);`) : le héros passe par-dessus le tuyau, comme dans la leçon d’avant. Puis mets `vitesse` à 120 : il traverse le tuyau en un éclair.',
     ],
     code: `// CE PROGRAMME : un héros avance tout seul et ENTRE dans un tuyau couché :
 // il disparaît dedans, et ressort de l'autre côté.
@@ -3903,9 +3907,10 @@ int main() {                      // Le jeu commence ici.
 // Là où le décor est vide (0), on voit toujours le lutin.
 
 #include <Tuile>    // un dessin de 8 × 8 pixels
-#include <poser>    // pose une tuile sur une case du fond
+#include <bande>    // bande() : la même tuile, plusieurs fois, de gauche à droite
 #include <texte>    // écrit un texte à l’écran
 #include <sprite>   // place un lutin de 8 × 8 au pixel près
+#include <avancer>  // avancer() : la place du héros, avancée à TA vitesse
 
 Tuile TUYAU = {                   // Un morceau de tuyau couché : AUCUN 0, il est tout plein.
   "33333333",                     //   le bord du haut, sombre
@@ -3933,17 +3938,19 @@ int main() {                          // Le jeu commence ici.
   texte(1, 1, "LE TUYAU");
 
   // Le tuyau : colonnes 8 à 12, ligne 9 (les pixels 64 à 103, en largeur).
-  for (uint8_t c = 8; c < 13; c++) {
-    poser(c, 9, TUYAU);
-  }
+  // bande(colonne, ligne, tuile, longueur) fait la boucle à notre place :
+  // elle pose TUYAU 5 fois, de la colonne 8 à la colonne 12.
+  bande(8, 9, TUYAU, 5);
 
   uint8_t x = 0;                      // La place du héros, en pixels.
+  uint8_t vitesse = 30;               // TA vitesse, en pixels par seconde : 15 lent, 30 tranquille, 60 rapide.
+                                      //   C'est le seul réglage : la console s'occupe que ce soit fluide.
 
   while (true) {                      // La boucle du jeu :
     image();
 
-    if (images() % 2 == 0) x++;       // Un pixel toutes les 2 images.
-    if (x > 152) x = 0;               // Sorti à droite : il repart de la gauche.
+    x = avancer(x, vitesse);          // La place, avancée en douceur à « vitesse » pixels par seconde ;
+                                      // sorti à droite (après 152), il repart de la gauche.
 
     // Ligne de pixels 72 = ligne 9 × 8 : pile à la hauteur du tuyau.
     sprite(0, x, 72, HEROS, DERRIERE);   // DERRIERE : le tuyau passe devant lui.
@@ -3969,6 +3976,286 @@ int main() {                          // Le jeu commence ici.
   },
 
   {
+    titre: 'Reculer : une vitesse négative, avancer(x, -30)',
+    difficulte: 9,
+    provenance: 'cours',
+    suite: true,
+    idee: 'x = avancer(x, -30) : une vitesse NÉGATIVE fait aller le lutin vers la gauche, avec la même douceur. Le héros traverse le tuyau de droite à gauche.',
+    texte: [
+      '**Le même tuyau, dans l’autre sens.** Cette fois, le héros part de la droite et traverse le tuyau **vers la gauche**.',
+      '**Ce qui est nouveau ici : une vitesse négative.** `uint8_t vitesse = -30;` : le signe moins veut dire « à reculons ». `x = avancer(x, vitesse);` fait alors aller le héros vers la gauche, à 30 pixels par seconde. Il n’y a **pas d’autre fonction à apprendre** : c’est toujours `avancer()`.',
+      '**Le nombre dit la vitesse, le signe dit le sens.** 30 : vers la droite. -30 : vers la gauche, aussi vite. -60 : vers la gauche, deux fois plus vite. 0 : il ne bouge plus.',
+      '**La même douceur dans les deux sens :** jusqu’à 60 (ou -60), jamais plus d’un pixel par image. La vitesse va de **-127 à 127**.',
+      '**Le bord, dans ce sens-là :** quand le héros sort à gauche (sous 0), il repart de la droite (152). C’est le miroir de ce qu’il faisait vers la droite.',
+      '**Pourquoi `uint8_t` accepte -30 ?** Un octet ne garde pas le signe : -30 y est rangé comme 226 (256 - 30). `avancer()` le sait, et comprend tout ce qui dépasse 127 comme un recul. Tu n’as qu’à écrire -30.',
+      '**À toi :** mets `vitesse` à -60, puis à 30. Puis fais-le changer de sens avec la manette : tant qu’on tient A, il va vers la droite ; sinon, vers la gauche — `if (bouton(A)) vitesse = 30; else vitesse = -30;`, juste avant `avancer()` (sans oublier `#include <bouton>`).',
+    ],
+    code: `// CE PROGRAMME : le tuyau, traversé dans l'AUTRE sens : de droite à gauche.
+//
+// Ce qui est nouveau : une vitesse NÉGATIVE.
+//   x = avancer(x, 30);    vers la droite, 30 pixels par seconde
+//   x = avancer(x, -30);   vers la GAUCHE, 30 pixels par seconde, aussi doux
+// Le nombre dit la vitesse, le signe dit le sens.
+
+#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <bande>    // bande() : la même tuile, plusieurs fois, de gauche à droite
+#include <texte>    // écrit un texte à l’écran
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+#include <avancer>  // avancer() : la place du héros, avancée à TA vitesse
+
+Tuile TUYAU = {                   // Un morceau de tuyau couché : AUCUN 0, il est tout plein.
+  "33333333",
+  "11111111",
+  "22222222",
+  "22222222",
+  "22222222",
+  "22222222",
+  "21212121",
+  "33333333",
+};
+
+Tuile HEROS = {                   // Le héros : les points (.) sont transparents.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+int main() {                          // Le jeu commence ici.
+  texte(1, 1, "MARCHE ARRIERE");
+
+  bande(8, 9, TUYAU, 5);              // Le tuyau : TUYAU 5 fois, colonnes 8 à 12, ligne 9.
+
+  uint8_t x = 152;                    // Le héros part de la DROITE de l'écran.
+  uint8_t vitesse = -30;              // TA vitesse : NÉGATIVE, il recule, vers la gauche.
+                                      //   -30 : 30 pixels par seconde, à gauche ; 30 : à droite.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    x = avancer(x, vitesse);          // Vers la gauche, en douceur ;
+                                      // sorti à gauche (sous 0), il repart de la droite.
+
+    sprite(0, x, 72, HEROS, DERRIERE);   // DERRIERE : le tuyau passe devant lui.
+  }
+}
+`,
+    aVoir: 'Le tuyau au milieu de l’écran. Le héros arrive de la DROITE, disparaît dans le tuyau, et ressort à gauche.',
+    controle: (c) => {
+      const places = []
+      for (let i = 0; i < 30; i++) { c.avancer(1); places.push(c.lutin(0).x) }
+      const pas = places.slice(1).map((p, i) => p - places[i]).filter((d) => d !== 0)
+      attendre(c, () => c.lutin(0).x === 124)
+      const dehorsADroite = nuance(c, 128, 74)
+      attendre(c, () => c.lutin(0).x === 88)
+      const dedans = nuance(c, 92, 75)
+      attendre(c, () => c.lutin(0).x === 20)
+      const ressorti = nuance(c, 24, 74)
+      attendre(c, () => c.lutin(0).x === 152, 1200)
+      return [
+        ['il va vers la GAUCHE, un pixel à la fois', pas.length > 5 && pas.every((d) => d === -1), ` (pas vus : ${[...new Set(pas)].join(', ')})`],
+        ['à droite du tuyau, on voit le héros', dehorsADroite === 3, ` (nuance ${dehorsADroite})`],
+        ['dans le tuyau, il a disparu', dedans === 2, ` (nuance ${dedans})`],
+        ['il ressort à gauche', ressorti === 3, ` (nuance ${ressorti})`],
+        ['sorti à gauche, il repart de la droite', c.lutin(0).x === 152],
+      ]
+    },
+  },
+
+  {
+    titre: 'S’arrêter à une place : avancer(x, 30, 56)',
+    difficulte: 9,
+    provenance: 'cours',
+    suite: true,
+    idee: 'x = avancer(x, 30, 100) : un 3e réglage, la place où s’arrêter. Le héros marche jusqu’au tuyau, et s’y arrête.',
+    texte: [
+      '**Jusqu’ici, le héros ne s’arrêtait jamais :** au bord, il repartait de l’autre côté. Pour un personnage qui va **quelque part** — jusqu’à une porte, un tuyau, un ami —, il faut qu’il s’arrête.',
+      '**Ce qui est nouveau ici : un 3e réglage, `jusqua`.** `x = avancer(x, 30, 56);` avance à 30 pixels par seconde **jusqu’au pixel 56**, puis ne bouge plus.',
+      '**Dans les deux sens :** `avancer(x, -30, 20)` recule jusqu’au pixel 20. Et une place déjà dépassée est retrouvée après un tour d’écran.',
+      '**Il marche, en plus :** `marcher(0, x, 72, HEROS1, HEROS2)` alterne deux dessins tous les 4 pixels parcourus. Quand il s’arrête, ses jambes s’arrêtent aussi — sans rien écrire de plus.',
+      '**À toi :** fais-le s’arrêter de l’autre côté du tuyau, au pixel 120 — il passera derrière (mets `spriteDerriere`, ou garde-le devant).',
+    ],
+    code: `// CE PROGRAMME : le héros marche jusqu'au tuyau, et s'arrête devant.
+//
+// Ce qui est nouveau : un 3e réglage à avancer(), la place où s'arrêter.
+//   x = avancer(x, 30);        il avance sans fin (au bord, il repart)
+//   x = avancer(x, 30, 56);    il avance JUSQU'AU pixel 56, puis s'arrête
+
+#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <bande>    // bande() : la même tuile, plusieurs fois, de gauche à droite
+#include <texte>    // écrit un texte à l’écran
+#include <avancer>  // avancer() : la place du héros, avancée à TA vitesse
+#include <marcher>  // marcher() : un lutin qui alterne deux dessins en avançant
+
+Tuile TUYAU = {                   // Un morceau de tuyau couché.
+  "33333333",
+  "11111111",
+  "22222222",
+  "22222222",
+  "22222222",
+  "22222222",
+  "21212121",
+  "33333333",
+};
+
+Tuile HEROS1 = {                  // Le héros, jambes écartées.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile HEROS2 = {                  // Le héros, jambes serrées.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  "..#..#..",
+  "..##.##.",
+};
+
+int main() {                          // Le jeu commence ici.
+  texte(1, 1, "JUSQU'AU TUYAU");
+
+  bande(8, 9, TUYAU, 5);              // Le tuyau : colonnes 8 à 12 (pixels 64 à 103).
+
+  uint8_t x = 0;                      // La place du héros.
+  uint8_t vitesse = 30;               // TA vitesse, en pixels par seconde.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    x = avancer(x, vitesse, 56);      // Jusqu'au pixel 56 : juste devant le tuyau.
+    marcher(0, x, 72, HEROS1, HEROS2);   // Il marche… et s'arrête de marcher en arrivant.
+  }
+}
+`,
+    aVoir: 'Le héros arrive de la gauche en marchant, et s’arrête juste devant le tuyau ; ses jambes s’arrêtent avec lui.',
+    controle: (c) => {
+      attendre(c, () => c.lutin(0).x === 30)
+      const enRoute = c.lutin(0).x
+      c.avancer(300)
+      const arrive = c.lutin(0)
+      c.avancer(60)
+      const ensuite = c.lutin(0)
+      return [
+        ['il avance', enRoute === 30],
+        ['il s’arrête au pixel 56', arrive.x === 56 && ensuite.x === 56, ` (x = ${ensuite.x})`],
+        ['à l’arrêt, ses jambes ne bougent plus', arrive.tuile === ensuite.tuile],
+      ]
+    },
+  },
+
+  {
+    titre: 'Sauter : sauter(y, hauteurMax, sol, gravite)',
+    difficulte: 9,
+    provenance: 'cours',
+    suite: true,
+    idee: 'y = sauter(y, hauteurMax, 104, gravite) : au sol, A lance un saut de 40 pixels. Le héros marche tout seul ; tu le fais sauter quand tu veux.',
+    texte: [
+      '**Un héros qui ne fait que marcher, c’est un peu triste.** Dans un jeu de plateformes, il **saute** : par-dessus un trou, un ennemi, sur une marche.',
+      '**Ce qui est nouveau ici : `sauter()`.** `y = sauter(y, hauteurMax, 104, gravite);`, à chaque image : quand le héros est au sol (`y` vaut 104) et qu’on appuie sur **A**, il saute de **40 pixels**. Il monte vite, ralentit, s’arrête une fraction de seconde en l’air, puis retombe de plus en plus vite et se pose sur 104.',
+      '**C’est la gravité,** et c’est la console qui la calcule. Toi, tu ne donnes que trois réglages : la hauteur du plus grand saut, où est le sol, et **la gravité**, rangée dans la variable `gravite` (`uint8_t gravite = 4;`) — 4, la gravité normale ; 2 ou 1, elle est faible : il flotte, le saut est lent et doux ; 8, elle est forte : le saut est rapide. Jamais plus haut que 40 : pour sauter plus haut, c’est 40 qu’on monte.',
+      '**Le joueur dose son saut :** plus il tient A, plus le héros monte — jusqu’à 40 pixels. Une petite tape, un petit bond.',
+      '**Deux mouvements à la fois :** `avancer()` pour la largeur, `sauter()` pour la hauteur. Le héros avance pendant qu’il saute : le saut fait une **courbe**, comme une balle lancée.',
+      '**Et ses jambes ?** `marcher()` les fait bouger avec `x + y` : en l’air aussi, elles s’agitent.',
+      '**À toi :** saute à 80 pixels de haut. Puis mets un ennemi au sol, et saute par-dessus.',
+    ],
+    code: `// CE PROGRAMME : le héros marche tout seul sur le sol. Appuie sur A : il saute.
+//
+// Ce qui est nouveau : sauter(), la gravité toute faite.
+//   uint8_t hauteurMax = 40;   la hauteur max du saut, dans une variable.
+//   uint8_t gravite = 4;       la gravité, dans une variable : tu la vois, tu la changes.
+//   y = sauter(y, hauteurMax, 104, gravite);
+//        au sol (y = 104), A lance un saut de 40 pixels (hauteurMax) au plus ;
+//        il monte, ralentit, retombe, se pose sur 104.
+//        gravite : 4 normale, 2 faible, 1 très faible, 8 forte.
+
+#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <bande>    // bande() : la même tuile, plusieurs fois, de gauche à droite
+#include <avancer>  // avancer() : la place du héros, avancée à TA vitesse
+#include <marcher>  // marcher() : un lutin qui alterne deux dessins en avançant
+#include <sauter>   // sauter() : un saut avec la gravité
+
+Tuile HEROS1 = {                  // Le héros, jambes écartées (il regarde à droite).
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile HEROS2 = {                  // Le héros, jambes serrées.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  "..#..#..",
+  "..##.##.",
+};
+
+Tuile SOL = {                     // Un bloc de sol, tout plein.
+  "33333333",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "33333333",
+};
+
+int main() {                          // Le jeu commence ici.
+  bande(0, 14, SOL, 20);              // Le sol : toute la ligne 14 (pixel 112).
+
+  uint8_t x = 0;                      // La place du héros, en largeur…
+  uint8_t y = 104;                    // …et en hauteur : posé sur le sol (112 - 8).
+  uint8_t hauteurMax = 40;            // La hauteur max du saut, en pixels (A tenu jusqu’en haut).
+  uint8_t gravite = 4;                // La gravité : 4 normale, 2 faible, 1 très faible, 8 forte.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    x = avancer(x, 30);               // Il marche, à 30 pixels par seconde.
+    y = sauter(y, hauteurMax, 104, gravite);     // A : un saut de 40 pixels ; il retombe sur 104.
+    marcher(0, x, y, HEROS1, HEROS2);
+  }
+}
+`,
+    aVoir: 'Le héros marche sur le sol, de gauche à droite. Appuie sur A : il saute en faisant une courbe, et retombe plus loin.',
+    controle: (c) => {
+      c.avancer(10)
+      const auSol = c.lutin(0).y
+      const x0 = c.lutin(0).x
+      c.gb.setButton('a', true); c.avancer(30); c.gb.setButton('a', false)   // A tenu : le grand saut
+      const ys = []
+      for (let i = 0; i < 90; i++) { c.avancer(1); ys.push(c.lutin(0).y) }
+      const haut = Math.min(...ys)
+      return [
+        ['avant A, il est au sol', auSol === 104],
+        ['A : il saute d’environ 40 pixels', auSol - haut >= 38 && auSol - haut <= 42, ` (monté de ${auSol - haut})`],
+        ['il a avancé pendant le saut', c.lutin(0).x !== x0],
+        ['il retombe sur le sol', ys.at(-1) === 104],
+      ]
+    },
+  },
+
+  {
     titre: 'Devant, derrière : deux lutins qui se croisent',
     difficulte: 9,
     provenance: 'cours',
@@ -3980,6 +4267,7 @@ int main() {                          // Le jeu commence ici.
       '**Ce qui est nouveau ici : deux lutins qui se touchent.** Le chat (`sprite(0, …)`, tout sombre) ne bouge pas, au pixel 76. La souris (`sprite(1, …)`, toute claire) arrive de la gauche.',
       '**Déroulons :** souris au pixel 72, chat au 76 : la souris est plus à gauche, **elle passe devant**. Souris au 76 : même `x`, le numéro 0 (le chat) gagne. Souris au 80 : le chat est maintenant le plus à gauche, **il passe devant**. La souris semble passer « derrière » le chat en le dépassant !',
       '**Ce qu’on en retient :** le numéro seul ne suffit pas à mettre un héros devant tout le monde. Dans un vrai jeu, on évite que deux personnages importants se chevauchent longtemps, ou bien on accepte ce petit « saut ».',
+      '**La vitesse, c’est toi qui la choisis :** `uint8_t vitesse = 15;`, en haut de `main()`, en pixels par seconde. `x = avancer(x, vitesse)` avance la souris en douceur. À 15, elle va lentement : on a le temps de voir qui passe devant. À 60, le croisement passe très vite.',
       '**À toi :** échange les numéros (le chat en 1, la souris en 0). À `x` égal, c’est maintenant la souris qui gagne. Ailleurs, rien ne change : c’est toujours le plus à gauche.',
     ],
     code: `// CE PROGRAMME : une souris (claire) avance et croise un chat (sombre) immobile.
@@ -3996,6 +4284,7 @@ int main() {                          // Le jeu commence ici.
 #include <Tuile>    // un dessin de 8 × 8 pixels
 #include <texte>    // écrit un texte à l’écran
 #include <sprite>   // place un lutin de 8 × 8 au pixel près
+#include <avancer>  // avancer() : la place de la souris, avancée à TA vitesse
 
 Tuile CHAT = {                    // Le chat : tout sombre (#). Deux oreilles en haut.
   "#.....#.",
@@ -4025,12 +4314,14 @@ int main() {                          // Le jeu commence ici.
   sprite(0, 76, 72, CHAT);            // Le CHAT : lutin numéro 0, immobile au pixel 76.
 
   uint8_t x = 0;                      // La place de la souris.
+  uint8_t vitesse = 15;               // TA vitesse, en pixels par seconde : 15, lentement, pour bien voir.
+                                      //   C'est le seul réglage : la console s'occupe que ce soit fluide.
 
   while (true) {                      // La boucle du jeu :
     image();
 
-    if (images() % 4 == 0) x++;       // Lentement : un pixel toutes les 4 images.
-    if (x > 152) x = 0;
+    x = avancer(x, vitesse);          // La place, avancée en douceur à « vitesse » pixels par seconde ;
+                                      // sortie à droite (après 152), elle repart de la gauche.
 
     sprite(1, x, 72, SOURIS);         // La SOURIS : lutin numéro 1.
   }
@@ -4797,9 +5088,10 @@ int main() {                              // Le jeu commence ici.
 // Le compilateur remplace la ligne de droite par celle de gauche : même prix.
 
 #include <Tuile>            // un dessin de 8 × 8 pixels
-#include <poser>            // pose une tuile sur une case du fond
+#include <bande>            // bande() : la même tuile, plusieurs fois, de gauche à droite
 #include <texte>            // écrit un texte à l’écran
 #include <spriteDerriere>   // place un lutin derrière le décor
+#include <avancer>          // avancer() : la place du héros, avancée à TA vitesse
 
 Tuile TUYAU = {                   // Un morceau de tuyau couché : AUCUN 0, il est tout plein.
   "33333333",
@@ -4826,17 +5118,17 @@ Tuile HEROS = {                   // Le héros : les points (.) sont transparent
 int main() {                          // Le jeu commence ici.
   texte(1, 1, "LE TUYAU");
 
-  for (uint8_t c = 8; c < 13; c++) {  // Le tuyau : colonnes 8 à 12, ligne 9.
-    poser(c, 9, TUYAU);
-  }
+  bande(8, 9, TUYAU, 5);              // Le tuyau : TUYAU 5 fois, colonnes 8 à 12, ligne 9.
 
   uint8_t x = 0;                      // La place du héros, en pixels.
+  uint8_t vitesse = 30;               // TA vitesse, en pixels par seconde : 15 lent, 30 tranquille, 60 rapide.
+                                      //   C'est le seul réglage : la console s'occupe que ce soit fluide.
 
   while (true) {                      // La boucle du jeu :
     image();
 
-    if (images() % 2 == 0) x++;       // Un pixel toutes les 2 images.
-    if (x > 152) x = 0;
+    x = avancer(x, vitesse);          // La place, avancée en douceur à « vitesse » pixels par seconde ;
+                                      // sorti à droite (après 152), il repart de la gauche.
 
     spriteDerriere(0, x, 72, HEROS);  // Le héros, derrière le décor : une ligne, sans 5e argument.
   }
@@ -5160,6 +5452,163 @@ int main() {                // Le jeu commence ici.
     },
   },
   /* ================================================ 11 — le hasard et le temps */
+
+  {
+    titre: 'La console a déjà touche() : #include <touche>',
+    difficulte: 10,
+    provenance: 'cours',
+    suite: true,
+    idee: 'touche(x1, y1, x2, y2) : la fonction que tu as écrite pour les deux boîtes existe aussi dans la console. Une ligne #include, et plus de fonction à recopier.',
+    texte: [
+      '**Tu as écrit `touche()` toi-même** (« Deux boîtes qui se touchent ») : quatre comparaisons, pour savoir si deux carrés de 8 × 8 se chevauchent. Elle sert dans **presque tous les jeux**.',
+      '**Ce qui est nouveau ici : la console l’a déjà.** `#include <touche>`, et `touche(x, y, px, py)` répond 1 ou 0, comme la tienne. Plus besoin de la recopier dans chaque programme.',
+      '**Et si tu gardes la tienne ?** Une fonction écrite dans le programme passe toujours **avant** celle de la console : ta `touche()` à toi reste la tienne. On n’écrit `#include <touche>` que pour prendre celle de la console.',
+      '**Ici,** le héros marche tout seul vers une pièce ; quand il la touche, le score monte et la pièce va plus loin.',
+      '**À toi :** ajoute un ennemi qui fait sa ronde avec `navette()`, et fais perdre le héros quand `touche()` dit qu’ils se rencontrent.',
+    ],
+    code: `// CE PROGRAMME : le héros marche ; chaque fois qu'il touche la pièce, le score monte.
+//
+// Ce qui est nouveau : touche(), la fonction de la console.
+//   touche(x1, y1, x2, y2)   1 si les deux carrés de 8 × 8 se chevauchent, 0 sinon
+// C'est celle que tu avais écrite toi-même : la console l'a déjà.
+
+#include <Tuile>    // un dessin de 8 × 8 pixels
+#include <sprite>   // place un lutin de 8 × 8 au pixel près
+#include <texte>    // écrit un texte à l’écran
+#include <nombre>   // écrit un nombre
+#include <avancer>  // avancer() : la place du héros, avancée à TA vitesse
+#include <touche>   // touche() : deux lutins se touchent-ils ?
+
+Tuile HEROS = {                   // Le héros.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile PIECE = {                   // Une pièce ronde.
+  "..####..",
+  ".#----#.",
+  "#--##--#",
+  "#-#--#-#",
+  "#-#--#-#",
+  "#--##--#",
+  ".#----#.",
+  "..####..",
+};
+
+int main() {                          // Le jeu commence ici.
+  texte(1, 1, "SCORE");
+  uint8_t score = 0;
+  uint8_t x = 0;                      // Le héros.
+  uint8_t px = 60;                    // La pièce.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    x = avancer(x, 40);               // Le héros marche, à 40 pixels par seconde.
+    if (touche(x, 72, px, 72)) {      // Il touche la pièce :
+      score++;                        //   un point de plus,
+      px = px + 50;                   //   et la pièce va plus loin.
+      if (px > 150) px = 20;
+    }
+
+    nombre(7, 1, score);
+    sprite(0, x, 72, HEROS);
+    sprite(1, px, 72, PIECE);
+  }
+}
+`,
+    aVoir: 'Le héros marche ; chaque fois qu’il passe sur la pièce, le score monte et la pièce saute plus loin devant lui.',
+    controle: (c) => {
+      const avant = c.lire(9, 1)
+      c.avancer(400)
+      const apres = c.lire(9, 1)
+      return [
+        ['la pièce s’est déplacée', c.lutin(1).x !== 60],
+        ['le score a monté', avant !== apres],
+      ]
+    },
+  },
+
+  {
+    titre: 'Un mur devant soi, en une ligne : toucheDecor()',
+    difficulte: 10,
+    provenance: 'cours',
+    suite: true,
+    idee: 'toucheDecor(x, y) : y a-t-il une tuile posée sous ce pixel ? Le héros s’arrête devant un mur sans calculer de case.',
+    texte: [
+      '**« Lire la case devant soi »** demandait un petit calcul : diviser la place en pixels par 8 pour trouver la case, puis `lire()` cette case. Juste, mais à refaire à chaque fois.',
+      '**Ce qui est nouveau ici : `toucheDecor(x, y)`.** Tu donnes un **pixel** ; la console trouve la case dessous, et répond 1 s’il y a une tuile posée, 0 sinon.',
+      '**Où regarder ?** Juste devant le héros : `x + 8` (le premier pixel à sa droite), et à mi-hauteur : `y + 4`. Sous ses pieds, ce serait `x + 4` et `y + 8`.',
+      '**Ici,** le héros avance tant qu’il n’y a rien devant lui, et s’arrête net devant le mur.',
+      '**À toi :** fais-le repartir dans l’autre sens quand il touche le mur (une vitesse négative, -30).',
+    ],
+    code: `// CE PROGRAMME : le héros marche vers un mur, et s'arrête juste devant.
+//
+// Ce qui est nouveau : toucheDecor(x, y), du décor sous ce pixel ?
+//   toucheDecor(x + 8, y + 4)   le pixel juste devant le héros, à mi-hauteur
+
+#include <Tuile>        // un dessin de 8 × 8 pixels
+#include <sprite>       // place un lutin de 8 × 8 au pixel près
+#include <bande>        // bande() : la même tuile, plusieurs fois
+#include <poser>        // pose une tuile sur une case du fond
+#include <avancer>      // avancer() : la place du héros, avancée à TA vitesse
+#include <toucheDecor>  // toucheDecor() : du décor sous ce pixel ?
+
+Tuile HEROS = {                   // Le héros.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile SOL = {                     // Un bloc de sol, tout plein.
+  "33333333",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "33333333",
+};
+
+int main() {                          // Le jeu commence ici.
+  bande(0, 10, SOL, 20);              // Le sol : la ligne 10.
+  poser(15, 9, SOL);                  // Un mur : la case (15, 9), pixels 120 à 127.
+
+  uint8_t x = 0;                      // Le héros, sur le sol (ligne 9 : pixel 72).
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    if (toucheDecor(x + 8, 76) == 0) {   // Rien juste devant lui :
+      x = avancer(x, 30);                //   il avance.
+    }
+    sprite(0, x, 72, HEROS);
+  }
+}
+`,
+    aVoir: 'Le héros marche sur le sol vers un bloc, et s’arrête pile devant lui.',
+    controle: (c) => {
+      attendre(c, () => c.lutin(0).x === 60)
+      const enRoute = c.lutin(0).x
+      c.avancer(400)
+      return [
+        ['il avance', enRoute === 60],
+        ['il s’arrête pile devant le mur', c.lutin(0).x === 112, ` (x = ${c.lutin(0).x})`],
+      ]
+    },
+  },
 
   {
     titre: 'Le hasard dans une plage choisie',
@@ -6874,6 +7323,808 @@ int main() {
         ['ma poserDevant() a teint la case (13, 9) : palette 2 et DEVANT', reglage === (2 | 0x80), ` (${reglage})`],
         ['dans le buisson, on voit le buisson (vert)', dansLeBuisson === '6/22/4', ` (${dansLeBuisson})`],
         ['à découvert, on voit le héros (rouge)', aDecouvert === '31/4/2', ` (${aDecouvert})`],
+      ]
+    },
+  },
+  /* ================================================================== */
+  /* Chapitre 16 — Le héros bouge : gauche, droite, sauter              */
+  /* ================================================================== */
+
+  {
+    titre: 'Aller à droite et à gauche : gaucheDroite(x, vitesseX)',
+    difficulte: 16,
+    provenance: 'cours',
+    idee: 'uint8_t vitesseX = 60; x = gaucheDroite(x, vitesseX); — la vitesse du héros est une variable, écrite une fois en haut. DROITE fait aller le héros vers la droite, GAUCHE vers la gauche, à vitesseX pixels par seconde, en douceur — et il ne sort jamais de l’écran.',
+    texte: [
+      '**Ce chapitre fait bouger un héros comme dans un vrai jeu :** à gauche, à droite, courir, sauter, monter sur une plateforme, se cogner à un mur, monter et descendre. Une seule chose nouvelle par leçon.',
+      '**On commence par le plus simple : la manette.** Tu appuies sur DROITE, le héros va à droite ; sur GAUCHE, il va à gauche ; tu lâches, il s’arrête.',
+      '**Ce qui est nouveau ici : `gaucheDroite(x, vitesse)`.** Elle **lit la manette toute seule**, choisit le sens, et fait avancer `x` à « vitesse » pixels par seconde. On range la réponse dans `x` : `x = gaucheDroite(x, vitesseX);`.',
+      '**La vitesse a son nom : `vitesseX`.** On l’écrit **une seule fois**, en haut de `main()` : `uint8_t vitesseX = 60;`. X, c’est la largeur, comme `x`. Pour changer la vitesse du héros, c’est cette ligne-là qu’on change — et nulle part ailleurs.',
+      '**Tu ne règles que la vitesse.** 60, c’est un pixel à chaque image : le plus doux possible. 30 : deux fois plus lent. La fluidité, c’est la console qui s’en occupe.',
+      '**Il ne sort pas de l’écran :** à gauche, il s’arrête à 0 ; à droite, à 152 (l’écran fait 160 pixels, le héros 8). Pas besoin d’écrire de `if`.',
+      '**À appeler à chaque image,** dans la boucle du jeu, même quand on n’appuie sur rien : c’est ce qui garde le mouvement régulier.',
+      '**À toi :** écris `uint8_t vitesseX = 30;`, puis `uint8_t vitesseX = 120;`. Laquelle te plaît pour un héros ?',
+    ],
+    code: `// CE PROGRAMME : un héros que la manette fait aller à droite et à gauche.
+//
+// Ce qui est nouveau : gaucheDroite(x, vitesse), et la vitesse dans une variable, vitesseX.
+//   DROITE : il va vers la droite ; GAUCHE : vers la gauche ; rien : il s'arrête.
+//   La vitesse est en pixels par seconde : 60, c'est un pixel à chaque image.
+//   Il s'arrête tout seul aux bords de l'écran (0 et 152).
+
+#include <Tuile>         // un dessin de 8 × 8 pixels
+#include <sprite>        // place un lutin de 8 × 8 au pixel près
+#include <gaucheDroite>  // gaucheDroite() : la manette, à gauche et à droite
+
+Tuile HEROS = {                   // Le héros : les points (.) sont transparents.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+int main() {                          // Le jeu commence ici.
+  uint8_t x = 76;                     // La place du héros : au milieu de l'écran.
+  uint8_t vitesseX = 60;              // SA VITESSE, en pixels par seconde : c'est ici qu'on la change.
+
+  while (true) {                      // La boucle du jeu, 60 fois par seconde :
+    image();
+
+    x = gaucheDroite(x, vitesseX);    // La manette le fait bouger, à vitesseX pixels par seconde.
+
+    sprite(0, x, 72, HEROS);          // On le dessine à sa nouvelle place.
+  }
+}
+`,
+    aVoir: 'Un héros au milieu de l’écran. DROITE : il glisse vers la droite ; GAUCHE : vers la gauche ; il s’arrête aux bords.',
+    controle: (c) => {
+      c.avancer(10)
+      const repos = c.lutin(0).x
+      c.gb.setButton('right', true); c.avancer(30); const droite = c.lutin(0).x
+      c.avancer(200); const bord = c.lutin(0).x; c.gb.setButton('right', false)
+      c.gb.setButton('left', true); c.avancer(30); const gauche = c.lutin(0).x; c.gb.setButton('left', false)
+      c.avancer(30); const lache = c.lutin(0).x
+      return [
+        ['sans bouton, il ne bouge pas', repos === 76],
+        ['DROITE : il va vers la droite (environ 30 pixels en une demi-seconde)', droite - repos >= 28 && droite - repos <= 31, ` (${repos} → ${droite})`],
+        ['il s’arrête au bord droit, 152', bord === 152],
+        ['GAUCHE : il revient vers la gauche', gauche < bord],
+        ['bouton lâché : il s’arrête', Math.abs(lache - gauche) <= 1, ` (${gauche} → ${lache})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Il regarde où il va, et il marche : marcher()',
+    difficulte: 16,
+    provenance: 'cours',
+    suite: true,
+    idee: 'marcher(0, x, 72, HEROS1, HEROS2) à la place de sprite() : le héros alterne deux dessins en avançant, et se tourne tout seul du côté où il va.',
+    texte: [
+      '**Le héros glisse, mais ne marche pas.** Ses jambes ne bougent pas, et il regarde toujours à droite, même quand il va à gauche.',
+      '**Ce qui est nouveau ici : `marcher()` à la place de `sprite()`.** On lui donne **deux dessins** — les jambes écartées, les jambes serrées — et elle les alterne tous les 4 pixels parcourus.',
+      '**Les jambes suivent la vitesse, toutes seules :** il va vite, elles s’agitent ; il s’arrête, elles s’arrêtent. Rien à compter.',
+      '**Il se tourne tout seul :** s’il va à gauche, la console retourne le dessin (le miroir). Il faut donc dessiner le héros **regardant à droite**.',
+      '**À toi :** dessine un troisième trait sur HEROS2 (un bras levé ?) et regarde-le marcher.',
+    ],
+    code: `// CE PROGRAMME : le même héros, mais il MARCHE et se tourne du côté où il va.
+//
+// Ce qui est nouveau : marcher() à la place de sprite().
+//   marcher(0, x, 72, HEROS1, HEROS2);
+//     deux dessins qui alternent tous les 4 pixels parcourus,
+//     et le dessin retourné quand il va vers la gauche.
+
+#include <Tuile>         // un dessin de 8 × 8 pixels
+#include <gaucheDroite>  // gaucheDroite() : la manette, à gauche et à droite
+#include <marcher>       // marcher() : deux dessins qui alternent, et le miroir
+
+Tuile HEROS1 = {                  // Les jambes écartées. Il regarde à DROITE.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile HEROS2 = {                  // Les jambes serrées.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  "..#..#..",
+  "..##.##.",
+};
+
+int main() {                          // Le jeu commence ici.
+  uint8_t x = 76;                     // La place du héros.
+  uint8_t vitesseX = 60;              // Sa vitesse, en pixels par seconde.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    x = gaucheDroite(x, vitesseX);    // La manette le fait bouger, à vitesseX.
+
+    marcher(0, x, 72, HEROS1, HEROS2);   // Il marche, et regarde où il va.
+  }
+}
+`,
+    aVoir: 'Le héros marche quand tu appuies : ses jambes bougent, et il se retourne quand il change de sens.',
+    controle: (c) => {
+      c.gb.setButton('right', true)
+      const dessins = new Set()
+      for (let i = 0; i < 30; i++) { c.avancer(1); dessins.add(c.lutin(0).tuile) }
+      const versDroite = c.gb.mmu.read(0xfe03) & 0x20
+      c.gb.setButton('right', false)
+      c.gb.setButton('left', true); c.avancer(10)
+      const versGauche = c.gb.mmu.read(0xfe03) & 0x20
+      c.gb.setButton('left', false)
+      return [
+        ['en marchant, ses deux dessins alternent', dessins.size === 2],
+        ['vers la droite : le dessin tel quel', versDroite === 0],
+        ['vers la gauche : le dessin retourné', versGauche === 0x20],
+      ]
+    },
+  },
+
+  {
+    titre: 'Courir avec B : une vitesse qui change',
+    difficulte: 16,
+    provenance: 'cours',
+    suite: true,
+    idee: 'uint8_t vitesseX = 50; if (bouton(B)) vitesseX = 110; — la vitesse en largeur est une variable, vitesseX : en tenant B, le héros court.',
+    texte: [
+      '**Dans beaucoup de jeux, on tient un bouton pour courir.** Ici, ce sera B.',
+      '**Ce qui est nouveau ici : la vitesse dans une variable, `vitesseX`, qui change.** Son nom dit ce qu’elle règle : la vitesse en **largeur**, celle de `x` (comme `x = gaucheDroite(x, vitesseX);`). Plus tard, la vitesse en hauteur s’appellera `vitesseY`. À chaque image, on part de la vitesse de marche (50) ; si B est tenu, on la remplace par celle de la course (110). Puis on la donne à `gaucheDroite()`.',
+      '**Rien d’autre ne change :** les jambes suivent toutes seules — elles s’agitent plus vite quand il court, puisqu’elles changent tous les 4 pixels.',
+      '**`bouton(B)`** rend 1 tant que B est enfoncé (il faut `#include <bouton>`).',
+      '**À toi :** ajoute une marche lente : si on tient SELECT, `vitesseX` passe à 20.',
+    ],
+    code: `// CE PROGRAMME : le héros marche ; en tenant B, il court.
+//
+// Ce qui est nouveau : une vitesse qui change pendant le jeu, vitesseX (X : la largeur, comme x).
+//   uint8_t vitesseX = 50;             la marche
+//   if (bouton(B)) vitesseX = 110;     B tenu : la course
+
+#include <Tuile>         // un dessin de 8 × 8 pixels
+#include <bouton>        // bouton() : lire un bouton de la manette
+#include <gaucheDroite>  // gaucheDroite() : la manette, à gauche et à droite
+#include <marcher>       // marcher() : deux dessins qui alternent, et le miroir
+
+Tuile HEROS1 = {                  // Les jambes écartées. Il regarde à DROITE.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile HEROS2 = {                  // Les jambes serrées.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  "..#..#..",
+  "..##.##.",
+};
+
+int main() {                          // Le jeu commence ici.
+  uint8_t x = 0;                      // La place du héros : à gauche.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    uint8_t vitesseX = 50;            // La marche : 50 pixels par seconde…
+    if (bouton(B)) vitesseX = 110;    // …mais B tenu : la course, 110.
+
+    x = gaucheDroite(x, vitesseX);    // La manette, à la vitesse choisie.
+    marcher(0, x, 72, HEROS1, HEROS2);
+  }
+}
+`,
+    aVoir: 'Le héros marche avec DROITE ; en tenant B en même temps, il court deux fois plus vite.',
+    controle: (c) => {
+      c.gb.setButton('right', true)
+      const a = c.lutin(0).x; c.avancer(30); const marche = c.lutin(0).x - a
+      c.gb.setButton('b', true)
+      const b = c.lutin(0).x; c.avancer(30); const course = c.lutin(0).x - b
+      c.gb.setButton('b', false); c.gb.setButton('right', false)
+      return [
+        ['en marchant : environ 25 pixels en une demi-seconde', marche >= 23 && marche <= 27, ` (${marche})`],
+        ['en courant (B) : plus de deux fois plus', course >= 2 * marche, ` (${course})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Sauter avec A : sauter(y, hauteurMax, 104, gravite)',
+    difficulte: 16,
+    provenance: 'cours',
+    suite: true,
+    idee: 'y = sauter(y, hauteurMax, 104, gravite) : au sol, A lance un saut de 40 pixels au plus. Le héros court, saute, et retombe sur le sol. Le dernier réglage, c’est la variable gravite : c’est toi qui la règles.',
+    texte: [
+      '**Un héros de plateformes saute.** Il faut maintenant deux places : `x` pour la largeur (la manette), et `y` pour la hauteur (le saut).',
+      '**Ce qui est nouveau ici : `y = sauter(y, hauteurMax, 104, gravite);`.** Quand le héros est au sol — `y` vaut 104 — et qu’on appuie sur A, il saute de **40 pixels**. Il monte vite, ralentit, s’arrête en l’air, retombe de plus en plus vite, et se pose sur 104.',
+      '**Les quatre réglages :** `y` (où il est), **`hauteurMax`** (le plus haut qu’il peut aller, en pixels — une variable : `uint8_t hauteurMax = 40;`), **104** (le sol), et **`gravite`** (la gravité — une variable aussi : `uint8_t gravite = 4;`, 4 : la gravité normale).',
+      '**La gravité se règle en fonction du saut :** `hauteurMax` (40) reste le plus haut qu’il peut aller, quelle que soit la gravité — la console calcule l’élan qu’il faut. La gravité change seulement **l’allure** : avec 4, c’est la gravité normale ; avec 2, elle est faible, il flotte, le saut dure longtemps ; avec 1, plus faible encore, comme sur la Lune ; avec 8, elle est forte, il monte et retombe très vite. Tu sais toujours où il peut aller au plus : 40 pixels au-dessus du sol.',
+      '**Sans le quatrième nombre,** `sauter(y, 40, 104)` marche aussi : la gravité vaut alors 4, la normale.',
+      '**Pourquoi 104 ?** Le sol est la ligne 14 de l’écran : 14 × 8 = 112 pixels. Le héros fait 8 pixels de haut : pour avoir les pieds sur le sol, son haut est à 112 - 8 = **104**.',
+      '**Plus tu tiens A, plus il saute haut :** `hauteurMax`, 40, c’est le plus grand saut, A tenu jusqu’en haut. Une petite tape sur A : un petit bond d’une quinzaine de pixels. C’est le joueur qui dose — comme dans les grands jeux de plateformes.',
+      '**Les deux à la fois :** pendant le saut, la manette marche toujours. Le saut fait une courbe, et tu peux le diriger en l’air.',
+      '**À toi :** écris `uint8_t gravite = 8;` — le saut va toujours à 40 pixels, mais plus vite. Puis **une gravité plus faible et un saut plus haut** : `uint8_t gravite = 2;` et `uint8_t hauteurMax = 64;` — un grand saut, lent, comme sur la Lune. Puis `uint8_t hauteurMax = 16;` : un petit bond.',
+    ],
+    code: `// CE PROGRAMME : le héros court sur le sol ; A le fait sauter.
+//
+// Ce qui est nouveau : sauter(y, hauteur, sol, gravité).
+//   y = sauter(y, hauteurMax, 104, gravite);   au sol (y = 104), A lance le saut.
+//   hauteurMax : la hauteur max, une variable (uint8_t hauteurMax = 40;) : le
+//                plus haut qu'il peut aller, en pixels (A tenu jusqu'en haut).
+//                Pour sauter PLUS HAUT, c'est elle qu'on monte (64, 80…).
+//   104        : le sol. La ligne 14 : 14 × 8 = 112, moins les 8 pixels du héros = 104.
+//   gravite    : la gravité, une variable (uint8_t gravite = 4;). 4 normale,
+//                2 faible (il flotte), 1 très faible (la Lune), 8 forte. Le saut
+//                va toujours à hauteurMax au plus : la gravité ne change que l'allure.
+
+#include <Tuile>         // un dessin de 8 × 8 pixels
+#include <bande>         // bande() : la même tuile, plusieurs fois
+#include <bouton>        // bouton() : lire un bouton de la manette
+#include <gaucheDroite>  // gaucheDroite() : la manette, à gauche et à droite
+#include <marcher>       // marcher() : deux dessins qui alternent, et le miroir
+#include <sauter>        // sauter() : un saut, avec la gravité
+
+Tuile HEROS1 = {                  // Les jambes écartées. Il regarde à DROITE.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile HEROS2 = {                  // Les jambes serrées.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  "..#..#..",
+  "..##.##.",
+};
+
+Tuile SOL = {                     // Un bloc de sol, tout plein.
+  "33333333",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "33333333",
+};
+
+int main() {                          // Le jeu commence ici.
+  bande(0, 14, SOL, 20);              // Le sol : toute la ligne 14.
+
+  uint8_t x = 20;                     // Le héros : en largeur…
+  uint8_t y = 104;                    // …et en hauteur, les pieds sur le sol.
+  uint8_t hauteurMax = 40;            // La hauteur max du saut, en pixels (A tenu jusqu’en haut).
+  uint8_t gravite = 4;                // La gravité : 4 normale, 2 faible, 1 très faible, 8 forte.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    uint8_t vitesseX = 50;
+    if (bouton(B)) vitesseX = 110;    // B : la course.
+
+    x = gaucheDroite(x, vitesseX);    // La manette : gauche et droite.
+    y = sauter(y, hauteurMax, 104, gravite);  // A : le saut (40 au plus) ; il retombe sur 104.
+
+    marcher(0, x, y, HEROS1, HEROS2);
+  }
+}
+`,
+    aVoir: 'Le héros sur un sol de blocs. DROITE et GAUCHE le font courir ; A le fait sauter en courbe.',
+    controle: (c) => {
+      c.avancer(10)
+      const auSol = c.lutin(0).y
+      c.gb.setButton('right', true)
+      c.gb.setButton('a', true); c.avancer(30); c.gb.setButton('a', false)   // A tenu : le grand saut
+      const ys = []
+      for (let i = 0; i < 90; i++) { c.avancer(1); ys.push(c.lutin(0).y) }
+      c.gb.setButton('right', false)
+      const haut = Math.min(...ys)
+      return [
+        ['au départ, les pieds sur le sol', auSol === 104],
+        ['A : un saut d’environ 40 pixels', auSol - haut >= 38 && auSol - haut <= 42, ` (monté de ${auSol - haut})`],
+        ['il retombe sur le sol', ys.at(-1) === 104],
+      ]
+    },
+  },
+
+  {
+    titre: 'Sauter sur une plateforme : un sol qui change',
+    difficulte: 16,
+    provenance: 'cours',
+    suite: true,
+    idee: 'Le sol n’est plus toujours à 104 : au-dessus de la plateforme, il est à 72. Une variable « sol », calculée à chaque image, et sauter() fait le reste.',
+    texte: [
+      '**Une plateforme, c’est un deuxième sol, plus haut.** Ici, une rangée de blocs ligne 10, des pixels 64 à 111 en largeur. Le héros qui se tient dessus a le haut à 10 × 8 - 8 = **72**.',
+      '**Ce qui est nouveau ici : le sol dans une variable.** À chaque image, on calcule où est le sol sous le héros : 104 en général, mais **72 s’il est au-dessus de la plateforme**. Puis `y = sauter(y, hauteurMax, sol, gravite);`.',
+      '**« Au-dessus de la plateforme »,** c’est deux choses : son milieu (`x + 4`) est entre 64 et 111, **et** il est plus haut qu’elle (`y <= 72`). Sans la seconde, le héros qui passe **dessous** serait aspiré dessus !',
+      '**Et quand il sort de la plateforme ?** Le sol redevient 104 : `sauter()` voit qu’il est au-dessus de son sol, et le fait **tomber tout seul**. Rien à écrire.',
+      '**À toi :** ajoute une deuxième plateforme, plus haut, à droite (ligne 6 : sol à 40).',
+    ],
+    code: `// CE PROGRAMME : un sol, et une plateforme au-dessus. Saute dessus avec A !
+//
+// Ce qui est nouveau : le sol dans une variable, recalculé à chaque image.
+//   sol = 104                       le sol d'en bas (ligne 14)
+//   sol = 72 au-dessus de la plateforme (ligne 10 : 10 × 8 - 8 = 72)
+//   y = sauter(y, hauteurMax, sol, gravite);   il se pose sur le sol qui est sous lui
+
+#include <Tuile>         // un dessin de 8 × 8 pixels
+#include <bande>         // bande() : la même tuile, plusieurs fois
+#include <bouton>        // bouton() : lire un bouton de la manette
+#include <gaucheDroite>  // gaucheDroite() : la manette, à gauche et à droite
+#include <marcher>       // marcher() : deux dessins qui alternent, et le miroir
+#include <sauter>        // sauter() : un saut, avec la gravité
+
+Tuile HEROS1 = {                  // Les jambes écartées. Il regarde à DROITE.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile HEROS2 = {                  // Les jambes serrées.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  "..#..#..",
+  "..##.##.",
+};
+
+Tuile SOL = {                     // Un bloc de sol, tout plein.
+  "33333333",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "33333333",
+};
+
+int main() {                          // Le jeu commence ici.
+  bande(0, 14, SOL, 20);              // Le sol : toute la ligne 14.
+  bande(8, 10, SOL, 6);               // La plateforme : ligne 10, colonnes 8 à 13 (pixels 64 à 111).
+
+  uint8_t x = 20;
+  uint8_t y = 104;
+  uint8_t hauteurMax = 40; // la hauteur max du saut, en pixels
+  uint8_t gravite = 4;   // la gravité : 4 normale, 2 faible, 1 très faible, 8 forte
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    uint8_t vitesseX = 50;
+    if (bouton(B)) vitesseX = 110;
+    x = gaucheDroite(x, vitesseX);
+
+    // Où est le sol, sous le héros ?
+    uint8_t sol = 104;                // en général : le sol d'en bas
+    if (x + 4 >= 64 && x + 4 < 112 && y <= 72) {
+      sol = 72;                       // au-dessus de la plateforme : son dessus
+    }
+
+    y = sauter(y, hauteurMax, sol, gravite);     // il se pose sur ce sol-là
+    marcher(0, x, y, HEROS1, HEROS2);
+  }
+}
+`,
+    aVoir: 'Un sol et une plateforme au-dessus. Saute (A) en courant vers la plateforme : tu te poses dessus ; marche jusqu’au bout : tu tombes.',
+    controle: (c) => {
+      c.gb.setButton('right', true)
+      attendre(c, () => c.lutin(0).x >= 40)
+      c.gb.setButton('a', true); c.avancer(30); c.gb.setButton('a', false)   // A tenu : le grand saut
+      c.avancer(40)                     // il court pendant le saut…
+      c.gb.setButton('right', false)    // …puis s'arrête, posé
+      c.avancer(40)
+      const surLaPlateforme = c.lutin(0).y
+      c.gb.setButton('right', true); c.avancer(120); c.gb.setButton('right', false)
+      c.avancer(60)
+      const tombe = c.lutin(0).y
+      return [
+        ['il s’est posé sur la plateforme (y = 72)', surLaPlateforme === 72, ` (y = ${surLaPlateforme})`],
+        ['sorti de la plateforme, il est retombé sur le sol (y = 104)', tombe === 104, ` (y = ${tombe})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Se cogner à un mur : toucheDecor()',
+    difficulte: 16,
+    provenance: 'cours',
+    suite: true,
+    idee: 'Avant d’avancer, on regarde le décor juste devant : s’il y a un bloc, vitesseX passe à 0. Le héros s’arrête contre le mur.',
+    texte: [
+      '**Le héros traverse les murs !** `gaucheDroite()` ne connaît que les bords de l’écran, pas le décor.',
+      '**Ce qui est nouveau ici : regarder devant soi avec `toucheDecor()`.** S’il va à droite, le pixel juste devant lui est `x + 8` ; s’il va à gauche, `x - 1`. À mi-hauteur : `y + 4`. Si `toucheDecor()` y trouve un bloc, on met `vitesseX` à **0** : il ne passe pas.',
+      '**`&&` veut dire « et » :** `if (bouton(DROITE) && toucheDecor(x + 8, y + 4))` — « s’il va à droite ET qu’il y a un mur devant ».',
+      '**Il peut toujours repartir** dans l’autre sens : on ne bloque que le côté du mur.',
+      '**À toi :** saute par-dessus le mur (il ne fait qu’un bloc de haut).',
+    ],
+    code: `// CE PROGRAMME : un mur sur le sol. Le héros s'arrête contre lui.
+//
+// Ce qui est nouveau : regarder devant soi avant d'avancer.
+//   vers la droite : le pixel juste devant est x + 8
+//   vers la gauche : le pixel juste devant est x - 1
+//   à mi-hauteur du héros : y + 4
+
+#include <Tuile>         // un dessin de 8 × 8 pixels
+#include <bande>         // bande() : la même tuile, plusieurs fois
+#include <poser>         // poser() : une tuile sur une case du fond
+#include <bouton>        // bouton() : lire un bouton de la manette
+#include <gaucheDroite>  // gaucheDroite() : la manette, à gauche et à droite
+#include <marcher>       // marcher() : deux dessins qui alternent, et le miroir
+#include <sauter>        // sauter() : un saut, avec la gravité
+#include <toucheDecor>   // toucheDecor() : du décor sous ce pixel ?
+
+Tuile HEROS1 = {                  // Les jambes écartées. Il regarde à DROITE.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile HEROS2 = {                  // Les jambes serrées.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  "..#..#..",
+  "..##.##.",
+};
+
+Tuile SOL = {                     // Un bloc, tout plein.
+  "33333333",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "33333333",
+};
+
+int main() {                          // Le jeu commence ici.
+  bande(0, 14, SOL, 20);              // Le sol.
+  poser(15, 13, SOL);                 // Un mur d'un bloc : colonne 15 (pixels 120 à 127).
+
+  uint8_t x = 20;
+  uint8_t y = 104;
+  uint8_t hauteurMax = 40; // la hauteur max du saut, en pixels
+  uint8_t gravite = 4;   // la gravité : 4 normale, 2 faible, 1 très faible, 8 forte
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    uint8_t vitesseX = 50;
+    if (bouton(B)) vitesseX = 110;
+
+    // Un mur juste devant ? Alors on ne bouge pas de ce côté-là.
+    if (bouton(DROITE) && toucheDecor(x + 8, y + 4)) vitesseX = 0;
+    if (bouton(GAUCHE) && toucheDecor(x - 1, y + 4)) vitesseX = 0;
+
+    x = gaucheDroite(x, vitesseX);
+    y = sauter(y, hauteurMax, 104, gravite);
+    marcher(0, x, y, HEROS1, HEROS2);
+  }
+}
+`,
+    aVoir: 'Un bloc sur le sol, à droite. Le héros qui court vers lui s’arrête net contre lui ; il peut repartir à gauche, ou sauter par-dessus.',
+    controle: (c) => {
+      c.gb.setButton('right', true); c.avancer(300); const contre = c.lutin(0).x; c.gb.setButton('right', false)
+      c.gb.setButton('left', true); c.avancer(30); const repart = c.lutin(0).x; c.gb.setButton('left', false)
+      return [
+        ['il s’arrête contre le mur (x = 112)', contre === 112, ` (x = ${contre})`],
+        ['il peut repartir à gauche', repart < contre],
+      ]
+    },
+  },
+
+  {
+    titre: 'Monter et descendre : hautBas(y, vitesseY)',
+    difficulte: 16,
+    provenance: 'cours',
+    suite: true,
+    idee: 'uint8_t vitesseY = 60; y = hautBas(y, vitesseY); — HAUT fait monter le héros, BAS descendre — pour un jeu vu de dessus, ou une échelle. Il ne sort pas de l’écran.',
+    texte: [
+      '**Tous les jeux ne sont pas des plateformes.** Dans un jeu vu **de dessus** (un labyrinthe, une aventure), le héros va aussi en haut et en bas.',
+      '**Ce qui est nouveau ici : `hautBas(y, vitesse)`,** la sœur de `gaucheDroite()`. BAS fait descendre, HAUT monter, à « vitesse » pixels par seconde. Sa vitesse a son nom, comme `vitesseX` : **`vitesseY`** (Y, c’est la hauteur, comme `y`), écrite une fois en haut : `uint8_t vitesseY = 60;`. En haut, il s’arrête à 0 ; en bas, à 136 (l’écran fait 144 pixels de haut).',
+      '**Ici, il ne fait que monter et descendre,** au milieu de l’écran : la leçon d’après mettra les deux ensemble.',
+      '**À toi :** fais-le descendre plus vite qu’il ne monte (`vitesseY` qui change avec `bouton(BAS)`, comme `vitesseX` avec B pour courir).',
+    ],
+    code: `// CE PROGRAMME : un héros que la manette fait monter et descendre.
+//
+// Ce qui est nouveau : hautBas(y, vitesse), comme gaucheDroite(), mais en hauteur ; sa vitesse : vitesseY.
+//   BAS : il descend ; HAUT : il monte ; il s'arrête aux bords (0 et 136).
+
+#include <Tuile>      // un dessin de 8 × 8 pixels
+#include <sprite>     // place un lutin de 8 × 8 au pixel près
+#include <hautBas>    // hautBas() : la manette, en haut et en bas
+
+Tuile HEROS = {                   // Le héros.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+int main() {                          // Le jeu commence ici.
+  uint8_t vitesseY = 60;              // Sa vitesse, en pixels par seconde.
+  uint8_t y = 68;                     // La hauteur du héros : au milieu.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    y = hautBas(y, vitesseY);         // HAUT et BAS, à vitesseY pixels par seconde.
+
+    sprite(0, 76, y, HEROS);
+  }
+}
+`,
+    aVoir: 'Un héros au milieu de l’écran. BAS le fait descendre, HAUT monter ; il s’arrête en haut et en bas.',
+    controle: (c) => {
+      c.gb.setButton('down', true); c.avancer(30); const descendu = c.lutin(0).y
+      c.avancer(200); const bas = c.lutin(0).y; c.gb.setButton('down', false)
+      c.gb.setButton('up', true); c.avancer(300); const haut = c.lutin(0).y; c.gb.setButton('up', false)
+      return [
+        ['BAS : il descend', descendu > 68],
+        ['il s’arrête en bas, à 136', bas === 136],
+        ['HAUT : il remonte, jusqu’à 0', haut === 0],
+      ]
+    },
+  },
+
+  {
+    titre: 'Les quatre directions : un héros vu de dessus',
+    difficulte: 16,
+    provenance: 'cours',
+    suite: true,
+    idee: 'x = gaucheDroite(x, vitesseX); y = hautBas(y, vitesseY); — les deux ensemble : le héros va partout, en diagonale aussi.',
+    texte: [
+      '**Ce qui est nouveau ici : les deux à la fois.** `gaucheDroite()` pour la largeur, `hautBas()` pour la hauteur. Deux lignes, chacune avec sa vitesse (`vitesseX`, `vitesseY`), et le héros va **dans les quatre directions** — et en diagonale si tu appuies sur deux flèches.',
+      '**Il marche dans tous les sens :** `marcher()` change de jambe selon `x + y`, donc aussi quand il monte ou descend.',
+      '**C’est le début d’un jeu vu de dessus :** un labyrinthe, un jardin, une ville. Avec `toucheDecor()` (deux leçons plus tôt), il ne traverserait plus les murs.',
+      '**À toi :** pose quelques blocs, et empêche-le de passer à travers, dans les quatre sens.',
+    ],
+    code: `// CE PROGRAMME : un héros vu de dessus, qui va dans les quatre directions.
+//
+// Ce qui est nouveau : gaucheDroite() et hautBas() ensemble.
+
+#include <Tuile>         // un dessin de 8 × 8 pixels
+#include <gaucheDroite>  // gaucheDroite() : la manette, à gauche et à droite
+#include <hautBas>       // hautBas() : la manette, en haut et en bas
+#include <marcher>       // marcher() : deux dessins qui alternent, et le miroir
+
+Tuile HEROS1 = {                  // Les jambes écartées. Il regarde à DROITE.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile HEROS2 = {                  // Les jambes serrées.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  "..#..#..",
+  "..##.##.",
+};
+
+int main() {                          // Le jeu commence ici.
+  uint8_t x = 76;
+  uint8_t vitesseX = 60;              // La vitesse en largeur…
+  uint8_t vitesseY = 60;              // …et en hauteur.
+  uint8_t y = 68;
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    x = gaucheDroite(x, vitesseX);    // GAUCHE et DROITE
+    y = hautBas(y, vitesseY);         // HAUT et BAS
+
+    marcher(0, x, y, HEROS1, HEROS2);
+  }
+}
+`,
+    aVoir: 'Un héros qui va partout avec les flèches, en diagonale aussi, et qui marche dans tous les sens.',
+    controle: (c) => {
+      c.gb.setButton('right', true); c.gb.setButton('down', true); c.avancer(30)
+      const p = c.lutin(0)
+      c.gb.setButton('right', false); c.gb.setButton('down', false)
+      return [
+        ['DROITE et BAS ensemble : en diagonale', p.x > 76 && p.y > 68, ` (${p.x}, ${p.y})`],
+      ]
+    },
+  },
+
+  {
+    titre: 'Tout ensemble : un petit niveau de plateformes',
+    difficulte: 16,
+    provenance: 'cours',
+    suite: true,
+    idee: 'Courir, sauter, monter sur une plateforme, se cogner aux murs, ramasser une pièce : tout le chapitre dans un seul niveau.',
+    texte: [
+      '**Tout ce que tu as appris dans ce chapitre,** dans un seul petit jeu : le sol, une plateforme, un mur, une pièce sur la plateforme, et un score.',
+      '**Rien de nouveau, tout rangé :** la vitesse `vitesseX` (B pour courir), les murs devant soi, le sol sous ses pieds, le saut, la marche — chacun sa ligne, dans cet ordre, à chaque image.',
+      '**La pièce :** quand `touche()` dit que le héros la touche, le score monte et la pièce change de côté.',
+      '**L’ordre compte :** d’abord on choisit `vitesseX` (et les murs), puis on bouge en largeur, puis on calcule le sol sous la nouvelle place, puis le saut, puis on dessine.',
+      '**À toi :** ajoute un ennemi qui fait sa ronde sur le sol avec `navette()` ; s’il touche le héros, fais `trembler(4)` et remets le score à 0.',
+    ],
+    code: `// CE PROGRAMME : un petit niveau. Cours (B), saute (A), monte sur la
+// plateforme, ramasse la pièce : chaque pièce rapporte un point.
+
+#include <Tuile>         // un dessin de 8 × 8 pixels
+#include <sprite>        // place un lutin de 8 × 8 au pixel près
+#include <bande>         // bande() : la même tuile, plusieurs fois
+#include <poser>         // poser() : une tuile sur une case du fond
+#include <texte>         // texte() : écrire à l’écran
+#include <nombre>        // nombre() : écrire un nombre
+#include <bouton>        // bouton() : lire un bouton de la manette
+#include <gaucheDroite>  // gaucheDroite() : la manette, à gauche et à droite
+#include <marcher>       // marcher() : deux dessins qui alternent, et le miroir
+#include <sauter>        // sauter() : un saut, avec la gravité
+#include <toucheDecor>   // toucheDecor() : du décor sous ce pixel ?
+#include <touche>        // touche() : deux lutins se touchent-ils ?
+
+Tuile HEROS1 = {                  // Les jambes écartées. Il regarde à DROITE.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};
+
+Tuile HEROS2 = {                  // Les jambes serrées.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  "..#..#..",
+  "..##.##.",
+};
+
+Tuile SOL = {                     // Un bloc, tout plein.
+  "33333333",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "32222223",
+  "33333333",
+};
+
+Tuile PIECE = {                   // Une pièce ronde.
+  "..####..",
+  ".#----#.",
+  "#--##--#",
+  "#-#--#-#",
+  "#-#--#-#",
+  "#--##--#",
+  ".#----#.",
+  "..####..",
+};
+
+int main() {                          // Le jeu commence ici.
+  bande(0, 14, SOL, 20);              // Le sol.
+  bande(8, 10, SOL, 6);               // La plateforme (pixels 64 à 111).
+  poser(1, 13, SOL);                  // Deux murs, aux deux bouts.
+  poser(18, 13, SOL);
+  texte(1, 1, "PIECES");
+
+  uint8_t x = 20;
+  uint8_t y = 104;
+  uint8_t hauteurMax = 40; // la hauteur max du saut, en pixels
+  uint8_t gravite = 4;   // la gravité : 4 normale, 2 faible, 1 très faible, 8 forte
+  uint8_t px = 84;                    // La pièce : posée sur la plateforme…
+  uint8_t py = 72;                    // …(le dessus de la plateforme : 80 - 8).
+  uint8_t score = 0;
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    // 1. La vitesse en largeur, vitesseX, et les murs devant soi.
+    uint8_t vitesseX = 50;
+    if (bouton(B)) vitesseX = 110;
+    if (bouton(DROITE) && toucheDecor(x + 8, y + 4)) vitesseX = 0;
+    if (bouton(GAUCHE) && toucheDecor(x - 1, y + 4)) vitesseX = 0;
+
+    // 2. Bouger en largeur.
+    x = gaucheDroite(x, vitesseX);
+
+    // 3. Le sol sous ses pieds, puis le saut.
+    uint8_t sol = 104;
+    if (x + 4 >= 64 && x + 4 < 112 && y <= 72) sol = 72;
+    y = sauter(y, hauteurMax, sol, gravite);
+
+    // 4. La pièce : touchée, un point, et elle change de place.
+    if (touche(x, y, px, py)) {
+      score++;
+      if (px == 84) {                 // elle était sur la plateforme :
+        px = 130;                     //   la voilà au sol, à droite…
+        py = 104;
+      } else {                        // …elle était au sol :
+        px = 84;                      //   de nouveau sur la plateforme.
+        py = 72;
+      }
+    }
+
+    // 5. Dessiner.
+    nombre(8, 1, score);
+    marcher(0, x, y, HEROS1, HEROS2);
+    sprite(1, px, py, PIECE);
+  }
+}
+`,
+    aVoir: 'Un petit niveau : un sol, une plateforme avec une pièce dessus, deux murs. Saute sur la plateforme pour prendre la pièce : le score monte.',
+    controle: (c) => {
+      const avant = c.lire(10, 1)
+      c.gb.setButton('right', true)
+      attendre(c, () => c.lutin(0).x >= 40)
+      c.gb.setButton('a', true); c.avancer(30); c.gb.setButton('a', false)   // A tenu : le grand saut
+      c.avancer(20)
+      c.gb.setButton('right', false)
+      c.avancer(30)
+      return [
+        ['le héros est monté sur la plateforme', c.lutin(0).y <= 72, ` (y = ${c.lutin(0).y})`],
+        ['il a ramassé la pièce : le score a monté', c.lire(10, 1) !== avant],
       ]
     },
   },

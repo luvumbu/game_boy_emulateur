@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Leçon 153.2 — Courir avec B : une vitesse qui change</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 16mm; }
+
+  :root {
+    --encre: #16181d;
+    --gris: #5c6472;
+    --vert: #3d6b47;
+    --vert-clair: #e8f2dc;
+    --bord: #d3d8e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; color: var(--encre); background: #fff;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10.5pt; line-height: 1.5;
+  }
+
+  code, pre { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+
+  h1 { font-size: 24pt; margin: 0 0 3pt; letter-spacing: -.4pt; }
+  h2 { font-size: 14pt; margin: 20pt 0 8pt; padding-bottom: 3pt; border-bottom: 1pt solid var(--bord); }
+  h3 { font-size: 10pt; margin: 0 0 4pt; }
+  p { margin: 0 0 7pt; }
+
+  .idee { color: var(--vert); font-size: 12pt; font-weight: 600; margin-bottom: 10pt; }
+
+  code {
+    background: #f2f4f7; border: 1px solid var(--bord); border-radius: 3pt;
+    padding: 0 3pt; font-size: .9em; color: #1f3a26;
+  }
+
+  pre {
+    margin: 0; background: #f7f8fa; border: 1px solid var(--bord); border-left: 2.5pt solid var(--vert);
+    border-radius: 4pt; padding: 7pt 9pt; font-size: 7.8pt; line-height: 1.45;
+    white-space: pre-wrap; overflow-wrap: break-word;
+  }
+
+  pre code { background: none; border: 0; padding: 0; color: var(--encre); font-size: 1em; }
+
+  .reperes { display: flex; gap: 5pt; flex-wrap: wrap; font-size: 7.5pt; margin: 0 0 8pt; }
+  .reperes span { border: 1px solid var(--bord); border-radius: 20pt; padding: 1.5pt 7pt; color: var(--gris); }
+  .reperes .niveau { color: var(--vert); border-color: #b9d199; font-weight: 600; }
+  .reperes .outil { background: var(--vert); border-color: var(--vert); color: #fff; font-weight: 600; }
+  .jauge { background: linear-gradient(90deg, var(--vert-clair) var(--part, 0%), transparent var(--part, 0%)); }
+
+  .avoir {
+    background: var(--vert-clair); border-left: 2.5pt solid var(--vert);
+    padding: 6pt 9pt; font-size: 9.5pt; border-radius: 0 3pt 3pt 0;
+  }
+
+  /* L'écran de la console fait 160 × 144 pixels : agrandi, il DOIT rester
+     carré et net. Un lissage ferait des lettres floues. */
+  img { image-rendering: pixelated; border: 1px solid var(--bord); border-radius: 3pt; display: block; }
+  figure { margin: 0; }
+  figcaption { font-size: 7.5pt; color: var(--gris); margin-top: 3pt; }
+
+  .morceau { display: grid; grid-template-columns: 1fr auto; gap: 6mm; align-items: start; margin-bottom: 9pt; break-inside: avoid; }
+  .morceau .quoi { font-size: 8pt; color: var(--vert); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3pt; }
+  .morceau img { width: 26mm; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; break-inside: avoid; }
+  .etapes img { width: 100%; }
+
+  .controles { list-style: none; margin: 0; padding: 0; font-size: 9pt; }
+  .controles li { padding: 2.5pt 0 2.5pt 16pt; position: relative; border-bottom: 1px dotted var(--bord); }
+  .controles li::before { content: '✓'; position: absolute; left: 2pt; color: var(--vert); font-weight: 700; }
+  .controles .detail { color: var(--gris); font-size: 8pt; }
+
+  .pied { margin-top: 16pt; padding-top: 6pt; border-top: 1pt solid var(--bord); font-size: 9pt; color: var(--gris); }
+</style>
+</head>
+<body>
+
+
+  <p class="reperes">
+    <span class="niveau">Chapitre 26 — Le héros bouge : gauche, droite, sauter</span>
+    <span class="outil">du cours</span>
+    
+    <span>leçon 153.2 sur 153</span>
+    <span class="jauge" style="--part: 100%">difficulté 10 / 10</span>
+    
+    
+    
+  </p>
+<h1>153.2. Courir avec B : une vitesse qui change</h1>
+<p class="idee">uint8_t vitesseX = 50; if (bouton(B)) vitesseX = 110; — la vitesse en largeur est une variable, vitesseX : en tenant B, le héros court.</p>
+
+<h2>1. Ce qu’il faut comprendre</h2>
+<p><strong>Dans beaucoup de jeux, on tient un bouton pour courir.</strong> Ici, ce sera B.</p>
+<p><strong>Ce qui est nouveau ici : la vitesse dans une variable, <code>vitesseX</code>, qui change.</strong> Son nom dit ce qu’elle règle : la vitesse en <strong>largeur</strong>, celle de <code>x</code> (comme <code>x = gaucheDroite(x, vitesseX);</code>). Plus tard, la vitesse en hauteur s’appellera <code>vitesseY</code>. À chaque image, on part de la vitesse de marche (50) ; si B est tenu, on la remplace par celle de la course (110). Puis on la donne à <code>gaucheDroite()</code>.</p>
+<p><strong>Rien d’autre ne change :</strong> les jambes suivent toutes seules — elles s’agitent plus vite quand il court, puisqu’elles changent tous les 4 pixels.</p>
+<p><strong><code>bouton(B)</code></strong> rend 1 tant que B est enfoncé (il faut <code>#include &lt;bouton&gt;</code>).</p>
+<p><strong>À toi :</strong> ajoute une marche lente : si on tient SELECT, <code>vitesseX</code> passe à 20.</p>
+
+<div style="border: 1px solid #c8d4b4; border-left: 4px solid #3d6b47; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #3d6b47;">Les fonctions de cette leçon — et le tuto de chacune</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+  <li><code>#include &lt;Tuile&gt;</code> → <a href="lecon-00-107.2-tuile-dessiner-une-case.html">0.107.2. Tuile — dessiner une case</a></li>
+  <li><code>#include &lt;bouton&gt;</code> → <a href="lecon-00-65.5-la-fonction-bouton-lire-la-manette.html">0.65.5. La fonction bouton() — lire la manette</a></li>
+  <li><code>#include &lt;gaucheDroite&gt;</code> → <a href="lecon-152-2-la-fonction-gauchedroite-la-manette-a-ga.html">152.2. La fonction gaucheDroite() — la manette, à gauche et à droite</a></li>
+  <li><code>#include &lt;marcher&gt;</code> → <a href="lecon-110-8-la-fonction-marcher-un-lutin-qui-marche.html">110.8. La fonction marcher() — un lutin qui marche</a></li>
+</ul>
+</div>
+
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">📖 Les mots de cette leçon — si tu débutes</p>
+  <ul style="margin: 0; padding-left: 14pt;">
+    <li style="margin: 2pt 0;"><strong>accolades { }</strong> — Elles entourent un bloc : les lignes qui vont ensemble (le corps d’une fonction, d’une boucle, d’un « if »). Chaque « { » a son « } ».</li>
+    <li style="margin: 2pt 0;"><strong>affectation (=)</strong> — « x = 5; » : la boîte x prend la valeur 5. Ce n’est pas une égalité : c’est un rangement.</li>
+    <li style="margin: 2pt 0;"><strong>argument</strong> — Une valeur donnée à une fonction quand on l’appelle, entre ses parenthèses : dans texte(5, 8, "SALUT"), 5, 8 et "SALUT" sont les arguments.</li>
+    <li style="margin: 2pt 0;"><strong>bloc</strong> — Un groupe de lignes entre accolades { }, qui s’exécutent ensemble.</li>
+    <li style="margin: 2pt 0;"><strong>booléen (vrai / faux)</strong> — Le résultat d’une condition : vrai (1) ou faux (0). « true » veut dire vrai, « false » faux.</li>
+    <li style="margin: 2pt 0;"><strong>boucle</strong> — Des instructions qui se répètent : « while » (tant que…) ou « for » (pour un compteur qui va de… à…).</li>
+    <li style="margin: 2pt 0;"><strong>boucle du jeu</strong> — « while (true) { image(); … } » : ce qui se répète 60 fois par seconde, sans fin, pendant tout le jeu.</li>
+    <li style="margin: 2pt 0;"><strong>bouton()</strong> — Une fonction de la console qui dit si un bouton de la manette est enfoncé : 1 oui, 0 non. Les boutons : A, B, HAUT, BAS, GAUCHE, DROITE, START, SELECT.</li>
+    <li style="margin: 2pt 0;"><strong>chaîne de caractères (texte)</strong> — Des lettres entre guillemets, "COMME CECI" : un texte pris tel quel. La police de la console n’a que des majuscules, sans accents.</li>
+    <li style="margin: 2pt 0;"><strong>commentaire (//)</strong> — Tout ce qui suit « // » jusqu’au bout de la ligne : une phrase pour l’humain, que la console ignore.</li>
+    <li style="margin: 2pt 0;"><strong>condition</strong> — Une question dont la réponse est vrai ou faux : « score &gt; 10 », « bouton(A) ». On la teste avec « if » ou « while ».</li>
+    <li style="margin: 2pt 0;"><strong>if (si)</strong> — Teste une condition : si elle est vraie, on fait le bloc qui suit.</li>
+    <li style="margin: 2pt 0;"><strong>image()</strong> — Attend l’image suivante. La console en montre 60 par seconde : c’est ce qui règle la vitesse d’un jeu.</li>
+    <li style="margin: 2pt 0;"><strong>#include</strong> — En haut du programme : « #include &lt;texte&gt; » demande la fonction texte() à la console ; « #include "fichier.cpp" » verse un de tes fichiers à cet endroit.</li>
+    <li style="margin: 2pt 0;"><strong>instruction</strong> — Un ordre donné à la console, terminé par un point-virgule : « texte(1, 1, "OK"); ».</li>
+    <li style="margin: 2pt 0;"><strong>main</strong> — « int main() { … } » : là où le programme commence. La console exécute d’abord la première ligne de main.</li>
+    <li style="margin: 2pt 0;"><strong>octet</strong> — Un nombre de 0 à 255 : la plus petite boîte de la mémoire. Une cartouche en a 32 768.</li>
+    <li style="margin: 2pt 0;"><strong>point-virgule (;)</strong> — Il termine une instruction, comme le point termine une phrase.</li>
+    <li style="margin: 2pt 0;"><strong>Tuile</strong> — Un dessin de 8 × 8 pixels, écrit rangée par rangée avec des signes (. - + #). Le décor en est fait.</li>
+    <li style="margin: 2pt 0;"><strong>uint8_t</strong> — Le genre de nombre de cette console : un entier de 0 à 255 (un octet). Au-delà, il repart à 0.</li>
+    <li style="margin: 2pt 0;"><strong>variable</strong> — Une boîte avec un nom, dans la mémoire, qui retient un nombre qu’on peut lire et changer.</li>
+    <li style="margin: 2pt 0;"><strong>while (tant que)</strong> — Répète un bloc tant qu’une condition est vraie.</li>
+  </ul>
+</div>
+<div style="border: 1px solid #c9c2e6; border-left: 4px solid #6b5bb8; border-radius: 4px; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid; break-inside: auto;">
+  <p style="margin: 0 0 4pt; font-weight: 700; color: #4b3d99;">🔍 Le programme, ligne par ligne — chaque ligne dite en français</p>
+  <table style="width: 100%; border-collapse: collapse; table-layout: fixed;"><tbody>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// CE PROGRAMME : le héros marche ; en tenant B, il court.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« CE PROGRAMME : le héros marche ; en tenant B, il court. »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">// Ce qui est nouveau : une vitesse qui change pendant le jeu, vitesseX (X : la largeur, comme x).</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« Ce qui est nouveau : une vitesse qui change pendant le jeu, vitesseX (X : la largeur, comme x). »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   uint8_t vitesseX = 50;             la marche</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« uint8_t vitesseX = 50;             la marche »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">//   if (bouton(B)) vitesseX = 110;     B tenu : la course</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Un commentaire : une phrase pour celui qui lit (« if (bouton(B)) vitesseX = 110;     B tenu : la course »). La console l’ignore.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;Tuile&gt;         // un dessin de 8 × 8 pixels</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « Tuile » (ce que c’est : un dessin de 8 × 8 pixels). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « un dessin de 8 × 8 pixels ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;bouton&gt;        // bouton() : lire un bouton de la manette</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « bouton » (ce que c’est : lit un bouton de la manette). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « bouton() : lire un bouton de la manette ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;gaucheDroite&gt;  // gaucheDroite() : la manette, à gauche et à droite</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « gaucheDroite » (ce que c’est : la manette fait aller à gauche et à droite, à ta vitesse, sans sortir de l’écran). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « gaucheDroite() : la manette, à gauche et à droite ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">#include &lt;marcher&gt;       // marcher() : deux dessins qui alternent, et le miroir</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Demande à la console « marcher » (ce que c’est : un lutin qui marche : deux dessins qui alternent, au rythme de sa vitesse, et qui se tourne tout seul). Sans cette ligne, le compilateur refuserait de l’employer. (Le commentaire le dit : « marcher() : deux dessins qui alternent, et le miroir ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">Tuile HEROS1 = {                  // Les jambes écartées. Il regarde à DROITE.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Le début d’un dessin appelé HEROS1 : une tuile de 8 × 8 pixels. Les lignes suivantes en sont les rangées, de haut en bas. (Le commentaire le dit : « Les jambes écartées. Il regarde à DROITE. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">"..####..",</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Les rangées du dessin, une par ligne : chaque signe est un pixel — « . » le plus clair, « - » clair, « + » foncé, « # » le plus foncé (ou les chiffres 0 à 3).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">};</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">La fin du dessin (ou de la liste).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">Tuile HEROS2 = {                  // Les jambes serrées.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Le début d’un dessin appelé HEROS2 : une tuile de 8 × 8 pixels. Les lignes suivantes en sont les rangées, de haut en bas. (Le commentaire le dit : « Les jambes serrées. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">"..####..",</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Les rangées du dessin, une par ligne : chaque signe est un pixel — « . » le plus clair, « - » clair, « + » foncé, « # » le plus foncé (ou les chiffres 0 à 3).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">};</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">La fin du dessin (ou de la liste).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">int main() {                          // Le jeu commence ici.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Le début du programme : la console commence ici, par la première ligne qui suit. (Le commentaire le dit : « Le jeu commence ici. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">uint8_t x = 0;                      // La place du héros : à gauche.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Une variable : une boîte appelée x, qui retient un nombre de 0 à 255, et qui commence à 0. (Le commentaire le dit : « La place du héros : à gauche. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">while (true) {                      // La boucle du jeu :</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">La boucle du jeu : tout ce qui est entre les accolades recommence sans fin, 60 fois par seconde avec image(). (Le commentaire le dit : « La boucle du jeu : ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">image();</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Attendre l’image suivante : la console en montre 60 par seconde. C’est ce qui règle la vitesse du jeu.</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">uint8_t vitesseX = 50;            // La marche : 50 pixels par seconde…</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Une variable : une boîte appelée vitesseX, qui retient un nombre de 0 à 255, et qui commence à 50. (Le commentaire le dit : « La marche : 50 pixels par seconde… ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">if (bouton(B)) vitesseX = 110;    // …mais B tenu : la course, 110.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Une décision : si le bouton B est enfoncé alors on fait « vitesseX = 110 ». Sinon, on passe. (Le commentaire le dit : « …mais B tenu : la course, 110. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">x = gaucheDroite(x, vitesseX);    // La manette, à la vitesse choisie.</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">x prend une nouvelle valeur : gaucheDroite(x, vitesseX). (Le commentaire le dit : « La manette, à la vitesse choisie. ».)</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">marcher(0, x, 72, HEROS1, HEROS2);</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">Appel de la fonction marcher de la console, avec les arguments 0, x, 72, HEROS1, HEROS2. Ce qu’elle fait : place un lutin qui MARCHE : il alterne les deux dessins tous les 4 pixels parcourus. La vitesse règle les jambes toute seule — vite, elles s’agitent ; à l’arrêt, elles s’arrêtent. Et il se tourne tout seul du côté où il va (dessine-le regardant à droite) : marcher(0, x, 72, HEROS1, HEROS2).</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+    <tr><td style="width: 46%; vertical-align: top; padding: 2pt 6pt 2pt 0; border-bottom: 1px dotted #ddd;"><code style="white-space: pre-wrap; overflow-wrap: anywhere; font-size: 8pt;">}</code></td><td style="vertical-align: top; padding: 2pt 0; border-bottom: 1px dotted #ddd; font-size: 9pt; overflow-wrap: anywhere;">L’accolade fermante : la fin du bloc ouvert plus haut par « { ».</td></tr>
+  </tbody></table>
+</div>
+
+<h2>2. Le programme, morceau par morceau</h2>
+<p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait
+<strong>1718 octets</strong> de cartouche.</p>
+<p>Ce que le compilateur y a gravé, nommé — chaque morceau, sa taille, qui l’a demandé — et ce qu’il a laissé, parce que rien ne l’appelle :</p>
+<pre><code>Gravé dans la cartouche :
+  démarrage            47 o  ← la console, à l’allumage  — la mise en route de la console
+  avancer_va()        324 o  ← manette_pas()  — une fonction fournie par le langage
+  marcher()           240 o  ← main()  — une fonction fournie par le langage
+  manette_pas()       154 o  ← main()  — une fonction fournie par le langage
+  main()               74 o  ← démarrage  — ta fonction
+  VBlank                8 o  ← la console, à chaque image  — compte les images, 60 fois par seconde
+  AttendreImage        28 o  ← image()  — attend l’image suivante
+  AttendreVBlank       16 o  ← démarrage  — attend que l’écran soit libre
+  RangerLutins         11 o  ← démarrage  — range les 40 lutins hors de l’écran
+  InstallerTransfert   15 o  ← démarrage  — installe la copie des lutins en mémoire rapide
+  CopierTuiles         18 o  ← démarrage  — copie les lettres et les dessins en mémoire vidéo
+  LireManette          37 o  ← bouton()  — lit les huit boutons
+  Tuiles              736 o  ← CopierTuiles  — la police entière, et 2 tuiles dessinées
+  DonneesTransfert     10 o  ← InstallerTransfert  — la petite routine qui copie les lutins
+Lettres gravées : toutes (sprite() reçoit un numéro calculé)
+Pas gravé (jamais appelé) : AvancerAirs, AttendreAcces, AttendreFinVBlank, AdresseCase, EffacerCases, EcrireTexte, EcrireNombre, Diviser, Reste, Multiplier, DecalerGauche, DecalerDroite, EffacerCarte, Hasard, EffacerFond, EffacerPanneau, Notes
+Fonctions du langage appelées :
+  sprite()      × 2   118 o sur place, dans marcher()
+  bouton()      × 5    25 o sur place, dans manette_pas(), main()  + LireManette (37 o)
+  image()       × 1     6 o sur place, dans main()  + AttendreImage (28 o)
+  images()      × 1     2 o sur place, dans avancer_va()
+Tes fonctions appelées :
+  avancer_va()  × 3    77 o sur place, dans manette_pas()
+  marcher()     × 1    22 o sur place, dans main()
+  manette_pas() × 1    21 o sur place, dans main()</code></pre>
+
+
+<div class="morceau">
+  <div>
+    <p class="quoi">1. ce que le programme raconte de lui-même</p>
+    <pre><code>// CE PROGRAMME : le héros marche ; en tenant B, il court.
+//
+// Ce qui est nouveau : une vitesse qui change pendant le jeu, vitesseX (X : la largeur, comme x).
+//   uint8_t vitesseX = 50;             la marche
+//   if (bouton(B)) vitesseX = 110;     B tenu : la course
+
+#include &lt;Tuile&gt;         // un dessin de 8 × 8 pixels
+#include &lt;bouton&gt;        // bouton() : lire un bouton de la manette
+#include &lt;gaucheDroite&gt;  // gaucheDroite() : la manette, à gauche et à droite
+#include &lt;marcher&gt;       // marcher() : deux dessins qui alternent, et le miroir</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">2. un dessin — HEROS1</p>
+    <pre><code>Tuile HEROS1 = {                  // Les jambes écartées. Il regarde à DROITE.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  ".#....#.",
+  "##....##",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAeUlEQVR4nO3XsQ2AMAxE0ZSMQJkRGYOxGIERMgYlPZGMFQUj+b50rc+viayUdp2vWdY6JZ5dBRAgAVBftB/bI571nilAgBRAnurIAAKkAIo8roAAaYL+DSBA+UDGn814nN9NAQKkABormkUEBCgfyLhzAaA+gAClA93R8clXI4wb5wAAAABJRU5ErkJggg==" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">3. un dessin — HEROS2</p>
+    <pre><code>Tuile HEROS2 = {                  // Les jambes serrées.
+  "..####..",
+  ".#-##-#.",
+  "########",
+  "#.####.#",
+  "########",
+  "..#..#..",
+  "..#..#..",
+  "..##.##.",
+};</code></pre>
+  </div>
+  <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAdElEQVR4nO3XsQ3AIAxEUUpGSJkRGSNjZQRGyBgp6UEiJ0SMhL907dmvQcjhefNn4nFOibIrAALkANQOuu5URVmvtAAB8gBSRlsGECAPIMvPFRAgn6C1AQRoP1DnZus8zv9agAABAgQIkA1IWTbWAgRoO1ABATTJV6l3cwUAAAAASUVORK5CYII=" alt="le dessin"><figcaption>à l’écran</figcaption></figure>
+</div>
+
+<div class="morceau">
+  <div>
+    <p class="quoi">4. le point d’entrée : c’est ici que la console arrive</p>
+    <pre><code>int main() {                          // Le jeu commence ici.
+  uint8_t x = 0;                      // La place du héros : à gauche.
+
+  while (true) {                      // La boucle du jeu :
+    image();
+
+    uint8_t vitesseX = 50;            // La marche : 50 pixels par seconde…
+    if (bouton(B)) vitesseX = 110;    // …mais B tenu : la course, 110.
+
+    x = gaucheDroite(x, vitesseX);    // La manette, à la vitesse choisie.
+    marcher(0, x, 72, HEROS1, HEROS2);
+  }
+}</code></pre>
+  </div>
+  <div></div>
+</div>
+
+<h2>3. Ce qui se passe, étape par étape</h2>
+<p>La cartouche a été compilée et exécutée pour de bon ; voici son écran aux
+instants qui comptent. Une image identique à la précédente n’est pas montrée —
+un programme qui ne bouge pas n’a qu’une seule image, et c’est la vérité sur ce
+programme.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABZUlEQVR4nO3RUQkAIBTAwNc/nRGM4acpRBgHF2Cw2WcRNt8LeMrgOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjDI4zOM7gOIPjLpQWHgJrZdHXAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>la toute première image — la console vient de démarrer — image 1</figcaption>
+  </figure>
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABm0lEQVR4nO3YsQkCQRBA0Q0twdASLcOyLMESLMPQYEWPu/Tk4PPgBRsOfGZZdjxfD8LG4RPwVwLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRz3CXw6X74On4kdjVn3dr/OuvNw+FjsZSx31x73jNlylVbgDBsc93tkrQ40jG1UjUvG9kJ2RZf46IgTOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHj3vkqwKOQddTRAAAAAElFTkSuQmCC" alt="l’écran">
+    <figcaption>un tiers de seconde plus tard : le premier dessin est posé — image 20</figcaption>
+  </figure>
+</div>
+
+
+<h2>4. Ce que les touches changent</h2>
+<p>Chaque bouton que le programme lit a été enfoncé douze images, puis
+relâché. Voici l’écran juste après.</p>
+
+<div class="etapes">
+
+  <figure>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACQCAIAAAAA1/fXAAABm0lEQVR4nO3YsQkCQRBA0Q0twdASLcOyLMESLMPQYEWPu/Tk4PPgBRsOfGZZdjxfD8LG4RPwVwLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRwncJzAcQLHCRz3CXw6X74On4kdjVn3dr/OuvNw+FjsZSx31x73jNlylVbgDBsc93tkrQ40jG1UjUvG9kJ2RZf46IgTOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHjBI4TOE7gOIHj3vkqwKOQddTRAAAAAElFTkSuQmCC" alt="l’écran après B">
+    <figcaption><strong>B</strong> — l’écran n’a pas bougé</figcaption>
+  </figure>
+</div>
+
+<h2>5. Ce qu’on doit voir</h2>
+<p class="avoir">Le héros marche avec DROITE ; en tenant B en même temps, il court deux fois plus vite.</p>
+
+<h2>6. Ce que la console répond</h2>
+<p>Ces contrôles ne sont pas décoratifs : ce sont ceux que
+<code>verifier-tuto.mjs</code> exige de cette leçon. Ils viennent d’être joués,
+et voici ce qu’ils ont mesuré.</p>
+
+<ul class="controles">
+
+  <li>en marchant : environ 25 pixels en une demi-seconde <span class="detail"> (24)</span></li>
+
+  <li>en courant (B) : plus de deux fois plus <span class="detail"> (54)</span></li>
+</ul>
+
+
+
+<p class="pied">
+  Ensuite : <strong>153.3. Sauter avec A : sauter(y, hauteurMax, 104, gravite)</strong> — chapitre 26 : Le héros bouge : gauche, droite, sauter.
+  &nbsp;·&nbsp; gameboy3 — écrire une cartouche Game Boy en C++
+</p>
+
+</body>
+</html>

@@ -2685,7 +2685,7 @@ export function installer({
 
       /*
        * Le genre du jeu : vu de dessus (les quatre flèches), ou de plateforme
-       * (gauche, droite, la pesanteur, et A pour sauter — comme Mario).
+       * (gauche, droite, la gravité, et A pour sauter — comme Mario).
        */
       const genre = document.createElement('div')
       genre.className = 'rangee'
@@ -2693,7 +2693,7 @@ export function installer({
       ditGenre.className = 'aide'
       ditGenre.textContent = 'le genre :'
       const choixGenre = document.createElement('select')
-      for (const [v, t] of [['dessus', 'vu de dessus — les quatre flèches'], ['plateforme', 'plateforme — la pesanteur, A pour sauter']]) {
+      for (const [v, t] of [['dessus', 'vu de dessus — les quatre flèches'], ['plateforme', 'plateforme — la gravité, A pour sauter']]) {
         const o = document.createElement('option')
         o.value = v
         o.textContent = t

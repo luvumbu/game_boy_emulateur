@@ -1,4 +1,4 @@
-// Un objet qui tombe — la pesanteur, en seizièmes de pixel.
+// Un objet qui tombe — la gravité, en seizièmes de pixel.
 //
 //   node gb3.mjs exemples/chute.cpp
 //
@@ -15,7 +15,7 @@
 //    descend, en dessous on monte. Soustraire 128 rend le vrai nombre.
 //
 // Le reste est la physique de tout le monde : la vitesse s'ajoute à la
-// position, la pesanteur s'ajoute à la vitesse, et le sol renvoie l'objet en
+// position, la gravité s'ajoute à la vitesse, et le sol renvoie l'objet en
 // lui prenant un quart de sa vitesse à chaque choc.
 
 #include <Tuile>    // un dessin de 8 × 8 pixels
@@ -67,7 +67,7 @@ uint8_t y = DEPART;
 uint8_t frac = 0;       // les seizièmes de pixel — ce que `y` ne peut pas dire
 uint8_t vy = REPOS;
 uint8_t x = 132;
-uint8_t g = 2;          // la pesanteur, en seizièmes de pixel par tour, par tour
+uint8_t g = 2;          // la gravité, en seizièmes de pixel par tour, par tour
 uint8_t rebonds = 0;
 uint8_t couchee = 0;
 uint8_t aAvant = 0;
@@ -105,7 +105,7 @@ void monter(uint8_t d) {
 
 /* ---------------------------------------------------------- la physique */
 
-/* La pesanteur ajoute à la vitesse ; la vitesse ajoute à la position. */
+/* La gravité ajoute à la vitesse ; la vitesse ajoute à la position. */
 void avancer() {
   vy = vy + g;
   if (vy > REPOS + VMAX) {
@@ -149,7 +149,7 @@ void toucherLeSol() {
  * Le plafond — un garde-fou, pas une règle du jeu.
  *
  * `y` est un octet : à zéro, un pixel de moins le renvoie à 255, et la balle
- * reparaîtrait par le bas de l'écran. Avec la pesanteur d'origine cela n'arrive
+ * reparaîtrait par le bas de l'écran. Avec la gravité d'origine cela n'arrive
  * jamais ; on ne laisse pas pour autant le programme au bord du trou.
  */
 void toucherLePlafond() {
@@ -177,7 +177,7 @@ void lireLesTouches() {
   }
   aAvant = a;
 
-  /* La pesanteur se règle au front, sinon un appui d'un dixième de seconde la
+  /* La gravité se règle au front, sinon un appui d'un dixième de seconde la
      ferait courir d'un bout à l'autre de son échelle. */
   uint8_t h = bouton(HAUT);
   if (h && !hAvant && g < 8) {
@@ -206,11 +206,11 @@ void decor() {
   texte(0, 0, "CHUTE LIBRE");
   texte(0, 2, "HAUTEUR");
   texte(0, 3, "VITESSE");
-  texte(0, 4, "PESANTEUR");
+  texte(0, 4, "GRAVITE");
   texte(0, 5, "REBONDS");
 
   texte(0, 7, "A RELANCE");
-  texte(0, 8, "HAUT BAS PESANTEUR");
+  texte(0, 8, "HAUT BAS GRAVITE");
   texte(0, 9, "GAUCHE DROITE POUSSE");
 
   for (uint8_t c = 0; c < 20; c++) {
@@ -225,7 +225,7 @@ void decor() {
  * Écrire dans la mémoire vidéo n'est possible que quand le balayage se repose.
  * Autrefois, `nombre()` attendait pour cela l'image suivante, et chaque tour de
  * boucle durait deux images : c'est sur ce rythme, trente pas par seconde, que
- * la pesanteur a été réglée. Aujourd'hui, `nombre()` n'attend plus qu'une
+ * la gravité a été réglée. Aujourd'hui, `nombre()` n'attend plus qu'une
  * ligne ; la boucle tourne à soixante tours par seconde, et c'est `main()` qui
  * ne fait avancer la physique qu'une image sur deux — écrit en clair, au lieu
  * de dépendre d'une attente cachée.
@@ -269,7 +269,7 @@ int main() {
     lireLesTouches();
 
     /* Un pas de physique toutes les DEUX images : trente par seconde, le
-       rythme pour lequel la pesanteur est réglée (voir mesures()). */
+       rythme pour lequel la gravité est réglée (voir mesures()). */
     pas = pas + 1;
     if (pas == 2) {
       pas = 0;

@@ -402,6 +402,11 @@
   .analyse-inclure button { padding: 2px 10px; font-size: 12px; }
   .analyse-liste ol { margin: 4px 0 0; padding-left: 20px; }
   .inspecteur { margin-top: 10px; font-size: 12.5px; }
+  /* Le bouton de capture, sur sa propre ligne sous « Plein écran », et ses aperçus en dessous. */
+  .groupe-console .capturer-lutins { flex-basis: 100%; }
+  .groupe-console .captures-lutins { flex-basis: 100%; }
+  .groupe-console .capturer-autres { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 4px; }
+  .captures-lutins[hidden] { display: none; }
   .inspecteur summary { cursor: pointer; font-weight: 600; }
   .inspecteur-onglets { display: flex; gap: 4px; flex-wrap: wrap; margin: 8px 0; }
   .inspecteur-contenu input { font-family: var(--code-police); width: 5em; }
@@ -1533,8 +1538,9 @@
         <option value="echecs">ÉCHECS — les blancs contre les noirs</option>
         <option value="cartes">COULEURS — un jeu de cartes, style UNO, contre la console</option>
         <option value="herisson">FLASH LE HÉRISSON — courir, sauter en boule, ramasser les anneaux</option>
+        <option value="pou">LE POU SAUTEUR — sauter de tête en tête et donner des poux</option>
         <option value="puits">Le puits qui s'empile</option>
-        <option value="chute">La pesanteur — un objet qui tombe et rebondit</option>
+        <option value="chute">La gravité — un objet qui tombe et rebondit</option>
         <option value="bonjour">Débuter — bonjour</option>
         <option value="compteur">Débuter — compteur</option>
         <option value="langage">Tout le langage, en un fichier</option>
@@ -1882,6 +1888,21 @@
           <button type="button" id="plein-ecran" title="la console seule à l’écran — F ou « Échap » pour revenir">⛶ Plein écran</button>
           <button type="button" id="manette-ecran" title="une croix et des boutons A, B, Start, Select à toucher — pour une tablette ou un téléphone">📱 Manette à l’écran</button>
           <span class="aide" id="ips">—</span>
+          <!-- Sous « Plein écran » : prendre les personnages que la console montre
+               (le jeu écrit ici, ou un .gb ouvert) pour les mettre dans ses dessins. -->
+          <button type="button" id="capturer-lutins" class="capturer-lutins" title="prend les personnages à l’écran en ce moment — de ton jeu ou d’un .gb ouvert — pour les mettre dans tes dessins">📸 Capturer les lutins</button>
+          <!-- Le second : capturer PENDANT qu'on joue. Un personnage change de dessin
+               quand il marche, saute, se retourne : on les ramasse tous. -->
+          <button type="button" id="capturer-plus" class="capturer-lutins" title="clique, joue quelques secondes, reclique : tous les dessins différents vus pendant ce temps (marche, saut, ennemis…)">🎞 Capturer pendant que je joue</button>
+          <!-- Les autres captures : le décor et le panneau deviennent des cartes
+               (« La carte »), les couleurs rejoignent celles du programme. -->
+          <div class="capturer-autres">
+            <button type="button" id="capturer-decor" class="petit" title="le décor visible (20 × 18 cases, défilement compris) devient une carte de ton programme">🧱 Le décor</button>
+            <button type="button" id="capturer-panneau" class="petit" title="le panneau du jeu (score, vies, dialogue) devient une carte de ton programme">🪟 Le panneau</button>
+            <button type="button" id="capturer-couleurs" class="petit" title="les 8 palettes du fond et des lutins (Game Boy Color) deviennent celles de ton programme">🎨 Les couleurs</button>
+            <button type="button" id="capturer-tout" class="petit" title="les lutins, le décor, le panneau et les couleurs, d’un coup">🧩 Tout l’écran</button>
+          </div>
+          <div id="captures-lutins" class="captures-lutins" hidden></div>
         </div>
         <div class="groupe-console" role="group" aria-label="État">
           <span class="groupe-titre">État</span>
@@ -1934,7 +1955,7 @@ import { poserLaQuestion } from './question-include.js'
 import { GameBoy } from './emulateur.js'
 import { installer as installerTuiles } from './editeur-tuiles.js'
 import { installerEditeur } from './editeur-code.js'
-import { installer as installerCouleurs } from './editeur-couleurs.js'
+import { installer as installerCouleurs, ecrireCouleurs } from './editeur-couleurs.js'
 import { installer as installerAirs } from './editeur-airs.js'
 import { installer as installerCarte, ecrireCarte, listerLesCartes, LARGEUR_PX, HAUTEUR_PX } from './editeur-carte.js'
 import { ajouterDessin, peindre, lireDessins, lireEtiquettes, nomsDuProgramme } from './editeur-tuiles.js'
@@ -1954,8 +1975,9 @@ import { suivreLesManettes, installerLaManetteTactile } from './manette.js'
 import { MODELES as MODELES_DE_JEUX } from './modeles-jeux.js'
 import { analyser as analyserLaCartouche, montrer as montrerLAnalyse } from './analyse-rom.js'
 import { capturer as capturerLEtat, restaurer as restaurerLEtat } from './etat-console.js'
-import { installer as installerLInspecteur } from './inspecteur.js'
-import { champDeRecherche, correspond, fiche, filtrerUnMenu, filtrerUneGrille, motsDe, motsDuCode, normaliser } from './recherche.js'
+import { installer as installerLInspecteur, montrerLesCaptures } from './inspecteur.js'
+import { capturerLeDecor, capturerLePanneau, capturerLesCouleurs, capturerLesLutins } from './capturer-lutins.js'
+import { champDeRecherche, correspond, fiche, filtrerUnMenu, filtrerUneGrille, motsDe, motsDuCode, normaliser, phrase } from './recherche.js'
 import { installer as installerToutChercher } from './recherche-globale.js'
 import { FONCTIONS } from './aide-fonctions.js'
 import { installer as installerLesSources } from './sources.js'
@@ -2032,6 +2054,7 @@ const EXEMPLES = {
   echecs: 'exemples/echecs.cpp',
   cartes: 'exemples/cartes.cpp',
   herisson: 'exemples/herisson.cpp',
+  pou: 'exemples/pou.cpp',
   langage: 'exemples/langage.cpp',
   console: 'exemples/console.cpp',
   musique: 'exemples/musique.cpp',
@@ -3670,8 +3693,173 @@ const inspecteur = installerLInspecteur({
   gb: () => gb,
   variables: () => derniereCompilation?.variables ?? new Map(),
   zones: () => derniereCompilation?.zones ?? new Map(),
+  ajouterUnDessin: (dessin) => ajouterUnDessinCapture(dessin),
 })
 $('inspecteur').addEventListener('toggle', () => inspecteur.suivre($('inspecteur').open))
+
+/* Le bouton « 📸 Capturer les lutins », sous « Plein écran » : la même capture
+   que l'inspecteur, montrée juste dessous. Un second clic la refait : le jeu a
+   pu bouger depuis. */
+$('capturer-lutins').addEventListener('click', () => {
+  $('captures-lutins').hidden = false
+  montrerLesCaptures($('captures-lutins'), gb, ajouterUnDessinCapture, { ajouterTout: ajouterToutesLesCaptures })
+})
+
+/*
+ * Le second bouton : « 🎞 Capturer pendant que je joue ».
+ *
+ * Une capture instantanée n'attrape qu'UNE image du héros. Celui-ci en a
+ * plusieurs — les pas de la marche, le saut, le dos tourné — et les ennemis
+ * n'arrivent pas tous en même temps. On relit donc l'écran dix fois par
+ * seconde pendant qu'on joue, et l'on garde chaque dessin NOUVEAU (les pareils
+ * ne comptent qu'une fois, retournés ou non : un personnage vu dans les deux
+ * sens ne donne qu'un dessin). Un second clic arrête, et montre la récolte.
+ * Au plus 64 dessins : au-delà, on arrête tout seul.
+ */
+const RECOLTE_MAX = 64
+let recolte = null   // { dessins: Map(clé → dessin), minuteur }
+const retourne = (rangees) => rangees.map((r) => [...r].reverse().join(''))
+
+function arreterLaRecolte() {
+  clearInterval(recolte.minuteur)
+  const dessins = [...recolte.dessins.values()]
+  recolte = null
+  $('capturer-plus').textContent = '🎞 Capturer pendant que je joue'
+  $('capturer-plus').classList.remove('principal')
+  $('captures-lutins').hidden = false
+  montrerLesCaptures($('captures-lutins'), gb, ajouterUnDessinCapture, { dessins, ajouterTout: ajouterToutesLesCaptures })
+}
+
+$('capturer-plus').addEventListener('click', () => {
+  if (recolte) { arreterLaRecolte(); return }
+  recolte = { dessins: new Map(), minuteur: null }
+  $('capturer-plus').classList.add('principal')
+  const ramasser = () => {
+    for (const d of capturerLesLutins(gb)) {
+      const cle = d.rangees.join('|')
+      if (recolte.dessins.has(cle) || recolte.dessins.has(retourne(d.rangees).join('|'))) continue
+      recolte.dessins.set(cle, d)
+    }
+    $('capturer-plus').textContent = `⏹ Arrêter — ${recolte.dessins.size} dessin${recolte.dessins.size > 1 ? 's' : ''} ramassé${recolte.dessins.size > 1 ? 's' : ''}`
+    if (recolte.dessins.size >= RECOLTE_MAX) arreterLaRecolte()
+  }
+  ramasser()
+  recolte.minuteur = setInterval(() => { if (recolte) ramasser() }, 100)
+})
+
+/*
+ * « ➕ Tout dans mes dessins » : un seul nom demandé, la BASE — CAPTURE, par
+ * exemple —, et les dessins deviennent CAPTURE1, CAPTURE2… On ne demande pas
+ * vingt noms d'affilée.
+ */
+async function ajouterToutesLesCaptures(dessins) {
+  let source = $('source').value
+  const pris = new Set(lireDessins(source).map((d) => d.nom))
+  const base = await demanderUnNom({ quoi: `ces ${dessins.length} dessins capturés (ils seront numérotés : 1, 2, 3…)`, propose: 'CAPTURE', pris })
+  if (!base) return
+  const noms = []
+  let n = 1
+  for (const d of dessins) {
+    while (pris.has(base + n)) n++
+    const nom = base + n
+    pris.add(nom)
+    noms.push(nom)
+    source = ajouterDessin(source, nom, d.cote, d.rangees)
+  }
+  poserLeCode(source, 'programme')
+  atelier.rafraichir()
+  compterLAtelier()
+  if (!romDuDehors) compilerEtLancer()
+  $('etat').className = 'etat bon'
+  $('etat').textContent = `${noms.length} dessins ajoutés : ${noms[0]} à ${noms.at(-1)} (onglet « Les tuiles »).`
+}
+
+/*
+ * Le décor et le panneau d'un jeu, en CARTE ; ses couleurs, dans le programme.
+ *
+ * Le décor (ou le panneau) est relu tel que l'écran le montre, au pixel
+ * (capturer-lutins.js), et écrit comme l'atelier de la carte écrit une carte :
+ * une fonction à son nom, qu'on appelle pour l'afficher — « DECOR(); ».
+ * Les palettes de chaque case ne sont gardées que si le programme est en
+ * couleur : en 4 nuances, « teindre » serait refusé.
+ * Une cartouche du dehors continue de tourner : on ne recompile pas.
+ */
+async function capturerUneCarte(quoi, propose) {
+  const lu = quoi === 'panneau' ? capturerLePanneau(gb) : capturerLeDecor(gb)
+  if (!lu) {
+    $('etat').className = 'etat erreur'
+    $('etat').textContent = 'Le panneau est éteint en ce moment : rien à capturer. Mets le jeu là où il se voit (le score, un dialogue), puis recommence.'
+    return null
+  }
+  const source = $('source').value
+  const pris = new Set([...lireDessins(source).map((d) => d.nom), ...listerLesCartes(source)])
+  const nom = await demanderUnNom({ quoi: quoi === 'panneau' ? 'ce panneau capturé (une carte)' : 'ce décor capturé (une carte)', propose, pris })
+  if (!nom) return null
+  const enCouleur = REGLAGES.console !== 'gb'
+  const teintes = enCouleur ? lu.teintes : lu.teintes.map((r) => r.map(() => 0))
+  const devant = enCouleur ? lu.devant : new Set()
+  poserLeCode(ecrireCarte($('source').value, nom, lu.grille, false, teintes, devant), 'programme')
+  atelierCarte.rafraichir()
+  compterLAtelier()
+  if (!romDuDehors) compilerEtLancer()
+  $('etat').className = 'etat bon'
+  $('etat').textContent = `« ${nom} » est dans « La carte ». Pour l’afficher, écris ${nom}(); dans main().`
+  return nom
+}
+
+function capturerLesCouleursDuJeu() {
+  const couleurs = capturerLesCouleurs(gb)
+  if (!couleurs) {
+    $('etat').className = 'etat erreur'
+    $('etat').textContent = 'Ce jeu est en 4 nuances (Game Boy d’origine) : il n’a pas de couleurs à prendre. Ses nuances sont déjà recopiées dans le décor capturé.'
+    return false
+  }
+  if (REGLAGES.console === 'gb') {
+    $('etat').className = 'etat erreur'
+    $('etat').textContent = 'Ton programme est en 4 nuances : choisis « En couleur (Game Boy Color) » en haut de la page, puis recommence.'
+    return false
+  }
+  poserLeCode(ecrireCouleurs($('source').value, couleurs.fond, couleurs.lutins), 'programme')
+  atelierCouleurs.rafraichir()
+  if (!romDuDehors) compilerEtLancer()
+  $('etat').className = 'etat bon'
+  $('etat').textContent = 'Les 8 palettes du fond et les 8 des lutins sont maintenant celles de ton programme (onglet « Les couleurs »).'
+  return true
+}
+
+$('capturer-decor').addEventListener('click', () => capturerUneCarte('decor', 'DECOR'))
+$('capturer-panneau').addEventListener('click', () => capturerUneCarte('panneau', 'PANNEAU_JEU'))
+$('capturer-couleurs').addEventListener('click', () => capturerLesCouleursDuJeu())
+/* Tout l'écran : les lutins (en aperçus, à prendre un par un), puis le décor,
+   le panneau s'il est allumé, et les couleurs si l'on peut. */
+$('capturer-tout').addEventListener('click', async () => {
+  $('captures-lutins').hidden = false
+  montrerLesCaptures($('captures-lutins'), gb, ajouterUnDessinCapture)
+  const fait = []
+  if (await capturerUneCarte('decor', 'DECOR')) fait.push('le décor')
+  if (capturerLePanneau(gb) && await capturerUneCarte('panneau', 'PANNEAU_JEU')) fait.push('le panneau')
+  if (capturerLesCouleurs(gb) && REGLAGES.console !== 'gb' && capturerLesCouleursDuJeu()) fait.push('les couleurs')
+  $('etat').className = 'etat bon'
+  $('etat').textContent = (fait.length ? `Capturés : ${fait.join(', ')}.` : 'Rien d’autre à capturer.')
+    + ' Les lutins sont en aperçu sous les boutons : « ➕ Dans mes dessins » pour chacun.'
+})
+
+/* Un dessin capturé dans la console (un lutin, une tuile) : on demande son
+   nom, et il rejoint les dessins du programme. Une cartouche du dehors
+   continue de tourner — on ne recompile pas : on peut capturer encore. */
+async function ajouterUnDessinCapture({ cote, rangees, propose }) {
+  const pris = new Set(lireDessins($('source').value).map((d) => d.nom))
+  let nomPropose = propose
+  for (let n = 2; pris.has(nomPropose); n++) nomPropose = propose + '_' + n
+  const nom = await demanderUnNom({ quoi: 'ce dessin capturé, dans ton programme', propose: nomPropose, pris })
+  if (!nom) return
+  poserLeCode(ajouterDessin($('source').value, nom, cote, rangees), 'programme')
+  atelier.rafraichir()
+  compterLAtelier()
+  if (!romDuDehors) compilerEtLancer()
+  $('etat').className = 'etat bon'
+  $('etat').textContent = `« ${nom} » est dans tes dessins (${cote} × ${cote}) : onglet « Les tuiles ».`
+}
 
 /* ------------------------------------------------------- le plein écran */
 
@@ -5996,7 +6184,7 @@ function fichesDe(laSerie) {
   return fichesDesSeries[laSerie]
 }
 rechercheLecons = champDeRecherche({
-  texte: '🔎 leçon : titre, numéro, fonction…',
+  texte: '🔎 leçon : titre, phrase, numéro, fonction…',
   unite: ['leçon', 'leçons'],
   enLigne: true,
   filtrer: (mots) => {
@@ -6009,6 +6197,34 @@ rechercheLecons = champDeRecherche({
   ouvrir: () => {
     const premiere = [...$('lecon-choix').options].find((o) => !o.hidden)
     if (premiere) allerALaLecon(Number(premiere.value))
+  },
+  /* Les leçons trouvées, MONTRÉES sous le champ pendant qu'on tape : on voit
+     tout de suite ce qui correspond, sans ouvrir le menu. On peut coller la
+     phrase entière d'un cours (« 0.1. Afficher la lettre A ») : la
+     ponctuation est ignorée (motsDe), et les leçons dont le titre contient
+     la phrase telle quelle viennent en tête — puis celle qui porte le numéro
+     exact, puis les autres, dans l'ordre du parcours. */
+  resultats: (mots) => {
+    const { fiches, numeros: nums } = fichesDe(serie)
+    const { liste: lecons, groupes, groupe: nomDuGroupe } = SERIES[serie]
+    const motsDuTitre = mots.filter((m) => !/^\d+(\.\d+)*$/.test(m)).join(' ')   // la phrase, sans le numéro
+    const trouves = []
+    lecons.forEach((lecon, i) => {
+      if (!correspond(mots, fiches[i], nums[i])) return
+      let rang = 2
+      if (motsDuTitre && phrase(lecon.titre).includes(motsDuTitre)) rang = 0   // toute la phrase est dans le titre
+      else if (mots.includes(nums[i])) rang = 1                                // le numéro exact
+      if (rang === 0 && mots.includes(nums[i])) rang = -1                       // la phrase ET le numéro : c'est elle
+      const partie = partieDe(lecons, i)
+      trouves.push({
+        rang,
+        titre: `${nums[i]}. ${lecon.titre}`,
+        ou: `${lecon.serie ? `Série ${lecon.serie}` : `${nomDuGroupe} ${lecon.difficulte}`} — ${groupes[lecon.difficulte]}`
+          + (partie ? ` · ${partie.lettre}. ${partie.nom}` : ''),
+        ouvrir: () => allerALaLecon(i),
+      })
+    })
+    return trouves.sort((a, b) => a.rang - b.rang)   // sort garde l'ordre du parcours à rang égal
   },
 })
 $('lecon-choix').before(rechercheLecons.element)
@@ -6026,6 +6242,21 @@ const rechercheExemples = champDeRecherche({
     if (!premiere) return
     $('exemples').value = premiere.value
     $('exemples').dispatchEvent(new Event('change'))
+  },
+  /* Les exemples trouvés, MONTRÉS sous le champ, comme pour les leçons : un
+     menu déroulant fermé ne laisse rien voir de ce qu'il garde. Ceux dont le
+     nom contient la phrase tapée telle quelle viennent en tête. */
+  resultats: (mots) => {
+    const voulue = mots.join(' ')
+    return [...$('exemples').options]
+      .filter((o) => o.value && correspond(mots, fiche(o.textContent, o.value)))
+      .map((o) => ({
+        rang: phrase(o.textContent).includes(voulue) ? 0 : 1,
+        titre: o.textContent,
+        ou: o.parentElement?.label ?? '',
+        ouvrir: () => { $('exemples').value = o.value; $('exemples').dispatchEvent(new Event('change')) },
+      }))
+      .sort((a, b) => a.rang - b.rang)
   },
 })
 rechercheExemples.element.classList.add('recherche-exemples')

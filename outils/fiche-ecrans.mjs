@@ -30,6 +30,7 @@ import { pathToFileURL } from 'node:url'
 import { demarrer } from './controle.mjs'
 import { imageDeLEcran } from '../tuto/etapes.mjs'
 import { STYLE } from '../tuto/style.js'
+import { encadreDesMots, encadreLigneParLigne, lexiqueEnHtml } from './debutant.mjs'   // pour qui n’a jamais programmé
 
 const SOURCE = 'exemples/ecrans.cpp'
 const NOM = 'documents/passer-d-un-ecran-a-l-autre'
@@ -213,8 +214,9 @@ ${morceau('les valeurs de la scène, et la scène elle-même', declarations,
   '<code>scene == 1</code> demande de se souvenir. <code>aAvant</code> retient l’état du bouton ' +
   'à l’image précédente — on verra au chapitre 4 pourquoi il est indispensable.')}
 
-${morceau('effacer — les 20 × 18 cases de l’écran', fonction('effacer'),
-  'La tuile 0 est vide. Sans cet effacement, « A POUR JOUER » resterait sous ' +
+${morceau('effacer() — les 20 × 18 cases de l’écran', 'effacer();   // dans allerA(), avant de dessiner le nouvel écran',
+  'effacer() est une fonction de la console (demandée en haut par sa ligne #include) : sans argument, ' +
+  'elle vide tout l’écran. Sans cet effacement, « A POUR JOUER » resterait sous ' +
   '« A POUR FINIR », les deux textes mélangés à l’écran.')}
 
 ${morceau('un dessin par écran', fonction('dessinerTitre') + '\n\n' + fonction('dessinerJeu') + '\n\n' + fonction('dessinerFin'),
@@ -279,6 +281,12 @@ dans <code>allerA()</code>. Rien d’autre du programme ne change.</p>
 <code>exemples/decoupe/</code> — le même, réparti sur cinq fichiers, pour voir <code>#include</code> à l’œuvre.<br>
 <code>livrets/lecon-18-passer-d-un-ecran-a-l-autre.pdf</code> — la même idée écrite avec <code>enum</code> et <code>switch</code>.
 </div>
+
+<h2 style="break-before: page;">Si tu débutes : le programme entier, ligne par ligne</h2>
+<p>Chaque ligne du programme, puis ce qu’elle veut dire en français. Les mots techniques sont expliqués juste en dessous, et dans le lexique à la fin.</p>
+${encadreDesMots(texte)}
+${encadreLigneParLigne(texte)}
+${lexiqueEnHtml('h2')}
 
 <p class="pied">Fiche produite par <code>node fiche-ecrans.mjs</code> — le programme y est
 compilé, exécuté et photographié à chaque impression. Elle ne peut pas vieillir sans qu’on le voie.</p>

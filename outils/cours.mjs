@@ -29,6 +29,7 @@ import { pathToFileURL } from 'node:url'
 import { COURS, CHAPITRES } from '../tuto/programmation.js'
 import { STYLE } from '../tuto/style.js'
 import { enrichir, echapper } from '../tuto/enrichir.js'
+import { encadreDebutant, basesEnHtml, lexiqueEnHtml } from './debutant.mjs'   // pour qui n’a jamais programmé
 import { consoleDuProgramme } from '../tuto/console.mjs'
 import { lignesGravees } from '../analyse-rom.js'
 import { decouperLeProgramme, etapesDeLExecution, controlesJoues, imageDeLEcran } from '../tuto/etapes.mjs'
@@ -184,6 +185,7 @@ function pageDeLecon(lecon, index, matiere) {
 
 ${titre('Ce qu’il faut comprendre')}
 ${lecon.texte.map((p) => `<p>${enrichir(p)}</p>`).join('\n')}
+${encadreDebutant(lecon)}
 
 ${titre('Le programme, morceau par morceau')}
 <p>Le programme entier de la leçon, découpé comme l’œil le lit. Il fait

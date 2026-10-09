@@ -1,5 +1,13 @@
 # gameboy3 — écrire une cartouche Game Boy en C++
 
+> **Tu n’as jamais programmé ?** Commence par **`documents/doc-technique.pdf`**
+> (« Comment marche gameboy3 ») : il part de zéro — ce qu’est un programme, un
+> compilateur, une cartouche —, explique le dossier fichier par fichier, suit un
+> vrai programme à travers chaque étape jusqu’à l’écran, et finit par un lexique.
+> Puis **`documents/cours-complet.pdf`** : « Les bases », puis toutes les leçons,
+> chacune avec ses mots expliqués et son programme dit **ligne par ligne**, en
+> français. La suite de ce fichier est plus technique.
+
 Un compilateur qui lit du C++ et rend un `.gb` de 32 Ko, qui démarre sur une
 console d'origine.
 
