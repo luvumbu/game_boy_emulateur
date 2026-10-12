@@ -3758,3 +3758,130 @@ d’avant), 8 → 36. Hauteur 64 et gravité 2 : 90 images.
 - Limites : jamais plus haut que le haut de l’écran (sol à 104 → 104 au plus) ;
   l’élan ne dépasse pas 7 pixels par image, donc une gravité très forte coupe
   un grand saut (32 → 28 pixels, 16 → 52). Coupé, jamais refusé.
+
+## Plus tard encore : les Bulles gloutonnes, contre trois IA
+
+Un jeu de plus dans le style d’agar.io : `exemples/bulles.cpp` (et
+`projets/les_bulles_gloutonnes/`, et le menu des exemples). **Tu es une bulle.**
+
+- douze miettes sur le fond : une miette, 1 de masse ; mangée, elle repousse
+  ailleurs, au hasard ;
+- trois tailles — petite (8 pixels) jusqu’à 11, moyenne (16) jusqu’à 29,
+  grosse (24) au-delà. Le dessin n’est fait qu’une fois : `spriteTaille(…, 1)`,
+  `(…, 2)`, `(…, 3)` ;
+- une bulle d’une taille au-dessus mange l’autre si le milieu de l’autre est
+  dedans, et prend toute sa masse ; à taille égale, personne ne mange ;
+- plus grosse = plus lente (toi : 60, 45, 32 pixels par seconde ; les IA : 56,
+  42, 30) : une petite peut toujours fuir une grosse ;
+- 99 de masse : gagné. Mangé : perdu. Le record est gardé dans la cartouche.
+
+Les trois IA ont chacune leur caractère, en deux nombres : à quelle distance
+elles voient le danger, et une proie. **Peureuse** (64, 24), **gourmande** (32,
+32 : les miettes avant tout), **chasseuse** (40, 96). À chaque tour, une seule
+réfléchit (chacune son tour) : fuir vers le bord opposé, sinon courir après une
+proie, sinon aller à la miette la plus proche. Puis `suivre()` la mène à son but
+— un `suivre()` par place et par IA, pour que chacun garde son horloge (six, plus
+`gaucheDroite()` et `hautBas()` pour toi : la limite de huit est pile atteinte).
+Une IA mangée revient trois secondes plus tard, toute petite, dans le coin le
+plus loin de toi.
+
+Réglé en jouant (un joueur automatique qui fuit, chasse et mange) :
+- au début, la deuxième IA ne bougeait jamais : on la choisissait par
+  `images() & 3`, mais un tour dure deux images, et 2 ne tombait jamais. Un
+  compteur à soi (`qui`, 1, 2, 3) ;
+- une IA petite (44 pixels par seconde) était plus lente que toi en moyen (45) :
+  elle ne pouvait pas fuir, et l’on gagnait en quinze secondes. Avec 56, 42,
+  30, et la victoire à 99 : sur six parties, trois gagnées (en 23 à 33 secondes),
+  trois perdues au début.
+
+`verifier-jeux.mjs` joue une partie entière avec ce joueur : les trois IA
+bougent, on grossit, des IA se font manger, la fin, le record ; puis une partie
+sans bouger, où une IA finit par te manger.
+
+## Plus tard encore : les Bulles dans un monde de 3000 × 3000
+
+Le monde des Bulles gloutonnes n’est plus l’écran : il fait **3000 × 3000
+pixels**, et la caméra suit ta bulle. Et **plus tu es gros, moins tu vas
+vite**, à chaque miette, et non plus par paliers.
+
+- **3000 dans un octet ?** Le langage n’a que des `uint8_t` (0 à 255). Chaque
+  place est faite de deux nombres : la **zone** (0 à 11) et le **pixel** dans la
+  zone (place = zone × 256 + pixel ; 2999 = 11 × 256 + 183). Avancer au-delà de
+  255 fait une retenue sur la zone. Quatre petites fonctions font tout :
+  `ecartGrand()` (l’écart entre deux places, plafonné à 255), `avant()`,
+  `dedans()` et `pousser()` (avancer de n pixels, sans sortir du monde).
+- **La caméra** : ton milieu au milieu de l’écran, sauf au bord du monde où elle
+  s’arrête. La carte du fond (256 × 256) est couverte d’un quadrillage partout
+  pareil : `defiler()` du seul PIXEL de la caméra suffit, il a l’air infini.
+- **Les miettes** (24) ne sont posées que dans un carré de 256 autour de
+  l’écran — plus loin, la carte qui boucle les ferait revenir par l’autre bord.
+  Trop loin, elles s’en vont et repoussent près de toi, hors de l’écran (sauf
+  au tout début de la partie).
+- **Neuf IA** au lieu de trois (peureuse, gourmande, chasseuse, trois fois),
+  partout dans le monde. Seules les bulles à l’écran sont dessinées : quatre
+  places de neuf lutins, données dans l’ordre. Sans rien en vue, une IA rôde —
+  une fois sur deux vers toi. Loin de l’écran, elle grossit un peu toute seule
+  (jusqu’à 60). Mangée, elle revient ailleurs, jamais à côté de toi.
+- **Un repère** au bord de l’écran montre la bulle la plus proche hors de vue ;
+  il clignote si elle est plus grosse que toi.
+- **Le panneau**, en bas, ne défile pas : MASSE, REC, et ta zone (X, Y).
+- **La vitesse** : 60 − masse/4 − masse/8 pixels par seconde (60 au début, 24
+  à 99) ; les IA, 2 de moins. Elle se fait sans `gaucheDroite()` ni `suivre()`,
+  qui s’arrêtent à 152 ou à 255 : chaque bulle ajoute sa vitesse à chaque image
+  passée, et chaque fois que ça fait 60, c’est un pixel.
+
+Mesuré : au début, un tour durait 4 images (le jeu à 15 par seconde, et la
+bulle aux trois quarts de sa vitesse). Ce qui coûtait : surveiller les 24
+miettes à chaque tour, et une IA qui les passait toutes en revue. Maintenant :
+six miettes par tour, les IA loin de l’écran ne cherchent pas de miettes, le
+côté des bulles rangé dans un tableau (`cot[]`), les rencontres toi/IA à
+chaque tour et IA/IA à tour de rôle. Un tour dure 2 images, comme avant.
+
+`verifier-jeux.mjs` : départ au milieu du monde, 24 miettes, 60 pixels par
+seconde au début, la caméra qui suit, les neuf IA qui bougent, un voyage à
+plus de 256 pixels du départ, une partie entière, le record, 24 pixels par
+seconde à 98 de masse, et une partie sans bouger où une IA finit par te manger.
+Le joueur automatique, qui voit tout le monde, gagne ses parties en 30 à 72
+secondes ; à l’écran, on ne voit que 160 × 136 pixels autour de soi.
+
+## Plus tard encore : les Bulles en couleur, la carte, dix tailles, et se manger vraiment
+
+Quatre demandes, sur les Bulles gloutonnes (`exemples/bulles.cpp`) :
+
+- **La carte de tout le monde.** SELECT : le jeu attend, l’écran montre les
+  3000 × 3000 dans un cadre (un pixel de carte pour 32 du monde :
+  zone × 8 + pixel / 32), chaque bulle un point de sa couleur — petit, moyen ou
+  gros selon sa taille —, le tien clignote. SELECT : on revient, le sol et les
+  miettes sont redessinés, et l’horloge ne compte pas le temps passé sur la
+  carte.
+- **Se manger, vraiment.** Avant, il fallait une taille entière de plus : deux
+  bulles proches ne se mangeaient jamais. Maintenant, comme dans agar.io : la
+  masse doit dépasser celle de l’autre d’**au moins un quart** (et d’au moins
+  1), et le milieu de l’autre doit être dedans. Pour tout le monde : toi, les
+  IA entre elles, les IA contre toi. Les IA fuient et chassent avec la même
+  règle, et le repère clignote si la bulle hors de vue peut te manger.
+- **Grandir peu à peu.** Dix tailles au lieu de trois : 4, 6, 8, 10, 12, 14,
+  16, 18, 21 et 24 pixels, à 3, 4, 7, 11, 16, 22, 30, 40, 53 et 70 de masse —
+  des marches de plus en plus longues. Elles viennent de **cinq ronds de 8 × 8**
+  (4 à 8 pixels de large), tels quels ou agrandis × 2 et × 3 par
+  `spriteTaille()` ; ta bulle a des yeux dès 6 pixels. Les IA commencent
+  petites : loin de toi, elles grossissent jusqu’à un plafond qui monte de 8 à
+  70 au fil de la partie.
+- **Des couleurs.** Le jeu est une cartouche **Game Boy Color** (`bulles.gbc`) :
+  huit palettes de lutins — toi en bleu, et sept IA, chacune la sienne (rouge,
+  orange, jaune, vert, turquoise, violet, rose). Les IA passent donc de neuf à
+  **sept**, pour qu’aucune couleur ne se répète. Le sol est d’un blanc bleuté,
+  et les miettes de six couleurs (palettes du fond 1 à 6, dont les teintes 0 et
+  1 sont celles du sol : une case mangée redevient du sol). Chaque miette garde
+  sa couleur (`fcoul`) pour la retrouver après la carte.
+
+Les lutins ne sont plus quatre places fixes de neuf : ils sont donnés à la
+suite (1, 4 ou 9 selon la taille) tant qu’il en reste — huit petites bulles à
+l’écran se voient toutes. Un tour dure toujours 2 images.
+
+`verifier-jeux.mjs` : la cartouche est en couleur, six couleurs de miettes, ta
+palette, la carte (le jeu attend, un point par bulle dans sa couleur, le
+retour), toi qui manges une IA (20 + 5 = 25), 10 contre 9 où personne ne mange,
+une IA qui en mange une autre (30 + 5 = 35), une IA qui te mange ; en jouant,
+les dix tailles l’une après l’autre ; 30 pixels par seconde à 80 de masse. Le
+joueur automatique gagne ses parties en 63 à 160 secondes (avant : 30 à 72).

@@ -4,7 +4,7 @@
  *   node verification/verifier-jeux.mjs
  *
  * Puissance 4, Dames, Échecs et Couleurs (un jeu de cartes dans le style du
- * UNO), dans exemples/ — et Flash le hérisson, et le Pou sauteur. On ne relit pas le code : on compile chaque jeu, on le
+ * UNO), dans exemples/ — et Flash le hérisson, le Pou sauteur, les Bulles gloutonnes. On ne relit pas le code : on compile chaque jeu, on le
  * fait tourner dans l'émulateur du projet, on appuie sur de vraies touches, et
  * on lit l'écran et les variables — une vraie partie, coup par coup.
  */
@@ -229,6 +229,119 @@ const deplacer = (j, c0, l0, c1, l1) => { viser(j, c0, l0); viser(j, c1, l1); j.
   const vies = v('vies')
   jeu.gb.setButton('left', true); jeu.gb.setButton('a', true); jeu.avancer(30); jeu.gb.setButton('a', false); jeu.avancer(30); jeu.gb.setButton('left', false); jeu.avancer(30)
   b.verifier('pou : START rejoue, et tomber dans la rue coûte une vie', vies === 3 && v('vies') < 3, ` (${vies} → ${v('vies')})`)
+}
+
+/* ------------------------------------------------- Les bulles gloutonnes */
+{
+  const jeu = demarrer('exemples/bulles.cpp', 30)
+  const v = (n) => jeu.valeurDe(n), c = (n, i) => jeu.caseDe(n, i)
+  const ecrire = (n, i, x) => jeu.gb.mmu.write(jeu.adresseDe(n) + i, x)
+  // une grande place : zone × 256 + pixel (le monde fait 3000 × 3000)
+  const M = (i) => [c('mzx', i) * 256 + c('mpx', i), c('mzy', i) * 256 + c('mpy', i)]
+  const X = (i) => c('zx', i) * 256 + c('px', i), Y = (i) => c('zy', i) * 256 + c('py', i)
+  // donner une masse à une bulle, avec la taille qui va avec (le tableau de fixerTaille())
+  const masse = (i, m) => {
+    const t = m >= 70 ? 9 : m >= 53 ? 8 : m >= 40 ? 7 : m >= 30 ? 6 : m >= 22 ? 5 : m >= 16 ? 4 : m >= 11 ? 3 : m >= 7 ? 2 : m >= 4 ? 1 : 0
+    ecrire('masse', i, m); ecrire('taille', i, t); ecrire('cot', i, [4, 6, 8, 10, 12, 14, 16, 18, 21, 24][t])
+    ecrire('marge', i, [2, 1, 0, 2, 2, 0, 0, 3, 0, 0][t]); ecrire('lutins', i, t >= 7 ? 9 : t >= 3 ? 4 : 1)
+  }
+  // poser une bulle à une grande place, et lui dire d'y rester
+  const placer = (i, x, y) => {
+    for (const [n, val] of [['zx', x >> 8], ['px', x & 255], ['zy', y >> 8], ['py', y & 255], ['bzx', x >> 8], ['bpx', x & 255], ['bzy', y >> 8], ['bpy', y & 255]]) ecrire(n, i, val)
+  }
+  // une partie démarre en dessinant 1024 cases de quadrillage : on attend qu'elle soit lancée
+  const start = () => { jeu.gb.setButton('start', true); for (let w = 0; w < 200 && v('etat') !== 1; w++) jeu.avancer(1); jeu.gb.setButton('start', false); jeu.avancer(4) }
+  const appuyer = (t) => { jeu.gb.setButton(t, true); jeu.avancer(6); jeu.gb.setButton(t, false); jeu.avancer(6) }
+  b.verifier('bulles : l’écran titre dit GLOUTONNES', jeu.ecran(4, 6, 10).map((x) => ORDRE[x]).join('') === 'GLOUTONNES')
+  b.verifier('bulles : une cartouche Game Boy Color', jeu.gb.ppu.couleur === true)
+  start()
+  b.verifier('bulles : START lance la partie, au milieu du monde, toute petite', v('etat') === 1 && X(0) === 1480 && Y(0) === 1480 && c('masse', 0) === 3 && c('cot', 0) === 4)
+  b.verifier('bulles : 24 miettes posées autour de toi, de six couleurs', [...Array(24)].every((_, k) => c('posee', k) === 1) && new Set([...Array(24)].map((_, k) => c('fcoul', k))).size === 6)
+  b.egal('bulles : ta bulle a la palette 0 (le bleu)', jeu.gb.mmu.read(0xfe03) & 7, 0)
+  // la caméra suit : à droite pendant 2 secondes, 120 pixels (60 par seconde), et l'écran glisse d'autant
+  const x0 = X(0), cam0 = v('czx') * 256 + v('cpx')
+  jeu.gb.setButton('right', true); jeu.avancer(120); jeu.gb.setButton('right', false)
+  b.verifier('bulles : à 3 de masse, 60 pixels par seconde', Math.abs(X(0) - x0 - 120) <= 2, ` (${X(0) - x0} pixels en 2 s)`)
+  b.verifier('bulles : la caméra suit (le fond glisse d’autant)', Math.abs(v('czx') * 256 + v('cpx') - cam0 - (X(0) - x0)) <= 1)
+  // les sept IA bougent toutes seules
+  const avant = [...Array(7)].map((_, k) => [X(k + 1), Y(k + 1)])
+  jeu.avancer(120)
+  b.verifier('bulles : les sept IA bougent toutes seules', avant.every(([x, y], k) => X(k + 1) !== x || Y(k + 1) !== y))
+
+  // la carte : SELECT l'ouvre, le jeu attend, SELECT la ferme
+  appuyer('select')
+  const figees = [...Array(8)].map((_, i) => X(i))
+  jeu.avancer(60)
+  b.verifier('bulles : SELECT ouvre la carte, et le jeu attend', v('etat') === 3 && figees.every((x, i) => X(i) === x) && jeu.ecran(6, 0, 8).map((x) => ORDRE[x]).join('') === 'LA CARTE')
+  b.verifier('bulles : sur la carte, un point par bulle, dans sa couleur', [1, 2, 3, 4, 5, 6, 7].every((i) => !c('vivante', i) || (jeu.gb.mmu.read(0xfe00 + i * 4 + 3) & 7) === i))
+  appuyer('select')
+  b.verifier('bulles : SELECT ramène au jeu', v('etat') === 1)
+
+  // se manger : toi (20) contre une IA de 5, posée sur toi → tu la manges, tu prends sa masse
+  masse(0, 20); placer(1, X(0) + 2, Y(0) + 2); masse(1, 5)
+  jeu.avancer(6)
+  b.verifier('bulles : tu manges une IA plus petite (20 + 5 = 25)', c('vivante', 1) === 0 && c('masse', 0) === 25, ` (masse ${c('masse', 0)})`)
+  // deux bulles trop proches en masse : 10 contre 9 (il faut un quart de plus) → personne ne mange
+  masse(0, 10); placer(2, X(0), Y(0)); masse(2, 9)
+  jeu.avancer(6)
+  b.verifier('bulles : 10 contre 9, trop proches : personne ne mange', c('vivante', 0) === 1 && c('vivante', 2) === 1 && c('masse', 0) === 10)
+  // une IA (30) mange une IA (5), loin de toi
+  placer(3, 600, 600); masse(3, 30); placer(4, 604, 604); masse(4, 5)
+  jeu.avancer(30)
+  b.verifier('bulles : une IA mange une autre IA (30 + 5 = 35)', c('vivante', 4) === 0 && c('masse', 3) === 35, ` (vivante ${c('vivante', 4)}, masse ${c('masse', 3)})`)
+  // une IA (30) posée sur toi (10) → elle te mange, la partie est finie
+  placer(5, X(0) - 4, Y(0) - 4); masse(5, 30)
+  jeu.avancer(6)
+  b.verifier('bulles : une IA plus grosse te mange : fini', v('etat') === 2 && c('vivante', 0) === 0 && v('gagne') === 0)
+
+  // un joueur : fuit les plus grosses, court après les plus petites, sinon la miette la plus proche
+  start()
+  let iaMangees = 0, loin = false
+  const tailles = new Set()
+  const vivantes = [1, 1, 1, 1, 1, 1, 1, 1]
+  for (let f = 0; f < 60 * 300 && v('etat') === 1; f++) {
+    const [x, y] = M(0), m0 = c('masse', 0)
+    let danger = null, proie = null, dd = 999, dp = 999, but = null
+    for (let j = 1; j < 8; j++) {
+      if (!c('vivante', j)) continue
+      const [a, e] = M(j), d = Math.max(Math.abs(a - x), Math.abs(e - y)), mj = c('masse', j)
+      if (mj >= m0 + (m0 >> 2) + 1 && d < 56 && d < dd) { dd = d; danger = [a, e] }
+      if (m0 >= mj + (mj >> 2) + 1 && d < 70 && d < dp) { dp = d; proie = [a, e] }
+    }
+    let dx, dy
+    if (danger) {
+      dx = x < danger[0] ? -1 : 1; dy = y < danger[1] ? -1 : 1
+      if (x < 20 || x > 2980) dx = 0
+      if (y < 20 || y > 2980) dy = 0
+    } else {
+      but = proie
+      if (!but) { let m = 999; for (let k = 0; k < 24; k++) { if (!c('posee', k)) continue; const a = c('fzx', k) * 256 + c('fpx', k), e = c('fzy', k) * 256 + c('fpy', k), d = Math.max(Math.abs(a - x), Math.abs(e - y)); if (d < m) { m = d; but = [a, e] } } }
+      if (!but) but = [x + 50, y]
+      dx = but[0] > x + 1 ? 1 : but[0] < x - 1 ? -1 : 0; dy = but[1] > y + 1 ? 1 : but[1] < y - 1 ? -1 : 0
+    }
+    jeu.gb.setButton('right', dx > 0); jeu.gb.setButton('left', dx < 0); jeu.gb.setButton('down', dy > 0); jeu.gb.setButton('up', dy < 0)
+    jeu.avancer(1)
+    tailles.add(c('taille', 0))
+    if (Math.abs(X(0) - 1480) > 256 || Math.abs(Y(0) - 1480) > 256) loin = true
+    for (let j = 1; j < 8; j++) { const w = c('vivante', j); if (vivantes[j] && !w) iaMangees++; vivantes[j] = w }
+  }
+  for (const t of ['right', 'left', 'up', 'down']) jeu.gb.setButton(t, false)
+  jeu.avancer(10)
+  b.verifier('bulles : en jouant, la bulle grandit marche après marche', tailles.size >= 5, ` (${tailles.size} tailles sur 10)`)
+  b.verifier('bulles : on voyage dans le monde (plus de 256 pixels du départ)', loin)
+  b.verifier('bulles : la partie va jusqu’au bout', v('etat') === 2, ` (masse ${c('masse', 0)}, gagné ${v('gagne')}, ${iaMangees} IA mangées)`)
+  b.egal('bulles : le record est la meilleure masse', v('record'), Math.max(c('masse', 0), 25))
+  start()
+  b.verifier('bulles : START rejoue, de nouveau toute petite', v('etat') === 1 && c('masse', 0) === 3)
+  // plus gros, plus lent : 80 de masse (60 - 80/4 - 80/8 = 30 pixels par seconde ; une miette ou deux en route le ralentissent à peine)
+  masse(0, 80)
+  jeu.gb.setButton('left', true); jeu.avancer(10)
+  const x1 = X(0); jeu.avancer(120); const parcouru = x1 - X(0)
+  jeu.gb.setButton('left', false)
+  b.verifier('bulles : plus gros, plus lent (80 de masse : 30 pixels par seconde, contre 60 au départ)', parcouru >= 54 && parcouru <= 62, ` (${parcouru} pixels en 2 s)`)
+  masse(0, 3)
+  for (let f = 0; f < 60 * 180 && v('etat') === 1; f++) jeu.avancer(1)
+  b.verifier('bulles : sans bouger, une IA finit par te manger', v('etat') === 2 && c('vivante', 0) === 0 && v('gagne') === 0)
 }
 
 /* ------------------------------------------------------- Couleurs (cartes) */

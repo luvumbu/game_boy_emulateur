@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 960" width="960" height="960">
+  <!--
+    DFPlayer Mini (DFRobot) — vu de dessus, comme sur la photo du vendeur.
+
+    Ce qui est IMPRIMÉ sur la carte est recopié tel quel : « DFPlayer Mini »,
+    les codes des résistances « 152 » (1,5 kΩ) et « 103 » (10 kΩ), et le petit
+    « 1 » à droite. Les noms des pattes, en gris À L'EXTÉRIEUR de la carte, ne
+    sont PAS imprimés dessus : ils viennent de la fiche technique, pour savoir
+    quoi brancher où. La patte 1 (VCC) est la carrée, en haut à gauche.
+  -->
+  <defs>
+    <radialGradient id="etain" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.45" stop-color="#c9ccd1"/>
+      <stop offset="1" stop-color="#6d7178"/>
+    </radialGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e3e4e6"/>
+      <stop offset="0.5" stop-color="#b9bbbf"/>
+      <stop offset="1" stop-color="#9a9da2"/>
+    </linearGradient>
+    <linearGradient id="beige" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9d9b8"/>
+      <stop offset="1" stop-color="#b89a6a"/>
+    </linearGradient>
+    <g id="patte">
+      <circle r="21" fill="#1a1a1a"/>
+      <circle r="17" fill="url(#etain)"/>
+      <circle r="5" fill="#8a8d92"/>
+    </g>
+    <g id="condensateur">
+      <rect x="-13" y="-22" width="26" height="44" rx="3" fill="url(#beige)"/>
+      <rect x="-13" y="-22" width="26" height="9" fill="#cfd2d6"/>
+      <rect x="-13" y="13" width="26" height="9" fill="#cfd2d6"/>
+    </g>
+    <g id="resistance">
+      <rect x="-13" y="-22" width="26" height="44" rx="2" fill="#141414"/>
+      <rect x="-13" y="-22" width="26" height="8" fill="#cfd2d6"/>
+      <rect x="-13" y="14" width="26" height="8" fill="#cfd2d6"/>
+    </g>
+  </defs>
+
+  <rect width="960" height="960" fill="#ffffff"/>
+
+  <!-- la carte : noire, bord beige (la tranche du circuit), encoche en haut -->
+  <path d="M205 222 H458 A22 22 0 0 0 502 222 H748 V778 H205 Z" fill="#d8cdb4"/>
+  <path d="M212 229 H462 A18 18 0 0 0 498 229 H741 V771 H212 Z" fill="#121212"/>
+
+  <!-- en haut : 3 condensateurs, la DEL, 2 résistances (152, 103), 1 condensateur -->
+  <use href="#condensateur" x="280" y="258"/>
+  <use href="#condensateur" x="335" y="258"/>
+  <use href="#condensateur" x="393" y="258"/>
+  <rect x="440" y="276" width="36" height="16" rx="2" fill="#cfd2d6"/>
+  <rect x="448" y="278" width="20" height="12" rx="2" fill="#f4f1e6"/>
+  <use href="#resistance" x="548" y="258"/>
+  <use href="#resistance" x="603" y="258"/>
+  <use href="#condensateur" x="660" y="258"/>
+  <text x="548" y="258" fill="#f2f2f2" font-family="Arial, Helvetica, sans-serif" font-size="13" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 548 258)">152</text>
+  <text x="603" y="258" fill="#f2f2f2" font-family="Arial, Helvetica, sans-serif" font-size="13" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 603 258)">103</text>
+
+  <!-- l'inscription -->
+  <text x="466" y="333" fill="#f4f4f4" font-family="'Times New Roman', Times, serif" font-size="38" text-anchor="middle" letter-spacing="1">DFPlayer Mini</text>
+
+  <!-- les 8 contacts de la carte microSD, sous l'inscription -->
+  <g fill="#c9ccd1">
+    <rect x="290" y="352" width="13" height="18"/>
+    <rect x="320" y="352" width="13" height="18"/>
+    <rect x="350" y="352" width="13" height="18"/>
+    <rect x="380" y="352" width="13" height="18"/>
+    <rect x="410" y="352" width="13" height="18"/>
+    <rect x="440" y="352" width="13" height="18"/>
+    <rect x="470" y="352" width="13" height="18"/>
+    <rect x="500" y="352" width="13" height="18"/>
+    <rect x="530" y="352" width="13" height="18"/>
+  </g>
+
+  <!-- le lecteur de carte microSD : la boîte de métal -->
+  <rect x="262" y="378" width="418" height="398" rx="6" fill="url(#metal)" stroke="#7d8086" stroke-width="2"/>
+  <rect x="262" y="378" width="418" height="14" fill="#d9dadd"/>
+  <rect x="640" y="372" width="30" height="20" fill="#b0b3b8" stroke="#7d8086"/>
+  <!-- le ressort de gauche -->
+  <rect x="268" y="400" width="26" height="150" fill="#d0d2d5" stroke="#8a8d92"/>
+  <path d="M276 410 L284 420 L278 540" stroke="#7a5a2a" stroke-width="3" fill="none"/>
+  <rect x="273" y="520" width="18" height="28" fill="#2a2a2a"/>
+  <!-- l'interrupteur de détection, en bas à droite -->
+  <rect x="612" y="590" width="58" height="140" fill="#2b2b2b" stroke="#7d8086"/>
+  <path d="M626 600 V700 L640 722" stroke="#d6d8db" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <rect x="650" y="600" width="12" height="40" fill="#d6d8db"/>
+  <!-- l'ouverture, en bas : la carte microSD entre par là -->
+  <rect x="262" y="760" width="418" height="16" fill="#8f9297"/>
+
+  <!-- le petit « 1 » imprimé à droite -->
+  <text x="688" y="634" fill="#f2f2f2" font-family="Arial, Helvetica, sans-serif" font-size="16" transform="rotate(-20 688 634)">1</text>
+
+  <!-- les 16 pattes : 8 à gauche, 8 à droite ; la 1 (VCC) est carrée -->
+  <rect x="210" y="223" width="40" height="40" rx="3" fill="#1a1a1a"/>
+  <rect x="214" y="227" width="32" height="32" rx="3" fill="url(#etain)"/>
+  <circle cx="230" cy="243" r="5" fill="#8a8d92"/>
+  <use href="#patte" x="230" y="320"/>
+  <use href="#patte" x="230" y="384"/>
+  <use href="#patte" x="230" y="455"/>
+  <use href="#patte" x="230" y="521"/>
+  <use href="#patte" x="230" y="595"/>
+  <use href="#patte" x="230" y="663"/>
+  <use href="#patte" x="230" y="735"/>
+  <use href="#patte" x="720" y="243"/>
+  <use href="#patte" x="720" y="312"/>
+  <use href="#patte" x="720" y="378"/>
+  <use href="#patte" x="720" y="445"/>
+  <use href="#patte" x="720" y="519"/>
+  <use href="#patte" x="720" y="593"/>
+  <use href="#patte" x="720" y="660"/>
+  <use href="#patte" x="720" y="728"/>
+
+  <!-- les noms des pattes (fiche technique) : PAS imprimés sur la carte -->
+  <g font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#7a7a7a">
+    <text x="190" y="249" text-anchor="end">1 · VCC</text>
+    <text x="190" y="326" text-anchor="end">2 · RX</text>
+    <text x="190" y="390" text-anchor="end">3 · TX</text>
+    <text x="190" y="461" text-anchor="end">4 · DAC_R</text>
+    <text x="190" y="527" text-anchor="end">5 · DAC_L</text>
+    <text x="190" y="601" text-anchor="end">6 · SPK_1</text>
+    <text x="190" y="669" text-anchor="end">7 · GND</text>
+    <text x="190" y="741" text-anchor="end">8 · SPK_2</text>
+    <text x="760" y="249">16 · BUSY</text>
+    <text x="760" y="318">15 · USB−</text>
+    <text x="760" y="384">14 · USB+</text>
+    <text x="760" y="451">13 · ADKEY_2</text>
+    <text x="760" y="525">12 · ADKEY_1</text>
+    <text x="760" y="599">11 · IO_2</text>
+    <text x="760" y="666">10 · GND</text>
+    <text x="760" y="734">9 · IO_1</text>
+  </g>
+  <text x="480" y="840" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#9a9a9a" text-anchor="middle">En gris : les noms des pattes (fiche technique) — ils ne sont pas imprimés sur la carte.</text>
+  <text x="480" y="866" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#9a9a9a" text-anchor="middle">La carte microSD entre par le bas. La patte carrée, en haut à gauche, est la 1.</text>
+</svg>

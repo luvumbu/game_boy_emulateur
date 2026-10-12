@@ -159,6 +159,97 @@ function corps(): array
     return is_array($lu) ? $lu : [];
 }
 
+/* ===================================================================
+ *  Les CAPTURES d'une cartouche : un dossier par cartouche, sous
+ *  « captures/ » (à côté de « projets/ », pour ne pas se mêler aux jeux).
+ *
+ *    captures/captures_tetris/
+ *      capture.json    { titre, empreinte, octets, dessins: [{ nom, cote, rangees, source, adresse }] }
+ *      tuiles-1.png    toute la cartouche en tuiles (« 🗂 Toute la cartouche »)
+ *      ramasse-1.png   ce que le collecteur a ramassé (« 🧲 »)
+ *
+ *  Mêmes gardes que les projets, et la traduction exacte de
+ *  projets-serveur.mjs.
+ * =================================================================== */
+const CAPTURES = __DIR__ . '/captures';
+
+function dossierDesCaptures(string $nom, bool $doitExister = true): string
+{
+    if (!preg_match('/^[a-z0-9_-]{1,40}$/', $nom)) {
+        refuser("« $nom » n’est pas un nom de dossier : des lettres, des chiffres, « _ » et « - », pas plus.");
+    }
+    if (!is_dir(CAPTURES)) {
+        @mkdir(CAPTURES, 0777, true);
+    }
+    $chemin = CAPTURES . '/' . $nom;
+    if ($doitExister && !is_file($chemin . '/capture.json')) {
+        refuser("le dossier de captures « $nom » n’existe pas", 404);
+    }
+    if (is_dir($chemin)) {
+        $reel = realpath($chemin);
+        $racine = realpath(CAPTURES);
+        if ($reel === false || $racine === false || !str_starts_with($reel, $racine . DIRECTORY_SEPARATOR)) {
+            refuser('chemin refusé', 403);
+        }
+    }
+    return $chemin;
+}
+
+function lireCapture(string $dossier): array
+{
+    $lu = json_decode((string) file_get_contents($dossier . '/capture.json'), true);
+    return is_array($lu) ? $lu : ['dessins' => []];
+}
+
+function ecrireCapture(string $dossier, array $capture): void
+{
+    $texte = json_encode($capture, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    if (strlen($texte) > TAILLE_MAX * 4) {
+        refuser('trop de dessins dans ce dossier (8 Mo au plus)');
+    }
+    file_put_contents($dossier . '/capture.json', $texte);
+}
+
+function imagesDe(string $dossier): array
+{
+    $images = array_values(array_filter(scandir($dossier) ?: [], static fn ($f) => (bool) preg_match('/^(tuiles|ramasse)-\d{1,4}\.png$/', $f)));
+    natsort($images);
+    return array_values($images);
+}
+
+/** Un dessin venu de la page : vérifié champ par champ, rien d'autre n'est gardé. */
+function dessinPropre($d): array
+{
+    if (!is_array($d)) {
+        refuser('un dessin illisible');
+    }
+    $nom = (string) ($d['nom'] ?? '');
+    if (!preg_match('/^[A-Z_][A-Z0-9_]{0,39}$/', $nom)) {
+        refuser("« $nom » n’est pas un nom de dessin : MAJUSCULES, chiffres et « _ »");
+    }
+    $cote = (int) ($d['cote'] ?? 0);
+    if (!in_array($cote, [8, 16, 32], true)) {
+        refuser("« $nom » : la taille doit être 8, 16 ou 32");
+    }
+    $rangees = $d['rangees'] ?? null;
+    if (!is_array($rangees) || count($rangees) !== $cote) {
+        refuser("« $nom » : ses pixels ne font pas $cote × $cote");
+    }
+    foreach ($rangees as $r) {
+        if (!is_string($r) || !preg_match('/^[0-3]{' . $cote . '}$/', $r)) {
+            refuser("« $nom » : ses pixels ne font pas $cote × $cote");
+        }
+    }
+    $propre = ['nom' => $nom, 'cote' => $cote, 'rangees' => array_values($rangees)];
+    if (isset($d['source']) && is_string($d['source'])) {
+        $propre['source'] = substr($d['source'], 0, 20);
+    }
+    if (isset($d['adresse']) && is_int($d['adresse'])) {
+        $propre['adresse'] = $d['adresse'];
+    }
+    return $propre;
+}
+
 /* ------------------------------------------------------------------ */
 
 if (!is_dir(DOSSIER) && !@mkdir(DOSSIER, 0777, true) && !is_dir(DOSSIER)) {
@@ -417,4 +508,284 @@ switch ($quoi) {
     }
 }
 
-refuser("« $quoi » n’est pas une demande connue : liste, ouvrir, creer, enregistrer, capture, cartouche, renommer, supprimer", 404);
+switch ($quoi) {
+    case 'captures-liste': {
+        $captures = [];
+        foreach (is_dir(CAPTURES) ? (scandir(CAPTURES) ?: []) : [] as $entree) {
+            $dossier = CAPTURES . '/' . $entree;
+            if (!preg_match('/^[a-z0-9_-]{1,40}$/', $entree) || !is_file($dossier . '/capture.json')) {
+                continue;
+            }
+            $c = lireCapture($dossier);
+            $captures[] = [
+                'nom' => $entree,
+                'titre' => (string) ($c['titre'] ?? ''),
+                'empreinte' => (string) ($c['empreinte'] ?? ''),
+                'dessins' => count($c['dessins'] ?? []),
+                'images' => imagesDe($dossier),
+                'change' => filemtime($dossier . '/capture.json'),
+            ];
+        }
+        usort($captures, static fn ($a, $b) => $b['change'] <=> $a['change']);
+        repondre(['captures' => $captures, 'dossier' => str_replace('\\', '/', realpath(CAPTURES) ?: CAPTURES)]);
+    }
+
+    case 'captures-ouvrir': {
+        $dossier = dossierDesCaptures($nom);
+        $lireSiLa = static function (string $fichier, $defaut) use ($dossier) {
+            if (!is_file("$dossier/$fichier")) {
+                return $defaut;
+            }
+            $lu = json_decode((string) file_get_contents("$dossier/$fichier"), true);
+            return is_array($lu) ? $lu : $defaut;
+        };
+        $roles = $lireSiLa('roles.json', []);
+        $decors = is_dir("$dossier/decors")
+            ? array_values(array_filter(scandir("$dossier/decors") ?: [], static fn ($f) => (bool) preg_match('/^niveau-\d{1,3}(-\d{1,2})?\.png$/', $f)))
+            : [];
+        natsort($decors);
+        $decors = array_values($decors);
+        repondre([
+            'nom' => $nom, 'capture' => lireCapture($dossier), 'images' => imagesDe($dossier),
+            'dossier' => str_replace('\\', '/', realpath($dossier) ?: $dossier),
+            'rangement' => $lireSiLa('rangement.json', null),        // organiser-cartouche.js : banques, paquets, rôles
+            'roles' => $roles === [] ? new stdClass() : $roles,      // clé d'une tuile → 'lutin' | 'decor' (ramassé par 🧲)
+            'decors' => $decors,                                     // les niveaux enregistrés (🗺)
+        ]);
+    }
+
+    /* Un niveau enregistré (🗺) : decors/niveau-N.png, N choisi par le service ;
+       les parties suivantes d'un très long niveau : niveau-N-2.png, -3… */
+    case 'captures-decor': {
+        $dossier = dossierDesCaptures($nom);
+        if (!preg_match('#^data:image/png;base64,([A-Za-z0-9+/=]+)$#', (string) ($donnees['png'] ?? ''), $png)) {
+            refuser('l’image doit être un PNG');
+        }
+        $octets = base64_decode($png[1], true);
+        if ($octets === false || strlen($octets) > TAILLE_MAX || substr($octets, 0, 8) !== "\x89PNG\r\n\x1a\n") {
+            refuser('ce n’est pas un PNG (ou il fait plus de 2 Mo)');
+        }
+        $ou = "$dossier/decors";
+        if (!is_dir($ou)) {
+            @mkdir($ou, 0777, true);
+        }
+        $partie = is_int($donnees['partie'] ?? null) && $donnees['partie'] >= 1 && $donnees['partie'] < 100 ? $donnees['partie'] : 0;
+        $numero = is_int($donnees['numero'] ?? null) && $donnees['numero'] >= 1 && $donnees['numero'] < 1000 ? $donnees['numero'] : 0;
+        if (!$numero) {
+            $numero = 1;
+            while (is_file("$ou/niveau-$numero.png")) {
+                $numero++;
+            }
+        }
+        $image = $partie ? "niveau-$numero-" . ($partie + 1) . '.png' : "niveau-$numero.png";
+        file_put_contents("$ou/$image", $octets);
+        repondre(['nom' => $nom, 'numero' => $numero, 'image' => "decors/$image"]);
+    }
+
+    /* Les rôles ramassés par 🧲 (personnage ou décor), ajoutés à ceux du dossier.
+       « lutin » l'emporte sur « decor ». */
+    case 'captures-roles': {
+        $dossier = dossierDesCaptures($nom);
+        $nouveaux = $donnees['roles'] ?? null;
+        if (!is_array($nouveaux)) {
+            refuser('pas de rôles');
+        }
+        $roles = [];
+        if (is_file("$dossier/roles.json")) {
+            $lu = json_decode((string) file_get_contents("$dossier/roles.json"), true);
+            $roles = is_array($lu) ? $lu : [];
+        }
+        $ajoutes = 0;
+        foreach ($nouveaux as $cle => $role) {
+            if (!preg_match('/^[0-9a-f]{32}$/', (string) $cle) || !in_array($role, ['lutin', 'decor'], true)) {
+                continue;
+            }
+            if (($roles[$cle] ?? null) === $role || ($roles[$cle] ?? null) === 'lutin') {
+                continue;
+            }
+            $roles[$cle] = $role;
+            $ajoutes++;
+        }
+        $texte = json_encode($roles === [] ? new stdClass() : $roles);
+        if (strlen($texte) > TAILLE_MAX * 4) {
+            refuser('trop de rôles (8 Mo au plus)');
+        }
+        file_put_contents("$dossier/roles.json", $texte);
+        repondre(['nom' => $nom, 'ajoutes' => $ajoutes, 'roles' => count($roles)]);
+    }
+
+    /* Le rangement : rangement.json, et les images dans quatre sous-dossiers
+       fixes, REFAITS à chaque rangement (« debut » les vide de leurs PNG).
+       On n'efface rien d'autre. */
+    case 'captures-organiser': {
+        $dossier = dossierDesCaptures($nom);
+        $sousDossiers = ['banques', 'personnages', 'decor', 'pas-encore-vu'];
+        if (!empty($donnees['debut'])) {
+            foreach ($sousDossiers as $sous) {
+                if (!is_dir("$dossier/$sous")) {
+                    continue;
+                }
+                foreach (scandir("$dossier/$sous") ?: [] as $f) {
+                    if (preg_match('/^[a-z0-9_-]{1,60}\.png$/', $f)) {
+                        @unlink("$dossier/$sous/$f");
+                    }
+                }
+            }
+        }
+        if (array_key_exists('rangement', $donnees)) {
+            if (!is_array($donnees['rangement'])) {
+                refuser('rangement illisible');
+            }
+            $texte = json_encode($donnees['rangement'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if (strlen($texte) > TAILLE_MAX * 4) {
+                refuser('rangement trop gros');
+            }
+            file_put_contents("$dossier/rangement.json", $texte);
+        }
+        $ecrites = 0;
+        foreach (is_array($donnees['images'] ?? null) ? $donnees['images'] : [] as $image) {
+            $chemin = (string) ($image['chemin'] ?? '');
+            if (!preg_match('#^(banques|personnages|decor|pas-encore-vu)/([a-z0-9_-]{1,60}\.png)$#', $chemin, $bouts)) {
+                refuser("« $chemin » n’est pas un chemin d’image du rangement");
+            }
+            if (!preg_match('#^data:image/png;base64,([A-Za-z0-9+/=]+)$#', (string) ($image['png'] ?? ''), $png)) {
+                refuser('l’image doit être un PNG');
+            }
+            $octets = base64_decode($png[1], true);
+            if ($octets === false || strlen($octets) > TAILLE_MAX || substr($octets, 0, 8) !== "\x89PNG\r\n\x1a\n") {
+                refuser('ce n’est pas un PNG (ou il fait plus de 2 Mo)');
+            }
+            if (!is_dir("$dossier/{$bouts[1]}")) {
+                @mkdir("$dossier/{$bouts[1]}", 0777, true);
+            }
+            file_put_contents("$dossier/{$bouts[1]}/{$bouts[2]}", $octets);
+            $ecrites++;
+        }
+        repondre(['nom' => $nom, 'ecrites' => $ecrites]);
+    }
+
+    /* Jamais d'écrasement : un nom pris reçoit un numéro, comme les projets. */
+    case 'captures-creer': {
+        $propre = nomPropre($nom);
+        if ($propre === '') {
+            refuser('il faut un nom : des lettres, des chiffres, « _ » ou « - »');
+        }
+        dossierDesCaptures($propre, false);
+        $libre = $propre;
+        for ($n = 2; is_dir(CAPTURES . '/' . $libre) && $n < 1000; $n++) {
+            $libre = substr($propre, 0, 40 - strlen((string) $n)) . $n;
+        }
+        $dossier = dossierDesCaptures($libre, false);
+        if (!@mkdir($dossier, 0777, true) && !is_dir($dossier)) {
+            refuser("le dossier « $libre » n’a pas pu être créé", 500);
+        }
+        ecrireCapture($dossier, [
+            'titre' => substr((string) ($donnees['titre'] ?? ''), 0, 40),
+            'empreinte' => substr(preg_replace('/[^0-9a-f]/', '', (string) ($donnees['empreinte'] ?? '')), 0, 16),
+            'octets' => is_int($donnees['octets'] ?? null) ? $donnees['octets'] : 0,
+            'dessins' => [],
+        ]);
+        repondre(['nom' => $libre, 'dossier' => str_replace('\\', '/', realpath($dossier) ?: $dossier)]);
+    }
+
+    /* Les pareils ne comptent qu'une fois ; un nom pris reçoit un numéro. */
+    case 'captures-ajouter': {
+        $dossier = dossierDesCaptures($nom);
+        if (!is_array($donnees['dessins'] ?? null)) {
+            refuser('rien à ajouter');
+        }
+        $capture = lireCapture($dossier);
+        $dessins = is_array($capture['dessins'] ?? null) ? $capture['dessins'] : [];
+        $pixels = [];
+        $noms = [];
+        foreach ($dessins as $d) {
+            $pixels[implode('|', $d['rangees'])] = true;
+            $noms[$d['nom']] = true;
+        }
+        $ajoutes = 0;
+        foreach ($donnees['dessins'] as $brut) {
+            $d = dessinPropre($brut);
+            $cle = implode('|', $d['rangees']);
+            if (isset($pixels[$cle])) {
+                continue;
+            }
+            $libre = $d['nom'];
+            for ($n = 2; isset($noms[$libre]); $n++) {
+                $libre = substr($d['nom'], 0, 40 - strlen((string) $n) - 1) . '_' . $n;
+            }
+            $d['nom'] = $libre;
+            $pixels[$cle] = true;
+            $noms[$libre] = true;
+            $dessins[] = $d;
+            $ajoutes++;
+        }
+        $capture['dessins'] = $dessins;
+        ecrireCapture($dossier, $capture);
+        repondre(['nom' => $nom, 'ajoutes' => $ajoutes, 'dessins' => count($dessins)]);
+    }
+
+    /* Les dessins modifiés dans la page (renommés, ôtés) : la liste entière remplace l'ancienne. */
+    case 'captures-modifier': {
+        $dossier = dossierDesCaptures($nom);
+        if (!is_array($donnees['dessins'] ?? null)) {
+            refuser('rien à enregistrer');
+        }
+        $dessins = array_map('dessinPropre', $donnees['dessins']);
+        if (count(array_unique(array_column($dessins, 'nom'))) !== count($dessins)) {
+            refuser('deux dessins portent le même nom');
+        }
+        $capture = lireCapture($dossier);
+        $capture['dessins'] = $dessins;
+        ecrireCapture($dossier, $capture);
+        repondre(['nom' => $nom, 'dessins' => count($dessins)]);
+    }
+
+    /* Une image de plus : « tuiles-3.png » si 1 et 2 existent. Le service choisit le nom. */
+    case 'captures-image': {
+        $dossier = dossierDesCaptures($nom);
+        $sorte = (string) ($donnees['sorte'] ?? '');
+        if (!in_array($sorte, ['tuiles', 'ramasse'], true)) {
+            refuser('sorte d’image inconnue : tuiles ou ramasse');
+        }
+        if (!preg_match('#^data:image/png;base64,([A-Za-z0-9+/=]+)$#', (string) ($donnees['png'] ?? ''), $bouts)) {
+            refuser('l’image doit être un PNG');
+        }
+        $octets = base64_decode($bouts[1], true);
+        if ($octets === false || strlen($octets) > TAILLE_MAX || substr($octets, 0, 8) !== "\x89PNG\r\n\x1a\n") {
+            refuser('ce n’est pas un PNG (ou il fait plus de 2 Mo)');
+        }
+        /* La même image déjà là (on a rangé deux fois sans rien changer) : on ne la double pas. */
+        foreach (imagesDe($dossier) as $im) {
+            if (str_starts_with($im, $sorte . '-') && file_get_contents("$dossier/$im") === $octets) {
+                repondre(['nom' => $nom, 'image' => $im, 'deja' => true]);
+            }
+        }
+        $n = 1;
+        while (is_file("$dossier/$sorte-$n.png")) {
+            $n++;
+        }
+        file_put_contents("$dossier/$sorte-$n.png", $octets);
+        repondre(['nom' => $nom, 'image' => "$sorte-$n.png"]);
+    }
+
+    case 'captures-renommer': {
+        $dossier = dossierDesCaptures($nom);
+        $vers = nomPropre((string) ($donnees['vers'] ?? ''));
+        if ($vers === '') {
+            refuser('il faut un nouveau nom');
+        }
+        if ($vers === $nom) {
+            repondre(['nom' => $nom]);
+        }
+        $ailleurs = dossierDesCaptures($vers, false);
+        if (is_dir($ailleurs)) {
+            refuser("« $vers » existe déjà");
+        }
+        if (!@rename($dossier, $ailleurs)) {
+            refuser('le dossier n’a pas pu être renommé', 500);
+        }
+        repondre(['nom' => $vers]);
+    }
+}
+
+refuser("« $quoi » n’est pas une demande connue : liste, ouvrir, creer, enregistrer, capture, cartouche, renommer, supprimer, captures-liste, captures-ouvrir, captures-creer, captures-ajouter, captures-modifier, captures-image, captures-renommer, captures-roles, captures-organiser, captures-decor", 404);

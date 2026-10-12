@@ -407,6 +407,19 @@
   .groupe-console .captures-lutins { flex-basis: 100%; }
   .groupe-console .capturer-autres { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 4px; }
   .captures-lutins[hidden] { display: none; }
+  /* « 📁 Tout ranger » : le bouton qui prend TOUT, en vert qui clignote en rouge, pour qu'on ne le rate pas. */
+  /* Le clignotement est fait en JavaScript (classe « rouge » toutes les demi-secondes) : le réglage
+     « animations » de la page coupe les animations CSS, et ce bouton-là doit clignoter quoi qu'il arrive. */
+  button.clignote-tout, .groupe-console > button.clignote-tout, button.clignote-tout:hover:not(:disabled) { background: #1f9d3a; color: #fff; border-color: #1f9d3a; font-weight: 700; }
+  button.clignote-tout.rouge, .groupe-console > button.clignote-tout.rouge, button.clignote-tout.rouge:hover:not(:disabled) { background: #d62020; border-color: #d62020; }
+  .groupe-console > button.clignote-tout { flex-basis: 100%; font-size: 15px; padding: 8px 10px; }
+  .groupe-console > button.clignote-tout[hidden] { display: none; }
+  /* Le cadre « où sont les captures » : sa BORDURE clignote vert ↔ rouge (même minuterie que le bouton). */
+  .ou-captures { flex-basis: 100%; display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border: 3px solid #1f9d3a; border-radius: 8px; }
+  .ou-captures.rouge { border-color: #d62020; }
+  .ou-captures[hidden] { display: none; }
+  .ou-captures code { word-break: break-all; font-size: 12px; }
+  .ou-captures-boutons { display: flex; flex-wrap: wrap; gap: 4px; }
   .inspecteur summary { cursor: pointer; font-weight: 600; }
   .inspecteur-onglets { display: flex; gap: 4px; flex-wrap: wrap; margin: 8px 0; }
   .inspecteur-contenu input { font-family: var(--code-police); width: 5em; }
@@ -1539,6 +1552,7 @@
         <option value="cartes">COULEURS — un jeu de cartes, style UNO, contre la console</option>
         <option value="herisson">FLASH LE HÉRISSON — courir, sauter en boule, ramasser les anneaux</option>
         <option value="pou">LE POU SAUTEUR — sauter de tête en tête et donner des poux</option>
+        <option value="bulles">LES BULLES GLOUTONNES — style agar.io, en couleur : un monde de 3000 × 3000, sept IA, la carte</option>
         <option value="puits">Le puits qui s'empile</option>
         <option value="chute">La gravité — un objet qui tombe et rebondit</option>
         <option value="bonjour">Débuter — bonjour</option>
@@ -1890,6 +1904,20 @@
           <span class="aide" id="ips">—</span>
           <!-- Sous « Plein écran » : prendre les personnages que la console montre
                (le jeu écrit ici, ou un .gb ouvert) pour les mettre dans ses dessins. -->
+          <!-- Dès qu'une cartouche est ouverte : LE bouton qui prend tout, et le range
+               dans le dossier de la cartouche. Vert qui clignote en rouge. -->
+          <button type="button" id="tout-prendre" class="clignote-tout" hidden title="tous les dessins de la cartouche, et l’image de toutes ses tuiles, rangés dans son dossier (captures/…) — créé la première fois, complété ensuite">📁 TOUT PRENDRE de cette cartouche</button>
+          <!-- OÙ sont les captures de cette cartouche : le chemin du dossier, dans un
+               cadre dont la bordure clignote vert ↔ rouge. Caché tant que rien n'est rangé. -->
+          <div id="ou-captures" class="ou-captures clignote-bord" hidden>
+            <div>📂 Tes captures de cette cartouche sont ici :</div>
+            <code id="ou-captures-chemin"></code>
+            <div class="aide" id="ou-captures-detail"></div>
+            <div class="ou-captures-boutons">
+              <button type="button" id="ou-captures-ouvrir" class="petit">📁 Ouvrir ce dossier ici</button>
+              <button type="button" id="ou-captures-copier" class="petit" title="pour le coller dans la barre de l’explorateur Windows">📋 Copier le chemin</button>
+            </div>
+          </div>
           <button type="button" id="capturer-lutins" class="capturer-lutins" title="prend les personnages à l’écran en ce moment — de ton jeu ou d’un .gb ouvert — pour les mettre dans tes dessins">📸 Capturer les lutins</button>
           <!-- Le second : capturer PENDANT qu'on joue. Un personnage change de dessin
                quand il marche, saute, se retourne : on les ramasse tous. -->
@@ -1901,6 +1929,15 @@
             <button type="button" id="capturer-panneau" class="petit" title="le panneau du jeu (score, vies, dialogue) devient une carte de ton programme">🪟 Le panneau</button>
             <button type="button" id="capturer-couleurs" class="petit" title="les 8 palettes du fond et des lutins (Game Boy Color) deviennent celles de ton programme">🎨 Les couleurs</button>
             <button type="button" id="capturer-tout" class="petit" title="les lutins, le décor, le panneau et les couleurs, d’un coup">🧩 Tout l’écran</button>
+          </div>
+          <!-- Pas seulement ce qu'on voit : TOUS les dessins de la cartouche.
+               L'un lit le fichier entier, l'autre ramasse toute la mémoire vidéo
+               pendant qu'on joue (pour les dessins compressés). -->
+          <div class="capturer-autres">
+            <button type="button" id="capturer-cartouche" class="petit" title="toute la cartouche lue en tuiles, banque par banque : tous les dessins qui ne sont pas compressés, même ceux qu’on n’a jamais vus">🗂 Toute la cartouche</button>
+            <button type="button" id="capturer-vram" class="petit" title="clique, joue, reclique : chaque tuile chargée dans la mémoire vidéo pendant ce temps (lutins ET décor), même compressée dans la cartouche">🧲 Ramasser la mémoire vidéo pendant que je joue</button>
+            <button type="button" id="capturer-niveau" class="petit" title="clique, joue le niveau du début à la fin, reclique : tout le décor du niveau en une seule image, sans les personnages — comme un panorama">🗺 Enregistrer le niveau (tout le décor)</button>
+            <button type="button" id="dossiers-captures" class="petit" title="les dossiers où sont rangées les captures, un par cartouche : les rouvrir, renommer, modifier les dessins">📁 Mes dossiers de captures</button>
           </div>
           <div id="captures-lutins" class="captures-lutins" hidden></div>
         </div>
@@ -1977,6 +2014,10 @@ import { analyser as analyserLaCartouche, montrer as montrerLAnalyse } from './a
 import { capturer as capturerLEtat, restaurer as restaurerLEtat } from './etat-console.js'
 import { installer as installerLInspecteur, montrerLesCaptures } from './inspecteur.js'
 import { capturerLeDecor, capturerLePanneau, capturerLesCouleurs, capturerLesLutins } from './capturer-lutins.js'
+import { creerUnCollecteur } from './capturer-cartouche.js'
+import { creerUnPanorama, imagesDuMorceau, cartesDuMorceau } from './panorama-decor.js'
+import { montrerLaPlanche } from './planche-cartouche.js'
+import { rangerDansLeDossier, montrerLesDossiers, montrerLeDossier, dossierDeLaCartouche, organiserLeDossier, rangerDesNiveaux } from './dossier-captures.js'
 import { champDeRecherche, correspond, fiche, filtrerUnMenu, filtrerUneGrille, motsDe, motsDuCode, normaliser, phrase } from './recherche.js'
 import { installer as installerToutChercher } from './recherche-globale.js'
 import { FONCTIONS } from './aide-fonctions.js'
@@ -2055,6 +2096,7 @@ const EXEMPLES = {
   cartes: 'exemples/cartes.cpp',
   herisson: 'exemples/herisson.cpp',
   pou: 'exemples/pou.cpp',
+  bulles: 'exemples/bulles.cpp',
   langage: 'exemples/langage.cpp',
   console: 'exemples/console.cpp',
   musique: 'exemples/musique.cpp',
@@ -3465,6 +3507,8 @@ function tick() {
   for (let i = 0; i < combien; i++) {
     gb.runFrame()
     verserLeSon()
+    if (collecteur) collecteur.ramasser(gb.ppu)   // « 🧲 Ramasser la mémoire vidéo » : à chaque image
+    if (panorama) panorama.ramasser(gb.ppu)       // « 🗺 Enregistrer le niveau » : à chaque image
   }
 
   redessinerLEcran()
@@ -3746,6 +3790,261 @@ $('capturer-plus').addEventListener('click', () => {
   ramasser()
   recolte.minuteur = setInterval(() => { if (recolte) ramasser() }, 100)
 })
+
+/*
+ * Tous les dessins de la cartouche, pas seulement ceux de l'écran
+ * (capturer-cartouche.js pour les calculs, planche-cartouche.js pour la
+ * planche).
+ *
+ * « 🗂 Toute la cartouche » lit le fichier qui tourne — un .gb/.gbc ouvert, ou
+ * ton propre programme — en tuiles de 16 octets, banque par banque.
+ *
+ * « 🧲 Ramasser la mémoire vidéo » attrape ce que la cartouche cache
+ * compressé : à chaque image (dans tick), le collecteur relit toute la VRAM
+ * et garde chaque tuile nouvelle. Un second clic arrête et montre la planche
+ * de tout ce qui a été ramassé.
+ */
+let collecteur = null
+
+const direDansLEtat = (texte, bon) => {
+  $('etat').className = bon ? 'etat bon' : 'etat erreur'
+  $('etat').textContent = texte
+}
+
+/*
+ * « 📁 Ranger » : dans le dossier de la cartouche qui tourne (captures/…),
+ * créé la première fois — nom proposé, qu'on peut changer —, complété
+ * ensuite (dossier-captures.js). La cartouche est reconnue à son empreinte.
+ */
+async function rangerLesCaptures({ dessins, images }) {
+  if (!romActuelle) { direDansLEtat('Aucune cartouche ne tourne.', false); return }
+  try {
+    const r = await rangerDansLeDossier({
+      rom: romActuelle, dessins, images, demanderUnNom, roles: rolesRamasses,
+      progression: (p) => direDansLEtat(`Rangement… ${Math.round(p * 100)} %`, true),
+    })
+    if (!r) return
+    rolesRamasses = new Map()   // ils sont dans roles.json maintenant
+    const c = r.rangement
+    direDansLEtat(`${r.nouveau ? 'Dossier créé' : 'Ajouté au dossier'} « captures/${r.dossier} » : ${r.ajoutes} dessin${r.ajoutes > 1 ? 's' : ''} nouveau${r.ajoutes > 1 ? 'x' : ''} (${r.total} en tout)`
+      + (r.images.length ? `, ${r.images.join(', ')}` : '')
+      + `. Rangé : ${c.personnages} paquets de personnages, ${c.decor} de décor, ${c.inconnu} pas encore vus, ${c.banques} banques.`
+      + ' Le chemin est dans le cadre qui clignote, sous « TOUT PRENDRE ».', true)
+    await montrerOuSontLesCaptures()
+  } catch (e) {
+    direDansLEtat('Rangement impossible : ' + e.message, false)
+  }
+}
+
+/*
+ * Les rôles (personnage ou décor) ramassés par 🧲 et pas encore envoyés au
+ * dossier. À l'arrêt de 🧲, si la cartouche a déjà un dossier, ils y vont tout
+ * de suite et le dossier est réorganisé : plus on joue, mieux c'est trié.
+ * Sinon, ils attendent le premier « TOUT PRENDRE ».
+ */
+let rolesRamasses = new Map()
+const optionsDesDossiers = () => ({ ajouterUnDessin: ajouterUnDessinCapture, ajouterTout: ajouterToutesLesCaptures, demanderUnNom, dire: direEtSuivre, rom: () => (romDuDehors ? romActuelle : null) })
+
+async function rangerLesRoles() {
+  if (!rolesRamasses.size || !romActuelle) return
+  let dossier = null
+  try { dossier = await dossierDeLaCartouche(romActuelle) } catch { return }
+  if (!dossier) {
+    direDansLEtat(`${rolesRamasses.size} tuiles reconnues (personnage ou décor). Clique « TOUT PRENDRE » pour créer le dossier : elles serviront à le trier.`, true)
+    return
+  }
+  try {
+    const c = await organiserLeDossier({ rom: romActuelle, dossier: dossier.nom, roles: rolesRamasses, progression: (p) => direDansLEtat(`Tri du dossier « ${dossier.nom} »… ${Math.round(p * 100)} %`, true) })
+    rolesRamasses = new Map()
+    direDansLEtat(`Dossier « ${dossier.nom} » trié à nouveau : ${c.personnages} paquets de personnages, ${c.decor} de décor, ${c.inconnu} pas encore vus.`, true)
+  } catch (e) { direDansLEtat('Tri impossible : ' + e.message, false) }
+}
+
+$('dossiers-captures').addEventListener('click', () => {
+  montrerLesDossiers($('captures-lutins'), optionsDesDossiers())
+})
+
+/* Vert ↔ rouge, toutes les demi-secondes, pour tous les boutons « prendre tout ». */
+setInterval(() => document.querySelectorAll('.clignote-tout, .clignote-bord').forEach((b) => b.classList.toggle('rouge')), 500)
+
+/*
+ * Le cadre « 📂 Tes captures sont ici » : le chemin complet du dossier de la
+ * cartouche qui tourne. Montré après chaque rangement, et dès qu'on ouvre une
+ * cartouche qui a déjà un dossier ; caché sinon.
+ */
+let dossierMontre = null
+async function montrerOuSontLesCaptures() {
+  const cadre = $('ou-captures')
+  if (!romDuDehors || !romActuelle) { cadre.hidden = true; return }
+  let d = null
+  try { d = await dossierDeLaCartouche(romActuelle) } catch { /* pas de serveur : rien à montrer */ }
+  if (!d) { cadre.hidden = true; return }
+  dossierMontre = d
+  $('ou-captures-chemin').textContent = d.chemin.replace(/\//g, '\\')
+  $('ou-captures-detail').textContent = `${d.dessins} dessins dans capture.json` + (d.images.length ? ` · ${d.images.join(', ')}` : '')
+  cadre.hidden = false
+}
+$('ou-captures-ouvrir').addEventListener('click', () => {
+  if (dossierMontre) montrerLeDossier($('captures-lutins'), dossierMontre.nom, optionsDesDossiers())
+})
+/* Après un changement dans un dossier (renommé…), le cadre suit : son chemin reste juste. */
+function direEtSuivre(texte, bon) { direDansLEtat(texte, bon); montrerOuSontLesCaptures() }
+$('ou-captures-copier').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText($('ou-captures-chemin').textContent)
+    direDansLEtat('Chemin copié : colle-le (Ctrl+V) dans la barre de l’explorateur Windows.', true)
+  } catch { direDansLEtat('Copie refusée par le navigateur : sélectionne le chemin à la main.', false) }
+})
+
+/* « 📁 TOUT PRENDRE » : la planche s'ouvre, et son « Tout ranger » part aussitôt. */
+$('tout-prendre').addEventListener('click', () => {
+  $('capturer-cartouche').click()
+  planche?.toutRanger()
+})
+
+let planche = null
+$('capturer-cartouche').addEventListener('click', () => {
+  if (!romActuelle) { direDansLEtat('Aucune cartouche ne tourne : ouvre un .gb ou un .gbc, ou lance ton programme.', false); return }
+  planche = montrerLaPlanche($('captures-lutins'), { source: 'rom', rom: romActuelle, ajouterUnDessin: ajouterUnDessinCapture, ajouterTout: ajouterToutesLesCaptures, dire: direDansLEtat, ranger: rangerLesCaptures })
+})
+
+let minuteurDuCollecteur = null
+$('capturer-vram').addEventListener('click', () => {
+  if (collecteur) {
+    const tuiles = collecteur.tuiles()
+    for (const [cle, role] of collecteur.roles()) if (role === 'lutin' || !rolesRamasses.has(cle)) rolesRamasses.set(cle, role)
+    collecteur = null
+    rangerLesRoles()
+    clearInterval(minuteurDuCollecteur)
+    $('capturer-vram').textContent = '🧲 Ramasser la mémoire vidéo pendant que je joue'
+    $('capturer-vram').classList.remove('principal')
+    montrerLaPlanche($('captures-lutins'), { source: 'vram', rom: romActuelle, tuilesRamassees: tuiles, ajouterUnDessin: ajouterUnDessinCapture, ajouterTout: ajouterToutesLesCaptures, dire: direDansLEtat, ranger: rangerLesCaptures })
+    return
+  }
+  collecteur = creerUnCollecteur()
+  collecteur.ramasser(gb.ppu)   // ce qui est déjà chargé compte aussi
+  $('capturer-vram').classList.add('principal')
+  const compter = () => { if (collecteur) $('capturer-vram').textContent = `⏹ Arrêter — ${collecteur.combien()} tuiles ramassées` }
+  compter()
+  minuteurDuCollecteur = setInterval(compter, 250)
+})
+
+/*
+ * « 🗺 Enregistrer le niveau » : tout le décor d'un niveau, en panorama
+ * (panorama-decor.js). On clique, on joue le niveau, on reclique. Ensuite :
+ *   - 📁 ranger les niveaux dans le dossier de la cartouche (decors/) ;
+ *   - 💾 les télécharger en PNG ;
+ *   - ➕ mettre un morceau dans « La carte » (une carte fait au plus 32 × 32
+ *     cases : un niveau entier est donc découpé en morceaux).
+ */
+let panorama = null
+let minuteurDuPanorama = null
+
+$('capturer-niveau').addEventListener('click', () => {
+  if (panorama) {
+    const morceaux = panorama.morceaux()
+    panorama = null
+    clearInterval(minuteurDuPanorama)
+    $('capturer-niveau').textContent = '🗺 Enregistrer le niveau (tout le décor)'
+    $('capturer-niveau').classList.remove('principal')
+    montrerLesNiveaux($('captures-lutins'), morceaux)
+    return
+  }
+  if (!romActuelle) { direDansLEtat('Aucune cartouche ne tourne : ouvre un .gb ou un .gbc, ou lance ton programme.', false); return }
+  panorama = creerUnPanorama()
+  $('capturer-niveau').classList.add('principal')
+  const montrer = () => { if (panorama) $('capturer-niveau').textContent = `⏹ Arrêter — niveau en cours : ${panorama.taille()}${panorama.combien() > 1 ? ` · ${panorama.combien()} morceaux` : ''}` }
+  montrer()
+  minuteurDuPanorama = setInterval(montrer, 250)
+  direDansLEtat('Joue le niveau du début à la fin : tout ce que la caméra montre est recopié. Reclique quand tu as fini.', true)
+})
+
+function montrerLesNiveaux(zone, morceaux) {
+  const element = (balise, classe, texte) => { const e = document.createElement(balise); if (classe) e.className = classe; if (texte !== undefined) e.textContent = texte; return e }
+  const bouton = (texte, titre) => { const b = element('button', 'petit', texte); b.type = 'button'; if (titre) b.title = titre; return b }
+  zone.textContent = ''
+  zone.hidden = false
+  zone.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin:8px 0;min-width:0;max-width:100%;overflow:hidden'
+  if (!morceaux.length) {
+    zone.append(element('p', 'aide', 'Rien d’enregistré : il faut jouer au moins un écran de niveau entre les deux clics.'))
+    return
+  }
+  const images = morceaux.map((m) => imagesDuMorceau(m))   // [[{ png, largeur, hauteur }, …], …]
+  const actions = element('div')
+  actions.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px'
+  const ranger = bouton(`📁 Ranger ${morceaux.length > 1 ? `les ${morceaux.length} morceaux` : 'le niveau'} dans le dossier de la cartouche`, 'dans captures/…/decors/ : niveau-1.png, niveau-2.png…')
+  ranger.classList.add('clignote-tout')
+  const telecharger = bouton('💾 Télécharger en PNG')
+  actions.append(ranger, telecharger)
+  zone.append(element('strong', '', `🗺 ${morceaux.length} morceau${morceaux.length > 1 ? 'x' : ''} enregistré${morceaux.length > 1 ? 's' : ''}`),
+    element('span', 'aide', 'Un nouveau morceau commence à chaque porte, tuyau ou changement de décor. Ce que la caméra n’a pas montré est transparent (damier).'), actions)
+
+  morceaux.forEach((m, k) => {
+    const parties = images[k]
+    const largeur = parties.reduce((s, p) => s + p.largeur, 0)
+    const carte = element('div')
+    carte.style.cssText = 'display:flex;flex-direction:column;gap:4px;padding:6px;border:1px solid var(--bord);border-radius:6px;max-width:100%;min-width:0;box-sizing:border-box'
+    const cadre = element('div')
+    cadre.style.cssText = 'overflow-x:auto;max-width:100%;min-width:0;background:repeating-conic-gradient(#ccc 0 25%, #eee 0 50%) 0 0 / 16px 16px'
+    const ligne = element('div')
+    ligne.style.cssText = 'display:flex;width:max-content'
+    for (const p of parties) {
+      const im = element('img')
+      im.src = p.png
+      im.style.cssText = `image-rendering:pixelated;display:block;height:${p.hauteur * 2}px`
+      ligne.append(im)
+    }
+    cadre.append(ligne)
+    // ➕ un morceau dans « La carte »
+    const cartes = cartesDuMorceau(m)
+    const choix = element('select')
+    choix.style.maxWidth = '100%'
+    cartes.forEach((c, i) => choix.append(new Option(`morceau ${i + 1} / ${cartes.length} — ${c.colonnes} × ${c.lignes} cases (à partir de la case ${c.colonne}, ${c.ligne})`, String(i))))
+    const prendre = bouton('➕ Dans « La carte »', 'une carte de l’atelier fait au plus 32 × 32 cases : choisis le morceau du niveau')
+    prendre.addEventListener('click', () => mettreUnMorceauDansLaCarte(cartes[Number(choix.value)], `NIVEAU${k + 1}_${Number(choix.value) + 1}`))
+    const bas = element('div')
+    bas.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;align-items:center'
+    bas.append(choix, prendre)
+    carte.append(element('strong', '', `Morceau ${k + 1} — ${largeur} × ${parties[0].hauteur} pixels (${Math.ceil(largeur / 8)} × ${Math.ceil(parties[0].hauteur / 8)} cases)`), cadre, bas)
+    zone.append(carte)
+  })
+
+  telecharger.addEventListener('click', () => {
+    images.forEach((parties, k) => parties.forEach((p, i) => {
+      const a = document.createElement('a')
+      a.href = p.png
+      a.download = `niveau-${k + 1}${parties.length > 1 ? '-' + (i + 1) : ''}.png`
+      a.click()
+    }))
+  })
+  ranger.addEventListener('click', async () => {
+    try {
+      direDansLEtat('Rangement des niveaux…', true)
+      const r = await rangerDesNiveaux({ rom: romActuelle, niveaux: images.map((parties) => parties.map((p) => p.png)), demanderUnNom })
+      if (!r) return
+      direDansLEtat(`${r.nouveau ? 'Dossier créé' : 'Rangé dans'} « captures/${r.dossier} » : ${r.images.join(', ')}. Onglet « 🗺 Décors » du dossier.`, true)
+      await montrerOuSontLesCaptures()
+    } catch (e) { direDansLEtat('Rangement impossible : ' + e.message, false) }
+  })
+}
+
+/* Un morceau de niveau → une carte du programme (« La carte »), comme « 🧱 Le décor ». */
+async function mettreUnMorceauDansLaCarte(morceau, propose) {
+  const source = $('source').value
+  const pris = new Set([...lireDessins(source).map((d) => d.nom), ...listerLesCartes(source)])
+  const nom = await demanderUnNom({ quoi: 'ce morceau de niveau (une carte)', propose, pris })
+  if (!nom) return
+  const enCouleur = REGLAGES.console !== 'gb'
+  /* Une carte fait au moins un écran (20 × 18 cases) : un bout plus petit est complété de vide. */
+  const colonnes = Math.max(20, morceau.colonnes), lignes = Math.max(18, morceau.lignes)
+  const grille = Array.from({ length: lignes * 8 }, (_, y) => Array.from({ length: colonnes * 8 }, (_, x) => morceau.grille[y]?.[x] ?? 0))
+  const teintes = Array.from({ length: lignes }, (_, l) => Array.from({ length: colonnes }, (_, c) => (enCouleur ? morceau.teintes[l]?.[c] ?? 0 : 0)))
+  poserLeCode(ecrireCarte($('source').value, nom, grille, false, teintes, new Set()), 'programme')
+  atelierCarte.rafraichir()
+  compterLAtelier()
+  if (!romDuDehors) compilerEtLancer()
+  direDansLEtat(`« ${nom} » est dans « La carte » (${morceau.colonnes} × ${morceau.lignes} cases). Pour l’afficher, écris ${nom}(); dans main().`, true)
+}
 
 /*
  * « ➕ Tout dans mes dessins » : un seul nom demandé, la BASE — CAPTURE, par
@@ -5643,7 +5942,11 @@ $('fichier-gbtd').addEventListener('change', async (evenement) => {
  */
 let romDuDehors = false
 
-const montrerLaProvenance = () => { $('dehors').hidden = !romDuDehors }
+const montrerLaProvenance = () => {
+  $('dehors').hidden = !romDuDehors
+  $('tout-prendre').hidden = !romDuDehors   // le bouton clignotant : seulement pour une cartouche ouverte
+  montrerOuSontLesCaptures()                // et son dossier, s'il existe déjà
+}
 
 $('ouvrir-rom').addEventListener('click', () => $('fichier-rom').click())
 
@@ -5674,6 +5977,7 @@ $('fichier-rom').addEventListener('change', async (evenement) => {
  */
 function jouerLaCartouche(octets, nom, autre = '') {
   romActuelle = octets
+  rolesRamasses = new Map()   // les rôles ramassés par 🧲 appartiennent à la cartouche d'avant
   /* Une cartouche venue du dehors est ce qu’elle est : c’est son en-tête qui
      dit si elle veut la couleur — le bit 7 de $0143, comme sur la vraie console
      ($80 et $C0 sont tous deux « Game Boy Color »). */

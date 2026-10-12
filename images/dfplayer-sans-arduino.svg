@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 940" width="1400" height="940">
+  <!--
+    DFPlayer Mini TOUT SEUL, sans Arduino : des piles, un haut-parleur, des boutons.
+    Fabriqué à partir de images/dfplayer-mini.svg (la carte, recopiée à 60 %).
+
+    Les boutons (fiche DFRobot DFR0299 et forum DFRobot) :
+      IO_2 (patte 11) → GND : court = suivante,   long = volume +
+      IO_1 (patte 9)  → GND : court = précédente, long = volume −
+    Version la plus simple, pour tester : UN bouton sur IO_2 (patte 11) → GND. Une impulsion démarre la lecture.
+    ADKEY_1 et ADKEY_2 sont « tirés » à 22 kΩ dans la carte : ne JAMAIS y mettre le +.
+    Survole un fil : son nom s'affiche.
+  -->
+  <defs>
+    <radialGradient id="etain" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.45" stop-color="#c9ccd1"/>
+      <stop offset="1" stop-color="#6d7178"/>
+    </radialGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e3e4e6"/>
+      <stop offset="0.5" stop-color="#b9bbbf"/>
+      <stop offset="1" stop-color="#9a9da2"/>
+    </linearGradient>
+    <linearGradient id="beige" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9d9b8"/>
+      <stop offset="1" stop-color="#b89a6a"/>
+    </linearGradient>
+    <g id="patte">
+      <circle r="21" fill="#1a1a1a"/>
+      <circle r="17" fill="url(#etain)"/>
+      <circle r="5" fill="#8a8d92"/>
+    </g>
+    <g id="condensateur">
+      <rect x="-13" y="-22" width="26" height="44" rx="3" fill="url(#beige)"/>
+      <rect x="-13" y="-22" width="26" height="9" fill="#cfd2d6"/>
+      <rect x="-13" y="13" width="26" height="9" fill="#cfd2d6"/>
+    </g>
+    <g id="resistance">
+      <rect x="-13" y="-22" width="26" height="44" rx="2" fill="#141414"/>
+      <rect x="-13" y="-22" width="26" height="8" fill="#cfd2d6"/>
+      <rect x="-13" y="14" width="26" height="8" fill="#cfd2d6"/>
+    </g>
+  </defs>
+  <rect width="1400" height="940" fill="#ffffff"/>
+  <text x="700" y="52" font-family="Arial, Helvetica, sans-serif" font-size="30" fill="#333" text-anchor="middle" font-weight="bold">DFPlayer Mini — tout seul, sans Arduino</text>
+  <text x="700" y="84" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#555" text-anchor="middle">Le plus simple pour tester : des piles, un haut-parleur, une carte microSD et UN bouton pour démarrer.</text>
+  <rect x="70" y="240" width="270" height="200" rx="10" fill="#2b2b2b" stroke="#111" stroke-width="3"/>
+  <rect x="92" y="262" width="210" height="44" rx="8" fill="#e8a33d" stroke="#555"/>
+  <rect x="302" y="276" width="10" height="16" rx="2" fill="#bbb"/>
+  <text x="197" y="291" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#222" text-anchor="middle" font-weight="bold">AA 1,5 V</text>
+  <rect x="92" y="320" width="210" height="44" rx="8" fill="#c0c4ca" stroke="#555"/>
+  <rect x="302" y="334" width="10" height="16" rx="2" fill="#bbb"/>
+  <text x="197" y="349" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#222" text-anchor="middle" font-weight="bold">AA 1,5 V</text>
+  <rect x="92" y="378" width="210" height="44" rx="8" fill="#e8a33d" stroke="#555"/>
+  <rect x="302" y="392" width="10" height="16" rx="2" fill="#bbb"/>
+  <text x="197" y="407" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#222" text-anchor="middle" font-weight="bold">AA 1,5 V</text>
+  <text x="205" y="472" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#333" text-anchor="middle" font-weight="bold">3 piles AA = 4,5 V</text>
+  <text x="205" y="494" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#666" text-anchor="middle">(ou un câble USB : 5 V)</text>
+  <text x="205" y="514" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#a33" text-anchor="middle">de 3,2 à 5 V, pas plus</text>
+  <circle cx="340" cy="300" r="9" fill="#d62828"/>
+  <text x="326" y="290" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#fff" text-anchor="end" font-weight="bold">+</text>
+  <circle cx="340" cy="400" r="9" fill="#222" stroke="#888"/>
+  <text x="326" y="390" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#fff" text-anchor="end" font-weight="bold">−</text>
+  <g transform="translate(480 140) scale(0.6)">
+
+  <!-- la carte : noire, bord beige (la tranche du circuit), encoche en haut -->
+  <path d="M205 222 H458 A22 22 0 0 0 502 222 H748 V778 H205 Z" fill="#d8cdb4"/>
+  <path d="M212 229 H462 A18 18 0 0 0 498 229 H741 V771 H212 Z" fill="#121212"/>
+
+  <!-- en haut : 3 condensateurs, la DEL, 2 résistances (152, 103), 1 condensateur -->
+  <use href="#condensateur" x="280" y="258"/>
+  <use href="#condensateur" x="335" y="258"/>
+  <use href="#condensateur" x="393" y="258"/>
+  <rect x="440" y="276" width="36" height="16" rx="2" fill="#cfd2d6"/>
+  <rect x="448" y="278" width="20" height="12" rx="2" fill="#f4f1e6"/>
+  <use href="#resistance" x="548" y="258"/>
+  <use href="#resistance" x="603" y="258"/>
+  <use href="#condensateur" x="660" y="258"/>
+  <text x="548" y="258" fill="#f2f2f2" font-family="Arial, Helvetica, sans-serif" font-size="13" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 548 258)">152</text>
+  <text x="603" y="258" fill="#f2f2f2" font-family="Arial, Helvetica, sans-serif" font-size="13" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 603 258)">103</text>
+
+  <!-- l'inscription -->
+  <text x="466" y="333" fill="#f4f4f4" font-family="'Times New Roman', Times, serif" font-size="38" text-anchor="middle" letter-spacing="1">DFPlayer Mini</text>
+
+  <!-- les 8 contacts de la carte microSD, sous l'inscription -->
+  <g fill="#c9ccd1">
+    <rect x="290" y="352" width="13" height="18"/>
+    <rect x="320" y="352" width="13" height="18"/>
+    <rect x="350" y="352" width="13" height="18"/>
+    <rect x="380" y="352" width="13" height="18"/>
+    <rect x="410" y="352" width="13" height="18"/>
+    <rect x="440" y="352" width="13" height="18"/>
+    <rect x="470" y="352" width="13" height="18"/>
+    <rect x="500" y="352" width="13" height="18"/>
+    <rect x="530" y="352" width="13" height="18"/>
+  </g>
+
+  <!-- le lecteur de carte microSD : la boîte de métal -->
+  <rect x="262" y="378" width="418" height="398" rx="6" fill="url(#metal)" stroke="#7d8086" stroke-width="2"/>
+  <rect x="262" y="378" width="418" height="14" fill="#d9dadd"/>
+  <rect x="640" y="372" width="30" height="20" fill="#b0b3b8" stroke="#7d8086"/>
+  <!-- le ressort de gauche -->
+  <rect x="268" y="400" width="26" height="150" fill="#d0d2d5" stroke="#8a8d92"/>
+  <path d="M276 410 L284 420 L278 540" stroke="#7a5a2a" stroke-width="3" fill="none"/>
+  <rect x="273" y="520" width="18" height="28" fill="#2a2a2a"/>
+  <!-- l'interrupteur de détection, en bas à droite -->
+  <rect x="612" y="590" width="58" height="140" fill="#2b2b2b" stroke="#7d8086"/>
+  <path d="M626 600 V700 L640 722" stroke="#d6d8db" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <rect x="650" y="600" width="12" height="40" fill="#d6d8db"/>
+  <!-- l'ouverture, en bas : la carte microSD entre par là -->
+  <rect x="262" y="760" width="418" height="16" fill="#8f9297"/>
+
+  <!-- le petit « 1 » imprimé à droite -->
+  <text x="688" y="634" fill="#f2f2f2" font-family="Arial, Helvetica, sans-serif" font-size="16" transform="rotate(-20 688 634)">1</text>
+
+  <!-- les 16 pattes : 8 à gauche, 8 à droite ; la 1 (VCC) est carrée -->
+  <rect x="210" y="223" width="40" height="40" rx="3" fill="#1a1a1a"/>
+  <rect x="214" y="227" width="32" height="32" rx="3" fill="url(#etain)"/>
+  <circle cx="230" cy="243" r="5" fill="#8a8d92"/>
+  <use href="#patte" x="230" y="320"/>
+  <use href="#patte" x="230" y="384"/>
+  <use href="#patte" x="230" y="455"/>
+  <use href="#patte" x="230" y="521"/>
+  <use href="#patte" x="230" y="595"/>
+  <use href="#patte" x="230" y="663"/>
+  <use href="#patte" x="230" y="735"/>
+  <use href="#patte" x="720" y="243"/>
+  <use href="#patte" x="720" y="312"/>
+  <use href="#patte" x="720" y="378"/>
+  <use href="#patte" x="720" y="445"/>
+  <use href="#patte" x="720" y="519"/>
+  <use href="#patte" x="720" y="593"/>
+  <use href="#patte" x="720" y="660"/>
+  <use href="#patte" x="720" y="728"/>
+
+  </g>
+  <polyline points="340,300 600,300 600,285.79999999999995 618,285.79999999999995" fill="none" stroke="#d62828" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>+ des piles → VCC</title></polyline>
+  <polyline points="340,400 420,400 420,860 1200,860 1200,495.8" fill="none" stroke="#222" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>− des piles → GND (et retour des boutons)</title></polyline>
+  <polyline points="912,536 1200,536" fill="none" stroke="#222" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>GND de la carte</title></polyline>
+  <polyline points="618,497 545,497 545,740 535,740" fill="none" stroke="#1f6feb" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>SPK_1 → haut-parleur</title></polyline>
+  <polyline points="618,581 600,581 600,700" fill="none" stroke="#8e44ad" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>SPK_2 → haut-parleur</title></polyline>
+  <polyline points="912,495.8 1066,495.8" fill="none" stroke="#444" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>IO_2 → bouton</title></polyline>
+  <polyline points="1132,495.8 1200,495.8" fill="none" stroke="#222" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>bouton → GND</title></polyline>
+  <rect x="1066" y="475.8" width="66" height="40" rx="6" fill="#2b2b2b"/>
+  <circle cx="1099" cy="495.8" r="14" fill="#27ae60" stroke="#222" stroke-width="2"/>
+  <text x="1215" y="501.8" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#333" text-anchor="start">▶ démarrer</text>
+  <circle cx="1200" cy="495.8" r="7" fill="#222"/>
+  <circle cx="1200" cy="536" r="7" fill="#222"/>
+  <circle cx="420" cy="860" r="7" fill="#222"/>
+  <circle cx="575" cy="760" r="58" fill="#2b2b2b" stroke="#111" stroke-width="3"/>
+  <circle cx="575" cy="760" r="40" fill="#444"/>
+  <circle cx="575" cy="760" r="14" fill="#666"/>
+  <text x="647" y="754" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#333" text-anchor="start" font-weight="bold">Haut-parleur</text>
+  <text x="647" y="776" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#333" text-anchor="start">8 Ω, 3 W au plus</text>
+  <path d="M720 612 h80 v70 h-80 v-58 l10 -12 z" fill="#1d3557" stroke="#0b1a2e" stroke-width="2"/>
+  <text x="760" y="655" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#fff" text-anchor="middle">micro</text>
+  <text x="760" y="672" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#fff" text-anchor="middle" font-weight="bold">SD</text>
+  <path d="M760 700 v-14 m-8 8 l8 -10 l8 10" stroke="#1d3557" stroke-width="3" fill="none"/>
+  <text x="820" y="640" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#333" text-anchor="start">Carte microSD (FAT32), entre par le bas :</text>
+  <text x="820" y="660" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#1d3557" text-anchor="start" font-weight="bold">les musiques : 0001.mp3, 0002.mp3…</text>
+  <text x="604" y="275.79999999999995" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#d62828" text-anchor="end" font-weight="bold">VCC</text>
+  <text x="604" y="487" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#1f6feb" text-anchor="end" font-weight="bold">SPK_1</text>
+  <text x="596" y="571" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#8e44ad" text-anchor="end" font-weight="bold">SPK_2</text>
+  <text x="924" y="485.8" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#333" text-anchor="start" font-weight="bold">IO_2</text>
+  <text x="924" y="528" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#333" text-anchor="start" font-weight="bold">GND</text>
+  <rect x="60" y="560" width="350" height="206" rx="8" fill="#f6f6f6" stroke="#ccc"/>
+  <text x="76" y="586" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#333" text-anchor="start" font-weight="bold">Mode d’emploi</text>
+  <text x="76" y="612" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start">1. Mets les musiques sur la carte microSD,</text>
+  <text x="76" y="634" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start">    nommées 0001.mp3, 0002.mp3… ;</text>
+  <text x="76" y="656" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start">2. Branche les piles : rien ne joue encore.</text>
+  <text x="76" y="678" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start">3. Une impulsion (appui bref) sur le bouton :</text>
+  <text x="76" y="700" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start">    la 1re musique part, puis elles s’enchaînent.</text>
+  <text x="76" y="722" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start">4. Une autre impulsion : musique suivante.</text>
+  <text x="76" y="744" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start">    (appui long : plus fort)</text>
+  <text x="700" y="905" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#a33" text-anchor="middle">Ne jamais relier le + à IO_2 : le bouton va toujours vers GND.</text>
+</svg>

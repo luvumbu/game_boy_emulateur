@@ -245,6 +245,257 @@ export function creerLeService(racine) {
     },
   }
 
+  /* ===================================================================
+   *  Les CAPTURES d'une cartouche : un dossier par cartouche, sous
+   *  « captures/ » (à côté de « projets/ », pour ne pas se mêler aux jeux).
+   *
+   *    captures/captures_tetris/
+   *      capture.json    { titre, empreinte, octets, dessins: [{ nom, cote, rangees, source, adresse }] }
+   *      tuiles-1.png    toute la cartouche en tuiles (« 🗂 Toute la cartouche »)
+   *      ramasse-1.png   ce que le collecteur a ramassé (« 🧲 »)
+   *
+   *  Mêmes gardes que les projets : un nom « a-z 0-9 _ - », le chemin réel
+   *  revérifié, des fichiers écrits sous des noms que CE service choisit.
+   * =================================================================== */
+  const CAPTURES = join(racine, 'captures')
+  const NOM_DESSIN = /^[A-Z_][A-Z0-9_]{0,39}$/
+  const SORTES_D_IMAGE = ['tuiles', 'ramasse']
+
+  function dossierDesCaptures(nom, doitExister = true) {
+    if (!NOM_PROJET.test(nom)) refuser(`« ${nom} » n’est pas un nom de dossier : des lettres, des chiffres, « _ » et « - », pas plus.`)
+    if (!existsSync(CAPTURES)) mkdirSync(CAPTURES, { recursive: true })
+    const chemin = join(CAPTURES, nom)
+    if (doitExister && !estFichier(join(chemin, 'capture.json'))) refuser(`le dossier de captures « ${nom} » n’existe pas`, 404)
+    if (estDossier(chemin) && !realpathSync(chemin).startsWith(realpathSync(CAPTURES) + sep)) refuser('chemin refusé', 403)
+    return chemin
+  }
+
+  const lireCapture = (dossier) => JSON.parse(readFileSync(join(dossier, 'capture.json'), 'utf8'))
+  const ecrireCapture = (dossier, capture) => {
+    const texte = JSON.stringify(capture, null, 1)
+    if (Buffer.byteLength(texte) > TAILLE_MAX * 4) refuser('trop de dessins dans ce dossier (8 Mo au plus)')
+    writeFileSync(join(dossier, 'capture.json'), texte)
+  }
+  const imagesDe = (dossier) => readdirSync(dossier).filter((f) => /^(tuiles|ramasse)-\d{1,4}\.png$/.test(f))
+    .sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }))
+
+  /** Un dessin venu de la page : vérifié champ par champ, rien d'autre n'est gardé. */
+  function dessinPropre(d) {
+    if (!d || typeof d !== 'object') refuser('un dessin illisible')
+    const nom = String(d.nom ?? '')
+    if (!NOM_DESSIN.test(nom)) refuser(`« ${nom} » n’est pas un nom de dessin : MAJUSCULES, chiffres et « _ »`)
+    const cote = Number(d.cote)
+    if (![8, 16, 32].includes(cote)) refuser(`« ${nom} » : la taille doit être 8, 16 ou 32`)
+    const motif = new RegExp(`^[0-3]{${cote}}$`)
+    if (!Array.isArray(d.rangees) || d.rangees.length !== cote || !d.rangees.every((r) => motif.test(r))) refuser(`« ${nom} » : ses pixels ne font pas ${cote} × ${cote}`)
+    const propre = { nom, cote, rangees: d.rangees.map(String) }
+    if (typeof d.source === 'string') propre.source = d.source.slice(0, 20)
+    if (Number.isInteger(d.adresse)) propre.adresse = d.adresse
+    return propre
+  }
+
+  /** Les dessins ajoutés à ceux du dossier : les pareils ne comptent qu'une fois, un nom pris reçoit un numéro. */
+  function fusionner(anciens, nouveaux) {
+    const pixels = new Set(anciens.map((d) => d.rangees.join('|')))
+    const noms = new Set(anciens.map((d) => d.nom))
+    let ajoutes = 0
+    for (const d of nouveaux.map(dessinPropre)) {
+      if (pixels.has(d.rangees.join('|'))) continue
+      let nom = d.nom
+      for (let n = 2; noms.has(nom); n++) nom = d.nom.slice(0, 40 - String(n).length - 1) + '_' + n
+      pixels.add(d.rangees.join('|'))
+      noms.add(nom)
+      anciens.push({ ...d, nom })
+      ajoutes++
+    }
+    return ajoutes
+  }
+
+  Object.assign(DEMANDES, {
+    'captures-liste'() {
+      if (!existsSync(CAPTURES)) return { captures: [], dossier: barres(CAPTURES) }
+      const captures = []
+      for (const entree of readdirSync(CAPTURES)) {
+        const dossier = join(CAPTURES, entree)
+        if (!NOM_PROJET.test(entree) || !estFichier(join(dossier, 'capture.json'))) continue
+        try {
+          const c = lireCapture(dossier)
+          captures.push({ nom: entree, titre: c.titre ?? '', empreinte: c.empreinte ?? '', dessins: (c.dessins ?? []).length, images: imagesDe(dossier), change: Math.floor(statSync(join(dossier, 'capture.json')).mtimeMs / 1000) })
+        } catch { /* un capture.json abîmé : on le saute */ }
+      }
+      captures.sort((a, b) => b.change - a.change)
+      return { captures, dossier: barres(realpathSync(CAPTURES)) }
+    },
+
+    'captures-ouvrir'(nom) {
+      const dossier = dossierDesCaptures(nom)
+      const lireSiLa = (fichier, defaut) => { try { return JSON.parse(readFileSync(join(dossier, fichier), 'utf8')) } catch { return defaut } }
+      return {
+        nom, capture: lireCapture(dossier), images: imagesDe(dossier), dossier: barres(realpathSync(dossier)),
+        rangement: lireSiLa('rangement.json', null),   // organiser-cartouche.js : banques, paquets, rôles
+        roles: lireSiLa('roles.json', {}),             // clé d'une tuile → 'lutin' | 'decor' (ramassé par 🧲)
+        decors: estDossier(join(dossier, 'decors'))    // les niveaux enregistrés (🗺)
+          ? readdirSync(join(dossier, 'decors')).filter((f) => /^niveau-\d{1,3}(-\d{1,2})?\.png$/.test(f)).sort((a, b) => a.localeCompare(b, 'fr', { numeric: true }))
+          : [],
+      }
+    },
+
+    /*
+     * Un niveau enregistré (🗺, panorama-decor.js) : decors/niveau-N.png.
+     * Le service choisit N (le premier libre). Un très long niveau vient en
+     * plusieurs parties : la première reçoit N, les suivantes renvoient
+     * « numero » et « partie » → niveau-N-2.png, niveau-N-3.png…
+     */
+    'captures-decor'(nom, donnees) {
+      const dossier = dossierDesCaptures(nom)
+      const png = String(donnees.png ?? '').match(/^data:image\/png;base64,([A-Za-z0-9+/=]+)$/)
+      if (!png) refuser('l’image doit être un PNG')
+      const octets = Buffer.from(png[1], 'base64')
+      const ENTETE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+      if (octets.length > TAILLE_MAX || !octets.subarray(0, 8).equals(ENTETE)) refuser('ce n’est pas un PNG (ou il fait plus de 2 Mo)')
+      const ou = join(dossier, 'decors')
+      mkdirSync(ou, { recursive: true })
+      const partie = Number.isInteger(donnees.partie) && donnees.partie >= 1 && donnees.partie < 100 ? donnees.partie : 0
+      let numero = Number.isInteger(donnees.numero) && donnees.numero >= 1 && donnees.numero < 1000 ? donnees.numero : 0
+      if (!numero) { numero = 1; while (estFichier(join(ou, `niveau-${numero}.png`))) numero++ }
+      const image = partie ? `niveau-${numero}-${partie + 1}.png` : `niveau-${numero}.png`
+      writeFileSync(join(ou, image), octets)
+      return { nom, numero, image: `decors/${image}` }
+    },
+
+    /* Les rôles ramassés par 🧲 (personnage ou décor), ajoutés à ceux du dossier.
+       « lutin » l'emporte sur « decor ». */
+    'captures-roles'(nom, donnees) {
+      const dossier = dossierDesCaptures(nom)
+      const nouveaux = donnees.roles
+      if (!nouveaux || typeof nouveaux !== 'object') refuser('pas de rôles')
+      let roles = {}
+      try { roles = JSON.parse(readFileSync(join(dossier, 'roles.json'), 'utf8')) } catch { /* pas encore de rôles */ }
+      let ajoutes = 0
+      for (const [cle, role] of Object.entries(nouveaux)) {
+        if (!/^[0-9a-f]{32}$/.test(cle) || !['lutin', 'decor'].includes(role)) continue
+        if (roles[cle] === role || roles[cle] === 'lutin') continue
+        roles[cle] = role
+        ajoutes++
+      }
+      const texte = JSON.stringify(roles)
+      if (Buffer.byteLength(texte) > TAILLE_MAX * 4) refuser('trop de rôles (8 Mo au plus)')
+      writeFileSync(join(dossier, 'roles.json'), texte)
+      return { nom, ajoutes, roles: Object.keys(roles).length }
+    },
+
+    /*
+     * Le rangement (organiser-cartouche.js) : rangement.json, et les images
+     * dans quatre sous-dossiers fixes. « debut » : on vide d'abord ces
+     * sous-dossiers de leurs PNG — ils sont REFAITS à chaque rangement (un
+     * paquet passé de « pas encore vu » à « personnages » ne doit pas rester
+     * aux deux endroits). On n'efface rien d'autre : capture.json, roles.json
+     * et les images du dossier restent.
+     */
+    'captures-organiser'(nom, donnees) {
+      const dossier = dossierDesCaptures(nom)
+      const SOUS_DOSSIERS = ['banques', 'personnages', 'decor', 'pas-encore-vu']
+      if (donnees.debut) {
+        for (const sous of SOUS_DOSSIERS) {
+          const ou = join(dossier, sous)
+          if (!estDossier(ou)) continue
+          for (const f of readdirSync(ou)) if (/^[a-z0-9_-]{1,60}\.png$/.test(f)) { try { unlinkSync(join(ou, f)) } catch { /* tant pis */ } }
+        }
+      }
+      if (donnees.rangement !== undefined) {
+        if (!donnees.rangement || typeof donnees.rangement !== 'object') refuser('rangement illisible')
+        const texte = JSON.stringify(donnees.rangement, null, 1)
+        if (Buffer.byteLength(texte) > TAILLE_MAX * 4) refuser('rangement trop gros')
+        writeFileSync(join(dossier, 'rangement.json'), texte)
+      }
+      const ENTETE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+      let ecrites = 0
+      for (const image of Array.isArray(donnees.images) ? donnees.images : []) {
+        const bouts = String(image?.chemin ?? '').match(/^(banques|personnages|decor|pas-encore-vu)\/([a-z0-9_-]{1,60}\.png)$/)
+        if (!bouts) refuser(`« ${image?.chemin} » n’est pas un chemin d’image du rangement`)
+        const png = String(image.png ?? '').match(/^data:image\/png;base64,([A-Za-z0-9+/=]+)$/)
+        if (!png) refuser('l’image doit être un PNG')
+        const octets = Buffer.from(png[1], 'base64')
+        if (octets.length > TAILLE_MAX || !octets.subarray(0, 8).equals(ENTETE)) refuser('ce n’est pas un PNG (ou il fait plus de 2 Mo)')
+        mkdirSync(join(dossier, bouts[1]), { recursive: true })
+        writeFileSync(join(dossier, bouts[1], bouts[2]), octets)
+        ecrites++
+      }
+      return { nom, ecrites }
+    },
+
+    /* Jamais d'écrasement : un nom pris reçoit un numéro, comme les projets. */
+    'captures-creer'(nom, donnees) {
+      const propre = nomPropre(nom)
+      if (!propre) refuser('il faut un nom : des lettres, des chiffres, « _ » ou « - »')
+      dossierDesCaptures(propre, false)
+      let libre = propre
+      for (let n = 2; estDossier(join(CAPTURES, libre)) && n < 1000; n++) libre = propre.slice(0, 40 - String(n).length) + n
+      const dossier = dossierDesCaptures(libre, false)
+      mkdirSync(dossier, { recursive: true })
+      ecrireCapture(dossier, {
+        titre: String(donnees.titre ?? '').slice(0, 40),
+        empreinte: String(donnees.empreinte ?? '').replace(/[^0-9a-f]/g, '').slice(0, 16),
+        octets: Number.isInteger(donnees.octets) ? donnees.octets : 0,
+        dessins: [],
+      })
+      return { nom: libre, dossier: barres(realpathSync(dossier)) }
+    },
+
+    'captures-ajouter'(nom, donnees) {
+      const dossier = dossierDesCaptures(nom)
+      if (!Array.isArray(donnees.dessins)) refuser('rien à ajouter')
+      const capture = lireCapture(dossier)
+      capture.dessins = Array.isArray(capture.dessins) ? capture.dessins : []
+      const ajoutes = fusionner(capture.dessins, donnees.dessins)
+      ecrireCapture(dossier, capture)
+      return { nom, ajoutes, dessins: capture.dessins.length }
+    },
+
+    /* Les dessins modifiés dans la page (renommés, ôtés) : la liste entière remplace l'ancienne. */
+    'captures-modifier'(nom, donnees) {
+      const dossier = dossierDesCaptures(nom)
+      if (!Array.isArray(donnees.dessins)) refuser('rien à enregistrer')
+      const dessins = donnees.dessins.map(dessinPropre)
+      const noms = new Set(dessins.map((d) => d.nom))
+      if (noms.size !== dessins.length) refuser('deux dessins portent le même nom')
+      const capture = lireCapture(dossier)
+      capture.dessins = dessins
+      ecrireCapture(dossier, capture)
+      return { nom, dessins: dessins.length }
+    },
+
+    /* Une image de plus : « tuiles-3.png » si 1 et 2 existent. Le service choisit le nom. */
+    'captures-image'(nom, donnees) {
+      const dossier = dossierDesCaptures(nom)
+      const sorte = String(donnees.sorte ?? '')
+      if (!SORTES_D_IMAGE.includes(sorte)) refuser('sorte d’image inconnue : tuiles ou ramasse')
+      const bouts = String(donnees.png ?? '').match(/^data:image\/png;base64,([A-Za-z0-9+/=]+)$/)
+      if (!bouts) refuser('l’image doit être un PNG')
+      const octets = Buffer.from(bouts[1], 'base64')
+      const ENTETE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+      if (octets.length > TAILLE_MAX || !octets.subarray(0, 8).equals(ENTETE)) refuser('ce n’est pas un PNG (ou il fait plus de 2 Mo)')
+      /* La même image déjà là (on a rangé deux fois sans rien changer) : on ne la double pas. */
+      const pareille = imagesDe(dossier).find((im) => im.startsWith(sorte + '-') && readFileSync(join(dossier, im)).equals(octets))
+      if (pareille) return { nom, image: pareille, deja: true }
+      let n = 1
+      while (estFichier(join(dossier, `${sorte}-${n}.png`))) n++
+      writeFileSync(join(dossier, `${sorte}-${n}.png`), octets)
+      return { nom, image: `${sorte}-${n}.png` }
+    },
+
+    'captures-renommer'(nom, donnees) {
+      const dossier = dossierDesCaptures(nom)
+      const vers = nomPropre(donnees.vers ?? '')
+      if (!vers) refuser('il faut un nouveau nom')
+      if (vers === nom) return { nom }
+      const ailleurs = dossierDesCaptures(vers, false)
+      if (estDossier(ailleurs)) refuser(`« ${vers} » existe déjà`)
+      try { renameSync(dossier, ailleurs) } catch { refuser('le dossier n’a pas pu être renommé', 500) }
+      return { nom: vers }
+    },
+  })
+
   /** Répond à une requête « /projets.php?quoi=… ». */
   return async function servir(requete, reponse) {
     const repondre = (quoi, code = 200) => {
@@ -259,7 +510,7 @@ export function creerLeService(racine) {
       let brut = ''
       for await (const morceau of requete) {
         brut += morceau
-        if (brut.length > TAILLE_MAX * 2) refuser('requête trop grosse', 413)
+        if (brut.length > TAILLE_MAX * 5) refuser('requête trop grosse', 413)   // 10 Mo : la liste des dessins capturés peut être longue
       }
       let donnees = {}
       try { donnees = brut ? JSON.parse(brut) : {} } catch { donnees = {} }
@@ -267,7 +518,7 @@ export function creerLeService(racine) {
       const nom = String(adresse.searchParams.get('projet') ?? donnees.projet ?? '')
 
       const faire = DEMANDES[quoi]
-      if (!faire) refuser(`« ${quoi} » n’est pas une demande connue : liste, ouvrir, creer, enregistrer, capture, cartouche, renommer, supprimer`, 404)
+      if (!faire) refuser(`« ${quoi} » n’est pas une demande connue : liste, ouvrir, creer, enregistrer, capture, cartouche, renommer, supprimer, captures-liste, captures-ouvrir, captures-creer, captures-ajouter, captures-modifier, captures-image, captures-renommer, captures-roles, captures-organiser, captures-decor`, 404)
       repondre(faire(nom, donnees))
     } catch (erreur) {
       if (erreur instanceof Refus) repondre({ erreur: erreur.message }, erreur.code)

@@ -1473,6 +1473,16 @@ var Ppu = class {
   windowLine = 0;
   /** Palette index (pre-BGP) of each pixel on the current line, for sprite priority. */
   lineColours = new Uint8Array(SCREEN_WIDTH);
+  /*
+   * Le FOND SEUL, pour « 🗺 Enregistrer le niveau » (panorama-decor.js) : pour
+   * chaque pixel, ce que le fond y a peint — 128 | palette << 2 | teinte —,
+   * ou 0 là où il n'y a pas de fond (panneau par-dessus, fond éteint). Et le
+   * défilement de CHAQUE ligne : un jeu qui change SCX/SCY au milieu de
+   * l'image (une barre de score) se reconnaît ainsi. Rien d'autre ne s'en sert.
+   */
+  fondSeul = new Uint8Array(SCREEN_WIDTH * SCREEN_HEIGHT);
+  scxDeLaLigne = new Uint8Array(SCREEN_HEIGHT);
+  scyDeLaLigne = new Uint8Array(SCREEN_HEIGHT);
   /** Le bit de priorité de l'attribut, case par case — mode couleur seulement. */
   linePriorite = new Uint8Array(SCREEN_WIDTH);
   reset() {
@@ -1696,6 +1706,7 @@ var Ppu = class {
       );
       this.lineColours.fill(0);
       this.linePriorite.fill(0);
+      this.fondSeul.fill(0, rowStart, rowStart + SCREEN_WIDTH);
     } else {
       this.renderBackground(line, rowStart);
       if ((this.lcdc & LCDC_WINDOW_ENABLE) !== 0) this.renderWindow(line, rowStart);
@@ -1712,6 +1723,8 @@ var Ppu = class {
     const y = line + this.scy & 255;
     const tileRow = y >> 3;
     const pixelRow = y & 7;
+    this.scxDeLaLigne[line] = this.scx;
+    this.scyDeLaLigne[line] = this.scy;
     for (let x = 0; x < SCREEN_WIDTH; x++) {
       const mapX = x + this.scx & 255;
       const ouCarte = mapBase + tileRow * 32 + (mapX >> 3);
@@ -1719,6 +1732,7 @@ var Ppu = class {
       /* L'attribut vit à la MÊME adresse, dans la seconde banque. */
       const attribut = this.couleur ? this.vram[8192 + ouCarte] : 0;
       const colour = this.tilePixelCgb(tileIndex, pixelRow, mapX & 7, attribut);
+      this.fondSeul[rowStart + x] = 128 | (attribut & 7) << 2 | colour;
       this.lineColours[x] = colour;
       this.linePriorite[x] = attribut >> 7 & 1;
       this.peindreFond(rowStart + x, colour, attribut);
@@ -1773,6 +1787,7 @@ var Ppu = class {
       const tileIndex = this.vram[ouCarte];
       const attribut = this.couleur ? this.vram[8192 + ouCarte] : 0;
       const colour = this.tilePixelCgb(tileIndex, pixelRow, windowX & 7, attribut);
+      this.fondSeul[rowStart + x] = 0;   // le panneau cache le fond : ce pixel n'est pas du décor
       this.lineColours[x] = colour;
       this.linePriorite[x] = attribut >> 7 & 1;
       this.peindreFond(rowStart + x, colour, attribut);

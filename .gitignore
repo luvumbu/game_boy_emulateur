@@ -8,3 +8,6 @@ cartouches/
 /1
 
 node_modules/
+
+# Dessins pris dans des cartouches du commerce : ne pas publier
+captures/

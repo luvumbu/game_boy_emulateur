@@ -1004,6 +1004,7 @@ Après les 26 chapitres du parcours, **📚 APPRENDRE** a deux séries à part, 
 | `exemples/echecs.cpp` | **Échecs** : les six pièces et leurs règles, chemin libre, pion de deux cases, promotion, « ÉCHEC » affiché ; on gagne en prenant le roi | 567 | 32768 o |
 | `exemples/cartes.cpp` | **Couleurs**, un jeu de cartes dans le style du UNO, contre la console : passe, inverse, +2, joker (images de la série 3), dos de carte = le cadeau | 838 | 32768 o |
 | `exemples/herisson.cpp` | **Flash le hérisson**, un jeu de plateformes rapide : l’élan, le saut en boule, les anneaux, les ressorts, les pics, trois coccinelles, trois vies, un niveau de 160 colonnes qui défile ; le moteur de Mario | 841 | 32768 o |
+| `exemples/bulles.cpp` | **Les Bulles gloutonnes**, dans le style d’agar.io, en couleur (Game Boy Color) : un monde de 3000 × 3000 pixels, une caméra qui suit ta bulle, la carte de tout le monde sur SELECT, sept IA de sept couleurs (peureuse, gourmande, chasseuse) ; on se mange avec un quart de masse en plus ; dix tailles faites de cinq ronds de 8 × 8 agrandis par `spriteTaille()` ; plus gros = plus lent | 1 187 | 32768 o |
 | `exemples/invaders.cpp` | **Space Invaders entier, en couleur** : 5 × 7 envahisseurs, abris, bombes, soucoupe, 3 vies, record gardé dans la cartouche | 1 200 | 8 455 o |
 | `exemples/calcul.cpp` | **Mario Calcul (démo)** : trois portes « ? » barrent la route, chacune s'ouvre en trouvant le résultat d'une addition ou d'une soustraction | 360 | 2 491 o |
 

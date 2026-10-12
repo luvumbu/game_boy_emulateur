@@ -1,0 +1,212 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 940" width="1400" height="940">
+  <!--
+    DFPlayer Mini : le branchement complet avec un Arduino Uno.
+    Fabriqué à partir de images/dfplayer-mini.svg (la carte, recopiée à 60 %).
+    Le programme qui va avec : materiel/dfplayer_mini/dfplayer_mini.ino.
+    Survole un fil : son nom s'affiche.
+  -->
+  <defs>
+    <radialGradient id="etain" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.45" stop-color="#c9ccd1"/>
+      <stop offset="1" stop-color="#6d7178"/>
+    </radialGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e3e4e6"/>
+      <stop offset="0.5" stop-color="#b9bbbf"/>
+      <stop offset="1" stop-color="#9a9da2"/>
+    </linearGradient>
+    <linearGradient id="beige" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9d9b8"/>
+      <stop offset="1" stop-color="#b89a6a"/>
+    </linearGradient>
+    <g id="patte">
+      <circle r="21" fill="#1a1a1a"/>
+      <circle r="17" fill="url(#etain)"/>
+      <circle r="5" fill="#8a8d92"/>
+    </g>
+    <g id="condensateur">
+      <rect x="-13" y="-22" width="26" height="44" rx="3" fill="url(#beige)"/>
+      <rect x="-13" y="-22" width="26" height="9" fill="#cfd2d6"/>
+      <rect x="-13" y="13" width="26" height="9" fill="#cfd2d6"/>
+    </g>
+    <g id="resistance">
+      <rect x="-13" y="-22" width="26" height="44" rx="2" fill="#141414"/>
+      <rect x="-13" y="-22" width="26" height="8" fill="#cfd2d6"/>
+      <rect x="-13" y="14" width="26" height="8" fill="#cfd2d6"/>
+    </g>
+  </defs>
+  <rect width="1400" height="940" fill="#ffffff"/>
+  <text x="700" y="52" font-family="Arial, Helvetica, sans-serif" font-size="30" fill="#333" text-anchor="middle" font-weight="bold">DFPlayer Mini — le branchement avec un Arduino</text>
+  <text x="700" y="84" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#555" text-anchor="middle">Obligatoire : 5V, GND, RX (avec 1 kΩ), TX, le haut-parleur, la carte microSD.  En option : la DEL et les deux boutons.</text>
+  <rect x="60" y="200" width="330" height="470" rx="14" fill="#0f5e8c" stroke="#0a3f5e" stroke-width="3"/>
+  <rect x="42" y="240" width="70" height="60" rx="4" fill="#c9ccd1" stroke="#777"/>
+  <text x="78" y="328" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#dbe9f5" text-anchor="start">USB</text>
+  <rect x="50" y="540" width="60" height="70" rx="4" fill="#222"/>
+  <rect x="180" y="390" width="120" height="120" rx="6" fill="#1b1b1b"/>
+  <text x="240" y="455" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#aaa" text-anchor="middle">ATmega328P</text>
+  <text x="210" y="260" font-family="Arial, Helvetica, sans-serif" font-size="30" fill="#ffffff" text-anchor="middle" font-weight="bold">ARDUINO</text>
+  <text x="210" y="292" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#ffffff" text-anchor="middle">UNO</text>
+  <rect x="356" y="270" width="26" height="360" rx="3" fill="#1b1b1b"/>
+  <rect x="360" y="291" width="18" height="18" fill="#c9a227"/>
+  <text x="348" y="306" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#ffffff" text-anchor="end" font-weight="bold">5V</text>
+  <rect x="360" y="371" width="18" height="18" fill="#c9a227"/>
+  <text x="348" y="386" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#ffffff" text-anchor="end" font-weight="bold">D11</text>
+  <rect x="360" y="431" width="18" height="18" fill="#c9a227"/>
+  <text x="348" y="446" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#ffffff" text-anchor="end" font-weight="bold">D10</text>
+  <rect x="360" y="511" width="18" height="18" fill="#c9a227"/>
+  <text x="348" y="526" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#ffffff" text-anchor="end" font-weight="bold">GND</text>
+  <g transform="translate(480 140) scale(0.6)">
+
+  <!-- la carte : noire, bord beige (la tranche du circuit), encoche en haut -->
+  <path d="M205 222 H458 A22 22 0 0 0 502 222 H748 V778 H205 Z" fill="#d8cdb4"/>
+  <path d="M212 229 H462 A18 18 0 0 0 498 229 H741 V771 H212 Z" fill="#121212"/>
+
+  <!-- en haut : 3 condensateurs, la DEL, 2 résistances (152, 103), 1 condensateur -->
+  <use href="#condensateur" x="280" y="258"/>
+  <use href="#condensateur" x="335" y="258"/>
+  <use href="#condensateur" x="393" y="258"/>
+  <rect x="440" y="276" width="36" height="16" rx="2" fill="#cfd2d6"/>
+  <rect x="448" y="278" width="20" height="12" rx="2" fill="#f4f1e6"/>
+  <use href="#resistance" x="548" y="258"/>
+  <use href="#resistance" x="603" y="258"/>
+  <use href="#condensateur" x="660" y="258"/>
+  <text x="548" y="258" fill="#f2f2f2" font-family="Arial, Helvetica, sans-serif" font-size="13" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 548 258)">152</text>
+  <text x="603" y="258" fill="#f2f2f2" font-family="Arial, Helvetica, sans-serif" font-size="13" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 603 258)">103</text>
+
+  <!-- l'inscription -->
+  <text x="466" y="333" fill="#f4f4f4" font-family="'Times New Roman', Times, serif" font-size="38" text-anchor="middle" letter-spacing="1">DFPlayer Mini</text>
+
+  <!-- les 8 contacts de la carte microSD, sous l'inscription -->
+  <g fill="#c9ccd1">
+    <rect x="290" y="352" width="13" height="18"/>
+    <rect x="320" y="352" width="13" height="18"/>
+    <rect x="350" y="352" width="13" height="18"/>
+    <rect x="380" y="352" width="13" height="18"/>
+    <rect x="410" y="352" width="13" height="18"/>
+    <rect x="440" y="352" width="13" height="18"/>
+    <rect x="470" y="352" width="13" height="18"/>
+    <rect x="500" y="352" width="13" height="18"/>
+    <rect x="530" y="352" width="13" height="18"/>
+  </g>
+
+  <!-- le lecteur de carte microSD : la boîte de métal -->
+  <rect x="262" y="378" width="418" height="398" rx="6" fill="url(#metal)" stroke="#7d8086" stroke-width="2"/>
+  <rect x="262" y="378" width="418" height="14" fill="#d9dadd"/>
+  <rect x="640" y="372" width="30" height="20" fill="#b0b3b8" stroke="#7d8086"/>
+  <!-- le ressort de gauche -->
+  <rect x="268" y="400" width="26" height="150" fill="#d0d2d5" stroke="#8a8d92"/>
+  <path d="M276 410 L284 420 L278 540" stroke="#7a5a2a" stroke-width="3" fill="none"/>
+  <rect x="273" y="520" width="18" height="28" fill="#2a2a2a"/>
+  <!-- l'interrupteur de détection, en bas à droite -->
+  <rect x="612" y="590" width="58" height="140" fill="#2b2b2b" stroke="#7d8086"/>
+  <path d="M626 600 V700 L640 722" stroke="#d6d8db" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <rect x="650" y="600" width="12" height="40" fill="#d6d8db"/>
+  <!-- l'ouverture, en bas : la carte microSD entre par là -->
+  <rect x="262" y="760" width="418" height="16" fill="#8f9297"/>
+
+  <!-- le petit « 1 » imprimé à droite -->
+  <text x="688" y="634" fill="#f2f2f2" font-family="Arial, Helvetica, sans-serif" font-size="16" transform="rotate(-20 688 634)">1</text>
+
+  <!-- les 16 pattes : 8 à gauche, 8 à droite ; la 1 (VCC) est carrée -->
+  <rect x="210" y="223" width="40" height="40" rx="3" fill="#1a1a1a"/>
+  <rect x="214" y="227" width="32" height="32" rx="3" fill="url(#etain)"/>
+  <circle cx="230" cy="243" r="5" fill="#8a8d92"/>
+  <use href="#patte" x="230" y="320"/>
+  <use href="#patte" x="230" y="384"/>
+  <use href="#patte" x="230" y="455"/>
+  <use href="#patte" x="230" y="521"/>
+  <use href="#patte" x="230" y="595"/>
+  <use href="#patte" x="230" y="663"/>
+  <use href="#patte" x="230" y="735"/>
+  <use href="#patte" x="720" y="243"/>
+  <use href="#patte" x="720" y="312"/>
+  <use href="#patte" x="720" y="378"/>
+  <use href="#patte" x="720" y="445"/>
+  <use href="#patte" x="720" y="519"/>
+  <use href="#patte" x="720" y="593"/>
+  <use href="#patte" x="720" y="660"/>
+  <use href="#patte" x="720" y="728"/>
+
+  </g>
+  <polyline points="369,300 600,300 600,285.79999999999995 618,285.79999999999995" fill="none" stroke="#d62828" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>5V → VCC</title></polyline>
+  <polyline points="450,300 450,160 1200,160" fill="none" stroke="#d62828" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>5V vers la DEL</title></polyline>
+  <polyline points="369,380 430,380" fill="none" stroke="#e6a700" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>D11 → 1 kΩ</title></polyline>
+  <polyline points="500,380 560,380 560,332 618,332" fill="none" stroke="#e6a700" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>1 kΩ → RX</title></polyline>
+  <polyline points="618,370.4 580,370.4 580,440 369,440" fill="none" stroke="#2a9d4b" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>TX → D10</title></polyline>
+  <polyline points="369,520 420,520 420,860 1200,860 1200,536 912,536" fill="none" stroke="#222" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>GND</title></polyline>
+  <polyline points="618,497 545,497 545,740 535,740" fill="none" stroke="#1f6feb" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>SPK_1 → haut-parleur</title></polyline>
+  <polyline points="618,581 600,581 600,700" fill="none" stroke="#8e44ad" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>SPK_2 → haut-parleur</title></polyline>
+  <polyline points="1200,160 1200,200" fill="none" stroke="#d62828" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>5V → 220 Ω</title></polyline>
+  <polyline points="1200,260 1200,285.79999999999995 1150,285.79999999999995" fill="none" stroke="#d62828" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>220 Ω → DEL</title></polyline>
+  <polyline points="1090,285.79999999999995 912,285.79999999999995" fill="none" stroke="#ff8c00" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>DEL → BUSY</title></polyline>
+  <polyline points="912,495.8 1060,495.8" fill="none" stroke="#444" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>IO_2 → bouton</title></polyline>
+  <polyline points="1130,495.8 1200,495.8" fill="none" stroke="#222" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>bouton → GND</title></polyline>
+  <polyline points="912,576.8 1060,576.8" fill="none" stroke="#444" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>IO_1 → bouton</title></polyline>
+  <polyline points="1130,576.8 1200,576.8" fill="none" stroke="#222" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><title>bouton → GND</title></polyline>
+  <rect x="430" y="368" width="70" height="24" rx="4" fill="#e9d9b8" stroke="#7a5a2a" stroke-width="2"/>
+  <rect x="444.5" y="368" width="6" height="24" fill="#8b4513"/>
+  <rect x="462" y="368" width="6" height="24" fill="#111"/>
+  <rect x="479.5" y="368" width="6" height="24" fill="#d62828"/>
+  <text x="465" y="358" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#333" text-anchor="middle" font-weight="bold">1 kΩ</text>
+  <text x="465" y="420" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#777" text-anchor="middle">évite le grésillement</text>
+  <rect x="1188" y="200" width="24" height="60" rx="4" fill="#e9d9b8" stroke="#7a5a2a" stroke-width="2"/>
+  <rect x="1188" y="212" width="24" height="6" fill="#8b4513"/>
+  <rect x="1188" y="227" width="24" height="6" fill="#111"/>
+  <rect x="1188" y="242" width="24" height="6" fill="#d62828"/>
+  <text x="1220" y="236" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#333" text-anchor="start" font-weight="bold">220 Ω</text>
+  <path d="M1096 269.79999999999995 h40 a20 20 0 0 1 0 32 h-40 z" fill="#ffb347" stroke="#b36200" stroke-width="2"/>
+  <rect x="1090" y="267.79999999999995" width="6" height="36" fill="#d17a00"/>
+  <path d="M1116 277.79999999999995 l12 8 l-12 8 z" fill="#b36200"/>
+  <line x1="1128" y1="277.79999999999995" x2="1128" y2="293.79999999999995" stroke="#b36200" stroke-width="3"/>
+  <text x="1100" y="329.79999999999995" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start">DEL : allumée pendant la lecture</text>
+  <text x="1100" y="347.79999999999995" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#888" text-anchor="start">(option)</text>
+  <rect x="1060" y="473.8" width="70" height="44" rx="6" fill="#2b2b2b"/>
+  <circle cx="1095" cy="495.8" r="15" fill="#c0392b" stroke="#7b241c" stroke-width="2"/>
+  <text x="1215" y="501.8" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#333" text-anchor="start">suivante / volume +</text>
+  <rect x="1060" y="554.8" width="70" height="44" rx="6" fill="#2b2b2b"/>
+  <circle cx="1095" cy="576.8" r="15" fill="#c0392b" stroke="#7b241c" stroke-width="2"/>
+  <text x="1215" y="582.8" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#333" text-anchor="start">précédente / volume −</text>
+  <text x="1215" y="602.8" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#888" text-anchor="start">boutons (option) : court = piste,</text>
+  <text x="1215" y="618.8" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#888" text-anchor="start">long = volume</text>
+  <circle cx="450" cy="300" r="7" fill="#d62828"/>
+  <circle cx="1200" cy="160" r="7" fill="#d62828"/>
+  <circle cx="1200" cy="495.8" r="7" fill="#222"/>
+  <circle cx="1200" cy="576.8" r="7" fill="#222"/>
+  <circle cx="1200" cy="536" r="7" fill="#222"/>
+  <circle cx="420" cy="860" r="7" fill="#222"/>
+  <circle cx="575" cy="760" r="58" fill="#2b2b2b" stroke="#111" stroke-width="3"/>
+  <circle cx="575" cy="760" r="40" fill="#444"/>
+  <circle cx="575" cy="760" r="14" fill="#666"/>
+  <text x="647" y="754" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#333" text-anchor="start" font-weight="bold">Haut-parleur</text>
+  <text x="647" y="776" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#333" text-anchor="start">8 Ω, 3 W au plus</text>
+  <path d="M720 612 h80 v70 h-80 v-58 l10 -12 z" fill="#1d3557" stroke="#0b1a2e" stroke-width="2"/>
+  <text x="760" y="655" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#fff" text-anchor="middle">micro</text>
+  <text x="760" y="672" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#fff" text-anchor="middle" font-weight="bold">SD</text>
+  <path d="M760 700 v-14 m-8 8 l8 -10 l8 10" stroke="#1d3557" stroke-width="3" fill="none"/>
+  <text x="820" y="640" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#333" text-anchor="start">Carte microSD (FAT32), entre par le bas :</text>
+  <text x="820" y="660" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#1d3557" text-anchor="start" font-weight="bold">dossier mp3/ → 0001.mp3, 0002.mp3…</text>
+  <text x="604" y="275.79999999999995" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#d62828" text-anchor="end" font-weight="bold">VCC</text>
+  <text x="604" y="322" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#e6a700" text-anchor="end" font-weight="bold">RX</text>
+  <text x="604" y="392.4" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#2a9d4b" text-anchor="end" font-weight="bold">TX</text>
+  <text x="604" y="487" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#1f6feb" text-anchor="end" font-weight="bold">SPK_1</text>
+  <text x="596" y="571" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#8e44ad" text-anchor="end" font-weight="bold">SPK_2</text>
+  <text x="926" y="271.79999999999995" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#d17a00" text-anchor="start" font-weight="bold">BUSY</text>
+  <text x="926" y="483.8" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start" font-weight="bold">IO_2</text>
+  <text x="926" y="524" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start" font-weight="bold">GND</text>
+  <text x="926" y="564.8" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start" font-weight="bold">IO_1</text>
+  <rect x="60" y="700" width="330" height="128" rx="8" fill="#f6f6f6" stroke="#ccc"/>
+  <text x="76" y="724" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#333" text-anchor="start" font-weight="bold">Les fils</text>
+  <line x1="76" y1="742" x2="106" y2="742" stroke="#d62828" stroke-width="5"/>
+  <text x="116" y="747" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start">+5 V (alimentation)</text>
+  <line x1="76" y1="760" x2="106" y2="760" stroke="#222" stroke-width="5"/>
+  <text x="116" y="765" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start">GND (masse, 0 V)</text>
+  <line x1="76" y1="778" x2="106" y2="778" stroke="#e6a700" stroke-width="5"/>
+  <text x="116" y="783" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start">Arduino → DFPlayer (ordres)</text>
+  <line x1="76" y1="796" x2="106" y2="796" stroke="#2a9d4b" stroke-width="5"/>
+  <text x="116" y="801" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start">DFPlayer → Arduino (réponses)</text>
+  <line x1="76" y1="814" x2="92" y2="814" stroke="#1f6feb" stroke-width="5"/>
+  <line x1="92" y1="814" x2="106" y2="814" stroke="#8e44ad" stroke-width="5"/>
+  <text x="116" y="819" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#333" text-anchor="start">le son vers le haut-parleur</text>
+  <text x="700" y="905" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#777" text-anchor="middle">Les deux GND de la carte (pattes 7 et 10) sont reliés à l’intérieur : un seul fil suffit.</text>
+</svg>
